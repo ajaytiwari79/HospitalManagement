@@ -8,5 +8,6 @@ public class CommonMessageConstants {
     public static final String PLANNED_TIME_NOT_CONFIGURE = "plannedtime.not.configured";
     public static final String PLANNED_TIME_CANNOT_EMPTY = "plannedtime.cannot.empty";
     public static final String MESSAGE_CPRNUMBER_NOT_VALID = "error.cpr.number.not.valid";
+    public static final String MESSAGE_WTA_BASE_RULE_TEMPLATE_NULL_LIST = "message.wta-base-rule-template.null-list";
 
 }

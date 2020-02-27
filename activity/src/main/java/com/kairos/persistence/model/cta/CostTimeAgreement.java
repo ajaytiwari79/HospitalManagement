@@ -6,6 +6,9 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.wta.Expertise;
 import com.kairos.persistence.model.wta.OrganizationType;
 import com.kairos.persistence.model.wta.WTAOrganization;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -21,6 +24,9 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class CostTimeAgreement extends MongoBaseEntity {
     private String name;
     private String description;
@@ -38,150 +44,6 @@ public class CostTimeAgreement extends MongoBaseEntity {
     private List<BigInteger> tags;
     private boolean disabled;
     private Long employmentId;
-
-    public CostTimeAgreement() {
-        //Default Constructor
-    }
-
-
-    public Long getEmploymentId() {
-        return employmentId;
-    }
-
-    public void setEmploymentId(Long employmentId) {
-        this.employmentId = employmentId;
-    }
-
-    public WTAOrganization getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(WTAOrganization organization) {
-        this.organization = organization;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Expertise getExpertise() {
-        return expertise;
-    }
-
-    public void setExpertise(Expertise expertise) {
-        this.expertise = expertise;
-    }
-
-    public List<BigInteger> getRuleTemplateIds() {
-        return ruleTemplateIds;
-    }
-
-    public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {
-        this.ruleTemplateIds = ruleTemplateIds;
-    }
-
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public BigInteger getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(BigInteger parentId) {
-        this.parentId = parentId;
-    }
-    public boolean hasParent(){
-        return true;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public BigInteger getParentCountryCTAId() {
-        return parentCountryCTAId;
-    }
-
-    public void setParentCountryCTAId(BigInteger parentCountryCTAId) {
-        this.parentCountryCTAId = parentCountryCTAId;
-    }
-
-
-    public void removeOrganizationType(CTARuleTemplate ruleTemplate) {
-        if (ruleTemplate == null)
-            getRuleTemplateIds().remove(ruleTemplate);
-    }
-
-    public OrganizationType getOrganizationType() {
-        return organizationType;
-    }
-
-    public void setOrganizationType(OrganizationType organizationType) {
-        this.organizationType = organizationType;
-    }
-
-    public OrganizationType getOrganizationSubType() {
-        return organizationSubType;
-    }
-
-    public void setOrganizationSubType(OrganizationType organizationSubType) {
-        this.organizationSubType = organizationSubType;
-    }
-
-
-    public BigInteger getOrganizationParentId() {
-        return organizationParentId;
-    }
-
-    public void setOrganizationParentId(BigInteger organizationParentId) {
-        this.organizationParentId = organizationParentId;
-    }
-
-    public List<BigInteger> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<BigInteger> tags) {
-        this.tags = tags;
-    }
 
     @Override
     public boolean equals(Object o) {
