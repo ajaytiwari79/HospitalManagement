@@ -49,7 +49,7 @@ public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
             if (protectedDaysOffWTATemplate.getActivityId().equals(infoWrapper.getShift().getActivities().get(0).getActivityId()) && intervalBalance.getAvailable() < 1) {
                 WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                         new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, (int) intervalBalance.getTotal(),
-                                DurationType.DAYS, String.valueOf(0));
+                                DurationType.DAYS.toValue(), String.valueOf(0));
                 infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
             }
         }

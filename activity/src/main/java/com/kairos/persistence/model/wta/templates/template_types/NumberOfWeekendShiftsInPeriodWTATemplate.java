@@ -83,7 +83,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
             Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
             brakeRuleTemplateAndUpdateViolationDetails(infoWrapper, limitAndCounter[1], isValid, this,
-                    limitAndCounter[2], DurationType.DAYS, String.valueOf(limitAndCounter[0]));
+                    limitAndCounter[2], DurationType.DAYS.toValue(), String.valueOf(limitAndCounter[0]));
         }
     }
 

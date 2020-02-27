@@ -46,8 +46,8 @@ public class CollectiveTimeAgreementDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private List<Long> unitIds;
-    private boolean disabled;
     private List<TagDTO> tags =new ArrayList<>();
+
 
     public void setRuleTemplates(List<CTARuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = Optional.ofNullable(ruleTemplates).orElse(new ArrayList<>());

@@ -54,6 +54,7 @@ public class AppConstants {
     //KMD Nexus
     public static final String KMD_NEXUS_CLIENT_ID = "third_party_vendor";
     public static final String KMD_NEXUS_CLIENT_SECRET = "APNaYeGDVGOdjQf-jIFgU59tfkPux2mD6xGpbbAEuUc32ie8FRn7Y2cxcSayV6VafluS0pLu2TyhARFHtdHc-NQ";
+    public static final String SHIFT_S = "Shift(s)";
     public static String KMD_NEXUS_ACCESS_TOKEN = "";
     public static final String KMD_NEXUS_CUSTOMER = "unity";
     public static final String KMD_NEXUS_GRANT_TYPE = "password";
