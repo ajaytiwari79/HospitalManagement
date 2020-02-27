@@ -66,7 +66,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
                         if (!isLeaveAvailable) {
                             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                                     new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,
-                                            DurationType.DAYS, String.valueOf(leaveCount));
+                                            DurationType.DAYS.toValue(), String.valueOf(leaveCount));
                             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                         }
                     }
@@ -74,7 +74,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
             } else if (CollectionUtils.containsAny(infoWrapper.getShift().getActivityIds(), activityIds)) {
                 WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                         new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,
-                                DurationType.DAYS, String.valueOf(0));
+                                DurationType.DAYS.toValue(), String.valueOf(0));
                 infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
             }
         }

@@ -65,7 +65,7 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
                         if (!isLeaveAvailable) {
                             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                                     new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,
-                                            DurationType.DAYS, String.valueOf(leaveCount.getCount()+leaveCount.getTransferLeaveCount()));
+                                            DurationType.DAYS.toValue(), String.valueOf(leaveCount.getCount()+leaveCount.getTransferLeaveCount()));
                             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                             break;
                         }

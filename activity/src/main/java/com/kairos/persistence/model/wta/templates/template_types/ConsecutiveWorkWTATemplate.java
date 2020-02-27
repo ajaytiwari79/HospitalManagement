@@ -70,7 +70,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], consecutiveDays);
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
-                            limitAndCounter[2], DurationType.DAYS,String.valueOf(limitAndCounter[0]));
+                            limitAndCounter[2], DurationType.DAYS.toValue(),String.valueOf(limitAndCounter[0]));
                 }
             }
         }
