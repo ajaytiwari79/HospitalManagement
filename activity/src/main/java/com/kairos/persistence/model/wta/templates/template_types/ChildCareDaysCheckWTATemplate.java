@@ -68,7 +68,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
                         if (!isLeaveAvailable) {
                             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                                     new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,
-                                            DurationType.DAYS, String.valueOf(leaveCount));
+                                            DurationType.DAYS.toValue(), String.valueOf(leaveCount));
                             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                         }
                     }

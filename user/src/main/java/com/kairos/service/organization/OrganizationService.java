@@ -215,6 +215,9 @@ public class OrganizationService {
 
     public boolean deleteOrganization(long organizationId) {
         OrganizationBaseEntity organization = organizationBaseRepository.findOne(organizationId);
+        if(organization.isBoardingCompleted()){
+            exceptionService.actionNotPermittedException(MESSAGE_PUBLISH_ORGANIZATION_CONNOT_DELETE);
+        }
         boolean success;
         if (organization.isBoardingCompleted()) {
             organization.setEnable(false);

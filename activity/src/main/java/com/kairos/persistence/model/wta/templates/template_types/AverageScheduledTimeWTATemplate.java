@@ -82,7 +82,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
                         }
                     }
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin/(int)intervalLength);
-                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS,getHoursByMinutes(limitAndCounter[0],this.name));
+                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS.toValue(),getHoursByMinutes(limitAndCounter[0],this.name));
                     if(!isValid){
                         break;
                     }

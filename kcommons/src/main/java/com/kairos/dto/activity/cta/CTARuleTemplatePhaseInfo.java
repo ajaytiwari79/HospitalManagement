@@ -1,45 +1,20 @@
 package com.kairos.dto.activity.cta;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigInteger;
 import java.util.Objects;
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class CTARuleTemplatePhaseInfo{
     private BigInteger phaseId;
     private phaseType type;
     private int beforeStart;
     public enum  phaseType{
         DAYS,HOURS;
-    }
-
-    public CTARuleTemplatePhaseInfo() {
-    }
-
-    public CTARuleTemplatePhaseInfo(BigInteger phaseId) {
-        this.phaseId = phaseId;
-    }
-
-    public BigInteger getPhaseId() {
-        return phaseId;
-    }
-
-    public void setPhaseId(BigInteger phaseId) {
-        this.phaseId = phaseId;
-    }
-
-    public phaseType getType() {
-        return type;
-    }
-
-    public void setType(phaseType type) {
-        this.type = type;
-    }
-
-    public int getBeforeStart() {
-        return beforeStart;
-    }
-
-    public void setBeforeStart(int beforeStart) {
-        this.beforeStart = beforeStart;
     }
 
     @Override

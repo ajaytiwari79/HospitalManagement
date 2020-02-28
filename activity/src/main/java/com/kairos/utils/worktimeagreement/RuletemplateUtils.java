@@ -231,7 +231,7 @@ public class RuletemplateUtils {
     public static void brakeRuleTemplateAndUpdateViolationDetails(RuleTemplateSpecificInfo infoWrapper,
                                                                   Integer counterCount, boolean isValid,
                                                                   WTABaseRuleTemplate wtaBaseRuleTemplate,
-                                                                  Integer totalCounter, DurationType unitType,
+                                                                  Integer totalCounter, String unitType,
                                                                   String unitValue) {
         if (!isValid) {
             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation;

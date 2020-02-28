@@ -397,6 +397,14 @@ public class ShiftService extends MongoBaseService {
         todoService.createOrUpdateTodo(shifts.get(0), TodoType.APPROVAL_REQUIRED, isNull(shifts.get(0).getId()),staffAdditionalInfoDTO);
     }
 
+    public List<ShiftWithViolatedInfoDTO> deleteShiftsAfterValidation(List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS) {
+        List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS1 = new ArrayList<>();
+        for (ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO : shiftWithViolatedInfoDTOS) {
+            shiftWithViolatedInfoDTOS1.add(deleteShiftAfterValidation(shiftWithViolatedInfoDTO));
+        }
+        return shiftWithViolatedInfoDTOS1;
+    }
+
     public ShiftWithViolatedInfoDTO deleteShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo) {
         List<ShiftDTO> responseShiftDTOS = new ArrayList<>();
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftWithViolatedInfo.getShifts().stream().map(s->s.getId()).collect(Collectors.toList()));
@@ -412,6 +420,14 @@ public class ShiftService extends MongoBaseService {
         }
         shiftWithViolatedInfo.setShifts(responseShiftDTOS);
         return shiftWithViolatedInfo;
+    }
+
+    public  List<ShiftWithViolatedInfoDTO> saveShiftsAfterValidation(List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfos, Boolean validatedByStaff, boolean updateShiftState, Long unitId, ShiftActionType shiftActionType, TodoType todoType) {
+        List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
+        for (ShiftWithViolatedInfoDTO shiftWithViolatedInfo : shiftWithViolatedInfos) {
+            shiftWithViolatedInfoDTOS.add(saveShiftAfterValidation(shiftWithViolatedInfo,validatedByStaff,updateShiftState,unitId,shiftActionType,todoType));
+        }
+        return shiftWithViolatedInfoDTOS;
     }
 
     public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, Boolean validatedByStaff, boolean updateShiftState, Long unitId, ShiftActionType shiftActionType, TodoType todoType) {
@@ -1096,14 +1112,10 @@ public class ShiftService extends MongoBaseService {
 
     public ShiftWithActivityDTO buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ShiftDTO shiftDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap,Shift shift) {
         ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(isNull(shiftDTO) ? shift : shiftDTO, ShiftWithActivityDTO.class);
-        shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
-            shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
-            shiftActivityDTO.setTimeType(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getTimeType());
-            shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> {
-                childActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
-                childActivityDTO.setTimeType(activityWrapperMap.get(childActivityDTO.getActivityId()).getTimeType());
-            });
-        });
+        updateActivityDetails(activityWrapperMap, shiftWithActivityDTO);
+        if(isNotNull(shiftWithActivityDTO.getDraftShift())){
+            updateActivityDetails(activityWrapperMap, shiftWithActivityDTO.getDraftShift());
+        }
         if(isNotNull(shiftDTO)){
             shiftDTO.getActivities().forEach(shiftActivityDTO ->
                     shiftActivityDTO.setActivityName(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getName())
@@ -1112,6 +1124,17 @@ public class ShiftService extends MongoBaseService {
             shiftWithActivityDTO.setEndDate(shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
         }
         return shiftWithActivityDTO;
+    }
+
+    private void updateActivityDetails(Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shiftWithActivityDTO) {
+        shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
+            shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
+            shiftActivityDTO.setTimeType(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getTimeType());
+            shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> {
+                childActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
+                childActivityDTO.setTimeType(activityWrapperMap.get(childActivityDTO.getActivityId()).getTimeType());
+            });
+        });
     }
 
     public void deleteShiftsAndOpenShiftsOnEmploymentEnd(Long staffId, LocalDateTime employmentEndDate, Long unitId) {

@@ -23,10 +23,10 @@ public class WorkTimeAgreementRuleViolation {
     private Integer totalCounter;
     private boolean broken;
     private boolean canBeIgnore;
-    private DurationType unitType;
+    private String unitType;
     private String unitValue;
 
-    public WorkTimeAgreementRuleViolation(BigInteger ruleTemplateId, String name, Integer counter, boolean broken, boolean canBeIgnore,Integer totalCounter,DurationType unitType,String unitValue) {
+    public WorkTimeAgreementRuleViolation(BigInteger ruleTemplateId, String name, Integer counter, boolean broken, boolean canBeIgnore,Integer totalCounter,String unitType,String unitValue) {
         this.ruleTemplateId = ruleTemplateId;
         this.name = name;
         this.counter = counter;

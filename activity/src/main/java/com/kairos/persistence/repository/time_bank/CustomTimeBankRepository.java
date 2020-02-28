@@ -17,4 +17,6 @@ public interface CustomTimeBankRepository {
     List<DailyTimeBankEntry> findAllDailyTimeBankByEmploymentIdAndBetweenDates(Long employmentId, Date startDate, Date endDate);
 
     public long getTimeBankOffMinutes(Long employmentId);
+
+    void deleteDailyTimeBank(List<Long> employmentIds, Date startDate, Date endDate);
 }

@@ -498,6 +498,9 @@ public class CompanyCreationService {
             contactAddress.setZipCode(zipCode);
         }
         if(addressDTO.getMunicipality() != null) {
+            if(isNull(addressDTO.getMunicipality().getId())){
+                exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
+            }
             Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId(), 0);
             if(municipality == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);

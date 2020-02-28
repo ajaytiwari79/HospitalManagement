@@ -58,4 +58,9 @@ public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
         AggregationResults<DailyTimeBankEntry> results = mongoTemplate.aggregate(aggregation,DailyTimeBankEntry.class,DailyTimeBankEntry.class);
         return isCollectionEmpty(results.getMappedResults()) ? 0 : results.getMappedResults().get(0).getTimeBankOffMinutes();
     }
+
+    @Override
+    public void deleteDailyTimeBank(List<Long> employmentIds, Date startDate, Date endDate){
+        mongoTemplate.remove(new Query(Criteria.where(EMPLOYMENT_ID).in(employmentIds).and("date").gte(startDate).lt(endDate)),DailyTimeBankEntry.class);
+    }
 }

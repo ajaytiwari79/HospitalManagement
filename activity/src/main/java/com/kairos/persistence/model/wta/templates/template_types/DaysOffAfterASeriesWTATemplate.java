@@ -63,7 +63,7 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
             boolean isValid = true;
             isValid = validate(shiftDates, shiftDate, currentNightShift, consecutiveNightDays, daysOffCount, isValid);
             brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
-                    limitAndCounter[2], DurationType.DAYS,String.valueOf(restingTime));
+                    limitAndCounter[2], DurationType.DAYS.toValue(),String.valueOf(restingTime));
         }
     }
 

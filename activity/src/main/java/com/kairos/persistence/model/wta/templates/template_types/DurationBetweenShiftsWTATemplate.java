@@ -63,7 +63,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                     limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                     isValid = isValid(minMaxSetting, limitAndCounter[0], restingHours) || restingHours==NOT_VALID_VALUE;
                 }
-                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper, limitAndCounter[1], isValid, this, limitAndCounter[2], DurationType.HOURS, getHoursByMinutes(limitAndCounter[0],this.name));
+                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper, limitAndCounter[1], isValid, this, limitAndCounter[2], DurationType.HOURS.toValue(), getHoursByMinutes(limitAndCounter[0],this.name));
             }
         }
     }

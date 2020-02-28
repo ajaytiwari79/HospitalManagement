@@ -31,13 +31,12 @@ public class GdprIntegrationService {
     public boolean createDefaultDataForOrganization(long countryId, long unitId) {
         OrganizationTypeSubTypeAndServicesQueryResult organizationTypeSubType = organizationTypeGraphRepository.getOrganizationTypeSubTypesServiceAndSubServices(unitId);
         organizationTypeSubType.setCountryId(countryId);
-        return genericRestClient.publishRequest(organizationTypeSubType, unitId, true, IntegrationOperation.CREATE, "/inherit", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        });
+        return true;//genericRestClient.publishRequest(organizationTypeSubType, unitId, true, IntegrationOperation.CREATE, "/inherit", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() { });
     }
 
 
     public boolean createDefaultAssetForUnit(Long countryId,Long unitId, List<Long> orgSubTypeId, Long orgSubServiceId){
         BasicNameValuePair param = new BasicNameValuePair("countryId", countryId.toString());
-        return genericRestClient.publishRequest(orgSubTypeId, unitId, true, IntegrationOperation.CREATE, "/create_default_asset/org_sub_service/{orgSubService}", Collections.singletonList(param), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},orgSubServiceId);
+        return true;//genericRestClient.publishRequest(orgSubTypeId, unitId, true, IntegrationOperation.CREATE, "/create_default_asset/org_sub_service/{orgSubService}", Collections.singletonList(param), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},orgSubServiceId);
     }
 }

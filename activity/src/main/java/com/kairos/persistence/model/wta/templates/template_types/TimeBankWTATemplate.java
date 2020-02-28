@@ -41,7 +41,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
             Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0]*60, (int)infoWrapper.getTotalTimeBank());
             brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
-                    limitAndCounter[2], DurationType.HOURS,getHoursByMinutes(limitAndCounter[0]*60,this.name));
+                    limitAndCounter[2], DurationType.HOURS.toValue(),getHoursByMinutes(limitAndCounter[0]*60,this.name));
         }
     }
 

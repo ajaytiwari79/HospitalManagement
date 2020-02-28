@@ -28,14 +28,28 @@ public class TimeBankBalanceFilter <G> implements ShiftFilter {
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
             Map timeBankRangeMap = (Map) filterCriteriaMap.get(TIME_BANK_BALANCE).iterator().next();
-            long from = Long.getLong(timeBankRangeMap.get("from").toString());
-            Long to = isNotNull(timeBankRangeMap.get("to")) ? Long.getLong(timeBankRangeMap.get("to").toString()) : null;
+            Long from = isNotNull(timeBankRangeMap.get("from")) ? Long.parseLong(timeBankRangeMap.get("from").toString()) : null;
+            Long to = isNotNull(timeBankRangeMap.get("to")) ? Long.parseLong(timeBankRangeMap.get("to").toString()) : null;
             for (ShiftDTO shiftDTO : shiftDTOS) {
-                if(from <= employmentIdAndActualTimeBankData.get(shiftDTO.getEmploymentId()) && isNull(to) || to >= employmentIdAndActualTimeBankData.get(shiftDTO.getEmploymentId())) {
+                if(isValidTimeBank(from, to, shiftDTO.getEmploymentId())) {
                     filteredShifts.add((T) shiftDTO);
                 }
             }
         }
         return filteredShifts;
+    }
+
+    private boolean isValidTimeBank(Long from, Long to, Long employmentId){
+        boolean isValid = false;
+        if(employmentIdAndActualTimeBankData.containsKey(employmentId) && isNotNull(from) || isNotNull(to)) {
+            if (isNull(from)) {
+                isValid = employmentIdAndActualTimeBankData.get(employmentId) <= to;
+            } else if (isNull(to)) {
+                isValid = employmentIdAndActualTimeBankData.get(employmentId) >= from;
+            } else {
+                isValid = from <= employmentIdAndActualTimeBankData.get(employmentId) && to >= employmentIdAndActualTimeBankData.get(employmentId);
+            }
+        }
+        return isValid;
     }
 }

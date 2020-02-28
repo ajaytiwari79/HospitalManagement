@@ -7,6 +7,9 @@ import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.enums.cta.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.util.CollectionUtils;
 
@@ -29,6 +32,9 @@ import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
+@NoArgsConstructor
 public class CTARuleTemplateDTO {
 
     private BigInteger id;
@@ -67,9 +73,6 @@ public class CTARuleTemplateDTO {
     private String ruleTemplateCategoryName;
     private UserInfo lastModifiedBy;
 
-    public CTARuleTemplateDTO() {
-    }
-
     public CTARuleTemplateDTO(String name,BigInteger id,List<CTARuleTemplatePhaseInfo> phaseInfo, List<Long> employmentTypes, List<BigInteger> activityIds, Set<BigInteger> timeTypeIds, Set<BigInteger> plannedTimeIds) {
         this.name = name;
         this.id = id;
@@ -80,207 +83,17 @@ public class CTARuleTemplateDTO {
         this.plannedTimeIds = plannedTimeIds;
     }
 
-    public String getRuleTemplateCategoryName() {
-        return ruleTemplateCategoryName;
-    }
-
-    public void setRuleTemplateCategoryName(String ruleTemplateCategoryName) {
-        this.ruleTemplateCategoryName = ruleTemplateCategoryName;
-    }
-
-    public List<LocalDate> getPublicHolidays() {
-        return publicHolidays;
-    }
-
-    public void setPublicHolidays(List<LocalDate> publicHolidays) {
-        this.publicHolidays = publicHolidays;
-    }
-
-    public List<DayOfWeek> getDays() {
-        return days;
-    }
-
-    public void setDays(List<DayOfWeek> days) {
-        this.days = days;
-    }
-
-    public boolean isCalculateScheduledHours() {
-        return calculateScheduledHours;
-    }
-
-    public void setCalculateScheduledHours(boolean calculateScheduledHours) {
-        this.calculateScheduledHours = calculateScheduledHours;
-    }
-
-    public BigInteger getRuleTemplateCategoryId() {
-        return ruleTemplateCategoryId;
-    }
-
-    public void setRuleTemplateCategoryId(BigInteger ruleTemplateCategoryId) {
-        this.ruleTemplateCategoryId = ruleTemplateCategoryId;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
-    }
-
-    public String getRuleTemplateType() {
-        return ruleTemplateType;
-    }
-
-    public void setRuleTemplateType(String ruleTemplateType) {
-        this.ruleTemplateType = ruleTemplateType;
-    }
-
-    public String getPayrollType() {
-        return payrollType;
-    }
-
-    public void setPayrollType(String payrollType) {
-        this.payrollType = payrollType;
-    }
-
-    public String getPayrollSystem() {
-        return payrollSystem;
-    }
-
-    public void setPayrollSystem(String payrollSystem) {
-        this.payrollSystem = payrollSystem;
-    }
-
-    public CalculationUnit getCalculationUnit() {
-        return calculationUnit;
-    }
-
-    public void setCalculationUnit(CalculationUnit calculationUnit) {
-        this.calculationUnit = calculationUnit;
-    }
-
-    public CompensationTable getCompensationTable() {
-        return compensationTable;
-    }
-
-    public void setCompensationTable(CompensationTable compensationTable) {
-        this.compensationTable = compensationTable;
-    }
-
-    public CalculateValueAgainst getCalculateValueAgainst() {
-        return calculateValueAgainst;
-    }
-
-    public void setCalculateValueAgainst(CalculateValueAgainst calculateValueAgainst) {
-        this.calculateValueAgainst = calculateValueAgainst;
-    }
-
-    public ApprovalWorkFlow getApprovalWorkFlow() {
-        return approvalWorkFlow;
-    }
-
-    public void setApprovalWorkFlow(ApprovalWorkFlow approvalWorkFlow) {
-        this.approvalWorkFlow = approvalWorkFlow;
-    }
-
-    public List<CTARuleTemplatePhaseInfo> getPhaseInfo() {
-        return phaseInfo;
-    }
-
     public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
         this.phaseInfo = Optional.ofNullable(phaseInfo).orElse(new ArrayList<>());
     }
 
-    public BudgetType getBudgetType() {
-        return budgetType;
-    }
-
-    public void setBudgetType(BudgetType budgetType) {
-        this.budgetType = budgetType;
-    }
-
-    public List<CalculateValueIfPlanned> getCalculateValueIfPlanned() {
-        return calculateValueIfPlanned;
-    }
-
-    public void setCalculateValueIfPlanned(List<CalculateValueIfPlanned> calculateValueIfPlanned) {
-        this.calculateValueIfPlanned = calculateValueIfPlanned;
-    }
-
-    public List<Long> getEmploymentTypes() {
-        return employmentTypes;
-    }
-
-    public void setEmploymentTypes(List<Long> employmentTypes) {
-        this.employmentTypes = employmentTypes;
-    }
-
-
-
     public List<Long> getDayTypeIds() {
+        this.dayTypeIds = isNull(dayTypeIds) ? new ArrayList<>() : this.dayTypeIds;
         return dayTypeIds;
     }
 
     public void setDayTypeIds(List<Long> dayTypeIds) {
         this.dayTypeIds = isNull(dayTypeIds) ? new ArrayList<>() : dayTypeIds;
-    }
-
-    public PlanningCategory getPlanningCategory() {
-        return planningCategory;
-    }
-
-    public void setPlanningCategory(PlanningCategory planningCategory) {
-        this.planningCategory = planningCategory;
-    }
-
-    public List<Long> getStaffFunctions() {
-        return staffFunctions;
-    }
-
-    public void setStaffFunctions(List<Long> staffFunctions) {
-        this.staffFunctions = staffFunctions;
-    }
-
-    public PlannedTimeWithFactor getPlannedTimeWithFactor() {
-        return plannedTimeWithFactor;
-    }
-
-    public void setPlannedTimeWithFactor(PlannedTimeWithFactor plannedTimeWithFactor) {
-        this.plannedTimeWithFactor = plannedTimeWithFactor;
-    }
-
-
-    public ActivityTypeForCostCalculation getActivityTypeForCostCalculation() {
-        return activityTypeForCostCalculation;
-    }
-
-    public void setActivityTypeForCostCalculation(ActivityTypeForCostCalculation activityTypeForCostCalculation) {
-        this.activityTypeForCostCalculation = activityTypeForCostCalculation;
     }
 
     public List<BigInteger> getActivityIds() {
@@ -305,22 +118,6 @@ public class CTARuleTemplateDTO {
 
     public void setPlannedTimeIds(Set<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = isNull(plannedTimeIds) ? new HashSet<>() : plannedTimeIds;
-    }
-
-    public CalculationFor getCalculationFor() {
-        return calculationFor;
-    }
-
-    public void setCalculationFor(CalculationFor calculationFor) {
-        this.calculationFor = calculationFor;
-    }
-
-    public UserInfo getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(UserInfo lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
     }
 
     private boolean isPhaseValid(BigInteger shiftPhaseId){

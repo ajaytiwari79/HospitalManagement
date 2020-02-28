@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class OrganizationBasicDTO {
     private String kairosCompanyId;
     private List<Long> subTypeId;
     private AddressDTO contactAddress; // used in case of child organization
+    @Valid
     private UnitManagerDTO unitManager;  // Used in case of child organization only
     private Long unitTypeId;
     private boolean boardingCompleted;
