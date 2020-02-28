@@ -1088,7 +1088,7 @@ public class KPIBuilderCalculationService implements CounterService {
             employmentTypeIds = (List<Long>) filterCriteria[3];
             DefaultKpiDataDTO defaultKpiDataDTO = counterHelperService.getKPIAllData(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId,getLongValue(filterBasedCriteria.getOrDefault(TAGS,new ArrayList())));
             staffKpiFilterDTOS = defaultKpiDataDTO.getStaffKpiFilterDTOs();
-            getStaffsByTimeType(filterBasedCriteria);
+            getStaffsByTeamType(filterBasedCriteria);
             dateTimeIntervals = defaultKpiDataDTO.getDateTimeIntervals();
             List<TimeSlotDTO> timeSlotDTOS = defaultKpiDataDTO.getTimeSlotDTOS();
             selectedDatesAndStaffDTOSMap = defaultKpiDataDTO.getSelectedDatesAndStaffDTOSMap();
@@ -1108,17 +1108,20 @@ public class KPIBuilderCalculationService implements CounterService {
             updateAuditLogs();
         }
 
-        private void getStaffsByTimeType(Map<FilterType, List> filterBasedCriteria){
+        private void getStaffsByTeamType(Map<FilterType, List> filterBasedCriteria){
+            Set<StaffKpiFilterDTO> staffKpiFilterDTOList = new HashSet<>();
             if(filterBasedCriteria.containsKey(TEAM_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(TEAM_TYPE))) {
                 for(StaffKpiFilterDTO staffKpiFilterDTO :staffKpiFilterDTOS){
                     for(TeamDTO teamDTO :staffKpiFilterDTO.getTeams()){
-                        if(!(filterBasedCriteria.get(TEAM_TYPE).contains(teamDTO.getTeamType().name()))){
-                            staffKpiFilterDTOS.remove(staffKpiFilterDTO);
+                        if(filterBasedCriteria.get(TEAM_TYPE).contains(teamDTO.getTeamType().name())){
+                            staffKpiFilterDTOList.add(staffKpiFilterDTO);
                         }
                     }
                 }
-
+                staffKpiFilterDTOS = new ArrayList<>();
+                staffKpiFilterDTOS.addAll(staffKpiFilterDTOList);
             }
+
         }
 
         private void updateAuditLogs() {
@@ -1245,7 +1248,7 @@ public class KPIBuilderCalculationService implements CounterService {
             }
             if(includeFilter){
                 StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, this.timeSlotDTOS, this.unitId);
-                shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO,new ArrayList<>());
+                shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO,staffKpiFilterDTOS);
             }
             return shiftWithActivityDTOS;
         }

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.enums.FilterType.EMPLOYMENT_SUB_TYPE;
 import static com.kairos.enums.FilterType.EMPLOYMENT_TYPE;
 
@@ -30,8 +31,10 @@ public class EmploymentSubTypeFilter <G> implements ShiftFilter {
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
             for (ShiftDTO shiftDTO : shiftDTOS) {
-                if(filterCriteriaMap.get(EMPLOYMENT_SUB_TYPE).contains(employmentIdAndEmploymentSubTypeMap.get(shiftDTO.getEmploymentId()).name()))
-                    filteredShifts.add((T)shiftDTO);
+                if(isNotNull(employmentIdAndEmploymentSubTypeMap.get(shiftDTO.getEmploymentId()))) {
+                    if (filterCriteriaMap.get(EMPLOYMENT_SUB_TYPE).contains(employmentIdAndEmploymentSubTypeMap.getOrDefault(shiftDTO.getEmploymentId(), EmploymentSubType.NONE).name()))
+                        filteredShifts.add((T) shiftDTO);
+                }
             }
         }
         return filteredShifts;
