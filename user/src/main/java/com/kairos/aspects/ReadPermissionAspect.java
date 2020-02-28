@@ -12,21 +12,14 @@ import java.util.Collection;
 @Component
 public class ReadPermissionAspect {
 
-
-    private static PermissionService permissionService;
-    @Inject
-    public void setPermissionService(PermissionService permissionService) {
-        this.permissionService = permissionService;
-    }
-
     @Inject private AccessPageService accessPageService;
 
     //@Before("execution(* com.kairos.utils.response.ResponseHandler.generateResponse(..))")
-    public static <T> void validateStaffResponseAsPerPermission(Object object) {
-        Object[] objectArray = object instanceof Collection ? ((Collection) object).toArray() : new Object[]{object};
-        /*List<T> objects = checkAndReturnValidModel(objectArray);
+    /* public static <T> void validateStaffResponseAsPerPermission(Object object) {
+       Object[] objectArray = object instanceof Collection ? ((Collection) object).toArray() : new Object[]{object};
+        List<T> objects = checkAndReturnValidModel(objectArray);
         if(isCollectionNotEmpty(objects)) {
             permissionService.updateModelBasisOfPermission(objects, newHashSet(FieldLevelPermission.READ,FieldLevelPermission.HIDE));
-        }*/
-    }
+        }
+    }*/
 }

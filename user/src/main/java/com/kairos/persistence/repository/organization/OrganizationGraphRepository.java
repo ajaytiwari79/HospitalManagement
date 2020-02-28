@@ -116,4 +116,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN union")
     List<Organization> getAllUnionsByOrganizationOrCountryId(Long organizationId,Long countryId);
 
+    @Query("MATCH (n:Organization) where n.name='Kairos' return id(n)")
+    Long findKairosOrganizationId();
 }
