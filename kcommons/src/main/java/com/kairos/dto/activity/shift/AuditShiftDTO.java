@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.constants.CommonConstants;
 import com.kairos.enums.audit_logging.LoggingType;
 import lombok.Getter;
 import lombok.Setter;
@@ -71,18 +72,8 @@ public class AuditShiftDTO {
     }
 
     private int getChangedActivity(AuditShiftActivityDTO auditShiftActivityDTO, AuditShiftActivityDTO oldauditShiftActivityDTO) {
-        int changeMinutes = 0;
-        if(auditShiftActivityDTO.getInterval().overlaps(oldauditShiftActivityDTO.getInterval())){
-            changeMinutes = (int)(auditShiftActivityDTO.getInterval().getMinutes() - oldauditShiftActivityDTO.getInterval().getMinutes());
-        }else {
-            changeMinutes+= abs((int)(auditShiftActivityDTO.getInterval().getMinutes() - oldauditShiftActivityDTO.getInterval().getMinutes()));
-            if(auditShiftActivityDTO.getStartDate().after(oldauditShiftActivityDTO.getEndDate())){
-                changeMinutes+=abs((int)new DateTimeInterval(oldauditShiftActivityDTO.getEndDate(),auditShiftActivityDTO.getStartDate()).getMinutes());
-            }else {
-                changeMinutes+=abs((int)new DateTimeInterval(auditShiftActivityDTO.getEndDate(),oldauditShiftActivityDTO.getStartDate()).getMinutes());
-            }
-        }
-        return changeMinutes;
+        long differenceInMillis = (auditShiftActivityDTO.getStartDate().getTime() - oldauditShiftActivityDTO.getStartDate().getTime()) + (auditShiftActivityDTO.getEndDate().getTime() - oldauditShiftActivityDTO.getEndDate().getTime());
+        return (int)(differenceInMillis/ CommonConstants.ONE_MINUTE_MILLIS);
     }
 
     private int getMinutesOfActivity(List<AuditShiftActivityDTO> activities) {
