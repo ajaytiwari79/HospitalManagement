@@ -40,6 +40,7 @@ public class UserMessagesConstants {
     public static final String ERROR_USER_PASSCODE_NOTNULL = "error.User.password.notnull";
     public static final String ERROR_USER_PASSCODE_SIZE = "error.User.password.size";
     public static final String ERROR_ORGANIZATION_NAME_INSUFFIENT = "error.Organization.name.insuffient";
+    public static final String ERROR_UNIT_NAME_INSUFFIENT = "error.unit.name.insuffient";
     public static final String ERROR_ORGANIZATION_DESIREDURL_DUPLICATE = "error.Organization.desiredUrl.duplicate";
     public static final String ERROR_ORGANIZATION_NAME_DUPLICATE = "error.Organization.name.duplicate";
     public static final String ERROR_ORGANIZATION_NAME_SIZE = "error.Organization.name.size";
