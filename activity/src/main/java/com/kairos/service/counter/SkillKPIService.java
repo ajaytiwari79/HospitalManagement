@@ -11,10 +11,12 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Service
@@ -28,10 +30,8 @@ public class SkillKPIService {
 
 
     public double getCountOfSkillOfStaffIdOnSelectedDate(Long staffId, LocalDate selectedFromDate, LocalDate selectedToDate, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
-        Map<String, List<StaffPersonalDetail>> staffSkillMap = kpiCalculationRelatedInfo.getSelectedDatesAndStaffDTOSMap();
+        List<StaffPersonalDetail> staffPersonalDetails = userIntegrationService.getAllSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(),kpiCalculationRelatedInfo.getStaffIds());
         int count=0;
-
-        List<StaffPersonalDetail> staffPersonalDetails = staffSkillMap.get(selectedFromDate.toString());
         if(selectedFromDate.equals(selectedToDate)) {
             count = getCountOfSkillByDay(staffId, selectedFromDate, selectedToDate, count, staffPersonalDetails,kpiCalculationRelatedInfo);
         }
@@ -89,7 +89,7 @@ public class SkillKPIService {
                         }
                     }
                     else if (ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
-                        if ((selectedFromDate.isAfter(skillLevelDTO.getStartDate())||selectedFromDate.equals(skillLevelDTO.getStartDate())) && ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
+                        if ((dateTimeIntervalForMonth.contains(skillLevelDTO.getStartDate())||((selectedFromDate.isAfter(skillLevelDTO.getStartDate())||selectedFromDate.equals(skillLevelDTO.getStartDate())) && ObjectUtils.isNull(skillLevelDTO.getEndDate())))) {
                             count++;
                         }
                     }
