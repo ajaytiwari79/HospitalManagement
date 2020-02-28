@@ -45,4 +45,5 @@ public class CommonConstants {
     public static final String RED_COLOR_CODE = "#ff3b3b33";
     public static final String RED = "Red";
 
+    public static final int ONE_MINUTE_MILLIS = 60000;
 }
