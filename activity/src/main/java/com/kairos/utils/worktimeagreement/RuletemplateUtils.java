@@ -26,10 +26,12 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
+import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -44,13 +46,13 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
+import static com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService.isDayTypeValid;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
 public class RuletemplateUtils {
 
 
-
-    public static List<ShiftWithActivityDTO> getShiftsByIntervalAndActivityIds(Activity activity, Date shiftStartDate, List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds) {
+    public static List<ShiftWithActivityDTO> getShiftsByIntervalAndActivityIds(Activity activity, Date shiftStartDate, List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds, Map<Long, DayTypeDTO> dayTypeMap) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         LocalDate shiftStartLocalDate = DateUtils.asLocalDate(shiftStartDate);
         Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate)) && (interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getEndDate().isEqual(shiftStartLocalDate)))).findAny();
@@ -63,7 +65,17 @@ public class RuletemplateUtils {
                 }
             }
         }
-        return updatedShifts;
+        boolean isDayTypeExist;
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = new ArrayList<>();
+        for(ShiftWithActivityDTO shiftWithActivityDTO :updatedShifts){
+            for(ShiftActivityDTO shiftActivityDTO :shiftWithActivityDTO.getActivities()) {
+                isDayTypeExist =isDayTypeValid(shiftActivityDTO.getStartDate(), activity.getTimeCalculationActivityTab().getDayTypes(),dayTypeMap);
+                if (isDayTypeExist) {
+                    shiftWithActivityDTOS.add(shiftWithActivityDTO);
+                }
+            }
+        }
+        return shiftWithActivityDTOS;
     }
 
     public static DateTimeInterval getIntervalByNumberOfWeeks(Date startDate, int numberOfWeeks, LocalDate validationStartDate, LocalDate planningPeriodEndDate) {

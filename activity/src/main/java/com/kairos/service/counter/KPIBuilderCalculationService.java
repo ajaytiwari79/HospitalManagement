@@ -29,6 +29,7 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.EmploymentSubType;
@@ -77,6 +78,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
@@ -1090,6 +1092,7 @@ public class KPIBuilderCalculationService implements CounterService {
             employmentTypeIds = (List<Long>) filterCriteria[3];
             DefaultKpiDataDTO defaultKpiDataDTO = counterHelperService.getKPIAllData(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId,getLongValue(filterBasedCriteria.getOrDefault(TAGS,new ArrayList())));
             staffKpiFilterDTOS = defaultKpiDataDTO.getStaffKpiFilterDTOs();
+            getStaffsByTeamType(filterBasedCriteria);
             dateTimeIntervals = defaultKpiDataDTO.getDateTimeIntervals();
             List<TimeSlotDTO> timeSlotDTOS = defaultKpiDataDTO.getTimeSlotDTOS();
             selectedDatesAndStaffDTOSMap = defaultKpiDataDTO.getSelectedDatesAndStaffDTOSMap();
@@ -1107,6 +1110,23 @@ public class KPIBuilderCalculationService implements CounterService {
             staffIdAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().filter(distinctByKey(StaffKpiFilterDTO::getId)).collect(Collectors.toMap(StaffKpiFilterDTO::getId, v -> v));
             updateStaffAndShiftMap();
             updateAuditLogs();
+        }
+
+        private void getStaffsByTeamType(Map<FilterType, List> filterBasedCriteria){
+            List<StaffKpiFilterDTO> staffKpiFilterDTOList = new ArrayList<>();
+            if(filterBasedCriteria.containsKey(TEAM_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(TEAM_TYPE))) {
+                for(StaffKpiFilterDTO staffKpiFilterDTO :staffKpiFilterDTOS){
+                    for(TeamDTO teamDTO :staffKpiFilterDTO.getTeams()){
+                        if(filterBasedCriteria.get(TEAM_TYPE).contains(teamDTO.getTeamType().name())){
+                            staffKpiFilterDTOList.add(staffKpiFilterDTO);
+                            break;
+                        }
+                    }
+                }
+                staffKpiFilterDTOS = staffKpiFilterDTOList;
+
+            }
+
         }
 
         private void updateAuditLogs() {
@@ -1128,7 +1148,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 } else {
                     shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), false);
                     StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
-                    shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
+                    shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO,staffKpiFilterDTOS);
                 }
             }else {
                 shifts = new ArrayList<>();
@@ -1198,17 +1218,21 @@ public class KPIBuilderCalculationService implements CounterService {
             if (filterBasedCriteria.containsKey(TEAM)) {
                 filterData.add(new FilterSelectionDTO(TEAM, new HashSet<>((List<String>) filterBasedCriteria.get(TEAM))));
             }
+
             staffFilterDTO.setFiltersData(filterData);
             return staffFilterDTO;
         }
+
 
         public void getTimeSoltFilter(Map.Entry<FilterType, List> filterTypeListEntry, List<TimeSlotDTO> timeSlotDTOS, List<FilterSelectionDTO> filterData) {
             if (filterTypeListEntry.getKey().equals(TIME_SLOT)) {
                 Set<String> timeSlotName = new HashSet<>();
                 for (Object timeSlotId : filterTypeListEntry.getValue()) {
-                    for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
-                        if (timeSlotDTO.getId().equals(((Integer) timeSlotId).longValue())) {
-                            timeSlotName.add(timeSlotDTO.getName());
+                    if(isCollectionNotEmpty(timeSlotDTOS)) {
+                        for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
+                            if (timeSlotDTO.getId().equals(((Integer) timeSlotId).longValue())) {
+                                timeSlotName.add(timeSlotDTO.getName());
+                            }
                         }
                     }
                 }
@@ -1223,7 +1247,7 @@ public class KPIBuilderCalculationService implements CounterService {
             }
             if(includeFilter){
                 StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, this.timeSlotDTOS, this.unitId);
-                shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
+                shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO,staffKpiFilterDTOS);
             }
             return shiftWithActivityDTOS;
         }

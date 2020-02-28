@@ -18,6 +18,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,6 +49,7 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
     }
 
 
+
     // getActivityCutOffCounts().get(0) change and get count by date
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
@@ -58,7 +60,7 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
                 if(careDayCountMap.containsKey(shiftActivityDTO.getActivityId())) {
                 Activity activity = infoWrapper.getActivityWrapperMap().get(shiftActivityDTO.getActivityId()).getActivity();
                     ActivityCareDayCount careDayCount = careDayCountMap.get(activity.getId());
-                    List<ShiftWithActivityDTO> shifts = getShiftsByIntervalAndActivityIds(activity, infoWrapper.getShift().getStartDate(), infoWrapper.getShifts(), Arrays.asList(careDayCount.getActivityId()));
+                    List<ShiftWithActivityDTO> shifts = getShiftsByIntervalAndActivityIds(activity, infoWrapper.getShift().getStartDate(), infoWrapper.getShifts(), Arrays.asList(careDayCount.getActivityId()),infoWrapper.getDayTypeMap());
                     ActivityCutOffCount leaveCount=careDayCount.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(),activityCutOffCount.getEndDate()).containsAndEqualsEndDate(asDate(asLocalDate(infoWrapper.getShift().getStartDate())))).findFirst().orElse(new ActivityCutOffCount());
                     if (leaveCount.getCount()+leaveCount.getTransferLeaveCount()-leaveCount.getBorrowLeaveCount() < (shifts.size()+1)) {
                         boolean isLeaveAvailable = workTimeAgreementService.isLeaveCountAvailable(infoWrapper.getActivityWrapperMap(), careDayCount.getActivityId(), infoWrapper.getShift(), new DateTimeInterval(leaveCount.getStartDate(), leaveCount.getEndDate()), infoWrapper.getLastPlanningPeriodEndDate(), WTATemplateType.WTA_FOR_CARE_DAYS,leaveCount.getCount());
