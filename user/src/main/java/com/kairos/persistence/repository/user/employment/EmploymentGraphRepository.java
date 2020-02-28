@@ -165,9 +165,11 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "WITH staff,expertise,employment,activeEmploymentLine, datetime().year-datetime({epochmillis:expertise_from_date}).year as years_experience_in_expertise  \n" +
             "MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise) " +
             "WITH staff,employment,expertise,years_experience_in_expertise,activeEmploymentLine \n" +
-            "MATCH(activeEmploymentLine)-[:"+HAS_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) WHERE sl.to<=years_experience_in_expertise \n" +
+            "MATCH(activeEmploymentLine)-[:"+HAS_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) " +
+            "WHERE sl.to IS NOT NULL AND sl.to<=years_experience_in_expertise \n" +
             "MATCH(activeEmploymentLine)-[employmentEmploymentTypeRelationShip:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType)\n" +
-            "MATCH(expertise)-[:"+FOR_SENIORITY_LEVEL+"]->(nextSeniorityLevel:SeniorityLevel) WHERE nextSeniorityLevel.from <= years_experience_in_expertise and (nextSeniorityLevel.to > years_experience_in_expertise or nextSeniorityLevel.to is null) \n" +
+            "MATCH(expertise)-[:"+HAS_EXPERTISE_LINES+"]->(el:ExpertiseLine)-[:"+FOR_SENIORITY_LEVEL+"]->(nextSeniorityLevel:SeniorityLevel)  " +
+            "WHERE nextSeniorityLevel.from <= years_experience_in_expertise AND (nextSeniorityLevel.to IS NULL OR nextSeniorityLevel.to > years_experience_in_expertise) \n" +
             "RETURN id(employment) as employmentId,employmentEmploymentTypeRelationShip as employmentLineEmploymentTypeRelationShip ,employmentType,activeEmploymentLine as employmentLine,nextSeniorityLevel as seniorityLevel")
     List<EmploymentSeniorityLevelQueryResult> findEmploymentSeniorityLeveltoUpdate();
 
