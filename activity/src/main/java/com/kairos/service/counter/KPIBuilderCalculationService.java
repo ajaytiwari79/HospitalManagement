@@ -1113,17 +1113,18 @@ public class KPIBuilderCalculationService implements CounterService {
         }
 
         private void getStaffsByTeamType(Map<FilterType, List> filterBasedCriteria){
-            Set<StaffKpiFilterDTO> staffKpiFilterDTOList = new HashSet<>();
+            List<StaffKpiFilterDTO> staffKpiFilterDTOList = new ArrayList<>();
             if(filterBasedCriteria.containsKey(TEAM_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(TEAM_TYPE))) {
                 for(StaffKpiFilterDTO staffKpiFilterDTO :staffKpiFilterDTOS){
                     for(TeamDTO teamDTO :staffKpiFilterDTO.getTeams()){
                         if(filterBasedCriteria.get(TEAM_TYPE).contains(teamDTO.getTeamType().name())){
                             staffKpiFilterDTOList.add(staffKpiFilterDTO);
+                            break;
                         }
                     }
                 }
-                staffKpiFilterDTOS = new ArrayList<>();
-                staffKpiFilterDTOS.addAll(staffKpiFilterDTOList);
+                staffKpiFilterDTOS = staffKpiFilterDTOList;
+
             }
 
         }
