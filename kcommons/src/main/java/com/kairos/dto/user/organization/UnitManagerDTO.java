@@ -16,10 +16,14 @@ public class UnitManagerDTO {
     private Long accessGroupId;
     @NotNull(message = "error.cprnumber.notnull")
     private String cprNumber;
+    @NotNull(message = "error.firstname.notnull")
     private String firstName;
+    @NotNull(message = "error.lastname.notnull")
     private String lastName;
+    @NotNull(message = "error.email.notnull")
     private String email;
     private String accessGroupName;
+    @NotNull(message = "error.Staff.userName.notnull")
     private String userName;
 
 }
