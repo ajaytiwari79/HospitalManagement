@@ -8,7 +8,7 @@
     <entityClass>com.kairos.planner.vrp.taskplanning.model.TaskOrShift</entityClass>
     <entityClass>com.kairos.planner.vrp.taskplanning.model.Shift</entityClass>
     <scoreDirectorFactory>
-        <!--<scoreDrl>drl/vrp_task_rules.drl</scoreDrl>-->
+        <scoreDrl>drl/vrp_task_rules.drl</scoreDrl>
         <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
     </scoreDirectorFactory>
     <constructionHeuristic>

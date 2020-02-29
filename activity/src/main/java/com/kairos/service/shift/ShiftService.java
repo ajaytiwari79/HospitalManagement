@@ -277,7 +277,7 @@ public class ShiftService extends MongoBaseService {
         }
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         shift.setId(isNull(shift.getId()) ? shiftMongoRepository.nextSequence(Shift.class.getSimpleName()) : shift.getId());
-        todoService.updateStatusOfShiftActivityIfApprovalRequired(activityWrapperMap,shift,updateShift,staffAdditionalInfoDTO);
+        todoService.updateStatusOfShiftActivityIfApprovalRequired(activityWrapperMap,shift,updateShift);
         payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
         shiftMongoRepository.save(shift);
@@ -394,7 +394,7 @@ public class ShiftService extends MongoBaseService {
             payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
         });
         shiftMongoRepository.saveEntities(shifts);
-        todoService.createOrUpdateTodo(shifts.get(0), TodoType.APPROVAL_REQUIRED, isNull(shifts.get(0).getId()),staffAdditionalInfoDTO);
+        todoService.createOrUpdateTodo(shifts.get(0), TodoType.APPROVAL_REQUIRED);
     }
 
     public List<ShiftWithViolatedInfoDTO> deleteShiftsAfterValidation(List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS) {

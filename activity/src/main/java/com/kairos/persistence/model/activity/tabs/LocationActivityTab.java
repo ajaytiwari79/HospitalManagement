@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -16,7 +17,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocationActivityTab{
+public class LocationActivityTab implements Serializable {
     private Set<ActivityGlideTimeDetails> glideTimeForCheckIn;
     private Set<ActivityGlideTimeDetails> glideTimeForCheckOut;
 

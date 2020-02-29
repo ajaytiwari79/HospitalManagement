@@ -162,7 +162,18 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Override
     public List<CTAResponseDTO> getVersionsCTA(List<Long> upIds) {
-        String query = "{\n" +
+        String query = getVersionCTAQuery();
+        Document document = Document.parse(query);
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(EMPLOYMENT_ID).in(upIds).and(DELETED).is(false).and(CommonConstants.DISABLED).is(true)),
+                new CustomAggregationOperation(document)
+        );
+        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
+        return result.getMappedResults();
+    }
+
+    private String getVersionCTAQuery() {
+        return "{\n" +
                 "      $graphLookup: {\n" +
                 "         from: \"costTimeAgreement\",\n" +
                 "         startWith: \"$parentId\",\n" +
@@ -186,13 +197,6 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
                 "           as:\"ruleTemplates\"\n" +
                 "           }\n" +
                 "       }";
-        Document document = Document.parse(query);
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(EMPLOYMENT_ID).in(upIds).and(DELETED).is(false).and(CommonConstants.DISABLED).is(true)),
-                new CustomAggregationOperation(document)
-        );
-        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
-        return result.getMappedResults();
     }
 
     @Override

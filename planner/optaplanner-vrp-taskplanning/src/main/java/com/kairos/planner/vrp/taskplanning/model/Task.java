@@ -235,11 +235,6 @@ public class Task extends TaskOrShift{
         return lpd.getDistance();
     }
 
-    /**
-     * call it using previous task
-     * @param task
-     * @return
-     */
     public Task getPreviousValidTask() {
             return VrpPlanningUtil.getPreviousValidTask(this);
     }
@@ -264,14 +259,14 @@ public class Task extends TaskOrShift{
         Task task = (Task) o;
 
         return new EqualsBuilder()
-                .append(installationNo, task.installationNo)
+                .append(id, task.id)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(installationNo)
+                .append(id)
                 .toHashCode();
     }
 

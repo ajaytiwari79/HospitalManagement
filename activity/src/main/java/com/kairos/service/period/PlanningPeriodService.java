@@ -770,10 +770,6 @@ public class PlanningPeriodService extends MongoBaseService {
         userIntegrationService.restoreFunctionsWithDatesByEmploymentIds(employmentIdWithShiftDateFunctionIdMap, unitId);
     }
 
-    public PlanningPeriodDTO getStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId) {
-        return planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
-    }
-
     //add planning period in unit via job
     public boolean addPlanningPeriodViaJob() {
         List<PlanningPeriod> planningPeriodsViaJob = new ArrayList<>();

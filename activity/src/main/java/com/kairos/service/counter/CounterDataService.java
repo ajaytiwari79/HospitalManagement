@@ -462,6 +462,22 @@ public class CounterDataService extends MongoBaseService {
         if (applicableKPIS.isEmpty()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTER_KPI_NOTFOUND);
         }
+        KPI kpi = validateAndGetKpi(refId, kpiId, counterDTO, level, accessGroupPermissionCounterDTO, applicableKPIS);
+        kpi.setMultiDimensional(counterDTO.isMultiDimensional());
+        kpi.setCalculationFormula(counterDTO.getCalculationFormula());
+        applicableKPIS.get(0).setApplicableFilter(new ApplicableFilter(counterDTO.getSelectedFilters(), true));
+        List<ApplicableKPI> updateApplicableKPI = counterRepository.getFilterBaseApplicableKPIByKpiIdsOrUnitId(Arrays.asList(kpiId), Arrays.asList(ConfLevel.UNIT, ConfLevel.STAFF), ConfLevel.COUNTRY.equals(level) ? null : refId);
+        updateIntervalConfig(counterDTO, applicableKPIS, updateApplicableKPI);
+        applicableKPIS.get(0).setTitle(counterDTO.getTitle());
+        setIntervalConfigurationOfKpi(counterDTO, applicableKPIS.get(0));
+        applicableKPIS.addAll(updateApplicableKPI);
+        counterRepository.saveEntities(applicableKPIS);
+        counterRepository.save(kpi);
+        kpi.setTitle(counterDTO.getTitle());
+        return getTabKpiData(kpi, counterDTO, accessGroupPermissionCounterDTO);
+    }
+
+    private KPI validateAndGetKpi(Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, List<ApplicableKPI> applicableKPIS) {
         KPI kpi = counterRepository.getKPIByid(kpiId);
         if (isNotNull(kpi.getCalculationFormula()) && !kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula()) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
             exceptionService.actionNotPermittedException(MESSAGE_KPI_PERMISSION);
@@ -469,10 +485,10 @@ public class CounterDataService extends MongoBaseService {
         if (!applicableKPIS.get(0).getTitle().equals(counterDTO.getTitle()) && Optional.ofNullable(counterRepository.getKpiByTitleAndUnitId(counterDTO.getTitle(), refId, level)).isPresent()) {
             exceptionService.duplicateDataException(ERROR_KPI_NAME_DUPLICATE);
         }
-        kpi.setMultiDimensional(counterDTO.isMultiDimensional());
-        kpi.setCalculationFormula(counterDTO.getCalculationFormula());
-        applicableKPIS.get(0).setApplicableFilter(new ApplicableFilter(counterDTO.getSelectedFilters(), true));
-        List<ApplicableKPI> updateApplicableKPI = counterRepository.getFilterBaseApplicableKPIByKpiIdsOrUnitId(Arrays.asList(kpiId), Arrays.asList(ConfLevel.UNIT, ConfLevel.STAFF), ConfLevel.COUNTRY.equals(level) ? null : refId);
+        return kpi;
+    }
+
+    private void updateIntervalConfig(CounterDTO counterDTO, List<ApplicableKPI> applicableKPIS, List<ApplicableKPI> updateApplicableKPI) {
         for (ApplicableKPI applicableKPI : updateApplicableKPI) {
             applicableKPI.setApplicableFilter(new ApplicableFilter(counterDTO.getSelectedFilters(), false));
             if (applicableKPI.getTitle().equals(applicableKPIS.get(0).getTitle())) {
@@ -480,14 +496,6 @@ public class CounterDataService extends MongoBaseService {
             }
             setIntervalConfigurationOfKpi(counterDTO, applicableKPI);
         }
-        applicableKPIS.get(0).setTitle(counterDTO.getTitle());
-        setIntervalConfigurationOfKpi(counterDTO, applicableKPIS.get(0));
-        applicableKPIS.addAll(updateApplicableKPI);
-        save(applicableKPIS);
-        save(kpi);
-
-        kpi.setTitle(counterDTO.getTitle());
-        return getTabKpiData(kpi, counterDTO, accessGroupPermissionCounterDTO);
     }
 
     private void setIntervalConfigurationOfKpi(CounterDTO counterDTO, ApplicableKPI applicableKPIS) {
@@ -499,28 +507,13 @@ public class CounterDataService extends MongoBaseService {
 
     public TabKPIDTO copyKpiFilterData(String tabId, Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level) {
         boolean copy = isNotNull(tabId);
-        TabKPIConf tabKPIConf = null;
-        List<ApplicableKPI> applicableKPIS;
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         if (!accessGroupPermissionCounterDTO.isManagement()) {
             exceptionService.actionNotPermittedException(MESSAGE_KPI_PERMISSION);
         }
-        if (isNotNull(tabId) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
-            level = ConfLevel.STAFF;
-            applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, accessGroupPermissionCounterDTO.getStaffId());
-        } else {
-            applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
-        }
-        if (applicableKPIS.isEmpty()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTER_KPI_NOTFOUND);
-        }
-        KPI kpi = counterRepository.getKPIByid(kpiId);
-        if ((isNotNull(kpi.getCalculationFormula()) && !kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula())) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
-            exceptionService.actionNotPermittedException(MESSAGE_KPI_PERMISSION);
-        }
-        if (Optional.ofNullable(counterRepository.getKpiByTitleAndUnitId(counterDTO.getTitle(), refId, level)).isPresent()) {
-            exceptionService.duplicateDataException(ERROR_KPI_NAME_DUPLICATE);
-        }
+        List<ApplicableKPI> applicableKPIS = validateAndApplicableKPIS(level,refId, tabId,accessGroupPermissionCounterDTO,kpiId);
+        TabKPIConf tabKPIConf = null;
+        KPI kpi = validateAndGetKpiForCopy(refId, kpiId, counterDTO, level, accessGroupPermissionCounterDTO);
         KPI copyKpi = ObjectMapperUtils.copyPropertiesByMapper(kpi, KPI.class);
         copyKpi.setId(null);
         copyKpi.setTitle(counterDTO.getTitle());
@@ -546,6 +539,31 @@ public class CounterDataService extends MongoBaseService {
             tabKPIDTO.setId(tabKPIConf.getId());
         }
         return tabKPIDTO;
+    }
+
+    private List<ApplicableKPI> validateAndApplicableKPIS(ConfLevel level, Long refId, String tabId, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, BigInteger kpiId) {
+        List<ApplicableKPI> applicableKPIS;
+        if (isNotNull(tabId) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
+            level = ConfLevel.STAFF;
+            applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, accessGroupPermissionCounterDTO.getStaffId());
+        } else {
+            applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, refId);
+        }
+        if (applicableKPIS.isEmpty()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTER_KPI_NOTFOUND);
+        }
+        return applicableKPIS;
+    }
+
+    private KPI validateAndGetKpiForCopy(Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO) {
+        KPI kpi = counterRepository.getKPIByid(kpiId);
+        if ((isNotNull(kpi.getCalculationFormula()) && !kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula())) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
+            exceptionService.actionNotPermittedException(MESSAGE_KPI_PERMISSION);
+        }
+        if (Optional.ofNullable(counterRepository.getKpiByTitleAndUnitId(counterDTO.getTitle(), refId, level)).isPresent()) {
+            exceptionService.duplicateDataException(ERROR_KPI_NAME_DUPLICATE);
+        }
+        return kpi;
     }
 
     private void linkKpiToUncategorized(Long refId, ConfLevel level, KPI copyKpi) {
@@ -611,6 +629,11 @@ public class CounterDataService extends MongoBaseService {
         }
         List<Future<KPIResponseDTO>> kpiResults = getKPIResults(filters, organizationId, kpiIdAndApplicableKPIMap, kpiMap, filterBasedCriteria, staffKpiFilterCritera,startDate);
         KPIResponseDTO kpiResponseDTO = new KPISetResponseDTO();
+        updateResponse(kpiResults, kpiResponseDTO);
+        return kpiResponseDTO;
+    }
+
+    private void updateResponse(List<Future<KPIResponseDTO>> kpiResults, KPIResponseDTO kpiResponseDTO) {
         for (Future<KPIResponseDTO> data : kpiResults) {
             try {
                 if(isNotNull(data.get())) {
@@ -623,7 +646,6 @@ public class CounterDataService extends MongoBaseService {
                 LOGGER.error("error while generate KPI calculation data",e);
             }
         }
-        return kpiResponseDTO;
     }
 
     private  List<Future<KPIResponseDTO>> getKPIResults(FilterCriteriaDTO filters, Long organizationId, Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKPIMap, Map<BigInteger, KPI> kpiMap,  Map<FilterType, List> filterBasedCriteria, Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera,LocalDate startDate) {

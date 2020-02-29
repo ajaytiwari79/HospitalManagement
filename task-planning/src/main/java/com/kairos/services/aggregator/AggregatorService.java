@@ -437,9 +437,9 @@ public class AggregatorService extends MongoBaseService {
         LocalDate fourWeekLater = localDate.plusDays(28);
         Date monday = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date fourWeekSunday = Date.from(fourWeekLater.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        List<ClientException> clientExceptions = clientExceptionMongoRepository.getExceptionBetweenDates(monday, fourWeekSunday,new Sort(Sort.DEFAULT_DIRECTION,CITIZEN_ID));
+        List<ClientException> clientExceptions = clientExceptionMongoRepository.getExceptionBetweenDates(monday, fourWeekSunday,Sort.by(Sort.DEFAULT_DIRECTION,CITIZEN_ID));
         List<Long> citizenIds = clientExceptions.stream().map(clientException -> clientException.getClientId()).collect(Collectors.toList());
-        List<ClientAggregator> clientAggregators = clientAggregatorMongoRepository.findByCitizenIdIn(citizenIds, new Sort(Sort.DEFAULT_DIRECTION, CITIZEN_ID));
+        List<ClientAggregator> clientAggregators = clientAggregatorMongoRepository.findByCitizenIdIn(citizenIds, Sort.by(Sort.DEFAULT_DIRECTION, CITIZEN_ID));
         FourWeekFrequency fourWeekFrequency = FourWeekFrequency.getInstance();
         long citizenId = -1;
         List<Long> citizenUnitData = new ArrayList<>();
@@ -485,11 +485,11 @@ public class AggregatorService extends MongoBaseService {
         LocalDate fourWeekLater = localDate.plusDays(28);
         Date monday = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date fourWeekSunday = Date.from(fourWeekLater.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        List<Task> tasks = taskMongoRepository.getUnhandledTaskBetweenDates(monday, fourWeekSunday, new Sort(Sort.DEFAULT_DIRECTION, CITIZEN_ID));
+        List<Task> tasks = taskMongoRepository.getUnhandledTaskBetweenDates(monday, fourWeekSunday, Sort.by(Sort.DEFAULT_DIRECTION, CITIZEN_ID));
 
         //TODO citizen ids repeating in list, need to use aggregation here
         List<Long> citizenIds = tasks.stream().map(task -> task.getCitizenId()).collect(Collectors.toList());
-        List<ClientAggregator> citizenAggregators = clientAggregatorMongoRepository.findByCitizenIdIn(citizenIds, new Sort(Sort.DEFAULT_DIRECTION, CITIZEN_ID));
+        List<ClientAggregator> citizenAggregators = clientAggregatorMongoRepository.findByCitizenIdIn(citizenIds, Sort.by(Sort.DEFAULT_DIRECTION, CITIZEN_ID));
         FourWeekFrequency fourWeekFrequency = FourWeekFrequency.getInstance();
         List<Long> citizenUnitData = new ArrayList<>();
         long citizenId = -1;

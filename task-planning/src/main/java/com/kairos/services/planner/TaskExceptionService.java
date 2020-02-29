@@ -211,7 +211,7 @@ public class TaskExceptionService extends MongoBaseService {
     }
 
     public List<TaskGanttDTO> updateUnhandledActualPlanningTasks(long unitId, TaskDTO taskDTO) {
-        List<Task> tasks = taskMongoRepository.findByIdIn(taskDTO.getTaskIds(), new Sort(Sort.Direction.ASC, TIME_FROM));
+        List<Task> tasks = taskMongoRepository.findByIdIn(taskDTO.getTaskIds(), Sort.by(Sort.Direction.ASC, TIME_FROM));
         tasks.forEach(task -> {
             if (!task.isSingleTask() && task.getActualPlanningTask() == null) {
                 taskService.savePreplanningStateOfTask(task);
@@ -249,7 +249,7 @@ public class TaskExceptionService extends MongoBaseService {
 
     public List<TaskGanttDTO> updateBulkTask(long unitId, BulkUpdateTaskDTO bulkUpdateTaskDTO) {
 
-        List<Task> tasks = taskMongoRepository.findByIdIn(bulkUpdateTaskDTO.getTaskIds(), new Sort(Sort.Direction.ASC, TIME_FROM));
+        List<Task> tasks = taskMongoRepository.findByIdIn(bulkUpdateTaskDTO.getTaskIds(), Sort.by(Sort.Direction.ASC, TIME_FROM));
         if (tasks.isEmpty()) {
             return Collections.emptyList();
         }
@@ -375,7 +375,7 @@ public class TaskExceptionService extends MongoBaseService {
 
     public List<TaskGanttDTO> makeTasksActiveInactive(TaskActiveUpdationDTO taskActiveUpdationDTO, long unitId) {
 
-        List<Task> tasksToUpdate = taskMongoRepository.findByIdIn(taskActiveUpdationDTO.getTaskIds(), new Sort(Sort.Direction.ASC, TIME_FROM));
+        List<Task> tasksToUpdate = taskMongoRepository.findByIdIn(taskActiveUpdationDTO.getTaskIds(), Sort.by(Sort.Direction.ASC, TIME_FROM));
         if (tasksToUpdate.isEmpty()) {
             return Collections.emptyList();
         }
