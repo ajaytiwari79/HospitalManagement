@@ -5,40 +5,63 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
+import com.kairos.enums.EmploymentSubType;
+import com.kairos.enums.FilterType;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Service
 public class WeeklyEmploymentHoursKPIService {
 
     public Double getWeeklyHoursOfEmployment(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, LocalDate startDate, LocalDate endDate) {
-        DateTimeInterval dateTimeInterval = new DateTimeInterval(startDate,endDate);
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = isNotNull(staffId) ? Arrays.asList(kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().getOrDefault(staffId, new StaffKpiFilterDTO())) : kpiCalculationRelatedInfo.getStaffKpiFilterDTOS();
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(startDate, endDate);
         Double weeklyHours = 0.0d;
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS = kpiCalculationRelatedInfo.getStaffKpiFilterDTOS();
         for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
-            if (staffKpiFilterDTO.getId().equals(staffId)) {
-                for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
-                    if (ObjectUtils.isNotNull(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours())) {
-                        if ((employmentWithCtaDetailsDTO.getStartDate().isBefore(startDate) && ObjectUtils.isNull(employmentWithCtaDetailsDTO.getEndDate()))||dateTimeInterval.contains(employmentWithCtaDetailsDTO.getStartDate())) {
-                            weeklyHours += Double.valueOf(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours());
-                        }
-
-                        if (ObjectUtils.isNotNull(employmentWithCtaDetailsDTO.getEndDate())) {
-                            if ((employmentWithCtaDetailsDTO.getStartDate().isBefore(startDate) && employmentWithCtaDetailsDTO.getEndDate().isAfter(startDate)) || dateTimeInterval.containsAndEqualsEndDate(DateUtils.asDate(employmentWithCtaDetailsDTO.getStartDate())) || dateTimeInterval.containsAndEqualsEndDate(DateUtils.asDate(employmentWithCtaDetailsDTO.getEndDate()))) {
-                                weeklyHours += Double.valueOf(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours());
+            for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
+                    if (kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(FilterType.EMPLOYMENT_SUB_TYPE)) {
+                        if(isNotNull(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentSubType())) {
+                        if (kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).get(0).equals(EmploymentSubType.MAIN.name()) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).size() < 2) {
+                            if (employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentSubType().equals(EmploymentSubType.MAIN)) {
+                                weeklyHours = getWeeklyHours(startDate, dateTimeInterval, weeklyHours, employmentWithCtaDetailsDTO);
                             }
+                        } else if (kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).get(0).equals(EmploymentSubType.SECONDARY.name()) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).size() < 2) {
+                            if (employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentSubType().equals(EmploymentSubType.SECONDARY)) {
+                                weeklyHours = getWeeklyHours(startDate, dateTimeInterval, weeklyHours, employmentWithCtaDetailsDTO);
+                            }
+                        } else {
+                            weeklyHours = getWeeklyHours(startDate, dateTimeInterval, weeklyHours, employmentWithCtaDetailsDTO);
                         }
                     }
-
+                }
+                else {
+                    weeklyHours = getWeeklyHours(startDate, dateTimeInterval, weeklyHours, employmentWithCtaDetailsDTO);
                 }
 
             }
-
         }
 
+         return weeklyHours;
+        }
 
-            return weeklyHours;
+    private Double getWeeklyHours(LocalDate startDate, DateTimeInterval dateTimeInterval, Double weeklyHours, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
+        if (ObjectUtils.isNotNull(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours())) {
+            if ((employmentWithCtaDetailsDTO.getStartDate().isBefore(startDate) && ObjectUtils.isNull(employmentWithCtaDetailsDTO.getEndDate())) || dateTimeInterval.contains(employmentWithCtaDetailsDTO.getStartDate())) {
+                weeklyHours += Double.valueOf(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours());
+            }
+
+            if (ObjectUtils.isNotNull(employmentWithCtaDetailsDTO.getEndDate())) {
+                if ((employmentWithCtaDetailsDTO.getStartDate().isBefore(startDate) && employmentWithCtaDetailsDTO.getEndDate().isAfter(startDate)) || dateTimeInterval.containsAndEqualsEndDate(DateUtils.asDate(employmentWithCtaDetailsDTO.getStartDate())) || dateTimeInterval.containsAndEqualsEndDate(DateUtils.asDate(employmentWithCtaDetailsDTO.getEndDate()))) {
+                    weeklyHours += Double.valueOf(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours());
+                }
+            }
+        }
+        return weeklyHours;
     }
+
 }
