@@ -46,6 +46,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     public static final String NEXT_PHASE_ID = "nextPhaseId";
     public static final String NEXT_PHASE_DATA = "next_phase_data";
     public static final String PHASE = "phase";
+    public static final String DATE_RANGE = "dateRange";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -75,7 +76,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         ProjectionOperation projectionOperation = Aggregation.project(DURATION, DURATION_TYPE).
                 and("id").as("id").
                 andInclude("name").
-                andInclude("dateRange").
+                andInclude(DATE_RANGE).
                 andInclude(START_DATE).
                 andInclude(UNIT_ID).
                 andInclude(END_DATE).
@@ -104,7 +105,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         ProjectionOperation projectionOperation = Aggregation.project(DURATION, DURATION_TYPE).
                 and("id").as("id").
                 andInclude("name").
-                andInclude("dateRange").
+                andInclude(DATE_RANGE).
                 andInclude(START_DATE).
                 andInclude(END_DATE).
                 andInclude(PUBLISH_EMPLOYMENT_IDS).
@@ -134,7 +135,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         ProjectionOperation projectionOperation = Aggregation.project(DURATION, DURATION_TYPE).
                 and("id").as("id").
                 andInclude("name").
-                andInclude("dateRange").
+                andInclude(DATE_RANGE).
                 andInclude(START_DATE).
                 andInclude(END_DATE).
                 andInclude(PUBLISH_EMPLOYMENT_IDS).

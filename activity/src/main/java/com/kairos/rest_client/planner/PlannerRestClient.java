@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static com.kairos.utils.RestClientUrlUtil.getPlannerBaseUrl;
 @Service
 public class PlannerRestClient {
@@ -35,15 +36,15 @@ public class PlannerRestClient {
                             new HttpEntity<>(t), typeReference);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException(response.getMessage());
+                throwException(response.getMessage());
             }
             return response;
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
+            throwException("exception occurred in activity micro service " + e.getMessage());
         }
-
+        return null;
     }
 
     public static HttpMethod getHttpMethod(IntegrationOperation integrationOperation) {
@@ -60,7 +61,7 @@ public class PlannerRestClient {
 
         }
     }
-    public static <T>String getURI(PlannerUrl plannerUrl,Object... pathParams){
+    public static String getURI(PlannerUrl plannerUrl,Object... pathParams){
         String uri=null;
         switch (plannerUrl){
             case GET_VRP_SOLUTION:uri = String.format("/vrp/%s",pathParams);
@@ -70,14 +71,7 @@ public class PlannerRestClient {
             case SUBMIT_VRP_PROBLEM:uri = "/submitVRPPlanning";
                 break;
             case GET_INDICTMENT:uri=String.format("/vrp/%s/get_indictment",pathParams);
-        }/*
-
-        else if (t instanceof VrpTaskPlanningDTO){
-            uri = "planner/submitVRPPlanning";
         }
-        else if (t==null){
-
-        }*/
         return uri;
     }
 }

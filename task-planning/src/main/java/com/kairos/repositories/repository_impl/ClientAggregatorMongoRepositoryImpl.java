@@ -63,7 +63,7 @@ public class ClientAggregatorMongoRepositoryImpl implements CustomClientAggregat
         Query query = new Query().addCriteria(Criteria.where(UNIT_ID).is(unitId).and(CLIENT_EXCEPTION_COUNTS).exists(true));
         query.fields().include("citizenId").include(CLIENT_EXCEPTION_COUNTS);
         query.skip(skip).limit(limit);
-        query.with(new Sort(Sort.DEFAULT_DIRECTION,"citizenId"));
+        query.with(Sort.by(Sort.DEFAULT_DIRECTION,"citizenId"));
         return mongoTemplate.find(query,ClientAggregator.class,"clientAggregator");
     }
 

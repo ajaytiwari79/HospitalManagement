@@ -828,7 +828,7 @@ public class PlannerService extends MongoBaseService {
         List<BigInteger> taskIds = new ArrayList<>();
         customTaskList.forEach(customTask -> taskIds.add(new BigInteger(customTask.getId())));
 
-        List<Task> taskList = taskMongoRepository.findByIdIn(taskIds, new Sort(Sort.Direction.ASC, TIME_FROM));
+        List<Task> taskList = taskMongoRepository.findByIdIn(taskIds, Sort.by(Sort.Direction.ASC, TIME_FROM));
         long citizenId = -1;
         for (Task task : taskList) {
             if (!task.isSingleTask() && task.getActualPlanningTask() == null) {
@@ -1120,7 +1120,7 @@ public class PlannerService extends MongoBaseService {
             List<TaskGanttDTO> customSubTaskList = new ArrayList<>();
             if (task.getSubTaskIds() != null && task.getSubTaskIds().size() > 0) {
 
-                List<Task> subTasks = taskMongoRepository.findByIdIn(task.getSubTaskIds(), new Sort(Sort.Direction.ASC, TIME_FROM));
+                List<Task> subTasks = taskMongoRepository.findByIdIn(task.getSubTaskIds(), Sort.by(Sort.Direction.ASC, TIME_FROM));
 
                 for (Task subTask : subTasks) {
                     TaskGanttDTO subTaskResponse = customTask(subTask);
@@ -1924,7 +1924,7 @@ public class PlannerService extends MongoBaseService {
 
     public boolean deleteTasks(List<BigInteger> tasksIdsToDelete, long unitId) {
 
-        List<Task> tasks = taskMongoRepository.findByIdIn(tasksIdsToDelete, new Sort(Sort.Direction.ASC, TIME_FROM));
+        List<Task> tasks = taskMongoRepository.findByIdIn(tasksIdsToDelete, Sort.by(Sort.Direction.ASC, TIME_FROM));
         return deleteTasksFromDBAndVisitour(tasks, unitId);
     }
 
@@ -1953,7 +1953,7 @@ public class PlannerService extends MongoBaseService {
         }
         //TODO FLS service disabled
         /*int startPosition = 0;
-        Sort sort = new Sort(Sort.DEFAULT_DIRECTION,"unitId");
+        Sort sort = Sort.by(Sort.DEFAULT_DIRECTION,"unitId");
         ConcurrentMap<Long,ConcurrentMap<String,String>> flsCredentailsForUnits =
                 integrationServiceRestClient.getFLSCredentials(taskCountWithAssignedUnit.getUnitId());
         Long totalTasksToDelete = taskCountWithAssignedUnit.getTotalTasks();

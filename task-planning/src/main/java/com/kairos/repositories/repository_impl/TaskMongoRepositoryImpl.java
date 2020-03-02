@@ -95,7 +95,7 @@ public class TaskMongoRepositoryImpl implements CustomTaskMongoRepository {
                         .and(IS_DELETED).is(false)),
                 project("name", DATE_FROM, DATE_TO, ADDRESS, DURATION,"status", CITIZEN_ID),
                 group(CITIZEN_ID).push("$$ROOT").as(TASKS),
-                sort(new Sort(Sort.DEFAULT_DIRECTION,"_id")));
+                sort(Sort.by(Sort.DEFAULT_DIRECTION,"_id")));
         AggregationResults<StaffAssignedTasksWrapper> result = mongoTemplate.aggregate(aggregation,Task.class,StaffAssignedTasksWrapper.class);
         return result.getMappedResults();
     }
@@ -140,7 +140,7 @@ public class TaskMongoRepositoryImpl implements CustomTaskMongoRepository {
                         .and(IS_DELETED).is(false).and(VISITOUR_ID).ne(null)),
                 project("name", DATE_FROM, DATE_TO, VISITOUR_ID, DURATION, CITIZEN_ID, TIME_FROM, TIME_TO),
                 group(CITIZEN_ID).push("$$ROOT").as(TASKS),
-                sort(new Sort(Sort.DEFAULT_DIRECTION,"_id")));
+                sort(Sort.by(Sort.DEFAULT_DIRECTION,"_id")));
         AggregationResults<EscalatedTasksWrapper> result = mongoTemplate.aggregate(aggregation,Task.class,EscalatedTasksWrapper.class);
         return result.getMappedResults();
     }

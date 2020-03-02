@@ -36,34 +36,34 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
 
     public List<PhaseDTO> getPhasesByUnit(Long unitId, Sort.Direction direction) {
         Query query = Query.query(Criteria.where(ORGANIZATION_ID).is(unitId));
-        query.with(new Sort(direction, SEQUENCE).and(new Sort(Sort.Direction.DESC, PHASE_TYPE)));
+        query.with(Sort.by(direction, SEQUENCE).and(Sort.by(Sort.Direction.DESC, PHASE_TYPE)));
         return mongoTemplate.find(query, PhaseDTO.class, PHASES);
     }
 
     public List<PhaseDTO> getPhasesByCountryId(Long countryId, Sort.Direction direction) {
         Query query = Query.query(Criteria.where(COUNTRY_ID).is(countryId));
-        query.with(new Sort(direction, SEQUENCE).and(new Sort(Sort.Direction.DESC, PHASE_TYPE)));
+        query.with(Sort.by(direction, SEQUENCE).and(Sort.by(Sort.Direction.DESC, PHASE_TYPE)));
         return mongoTemplate.find(query, PhaseDTO.class, PHASES);
     }
 
 
     public List<PhaseDTO> getPlanningPhasesByUnit(Long unitId, Sort.Direction direction) {
         Query query = Query.query(Criteria.where(ORGANIZATION_ID).is(unitId).and(PHASE_TYPE).is(PhaseType.PLANNING));
-        query.with(new Sort(direction, SEQUENCE));
+        query.with(Sort.by(direction, SEQUENCE));
         return mongoTemplate.find(query, PhaseDTO.class, PHASES);
     }
 
     public List<PhaseDTO> getApplicablePlanningPhasesByUnit(Long unitId, Sort.Direction direction) {
 
         Query query = Query.query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING));
-        query.with(new Sort(direction, SEQUENCE));
+        query.with(Sort.by(direction, SEQUENCE));
         return mongoTemplate.find(query, PhaseDTO.class, PHASES);
     }
 
     @Override
     public List<PhaseDTO> getApplicablePlanningPhasesByUnitIds(List<Long> unitIds, Sort.Direction direction) {
         Query query = Query.query(Criteria.where(ORGANIZATION_ID).in(unitIds).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING));
-        query.with(new Sort(direction, SEQUENCE));
+        query.with(Sort.by(direction, SEQUENCE));
         return mongoTemplate.find(query, PhaseDTO.class, PHASES);
     }
 
@@ -83,7 +83,7 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
 
     public List<PhaseDTO> getNextApplicablePhasesOfUnitBySequence(Long unitId, int sequence) {
         Query query = Query.query(Criteria.where(ORGANIZATION_ID).is(unitId).and(SEQUENCE).gt(sequence).and(DURATION).gt(0));
-        query.with(new Sort(Sort.Direction.ASC, SEQUENCE));
+        query.with(Sort.by(Sort.Direction.ASC, SEQUENCE));
         query.limit(1);
         return mongoTemplate.find(query, PhaseDTO.class, PHASES);
 
@@ -101,18 +101,18 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
 
     public List<Phase> getPlanningPhasesByUnit(Long unitId) {
         Query query = Query.query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING));
-        query.with(new Sort(Sort.Direction.DESC, SEQUENCE));
+        query.with(Sort.by(Sort.Direction.DESC, SEQUENCE));
         return mongoTemplate.find(query, Phase.class, PHASES);
     }
     public List<Phase> getPlanningPhasesByCountry(Long countryId) {
         Query query = Query.query(Criteria.where(COUNTRY_ID).is(countryId).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING));
-        query.with(new Sort(Sort.Direction.DESC, SEQUENCE));
+        query.with(Sort.by(Sort.Direction.DESC, SEQUENCE));
         return mongoTemplate.find(query, Phase.class, PHASES);
     }
 
     public List<PhaseResponseDTO> findPlanningPhasesByCountry(Long countryId) {
         Query query = Query.query(Criteria.where(COUNTRY_ID).is(countryId).and(DURATION).gt(0).and(PHASE_TYPE).is(PhaseType.PLANNING));
-        query.with(new Sort(Sort.Direction.DESC, SEQUENCE));
+        query.with(Sort.by(Sort.Direction.DESC, SEQUENCE));
         query.fields().include("id").include("name");
         return mongoTemplate.find(query, PhaseResponseDTO.class, PHASES);
     }

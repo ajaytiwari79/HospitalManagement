@@ -49,6 +49,7 @@ import static org.apache.commons.collections.CollectionUtils.containsAny;
 public class TodoService {
 
     public static final String MMM_DD_YYYY = "MMM dd,yyyy";
+    public static final String SPAN = "</span>";
     @Inject
     private TodoRepository todoRepository;
     @Inject
@@ -67,7 +68,7 @@ public class TodoService {
     private UserIntegrationService userIntegrationService;
     @Inject private TimeBankService timeBankService;
 
-    public void createOrUpdateTodo(Shift shift, TodoType todoType, boolean shiftUpdate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public void createOrUpdateTodo(Shift shift, TodoType todoType) {
         List<Todo> todos = new ArrayList<>();
         if (todoType.equals(TodoType.APPROVAL_REQUIRED)) {
             Set<BigInteger> activityIds = shift.getActivities().stream().filter(shiftActivity -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivity.getStatus())).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
@@ -96,16 +97,15 @@ public class TodoService {
 
     }
 
-    public void updateStatusOfShiftActivityIfApprovalRequired(Map<BigInteger, ActivityWrapper> activityWrapperMap,Shift shift, boolean shiftUpdate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public void updateStatusOfShiftActivityIfApprovalRequired(Map<BigInteger, ActivityWrapper> activityWrapperMap,Shift shift, boolean shiftUpdate) {
         if (!shiftUpdate && UserContext.getUserDetails().isManagement()) {
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
             shift.getActivities().forEach(shiftActivity -> {
-                updateStatusIfApprovalRequired(activityWrapperMap, shiftActivity, shift, staffAdditionalInfoDTO);
-                shiftActivity.getChildActivities().forEach(childActivity -> updateStatusIfApprovalRequired(activityWrapperMap, childActivity, shift, staffAdditionalInfoDTO));
+                updateStatusIfApprovalRequired(activityWrapperMap, shiftActivity);
+                shiftActivity.getChildActivities().forEach(childActivity -> updateStatusIfApprovalRequired(activityWrapperMap, childActivity));
             });
             Activity activity = activityMongoRepository.findOne(shift.getActivities().get(0).getActivityId());
             TodoSubtype todoSubtype = FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_DAY : FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_WEEK : TodoSubtype.ABSENCE_WITH_TIME;
-            String description = "An activity <span class='activity-details'>" + activity.getName() + "</span> has been requested for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), MMM_DD_YYYY) + "</span>";
+            String description = "An activity <span class='activity-details'>" + activity.getName() + "</span> has been requested for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), MMM_DD_YYYY) + SPAN;
             Todo todo = new Todo(TodoType.APPROVAL_REQUIRED, todoSubtype, shift.getId(), activity.getId(), activity.getName(), APPROVE, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId(), shift.getActivities().get(0).getRemarks());
             todo.setApprovedOn(getDate());
             todoRepository.save(todo);
@@ -118,12 +118,12 @@ public class TodoService {
         } else {
             Activity activity = activityMongoRepository.findOne(shift.getRequestAbsence().getActivityId());
             TodoSubtype todoSubtype = FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_DAY : FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_WEEK : TodoSubtype.ABSENCE_WITH_TIME;
-            String description = "Absence request has been genereated for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), MMM_DD_YYYY) + "</span>";
+            String description = "Absence request has been genereated for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), MMM_DD_YYYY) + SPAN;
             todos.add(new Todo(TodoType.REQUEST_ABSENCE, todoSubtype, shift.getId(), activity.getId(), activity.getName(),getDate(), REQUESTED, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId(),shift.getActivities().get(0).getRemarks()));
         }
     }
 
-    private void updateStatusIfApprovalRequired(Map<BigInteger,ActivityWrapper> activityMap, ShiftActivity shiftActivity,Shift shift,StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    private void updateStatusIfApprovalRequired(Map<BigInteger,ActivityWrapper> activityMap, ShiftActivity shiftActivity) {
         if (activityMap.containsKey(shiftActivity.getActivityId())) {
             shiftActivity.getStatus().add(ShiftStatus.APPROVE);
         }
@@ -144,7 +144,7 @@ public class TodoService {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
         activities.stream().filter(activity -> activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())).forEach(activity -> {
             TodoSubtype todoSubtype = FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_DAY : FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_WEEK : TodoSubtype.ABSENCE_WITH_TIME;
-            String description = "An activity <span class='activity-details'>" + activity.getName() + "</span> has been requested for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), MMM_DD_YYYY) + "</span>";
+            String description = "An activity <span class='activity-details'>" + activity.getName() + "</span> has been requested for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), MMM_DD_YYYY) + SPAN;
             todos.add(new Todo(TodoType.APPROVAL_REQUIRED, todoSubtype, shift.getId(), activity.getId(), activity.getName(),getDate(), REQUESTED, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId(),shift.getActivities().get(0).getRemarks()));
         });
         return todos;

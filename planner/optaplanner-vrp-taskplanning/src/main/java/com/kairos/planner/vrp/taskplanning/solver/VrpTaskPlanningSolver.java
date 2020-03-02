@@ -115,6 +115,10 @@ public class VrpTaskPlanningSolver {
         StringBuilder sbs= new StringBuilder("Locs data:\n");
         StringBuilder sbTom= new StringBuilder("Locs data for tomtom:\n");
         StringBuilder shiftChainInfo= new StringBuilder("Shift chain data:\n");
+        /*Map<Employee,List<Shift>> employeeListMap = solution.getShifts().stream().collect(Collectors.groupingBy(s->s.getEmployee()));
+        for (Map.Entry<Employee, List<Shift>> employeeListEntry : employeeListMap.entrySet()) {
+
+        }*/
         for(Shift shift: solution.getShifts()){
             StringBuffer sb= new StringBuffer(shift+":::"+(shift.getNumberOfTasks()<10?0+""+shift.getNumberOfTasks():shift.getNumberOfTasks())+">>>"+shift.getTaskChainString()+" ,lat long chain:"+shift.getLocationsString());
             log.info(sb.toString());

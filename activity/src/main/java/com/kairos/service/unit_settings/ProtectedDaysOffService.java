@@ -50,7 +50,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
         }
         protectedDaysOffSetting.setProtectedDaysOffUnitSettings(protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings());
         protectedDaysOffRepository.save(protectedDaysOffSetting);
-        return protectedDaysOffSettingDTO;
+        return ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOffSetting,ProtectedDaysOffSettingDTO.class);
     }
 
     public ProtectedDaysOffSettingDTO getProtectedDaysOffByUnitId(Long unitId){

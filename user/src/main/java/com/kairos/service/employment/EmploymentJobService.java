@@ -135,7 +135,7 @@ public class EmploymentJobService {
 
         stopped = LocalDateTime.now();
 
-        userSchedulerJobService.createJobForEmploymentEnd(schedulerPanelId, unitId, started, stopped, log, result);
+        //userSchedulerJobService.createJobForEmploymentEnd(schedulerPanelId, unitId, started, stopped, log, result);
 
 
     }
