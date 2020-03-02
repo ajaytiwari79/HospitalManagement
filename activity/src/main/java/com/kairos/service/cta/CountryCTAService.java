@@ -43,6 +43,8 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_CTA_NAME_AL
 @Service
 @Transactional
 public class CountryCTAService extends MongoBaseService {
+    public static final String ORGANIZATION_SUB_TYPE_ID = "organizationSubTypeId";
+    public static final String EXPERTISE_ID = "expertiseId";
     private Logger logger = LoggerFactory.getLogger(CountryCTAService.class);
     @Inject
     private ExceptionService exceptionService;
@@ -74,8 +76,8 @@ public class CountryCTAService extends MongoBaseService {
             exceptionService.duplicateDataException(MESSAGE_CTA_NAME_ALREADYEXIST, collectiveTimeAgreementDTO.getName());
         }
         List<NameValuePair> requestParam = new ArrayList<>();
-        requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
-        requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().getId().toString()));
+        requestParam.add(new BasicNameValuePair(ORGANIZATION_SUB_TYPE_ID, collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
+        requestParam.add(new BasicNameValuePair(EXPERTISE_ID, collectiveTimeAgreementDTO.getExpertise().getId().toString()));
         CTABasicDetailsDTO ctaBasicDetailsDTO = userIntegrationService.getCtaBasicDetailsDTO(countryId, requestParam);
         List<TagDTO> tagDTOS = collectiveTimeAgreementDTO.getTags();
         collectiveTimeAgreementDTO.setTags(null);
@@ -84,7 +86,7 @@ public class CountryCTAService extends MongoBaseService {
         buildCTA(null, costTimeAgreement, collectiveTimeAgreementDTO, false, true, ctaBasicDetailsDTO, null);
         costTimeAgreement.setCountryId(countryId);
         costTimeAgreement.setTags(tagDTOS.stream().map(TagDTO::getId).collect(Collectors.toList()));
-        this.save(costTimeAgreement);
+        costTimeAgreementRepository.save(costTimeAgreement);
         // TO create CTA for organizations too which are linked with same sub type
         publishNewCTAToOrganizationByOrgSubType(null, costTimeAgreement, collectiveTimeAgreementDTO, ctaBasicDetailsDTO);
         return addTagsInResponse(costTimeAgreement, tagDTOS);
@@ -106,8 +108,8 @@ public class CountryCTAService extends MongoBaseService {
         }
 
         List<NameValuePair> requestParam = new ArrayList<>();
-        requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
-        requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().getId().toString()));
+        requestParam.add(new BasicNameValuePair(ORGANIZATION_SUB_TYPE_ID, collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
+        requestParam.add(new BasicNameValuePair(EXPERTISE_ID, collectiveTimeAgreementDTO.getExpertise().getId().toString()));
         if (CollectionUtils.isNotEmpty(collectiveTimeAgreementDTO.getUnitIds())) {
             requestParam.add(new BasicNameValuePair("unitIds", collectiveTimeAgreementDTO.getUnitIds().toString().replace("[", "").replace("]", "")));
         }
@@ -117,9 +119,8 @@ public class CountryCTAService extends MongoBaseService {
         CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
         costTimeAgreement.setId(null);
         buildCTA(null, costTimeAgreement, collectiveTimeAgreementDTO, false, false, ctaBasicDetailsDTO, null);
-        //costTimeAgreement.setCountryId(countryId);
         costTimeAgreement.setTags(tagDTOS.stream().map(TagDTO::getId).collect(Collectors.toList()));
-        this.save(costTimeAgreement);
+        costTimeAgreementRepository.save(costTimeAgreement);
         // TO create CTA for organizations too which are linked with same sub type
         publishNewCTAToOrganizationByOrgSubType(unitId, costTimeAgreement, collectiveTimeAgreementDTO, ctaBasicDetailsDTO);
         return addTagsInResponse( costTimeAgreement, tagDTOS);
@@ -146,7 +147,7 @@ public class CountryCTAService extends MongoBaseService {
                     });
                 }
             });
-            save(ruleTemplates);
+            ctaRuleTemplateRepository.saveEntities(ruleTemplates);
             ruleTemplateIds = ruleTemplates.stream().map(rt -> rt.getId()).collect(Collectors.toList());
         }
         if (creatingFromCountry) {
@@ -200,7 +201,7 @@ public class CountryCTAService extends MongoBaseService {
             }
         }
         if (!costTimeAgreements.isEmpty()) {
-            save(costTimeAgreements);
+            costTimeAgreementRepository.saveEntities(costTimeAgreements);
         }
         return true;
     }
@@ -248,8 +249,8 @@ public class CountryCTAService extends MongoBaseService {
         CostTimeAgreement costTimeAgreement = costTimeAgreementRepository.findOne(ctaId);
 
         List<NameValuePair> requestParam = new ArrayList<>();
-        requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
-        requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().getId().toString()));
+        requestParam.add(new BasicNameValuePair(ORGANIZATION_SUB_TYPE_ID, collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
+        requestParam.add(new BasicNameValuePair(EXPERTISE_ID, collectiveTimeAgreementDTO.getExpertise().getId().toString()));
         CTABasicDetailsDTO ctaBasicDetailsDTO = userIntegrationService.getCtaBasicDetailsDTO(countryId, requestParam);
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
         List<TagDTO> tagDTOS = collectiveTimeAgreementDTO.getTags();
@@ -258,14 +259,14 @@ public class CountryCTAService extends MongoBaseService {
         updateCostTimeAgreement.setId(costTimeAgreement.getId());
         costTimeAgreement.setId(null);
         costTimeAgreement.setDisabled(true);
-        this.save(costTimeAgreement);
+        costTimeAgreementRepository.save(costTimeAgreement);
         updateCostTimeAgreement.setCountryId(costTimeAgreement.getCountryId());
         updateCostTimeAgreement.setParentId(costTimeAgreement.getId());
         updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
         updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
         updateCostTimeAgreement.setTags(tagDTOS.stream().map(TagDTO::getId).collect(Collectors.toList()));
         buildCTA(null, updateCostTimeAgreement, collectiveTimeAgreementDTO, true, true, ctaBasicDetailsDTO, null);
-        this.save(updateCostTimeAgreement);
+        costTimeAgreementRepository.save(updateCostTimeAgreement);
         return addTagsInResponse( updateCostTimeAgreement, tagDTOS);
     }
 
@@ -284,8 +285,8 @@ public class CountryCTAService extends MongoBaseService {
         CostTimeAgreement costTimeAgreement = costTimeAgreementRepository.findOne(ctaId);
 
         List<NameValuePair> requestParam = new ArrayList<>();
-        requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().toString()));
-        requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().toString()));
+        requestParam.add(new BasicNameValuePair(ORGANIZATION_SUB_TYPE_ID, collectiveTimeAgreementDTO.getOrganizationSubType().toString()));
+        requestParam.add(new BasicNameValuePair(EXPERTISE_ID, collectiveTimeAgreementDTO.getExpertise().toString()));
 
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
         List<TagDTO> tagDTOS = collectiveTimeAgreementDTO.getTags();
@@ -294,13 +295,13 @@ public class CountryCTAService extends MongoBaseService {
         updateCostTimeAgreement.setId(costTimeAgreement.getId());
         costTimeAgreement.setDisabled(true);
         costTimeAgreement.setEndDate(collectiveTimeAgreementDTO.getStartDate().minusDays(1));
-        this.save(costTimeAgreement);
+        costTimeAgreementRepository.save(costTimeAgreement);
         updateCostTimeAgreement.setParentId(costTimeAgreement.getId());
         updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
         updateCostTimeAgreement.setTags(tagDTOS.stream().map(TagDTO::getId).collect(Collectors.toList()));
         updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
         buildCTA(null, updateCostTimeAgreement, collectiveTimeAgreementDTO, true, false, null, null);
-        this.save(updateCostTimeAgreement);
+        costTimeAgreementRepository.save(updateCostTimeAgreement);
         return addTagsInResponse( updateCostTimeAgreement, tagDTOS);
     }
 

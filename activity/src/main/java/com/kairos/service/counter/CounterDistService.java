@@ -466,7 +466,7 @@ public class CounterDistService extends MongoBaseService {
                     staffIds.add(kpis.getKey());
                 }
             });
-            counterRepository.removeApplicableKPI(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()), refId, ConfLevel.STAFF);
+            counterRepository.removeApplicableKPI(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()), ConfLevel.STAFF);
             counterRepository.removeTabKPIEntry(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()), ConfLevel.STAFF);
             counterRepository.removeEntityById(accessGroupKPIEntry.getId(), AccessGroupKPIEntry.class);
         } else {
@@ -495,7 +495,7 @@ public class CounterDistService extends MongoBaseService {
                 removeAbleKPi.add(kpiId);
             }
         });
-        counterRepository.removeApplicableKPI(Arrays.asList(accessGroupAndStaffDTO.getStaffId()), removeAbleKPi, unitId, ConfLevel.STAFF);
+        counterRepository.removeApplicableKPI(Arrays.asList(accessGroupAndStaffDTO.getStaffId()), removeAbleKPi, ConfLevel.STAFF);
         counterRepository.removeTabKPIEntry(Arrays.asList(accessGroupAndStaffDTO.getStaffId()), removeAbleKPi, ConfLevel.STAFF);
         counterRepository.removeDashboardTabOfStaff(accessGroupAndStaffDTO.getStaffId(), unitId, ConfLevel.STAFF);
     }
@@ -622,7 +622,7 @@ public class CounterDistService extends MongoBaseService {
             counterRepository.removeCategoryKPIEntry(unitIds, orgTypeKPIEntry.getKpiId());
             counterRepository.removeAccessGroupKPIEntry(unitIds, orgTypeKPIEntry.getKpiId());
             counterRepository.removeTabKPIEntry(unitIds, Arrays.asList(orgTypeKPIEntry.getKpiId()), ConfLevel.UNIT);
-            counterRepository.removeApplicableKPI(unitIds, Arrays.asList(orgTypeKPIEntry.getKpiId()), null, ConfLevel.UNIT);
+            counterRepository.removeApplicableKPI(unitIds, Arrays.asList(orgTypeKPIEntry.getKpiId()),  ConfLevel.UNIT);
         }
         counterRepository.removeEntityById(orgTypeKPIEntry.getId(), OrgTypeKPIEntry.class);
     }

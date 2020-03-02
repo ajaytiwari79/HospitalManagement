@@ -243,7 +243,7 @@ public class TaskService extends MongoBaseService {
     }
 
     public List<Task> getTasksByDemandId(String taskDemandId) {
-        return taskMongoRepository.findAllByTaskDemandIdAndIsDeleted(taskDemandId, false, new Sort(Sort.Direction.ASC, DATE_FROM));
+        return taskMongoRepository.findAllByTaskDemandIdAndIsDeleted(taskDemandId, false, Sort.by(Sort.Direction.ASC, DATE_FROM));
     }
 
     public List<Task> getAllTasks() {
@@ -686,7 +686,7 @@ public class TaskService extends MongoBaseService {
             TaskGanttDTO response = customTask(task);
             List<TaskGanttDTO> customSubTaskList = new ArrayList<>();
             if (task.getSubTaskIds() != null && task.getSubTaskIds().size() > 0) {
-                List<Task> subTasks = taskMongoRepository.findByIdIn(task.getSubTaskIds(), new Sort(Sort.Direction.ASC, "timeFrom"));
+                List<Task> subTasks = taskMongoRepository.findByIdIn(task.getSubTaskIds(), Sort.by(Sort.Direction.ASC, "timeFrom"));
                 for (Task subTask : subTasks) {
                     TaskGanttDTO subTaskResponse = customTask(subTask);
                     customSubTaskList.add(subTaskResponse);
@@ -927,7 +927,7 @@ public class TaskService extends MongoBaseService {
         Date endOfCurrentWeekAsDate = Date.from(endOfCurrentWeek.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         List<TaskWrapper> tasks = taskMongoRepository.getUnhandledTaskForMobileView(citizendId, unitId, startOfCurrentWeekAsDate,
-                endOfCurrentWeekAsDate, new Sort(Sort.DEFAULT_DIRECTION, CITIZEN_ID));
+                endOfCurrentWeekAsDate, Sort.by(Sort.DEFAULT_DIRECTION, CITIZEN_ID));
         List<ClientException> clientExceptions = clientExceptionMongoRepository.getExceptionOfCitizenBetweenDates(citizendId, startOfCurrentWeekAsDate, endOfCurrentWeekAsDate, unitId);
         TaskClientExceptionWrapper taskClientExceptionWrapper = new TaskClientExceptionWrapper();
         taskClientExceptionWrapper.setClientExceptions(clientExceptions);

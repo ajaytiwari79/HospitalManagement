@@ -66,7 +66,6 @@ public class SendGridMailService implements EmailService{
             LOGGER.info("Email sent");
         } catch (Exception e){
             LOGGER.info("exception occured {}",e);
-            return false;
         }
         return false;
     }
