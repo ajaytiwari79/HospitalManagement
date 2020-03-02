@@ -50,6 +50,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.enums.MasterDataTypeEnum.*;
 
 public class ShiftPlanningGenerator {
@@ -142,7 +143,7 @@ public class ShiftPlanningGenerator {
             unresolvedSolution = (BreaksIndirectAndActivityPlanningSolution) xstream.fromXML(new File(filePath));
             unresolvedSolution.getEmployees().forEach(emp->{
                 emp.setWorkingTimeConstraints(getWTA());
-                emp.setCollectiveTimeAgreement(getCTA(unresolvedSolution.getActivities()));
+                //emp.setCollectiveTimeAgreement(getCTA(unresolvedSolution.getActivities()));
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -189,7 +190,7 @@ public class ShiftPlanningGenerator {
             unresolvedSolution = (ShiftRequestPhasePlanningSolution) xstream.fromXML(new File(problemXml));
             unresolvedSolution.getEmployees().forEach(emp->{
                 emp.setWorkingTimeConstraints(getWTA());
-                emp.setCollectiveTimeAgreement(getCTA(unresolvedSolution.getActivities()));
+                //emp.setCollectiveTimeAgreement(getCTA(unresolvedSolution.getActivities()));
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -289,10 +290,10 @@ public class ShiftPlanningGenerator {
     public Map<ConstraintSubType, Constraint> getActivityContraints(){
         LongestDuration longestDuration = new LongestDuration(80, ScoreLevel.SOFT,-5);
         ShortestDuration shortestDuration = new ShortestDuration(60,ScoreLevel.HARD,-2);
-        MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(3,ScoreLevel.MEDIUM,-1);//3
+        MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(3,ScoreLevel.SOFT,-1);//3
         //ContinousActivityPerShift continousActivityPerShift = new ContinousActivityPerShift(3,ScoreLevel.SOFT,-4);
-        MaxDiffrentActivity maxDiffrentActivity = new MaxDiffrentActivity(3,ScoreLevel.MEDIUM,-1);//4
-        MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(60,ScoreLevel.MEDIUM,-1);//5
+        MaxDiffrentActivity maxDiffrentActivity = new MaxDiffrentActivity(3,ScoreLevel.SOFT,-1);//4
+        MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(60,ScoreLevel.SOFT,-1);//5
         List<DayType> dayTypes = getDayTypes();
         ActivityDayType activityDayType = new ActivityDayType(dayTypes,ScoreLevel.SOFT,5);
         ActivityRequiredTag activityRequiredTag = new ActivityRequiredTag(requiredTagId(),ScoreLevel.HARD,1);
@@ -334,211 +335,76 @@ public class ShiftPlanningGenerator {
     public List<Employee> generateEmployeeList(List<Activity> activities) {
         List<Employee> employees = new ArrayList<Employee>();
         Employee employee =new Employee("145","Sachin Verma",createSkillSet(), null,0,0,PaidOutFrequencyEnum.HOURLY,3l);
-        employee.setCollectiveTimeAgreement(getCTA(activities));
+        //employee.setCollectiveTimeAgreement(getCTA(activities));
         employee.setBaseCost(new BigDecimal(1.5));
         employee.setWorkingTimeConstraints(getWTA());
         employee.setPrevShiftsInfo(getPreShiftsInfo());
         employee.setPrevShiftStart(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(20));
         employee.setPrevShiftEnd(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(10));
+        employee.setTags(createTags1());
+        employee.setEmploymentTypeId(123l);
         employees.add(employee);
         //employees.add(new Employee(102l,"Jane Doe",new ArrayList<Skill>()));
         //employees.add(new Employee(103l,"Jean Doe",new ArrayList<Skill>()));
         Employee employee2 = new Employee("160","Pradeep Singh",createSkillSet(), null,0,0,PaidOutFrequencyEnum.HOURLY,5l);
-        employee2.setCollectiveTimeAgreement(getCTA(activities));
+        //employee2.setCollectiveTimeAgreement(getCTA(activities));
         employee2.setBaseCost(new BigDecimal(1.5));
         employee2.setWorkingTimeConstraints(getWTA());
         employee2.setPrevShiftsInfo(getPreShiftsInfo());
         employee2.setPrevShiftStart(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(20));
         employee2.setPrevShiftEnd(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(10));
+        employee2.setEmploymentTypeId(126l);
+        employee2.setTags(createTags2());
         employees.add(employee2);
 
         Employee employee3 = new Employee("170","Arvind Das",createSkillSet(), null,0,0,PaidOutFrequencyEnum.HOURLY,null);
-        employee3.setCollectiveTimeAgreement(getCTA(activities));
+        //employee3.setCollectiveTimeAgreement(getCTA(activities));
         employee3.setBaseCost(new BigDecimal(1.5));
         employee3.setWorkingTimeConstraints(getWTA());
         employee3.setPrevShiftsInfo(getPreShiftsInfo());
+        employee3.setEmploymentTypeId(123l);
         employee3.setPrevShiftStart(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(20));
         employee3.setPrevShiftEnd(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(10));
+        employee3.setTags(createTags2());
         employees.add(employee3);
 
         Employee employee4 =new Employee("180","Ulrik",createSkillSet(), null,0,0,PaidOutFrequencyEnum.HOURLY,7l);
-        employee4.setCollectiveTimeAgreement(getCTA(activities));
+        //employee4.setCollectiveTimeAgreement(getCTA(activities));
         employee4.setBaseCost(new BigDecimal(1.5));
         employee4.setWorkingTimeConstraints(getWTA());
         employee4.setPrevShiftsInfo(getPreShiftsInfo());
+        employee4.setEmploymentTypeId(126l);
         employee4.setPrevShiftStart(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(20));
         employee4.setPrevShiftEnd(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(10));
+        employee4.setTags(createTags3());
         employees.add(employee4);
 
         Employee employee5 = new Employee("190","Ramanuj",createSkillSet(), null,0,0,PaidOutFrequencyEnum.HOURLY,null);
-        employee5.setCollectiveTimeAgreement(getCTA(activities));
+        //employee5.setCollectiveTimeAgreement(getCTA(activities));
         employee5.setBaseCost(new BigDecimal(1.5));
         employee5.setWorkingTimeConstraints(getWTA());
         employee5.setPrevShiftsInfo(getPreShiftsInfo());
+        employee5.setEmploymentTypeId(123l);
         employee5.setPrevShiftStart(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(20));
         employee5.setPrevShiftEnd(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(10));
+        employee5.setTags(createTags4());
         employees.add(employee5);
 
 
         Employee employee6 = new Employee("195","Dravid",createSkillSet(), null,0,0,PaidOutFrequencyEnum.HOURLY,null);
-        employee6.setCollectiveTimeAgreement(getCTA(activities));
+        //employee6.setCollectiveTimeAgreement(getCTA(activities));
         employee6.setBaseCost(new BigDecimal(1.5));
         employee6.setWorkingTimeConstraints(getWTA());
         employee6.setPrevShiftsInfo(getPreShiftsInfo());
+        employee6.setEmploymentTypeId(145l);
         employee6.setPrevShiftStart(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(20));
         employee6.setPrevShiftEnd(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(10));
+        employee6.setTags(createTags4());
         employees.add(employee6);
 
 
         return employees;
     }
-
-   /* private float[][] getCTA(){
-        //0-1,1-2,2-3,3-4,4-5,5-6,6-7,7-8,8-9,9-10,10-11,11-12,12-13,13-14,14-15,15-16,16-17,17-18,18-19,19-20,20-21,21-22,22-23,23-0
-        float cta[][] =
-                        {{1.4f, 1.4f,  1.4f,  1.2f,  1,  1,  1,  1,  1,  1,    1.1f,    1,    1,    1,    1,    1,    1 ,   1,   1,     1,    1,    1,    2,   2},//Monday
-                        {1.4f, 1.4f,  1.4f,  1.2f,  1,  1,  1,  1,  1,  1,    1,    1,    1,    1,    1,    1,    1 ,   1,   1,     1,    1,    1,    2,   2},//Tuesday
-                        {1.2f, 1.2f,  1.3f,  1.6f,  1.2f,  1.2f,  1,  1,  1,  1,    1,    1,    1,    1,    1,    1,    1 ,   1,   1,     1,    1,    1,    2,   2},//Wednesday
-                        {1.2f, 1.2f,  1.2f,  2,  1,  1,  1,  1,  1,  1,    1,    1,    1,    1,    1,    1,    1 ,   1,   1,     1,    1,    1,    2,   2},//Thursday
-                        {1.3f, 1.3f,  1.3f,  2,  1,  1,  1,  1,  1,  1,    1,    1,    1,    1,    1,    1,    1 ,   1,   1,     1,    1,    1,    2,   2},//Friday
-                        {1.3f, 1.3f,  1.4f,  1.2f,  1,  1,  1,  1,  1,  1,    1.2f,    1.2f,    1.2f,    1.2f,    1.2f,    2,    2 ,   2,   2,     2,    2,    2,    3,   3},//Satur
-                        {1.3f, 1.4f,  1.4f,  2,  1,  1,  1,  1,  1,  1,    2,    2,    2,    2,    2,    2,    2 ,   2,   2,     2,    2,    2,    3,   3}};//Sun
-        return cta;
-    }*/
-
-
-   public CollectiveTimeAgreement getCTA(List<Activity> activities){
-        CollectiveTimeAgreement collectiveTimeAgreement = new CollectiveTimeAgreement();
-        /*List<CTARuleTemplate> ctaRuleTemplates = new ArrayList<CTARuleTemplate>();
-        ctaRuleTemplates.add(getWorkingEveningShift(activities));
-        ctaRuleTemplates.add(getWorkingNightShift(activities));
-        ctaRuleTemplates.add(getWorkingOnPublicHoliday(activities));
-        ctaRuleTemplates.add(getWorkingOnHalfPublicHoliday(activities));
-        ctaRuleTemplates.add(getWorkingOnSaturday(activities));
-        ctaRuleTemplates.add(getWorkingOnSunday(activities));
-       *//* WorkingExtraTimeCtaRuleTemplate workingExtraTime = new WorkingExtraTimeCtaRuleTemplate();
-        collectiveTimeAgreement.setWorkingExtraTime(workingExtraTime);*//*
-        collectiveTimeAgreement.setCtaRuleTemplates(ctaRuleTemplates);*/
-       return collectiveTimeAgreement;
-   }
-
-   /*private CTARuleTemplate getWorkingEveningShift(List<Activity> activities){
-       CTARuleTemplate workingEveningShift = new CTARuleTemplate();
-       workingEveningShift.setCtaIntervals(Arrays.asList(new CTAInterval(new TimeInterval(1020,1380),CompensationType.MINUTES,new BigDecimal(10.5))));
-       workingEveningShift.setId(101l);
-       workingEveningShift.setRuleName("working Evening Shift");
-       workingEveningShift.setPriority(1);
-       workingEveningShift.setGranularity(30);
-       workingEveningShift.setActivities(activities);
-       workingEveningShift.setDays(new boolean[]{true,true,true,true,true,true,true});
-       return workingEveningShift;
-   }
-
-   private CTARuleTemplate getWorkingNightShift(List<Activity> activities){
-       CTARuleTemplate workingNightShift = new CTARuleTemplate();
-       workingNightShift.setCtaIntervals(Arrays.asList(new CTAInterval(new TimeInterval(1380,420),CompensationType.MINUTES,new BigDecimal(10.5))));
-       workingNightShift.setId(102l);
-       workingNightShift.setRuleName("working night shift");
-       workingNightShift.setPriority(2);
-       workingNightShift.setGranularity(45);
-       workingNightShift.setActivities(activities);
-       workingNightShift.setDays(new boolean[]{true,true,true,true,true,true,true});
-       return workingNightShift;
-   }
-
-    private CTARuleTemplate getWorkingOnPublicHoliday(List<Activity> activities){
-        CTARuleTemplate workingOnPublicHoliday = new CTARuleTemplate();
-        //workingOnPublicHoliday.setStartFrom(1380);
-        //workingOnPublicHoliday.setEndTo(420);
-        workingOnPublicHoliday.setActivities(activities);
-        //workingOnPublicHoliday.setDays(Arrays.asList(1,2,3,4,5,6,7));
-        workingOnPublicHoliday.setCtaIntervals(Arrays.asList(new CTAInterval(new TimeInterval(0,1440),CompensationType.MINUTES,new BigDecimal(10.5))));
-        workingOnPublicHoliday.setId(103l);
-        workingOnPublicHoliday.setRuleName("working on public holiday");
-        workingOnPublicHoliday.setPriority(3);
-        workingOnPublicHoliday.setGranularity(10);
-        workingOnPublicHoliday.setHolidayDates(getPublicHolidayDates());
-        return workingOnPublicHoliday;
-    }
-
-
-    private List<LocalDate> getPublicHolidayDates(){
-        List<LocalDate> localDates = new ArrayList<>();
-        localDates.add(new LocalDate(2017,12,11));
-        localDates.add(new LocalDate(2017,12,16));
-        localDates.add(new LocalDate(2017,12,25));
-        localDates.add(new LocalDate(2017,12,10));
-        return localDates;
-    }
-
-   private CTARuleTemplate getWorkingOnSaturday(List<Activity> activities){
-       CTARuleTemplate workingOnSaturday = new CTARuleTemplate();
-      // workingOnSaturday.setStartFrom(1380);
-      // workingOnSaturday.setEndTo(420);
-       workingOnSaturday.setCtaIntervals(Arrays.asList(new CTAInterval(new TimeInterval(0,1440),CompensationType.FIXED,new BigDecimal(20.5))));
-       workingOnSaturday.setActivities(activities);
-       workingOnSaturday.setId(105l);
-       workingOnSaturday.setRuleName("working on saturday");
-       workingOnSaturday.setDays(new boolean[]{false,false,false,false,false,true,false});
-       workingOnSaturday.setPriority(5);
-       workingOnSaturday.setGranularity(1);
-       return workingOnSaturday;
-   }
-
-    private CTARuleTemplate getWorkingOnSunday(List<Activity> activities){
-        CTARuleTemplate workingOnSunday = new CTARuleTemplate();
-        // workingOnSaturday.setStartFrom(1380);
-        // workingOnSaturday.setEndTo(420);
-        workingOnSunday.setCtaIntervals(Arrays.asList(new CTAInterval(new TimeInterval(0,1440),CompensationType.PERCENTAGE,new BigDecimal(20.5))));
-        workingOnSunday.setActivities(activities);
-        workingOnSunday.setPriority(6);
-        workingOnSunday.setRuleName("working on sunday");
-        workingOnSunday.setId(106l);
-        workingOnSunday.setGranularity(60);
-        workingOnSunday.setDays(new boolean[]{false,false,false,false,false,false,true});
-        return workingOnSunday;
-    }
-
-
-    private CTARuleTemplate getWorkingOnHalfPublicHoliday(List<Activity> activities){
-        CTARuleTemplate workingOnHalfPublicHoliday = new CTARuleTemplate();
-        workingOnHalfPublicHoliday.setCtaIntervals(Arrays.asList(new CTAInterval(new TimeInterval(720,1440),CompensationType.PERCENTAGE,new BigDecimal(20.5))));
-        workingOnHalfPublicHoliday.setId(104l);
-        workingOnHalfPublicHoliday.setRuleName("working on half public holiday");
-        workingOnHalfPublicHoliday.setPriority(4);
-        workingOnHalfPublicHoliday.setGranularity(15);
-        workingOnHalfPublicHoliday.setActivities(activities);
-        //workingOnHalfPublicHoliday.setDays(Arrays.asList(7));
-        workingOnHalfPublicHoliday.setHolidayDates(getPublicHolidayDates());
-        return workingOnHalfPublicHoliday;
-    }*/
-
-
-
-    /*private BigDecimal[][] getCTAByDayAndTime(){
-     BigDecimal[][] costOfEmpByTime = new BigDecimal[7][24];
-     for (int i=0;i<costOfEmpByTime.length;i++){
-         for (int j=0;j<costOfEmpByTime[i].length;j++){
-             if (i==6 || i==7){
-                 if(j==0 || j==1 || j==2 || j==22 || j==23){
-                     costOfEmpByTime[i][j] = new BigDecimal(4.33);
-                     continue;
-                 }else {
-                     costOfEmpByTime[i][j] = new BigDecimal(2.33);
-                     continue;
-                 }
-             }
-             if(j==0 || j==1 || j==2 || j==22 || j==23){
-                costOfEmpByTime[i][j] = new BigDecimal(1.51);
-                 continue;
-             }
-             costOfEmpByTime[i][j] = new BigDecimal(1.00);
-         }
-     }
-     return costOfEmpByTime;
-    }*/
-
-
 
     public PrevShiftsInfo getPreShiftsInfo(){
         PrevShiftsInfo prevShiftsInfo = new PrevShiftsInfo();
@@ -553,34 +419,29 @@ public class ShiftPlanningGenerator {
     }
 
     public WorkingTimeConstraints getWTA(){
-        //CareDayCheckWTATemplate careDayCheck;
-        //  MaximumDaysOffInPeriodWTATemplate maximumDaysOffInPeriod = new MaximumDaysOffInPeriodWTATemplate(,1,ScoreLevel.MEDIUM);
-        //  MaximumSeniorDaysInYearWTATemplate maximumSeniorDaysInYear = new MaximumSeniorDaysInYearWTATemplate(,1,ScoreLevel.MEDIUM);
-        //MaximumVetoPerPeriodWTATemplate maximumVetoPerPeriod = new MaximumVetoPerPeriodWTATemplate(,1,ScoreLevel.MEDIUM);
-
         Interval interval = new Interval(getPlanningWeekStart().toDateTimeAtStartOfDay(),getPlanningWeekStart().plusDays(7).toDateTimeAtStartOfDay());
         long nightStarts = new DateTime().withTimeAtStartOfDay().plusHours(20).getMinuteOfDay();
         long nightEnds = new DateTime().plusDays(1).withTimeAtStartOfDay().plusHours(3).getMinuteOfDay();
-        MaximumAverageScheduledTimeWTATemplate maximumAverageScheduledTime = new MaximumAverageScheduledTimeWTATemplate(300,4,-10,ScoreLevel.MEDIUM,getPlanningWeekStart());
+        MaximumAverageScheduledTimeWTATemplate maximumAverageScheduledTime = new MaximumAverageScheduledTimeWTATemplate(300,4,-10,ScoreLevel.SOFT,getPlanningWeekStart());
         maximumAverageScheduledTime.setInterval(interval);
-        MaximumConsecutiveWorkingDaysWTATemplate maximumConsecutiveWorkingDays = new MaximumConsecutiveWorkingDaysWTATemplate(3,-5,ScoreLevel.MEDIUM);
-        MaximumConsecutiveWorkingNightsWTATemplate maximumConsecutiveWorkingNights = new MaximumConsecutiveWorkingNightsWTATemplate(2,-6,ScoreLevel.MEDIUM,nightStarts,nightEnds);
-        MaximumNightShiftLengthWTATemplate maximumNightShiftLength = new MaximumNightShiftLengthWTATemplate(600,-8,ScoreLevel.MEDIUM,nightStarts,nightEnds);
-        MaximumNumberOfNightsWTATemplate maximumNumberOfNights = new MaximumNumberOfNightsWTATemplate(4,-6,ScoreLevel.MEDIUM,nightStarts,nightEnds);
-        MaximumShiftLengthWTATemplate maximumShiftLength = new MaximumShiftLengthWTATemplate(600,-4,ScoreLevel.MEDIUM);
-        MaximumShiftsInIntervalWTATemplate maximumShiftsInInterval = new MaximumShiftsInIntervalWTATemplate(6,-5,ScoreLevel.MEDIUM);
+        MaximumConsecutiveWorkingDaysWTATemplate maximumConsecutiveWorkingDays = new MaximumConsecutiveWorkingDaysWTATemplate(3,-5,ScoreLevel.SOFT);
+        MaximumConsecutiveWorkingNightsWTATemplate maximumConsecutiveWorkingNights = new MaximumConsecutiveWorkingNightsWTATemplate(2,-6,ScoreLevel.SOFT,nightStarts,nightEnds);
+        MaximumNightShiftLengthWTATemplate maximumNightShiftLength = new MaximumNightShiftLengthWTATemplate(600,-8,ScoreLevel.SOFT,nightStarts,nightEnds);
+        MaximumNumberOfNightsWTATemplate maximumNumberOfNights = new MaximumNumberOfNightsWTATemplate(4,-6,ScoreLevel.SOFT,nightStarts,nightEnds);
+        MaximumShiftLengthWTATemplate maximumShiftLength = new MaximumShiftLengthWTATemplate(600,-4,ScoreLevel.SOFT);
+        MaximumShiftsInIntervalWTATemplate maximumShiftsInInterval = new MaximumShiftsInIntervalWTATemplate(6,-5,ScoreLevel.SOFT);
         maximumShiftsInInterval.setInterval(interval);
-        MinimumConsecutiveNightsWTATemplate minimumConsecutiveNights = new MinimumConsecutiveNightsWTATemplate(2,-1,ScoreLevel.MEDIUM,nightStarts,nightEnds);
-        MinimumDailyRestingTimeWTATemplateTemplate minimumDailyRestingTime = new MinimumDailyRestingTimeWTATemplateTemplate(660,-1,ScoreLevel.MEDIUM);
-        MinimumDurationBetweenShiftWTATemplate minimumDurationBetweenShift = new MinimumDurationBetweenShiftWTATemplate(60,-1,ScoreLevel.MEDIUM);
-        MinimumRestConsecutiveNightsWTATemplate minimumRestConsecutiveNights = new MinimumRestConsecutiveNightsWTATemplate(400,3,-1,ScoreLevel.MEDIUM,nightStarts,nightEnds);
-        MinimumRestInConsecutiveDaysWTATemplate minimumRestInConsecutiveDays = new MinimumRestInConsecutiveDaysWTATemplate(200,4,-1,ScoreLevel.MEDIUM);
-        MinimumShiftLengthWTATemplate minimumShiftLength = new MinimumShiftLengthWTATemplate(120,-1,ScoreLevel.MEDIUM);
-        MinimumWeeklyRestPeriodWTATemplate minimumWeeklyRestPeriod = new MinimumWeeklyRestPeriodWTATemplate(1200,-1,ScoreLevel.MEDIUM);
+        MinimumConsecutiveNightsWTATemplate minimumConsecutiveNights = new MinimumConsecutiveNightsWTATemplate(2,-1,ScoreLevel.SOFT,nightStarts,nightEnds);
+        MinimumDailyRestingTimeWTATemplateTemplate minimumDailyRestingTime = new MinimumDailyRestingTimeWTATemplateTemplate(660,-1,ScoreLevel.SOFT);
+        MinimumDurationBetweenShiftWTATemplate minimumDurationBetweenShift = new MinimumDurationBetweenShiftWTATemplate(60,-1,ScoreLevel.SOFT);
+        MinimumRestConsecutiveNightsWTATemplate minimumRestConsecutiveNights = new MinimumRestConsecutiveNightsWTATemplate(400,3,-1,ScoreLevel.SOFT,nightStarts,nightEnds);
+        MinimumRestInConsecutiveDaysWTATemplate minimumRestInConsecutiveDays = new MinimumRestInConsecutiveDaysWTATemplate(200,4,-1,ScoreLevel.SOFT);
+        MinimumShiftLengthWTATemplate minimumShiftLength = new MinimumShiftLengthWTATemplate(120,-1,ScoreLevel.SOFT);
+        MinimumWeeklyRestPeriodWTATemplate minimumWeeklyRestPeriod = new MinimumWeeklyRestPeriodWTATemplate(1200,-1,ScoreLevel.SOFT);
         minimumWeeklyRestPeriod.setInterval(interval);
         //NumberOfWeekendShiftInPeriodWTATemplate numberOfWeekendShiftInPeriod = new NumberOfWeekendShiftInPeriodWTATemplate(2,-5,ScoreLevel.SOFT);
-        NumberOfWeekendShiftInPeriodWTATemplate numberOfWeekendShiftInPeriod = new NumberOfWeekendShiftInPeriodWTATemplate(2, 4,new LocalTime(14,0),0,new LocalTime(7,15),false,-5,ScoreLevel.MEDIUM,getPlanningWeekStart());
-        ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRest = new ShortestAndAverageDailyRestWTATemplate(320,-5,ScoreLevel.MEDIUM);
+        NumberOfWeekendShiftInPeriodWTATemplate numberOfWeekendShiftInPeriod = new NumberOfWeekendShiftInPeriodWTATemplate(2, 4,new LocalTime(14,0),0,new LocalTime(7,15),false,-5,ScoreLevel.SOFT,getPlanningWeekStart());
+        ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRest = new ShortestAndAverageDailyRestWTATemplate(320,-5,ScoreLevel.SOFT);
         WorkingTimeConstraints workingTimeConstraints = new WorkingTimeConstraints();
         workingTimeConstraints.setMaximumAverageScheduledTime(maximumAverageScheduledTime);
         workingTimeConstraints.setMaximumConsecutiveWorkingDays(maximumConsecutiveWorkingDays);
@@ -602,7 +463,7 @@ public class ShiftPlanningGenerator {
     }
 
     public LocalDate getPlanningWeekStart(){
-        return DateTimeFormat.forPattern("dd/MM/yyyy").parseLocalDate("21/12/2019");
+        return DateTimeFormat.forPattern("dd/MM/yyyy").parseLocalDate("18/12/2019");
     }
    /* public List<LocalDate> getPlanningWeek(){
         LocalDate weekStart=getPlanningWeekStart();
@@ -803,10 +664,10 @@ public class ShiftPlanningGenerator {
     }
     private List<Activity> getActivities(){
         TimeType[] timeTypes= createTimeTypes();
-        List<Tag> tags1 = createTags1();
-        List<Tag> tags2 = createTags2();
-        List<Tag> tags3 = createTags3();
-        List<Tag> tags4 = createTags4();
+        Set<Tag> tags1 = createTags1();
+        Set<Tag> tags2 = createTags2();
+        Set<Tag> tags3 = createTags3();
+        Set<Tag> tags4 = createTags4();
         List<Activity> activityPlannerEntities = new ArrayList<>();
         Activity activity = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[0], 1,10, null,tags1);
         activity.setConstraintMap(getActivityContraints());
@@ -823,8 +684,8 @@ public class ShiftPlanningGenerator {
         return activityPlannerEntities;
     }
 
-    public List<Tag> createTags1(){
-        List<Tag> tags = new ArrayList<>();
+    public Set<Tag> createTags1(){
+        Set<Tag> tags = new HashSet<>();
         Tag tag1 = new Tag(new BigInteger("1"),"StaffTag", STAFF, false, 958);
         Tag tag2 = new Tag(new BigInteger("2"),"ActivityTag", ACTIVITY, true, 18712);
         Tag tag3 = new Tag(new BigInteger("3"),"SkillTag", SKILL, false, 958);
@@ -834,18 +695,19 @@ public class ShiftPlanningGenerator {
         return tags;
     }
 
-    public List<Tag> createTags2(){
-        List<Tag> tags = new ArrayList<>();
+    public Set<Tag> createTags2(){
+        Set<Tag> tags = new HashSet<>();
         Tag tag1 = new Tag(new BigInteger("1"),"StaffTag",EXPERTISE , false, 958);
         Tag tag2 = new Tag(new BigInteger("2"),"ActivityTag", ACTIVITY, true, 18712);
         Tag tag3 = new Tag(new BigInteger("3"),"SkillTag", SKILL, false, 958);
+
         tags.add(tag1);
         tags.add(tag2);
         tags.add(tag3);
         return tags;
     }
-    public List<Tag> createTags3(){
-        List<Tag> tags = new ArrayList<>();
+    public Set<Tag> createTags3(){
+        Set<Tag> tags = new HashSet<>();
         Tag tag1 = new Tag(new BigInteger("1"),"StaffTag", WTA, false, 958);
         Tag tag2 = new Tag(new BigInteger("2"),"ActivityTag", ACTIVITY, true, 18712);
         Tag tag3 = new Tag(new BigInteger("3"),"SkillTag", SKILL, false, 958);
@@ -854,8 +716,8 @@ public class ShiftPlanningGenerator {
         tags.add(tag3);
         return tags;
     }
-    public List<Tag>  createTags4(){
-        List<Tag> tags = new ArrayList<>();
+    public Set<Tag>  createTags4(){
+        Set<Tag> tags = new HashSet<>();
         Tag tag1 = new Tag(new BigInteger("1"),"StaffTag", CTA, false, 958);
         Tag tag2 = new Tag(new BigInteger("2"),"ActivityTag", ACTIVITY, true, 18712);
         Tag tag3 = new Tag(new BigInteger("3"),"SkillTag", SKILL, false, 958);
@@ -883,8 +745,8 @@ public class ShiftPlanningGenerator {
         unitConstraints.setShiftOnWeekend(shiftOnWeekend);
         //Prefer Permanent Employee
         PreferedEmployementType preferedEmployementType = new PreferedEmployementType();
-        preferedEmployementType.setEmploymentTypeId(3l);
-        preferedEmployementType.setLevel(ScoreLevel.MEDIUM);
+        preferedEmployementType.setPreferedEmploymentTypeIds(newHashSet(123l,145l));
+        preferedEmployementType.setLevel(ScoreLevel.SOFT);
         preferedEmployementType.setWeight(3);
         unitConstraints.setPreferedEmployementType(preferedEmployementType);
 

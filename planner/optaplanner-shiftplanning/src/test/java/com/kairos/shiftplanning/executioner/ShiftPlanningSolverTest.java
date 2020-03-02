@@ -24,7 +24,6 @@ import static com.kairos.enums.constraint.ConstraintSubType.*;
 //@PropertySource("/media/pradeep/bak/multiOpta/task-shiftplanning/src/main/resources/taskplanner.properties")
 public class ShiftPlanningSolverTest {
     @Test
-    @Ignore
     public void test() {
         //RequestedTask requestedTask =  new RequestedTask();
         //requestedTask.loadXMLFromDB();

@@ -93,30 +93,6 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
                 if(overlaps(activityLineIntervalsOuter,activityLineIntervalsInner)){
                     List<ActivityLineInterval> mergedAlis=new ArrayList<>();
                     boolean innerStartsFirst=activityLineIntervalsOuter.get(0).getStart().isAfter(activityLineIntervalsInner.get(0).getStart());
-                    /*if(innerStartsFirst){//A1B1
-                        int innerPartitionStart=-1;
-                        for(int i=0;i<activityLineIntervalsInner.size();i++){
-                            ActivityLineInterval ali=activityLineIntervalsInner.get(i);
-                            if(ali.getStart().isEqual(outersPartitionTime)){
-                                innerPartitionStart=i;
-                                break;
-                            }
-                        }
-                        mergedAlis.addAll(activityLineIntervalsOuter.subList(0,outerPartitionIndex));
-                        mergedAlis.addAll(activityLineIntervalsInner.subList(innerPartitionStart,activityLineIntervalsInner.size()));
-                    }else{//Write this else B1-A1
-                        int innerPartitionStart=-1;
-                        for(int i=0;i<activityLineIntervalsInner.size();i++){
-                            ActivityLineInterval ali=activityLineIntervalsInner.get(i);
-                            if(ali.getStart().isEqual(outersPartitionTime)){
-                                innerPartitionStart=i;
-                                break;
-                            }
-                        }
-                        mergedAlis.addAll(activityLineIntervalsOuter.subList(0,outerPartitionIndex));
-                        mergedAlis.addAll(activityLineIntervalsInner.subList(innerPartitionStart,activityLineIntervalsInner.size()));
-
-                    }*/
                     int innerPartitionStart=-1;
                     for(int i=0;i<activityLineIntervalsInner.size();i++){
                         ActivityLineInterval ali=activityLineIntervalsInner.get(i);

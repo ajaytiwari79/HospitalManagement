@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -35,5 +36,23 @@ public class Tag {
         }else {
             this.organizationId = countryOrOrdId;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tag tag = (Tag) o;
+        return countryTag == tag.countryTag &&
+                countryId == tag.countryId &&
+                organizationId == tag.organizationId &&
+                Objects.equals(tagId, tag.tagId) &&
+                Objects.equals(name, tag.name) &&
+                masterDataType == tag.masterDataType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tagId, name, masterDataType, countryTag, countryId, organizationId);
     }
 }
