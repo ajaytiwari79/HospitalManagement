@@ -117,26 +117,19 @@ public class StaffingLevelCalculationServiceTest {
                 "  \"employmentId\" : 3057,\n" +
                 "  \"activities\" : [ {\n" +
                 "    \"status\" : [ \"PUBLISH\" ],\n" +
-                "    \"message\" : null,\n" +
                 "    \"success\" : false,\n" +
-                "    \"activity\" : null,\n" +
                 "    \"activityId\" : 1005,\n" +
                 "    \"startDate\" : \"2020-02-27T00:00:00.000+0000\",\n" +
                 "    \"endDate\" : \"2020-02-27T06:00:00.000+0000\",\n" +
                 "    \"scheduledMinutes\" : 300,\n" +
                 "    \"durationMinutes\" : 300,\n" +
                 "    \"activityName\" : \"Team D\",\n" +
-                "    \"reasonCodeId\" : null,\n" +
-                "    \"absenceReasonCodeId\" : null,\n" +
-                "    \"remarks\" : null,\n" +
                 "    \"id\" : 2,\n" +
                 "    \"timeType\" : \"WORKING_TYPE\",\n" +
                 "    \"backgroundColor\" : \"#abe7fc\",\n" +
                 "    \"haltBreak\" : false,\n" +
                 "    \"breakShift\" : false,\n" +
                 "    \"breakReplaced\" : true,\n" +
-                "    \"reasonCode\" : null,\n" +
-                "    \"allowedBreakDurationInMinute\" : null,\n" +
                 "    \"timeBankCtaBonusMinutes\" : 50,\n" +
                 "    \"timeBankCTADistributions\" : [ {\n" +
                 "      \"ctaName\" : \"Night To Time bank\",\n" +
@@ -149,19 +142,11 @@ public class StaffingLevelCalculationServiceTest {
                 "      \"ctaDate\" : \"2020-01-08\",\n" +
                 "      \"minutes\" : 0\n" +
                 "    } ],\n" +
-                "    \"payoutPerShiftCTADistributions\" : [ ],\n" +
-                "    \"location\" : null,\n" +
-                "    \"description\" : null,\n" +
-                "    \"wtaRuleViolations\" : null,\n" +
                 "    \"plannedMinutesOfTimebank\" : 350,\n" +
                 "    \"startLocation\" : \"\",\n" +
                 "    \"endLocation\" : \"\",\n" +
                 "    \"scheduledMinutesOfTimebank\" : 300,\n" +
                 "    \"scheduledMinutesOfPayout\" : 0,\n" +
-                "    \"secondLevelType\" : null,\n" +
-                "    \"secondLevelTimeTypeId\" : null,\n" +
-                "    \"thirdLevelTimeTypeId\" : null,\n" +
-                "    \"fourthLevelTimeTypeId\" : null,\n" +
                 "    \"plannedTimes\" : [ {\n" +
                 "      \"plannedTimeId\" : 2,\n" +
                 "      \"startDate\" : \"2020-02-27T00:00:00.000+0000\",\n" +
@@ -172,9 +157,6 @@ public class StaffingLevelCalculationServiceTest {
                 "    \"payoutCtaBonusMinutes\" : 0,\n" +
                 "    \"childActivities\" : [ ],\n" +
                 "    \"breakNotHeld\" : false,\n" +
-                "    \"employmentId\" : null,\n" +
-                "    \"phaseId\" : null,\n" +
-                "    \"shiftType\" : null,\n" +
                 "    \"breakInterrupt\" : false,\n" +
                 "    \"totalPlannedMinutes\" : 350,\n" +
                 "    \"totalCtaBonusMinutes\" : 50\n" +
