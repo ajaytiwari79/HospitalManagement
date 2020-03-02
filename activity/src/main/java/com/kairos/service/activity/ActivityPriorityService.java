@@ -165,7 +165,7 @@ public class ActivityPriorityService {
         ActivityPriority activityPriority = activityPriorityMongoRepository.findOne(activityPriorityId);
         activityPriority.setDeleted(true);
         activityPriorityMongoRepository.save(activityPriority);
-        List<ActivityPriority> activityPriorities = activityPriorityMongoRepository.findAllGreaterThenAndEqualSequenceAndCountryId(activityPriority.getSequence(), countryId, new Sort(Sort.Direction.ASC, "sequence"));
+        List<ActivityPriority> activityPriorities = activityPriorityMongoRepository.findAllGreaterThenAndEqualSequenceAndCountryId(activityPriority.getSequence(), countryId, Sort.by(Sort.Direction.ASC, "sequence"));
         updateSequence(activityPriority, activityPriorities);
         activityPriorityMongoRepository.saveAll(activityPriorities);
         return true;
@@ -187,7 +187,7 @@ public class ActivityPriorityService {
         ActivityPriority activityPriority = activityPriorityMongoRepository.findOne(activityPriorityId);
         activityPriority.setDeleted(true);
         activityPriorityMongoRepository.save(activityPriority);
-        List<ActivityPriority> activityPriorities = activityPriorityMongoRepository.findAllGreaterThenAndEqualSequenceAndOrganizationId(activityPriority.getSequence(), organizationId, new Sort(Sort.Direction.ASC, "sequence"));
+        List<ActivityPriority> activityPriorities = activityPriorityMongoRepository.findAllGreaterThenAndEqualSequenceAndOrganizationId(activityPriority.getSequence(), organizationId, Sort.by(Sort.Direction.ASC, "sequence"));
         updateSequence(activityPriority, activityPriorities);
         activityPriorityMongoRepository.saveAll(activityPriorities);
         return true;

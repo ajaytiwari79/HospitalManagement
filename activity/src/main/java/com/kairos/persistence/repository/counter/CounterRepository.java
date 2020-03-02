@@ -364,13 +364,6 @@ public class CounterRepository{
         return aggregationResults.getMappedResults();
     }
 
-    ;
-
-/*
-Criteria.where(LEVEL).is(ConfLevel.COUNTRY.toString()),Criteria.where(LEVEL).is()
-               ,Criteria.where("kpiValidity").is(KPIValidity.MANDATORY.toString()),Criteria.where("kpiValidity").is(KPIValidity.OPTIONAL.toString()));
- */
-
     public List<TabKPIConf> findTabKPIConfigurationByTabIds(List<String> tabIds, List<BigInteger> kpiIds, Long refId, ConfLevel level) {
         String refQueryField = getRefQueryField(level);
         Query query = new Query(Criteria.where(DELETED).is(false).and(TAB_ID).in(tabIds).and(KPI_ID1).in(kpiIds).and(refQueryField).is(refId).and(LEVEL).is(level).and(KPI_VALIDITY).nin(KPIValidity.MANDATORY, KPIValidity.OPTIONAL));
@@ -423,7 +416,7 @@ Criteria.where(LEVEL).is(ConfLevel.COUNTRY.toString()),Criteria.where(LEVEL).is(
         mongoTemplate.remove(query, AccessGroupKPIEntry.class);
     }
 
-    public void removeApplicableKPI(List<Long> refIds, List<BigInteger> kpiIds, Long unitId, ConfLevel level) {
+    public void removeApplicableKPI(List<Long> refIds, List<BigInteger> kpiIds, ConfLevel level) {
         String refQueryField = getRefQueryField(level);
         Query query = ConfLevel.STAFF.equals(level) ? new Query(Criteria.where(DELETED).is(false).and(refQueryField).in(refIds).and(BASE_KPI_ID).in(kpiIds).and(LEVEL).in(level)) :
                 new Query(Criteria.where(DELETED).is(false).and(refQueryField).in(refIds).and(BASE_KPI_ID).in(kpiIds));

@@ -363,7 +363,7 @@ public class TimeBankService{
         TimeBankDTO timeBankDTO = timeBankCalculationService.getTimeBankOverview(unitId, employmentId, startDate, endDate, dailyTimeBankEntries, employmentWithCtaDetailsDTO);
             Long actualTimebankMinutes = getAccumulatedTimebankAndDelta(employmentId, unitId, true);
             timeBankDTO.setActualTimebankMinutes(actualTimebankMinutes);
-        PlanningPeriodDTO planningPeriodDTO = planningPeriodService.getStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
+        PlanningPeriodDTO planningPeriodDTO = planningPeriodService.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
         timeBankDTO.setPlanningPeriodStartDate(planningPeriodDTO.getStartDate());
         timeBankDTO.setPlanningPeriodEndDate(planningPeriodDTO.getEndDate());
         return timeBankDTO;

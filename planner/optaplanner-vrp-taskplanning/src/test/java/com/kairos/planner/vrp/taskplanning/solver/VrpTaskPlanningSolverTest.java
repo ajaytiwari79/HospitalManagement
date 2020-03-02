@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class VrpTaskPlanningSolverTest {
 
     @Test
-    @Ignore
+    //@Ignore
     public void solve() throws IOException {
         boolean readFromSolution=false;
         if(readFromSolution){

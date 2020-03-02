@@ -90,26 +90,13 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public TimeTypeDTO updateTimeType(TimeTypeDTO timeTypeDTO, Long countryId) {
-
-        boolean timeTypesExists = timeTypeMongoRepository.timeTypeAlreadyExistsByLabelAndCountryId(timeTypeDTO.getId(), timeTypeDTO.getLabel(), countryId);
-        if (timeTypesExists) {
-            exceptionService.duplicateDataException(MESSAGE_TIMETYPE_NAME_ALREADYEXIST);
-        }
-
-        TimeType timeType = timeTypeMongoRepository.findOneById(timeTypeDTO.getId());
-        if (!Optional.ofNullable(timeType).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND);
-        }
+        TimeType timeType = getAndValidateTimeType(timeTypeDTO, countryId);
         List<TimeType> timeTypes = new ArrayList<>();
         List<TimeType> childTimeTypes = timeTypeMongoRepository.findAllChildByParentId(timeType.getId(), countryId);
         Map<BigInteger, List<TimeType>> childTimeTypesMap = childTimeTypes.stream().collect(Collectors.groupingBy(t -> t.getUpperLevelTimeTypeId(), Collectors.toList()));
         List<BigInteger> childTimeTypeIds = childTimeTypes.stream().map(timetype -> timetype.getId()).collect(Collectors.toList());
         List<TimeType> leafTimeTypes = timeTypeMongoRepository.findAllChildTimeTypeByParentId(childTimeTypeIds);
         Map<BigInteger, List<TimeType>> leafTimeTypesMap = leafTimeTypes.stream().collect(Collectors.groupingBy(timetype -> timetype.getUpperLevelTimeTypeId(), Collectors.toList()));
-        if (timeType.getUpperLevelTimeTypeId() == null && !timeType.getLabel().equalsIgnoreCase(timeTypeDTO.getLabel())) {
-            //User Cannot Update NAME for TimeTypes of Second Level
-            exceptionService.actionNotPermittedException(MESSAGE_TIMETYPE_RENAME_NOTALLOWED, timeType.getLabel());
-        }
         activityService.updateBackgroundColorInShifts(timeTypeDTO.getBackgroundColor(), timeType.getBackgroundColor(),timeType.getId());
         updateDetailsTimeType(timeTypeDTO, timeType);
         updateOrganizationHierarchyDetailsInTimeType(timeTypeDTO, timeType);
@@ -124,6 +111,23 @@ public class TimeTypeService extends MongoBaseService {
         }
         timeTypeMongoRepository.saveEntities(timeTypes);
         return timeTypeDTO;
+    }
+
+    private TimeType getAndValidateTimeType(TimeTypeDTO timeTypeDTO, Long countryId) {
+        boolean timeTypesExists = timeTypeMongoRepository.timeTypeAlreadyExistsByLabelAndCountryId(timeTypeDTO.getId(), timeTypeDTO.getLabel(), countryId);
+        if (timeTypesExists) {
+            exceptionService.duplicateDataException(MESSAGE_TIMETYPE_NAME_ALREADYEXIST);
+        }
+
+        TimeType timeType = timeTypeMongoRepository.findOneById(timeTypeDTO.getId());
+        if (!Optional.ofNullable(timeType).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND);
+        }
+        if (timeType.getUpperLevelTimeTypeId() == null && !timeType.getLabel().equalsIgnoreCase(timeTypeDTO.getLabel())) {
+            //User Cannot Update NAME for TimeTypes of Second Level
+            exceptionService.actionNotPermittedException(MESSAGE_TIMETYPE_RENAME_NOTALLOWED, timeType.getLabel());
+        }
+        return timeType;
     }
 
     private void updateOrganizationHierarchyDetailsInTimeType(TimeTypeDTO timeTypeDTO, TimeType timeType) {
