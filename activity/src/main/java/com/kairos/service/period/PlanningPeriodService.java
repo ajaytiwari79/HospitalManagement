@@ -251,7 +251,7 @@ public class PlanningPeriodService extends MongoBaseService {
             LocalDateTime tempFlippingDate = startDate.atStartOfDay();
             boolean scopeToFlipNextPhase = true;
             BigInteger previousPhaseId = null;
-            int index = updateFlipingDateByPlanningPeriod(applicablePhases,tempFlippingDate,scopeToFlipNextPhase,currentPhaseId,0,nextPhaseId,previousPhaseId,tempPhaseFlippingDate);
+            updateFlipingDateByPlanningPeriod(applicablePhases,tempFlippingDate,scopeToFlipNextPhase,currentPhaseId,nextPhaseId,previousPhaseId,tempPhaseFlippingDate);
         }
         planningPeriod.setCurrentPhaseId(currentPhaseId);
         planningPeriod.setNextPhaseId(nextPhaseId);
@@ -259,7 +259,8 @@ public class PlanningPeriodService extends MongoBaseService {
         return planningPeriod;
     }
 
-    private int updateFlipingDateByPlanningPeriod(List<PhaseDTO> applicablePhases, LocalDateTime tempFlippingDate, boolean scopeToFlipNextPhase, BigInteger currentPhaseId, int index, BigInteger nextPhaseId, BigInteger previousPhaseId, List<PeriodPhaseFlippingDate> tempPhaseFlippingDate){
+    private int updateFlipingDateByPlanningPeriod(List<PhaseDTO> applicablePhases, LocalDateTime tempFlippingDate, boolean scopeToFlipNextPhase, BigInteger currentPhaseId, BigInteger nextPhaseId, BigInteger previousPhaseId, List<PeriodPhaseFlippingDate> tempPhaseFlippingDate){
+        int index = 0;
         for (PhaseDTO phase : applicablePhases) {
             // Check if duration of period is enough to assign next flipping
             if (DurationType.DAYS.equals(phase.getDurationType())) {
@@ -307,11 +308,7 @@ public class PlanningPeriodService extends MongoBaseService {
             if (!startDate.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
                 startDateList.add(startDate);
             }
-            while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
-                LocalDate startDateOfMonday = startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
-                startDateList.add((startDateOfMonday.isBefore(endDate) ? startDateOfMonday : startDate));
-                startDate = startDate.plusWeeks(planningPeriodDTO.getDuration());
-            }
+            updateStartDateByPlanningPeriod(startDate, endDate, planningPeriodDTO, startDateList);
         } else {
             while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
                 LocalDate startDateOfMonth = ((startDate.getDayOfMonth() != 1) ? startDate : startDate.withDayOfMonth(1));
@@ -320,6 +317,14 @@ public class PlanningPeriodService extends MongoBaseService {
             }
         }
         return startDateList;
+    }
+
+    private void updateStartDateByPlanningPeriod(LocalDate startDate, LocalDate endDate, PlanningPeriodDTO planningPeriodDTO, List<LocalDate> startDateList) {
+        while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
+            LocalDate startDateOfMonday = startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+            startDateList.add((startDateOfMonday.isBefore(endDate) ? startDateOfMonday : startDate));
+            startDate = startDate.plusWeeks(planningPeriodDTO.getDuration());
+        }
     }
 
     public LocalDate getNextValidDateForPlanningPeriod(LocalDate startDate, PlanningPeriodDTO planningPeriodDTO) {
@@ -471,7 +476,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 planningPeriodDTO.getPuzzleToConstructionDate().getHours(), planningPeriodDTO.getPuzzleToConstructionDate().getMinutes(), planningPeriodDTO.getPuzzleToConstructionDate().getSeconds()) : null;
         LocalDateTime draftFlippingDate = (Optional.ofNullable(planningPeriodDTO.getConstructionToDraftDate()).isPresent()) ? getLocalDateTime(planningPeriodDTO.getConstructionToDraftDate().getDate(), planningPeriodDTO.getConstructionToDraftDate().getHours(),
                 planningPeriodDTO.getConstructionToDraftDate().getMinutes(), planningPeriodDTO.getConstructionToDraftDate().getSeconds()) : null;
-        boolean valid = !((puzzleFlippingDateTime == null || (puzzleFlippingDateTime != null && constructionFlippingDate != null && constructionFlippingDate.isAfter(puzzleFlippingDateTime))) && (constructionFlippingDate == null || (constructionFlippingDate != null && draftFlippingDate != null && draftFlippingDate.isAfter(constructionFlippingDate))));
+        boolean valid = !((isNull(puzzleFlippingDateTime) || (isNotNull(puzzleFlippingDateTime) && constructionFlippingDate != null && constructionFlippingDate.isAfter(puzzleFlippingDateTime))) && (constructionFlippingDate == null || (constructionFlippingDate != null && draftFlippingDate != null && draftFlippingDate.isAfter(constructionFlippingDate))));
         if (valid) {
             exceptionService.actionNotPermittedException(MESSAGE_PERIOD_INVALID_FLIPPINGDATE);
         }
