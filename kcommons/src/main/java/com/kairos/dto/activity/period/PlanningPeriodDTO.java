@@ -2,6 +2,7 @@ package com.kairos.dto.activity.period;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.phase.PhaseDefaultName;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -44,6 +45,7 @@ public class PlanningPeriodDTO {
     private boolean active=true;
     private Set<Long> publishEmploymentIds=new HashSet<>();
     private String color;
+    private PhaseDefaultName phaseEnum;
 
     public PlanningPeriodDTO( LocalDate startDate, int duration, DurationType durationType, int recurringNumber, LocalDate endDate){
         this.startDate = startDate;
