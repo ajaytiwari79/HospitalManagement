@@ -251,7 +251,9 @@ public class PlanningPeriodService extends MongoBaseService {
             LocalDateTime tempFlippingDate = startDate.atStartOfDay();
             boolean scopeToFlipNextPhase = true;
             BigInteger previousPhaseId = null;
-            updateFlipingDateByPlanningPeriod(applicablePhases,tempFlippingDate,scopeToFlipNextPhase,currentPhaseId,nextPhaseId,previousPhaseId,tempPhaseFlippingDate);
+            BigInteger[] bigIntegers = updateFlipingDateByPlanningPeriod(applicablePhases,tempFlippingDate,scopeToFlipNextPhase,currentPhaseId,nextPhaseId,previousPhaseId,tempPhaseFlippingDate);
+            currentPhaseId = bigIntegers[0];
+            nextPhaseId = bigIntegers[1];
         }
         planningPeriod.setCurrentPhaseId(currentPhaseId);
         planningPeriod.setNextPhaseId(nextPhaseId);
@@ -259,7 +261,7 @@ public class PlanningPeriodService extends MongoBaseService {
         return planningPeriod;
     }
 
-    private int updateFlipingDateByPlanningPeriod(List<PhaseDTO> applicablePhases, LocalDateTime tempFlippingDate, boolean scopeToFlipNextPhase, BigInteger currentPhaseId, BigInteger nextPhaseId, BigInteger previousPhaseId, List<PeriodPhaseFlippingDate> tempPhaseFlippingDate){
+    private BigInteger[] updateFlipingDateByPlanningPeriod(List<PhaseDTO> applicablePhases, LocalDateTime tempFlippingDate, boolean scopeToFlipNextPhase, BigInteger currentPhaseId, BigInteger nextPhaseId, BigInteger previousPhaseId, List<PeriodPhaseFlippingDate> tempPhaseFlippingDate){
         int index = 0;
         for (PhaseDTO phase : applicablePhases) {
             // Check if duration of period is enough to assign next flipping
@@ -282,7 +284,7 @@ public class PlanningPeriodService extends MongoBaseService {
             tempPhaseFlippingDate.add(periodPhaseFlippingDate);
             index += 1;
         }
-        return index;
+        return new BigInteger[]{currentPhaseId,nextPhaseId};
     }
 
     // To create Planning Period object and to save the list
