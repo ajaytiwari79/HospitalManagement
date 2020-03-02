@@ -318,7 +318,7 @@ public class PhaseService extends MongoBaseService {
                 phase = getActualPhaseApplicableForDate(requestedDate, null, phaseMap, untilTentative, timeZone);
             }
             if(isNull(phase)){
-                exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PHASES,unitId);
+                exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PHASES_ON_DATE,unitId,requestedDate);
             }
             localDatePhaseStatusMap.put(DateUtils.asDate(requestedDate), phase);
         }
