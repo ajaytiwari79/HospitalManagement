@@ -94,20 +94,7 @@ public class SkillKPIServiceTestCase {
 
     @Test
     public void testTotalSkillOfStaffBetweenInterval(){
-        Mockito.when(userIntegrationService.getAllSkillIdAndLevelByStaffIds(anyLong(),anyList())).thenReturn(staffPersonalDetails);
         int totalSkill = skillKPIService.getCountOfSkillByMonth(staffIds.get(0),staffPersonalDetails,dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate());
         Assert.assertEquals(1,totalSkill);
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }

@@ -1,0 +1,1 @@
+db.getCollection('counter').update({"type":"ACTIVITY_KPI"},{"$push":{"filterTypes":"EMPLOYMENT_SUB_TYPE"}},{multi: true});
