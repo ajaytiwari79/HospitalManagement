@@ -98,6 +98,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_TIMETYPE_LINKED_REASON_CODE = "message.timetype.linked.reason_code";
     public static final String MESSAGE_QUESTIONNAIRE_FREQUENCY = "message.questionnaire.frequency";
     public static final String MESSAGE_ORGANIZATION_PHASES = "message.organization.phases";
+    public static final String MESSAGE_ORGANIZATION_PHASES_ON_DATE = "message.organization.phases.ondate";
     public static final String MESSAGE_MISMATCHED_IDS = "message.mismatched-ids";
     public static final String MESSAGE_ACTIVITY_NOTALLOW = "message.activity.notallow";
     public static final String MESSAGE_PARAMETERS_INCORRECT = "message.parameters.incorrect";
