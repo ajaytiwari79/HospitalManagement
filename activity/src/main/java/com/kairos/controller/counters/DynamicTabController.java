@@ -43,6 +43,11 @@ public class DynamicTabController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,  dynamicTabService.getDashboardTabOfRef(unitId,ConfLevel.STAFF));
     }
 
+   @PostMapping(UNIT_URL+STAFF_URL +COUNTER_CONF_URL+ DASHBOARD_SAVE_URL)
+    public ResponseEntity<Map<String, Object>> saveDashboardTabAtStaffLevel(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,  dynamicTabService.addDefaultTab(unitId,ConfLevel.STAFF));
+    }
+
     @PostMapping(UNIT_URL +COUNTER_CONF_URL+ DASHBOARD_URL)
     public ResponseEntity<Map<String, Object>> addDashboardTabAtUnitLevel(@PathVariable Long unitId, @RequestBody List<KPIDashboardDTO> kpiDashboardList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dynamicTabService.addDashboardTabToRef(unitId,null,kpiDashboardList, ConfLevel.UNIT));

@@ -6,6 +6,7 @@ import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPerm
 import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
 import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.persistence.model.counter.KPIDashboard;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -20,6 +21,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
@@ -40,6 +42,31 @@ public class DynamicTabService extends MongoBaseService {
      * @param level
      * @return
      */
+    public boolean addDefaultTab(Long refId, ConfLevel level) {
+
+        List<KPIDashboardDTO> kpiDashboardDTOS;
+        KPIDashboard kpiDashboard=null;
+        int flag;
+        if (ConfLevel.STAFF.equals(level)) {
+            List<StaffPersonalDetail> staffDTOS = userIntegrationService.getStaffListByUnit();
+            for(StaffPersonalDetail staff:staffDTOS) {
+                kpiDashboard = new KPIDashboard("module_1", "module_1_786", "Default", 18712L, refId, staff.getId(), level, true);
+                kpiDashboardDTOS = counterRepository.getKPIDashboard(refId, level, staff.getId());
+                flag=0;
+                for (KPIDashboardDTO kpiDashboardDTO : kpiDashboardDTOS) {
+                    if (kpiDashboardDTO.getName().equals("Default")) {
+                        flag++;
+                        break;
+                    }
+                }
+                if(flag==0)
+                    counterRepository.save(kpiDashboard);
+              }
+          }
+        return true;
+    }
+
+
     public List<KPIDashboardDTO> getDashboardTabOfRef(Long refId, ConfLevel level) {
         List<KPIDashboardDTO> kpiDashboardDTOS;
         if (ConfLevel.STAFF.equals(level)) {
@@ -50,6 +77,8 @@ public class DynamicTabService extends MongoBaseService {
         }
         return kpiDashboardDTOS;
     }
+
+
 
     public List<KPIDashboardDTO> addDashboardTabToRef(Long unitId, Long countryId, List<KPIDashboardDTO> kpiDashboardDTOS, ConfLevel level) {
         Long staffId;
