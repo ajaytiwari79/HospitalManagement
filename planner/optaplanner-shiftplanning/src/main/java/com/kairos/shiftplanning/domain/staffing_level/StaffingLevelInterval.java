@@ -13,7 +13,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @XStreamAlias("StaffingLevelInterval")
-@Deprecated
 public class StaffingLevelInterval {
     private DateTime start;
     private DateTime end;

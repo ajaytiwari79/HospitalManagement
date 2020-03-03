@@ -97,6 +97,10 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
         return shift.getBreaks() != null && shift.getBreaks().stream().filter(brk -> brk.getInterval().overlaps(this.getInterval())).findFirst().isPresent();
     }
 
+    public ShiftActivity getShiftActivity(){
+        return new ShiftActivity(this.start,this.activity,this.getEnd());
+    }
+
     @Override
     public int compareTo(ActivityLineInterval o) {
         return this.getStart().compareTo(o.getStart());

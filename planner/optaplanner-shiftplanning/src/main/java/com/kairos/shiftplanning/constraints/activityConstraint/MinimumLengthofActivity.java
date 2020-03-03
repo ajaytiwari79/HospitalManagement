@@ -47,4 +47,9 @@ public class MinimumLengthofActivity implements Constraint {
         return totalDiff/15;
     }
 
+    @Override
+    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+        return 0;
+    }
+
 }

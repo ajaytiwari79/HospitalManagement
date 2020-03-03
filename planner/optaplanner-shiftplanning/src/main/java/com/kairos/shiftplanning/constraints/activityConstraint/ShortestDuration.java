@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,6 +31,11 @@ public class ShortestDuration implements Constraint {
             int duration = Math.round((float)minutes/shift.getMinutes()*100);
             return duration<shortestDuration?shortestDuration-duration:0;
         }*/
+        return 0;
+    }
+
+    @Override
+    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
         return 0;
     }
 }

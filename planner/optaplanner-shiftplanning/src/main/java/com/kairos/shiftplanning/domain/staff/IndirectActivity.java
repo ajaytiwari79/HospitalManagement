@@ -53,8 +53,4 @@ public class IndirectActivity {
     public boolean overlapsInterval(Interval interval){
         return this.getInterval()!=null && interval!=null && interval.overlaps(this.getInterval());
     }
-
-    public boolean canBePlanned(List<ShiftImp> shifts) {
-        return ShiftPlanningUtility.checkEmployeesAvailability(shifts, employees, startTime);
-    }
 }

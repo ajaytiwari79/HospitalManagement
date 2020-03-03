@@ -41,4 +41,9 @@ public class MaxAllocationPerShift implements Constraint {
         }
         return allocatedActivityCount > maxAllocationPerShift?allocatedActivityCount-maxAllocationPerShift:0;
     }
+
+    @Override
+    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+        return 0;
+    }
 }

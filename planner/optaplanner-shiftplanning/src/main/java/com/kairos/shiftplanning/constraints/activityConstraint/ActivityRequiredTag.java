@@ -37,4 +37,9 @@ public class ActivityRequiredTag implements Constraint {
         return 1;
     }
 
+    @Override
+    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+        return 0;
+    }
+
 }
