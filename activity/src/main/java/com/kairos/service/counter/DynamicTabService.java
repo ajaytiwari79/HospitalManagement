@@ -35,6 +35,10 @@ public class DynamicTabService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private CounterDistService counterDistService;
+    final String PARENT_MODULE_ID="module_1";
+    final String MODULE_ID="module_1_786";
+    final String DEFAULT_TAB="Default";
+    final long COUNTRY_ID=18712L;
 
 
     /**
@@ -52,8 +56,8 @@ public class DynamicTabService extends MongoBaseService {
             List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboardsOfStaffs(refId, level, staffDTOS.stream().map(k -> k.getId()).collect(Collectors.toList()));
             Map<Long, List<KPIDashboardDTO>> staffDefaultMap = kpiDashboardDTOS.stream().collect(Collectors.groupingBy(k -> k.getStaffId()));
             for (StaffPersonalDetail staff : staffDTOS) {
-                if (staffDefaultMap.get(staff.getId()).stream().noneMatch(k -> "Default".equals(k.getName()))) {
-                    kpiDashboards.add(new KPIDashboard("module_1", "module_1_786", "Default", 18712L, refId, staff.getId(), level, true));
+                if (staffDefaultMap.get(staff.getId()).stream().noneMatch(k -> DEFAULT_TAB.equals(k.getName()))) {
+                    kpiDashboards.add(new KPIDashboard(PARENT_MODULE_ID, MODULE_ID, DEFAULT_TAB, COUNTRY_ID, refId, staff.getId(), level, true));
                 }
             }
             kpiDashboards=kpiDashboards.stream().filter(KPIDashboard->isNotNull(KPIDashboard)).collect(Collectors.toList());
