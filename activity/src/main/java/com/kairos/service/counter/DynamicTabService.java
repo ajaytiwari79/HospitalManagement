@@ -22,7 +22,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
@@ -35,10 +35,10 @@ public class DynamicTabService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private CounterDistService counterDistService;
-    final String PARENT_MODULE_ID="module_1";
-    final String MODULE_ID="module_1_786";
-    final String DEFAULT_TAB="Default";
-    final long COUNTRY_ID=18712L;
+    final String PARENT_MODULE_ID = "module_1";
+    final String MODULE_ID = "module_1_786";
+    final String DEFAULT_TAB = "Default";
+    final long COUNTRY_ID = 18712L;
 
 
     /**
@@ -60,10 +60,11 @@ public class DynamicTabService extends MongoBaseService {
                     kpiDashboards.add(new KPIDashboard(PARENT_MODULE_ID, MODULE_ID, DEFAULT_TAB, COUNTRY_ID, refId, staff.getId(), level, true));
                 }
             }
-            if(kpiDashboards.size()!=0)
-            counterRepository.saveEntities(kpiDashboards);
-
-        }    return true;
+            if (isCollectionNotEmpty(kpiDashboards)) {
+                counterRepository.saveEntities(kpiDashboards);
+            }
+        }
+        return true;
     }
 
 
