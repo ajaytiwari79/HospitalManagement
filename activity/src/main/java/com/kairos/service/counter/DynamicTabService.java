@@ -60,7 +60,7 @@ public class DynamicTabService extends MongoBaseService {
                     kpiDashboards.add(new KPIDashboard(PARENT_MODULE_ID, MODULE_ID, DEFAULT_TAB, COUNTRY_ID, refId, staff.getId(), level, true));
                 }
             }
-            kpiDashboards=kpiDashboards.stream().filter(KPIDashboard->isNotNull(KPIDashboard)).collect(Collectors.toList());
+            if(kpiDashboards.size()!=0)
             counterRepository.saveEntities(kpiDashboards);
 
         }    return true;
