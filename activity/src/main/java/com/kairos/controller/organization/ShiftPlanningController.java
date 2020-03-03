@@ -1,7 +1,7 @@
 package com.kairos.controller.organization;
 
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.service.organization.ShiftPlanningService;
+import com.kairos.wrapper.shift.StaffShiftDetails;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +22,7 @@ public class ShiftPlanningController {
     private ShiftPlanningService shiftPlanningService;
 
     @GetMapping(value = "/staff_and_shift_details")
-    public List<ShiftWithActivityDTO> shiftsAndPlanningSettings(@PathVariable Long unitId){
+    public List<StaffShiftDetails> shiftsAndPlanningSettings(@PathVariable Long unitId){
        return shiftPlanningService.getShiftPlanningDetailsForUnit(unitId);
     }
 }

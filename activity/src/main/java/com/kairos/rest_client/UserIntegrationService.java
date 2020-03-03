@@ -918,10 +918,10 @@ public class UserIntegrationService {
 //        return genericRestClient.publishRequest(employmentIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_total_sum_of_paylevel", queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
 //    }
     public List<StaffShiftDetails> getAllPlanningStaffForUnit(Long unitId){
-       StaffShiftDetails[] staffShiftDetails = restTemplate.getForObject("http://localdev.kairosplanning.com/kairos/user/api/v1/unit/1172/staff/get_all_planning_staff?moduleId=12",StaffShiftDetails[].class);
-//        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/staff/get_all_planning_staff", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffShiftDetails>>>() {
-//        });
-        return Arrays.asList(staffShiftDetails);
+//       StaffShiftDetails[] staffShiftDetails = restTemplate.getForObject("http://localdev.kairosplanning.com/kairos/user/api/v1/unit/1172/staff/get_all_planning_staff?moduleId=12",StaffShiftDetails[].class);
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/staff/get_all_planning_staff", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffShiftDetails>>>() {
+        });
+//        return Arrays.asList(staffShiftDetails);
     }
 
 

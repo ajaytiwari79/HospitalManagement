@@ -1129,9 +1129,10 @@ public class StaffService {
     }
 
     public List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId){
-        LocalDate localDate = LocalDate.now();
+        LocalDate localDate = LocalDate.of(2020,01,01);
        String dateToday = DateUtils.formatLocalDate(localDate,"dd-MM-yyyy");
 
         return staffGraphRepository.getAllStaffForUnitWithEmploymentStatus(unitId,dateToday);
     }
+
 }
