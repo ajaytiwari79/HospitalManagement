@@ -73,10 +73,10 @@ public class GdprServiceRestClient {
     }
 
 
-    public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-        final String baseUrl = getGdprServiceBaseUrl(isUnit,id)+uri;
-        String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
-        try {
+   public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+        final String baseUrl = getGdprServiceBaseUrl(isUnit, id) + uri;
+        String url = baseUrl + getURIWithParam(queryParam).replace("%2C+", ",");
+       try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
                             url,

@@ -6,12 +6,14 @@ import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPerm
 import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
 import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+
 import com.kairos.persistence.model.counter.KPIDashboard;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
@@ -32,6 +35,11 @@ public class DynamicTabService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private CounterDistService counterDistService;
+    final String PARENT_MODULE_ID = "module_1";
+    final String MODULE_ID = "module_1_786";
+    final String DEFAULT_TAB = "Default";
+    final long COUNTRY_ID = 18712L;
+
 
     /**
      * @param refId it can be either countryId or unitId based on level
@@ -40,6 +48,26 @@ public class DynamicTabService extends MongoBaseService {
      * @param level
      * @return
      */
+    public boolean addDefaultTab(Long refId, ConfLevel level) {
+
+        List<KPIDashboard> kpiDashboards = new ArrayList<>();
+        if (ConfLevel.STAFF.equals(level)) {
+            List<StaffPersonalDetail> staffDTOS = userIntegrationService.getStaffListByUnit();
+            List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboardsOfStaffs(refId, level, staffDTOS.stream().map(k -> k.getId()).collect(Collectors.toList()));
+            Map<Long, List<KPIDashboardDTO>> staffDefaultMap = kpiDashboardDTOS.stream().collect(Collectors.groupingBy(k -> k.getStaffId()));
+            for (StaffPersonalDetail staff : staffDTOS) {
+                if (staffDefaultMap.get(staff.getId()).stream().noneMatch(k -> DEFAULT_TAB.equals(k.getName()))) {
+                    kpiDashboards.add(new KPIDashboard(PARENT_MODULE_ID, MODULE_ID, DEFAULT_TAB, COUNTRY_ID, refId, staff.getId(), level, true));
+                }
+            }
+            if (isCollectionNotEmpty(kpiDashboards)) {
+                counterRepository.saveEntities(kpiDashboards);
+            }
+        }
+        return true;
+    }
+
+
     public List<KPIDashboardDTO> getDashboardTabOfRef(Long refId, ConfLevel level) {
         List<KPIDashboardDTO> kpiDashboardDTOS;
         if (ConfLevel.STAFF.equals(level)) {
@@ -50,6 +78,7 @@ public class DynamicTabService extends MongoBaseService {
         }
         return kpiDashboardDTOS;
     }
+
 
     public List<KPIDashboardDTO> addDashboardTabToRef(Long unitId, Long countryId, List<KPIDashboardDTO> kpiDashboardDTOS, ConfLevel level) {
         Long staffId;
