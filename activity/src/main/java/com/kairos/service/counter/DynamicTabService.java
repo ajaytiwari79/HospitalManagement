@@ -56,7 +56,7 @@ public class DynamicTabService extends MongoBaseService {
             List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboardsOfStaffs(refId, level, staffDTOS.stream().map(k -> k.getId()).collect(Collectors.toList()));
             Map<Long, List<KPIDashboardDTO>> staffDefaultMap = kpiDashboardDTOS.stream().collect(Collectors.groupingBy(k -> k.getStaffId()));
             for (StaffPersonalDetail staff : staffDTOS) {
-                if (staffDefaultMap.get(staff.getId()).stream().noneMatch(k -> DEFAULT_TAB.equals(k.getName()))) {
+                if (staffDefaultMap.getOrDefault(staff.getId(),new ArrayList<>()).stream().noneMatch(k -> DEFAULT_TAB.equals(k.getName()))) {
                     kpiDashboards.add(new KPIDashboard(PARENT_MODULE_ID, MODULE_ID, DEFAULT_TAB, COUNTRY_ID, refId, staff.getId(), level, true));
                 }
             }
