@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 @Getter
 @Setter
@@ -34,5 +35,10 @@ public class MaxDiffrentActivity implements Constraint {
             activities.add(ali.getActivity());
         }
         return activities.size()>maxDiffrentActivity?activities.size()-maxDiffrentActivity:0;
+    }
+
+    @Override
+    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+        return 0;
     }
 }

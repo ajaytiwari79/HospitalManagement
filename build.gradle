@@ -78,7 +78,7 @@ sonarqube {
         property "sonar.host.url","http://sonarqube.oodleslab.com"
         property "sonar.login","b6799511be0b33e4b35e17db1747a232e6c18a3c"
         property "sonar.sourceEncoding", "UTF-8"
-        property "sonar.exclusions", ["task-planning/**"]
+        property "sonar.exclusions", ["task-planning/**","kairos-user/planner/optaplanner-taskplanning/**","kairos-user/planner/optaplanner-vrp-taskplanning/**"]
     }
 }
 
@@ -109,9 +109,9 @@ task verifyRelease {
     dependsOn ":gdpr:build"
     dependsOn ":activity:build"
     dependsOn ":scheduler-service:build"
-    dependsOn ":planner:optaplanner-shiftplanning:build"
+    dependsOn ":planner:optaplanner-shiftplanning:build"/*
     dependsOn ":planner:optaplanner-taskplanning:build"
-    dependsOn ":planner:optaplanner-vrp-taskplanning:build"
+    dependsOn ":planner:optaplanner-vrp-taskplanning:build"*/
 }
 
 beforeReleaseBuild.dependsOn verifyRelease

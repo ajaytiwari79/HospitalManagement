@@ -5,6 +5,7 @@ import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
 import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.domain.skill.Skill;
+import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -46,6 +47,7 @@ public class Employee {
     private PaidOutFrequencyEnum paidOutFrequencyEnum;
     private Long employmentTypeId;
     private Long employmentId;
+    private Set<Tag> tags;
 
 
     public Employee(String id, String name, Set<Skill> skillSet, Long expertiseId, int totalWeeklyMinutes, int workingDaysInWeek, PaidOutFrequencyEnum paidOutFrequencyEnum, Long employmentTypeId) {

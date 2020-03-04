@@ -3,43 +3,27 @@ package com.kairos.shiftplanning.constraints.unitConstraint;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.wta.ConstraintHandler;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
+@Setter
+@Getter
 public class ShiftOnWeekend implements ConstraintHandler {
 
     private ScoreLevel level;
     private int weight;
-
-    @Override
-    public ScoreLevel getLevel() {
-        return level;
-    }
-
-    public void setLevel(ScoreLevel level) {
-        this.level = level;
-    }
-
-    @Override
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
+    private Set<DayOfWeek> weekEndSet = newHashSet(DayOfWeek.SATURDAY,DayOfWeek.SUNDAY);
 
 
     public  int checkConstraints(List<ShiftImp> shifts){
-        List<ShiftImp> shiftImps= new ArrayList<>();
-        for(ShiftImp shiftImp:shifts){
-            if(shiftImp.getDate().dayOfWeek().get() == DayOfWeek.SATURDAY.getValue() || shiftImp.getDate().dayOfWeek().get() == DayOfWeek.SUNDAY.getValue()){
-                shiftImps.add(shiftImp);
-            }
-        }
-        return shiftImps.size();
+        return (int)shifts.stream().filter(shiftImp -> weekEndSet.contains(shiftImp.getDate())).count();
     }
 
 

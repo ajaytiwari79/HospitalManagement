@@ -20,7 +20,7 @@ public class ShiftBreakListener implements VariableListener<Shift> {
 
     @Override
     public void afterEntityAdded(ScoreDirector scoreDirector, Shift shift) {
-        //updateBreaks(scoreDirector,shift);
+        //Not in use
     }
 
     @Override
@@ -30,8 +30,7 @@ public class ShiftBreakListener implements VariableListener<Shift> {
 
     @Override
     public void afterVariableChanged(ScoreDirector scoreDirector, Shift shift) {
-        //updateBreaks(scoreDirector,shift);
-
+        //Not in use
     }
     @Override
     public void beforeEntityRemoved(ScoreDirector scoreDirector, Shift shift) {
@@ -47,15 +46,14 @@ public class ShiftBreakListener implements VariableListener<Shift> {
         if(((ShiftImp)shift).isAbsenceActivityApplied()){
             return;
         }
-        List<ShiftBreak> breaks= ShiftPlanningUtility.generateBreaksForShift(shift);
+        List<ShiftBreak> breaks= ShiftPlanningUtility.generateBreaksForShift();
         if(!Objects.equals(shift.getBreaks(),breaks)){
             scoreDirector.beforeVariableChanged(shift,"breaks");
             shift.setBreaks(breaks);
             scoreDirector.afterVariableChanged(shift,"breaks");
             if(CollectionUtils.isNotEmpty(breaks)){
-                //FIXME this triggers ali->shift which triggers shift->alis (IRSV) and then alis->start and start->breaks and break's overlapping ali-> null(shift) again making a loop
+                //TODO this triggers ali->shift which triggers shift->alis (IRSV) and then alis->start and start->breaks and break's overlapping ali-> null(shift) again making a loop
                 //Also UNDO move wont undo breaks.. so it's more problematic than anything
-               // ShiftPlanningUtility.unassignShiftIntervalsOverlappingBreaks(scoreDirector,(ShiftImp) shift,breaks);
             }
 
         }
