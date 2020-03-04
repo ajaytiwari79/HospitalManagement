@@ -2,7 +2,7 @@ package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.activity.activity.TranslationInfo;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.CompositeShiftActivityDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.ActivityStateEnum;

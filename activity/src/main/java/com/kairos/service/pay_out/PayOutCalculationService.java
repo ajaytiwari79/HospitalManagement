@@ -89,7 +89,7 @@ public class PayOutCalculationService {
                             PayOutPerShiftCTADistributionDTO payOutPerShiftCTADistributionDTO = new PayOutPerShiftCTADistributionDTO(ruleTemplate.getName(),  ctaScheduledOrCompensationMinutes, ruleTemplate.getId());
                             shiftActivityDTO.getPayoutPerShiftCTADistributions().add(payOutPerShiftCTADistributionDTO);
                         }
-                        shiftActivityDTO.setPayoutCtaBonusMinutes(shiftActivity.getPayoutCtaBonusMinutes() + ctaScheduledOrCompensationMinutes);
+                        shiftActivityDTO.setPayoutCtaBonusMinutes(shiftActivityDTO.getPayoutCtaBonusMinutes() + ctaScheduledOrCompensationMinutes);
 
                     }
                     ctaPayoutMinMap.put(ruleTemplate.getId(), ctaPayoutMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaScheduledOrCompensationMinutes);

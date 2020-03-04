@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kairos.dto.activity.activity.TranslationInfo;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.common.UserInfo;
 import lombok.Getter;
 import lombok.Setter;

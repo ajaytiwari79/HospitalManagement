@@ -37,8 +37,8 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         getCurrentUserDetails();
         String orgIdString=isNotNull(pathVariables) ? pathVariables.get("organizationId") : null;
         String unitIdString=isNotNull(pathVariables) ? pathVariables.get("unitId") : null;
-        LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
-                + "]" + request.getRequestURI()+"[ organizationID ,Unit Id " +orgIdString+" ,"+unitIdString+" ]") ;
+        LOGGER.debug("[preHandle][" + request + "]" + "[" + request.getMethod()
+                + "]" + request.getRequestURI()+"[ organizationID ,Unit Id " +orgIdString+" ,"+unitIdString+" ]"); ;
         updateOrganizationId(orgIdString);
         updateUnitId(unitIdString);
         ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
