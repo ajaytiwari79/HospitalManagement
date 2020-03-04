@@ -1,6 +1,7 @@
 package com.kairos.controller.data_inventory.asset;
 
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
 import com.kairos.service.data_inventory.asset.AssetService;
@@ -111,6 +112,18 @@ class AssetController {
     @PutMapping("/asset/{assetId}")
     public ResponseEntity<Object> updateAssetData(@PathVariable Long unitId, @PathVariable Long assetId, @Valid @RequestBody AssetDTO asset) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.updateAssetData(unitId, assetId, asset));
+    }
+
+    @ApiOperation(value = "add translated data")
+    @PostMapping("/asset/{assetId}/update_translation")
+    public ResponseEntity<Object> updateTranslation(@PathVariable Long assetId, @RequestBody TranslationInfo translationData) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.updateTranslation(assetId, translationData));
+    }
+
+    @ApiOperation(value = "get translated data")
+    @GetMapping("/asset/{assetId}/translation")
+    public ResponseEntity<Object> getTranslatedData(@PathVariable Long assetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getTranslatedData(assetId));
     }
 
 }
