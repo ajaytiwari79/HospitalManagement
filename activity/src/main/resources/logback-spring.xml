@@ -32,7 +32,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="development,test,local,production,qa">
+    <springProfile name="development,test,production,qa">
         <logger name="org.springframework.kafka" level="OFF"/>
         <logger name="org.apache.kafka" level="OFF"/>
         <logger name="org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport" level="OFF"/>
