@@ -363,11 +363,13 @@ public class CountryService {
     }
 
     public boolean deleteLevel(long countryId, long levelId) {
+        if(countryGraphRepository.isPublishedPayTable(countryId, levelId)){
+            exceptionService.actionNotPermittedException(MESSAGE_COUNTRY_LEVEL_CANNOT_DELETE);
+        }
         Level levelToDelete = countryGraphRepository.getLevel(countryId, levelId);
         if (levelToDelete == null) {
             logger.debug("Finding level by id::" + levelId);
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_LEVEL_ID_NOTFOUND, levelId);
-
         }
 
         levelToDelete.setEnabled(false);
