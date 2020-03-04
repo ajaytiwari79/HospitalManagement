@@ -2,7 +2,7 @@ package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.activity.activity.TranslationInfo;
+import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.GraphId;

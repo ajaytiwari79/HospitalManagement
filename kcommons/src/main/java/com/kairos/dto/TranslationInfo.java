@@ -1,4 +1,4 @@
-package com.kairos.dto.activity.activity;
+package com.kairos.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

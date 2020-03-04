@@ -1,15 +1,11 @@
 package com.kairos.service.employment;
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.PositionDTO;
-import com.kairos.enums.scheduler.Result;
-import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
 import com.kairos.persistence.model.staff.position.Position;
-import com.kairos.persistence.model.staff.position.PositionQueryResult;
 import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.EmploymentLine;
 import com.kairos.persistence.model.user.employment.EmploymentLineEmploymentTypeRelationShip;
@@ -24,16 +20,18 @@ import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.scheduler.SchedulerToUserQueueService;
 import com.kairos.service.scheduler.UserSchedulerJobService;
 import com.kairos.service.scheduler.UserToSchedulerQueueService;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,6 +47,7 @@ import static com.kairos.constants.UserMessagesConstants.MESSAGE_REASONCODE_ID_N
 @Service
 @Transactional
 public class EmploymentJobService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerToUserQueueService.class);
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
     @Inject
@@ -74,7 +73,6 @@ public class EmploymentJobService {
 
     public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId, Long unitId) {
         LocalDate todayDate = getCurrentLocalDate();
-        String log = null;
         try {
             List<EmploymentSeniorityLevelQueryResult> employmentSeniorityLevelQueryResults = employmentGraphRepository.findEmploymentSeniorityLeveltoUpdate();
             if (isCollectionNotEmpty(employmentSeniorityLevelQueryResults)) {
@@ -101,7 +99,7 @@ public class EmploymentJobService {
                                 .build();
                         employmentLine.get().setEndDate(todayDate.minusDays(1));
                         currentEmployment.getEmploymentLines().add(newEmploymentLine);
-                        updateSeniorityLevelOfAllValidEmploymentLine(currentEmployment,employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getSeniorityLevel(),employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getExpertiseEndDate(),employmentLine.get().getEndDate());
+                        updateSeniorityLevelOfAllValidEmploymentLine(currentEmployment,employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getSeniorityLevel(),employmentLine.get().getEndDate(),employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getExpertiseEndDate());
                         newEmploymentLineWithParentId.put(new EmploymentIdDTO(currentEmployment.getId(), null, employmentLine.get().getId()), newEmploymentLine);
                     }
                 }
@@ -118,15 +116,13 @@ public class EmploymentJobService {
                 employmentAndEmploymentTypeRelationShipGraphRepository.saveAll(employmentLineEmploymentTypeRelationShips);
             }
         } catch (Exception ex) {
-            log = ex.getMessage();
+            LOGGER.info(ex.getMessage());
         }
-
-        //userSchedulerJobService.createJobForEmploymentEnd(schedulerPanelId, unitId, started, stopped, log, result);
     }
 
-    private void updateSeniorityLevelOfAllValidEmploymentLine(Employment currentEmployment, SeniorityLevel seniorityLevel, LocalDate expertiseEndDate, LocalDate startDate) {
+    private void updateSeniorityLevelOfAllValidEmploymentLine(Employment currentEmployment, SeniorityLevel seniorityLevel, LocalDate startDate, LocalDate endDate) {
         List<EmploymentLine> employmentLines = currentEmployment.getEmploymentLines().stream()
-                .filter(pl -> !startDate.isAfter(pl.getStartDate()) && (isNull(pl.getEndDate()) || !expertiseEndDate.isBefore(pl.getEndDate()))).collect(Collectors.toList());
+                .filter(pl -> !startDate.isAfter(pl.getStartDate()) && (isNull(pl.getEndDate()) || !endDate.isBefore(pl.getEndDate()))).collect(Collectors.toList());
         employmentLines.forEach(employmentLine -> employmentLine.setSeniorityLevel(seniorityLevel));
     }
 
@@ -138,14 +134,14 @@ public class EmploymentJobService {
 
         }
         List<Employment> employments = employmentGraphRepository.getEmploymentsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis).toString());
-        Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(positionDTO.getReasonCodeId(), 0);
-        if (!reasonCode.isPresent()) {
+        ReasonCode reasonCode = reasonCodeGraphRepository.findOne(positionDTO.getReasonCodeId(), 0);
+        if (isNull(reasonCode)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, positionDTO.getReasonCodeId());
         }
         for (Employment employment : employments) {
             employment.setEndDate(DateUtils.getLocalDate(endDateMillis));
             if (!Optional.ofNullable(employment.getReasonCode()).isPresent()) {
-                employment.setReasonCode(reasonCode.get());
+                employment.setReasonCode(reasonCode);
             }
         }
         if (CollectionUtils.isNotEmpty(employments)) {
@@ -158,22 +154,15 @@ public class EmploymentJobService {
         position.setEndDateMillis(endDateMillis);
         positionGraphRepository.deletePositionReasonCodeRelation(staffId);
 
-        position.setReasonCode(reasonCode.get());
+        position.setReasonCode(reasonCode);
         position.setAccessGroupIdOnPositionEnd(positionDTO.getAccessGroupIdOnPositionEnd());
         employmentGraphRepository.saveAll(employments);
         positionGraphRepository.save(position);
-        User user = userGraphRepository.getUserByStaffId(staffId);
-        PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnPositionEnd());
         return employmentService.getEmploymentsOfStaff(unitId,staffId,true);
-
     }
 
     public void updateNightWorkers(){
         List<Map> employments = employmentGraphRepository.findStaffsWithEmploymentIds();
         activityIntegrationService.updateNightWorkers(employments);
-
     }
-
-
-
 }
