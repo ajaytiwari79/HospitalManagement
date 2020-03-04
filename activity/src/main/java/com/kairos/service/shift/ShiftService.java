@@ -713,7 +713,7 @@ public class ShiftService extends MongoBaseService {
 
     private ShiftWithViolatedInfoDTO validateRuleCheck(Shift shift, boolean ruleCheckRequired, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO, boolean valid, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shiftWithActivityDTO, Shift oldStateShift) {
         if (ruleCheckRequired) {
-            if (!valid) {
+            if (!valid && oldStateShift.getShiftType().equals(shift.getShiftType())) {
                 validateStaffingLevel(shift, activityWrapperMap, phase, oldStateShift);
             }
             shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldStateShift, activityWrapperMap, true, false);
