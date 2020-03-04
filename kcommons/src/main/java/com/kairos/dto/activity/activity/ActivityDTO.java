@@ -3,6 +3,7 @@ package com.kairos.dto.activity.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.enums.shift.ShiftStatus;

@@ -1,7 +1,7 @@
 package com.kairos.controller.organization;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.TranslationInfo;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;

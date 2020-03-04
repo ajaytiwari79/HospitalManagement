@@ -1,6 +1,6 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
-import com.kairos.dto.activity.activity.TranslationInfo;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.TimeTypeEnum;
 import lombok.Getter;

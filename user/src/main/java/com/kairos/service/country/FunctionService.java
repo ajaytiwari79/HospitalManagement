@@ -1,7 +1,7 @@
 package com.kairos.service.country;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.activity.TranslationInfo;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user_context.UserContext;
