@@ -36,14 +36,12 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         getCurrentUserDetails();
         updateUserInfo(request, pathVariables);
-        ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest httpServletRequest = servletRequest.getRequest();
 
-        String tabId = httpServletRequest.getParameter("moduleId");
+        String tabId = request.getParameter("moduleId");
         if(Optional.ofNullable(tabId).isPresent()){
             UserContext.setTabId(tabId);
         }
-        return isNotNull(httpServletRequest);
+        return isNotNull(request);
     }
 
     private void getCurrentUserDetails() {
@@ -82,12 +80,5 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
                 UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
             }
         }
-
-        String tabId = request.getParameter("moduleId");
-        if(Optional.ofNullable(tabId).isPresent()){
-            UserContext.setTabId(tabId);
-        }
-        LOGGER.info(" module id received is {}",tabId);
-        return isNotNull(request);
     }
 }

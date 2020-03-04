@@ -31,6 +31,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             HttpServletRequest request,
             HttpServletResponse response,
             Object handler) {
+
         if(request.getRequestURL().toString().contains("/scheduler_execute_job")) return true;
         if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
@@ -42,13 +43,12 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
                 + "]" + request.getRequestURI()+"[ organizationID ,Unit Id " +orgIdString+" ,"+unitIdString+" ]"); ;
         updateOrganizationId(orgIdString);
         updateUnitId(unitIdString);
-        ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest httpServletRequest = servletRequest.getRequest();
-        String tabId = httpServletRequest.getParameter("moduleId");
+
+        String tabId = request.getParameter("moduleId");
         if(Optional.ofNullable(tabId).isPresent()){
             UserContext.setTabId(tabId);
         }
-        return isNotNull(httpServletRequest);
+        return isNotNull(request);
     }
 
     private void getCurrentUserDetails() {
@@ -76,13 +76,5 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             UserContext.setUnitId(unitId);
             UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
         }
-
-//        ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-//        HttpServletRequest httpServletRequest = servletRequest.getRequest();
-        String tabId = request.getParameter("moduleId");
-        if(Optional.ofNullable(tabId).isPresent()){
-            UserContext.setTabId(tabId);
-        }
-        return isNotNull(request);
     }
 }
