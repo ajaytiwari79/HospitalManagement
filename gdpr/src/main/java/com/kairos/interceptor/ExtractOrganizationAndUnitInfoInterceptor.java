@@ -56,7 +56,7 @@ class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapte
         String unitIdString=isNull(pathVariables) ? null : pathVariables.get("unitId");
         String orgIdString=isNull(pathVariables) ? null : pathVariables.get("organizationId");
         String countryIdString = isNull(pathVariables) ? null : pathVariables.get("countryId");
-        LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
+        LOGGER.debug("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI() + "[ organizationID ,Unit Id " + orgIdString + " ," + unitIdString + " ]");
         updateOrganizationId(orgIdString);
         updateCountryId(countryIdString);
