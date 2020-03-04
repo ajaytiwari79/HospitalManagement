@@ -63,7 +63,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                     limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                     isValid = isValid(minMaxSetting, limitAndCounter[0], restingHours) || restingHours==NOT_VALID_VALUE;
                 }
-                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper, limitAndCounter[1], isValid, this, limitAndCounter[2], DurationType.HOURS, getHoursByMinutes(limitAndCounter[0],this.name));
+                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper, limitAndCounter[1], isValid, this, limitAndCounter[2], DurationType.HOURS.toValue(), getHoursByMinutes(limitAndCounter[0],this.name));
             }
         }
     }
@@ -96,7 +96,8 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                 if(checkBefore && !activity.getEndDate().after(date) && timeTypeEnums.contains(activity.getActivity().getBalanceSettingsActivityTab().getTimeType())){
                     int duration = (int)new DateTimeInterval(activity.getEndDate(),date).getMinutes();
                     restingHours = restingHours > duration || restingHours==NOT_VALID_VALUE ? duration : restingHours;
-                }if(!checkBefore && !activity.getStartDate().before(date) && timeTypeEnums.contains(activity.getActivity().getBalanceSettingsActivityTab().getTimeType())){
+                }
+                if(!checkBefore && !activity.getStartDate().before(date) && timeTypeEnums.contains(activity.getActivity().getBalanceSettingsActivityTab().getTimeType())){
                     int duration = (int)new DateTimeInterval(date,activity.getStartDate()).getMinutes();
                     restingHours = restingHours > duration || restingHours==NOT_VALID_VALUE ? duration : restingHours;
                 }

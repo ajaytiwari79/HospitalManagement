@@ -24,7 +24,7 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
 
     public List<StaffingLevel> getStaffingLevelsByUnitIdAndDate(Long unitId, Date startDate, Date endDate){
         Query query = new Query(Criteria.where("unitId").is(unitId).and(CURRENT_DATE).gte(startDate).lte(endDate).and("deleted").is(false));
-        query.with(new Sort(Sort.Direction.ASC, CURRENT_DATE));
+        query.with(Sort.by(Sort.Direction.ASC, CURRENT_DATE));
         return mongoTemplate.find(query,StaffingLevel.class);
     }
 

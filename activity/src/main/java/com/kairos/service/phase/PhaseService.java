@@ -310,16 +310,18 @@ public class PhaseService extends MongoBaseService {
         List<PlanningPeriod> planningPeriods=planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId,localDates);
         for(LocalDateTime requestedDate:dates){
             Phase phase;
-            if(requestedDate.isAfter(untilTentative)){
-               PlanningPeriod planningPeriod= planningPeriods.stream().filter(startDateFilter->startDateFilter.getStartDate().minusDays(1).atStartOfDay().isBefore(requestedDate)).
-                       filter(endDateFilter->endDateFilter.getEndDate().plusDays(1).atStartOfDay().isAfter(requestedDate)).findAny().orElse(null);
-               phase=phaseAndIdMap.get(planningPeriod.getCurrentPhaseId());
+            if (requestedDate.isAfter(untilTentative)) {
+                PlanningPeriod planningPeriod = planningPeriods.stream().filter(startDateFilter -> startDateFilter.getStartDate().minusDays(1).atStartOfDay().isBefore(requestedDate)).
+                        filter(endDateFilter -> endDateFilter.getEndDate().plusDays(1).atStartOfDay().isAfter(requestedDate)).findAny().orElse(null);
+                phase = phaseAndIdMap.get(planningPeriod.getCurrentPhaseId());
+            } else {
+                phase = getActualPhaseApplicableForDate(requestedDate, null, phaseMap, untilTentative, timeZone);
             }
-            else {
-               phase= getActualPhaseApplicableForDate(requestedDate,null,phaseMap,untilTentative,timeZone);
+            if(isNull(phase)){
+                exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PHASES_ON_DATE,unitId,requestedDate);
             }
-            localDatePhaseStatusMap.put(DateUtils.asDate(requestedDate),phase);
-            }
+            localDatePhaseStatusMap.put(DateUtils.asDate(requestedDate), phase);
+        }
         }
         return localDatePhaseStatusMap;
     }

@@ -30,6 +30,7 @@ public final class ApiConstants {
     public static final String COUNTRY_ACTIVITY_CONFIGURATION = COUNTRY_URL + "/activity_configuration";
     public static final String UNIT_ACTIVITY_CONFIGURATION = UNIT_URL + "/activity_configuration";
     public static final String DASHBOARD_URL = "/dashboard_tab";
+    public static final String DASHBOARD_SAVE_URL = "/save_dashboard_tab";
     public static final String COUNTERS = "/counters";
     public static final String CATEGORY = "/category";
     public static final String TAB = "/tab";
@@ -174,6 +175,7 @@ public final class ApiConstants {
 
     public static final String REQUEST_ABSENCE = API_V1+"/request_absence";
     public static final String TODO = API_V1 + UNIT_URL+"/todo";
+    public static final Long DEFAULT_ID =-1l;
 
 
 }

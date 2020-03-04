@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -39,11 +40,11 @@ public class Activity {
     private int order;
     private int rank;
     private List<Long> expertises;
-    private List<Tag> tags;
+    private Set<Tag> tags;
 
 
 
-    public Activity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises, List<Tag> tags) {
+    public Activity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises, Set<Tag> tags) {
         this.id = id;
         this.skills = skills;
         this.priority = priority;
@@ -81,6 +82,10 @@ public class Activity {
     public int checkActivityConstraints(ShiftImp shift, ConstraintSubType constraintSubType) {
         if(shift.isLocked()) return 0;
         return constraintMap.get(constraintSubType).checkConstraints(this,shift);
+    }
+
+    public int checkActivityConstraints(List<ShiftImp> shifts, ConstraintSubType constraintSubType) {
+        return constraintMap.get(constraintSubType).checkConstraints(this,shifts);
     }
 
 

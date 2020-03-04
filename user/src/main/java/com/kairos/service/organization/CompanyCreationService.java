@@ -429,6 +429,9 @@ public class CompanyCreationService {
         if(unitGraphRepository.existsByName("(?i)"+organizationBasicDTO.getName())) {
             exceptionService.duplicateDataException(ERROR_ORGANIZATION_NAME_DUPLICATE, organizationBasicDTO.getName());
         }
+        if(organizationBasicDTO.getName().length() < 3 ){
+            exceptionService.actionNotPermittedException(ERROR_UNIT_NAME_INSUFFIENT);
+        }
         Country country=parentUnit.getCountry();
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(organizationBasicDTO);
         Unit unit = new OrganizationBuilder().setName(WordUtils.capitalize(organizationBasicDTO.getName())).setDescription(organizationBasicDTO.getDescription())
@@ -498,6 +501,9 @@ public class CompanyCreationService {
             contactAddress.setZipCode(zipCode);
         }
         if(addressDTO.getMunicipality() != null) {
+            if(isNull(addressDTO.getMunicipality().getId())){
+                exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
+            }
             Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId(), 0);
             if(municipality == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);

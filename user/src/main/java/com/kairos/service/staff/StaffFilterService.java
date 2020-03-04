@@ -19,6 +19,7 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
+import com.kairos.enums.cta.AccountType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
@@ -131,6 +132,7 @@ public class StaffFilterService {
     @Inject
     private UnitService unitService;
 
+
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
 
         return getAllAndFavouriteFiltersFromParent(moduleId, unitId);
@@ -151,6 +153,9 @@ public class StaffFilterService {
         }
         Long countryId = UserContext.getUserDetails().getCountryId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
+        if(isNull(staff)){
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
+        }
         StaffFilterDataDTO staffFilterDataDTO = activityIntegrationService.getStaffFilterDataByUnitId(unitId);
         return new FiltersAndFavouriteFiltersDTO(
                 getAllFilters(moduleId, countryId, unitId, staffFilterDataDTO),
@@ -218,22 +223,12 @@ public class StaffFilterService {
                 return dtoToQueryesultConverter(SkillLevel.getListOfSkillLevelForFilters(), objectMapper);
             case ACCESS_GROUPS:
                 return unitService.getAllAccessGroupByUnitIdForFilter(unitId);
-            /*case WTA_RULES:
-                return getWTARules(staffFilterDataDTO.getWtadtos());
-            case CTA_RULES:
-                return getCTARules(staffFilterDataDTO.getCtadtos());*/
+            case CTA_ACCOUNT_TYPE:
+                return getCTAAccounts();
             default:
                 break;
         }
         return new ArrayList<>();
-    }
-
-    private List<FilterSelectionQueryResult> getCTARules(List<CTAResponseDTO> ctadtos) {
-        return ctadtos.stream().map(cta  -> new FilterSelectionQueryResult(cta.getId().toString(),cta.getName())).collect(Collectors.toList());
-    }
-
-    private List<FilterSelectionQueryResult> getWTARules(List<WTAResponseDTO> wtadtos) {
-        return wtadtos.stream().map(wta  -> new FilterSelectionQueryResult(wta.getId().toString(),wta.getName())).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getTags(Long orgId) {
@@ -244,6 +239,10 @@ public class StaffFilterService {
     private List<FilterSelectionQueryResult> getGroups(Long unitId) {
         List<GroupDTO> groups = groupService.getAllGroupsOfUnit(unitId);
         return groups.stream().map(group  -> new FilterSelectionQueryResult(group.getId().toString(),group.getName())).collect(Collectors.toList());
+    }
+
+    private List<FilterSelectionQueryResult> getCTAAccounts() {
+        return Arrays.stream(AccountType.values()).map(accountType -> new FilterSelectionQueryResult(accountType.name(),accountType.toString())).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getTAStatus(){
@@ -480,7 +479,7 @@ public class StaffFilterService {
 
     private <T> List<Map> getFilteredStaffs(List<Map> staffListMap, FilterType filterType, Map<FilterType, Set<T>> filterData){
         Map ageRangeMap = (Map) filterData.get(filterType).iterator().next();
-        final AgeRangeDTO ageRange = new AgeRangeDTO(Integer.parseInt(ageRangeMap.get(FROM.toLowerCase()).toString()), isNotNull(ageRangeMap.get(TO.toLowerCase())) ? Integer.parseInt(ageRangeMap.get(TO.toLowerCase()).toString()) : null, isNull(ageRangeMap.get(DURATION_TYPE)) ? DurationType.DAYS : DurationType.valueOf(ageRangeMap.get(DURATION_TYPE).toString()));
+        AgeRangeDTO ageRange = new AgeRangeDTO(Integer.parseInt(ageRangeMap.get(FROM.toLowerCase()).toString()), isNotNull(ageRangeMap.get(TO.toLowerCase())) ? Integer.parseInt(ageRangeMap.get(TO.toLowerCase()).toString()) : null, isNull(ageRangeMap.get(DURATION_TYPE)) ? DurationType.DAYS : DurationType.valueOf(ageRangeMap.get(DURATION_TYPE).toString()));
         switch (filterType){
             case AGE:
                 staffListMap =  staffListMap.stream().filter(map -> isNotNull(map.get(DATE_OF_BIRTH)) && validate(asLocalDate(map.get(DATE_OF_BIRTH).toString()), getCurrentLocalDate(), ageRange)).collect(Collectors.toList());
@@ -489,6 +488,8 @@ public class StaffFilterService {
                 staffListMap =   staffListMap.stream().filter(map -> isNotNull(map.get(JOINING_BIRTH)) && validate(asLocalDate(map.get(JOINING_BIRTH).toString()), getCurrentLocalDate(), ageRange)).collect(Collectors.toList());
                 break;
             case BIRTHDAY:
+                ageRange.setTo(ageRange.getFrom());
+                ageRange.setFrom(0);
                 staffListMap =   staffListMap.stream().filter(map -> isNotNull(map.get(DATE_OF_BIRTH)) && validate(getCurrentLocalDate(), asLocalDate(getCurrentLocalDate().toString().substring(0,4) + map.get(DATE_OF_BIRTH).toString().substring(4)), ageRange)).collect(Collectors.toList());
                 break;
             case SENIORITY:

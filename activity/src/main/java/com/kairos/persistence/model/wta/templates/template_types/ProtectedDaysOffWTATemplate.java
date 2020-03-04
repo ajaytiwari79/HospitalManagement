@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_MISMATCHED_IDS;
 import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
 
 /**
@@ -32,7 +33,7 @@ import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
 @Getter
 @Setter
 public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
-    @NotNull(message = "message.mismatched-ids")
+    @NotNull(message = MESSAGE_MISMATCHED_IDS)
     private BigInteger activityId;
 
     public ProtectedDaysOffWTATemplate() {
@@ -49,7 +50,7 @@ public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
             if (protectedDaysOffWTATemplate.getActivityId().equals(infoWrapper.getShift().getActivities().get(0).getActivityId()) && intervalBalance.getAvailable() < 1) {
                 WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                         new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, (int) intervalBalance.getTotal(),
-                                DurationType.DAYS, String.valueOf(0));
+                                DurationType.DAYS.toValue(), String.valueOf(0));
                 infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
             }
         }

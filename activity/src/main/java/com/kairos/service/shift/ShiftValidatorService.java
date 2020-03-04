@@ -18,6 +18,7 @@ import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import com.kairos.enums.shift.*;
@@ -665,7 +666,7 @@ public class ShiftValidatorService {
             activity = activityMongoRepository.findByIdAndChildActivityEligibleForStaffingLevelTrue(shiftActivity.getActivityId());
         }
         outerLoop:
-        for (int currentIndex = lowerLimit; currentIndex <= upperLimit; currentIndex++) {
+        for (int currentIndex = lowerLimit; currentIndex <= upperLimit && currentIndex < applicableIntervals.size(); currentIndex++) {
             int shiftsCount = 0;
             Optional<StaffingLevelActivity> staffingLevelActivity = applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream()
                     .filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId()))
@@ -902,6 +903,11 @@ public class ShiftValidatorService {
         List<ShiftWithActivityDTO> overlappedShifts = shiftMongoRepository.findOverlappedShiftsByEmploymentId(byTandAPhase ?
                         shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getId(), startDate,
                 endDate);
+        if(isCollectionNotEmpty(overlappedShifts)) {
+            if (ShiftType.ABSENCE.equals(overlappedShifts.get(0).getShiftType())) {
+                overlappedShifts.get(0).setEndDate(asDateEndOfDay(asLocalDate(overlappedShifts.get(0).getStartDate())));
+            }
+        }
         if (!CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) && isShiftOverlap(overlappedShifts, shiftInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
             shiftOverlappedWithNonWorkingType = true;
         }
@@ -962,7 +968,7 @@ public class ShiftValidatorService {
 
 
     //This method is being used to check overlapping shift with full day and full week activity
-    public void checkAbsenceTypeShift(ShiftDTO shiftDTO) {
+    public void checkAbsenceTypeShift(ShiftDTO shiftDTO, ActivityWrapper activityWrapper) {
         Date startDate = null;
         Date endDate = null;
         List<Shift> shiftList = new ArrayList<>();
@@ -980,7 +986,7 @@ public class ShiftValidatorService {
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
         }
         boolean absenceShiftExists = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
-        if(isCollectionEmpty(shiftList)){
+        if(isCollectionEmpty(shiftList)||(shiftList.get(0).getActivities().get(0).getTimeType().equals(activityWrapper.getTimeType())&&TimeTypeEnum.ABSENCE.equals(activityWrapper.getTimeTypeInfo().getSecondLevelType()))){
             absenceShiftExists =false;
         }
         if (absenceShiftExists) {

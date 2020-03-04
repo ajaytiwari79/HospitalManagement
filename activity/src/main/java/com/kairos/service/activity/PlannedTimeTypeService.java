@@ -23,7 +23,7 @@ import java.util.Optional;
  */
 
 @Service
-public class PlannedTimeTypeService extends MongoBaseService {
+public class PlannedTimeTypeService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlannedTimeTypeService.class);
 
@@ -52,7 +52,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
         }
         plannedTimeType = new PlannedTimeType(presenceTypeDTO.getName(), countryId);
         plannedTimeType.setImageName(presenceTypeDTO.getImageName());
-        save(plannedTimeType);
+        plannedTimeTypeRepository.save(plannedTimeType);
         presenceTypeDTO.setId(plannedTimeType.getId());
         LOGGER.info(plannedTimeType.toString());
         return presenceTypeDTO;
@@ -72,7 +72,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
         }
         PlannedTimeType plannedTimeType = presenceTypeOptional.get();
         plannedTimeType.setDeleted(true);
-        save(plannedTimeType);
+        plannedTimeTypeRepository.save(plannedTimeType);
         return true;
     }
 

@@ -118,14 +118,16 @@ public class StaffCreationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffService.class);
 
     private Staff createStaffByUser(User user) {
-        Staff staff = new Staff();
-        staff.setEmail(user.getEmail());
-        staff.setFirstName(user.getFirstName());
-        staff.setLastName(user.getLastName());
-        staff.setUser(user);
-        staff.setContactDetail(user.getContactDetail());
-        staffGraphRepository.save(staff);
-        return staff;
+
+            Staff staff = new Staff();
+            staff.setEmail(user.getEmail());
+            staff.setFirstName(user.getFirstName());
+            staff.setLastName(user.getLastName());
+            staff.setUser(user);
+            staff.setContactDetail(user.getContactDetail());
+            staffGraphRepository.save(staff);
+            return staff;
+
     }
 
     private Staff updateStaffDetailsOnCreationOfStaff(Organization organization, StaffCreationDTO payload) {

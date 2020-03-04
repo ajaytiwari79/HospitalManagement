@@ -152,23 +152,19 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo ORDER BY employment.creationDate")
     List<EmploymentQueryResult> getAllEmploymentsBasicDetailsAndWTAByUser(long userId);
 
-
-
-    @Query( "MATCH(sector:Sector)-[:"+BELONGS_TO_SECTOR+"]-(expertise:Expertise{deleted:false}) \n" +
-            "WITH sector,expertise \n" +
-            "MATCH(staff:Staff)-[expertise_from_date:"+STAFF_HAS_EXPERTISE+"]->(expertise)\n" +
-            "WITH staff,sector,expertise,expertise_from_date \n" +
-            "WITH MIN(expertise_from_date.expertiseStartDate) as expertise_from_date,staff,expertise\n" +
+    @Query( "MATCH(staff:Staff)-[expertise_from_date:STAFF_HAS_EXPERTISE]->(expertise:Expertise) \n" +
+            "WITH staff,expertise,expertise_from_date.expertiseStartDate as expertise_from_date \n" +
             "WHERE expertise_from_date IS NOT NULL AND datetime({epochmillis:expertise_from_date}).month=datetime().month AND \n" +
             "datetime({epochmillis:expertise_from_date}).day=datetime().day AND datetime({epochmillis:expertise_from_date}).year<>datetime().year \n" +
-            "MATCH(activeEmploymentLine:EmploymentLine)<-[:"+ HAS_EMPLOYMENT_LINES +"]-(employment:Employment{deleted:false,published:true})-[:"+HAS_EXPERTISE_IN+"]->(expertise) WHERE activeEmploymentLine.endDate IS NULL OR activeEmploymentLine.endDate >= date()\n" +
-            "WITH staff,expertise,employment,activeEmploymentLine, datetime().year-datetime({epochmillis:expertise_from_date}).year as years_experience_in_expertise  \n" +
-            "MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise) " +
-            "WITH staff,employment,expertise,years_experience_in_expertise,activeEmploymentLine \n" +
-            "MATCH(activeEmploymentLine)-[:"+HAS_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) WHERE sl.to<=years_experience_in_expertise \n" +
-            "MATCH(activeEmploymentLine)-[employmentEmploymentTypeRelationShip:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType)\n" +
-            "MATCH(expertise)-[:"+FOR_SENIORITY_LEVEL+"]->(nextSeniorityLevel:SeniorityLevel) WHERE nextSeniorityLevel.from <= years_experience_in_expertise and (nextSeniorityLevel.to > years_experience_in_expertise or nextSeniorityLevel.to is null) \n" +
-            "RETURN id(employment) as employmentId,employmentEmploymentTypeRelationShip as employmentLineEmploymentTypeRelationShip ,employmentType,activeEmploymentLine as employmentLine,nextSeniorityLevel as seniorityLevel")
+            "MATCH(expertise)<-[:HAS_EXPERTISE_IN]-(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]->(activeEmploymentLine:EmploymentLine) \n" +
+            "WHERE DATE(activeEmploymentLine.startDate) <= date() AND (activeEmploymentLine.endDate IS NULL OR Date(activeEmploymentLine.endDate) >= date()) \n" +
+            "WITH staff,expertise,employment,activeEmploymentLine,datetime().year-datetime({epochmillis:expertise_from_date}).year as years_experience_in_expertise \n" +
+            "MATCH(activeEmploymentLine)-[:HAS_SENIORITY_LEVEL]->(sl:SeniorityLevel) \n" +
+            "WHERE sl.to IS NOT NULL AND sl.to<=years_experience_in_expertise \n" +
+            "MATCH(expertise)-[:HAS_EXPERTISE_LINES]->(el:ExpertiseLine)-[:FOR_SENIORITY_LEVEL]->(nextSeniorityLevel:SeniorityLevel) \n" +
+            "WHERE  (Date(el.startDate) <= date() AND (el.endDate IS NULL OR Date(el.endDate) >= date())) AND nextSeniorityLevel.from <= years_experience_in_expertise AND (nextSeniorityLevel.to IS NULL OR nextSeniorityLevel.to > years_experience_in_expertise) \n" +
+            "MATCH(activeEmploymentLine)-[employmentEmploymentTypeRelationShip:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n"+
+            "RETURN  id(employment) as employmentId,nextSeniorityLevel as seniorityLevel,activeEmploymentLine as employmentLine,employmentEmploymentTypeRelationShip as employmentLineEmploymentTypeRelationShip,employmentType,el.endDate as expertiseEndDate")
     List<EmploymentSeniorityLevelQueryResult> findEmploymentSeniorityLeveltoUpdate();
 
     @Query("MATCH(staff:Staff),(unit:Unit) where id(staff)={0} and id(unit)={1} \n" +

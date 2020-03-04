@@ -34,6 +34,19 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(request.getRequestURI().contains("swagger-ui")) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        getCurrentUserDetails();
+        updateUserInfo(request, pathVariables);
+        ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest httpServletRequest = servletRequest.getRequest();
+
+        String tabId = httpServletRequest.getParameter("moduleId");
+        if(Optional.ofNullable(tabId).isPresent()){
+            UserContext.setTabId(tabId);
+        }
+        return isNotNull(httpServletRequest);
+    }
+
+    private void getCurrentUserDetails() {
         try {
             CurrentUserDetails userDetails = userIntegrationService.getCurrentUser();
             if(isNotNull(UserContext.getUserDetails()) && isNotNull(userDetails)) {
@@ -42,15 +55,26 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
     } catch (Exception e) {
              LOGGER.error("exception {}",e);
     }
+    }
+
+    private void updateUserInfo(HttpServletRequest request, Map<String, String> pathVariables) {
         String orgIdString=isNotNull(pathVariables) ? pathVariables.get("organizationId") : null;
         String unitIdString=isNotNull(pathVariables) ? pathVariables.get("unitId") : null;
-        LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
+        LOGGER.debug("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI()+"[ organizationId ,Unit Id " +orgIdString+" ,"+unitIdString+" ]");
 
+        updateOrganizationId(orgIdString);
+        updateUnitId(unitIdString);
+    }
+
+    private void updateOrganizationId(String orgIdString) {
         if(orgIdString!=null && !"null".equalsIgnoreCase(orgIdString)){
               final Long orgId = Long.valueOf(orgIdString);
               UserContext.setOrgId(orgId);
           }
+    }
+
+    private void updateUnitId(String unitIdString) {
         if(unitIdString!=null){
             final Long unitId = Long.valueOf(unitIdString);
             UserContext.setUnitId(unitId);

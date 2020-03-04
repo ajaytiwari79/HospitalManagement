@@ -15,6 +15,8 @@ import java.util.List;
  * Created by prabjot on 22/11/16.
  */
 public class AppConstants {
+    public static final String SHIFT_S = "Shift(s)";
+
     private AppConstants() {
     }
 
@@ -221,7 +223,9 @@ public class AppConstants {
     public static final String HAS_SYSTEM_LANGUAGE = "HAS_SYSTEM_LANGUAGE";
     public static final String KAIROS="Kairos";
     public static final String KAIROS_DENMARK_EMAIL="kairos_denmark@kairos.com";
-    public static final String ULRIK_EMAIL="ulrik@kairos.com";
+    public static final String ULRIK_EMAIL="ulrik@kairosplanning.com";
+    public static final String COUNTRY_ADMIN_EMAIL="will@kairosplanning.com";
+    public static final String COUNTRY_ADMIN_NAME="will";
     public static final String ULRIK="Ulrik";
     public static final String AUTHORIZATION = "Authorization";
 

@@ -61,8 +61,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.user.UserType.SYSTEM_ACCOUNT;
+import static com.kairos.enums.user.UserType.USER_ACCOUNT;
 
 /**
  * Created by kairosCountryLevel on 8/12/16.
@@ -187,6 +189,7 @@ public class BootDataService {
             createCountryLevelOrganization();
             createRegionLevelOrganization();
             createTimeTypes();
+            createDefaultCountryAdmin();
 //            createCTARuleTemplateCategory();
 //            createCityLevelOrganization();
         }
@@ -196,6 +199,63 @@ public class BootDataService {
         createEquipmentCategories();
 
 
+    }
+
+    public boolean createDefaultCountryAdmin() {
+        User admin = getCountryAdminUser();
+        Staff adminAsStaff = getCountryAdminStaff(admin);
+
+        staffGraphRepository.save(adminAsStaff);
+        createTeam("dev Team");
+        linkingOfStaffAndTeam(nestingTeam,adminAsStaff);
+        if(isNull(accessGroup) || isNull(kairosCountryLevel)){
+            Long accessGroupId = accessGroupRepository.findSuperAdminAccessGroup();
+            accessGroup = accessGroupRepository.findById(accessGroupId,2).get();
+            Long organizationId = organizationGraphRepository.findKairosOrganizationId();
+            kairosCountryLevel = organizationGraphRepository.findOne(organizationId,2);
+        }
+        createPosition(adminAsStaff);
+        createUnitPermissionForCountryLevel();
+        return true;
+    }
+
+    private Staff getCountryAdminStaff(User admin) {
+        Staff adminAsStaff = new Staff();
+        ContactAddress contactAddress = new ContactAddress();
+//        adminAsStaff.setContactAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
+        adminAsStaff.setGeneralNote("Will manage the platform");
+        adminAsStaff.setUser(admin);
+        adminAsStaff.setSignature("will");
+        adminAsStaff.setCardNumber("LPSPSW11323");
+        adminAsStaff.setCopyKariosMailToLogin(true);
+        adminAsStaff.setContactDetail(new ContactDetail("smith@kairos.com", "admin@kairos.com", "5365433", "facebook.com/will_cool"));
+        adminAsStaff.setFamilyName(COUNTRY_ADMIN_NAME);
+        adminAsStaff.setFirstName(COUNTRY_ADMIN_NAME);
+        adminAsStaff.setLastName("Smith");
+        adminAsStaff.setCurrentStatus(StaffStatusEnum.ACTIVE);
+        adminAsStaff.setEmail(COUNTRY_ADMIN_EMAIL);
+        adminAsStaff.setNationalInsuranceNumber("NIN44500331");
+        adminAsStaff.setLanguage(danish);
+        adminAsStaff.setPassword(new BCryptPasswordEncoder().encode("smith@kairos.com"));
+        return adminAsStaff;
+    }
+
+    private User getCountryAdminUser() {
+        User admin = new User();
+        admin.setCprNumber("0309514290");
+        admin.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(admin.getCprNumber()));
+        admin.setUserName(COUNTRY_ADMIN_EMAIL);
+        admin.setEmail(COUNTRY_ADMIN_EMAIL);
+        admin.setPassword(new BCryptPasswordEncoder().encode("smith@kairos.com"));
+        admin.setFirstName(COUNTRY_ADMIN_NAME);
+        admin.setNickName(COUNTRY_ADMIN_NAME);
+        admin.setLastName("Smith");
+        admin.setUserType(USER_ACCOUNT);
+        admin.setGender(Gender.MALE);
+        admin.setPasswordUpdated(true);
+        admin.setContactDetail(new ContactDetail("will@kairoscountrylevel.com", "will007@gmail.com", "5365433", "facebook.com/will_cool"));
+        userGraphRepository.save(admin);
+        return admin;
     }
 
    /* private void startRegisteredCronJobs() {
@@ -222,58 +282,25 @@ public class BootDataService {
     }
 
     private void createGeoGraphicalData() {
-
-        hovedstaden = new Region();
-        hovedstaden.setCountry(denmark);
-        hovedstaden.setName("hovedstaden");
-        hovedstaden.setCode("1084");
-        regionGraphRepository.save(hovedstaden);
-
-        copenhagenCity = new Province();
-        copenhagenCity.setName("Copenhagen City");
-        copenhagenCity.setRegion(hovedstaden);
-        copenhagenCity = provinceGraphRepository.save(copenhagenCity);
-
-
-        copenhagen = new Municipality();
-        copenhagen.setName("Copenhagen");
-        copenhagen.setProvince(copenhagenCity);
-        copenhagen = municipalityGraphRepository.save(copenhagen);
-
-        frederiksberg = new Municipality();
-        frederiksberg.setName("Frederiksberg");
-        frederiksberg.setProvince(copenhagenCity);
-        frederiksberg = municipalityGraphRepository.save(frederiksberg);
-
-        bornholm = new Province();
-        bornholm.setName("Bornholm");
-        bornholm.setRegion(hovedstaden);
-        bornholm = provinceGraphRepository.save(bornholm);
-
-
-        ertholmene = new Municipality();
-        ertholmene.setName("Ertholmene");
-        ertholmene.setProvince(bornholm);
-        ertholmene = municipalityGraphRepository.save(ertholmene);
-
-
+        createRegion();
+        copenhagenCity = createProvince("Copenhagen City",hovedstaden);
+        copenhagen = createMuncipality("Copenhagen",copenhagenCity);
+        frederiksberg = createMuncipality("Frederiksberg",copenhagenCity);
+        bornholm = createProvince("Bornholm",hovedstaden);
+        ertholmene = createMuncipality("Ertholmene",bornholm);
         Fyn = new Province();
         Fyn.setName("Fyn");
-        Fyn = provinceGraphRepository.save(Fyn);
-
+        Fyn = createProvince("Bornholm",hovedstaden);
         Odense = new Municipality();
         Odense.setName("Odense");
         Odense.setProvince(Fyn);
-        Odense = municipalityGraphRepository.save(Odense);
+        Odense = createMuncipality("Odense",Fyn);
+        createZipcode();
+        createAllegadeZipcode();
+    }
 
-        kobenhavn = new ZipCode();
-        List<Municipality> municipalities = kobenhavn.getMunicipalities();
-        municipalities.add(frederiksberg);
-        kobenhavn.setMunicipalities(municipalities);
-        kobenhavn.setName("Kobenhavn");
-        kobenhavn.setZipCode(1000);
-        kobenhavn = zipCodeGraphRepository.save(kobenhavn);
-
+    private void createAllegadeZipcode() {
+        List<Municipality> municipalities;
         allegade = new ZipCode();
         municipalities = allegade.getMunicipalities();
         municipalities.add(frederiksberg);
@@ -281,8 +308,38 @@ public class BootDataService {
         allegade.setName("Allegade");
         allegade.setZipCode(2000);
         allegade = zipCodeGraphRepository.save(allegade);
+    }
 
+    private void createZipcode() {
+        kobenhavn = new ZipCode();
+        List<Municipality> municipalities = kobenhavn.getMunicipalities();
+        municipalities.add(frederiksberg);
+        kobenhavn.setMunicipalities(municipalities);
+        kobenhavn.setName("Kobenhavn");
+        kobenhavn.setZipCode(1000);
+        kobenhavn = zipCodeGraphRepository.save(kobenhavn);
+    }
 
+    private Municipality createMuncipality(String name,Province province) {
+        copenhagen = new Municipality();
+        copenhagen.setName("Copenhagen");
+        copenhagen.setProvince(copenhagenCity);
+        return municipalityGraphRepository.save(copenhagen);
+    }
+
+    private Province createProvince(String name,Region region) {
+        copenhagenCity = new Province();
+        copenhagenCity.setName(name);
+        copenhagenCity.setRegion(region);
+        return provinceGraphRepository.save(copenhagenCity);
+    }
+
+    private void createRegion() {
+        hovedstaden = new Region();
+        hovedstaden.setCountry(denmark);
+        hovedstaden.setName("hovedstaden");
+        hovedstaden.setCode("1084");
+        regionGraphRepository.save(hovedstaden);
     }
 
     private void createMasterSkills() {
@@ -371,6 +428,20 @@ public class BootDataService {
         kairosCountryLevel.setCostCenterCode("OD12");
         kairosCountryLevel.setCountry(denmark);
         kairosCountryLevel.setParentOrganization(true);
+         ContactAddress contactAddress = createContactAddress();
+         kairosCountryLevel.setContactAddress(contactAddress);
+
+        organizationService.createOrganization(kairosCountryLevel,  true);
+
+        createSuperAdminAccessGroup();
+        createPosition(adminAsStaff);
+        createTeam("Nesting Team");
+
+        linkingOfStaffAndTeam(nestingTeam, adminAsStaff);
+        createUnitPermissionForCountryLevel();
+    }
+
+    private ContactAddress createContactAddress() {
         ContactAddress contactAddress = new ContactAddress();
         contactAddress.setZipCode(allegade);
         contactAddress.setFloorNumber(10);
@@ -382,16 +453,7 @@ public class BootDataService {
         contactAddress.setRegionCode(frederiksberg.getProvince().getRegion().getCode());
         contactAddress.setRegionName(frederiksberg.getProvince().getRegion().getName());
         contactAddress.setProvince(frederiksberg.getProvince().getName());
-        kairosCountryLevel.setContactAddress(contactAddress);
-
-        organizationService.createOrganization(kairosCountryLevel,  true);
-
-        createSuperAdminAccessGroup();
-        createPosition();
-        createTeam();
-
-        linkingOfStaffAndTeam();
-        createUnitEmploymentForCountryLevel();
+        return contactAddress;
     }
 
     private void createUser() {
@@ -448,15 +510,15 @@ public class BootDataService {
 
     }
 
-    private void createTeam() {
+    private void createTeam(String team) {
         //creating teams
         nestingTeam = new Team();
-        nestingTeam.setName("Nesting Team");
+        nestingTeam.setName(team);
         teamGraphRepository.saveAll(Arrays.asList(nestingTeam));
     }
 
 
-    private void linkingOfStaffAndTeam() {
+    private void linkingOfStaffAndTeam(Team nestingTeam, Staff adminAsStaff) {
         StaffTeamRelationshipGraphRepository.save(new StaffTeamRelationship(nestingTeam, adminAsStaff));
     }
 
@@ -466,13 +528,13 @@ public class BootDataService {
         accessGroupRepository.save(accessGroup);
     }
 
-    private void createPosition() {
+    private void createPosition(Staff adminAsStaff) {
         positionForAdmin = new Position("working as country admin", adminAsStaff);
         kairosCountryLevel.getPositions().add(positionForAdmin);
         organizationGraphRepository.save(kairosCountryLevel);
     }
 
-    private void createUnitEmploymentForCountryLevel() {
+    private void createUnitPermissionForCountryLevel() {
 
 //        accessGroup = accessGroupRepository.getAccessGroupOfOrganizationByName(kairosCountryLevel.getId(), AppConstants.AG_COUNTRY_ADMIN);
         UnitPermission unitPermission = new UnitPermission();
@@ -505,6 +567,15 @@ public class BootDataService {
         kairosRegionLevel.setCountry(denmark);
         kairosRegionLevel.setKairosHub(false);
         kairosRegionLevel.setBoardingCompleted(true);
+        ContactAddress contactAddress = getContactAddress();
+        kairosRegionLevel.setContactAddress(contactAddress);
+        OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
+        organizationService.createOrganization(kairosRegionLevel,  true);
+
+        //organizationGraphRepository.addOrganizationServiceInUnit(kairosRegionLevel.getId(),Arrays.asList(privateOrganization.getOrganizationServiceList().get(0).getId()),DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
+    }
+
+    private ContactAddress getContactAddress() {
         ContactAddress contactAddress = new ContactAddress();
         contactAddress.setZipCode(allegade);
         contactAddress.setFloorNumber(10);
@@ -516,11 +587,7 @@ public class BootDataService {
         contactAddress.setRegionCode(frederiksberg.getProvince().getRegion().getCode());
         contactAddress.setRegionName(frederiksberg.getProvince().getRegion().getName());
         contactAddress.setProvince(frederiksberg.getProvince().getName());
-        kairosRegionLevel.setContactAddress(contactAddress);
-        OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
-        organizationService.createOrganization(kairosRegionLevel,  true);
-
-        //organizationGraphRepository.addOrganizationServiceInUnit(kairosRegionLevel.getId(),Arrays.asList(privateOrganization.getOrganizationServiceList().get(0).getId()),DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
+        return contactAddress;
     }
 
     private void createPaymentTypes() {
@@ -569,16 +636,7 @@ public class BootDataService {
             equipmentCategorySmall.setWidthInCm(20F);
             equipmentCategorySmall.setLengthInCm(20F);
             equipmentCategorySmall.setVolumeInCm(20F);
-
-            EquipmentCategory equipmentCategoryMedium = new EquipmentCategory();
-            equipmentCategoryMedium.setName("Medium");
-            equipmentCategoryMedium.setDescription("Medium");
-            equipmentCategoryMedium.setWeightInKg(50F);
-            equipmentCategoryMedium.setHeightInCm(50F);
-            equipmentCategoryMedium.setWidthInCm(50F);
-            equipmentCategoryMedium.setLengthInCm(50F);
-            equipmentCategoryMedium.setVolumeInCm(50F);
-
+            EquipmentCategory equipmentCategoryMedium = getEquipmentCategory();
             EquipmentCategory equipmentCategoryLarge = new EquipmentCategory();
             equipmentCategoryLarge.setName("Large");
             equipmentCategoryLarge.setDescription("Large");
@@ -587,9 +645,20 @@ public class BootDataService {
             equipmentCategoryLarge.setWidthInCm(100F);
             equipmentCategoryLarge.setLengthInCm(100F);
             equipmentCategoryLarge.setVolumeInCm(100F);
-
             equipmentCategoryGraphRepository.saveAll(Arrays.asList(equipmentCategorySmall, equipmentCategoryMedium, equipmentCategoryLarge));
         }
+    }
+
+    private EquipmentCategory getEquipmentCategory() {
+        EquipmentCategory equipmentCategoryMedium = new EquipmentCategory();
+        equipmentCategoryMedium.setName("Medium");
+        equipmentCategoryMedium.setDescription("Medium");
+        equipmentCategoryMedium.setWeightInKg(50F);
+        equipmentCategoryMedium.setHeightInCm(50F);
+        equipmentCategoryMedium.setWidthInCm(50F);
+        equipmentCategoryMedium.setLengthInCm(50F);
+        equipmentCategoryMedium.setVolumeInCm(50F);
+        return equipmentCategoryMedium;
     }
 
 

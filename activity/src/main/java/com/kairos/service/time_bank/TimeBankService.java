@@ -150,7 +150,12 @@ public class TimeBankService{
             for (Shift shift : shiftList) {
                 shiftService.updateCTADetailsOfEmployement(asLocalDate(shift.getStartDate()),staffAdditionalInfoDTO);
                 payOutService.updatePayOut(staffAdditionalInfoDTO,shift,activityWrapperMap);
-                dailyTimeBankEntries.add(renewDailyTimeBank(staffAdditionalInfoDTO,shift,false));
+                DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO,shift,false);
+                dailyTimeBankEntries.removeIf(dailyTimeBankEntry1 -> dailyTimeBankEntry.getEmploymentId().equals(dailyTimeBankEntry1.getEmploymentId()) && dailyTimeBankEntry.getDate().equals(dailyTimeBankEntry1.getDate()));
+                dailyTimeBankEntries.add(dailyTimeBankEntry);
+            }
+            if(isCollectionNotEmpty(shiftList)){
+                shiftMongoRepository.saveEntities(shiftList);
             }
         }
         if(isCollectionNotEmpty(dailyTimeBankEntries)){
@@ -239,7 +244,10 @@ public class TimeBankService{
             for (Shift shift : shifts) {
                 shift.setScheduledMinutesOfPayout(0);
                 shift.setScheduledMinutesOfTimebank(0);
-                renewDailyTimeBank(staffAdditionalInfoDTO,shift,false);
+                dailyTimeBankEntries.add(renewDailyTimeBank(staffAdditionalInfoDTO,shift,false));
+            }
+            if(isCollectionNotEmpty(shifts)){
+                shiftMongoRepository.saveEntities(shifts);
             }
         }
         if(isCollectionNotEmpty(dailyTimeBankEntries)){
@@ -305,10 +313,6 @@ public class TimeBankService{
             Interval yearTillDate = new Interval(asDate(planningPeriod.getStartDate().with(TemporalAdjusters.firstDayOfYear())).getTime(),getEndOfDay(startDate).getTime());
             intervals = newArrayList(todayInterval,planningPeriodInterval,yearTillDate);
             endDate = todayInterval.getEnd().isAfter(planningPeriodInterval.getEnd()) ? todayInterval.getEnd().toDate() : planningPeriodInterval.getEnd().toDate();
-            sequenceIntervalMap = new HashMap<>();
-            sequenceIntervalMap.put(todayInterval,1);
-            sequenceIntervalMap.put(planningPeriodInterval,2);
-            sequenceIntervalMap.put(yearTillDate,3);
             if(isNotNull(employmentId)){
                 EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = updateCostTimeAgreementDetails(employmentId, startDate, endDate);
                 employmentDetails = newArrayList(employmentWithCtaDetailsDTO);
@@ -323,7 +327,7 @@ public class TimeBankService{
 
         List<DailyTimeBankEntry> dailyTimeBanks = timeBankRepository.findAllByEmploymentIdsAndBeforDate(employmentIds, endDate);
         Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, startDate,endDate,employmentId);
-        return timeBankCalculationService.getTimeBankAdvanceView(intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,sequenceIntervalMap,payOutPerShifts);
+        return timeBankCalculationService.getTimeBankAdvanceView(intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts);
     }
 
     private long getStartDateByQueryParam(Date startDate,String query) {
@@ -359,7 +363,7 @@ public class TimeBankService{
         TimeBankDTO timeBankDTO = timeBankCalculationService.getTimeBankOverview(unitId, employmentId, startDate, endDate, dailyTimeBankEntries, employmentWithCtaDetailsDTO);
             Long actualTimebankMinutes = getAccumulatedTimebankAndDelta(employmentId, unitId, true);
             timeBankDTO.setActualTimebankMinutes(actualTimebankMinutes);
-        PlanningPeriodDTO planningPeriodDTO = planningPeriodService.getStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
+        PlanningPeriodDTO planningPeriodDTO = planningPeriodService.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
         timeBankDTO.setPlanningPeriodStartDate(planningPeriodDTO.getStartDate());
         timeBankDTO.setPlanningPeriodEndDate(planningPeriodDTO.getEndDate());
         return timeBankDTO;
@@ -443,6 +447,9 @@ public class TimeBankService{
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             dailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, false));
             ctaResponseDTOMap.put(shiftDate, ctaResponseDTO);
+        }
+        if(isCollectionNotEmpty(shifts)){
+            shiftMongoRepository.saveEntities(shifts);
         }
         if(!dailyTimeBanks.isEmpty()) {
             timeBankRepository.saveEntities(dailyTimeBanks);
@@ -646,6 +653,7 @@ public class TimeBankService{
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                 updateDailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, false));
             }
+            shiftMongoRepository.saveEntities(shifts);
             if(isCollectionNotEmpty(updateDailyTimeBanks)) {
                 timeBankRepository.saveEntities(updateDailyTimeBanks);
             }

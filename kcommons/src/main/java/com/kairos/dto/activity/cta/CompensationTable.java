@@ -1,11 +1,16 @@
 package com.kairos.dto.activity.cta;
 
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class CompensationTable {
     private int granularityLevel;
     private List<CompensationTableInterval> compensationTableInterval=new ArrayList<>();
@@ -14,8 +19,6 @@ public class CompensationTable {
     private float unusedDaysOffvalue;
 
 
-    public CompensationTable() {
-    }
 
     public CompensationTable(int granularityLevel) {
         this.granularityLevel = granularityLevel;
@@ -25,39 +28,6 @@ public class CompensationTable {
         this.granularityLevel = granularityLevel;
         this.setCompensationTableInterval(compensationTableIntervals);
     }
-
-    public int getGranularityLevel() {
-        return granularityLevel;
-    }
-
-    public void setGranularityLevel(int granularityLevel) {
-        this.granularityLevel = granularityLevel;
-    }
-
-
-    public List<CompensationTableInterval> getCompensationTableInterval() {
-        return compensationTableInterval;
-    }
-
-    public void setCompensationTableInterval(List<CompensationTableInterval> compensationTableInterval) {
-        this.compensationTableInterval = compensationTableInterval;
-    }
-    public CompensationMeasurementType getUnusedDaysOffType() {
-        return unusedDaysOffType;
-    }
-
-    public void setUnusedDaysOffType(CompensationMeasurementType unusedDaysOffType) {
-        this.unusedDaysOffType = unusedDaysOffType;
-    }
-
-    public float getUnusedDaysOffvalue() {
-        return unusedDaysOffvalue;
-    }
-
-    public void setUnusedDaysOffvalue(float unusedDaysOffvalue) {
-        this.unusedDaysOffvalue = unusedDaysOffvalue;
-    }
-
 
     public void addCompensationTableInterval(CompensationTableInterval compensationTableInterval) {
         if (compensationTableInterval == null)

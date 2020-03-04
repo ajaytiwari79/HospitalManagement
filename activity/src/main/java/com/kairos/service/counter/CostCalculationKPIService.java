@@ -51,9 +51,10 @@ public class CostCalculationKPIService {
           for (CTARuleTemplateDTO ruleTemplate : ctaResponseDTO.getRuleTemplates()) {
               if (CalculationFor.BONUS_HOURS.equals(ruleTemplate.getCalculationFor())) {
                   RuletemplateUtils.updateDayTypeDetailInCTARuletemplate(daytypesMap, ruleTemplate);
-                  boolean valid = timeBankCalculationService.validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, new StaffEmploymentDetails(new EmploymentType(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentTypeId())), shiftActivityDTO.getPhaseId(), shiftActivityDTO.getActivityId(), shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivityDTO.getStartDate(), shiftActivityDTO.getPlannedTimes());
-                  if (valid) {
-                      totalCtaBonus += timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivityDTO, new StaffEmploymentDetails(employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getCtaRuleTemplates(), BigDecimal.valueOf(employmentWithCtaDetailsDTO.getHourlyCost()), employmentWithCtaDetailsDTO.getEmploymentLines())).intValue();
+                  boolean valid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, new StaffEmploymentDetails(new EmploymentType(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentTypeId())), shiftActivityDTO.getPhaseId(), shiftActivityDTO.getActivityId(), shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivityDTO.getPlannedTimes());
+                  boolean dayTypeValid = timeBankCalculationService.isDayTypeValid(shiftActivityDTO.getStartDate(), ruleTemplate, dayTypeDTOMap);
+                  if (valid && dayTypeValid) {
+                      totalCtaBonus += timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivityDTO, new StaffEmploymentDetails(employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getCtaRuleTemplates(), BigDecimal.valueOf(employmentWithCtaDetailsDTO.getHourlyCost()), employmentWithCtaDetailsDTO.getEmploymentLines()),dayTypeDTOMap).intValue();
                   }
               }
           }

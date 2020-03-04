@@ -98,6 +98,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_TIMETYPE_LINKED_REASON_CODE = "message.timetype.linked.reason_code";
     public static final String MESSAGE_QUESTIONNAIRE_FREQUENCY = "message.questionnaire.frequency";
     public static final String MESSAGE_ORGANIZATION_PHASES = "message.organization.phases";
+    public static final String MESSAGE_ORGANIZATION_PHASES_ON_DATE = "message.organization.phases.ondate";
     public static final String MESSAGE_MISMATCHED_IDS = "message.mismatched-ids";
     public static final String MESSAGE_ACTIVITY_NOTALLOW = "message.activity.notallow";
     public static final String MESSAGE_PARAMETERS_INCORRECT = "message.parameters.incorrect";
@@ -127,6 +128,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_PERIOD_STARTDATE_ENDDATE_NOTUPDATE = "message.period.startdate.enddate.notupdate";
     public static final String MESSAGE_PERIOD_REQUEST_PHASE_NOTFOUND = "message.period.request.phase.notfound";
     public static final String MESSAGE_PERIODSETTING_NOTFOUND = "message.periodsetting.notFound";
+    public static final String MESSAGE_CURRENT_PLANNING_PERIOD = "message.current.planning.period";
     public static final String MESSAGE_ORGANIZATION_PHASE_NOTFOUND = "message.organization.phase.notfound";
     public static final String MESSAGE_EMPLOYMENTTYPE_NOTFOUND="message.employmenttype.notfound";
     public static final String MESSAGE_VALID_DURATION="message.valid.duration";
@@ -370,4 +372,6 @@ public class ActivityMessagesConstants {
     public static final String ERROR_BLOCK_SETTING_NOT_FOUND = "error.block.setting.not.found";
     public static final String MESSAGE_BLOCKED_FOR_SHIFT_ENTER_AT_DATE = "message.blocked.for.shift.entered.at.date";
     public static final String CUT_OFF_CONFIGUATION = "activity.cutoff.configuration";
+    public static final String ACTIVITY_NOT_ASSIGN_IN_PROTECTED_DAYS_OFF_RULE_TEMPLATE = "activity.not.assign.in.protected.days.off.rule.template";
+
 }

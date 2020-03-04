@@ -1,5 +1,6 @@
 package com.kairos.controller.country;
 
+import com.kairos.config.BootDataService;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
@@ -58,6 +59,7 @@ public class CountryController {
     private ExpertiseService expertiseService;
     @Inject
     private CompanyCreationService companyCreationService;
+    @Inject private BootDataService bootDataService;
 
     @PostMapping(value = "/country")
     @ApiOperation("Create a new Country")
@@ -424,6 +426,14 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getAllUnits(countryId));
 
     }
+
+    @ApiOperation(value = "create Country Admin")
+    @PostMapping(value = COUNTRY_URL + "/admin")
+    public ResponseEntity<Map<String, Object>> createDefaultCountryAdmin(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, bootDataService.createDefaultCountryAdmin());
+
+    }
+
 
 }
 

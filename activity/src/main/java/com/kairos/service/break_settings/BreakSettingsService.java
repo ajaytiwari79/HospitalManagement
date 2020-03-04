@@ -58,7 +58,7 @@ public class BreakSettingsService {
         if (!Optional.ofNullable(expertise).isPresent()) {
             exceptionService.duplicateDataException(ERROR_EXPERTISE_NOTFOUND);
         }
-        String secondLevelTimeType=expertise.getBreakPaymentSetting().equals(PAID)?PAID_BREAK:UNPAID_BREAK;
+        String secondLevelTimeType=PAID.equals(expertise.getBreakPaymentSetting())?PAID_BREAK:UNPAID_BREAK;
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllByDeletedFalseAndCountryIdAndTimeType(countryId,secondLevelTimeType );
         List<BigInteger> parentIds = timeTypes.stream().map(TimeType::getId).collect(Collectors.toList());
         List<ActivityDTO> activities = activityMongoRepository.findAllActivitiesByCountryIdAndTimeTypes(countryId, parentIds);

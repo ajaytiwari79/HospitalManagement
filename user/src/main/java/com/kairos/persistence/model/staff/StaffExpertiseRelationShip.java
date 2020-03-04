@@ -36,49 +36,6 @@ public class StaffExpertiseRelationShip extends UserBaseEntity{
     private Date expertiseStartDate;
     private boolean unionRepresentative;
 
-    public StaffExpertiseRelationShip() {
-        //Default Constructor
-    }
-
-    public Staff getStaff() {
-        return staff;
-    }
-
-    public void setStaff(Staff staff) {
-        this.staff = staff;
-    }
-
-    public Expertise getExpertise() {
-        return expertise;
-    }
-
-    public void setExpertise(Expertise expertise) {
-        this.expertise = expertise;
-    }
-
-    public Integer getRelevantExperienceInMonths() {
-        return relevantExperienceInMonths;
-    }
-
-    public void setRelevantExperienceInMonths(Integer relevantExperienceInMonths) {
-        this.relevantExperienceInMonths = relevantExperienceInMonths;
-    }
-
-    public Date getExpertiseStartDate() {
-        return expertiseStartDate;
-    }
-
-    public void setExpertiseStartDate(Date expertiseStartDate) {
-        this.expertiseStartDate = expertiseStartDate;
-    }
-
-    public boolean isUnionRepresentative() {
-        return unionRepresentative;
-    }
-
-    public void setUnionRepresentative(boolean unionRepresentative) {
-        this.unionRepresentative = unionRepresentative;
-    }
 
     public StaffExpertiseRelationShip(Long id, Staff staff, Expertise expertise, Integer relevantExperienceInMonths, Date expertiseStartDate) {
         this.id=id;
