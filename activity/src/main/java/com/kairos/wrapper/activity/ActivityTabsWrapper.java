@@ -11,6 +11,9 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -23,6 +26,9 @@ import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class ActivityTabsWrapper {
 
     private GeneralActivityTabWithTagDTO generalTab;
@@ -45,6 +51,7 @@ public class ActivityTabsWrapper {
     private List<Long> rulesTabDayTypes= new ArrayList<>();
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
     private Set<AccessGroupRole> roles;
+    private boolean sicknessSettingValid;
 
 
     public ActivityTabsWrapper(OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
@@ -83,7 +90,15 @@ public class ActivityTabsWrapper {
         this.rulesTab = rulesTab;
     }
 
-    public ActivityTabsWrapper(RulesActivityTab rulesTab, List<DayType> dayTypes,List<EmploymentTypeDTO> employmentTypes) {
+    public ActivityTabsWrapper(LocationActivityTab locationActivityTab) {
+        this.locationActivityTab = locationActivityTab;
+    }
+
+    public ActivityTabsWrapper(NotesActivityTab notesActivityTab) {
+        this.notesActivityTab = notesActivityTab;
+    }
+
+    public ActivityTabsWrapper(RulesActivityTab rulesTab, List<DayType> dayTypes, List<EmploymentTypeDTO> employmentTypes) {
         this.rulesTab = rulesTab;
         this.dayTypes = dayTypes;
         this.employmentTypes=employmentTypes;
@@ -96,9 +111,6 @@ public class ActivityTabsWrapper {
         this.employmentTypes=employmentTypes;
     }
 
-    public ActivityTabsWrapper() {
-    }
-
     public ActivityTabsWrapper(GeneralActivityTabWithTagDTO generalTab, List<ActivityCategory> activityCategories) {
         this.generalTab = generalTab;
         this.activityCategories = activityCategories;
@@ -109,10 +121,6 @@ public class ActivityTabsWrapper {
         this.activityId = activityId;
         this.activityCategories=activityCategories;
     }
-    public ActivityTabsWrapper(TimeCalculationActivityTab timeCalculationActivityTab) {
-        this.timeCalculationActivityTab = timeCalculationActivityTab;
-
-    }
 
     public ActivityTabsWrapper(TimeCalculationActivityTab timeCalculationActivityTab, List<DayType> dayTypes,List<Long> rulesTabDayTypes) {
         this.timeCalculationActivityTab = timeCalculationActivityTab;
@@ -121,168 +129,4 @@ public class ActivityTabsWrapper {
 
     }
 
-
-
-    public ActivityTabsWrapper(LocationActivityTab locationActivityTab) {
-        this.locationActivityTab = locationActivityTab;
-    }
-
-
-    public ActivityTabsWrapper(NotesActivityTab notesActivityTab) {
-        this.notesActivityTab = notesActivityTab;
-    }
-
-    public GeneralActivityTabWithTagDTO getGeneralTab() {
-        return generalTab;
-    }
-
-    public void setGeneralTab(GeneralActivityTabWithTagDTO generalTab) {
-        this.generalTab = generalTab;
-    }
-
-    public List<ActivityCategory> getActivityCategories() {
-        return activityCategories;
-    }
-
-    public void setActivityCategories(List<ActivityCategory> activityCategories) {
-        this.activityCategories = activityCategories;
-    }
-
-
-    public RulesActivityTab getRulesTab() {
-        return rulesTab;
-    }
-
-    public void setRulesTab(RulesActivityTab rulesTab) {
-        this.rulesTab = rulesTab;
-    }
-
-    public TimeCalculationActivityTab getTimeCalculationActivityTab() {
-        return timeCalculationActivityTab;
-    }
-
-    public void setTimeCalculationActivityTab(TimeCalculationActivityTab timeCalculationActivityTab) {
-        this.timeCalculationActivityTab = timeCalculationActivityTab;
-
-    }
-
-    public NotesActivityTab getNotesActivityTab() {
-        return notesActivityTab;
-    }
-
-    public void setNotesActivityTab(NotesActivityTab notesActivityTab) {
-        this.notesActivityTab = notesActivityTab;
-    }
-
-    public CommunicationActivityTab getCommunicationActivityTab() {
-        return communicationActivityTab;
-    }
-
-    public void setCommunicationActivityTab(CommunicationActivityTab communicationActivityTab) {
-        this.communicationActivityTab = communicationActivityTab;
-    }
-
-    public BonusActivityTab getBonusActivityTab() {
-        return bonusActivityTab;
-    }
-
-    public void setBonusActivityTab(BonusActivityTab bonusActivityTab) {
-        this.bonusActivityTab = bonusActivityTab;
-    }
-
-    public SkillActivityTab getSkillActivityTab() {
-        return skillActivityTab;
-    }
-
-    public void setSkillActivityTab(SkillActivityTab skillActivityTab) {
-        this.skillActivityTab = skillActivityTab;
-    }
-
-    public OptaPlannerSettingActivityTab getOptaPlannerSettingActivityTab() {
-        return optaPlannerSettingActivityTab;
-    }
-
-    public void setOptaPlannerSettingActivityTab(OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
-        this.optaPlannerSettingActivityTab = optaPlannerSettingActivityTab;
-    }
-
-    public CTAAndWTASettingsActivityTab getCtaAndWtaSettingsActivityTab() {
-        return ctaAndWtaSettingsActivityTab;
-    }
-
-    public void setCtaAndWtaSettingsActivityTab(CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab) {
-        this.ctaAndWtaSettingsActivityTab = ctaAndWtaSettingsActivityTab;
-    }
-
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
-
-    public PresenceTypeWithTimeTypeDTO getPresenceTypeWithTimeType() {
-        return presenceTypeWithTimeType;
-    }
-
-    public void setPresenceTypeWithTimeType(PresenceTypeWithTimeTypeDTO presenceTypeWithTimeType) {
-        this.presenceTypeWithTimeType = presenceTypeWithTimeType;
-    }
-
-    public LocationActivityTab getLocationActivityTab() {
-        return locationActivityTab;
-    }
-
-    public void setLocationActivityTab(LocationActivityTab locationActivityTab) {
-        this.locationActivityTab = locationActivityTab;
-    }
-
-    public List<EmploymentTypeDTO> getEmploymentTypes() {
-        return employmentTypes;
-    }
-
-    public void setEmploymentTypes(List<EmploymentTypeDTO> employmentTypes) {
-        this.employmentTypes = employmentTypes;
-    }
-
-    public List<Long> getRulesTabDayTypes() {
-        return rulesTabDayTypes;
-    }
-
-    public void setRulesTabDayTypes(List<Long> rulesTabDayTypes) {
-        this.rulesTabDayTypes = rulesTabDayTypes;
-    }
-
-    public List<TimeTypeDTO> getTimeTypes() {
-        return timeTypes;
-    }
-
-    public void setTimeTypes(List<TimeTypeDTO> timeTypes) {
-        this.timeTypes = timeTypes;
-    }
-
-    public List<DayType> getDayTypes() {
-        return dayTypes;
-    }
-
-    public void setDayTypes(List<DayType> dayTypes) {
-        this.dayTypes = dayTypes;
-    }
-
-    public PhaseSettingsActivityTab getPhaseSettingsActivityTab() {
-        return phaseSettingsActivityTab;
-    }
-
-    public void setPhaseSettingsActivityTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
-        this.phaseSettingsActivityTab = phaseSettingsActivityTab;
-    }
-
-    public Set<AccessGroupRole> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<AccessGroupRole> roles) {
-        this.roles = roles;
-    }
 }

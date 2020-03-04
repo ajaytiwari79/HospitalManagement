@@ -235,6 +235,7 @@ public class TimeBankService{
         Date endDate = isNotNull(endDateTime) ? getEndOfDay(endDateTime) : null;
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(null,staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate,null);
         List<DailyTimeBankEntry> dailyTimeBankEntries = new ArrayList<>();
+        staffAdditionalInfoDTO.getEmployment().setFunctionId(null);
         if(isCollectionNotEmpty(shiftWithActivityDTOS)) {
             shiftWithActivityDTOS = shiftWithActivityDTOS.stream().sorted(Comparator.comparing(ShiftWithActivityDTO::getStartDate)).collect(Collectors.toList());
             if(isNull(endDate)) {

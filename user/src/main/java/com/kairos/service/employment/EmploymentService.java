@@ -1184,7 +1184,7 @@ public class EmploymentService {
                         linkExistingRelations(employmentLineToBeCreated, employmentLine);
                     } else {
                         employmentLine.setFullTimeWeeklyMinutes(employmentLine.getFullTimeWeeklyMinutes());
-                        //employmentLine.setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), null, employment.getExpertise().getId()));
+                        employmentLine.setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), null, employment.getExpertise().getId()));
                         employmentLine.setWorkingDaysInWeek(employmentLine.getWorkingDaysInWeek());
                     }
                 }
