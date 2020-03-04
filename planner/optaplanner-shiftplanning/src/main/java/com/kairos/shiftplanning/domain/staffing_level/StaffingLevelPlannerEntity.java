@@ -25,6 +25,6 @@ public class StaffingLevelPlannerEntity {
         return ShiftPlanningUtility.getStaffingLevelSatisfaction(this,shift);
     }
     public Integer getStaffingLevelSatisfaction(List<Shift> shifts){
-        return ShiftPlanningUtility.getStaffingLevelSatisfaction(this,shifts);
+        return ShiftPlanningUtility.getStaffingLevelSatisfaction(this);
     }
 }

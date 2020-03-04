@@ -250,7 +250,6 @@ public class ShiftService extends MongoBaseService {
             //shiftReminderService.updateJobForShiftReminder(activityWrapperMap, mainShift);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(isNotNull(mainShift.getDraftShift()) ? mainShift.getDraftShift() : mainShift, ShiftDTO.class);
             shiftDTO.setId(mainShift.getId());
-            shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
             shiftValidatorService.validateShiftViolatedRules(mainShift, shiftOverlappedWithNonWorkingType, shiftWithViolatedInfoDTO, PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) ? ShiftActionType.SAVE_AS_DRAFT : null);
             shiftDTO = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(Arrays.asList(shiftDTO)).get(0);
         }
@@ -480,7 +479,6 @@ public class ShiftService extends MongoBaseService {
                 }
                 //todoService.createOrUpdateTodo(shift, TodoType.APPROVAL_REQUIRED, isNotNull(shiftDTO.getId()),staffAdditionalInfoDTO);
                 shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
-                shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
                 updateShiftViolatedOnIgnoreCounter(shift, shiftOverLappedWithNonWorkingTime, updatedShiftWithViolatedInfo);
                 activitySchedulerJobService.updateJobForShiftReminder(activityWrapperMap, shift);
                 if (updateShiftState) {
@@ -687,7 +685,6 @@ public class ShiftService extends MongoBaseService {
                 wtaRuleTemplateCalculationService.updateWTACounter(shift, staffAdditionalInfoDTO);
                 shiftDTO = UserContext.getUserDetails().isManagement() ? ObjectMapperUtils.copyPropertiesByMapper(isNotNull(shift.getDraftShift()) ? shift.getDraftShift() : shift, ShiftDTO.class) : ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
                 timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
-                shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
                 if (ShiftActionType.SAVE.equals(shiftAction)) {
                     shiftStateService.createShiftState(Arrays.asList(shift), true, shift.getUnitId());
                 }
@@ -828,7 +825,7 @@ public class ShiftService extends MongoBaseService {
         }
         UserAccessRoleDTO userAccessRoleDTO;
         if (isNotNull(staffAdditionalInfoDTO)) {
-            shifts = timeBankService.updateTimebankDetailsInShiftDTO(shifts);
+            //shifts = timeBankService.updateTimebankDetailsInShiftDTO(shifts);
             userAccessRoleDTO = staffAdditionalInfoDTO.getUserAccessRoleDTO();
         } else {
             userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
