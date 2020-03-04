@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -97,6 +98,9 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
             "WITH staff, collect(distinct {skillLevel:skillRel.skillLevel,skillId:id(skill),startDate:skillRel.startDate,endDate:skillRel.endDate}) AS skills \n" +
             "RETURN id(staff) as id,skills")
     List<StaffQueryResult> getAllStaffSkillAndLevelByStaffIds(List<Long> staffIds);
+
+    @Query("Match (organization)-[r:"+ORGANISATION_HAS_SKILL+"]->(skill:Skill) where id(organization)={0}  AND r.isEnabled=TRUE RETURN id(skill) ")
+    List<Long> findAllSkillsByUnitId(Long unitId);
 
 
 }

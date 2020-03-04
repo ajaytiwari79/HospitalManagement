@@ -1,4 +1,5 @@
-package com.kairos.persistence.repository.organization;/*
+package com.kairos.persistence.repository.organization;
+/*
  *Created By Pavan on 27/5/19
  *
  */

@@ -3,6 +3,7 @@ package com.kairos.rest_client;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.RestClientUrlUtil;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.OrganizationMappingDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
@@ -916,6 +917,12 @@ public class UserIntegrationService {
     public List<Skill> getSkillsByName(Set<String> skillsOfAllTimeCareActivity, Long countryId) {
         return genericRestClient.publishRequest(skillsOfAllTimeCareActivity, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/skills_by_name", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Skill>>>() {});
     }
+
+    public ActivityDTO getAllSkillsByUnit(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/skills_by_unit", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ActivityDTO>>() {});
+    }
+
+
 
 //    public Long getTotalSumOfPayLevel(Long countryId, List<Long> employmentIds,LocalDate selectedDate) {
 //        List<NameValuePair> queryParamList = new ArrayList<>();

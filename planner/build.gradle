@@ -56,9 +56,9 @@ repositories {
 
 dependencies {
 	compile project(':kcommons')
-	compile project('optaplanner-shiftplanning')
-ved 	compile project('optaplanner-taskplanning')
-	compile project('optaplanner-vrp-taskplanning')
+	compile project('optaplanner-shiftplanning')/*
+	compile project('optaplanner-taskplanning')
+	compile project('optaplanner-vrp-taskplanning')*/
 	compile project (':kcommons')
 	compile project (':kpermissions')
 	compile group: 'joda-time', name: 'joda-time', version: '2.9.9'

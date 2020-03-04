@@ -4,6 +4,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationSkillDTO;
 import com.kairos.enums.MasterDataTypeEnum;
@@ -32,6 +33,7 @@ import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGr
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.expertise.ExpertiseUnitService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.staff.StaffRetrievalService;
@@ -89,6 +91,8 @@ public class SkillService {
     private ExceptionService exceptionService;
     @Inject
     private StaffRetrievalService staffRetrievalService;
+    @Inject
+    private ExpertiseUnitService expertiseUnitService;
 
     public Map<String, Object> createSkill(SkillDTO skillDTO, long skillCategoryId) {
         SkillCategory skillCategory = skillCategoryGraphRepository.findOne(skillCategoryId);
@@ -399,6 +403,14 @@ public class SkillService {
             skills.addAll(skillGraphRepository.findSkillByNameIn(skillsToFind));
         }
         return skills;
+    }
+
+    public ActivityDTO getSkillByUnit(Long unitId){
+        ActivityDTO activityDTO=new ActivityDTO();
+        activityDTO.setSkills(skillGraphRepository.findAllSkillsByUnitId(unitId));
+        activityDTO.setExpertises(expertiseUnitService.getExpertiseIdsByUnit(unitId));
+        return activityDTO;
+
     }
 
 
