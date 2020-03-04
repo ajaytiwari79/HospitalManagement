@@ -32,7 +32,7 @@ public class MaximumDaysOffInPeriodWTATemplate implements ConstraintHandler {
     private String templateType;
 
     public int checkConstraints(List<Shift> shifts){
-        int shiftsNum=ShiftPlanningUtility.getSortedDates(shifts).size();
+        int shiftsNum=ShiftPlanningUtility.getSortedAndUniqueDates(shifts).size();
         return 7-shiftsNum>daysLimit?0:(daysLimit-(7 - shiftsNum));
     }
 }

@@ -229,7 +229,6 @@ public class AbsenceShiftService {
             shiftService.saveShiftWithActivity(phaseMapByDate, shifts, staffAdditionalInfoDTO);
             shiftDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shifts, ShiftDTO.class);
             shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
-            shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS);
         }
         shiftWithViolatedInfoDTO.setShifts(shiftDTOS);
         return shiftWithViolatedInfoDTO;

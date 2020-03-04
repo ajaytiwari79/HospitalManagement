@@ -21,10 +21,10 @@ public class StaffingLevelPlannerEntity {
     private LocalDate date;
     private List<StaffingLevelInterval> intervals;
 
-    public Integer getStaffingLevelSatisfaction(Shift shift, List<IndirectActivity> indirectActivityList){
-        return ShiftPlanningUtility.getStaffingLevelSatisfaction(this,shift,indirectActivityList);
+    public Integer getStaffingLevelSatisfaction(Shift shift){
+        return ShiftPlanningUtility.getStaffingLevelSatisfaction(this,shift);
     }
-    public Integer getStaffingLevelSatisfaction(List<Shift> shifts,List<IndirectActivity> indirectActivityList){
-        return ShiftPlanningUtility.getStaffingLevelSatisfaction(this,shifts,indirectActivityList);
+    public Integer getStaffingLevelSatisfaction(List<Shift> shifts){
+        return ShiftPlanningUtility.getStaffingLevelSatisfaction(this);
     }
 }

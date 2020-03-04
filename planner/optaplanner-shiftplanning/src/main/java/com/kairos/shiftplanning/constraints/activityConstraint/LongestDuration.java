@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,6 +29,11 @@ public class LongestDuration implements Constraint {
 
     public int checkConstraints(Activity activity, ShiftImp shift){
 
+        return 0;
+    }
+
+    @Override
+    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
         return 0;
     }
 }

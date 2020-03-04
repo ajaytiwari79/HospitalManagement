@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,5 +30,10 @@ public class PresenceAndAbsenceAtSameTime implements Constraint {
     public int checkConstraints(Activity activity, ShiftImp shift){
         Set<TimeTypeEnum> timeTypeEnumSet = shift.getActivityLineIntervals().stream().map(activityLineInterval -> activityLineInterval.getActivity().getTimeType().getTimeTypeEnum()).collect(Collectors.toSet());
         return timeTypeEnumSet.size();
+    }
+
+    @Override
+    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+        return 0;
     }
 }

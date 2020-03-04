@@ -51,7 +51,7 @@ public class MinimumRestConsecutiveNightsWTATemplate implements ConstraintHandle
     public int checkConstraints(List<Shift> shifts) {
         if(shifts.size()<2) return 0;
         ShiftPlanningUtility.sortShifts(shifts);
-        List<LocalDate> dates=ShiftPlanningUtility.getSortedDates(shifts);
+        List<LocalDate> dates=ShiftPlanningUtility.getSortedAndUniqueDates(shifts);
         int l=1;
         int consDays=0;
         int totalRestUnder=0;
@@ -64,7 +64,7 @@ public class MinimumRestConsecutiveNightsWTATemplate implements ConstraintHandle
             if(consDays>=nightsWorked){
                 DateTime start=shifts.get(l-1).getEnd();
                 DateTime end=shifts.get(l).getStart();
-                int diff=new Interval(start,end).toDuration().toStandardMinutes().getMinutes()- minimumRest;//FIXME
+                int diff=new Interval(start,end).toDuration().toStandardMinutes().getMinutes()- minimumRest;
                 totalRestUnder+=diff;
                 consDays=0;
             }
