@@ -25,7 +25,7 @@ public class Unit {
         switch (index){
             case 1:return unitConstraints.getShiftOnWeekend().checkConstraints(shifts);
             case 2:return unitConstraints.getPreferedEmployementType().checkConstraints(shifts);
-
+            default:break;
         }
         return 0;
     }

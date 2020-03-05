@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.enums.FilterType.*;
+import static com.kairos.enums.FilterType.EMPLOYMENT_TYPE;
 
 public class EmploymentTypeFilter <G> implements ShiftFilter {
 

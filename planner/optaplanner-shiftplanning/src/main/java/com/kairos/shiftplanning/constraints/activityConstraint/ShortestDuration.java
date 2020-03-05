@@ -26,11 +26,6 @@ public class ShortestDuration implements Constraint {
     }
 
     public int checkConstraints(Activity activity, ShiftImp shift){
-       /*int minutes = shift.getActivityLineIntervalsList().stream().filter(a->a.getActivity().equals(activity)).mapToInt(a->a.getInterval().toDuration().toStandardMinutes().getMinutes()).sum();
-        if(minutes>0){
-            int duration = Math.round((float)minutes/shift.getMinutes()*100);
-            return duration<shortestDuration?shortestDuration-duration:0;
-        }*/
         return 0;
     }
 

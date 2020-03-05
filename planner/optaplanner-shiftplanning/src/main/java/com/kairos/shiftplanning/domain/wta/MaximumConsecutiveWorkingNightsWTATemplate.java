@@ -12,7 +12,6 @@ import lombok.Setter;
 import org.joda.time.LocalDate;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Pradeep singh on 5/8/17.
