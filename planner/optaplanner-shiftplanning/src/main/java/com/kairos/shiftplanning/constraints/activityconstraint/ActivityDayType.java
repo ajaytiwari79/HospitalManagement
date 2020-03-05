@@ -1,4 +1,4 @@
-package com.kairos.shiftplanning.constraints.activityConstraint;
+package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
@@ -10,30 +10,37 @@ import lombok.Setter;
 
 import java.util.List;
 
+import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.isValidForDayType;
+
+/**
+ * @author pradeep
+ * @date - 18/12/18
+ */
 @Getter
 @Setter
 @NoArgsConstructor
-public class LongestDuration implements Constraint {
+public class ActivityDayType implements Constraint {
 
-
-    //By percent
-    private int longestDuration;
+    private List<DayType> dayTypes;
     private ScoreLevel level;
     private int weight;
 
-    public LongestDuration(int longestDuration, ScoreLevel level, int weight) {
-        this.longestDuration = longestDuration;
+
+    public ActivityDayType(List<DayType> dayTypes, ScoreLevel level, int weight) {
+        this.dayTypes = dayTypes;
         this.level = level;
         this.weight = weight;
     }
 
-    public int checkConstraints(Activity activity, ShiftImp shift){
 
-        return 0;
+    @Override
+    public int checkConstraints(Activity activity, ShiftImp shift) {
+        return isValidForDayType(shift,this.dayTypes) ? 0 : 1;
     }
 
     @Override
     public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
         return 0;
     }
+
 }

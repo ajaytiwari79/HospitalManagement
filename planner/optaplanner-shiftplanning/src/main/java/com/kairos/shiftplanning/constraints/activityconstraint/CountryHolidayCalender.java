@@ -1,4 +1,4 @@
-package com.kairos.shiftplanning.constraints.activityConstraint;
+package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

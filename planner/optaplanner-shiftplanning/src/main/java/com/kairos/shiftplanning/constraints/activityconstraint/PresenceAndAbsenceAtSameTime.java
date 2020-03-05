@@ -1,5 +1,7 @@
-package com.kairos.shiftplanning.constraints.activityConstraint;
+package com.kairos.shiftplanning.constraints.activityconstraint;
 
+
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.activity.Activity;
@@ -9,24 +11,25 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+/*
+* This class represent constraint
+* Presence and Absence type of shifts
+* should not happen at same time
+* */
 @Getter
 @Setter
 @NoArgsConstructor
-public class ShortestDuration implements Constraint {
+public class PresenceAndAbsenceAtSameTime implements Constraint {
 
-    private int shortestDuration;
     private ScoreLevel level;
     private int weight;
 
-    public ShortestDuration(int shortestDuration, ScoreLevel level, int weight) {
-        this.shortestDuration = shortestDuration;
-        this.level = level;
-        this.weight = weight;
-    }
-
     public int checkConstraints(Activity activity, ShiftImp shift){
-        return 0;
+        Set<TimeTypeEnum> timeTypeEnumSet = shift.getActivityLineIntervals().stream().map(activityLineInterval -> activityLineInterval.getActivity().getTimeType().getTimeTypeEnum()).collect(Collectors.toSet());
+        return timeTypeEnumSet.size();
     }
 
     @Override
