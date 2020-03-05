@@ -22,11 +22,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_TRANSFERMETHOD;
+
 @Service
 public class OrganizationTransferMethodService {
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TransferMethodService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationTransferMethodService.class);
 
     @Inject
     private TransferMethodRepository transferMethodRepository;
@@ -93,7 +95,7 @@ public class OrganizationTransferMethodService {
 
         List<String> processingActivitiesLinkedWithTransferMethod = processingActivityRepository.findAllProcessingActivityLinkedWithTransferMethod(unitId, transferMethodId);
         if (!processingActivitiesLinkedWithTransferMethod.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.transferMethod", StringUtils.join(processingActivitiesLinkedWithTransferMethod, ','));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", MESSAGE_TRANSFERMETHOD, StringUtils.join(processingActivitiesLinkedWithTransferMethod, ','));
         }
         transferMethodRepository.deleteByIdAndOrganizationId(transferMethodId, unitId);
         return true;
@@ -113,11 +115,11 @@ public class OrganizationTransferMethodService {
             if (id.equals(transferMethod.getId())) {
                 return transferMethodDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "message.transferMethod", transferMethod.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_TRANSFERMETHOD, transferMethod.getName());
         }
         Integer resultCount = transferMethodRepository.updateMetadataName(transferMethodDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.transferMethod", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", MESSAGE_TRANSFERMETHOD, id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, transferMethodDTO.getName());
         }
