@@ -6,7 +6,6 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.enums.DurationType;
 import com.kairos.enums.shift.ShiftOperationType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;

@@ -3,7 +3,6 @@ package com.kairos.commons.service.mail;
 import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.sendgrid.*;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

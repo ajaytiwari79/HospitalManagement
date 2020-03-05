@@ -9,7 +9,6 @@ import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
 import com.kairos.persistence.model.priority_group.PriorityGroup;
 import com.kairos.persistence.repository.open_shift.OpenShiftRuleTemplateRepository;
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 

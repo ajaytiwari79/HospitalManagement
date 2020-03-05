@@ -26,7 +26,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.FilterType.TEAM_TYPE;
 import static com.kairos.enums.kpi.CalculationType.*;
 import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
-import static java.util.Map.Entry.comparingByKey;
 import static java.util.stream.Collectors.toMap;
 
 

@@ -2,7 +2,6 @@ package com.kairos.commons.utils;
 
 import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
-import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 
 import javax.inject.Inject;
 

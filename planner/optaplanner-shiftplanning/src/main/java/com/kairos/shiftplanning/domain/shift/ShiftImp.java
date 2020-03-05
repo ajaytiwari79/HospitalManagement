@@ -108,7 +108,7 @@ public class ShiftImp implements Shift{
     }
 
     /**
-     * This method tells missing intervals in shif. Note this does not tell which activityintervals are overlapped multiple times in same interval.
+     * This method tells missing intervals in shift. Note this does not tell which activityintervals are overlapped multiple times in same interval.
      * @return totalMissing
      */
     public int missingIntervals(){
@@ -131,9 +131,6 @@ public class ShiftImp implements Shift{
             if(breaks!=null && breaksIndices.contains(i)) continue;
             if(!intervalEntry.containsKey(i)) totalMissing++;
         }
-        /*if(totalMissing>0){
-            log.info("misssing");
-        }*/
         return totalMissing;
 
     }
@@ -195,12 +192,6 @@ public class ShiftImp implements Shift{
                 '}';
     }
 
-    public ShiftImp getShiftByActivity(Activity activity, List<ShiftImp> shifts){
-        for (ShiftImp shift:shifts) {
-
-        }
-        return null;
-    }
     public boolean hasIntervalsForActivity(Activity activity){
         for(ActivityLineInterval ali:activityLineIntervals){
             if(ali.getActivity().getId().equals(activity.getId())){
@@ -218,39 +209,30 @@ public class ShiftImp implements Shift{
     public int getMissingBreakTimes(){
         int totalMins=getMinutes();
         if(totalMins<300) return 0;
-        /*int assignedMins= activityLineIntervals.stream().mapToInt(ActivityLineInterval::getDuration).sum();
-        int diff= totalMins-assignedMins;*/
         int missing=0;
         List<Interval> mergedIntervals= ShiftPlanningUtility.getMergedIntervals(activityLineIntervals,false);
         int max=0;
         for (int i = 1; i < mergedIntervals.size()-1; i++) {
             max=mergedIntervals.get(i).getStart().isAfter(mergedIntervals.get(i-1).getEnd()) && ShiftPlanningUtility.getMinutes(mergedIntervals.get(i-1).getEnd(),mergedIntervals.get(i).getStart())>max?ShiftPlanningUtility.getMinutes(mergedIntervals.get(i-1).getEnd(),mergedIntervals.get(i).getStart()):max;
         }
-        //check for 5 hours break
         if(totalMins>300 && max<30){
             missing=(30-max)/15;
         }
-        //log.info("**************************{}************",missing);
         return  missing;
     }
     public boolean isAvailableThisInterval(Interval interval,List<ShiftBreak> breaks){
-        //log.info(this.getPrettyId());
         if(isAbsenceActivityApplied() || !getInterval().contains(interval)){
-            //log.info("false");
             return false;
         }
 
         for(ShiftBreak sb:breaks){
             if(sb.getShift().getId().equals(this.id) && sb.getInterval()!=null && sb.getInterval().overlaps(interval)){
-                    //log.info("false");
                 return false;
             }
         }
-        //log.info("true");
         return true;
     }
     public boolean hasAnyEmployee(List<Employee> emps){
-        //log.info("E"+this.getPrettyId()+":::"+emps.contains(this.employee));
         return emps.contains(this.employee);
     }
 }

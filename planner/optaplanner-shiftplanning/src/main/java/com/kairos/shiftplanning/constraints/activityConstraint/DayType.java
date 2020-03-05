@@ -1,6 +1,9 @@
 package com.kairos.shiftplanning.constraints.activityConstraint;
 
 import com.kairos.enums.Day;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +12,9 @@ import java.util.List;
  * @author pradeep
  * @date - 18/12/18
  */
-
+@NoArgsConstructor
+@Getter
+@Setter
 public class DayType {
     private Long id;
     private String name;
@@ -24,57 +29,6 @@ public class DayType {
         this.validDays = validDays;
         this.countryHolidayCalenders = countryHolidayCalenders;
         this.holidayType = holidayType;
-        this.allowTimeSettings = allowTimeSettings;
-    }
-
-    public DayType() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Day> getValidDays() {
-        return validDays;
-    }
-
-    public void setValidDays(List<Day> validDays) {
-        this.validDays = validDays;
-    }
-
-    public List<CountryHolidayCalender> getCountryHolidayCalenders() {
-        return countryHolidayCalenders;
-    }
-
-    public void setCountryHolidayCalenders(List<CountryHolidayCalender> countryHolidayCalenders) {
-        this.countryHolidayCalenders = countryHolidayCalenders;
-    }
-
-    public boolean isHolidayType() {
-        return holidayType;
-    }
-
-    public void setHolidayType(boolean holidayType) {
-        this.holidayType = holidayType;
-    }
-
-    public boolean isAllowTimeSettings() {
-        return allowTimeSettings;
-    }
-
-    public void setAllowTimeSettings(boolean allowTimeSettings) {
         this.allowTimeSettings = allowTimeSettings;
     }
 
