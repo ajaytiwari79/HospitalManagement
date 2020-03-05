@@ -339,6 +339,7 @@ public class ShiftPlanningUtility {
         }
         //to add last one
         shiftActivities.add(shiftActivity);
+        shiftActivities.sort(Comparator.comparing(ShiftActivity::getStartTime));
         return shiftActivities;
     }
 
