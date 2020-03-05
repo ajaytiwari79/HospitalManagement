@@ -115,14 +115,14 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
         ActivityLineInterval that = (ActivityLineInterval) o;
 
         return new EqualsBuilder()
-                .append(id, that.id)
+                .append(id, that.id).append(this.getStart(),that.getStart()).append(this.getEnd(),that.getEnd()).append(this.getActivity(),that.getActivity())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(id)
+                .append(id).append(this.getStart()).append(this.getEnd()).append(this.getActivity())
                 .toHashCode();
     }
 }

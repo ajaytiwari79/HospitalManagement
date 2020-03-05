@@ -8,34 +8,32 @@ import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Objects;
+
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @XStreamAlias("Tag")
 public class Tag {
-    BigInteger tagId;
+    Long id;
     private String name;
     @Indexed
     private MasterDataTypeEnum masterDataType;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
-    private boolean countryTag;
-
-    private long countryId;
-
-    private long organizationId;
-
-    public Tag(BigInteger tagId,String name, MasterDataTypeEnum masterDataType, boolean countryTag, long countryOrOrdId){
-        this.tagId = tagId;
+    public Tag(Long id,String name, MasterDataTypeEnum masterDataType){
+        this.id = id;
         this.name = name;
         this.masterDataType = masterDataType;
-        this.countryTag = countryTag;
-        if(countryTag) {
-            this.countryId = countryOrOrdId;
-        }else {
-            this.organizationId = countryOrOrdId;
-        }
+    }
+
+    public boolean isValidTag(LocalDate localDate){
+        return (isNull(this.getEndDate()) && !this.getStartDate().isAfter(localDate)) || (isNotNull(this.getEndDate()) && !this.getStartDate().isAfter(localDate) && !this.getEndDate().isBefore(localDate));
     }
 
     @Override
@@ -43,16 +41,11 @@ public class Tag {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Tag tag = (Tag) o;
-        return countryTag == tag.countryTag &&
-                countryId == tag.countryId &&
-                organizationId == tag.organizationId &&
-                Objects.equals(tagId, tag.tagId) &&
-                Objects.equals(name, tag.name) &&
-                masterDataType == tag.masterDataType;
+        return id.equals(tag.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tagId, name, masterDataType, countryTag, countryId, organizationId);
+        return Objects.hash(id);
     }
 }
