@@ -37,6 +37,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
 import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
@@ -80,6 +81,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.ACTIVITY_END_DATE_LESS_THAN_START_DATE;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ORGANIZATION_PHASES;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
 import static com.kairos.enums.cta.AccountType.PAID_OUT;
@@ -632,7 +634,6 @@ public class TimeBankCalculationService {
     }
 
     public Interval getIntervalValidIntervalForTimebank(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, Interval interval, DateTimeInterval planningPeriodInterval) {
-        Interval updatedInterval = null;
         DateTime employmentStartTime = toJodaDateTime(employmentWithCtaDetailsDTO.getStartDate());
         DateTime employmentEndTime = toJodaDateTime(isNull(employmentWithCtaDetailsDTO.getEndDate()) ? planningPeriodInterval.getEndLocalDate() : employmentWithCtaDetailsDTO.getEndDate().isBefore(planningPeriodInterval.getEndLocalDate()) ? employmentWithCtaDetailsDTO.getEndDate() : planningPeriodInterval.getEndLocalDate());
         Interval employmentInterval = new Interval(employmentStartTime, employmentEndTime);
@@ -1110,7 +1111,11 @@ public class TimeBankCalculationService {
             localDateTimes.add(startDateTime);
             startDateTime = startDateTime.plusDays(1);
         }
-        return phaseService.getPhasesByDates(unitId, localDateTimes).entrySet().stream().collect(Collectors.toMap(k -> asLocalDate(k.getKey()), v -> v.getValue().getPhaseEnum()));
+        Map<Date, Phase> phasesByDates = phaseService.getPhasesByDates(unitId, localDateTimes);
+        if(isNull(phasesByDates)){
+            exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PHASES);
+        }
+        return phasesByDates.entrySet().stream().collect(Collectors.toMap(k -> asLocalDate(k.getKey()), v -> v.getValue().getPhaseEnum()));
     }
 
     public Map<java.time.LocalDate, Boolean> getDateWisePublishPlanningPeriod(Long employmentTypeId, java.time.LocalDate startDate, java.time.LocalDate endDate, Long unitId) {

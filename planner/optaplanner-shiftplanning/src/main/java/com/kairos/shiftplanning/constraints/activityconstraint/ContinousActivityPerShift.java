@@ -1,4 +1,4 @@
-package com.kairos.shiftplanning.constraints.activityConstraint;
+package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import lombok.Getter;

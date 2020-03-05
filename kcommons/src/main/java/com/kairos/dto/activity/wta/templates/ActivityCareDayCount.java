@@ -3,6 +3,7 @@ package com.kairos.dto.activity.wta.templates;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.Objects;
 @Getter
 @Setter
 public class ActivityCareDayCount {
+    @NotNull(message = "message.mismatched-ids")
     private BigInteger activityId;
     private int count;
     private List<ActivityCutOffCount> activityCutOffCounts=new ArrayList<>();
