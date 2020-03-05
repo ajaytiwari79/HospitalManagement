@@ -205,6 +205,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_COUNTRY_ID_NOTNULL = "message.country.id.notNull";
     public static final String MESSAGE_COUNTRY_LEVEL_NAME_NOTEMPTY = "message.country.level.name.notEmpty";
     public static final String MESSAGE_COUNTRY_LEVEL_ID_NOTFOUND = "message.country.level.id.notFound";
+    public static final String MESSAGE_COUNTRY_LEVEL_CANNOT_DELETE = "message.country.level.cannot.delete";
     public static final String MESSAGE_COUNTRY_REALTIONTYPE_ID_NOTFOUND = "message.country.realtionType.id.notFound";
     public static final String MESSAGE_COUNTRY_LEVEL_NAME_EXIST  = "message.country.level.name.exist ";
     public static final String MESSAGE_DAYTYPE_NOTFOUND = "message.dayType.notfound";

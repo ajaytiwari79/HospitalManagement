@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_LEGALBASIS;
+
 @Service
 public class OrganizationProcessingLegalBasisService{
 
@@ -92,7 +94,7 @@ public class OrganizationProcessingLegalBasisService{
 
         List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingLegalBasis(unitId, legalBasisId);
         if (!processingActivities.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.legalBasis", StringUtils.join(processingActivities, ','));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", MESSAGE_LEGALBASIS, StringUtils.join(processingActivities, ','));
         }
         processingLegalBasisRepository.deleteByIdAndOrganizationId(legalBasisId, unitId);
         return true;
@@ -112,11 +114,11 @@ public class OrganizationProcessingLegalBasisService{
             if (id.equals(processingLegalBasis.getId())) {
                 return legalBasisDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "message.legalBasis", processingLegalBasis.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_LEGALBASIS, processingLegalBasis.getName());
         }
         Integer resultCount =  processingLegalBasisRepository.updateMetadataName(legalBasisDTO.getName(), id, unitId);
         if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.legalBasis", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", MESSAGE_LEGALBASIS, id);
         }else{
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, legalBasisDTO.getName());
         }
