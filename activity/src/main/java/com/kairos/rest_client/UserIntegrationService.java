@@ -919,7 +919,7 @@ public class UserIntegrationService {
     }
 
     public ActivityDTO getAllSkillsByUnit(Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/skills_by_unit", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ActivityDTO>>() {});
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/skills_and_expertise_by_unit", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ActivityDTO>>() {});
     }
 
 

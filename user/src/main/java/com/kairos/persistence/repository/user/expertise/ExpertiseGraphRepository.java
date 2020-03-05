@@ -158,7 +158,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     boolean removeChildCareDays(Long expertiseId);
 
     @Query("MATCH (expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE  (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE()))  " +
-            "MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {1}\n" +
+            "MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {0}\n" +
             "RETURN id(expertise) ")
     List<Long> getExpertiseIdsByServices(Set<Long> organizationServicesIds);
  }
