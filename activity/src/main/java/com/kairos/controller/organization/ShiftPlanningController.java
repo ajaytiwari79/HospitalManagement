@@ -1,12 +1,10 @@
 package com.kairos.controller.organization;
 
+import com.kairos.dto.activity.shift.ShiftSearchDTO;
 import com.kairos.service.organization.ShiftPlanningService;
 import com.kairos.wrapper.shift.StaffShiftDetails;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -21,8 +19,8 @@ public class ShiftPlanningController {
     @Inject
     private ShiftPlanningService shiftPlanningService;
 
-    @GetMapping(value = "/staff_and_shift_details")
-    public List<StaffShiftDetails> shiftsAndPlanningSettings(@PathVariable Long unitId){
-       return shiftPlanningService.getShiftPlanningDetailsForUnit(unitId);
+    @PostMapping(value = "/search/shifts")
+    public List<StaffShiftDetails> shiftsAndPlanningSettings(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO){
+       return shiftPlanningService.getShiftPlanningDetailsForUnit(unitId,searchDTO);
     }
 }
