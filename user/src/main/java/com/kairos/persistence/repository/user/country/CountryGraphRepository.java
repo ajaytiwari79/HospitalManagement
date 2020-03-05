@@ -102,7 +102,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     Level getLevel(Long countryId, Long levelId);
 
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true})<-[:"+IN_ORGANIZATION_LEVEL+"]-(payTable:PayTable{published:true}) \n" +
-            "where id(country)=18712 AND id(level)=1753 \n" +
+            "where id(country)={0} AND id(level)={1} \n" +
             "RETURN count(payTable) > 0")
     Boolean isLinkedPayTablePublished(Long countryId, Long levelId);
 
