@@ -9,7 +9,6 @@ import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.constraints.activityConstraint.*;
 import com.kairos.shiftplanning.constraints.unitConstraint.PreferedEmployementType;
 import com.kairos.shiftplanning.constraints.unitConstraint.ShiftOnWeekend;
-import com.kairos.shiftplanning.constraints.unitConstraint.UnitConstraints;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
@@ -218,7 +217,7 @@ public class ShiftPlanningGenerator {
         return constraintMap;
     }
     public  Tag requiredTagId(){
-        return new Tag(BigInteger.valueOf(1), STAFF_TAG, STAFF, false, 958);
+        return new Tag(1l, STAFF_TAG, STAFF);
     }
 
 
@@ -462,9 +461,9 @@ public class ShiftPlanningGenerator {
 
     public Set<Tag> createTags1(){
         Set<Tag> tags = new HashSet<>();
-        Tag tag1 = new Tag(BigInteger.valueOf(1), STAFF_TAG, STAFF, false, 958);
-        Tag tag2 = new Tag(BigInteger.valueOf(2), ACTIVITY_TAG, ACTIVITY, true, 18712);
-        Tag tag3 = new Tag(BigInteger.valueOf(3), SKILL_TAG, SKILL, false, 958);
+        Tag tag1 = new Tag(1l, STAFF_TAG, STAFF);
+        Tag tag2 = new Tag(2l, ACTIVITY_TAG, ACTIVITY);
+        Tag tag3 = new Tag(3l, SKILL_TAG, SKILL);
         tags.add(tag1);
         tags.add(tag2);
         tags.add(tag3);
@@ -473,9 +472,9 @@ public class ShiftPlanningGenerator {
 
     public Set<Tag> createTags2(){
         Set<Tag> tags = new HashSet<>();
-        Tag tag1 = new Tag(BigInteger.valueOf(1), STAFF_TAG,EXPERTISE , false, 958);
-        Tag tag2 = new Tag(BigInteger.valueOf(2), ACTIVITY_TAG, ACTIVITY, true, 18712);
-        Tag tag3 = new Tag(BigInteger.valueOf(3), SKILL_TAG, SKILL, false, 958);
+        Tag tag1 = new Tag(1l, STAFF_TAG,EXPERTISE);
+        Tag tag2 = new Tag(2l, ACTIVITY_TAG, ACTIVITY);
+        Tag tag3 = new Tag(3l, SKILL_TAG, SKILL);
 
         tags.add(tag1);
         tags.add(tag2);
@@ -484,9 +483,9 @@ public class ShiftPlanningGenerator {
     }
     public Set<Tag> createTags3(){
         Set<Tag> tags = new HashSet<>();
-        Tag tag1 = new Tag(BigInteger.valueOf(1), STAFF_TAG, WTA, false, 958);
-        Tag tag2 = new Tag(BigInteger.valueOf(2), ACTIVITY_TAG, ACTIVITY, true, 18712);
-        Tag tag3 = new Tag(BigInteger.valueOf(3), SKILL_TAG, SKILL, false, 958);
+        Tag tag1 = new Tag(1l, STAFF_TAG, WTA);
+        Tag tag2 = new Tag(2l, ACTIVITY_TAG, ACTIVITY);
+        Tag tag3 = new Tag(3l, SKILL_TAG, SKILL);
         tags.add(tag1);
         tags.add(tag2);
         tags.add(tag3);
@@ -494,9 +493,9 @@ public class ShiftPlanningGenerator {
     }
     public Set<Tag>  createTags4(){
         Set<Tag> tags = new HashSet<>();
-        Tag tag1 = new Tag(BigInteger.valueOf(1), STAFF_TAG, CTA, false, 958);
-        Tag tag2 = new Tag(BigInteger.valueOf(2), ACTIVITY_TAG, ACTIVITY, true, 18712);
-        Tag tag3 = new Tag(BigInteger.valueOf(3), SKILL_TAG, SKILL, false, 958);
+        Tag tag1 = new Tag(1l, STAFF_TAG, CTA);
+        Tag tag2 = new Tag(2l, ACTIVITY_TAG, ACTIVITY);
+        Tag tag3 = new Tag(3l, SKILL_TAG, SKILL);
         tags.add(tag1);
         tags.add(tag2);
         tags.add(tag3);
@@ -507,15 +506,15 @@ public class ShiftPlanningGenerator {
         ShiftOnWeekend shiftOnWeekend = new ShiftOnWeekend();
         shiftOnWeekend.setLevel(ScoreLevel.HARD);
         shiftOnWeekend.setWeight(3);
-        UnitConstraints unitConstraints = new UnitConstraints();
-        unitConstraints.setShiftOnWeekend(shiftOnWeekend);
+        Map<ConstraintSubType,Constraint> unitConstraints = new HashMap<>();
         PreferedEmployementType preferedEmployementType = new PreferedEmployementType();
         preferedEmployementType.setPreferedEmploymentTypeIds(newHashSet(123l,145l));
         preferedEmployementType.setLevel(ScoreLevel.SOFT);
         preferedEmployementType.setWeight(3);
-        unitConstraints.setPreferedEmployementType(preferedEmployementType);
+        unitConstraints.put(ConstraintSubType.PREFER_PERMANENT_EMPLOYEE,preferedEmployementType);
+        unitConstraints.put(ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS,shiftOnWeekend);
         Unit unit =new Unit();
-        unit.setUnitConstraints(unitConstraints);
+        unit.setConstraints(unitConstraints);
         unit.setId("1");
         return unit;
     }

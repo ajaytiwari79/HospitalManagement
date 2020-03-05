@@ -98,13 +98,17 @@ public class ShiftImp implements Shift{
         return id.equals(that.getId());
     }
 
+    public boolean isChanged(ShiftImp shiftImp){
+        if (shiftImp == null || getClass() != shiftImp.getClass()) return true;
+        return (!id.equals(shiftImp.id) || !this.startTime.equals(endTime) || !this.getEndTime().equals(shiftImp.getEndTime()) || !this.getActivityLineIntervals().equals(shiftImp.getActivityLineIntervals()) || ! this.employee.equals(shiftImp.employee));
+    }
+
     public ShiftImp() {
     }
 
     @Override
     public int hashCode() {
-        int hashcode=id.hashCode();
-        return hashcode;
+        return id.hashCode();
     }
 
     /**

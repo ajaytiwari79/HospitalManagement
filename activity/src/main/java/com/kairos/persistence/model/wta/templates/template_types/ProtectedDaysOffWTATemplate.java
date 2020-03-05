@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_MISMATCHED_IDS;
 import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
 
@@ -42,12 +43,10 @@ public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled() && !ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType())){
+        if(!isDisabled() && !ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType()) && isNotNull(this.getActivityId())){
             WorkTimeAgreementService workTimeAgreementService = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementService.class);
-            List<WTAQueryResultDTO> wtaQueryResultDTOS = workTimeAgreementService.getWTAByEmploymentIdAndDates(infoWrapper.getShift().getEmploymentId(), (infoWrapper.getShift().getStartDate()), infoWrapper.getShift().getEndDate());
-            ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = (ProtectedDaysOffWTATemplate) wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplate -> PROTECTED_DAYS_OFF.equals(wtaBaseRuleTemplate.getWtaTemplateType()))).findFirst().get();
-            IntervalBalance intervalBalance = workTimeAgreementService.getProtectedDaysOffCount(infoWrapper.getShift().getUnitId(), asLocalDate(infoWrapper.getShift().getStartDate()), infoWrapper.getShift().getStaffId(), protectedDaysOffWTATemplate.activityId);
-            if (protectedDaysOffWTATemplate.getActivityId().equals(infoWrapper.getShift().getActivities().get(0).getActivityId()) && intervalBalance.getAvailable() < 1) {
+            IntervalBalance intervalBalance = workTimeAgreementService.getProtectedDaysOffCount(infoWrapper.getShift().getUnitId(), asLocalDate(infoWrapper.getShift().getStartDate()), infoWrapper.getShift().getStaffId(), this.activityId);
+            if (this.getActivityId().equals(infoWrapper.getShift().getActivities().get(0).getActivityId()) && intervalBalance.getAvailable() < 1) {
                 WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                         new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, (int) intervalBalance.getTotal(),
                                 DurationType.DAYS.toValue(), String.valueOf(0));
