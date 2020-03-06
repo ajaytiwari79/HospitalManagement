@@ -1,0 +1,1 @@
+MATCH (t:Team)-[rel:TEAM_HAS_MEMBER]->(s:Staff) SET rel.startDate =date()  RETURN rel,t,s

@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,5 +23,7 @@ public class StaffTeamDTO {
     private String name;
     private TeamType teamType;
     private LeaderType leaderType;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
 }

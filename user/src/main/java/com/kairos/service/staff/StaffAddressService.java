@@ -23,14 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GEOGRAPHYDATA_NOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_MUNICIPALITY_NOTFOUND;
 
@@ -64,13 +61,15 @@ public class StaffAddressService {
     private ExceptionService exceptionService;
 
      void saveAddress(Staff staff, List<AddressDTO> addressDTOs) {
-        List<ContactAddress> contactAddresses = contactAddressGraphRepository.findAllById(addressDTOs.stream().map(AddressDTO::getId).collect(Collectors.toList()));
+         List<AddressDTO> addressDTOS = addressDTOs.stream().filter(addressDTO -> isNotNull(addressDTO)).collect(Collectors.toList());
+         List<ContactAddress>  contactAddresses = contactAddressGraphRepository.findAllById(addressDTOS.stream().map(AddressDTO::getId).collect(Collectors.toList()));
+
         Map<Long, ContactAddress> contactAddressMap = contactAddresses.stream().collect(Collectors.toMap(ContactAddress::getId, Function.identity()));
-        List<ZipCode> zipCodes = zipCodeGraphRepository.findAllByZipCode(addressDTOs.stream().map(addressDTO -> addressDTO.getZipCode().getZipCode()).collect(Collectors.toList()));
+        List<ZipCode> zipCodes = zipCodeGraphRepository.findAllByZipCode(addressDTOS.stream().map(addressDTO -> addressDTO.getZipCode().getZipCode()).collect(Collectors.toList()));
         Map<Integer, ZipCode> zipCodeMap = zipCodes.stream().collect(Collectors.toMap(ZipCode::getZipCode, Function.identity()));
-        List<Municipality> municipalities = municipalityGraphRepository.findAllById(addressDTOs.stream().map(addressDTO->addressDTO.getMunicipality().getId()).collect(Collectors.toList()));
+        List<Municipality> municipalities = municipalityGraphRepository.findAllById(addressDTOS.stream().map(addressDTO->addressDTO.getMunicipality().getId()).collect(Collectors.toList()));
         Map<Long, Municipality> municipalityMap = municipalities.stream().collect(Collectors.toMap(Municipality::getId, Function.identity()));
-        for (AddressDTO addressDTO : addressDTOs) {
+        for (AddressDTO addressDTO : addressDTOS) {
             ContactAddress contactAddress = contactAddressMap.getOrDefault(addressDTO.getId(), new ContactAddress());
             contactAddress.setPrimary(addressDTO.isPrimary());
             // Verify Address here

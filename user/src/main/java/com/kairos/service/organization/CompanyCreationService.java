@@ -354,7 +354,6 @@ public class CompanyCreationService {
                     if(userByCprNumberOrEmail != null) {
                         user = userByCprNumberOrEmail;
                         reinitializeUserManagerDto(unitManagerDTO, user);
-                        userGraphRepository.save(user);
                         //setAccessGroupInUserAccount(user, organizationBaseEntity.getId(), unitManagerDTO.getAccessGroupId(), union);
                     } else {
                         user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getUserName(), true);
@@ -362,7 +361,10 @@ public class CompanyCreationService {
                     }
                     user.setLastSelectedOrganizationId(isNotNull(unitId) ? unitId : organization.getId());
                     userGraphRepository.save(user);
-                    staffService.setUserAndPosition(organizationBaseEntity, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
+                    Staff parentOrganizationStaff =staffCreationService.getStaffByUnitIdAndUserId(organization.getId(),user.getId());
+                    if(isNull(parentOrganizationStaff)) {
+                        staffService.setUserAndPosition(organizationBaseEntity, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
+                    }
 
                 }
             }
