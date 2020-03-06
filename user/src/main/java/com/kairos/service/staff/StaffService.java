@@ -801,7 +801,7 @@ public class StaffService {
             }
         }
         position.getUnitPermissions().add(unitPermission);
-        positionGraphRepository.save(position);
+        positionGraphRepository.save(position,2);
     }
 
     public void updateStaffFromExcel(MultipartFile multipartFile) {
