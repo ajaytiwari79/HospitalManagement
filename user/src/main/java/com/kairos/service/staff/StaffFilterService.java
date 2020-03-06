@@ -155,9 +155,8 @@ public class StaffFilterService {
         if(isNull(staff)){
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
         }
-        StaffFilterDataDTO staffFilterDataDTO = activityIntegrationService.getStaffFilterDataByUnitId(unitId);
         return new FiltersAndFavouriteFiltersDTO(
-                getAllFilters(moduleId, countryId, unitId, staffFilterDataDTO),
+                getAllFilters(moduleId, countryId, unitId),
                 getFavouriteFilters(moduleId, staff.getId()));
     }
 
@@ -169,7 +168,7 @@ public class StaffFilterService {
     }
 
     //todo send single call for get activity data
-    private List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId, StaffFilterDataDTO staffFilterDataDTO) {
+    private List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId) {
         ObjectMapper objectMapper = new ObjectMapper();
         switch (filterType) {
             case EMPLOYMENT_TYPE:
@@ -307,20 +306,20 @@ public class StaffFilterService {
         }
     }
 
-    private FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId, StaffFilterDataDTO staffFilterDataDTO) {
+    private FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId) {
         FilterQueryResult tempFilterDTO = new FilterQueryResult();
         tempFilterDTO.setName(filterType.name());
         tempFilterDTO.setTitle(filterType.value);
-        tempFilterDTO.setFilterData(getFilterDetailsByFilterType(filterType, countryId, unitId, staffFilterDataDTO));
+        tempFilterDTO.setFilterData(getFilterDetailsByFilterType(filterType, countryId, unitId));
         return tempFilterDTO;
     }
 
-    private List<FilterQueryResult> getAllFilters(String moduleId, Long countryId, Long unitId, StaffFilterDataDTO staffFilterDataDTO) {
+    private List<FilterQueryResult> getAllFilters(String moduleId, Long countryId, Long unitId) {
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
         List<FilterQueryResult> filterDTOs = new ArrayList<>();
         if (Optional.ofNullable(filterGroup).isPresent()) {
             filterGroup.getFilterTypes().forEach(filterType -> {
-                FilterQueryResult tempFilterQueryResult = getFilterDataByFilterType(filterType, countryId, unitId, staffFilterDataDTO);
+                FilterQueryResult tempFilterQueryResult = getFilterDataByFilterType(filterType, countryId, unitId);
                 if (isCollectionNotEmpty(tempFilterQueryResult.getFilterData())) {
                     filterDTOs.add(tempFilterQueryResult);
                 }
