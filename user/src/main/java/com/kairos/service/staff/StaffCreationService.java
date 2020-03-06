@@ -273,10 +273,7 @@ public class StaffCreationService {
             if (staffGraphRepository.isStaffExistsByCPRNumber(payload.getCprNumber(), organization.getId())) {
                 exceptionService.invalidRequestException(ERROR_STAFF_EXISTS_SAME_CPRNUMBER, payload.getCprNumber());
             }
-            User userWithExistingUserName = userGraphRepository.findUserByUserName("(?i)" + payload.getUserName());
-            if (Optional.ofNullable(userWithExistingUserName).isPresent()) {
-                exceptionService.duplicateDataException(MESSAGE_STAFF_USERNAME_ALREADYEXIST);
-            }
+
             user = userGraphRepository.findUserByCprNumber(payload.getCprNumber());
             if (!Optional.ofNullable(user).isPresent()) {
                 user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User(payload.getCprNumber(), payload.getFirstName().trim(), payload.getLastName().trim(), payload.getPrivateEmail(), payload.getUserName()));
