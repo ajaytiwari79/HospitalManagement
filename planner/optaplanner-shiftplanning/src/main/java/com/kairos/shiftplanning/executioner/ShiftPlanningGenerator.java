@@ -264,7 +264,7 @@ public class ShiftPlanningGenerator {
     }
 
     private Employee getEmployee(String s, String s2, long l, Set<Tag> tags2) {
-        Employee employee3 = new Employee(s, s2, createSkillSet(), null, 0, 0, PaidOutFrequencyEnum.HOURLY, null);
+        Employee employee3 = new Employee(Long.valueOf(s), s2, createSkillSet(), null, 0, 0, PaidOutFrequencyEnum.HOURLY, null);
         employee3.setBaseCost(BigDecimal.valueOf(1.5));
         employee3.setWorkingTimeConstraints(getWTA());
         employee3.setPrevShiftsInfo(getPreShiftsInfo());
