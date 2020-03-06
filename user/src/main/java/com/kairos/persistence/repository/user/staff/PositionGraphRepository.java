@@ -37,10 +37,11 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
     void createPositions(long organizationId, List<Long> staffId, long unitId);
 
 
-    @Query("MATCH(position:Position)-[r1:" + BELONGS_TO + "]->(staff:Staff) WHERE id(position) in {0} \n" +
-            "MATCH(position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) RETURN position, \n" +
-            "CASE WHEN org IS NOT NULL THEN COLLECT( DISTINCT org) else[] end AS organizations, \n" +
-            "CASE WHEN unitPermission is NOT null THEN COLLECT(DISTINCT unitPermission) else[] end AS unitPermissions")
+    @Query("MATCH (staff:Staff)<-[rel:"+ BELONGS_TO +"]-(position:Position) -[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission) WHERE id(position) IN {0} \n" +
+            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{enabled:true}) \n" +
+            "MATCH (unitPermission)-[:APPLICABLE_IN_UNIT]->(org:OrganizationBaseEntity) \n" +
+            "WITH CASE WHEN org IS NULL THEN [] ELSE COLLECT(DISTINCT org) END AS units,position,rel,staff \n" +
+            "RETURN position,rel,staff,units")
     List<ExpiredPositionsQueryResult> findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(List<Long> positionIds);
 
     @Query("MATCH(staff:Staff)<-[:"+ BELONGS_TO +"]-(position:Position) WHERE id(staff) = {0} " +
@@ -67,5 +68,10 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
             "MATCH (org)-[:"+ HAS_POSITIONS +"]->(position:Position{deleted:false})-[" + BELONGS_TO + "]->(staff) RETURN position")
     Position findPositionByOrganizationIdAndUserId(long organizationId, long userId);
 
+    @Query("MATCH(position:Position) WHERE position.endDateMillis={0} \n" +
+            "MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission) \n" +
+            "MATCH (unitPermission)-[r:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) " +
+            "RETURN DISTINCT id(position)")
+    List<Long> findAllPositionsIdByEndDate(Long endDateMillis);
 }
 

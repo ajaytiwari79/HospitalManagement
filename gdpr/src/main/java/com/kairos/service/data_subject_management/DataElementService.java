@@ -5,19 +5,17 @@ import com.kairos.persistence.model.master_data.data_category_element.DataElemen
 import com.kairos.persistence.repository.master_data.data_category_element.DataElementRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_DATAELEMENT;
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_DUPLICATE;
+
 
 @Service
 public class DataElementService{
-
-
-    Logger LOGGER = LoggerFactory.getLogger(DataElementService.class);
 
     @Inject
     private ExceptionService exceptionService;
@@ -37,7 +35,7 @@ public class DataElementService{
         Set<String> dataElementNames = checkForDuplicacyInName(dataElementsDto);
         List<DataElement> existingDataElement = isOrganization ? dataElementRepository.findByUnitIdAndNames(referenceId, dataElementNames) : dataElementRepository.findByCountryIdAndNames(referenceId, dataElementNames);
         if (CollectionUtils.isNotEmpty(existingDataElement)) {
-            exceptionService.duplicateDataException("message.duplicate", "message.dataElement", existingDataElement.iterator().next().getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_DATAELEMENT, existingDataElement.iterator().next().getName());
         }
         List<DataElement> dataElementList = new ArrayList<>();
         for (String name : dataElementNames) {
@@ -81,7 +79,7 @@ public class DataElementService{
         previousDataElementList.forEach(dataElement -> {
 
             if (!dataElementDTOMap.containsKey(dataElement.getId())) {
-                exceptionService.duplicateDataException("message.duplicate", "message.dataElement", dataElement.getName());
+                exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_DATAELEMENT, dataElement.getName());
             }
         });
         previousDataElementList = isOrganization ? dataElementRepository.findByUnitIdAndIds(referenceId, dataElementDTOMap.keySet()) : dataElementRepository.findByCountryIdAndIds(referenceId, dataElementDTOMap.keySet());
@@ -99,7 +97,7 @@ public class DataElementService{
         List<String> dataElementNamesLowerCase = new ArrayList<>();
         dataElementDTOs.forEach(dataElementDTO -> {
             if (dataElementNamesLowerCase.contains(dataElementDTO.getName().toLowerCase())) {
-                exceptionService.duplicateDataException("message.duplicate", "message.dataElement",dataElementDTO.getName());
+                exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_DATAELEMENT,dataElementDTO.getName());
             }
             dataElementNames.add(dataElementDTO.getName());
             dataElementNamesLowerCase.add(dataElementDTO.getName().toLowerCase());

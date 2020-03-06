@@ -22,9 +22,11 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ApiConstants.JOB_DETAILS;
 
 @Service
@@ -48,14 +50,14 @@ public class UserSchedulerJobService  {
         }
     }
 
-    public void createJobForEmploymentEnd(BigInteger schedulerPanelId, Long unitId, LocalDateTime started, LocalDateTime stopped, String log, Result result) {
-        KairosSchedulerLogsDTO schedulerLogsDTO = new KairosSchedulerLogsDTO(result, log, schedulerPanelId, unitId, DateUtils.getMillisFromLocalDateTime(started), DateUtils.getMillisFromLocalDateTime(stopped), JobSubType.SENIORITY_LEVEL);
-        schedulerRestClient.publishRequest(schedulerLogsDTO,null,false,IntegrationOperation.CREATE,JOB_DETAILS,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
+    public void createJobForSeniorityLevel() {
+        SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(newArrayList(DayOfWeek.values()), LocalTime.of(0, 1), JobType.SYSTEM, JobSubType.SENIORITY_LEVEL, ZoneId.systemDefault().toString());
+        schedulerRestClient.publishRequest(newArrayList(schedulerPanelDTO), null, false, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
     }
 
-    public void createJobForPositionEnd(BigInteger schedulerPanelId, Long unitId, LocalDateTime started, LocalDateTime stopped, String log, Result result) {
-        KairosSchedulerLogsDTO schedulerLogsDTO = new KairosSchedulerLogsDTO(result, log, schedulerPanelId, unitId, DateUtils.getMillisFromLocalDateTime(started), DateUtils.getMillisFromLocalDateTime(stopped), JobSubType.EMPLOYMENT_END);
-        schedulerRestClient.publishRequest(schedulerLogsDTO,null,false,IntegrationOperation.CREATE,JOB_DETAILS,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
+    public void createJobForPositionEnd() {
+        SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(newArrayList(DayOfWeek.values()), LocalTime.of(0, 1), JobType.SYSTEM, JobSubType.POSITION_END, ZoneId.systemDefault().toString());
+        schedulerRestClient.publishRequest(newArrayList(schedulerPanelDTO), null, false, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
     }
 
     public void updateJobForTimecareShift(KairosSchedulerExecutorDTO job, LocalDateTime started, LocalDateTime stopped, Transstatus transstatus, String unzipped) {

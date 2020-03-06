@@ -7,7 +7,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
-import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
@@ -67,8 +66,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.kairos.commons.utils.DateUtils.getDate;
-import static com.kairos.commons.utils.DateUtils.parseDate;
+import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -219,15 +218,11 @@ public class PositionService {
             }else{
                 unitPermissionGraphRepository.createPermission(accessGroupId,unitPermission.getId());
             }
-
-
             LOGGER.info(" Currently created Unit Permission ");
             response.put("startDate", getDate(unitPermission.getStartDate()));
             response.put("endDate", getDate(unitPermission.getEndDate()));
             response.put("id", unitPermission.getId());
             staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
-
-
         } else {
             staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
             // need to remove unit permission
@@ -241,9 +236,7 @@ public class PositionService {
         List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("created", created + ""));
         genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {
         }, accessGroupId);
-
         setUnitWiseAccessRole(unitId, staffId);
-
         response.put("organizationId", unitId);
         response.put("synInFls", flsSyncStatus);
         return response;
@@ -503,52 +496,11 @@ public class PositionService {
         return saveEmploymentEndDate(organization, employmentEndDate, staffId, null, null, null);
     }
 
-
-    public boolean moveToReadOnlyAccessGroup(List<Long> positionIds) {
-        List<UnitPermission> unitPermissions;
-        UnitPermission unitPermission;
-        List<ExpiredPositionsQueryResult> expiredPositionsQueryResults = positionGraphRepository.findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(positionIds);
-        accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(positionIds);
-
-        List<Unit> units;
-        List<Position> positions = new ArrayList<>();
-        Position position;
-
-        for (ExpiredPositionsQueryResult expiredPositionsQueryResult : expiredPositionsQueryResults) {
-            units = expiredPositionsQueryResult.getUnits();
-            position = expiredPositionsQueryResult.getPosition();
-            unitPermissions = expiredPositionsQueryResult.getUnitPermissions();
-            List<Long> orgIds = units.stream().map(organization -> organization.getId()).collect(Collectors.toList());
-
-            accessGroupRepository.createAccessGroupUnitRelation(orgIds, position.getAccessGroupIdOnPositionEnd());
-            AccessGroup accessGroupDB = accessGroupRepository.findById(position.getAccessGroupIdOnPositionEnd()).get();
-            for (int currentElement = 0; currentElement < expiredPositionsQueryResult.getUnits().size(); currentElement++) {
-                unitPermission = unitPermissions.get(currentElement);
-                if (!Optional.ofNullable(unitPermission).isPresent()) {
-                    unitPermission = new UnitPermission();
-                    unitPermission.setUnit(units.get(currentElement));
-                    unitPermission.setStartDate(DateUtils.getCurrentDate().getTime());
-                }
-                unitPermission.setAccessGroup(accessGroupDB);
-                position.getUnitPermissions().add(unitPermission);
-                currentElement++;
-            }
-            position.setEmploymentStatus(EmploymentStatus.FORMER);
-            positions.add(position);
-        }
-        if (expiredPositionsQueryResults.size() > 0) {
-            positionGraphRepository.saveAll(positions);
-        }
-        return true;
-    }
-
     public Position updatePositionEndDate(Organization organization, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) throws Exception {
         Long employmentEndDate = null;
         if (Optional.ofNullable(endDateMillis).isPresent()) {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
         }
-
-
         return saveEmploymentEndDate(organization, employmentEndDate, staffId, reasonCodeId, endDateMillis, accessGroupId);
     }
 
@@ -600,32 +552,6 @@ public class PositionService {
 
     }
 
-    public void endEmploymentProcess(BigInteger schedulerPanelId, Long unitId, Long positionId, LocalDateTime positionEndDate) {
-        LocalDateTime started = LocalDateTime.now();
-        KairosSchedulerLogsDTO schedulerLogsDTO;
-        LocalDateTime stopped;
-        String log = null;
-        Result result = Result.SUCCESS;
-
-
-        try {
-            List<Long> positionIds = Stream.of(positionId).collect(Collectors.toList());
-
-            moveToReadOnlyAccessGroup(positionIds);
-            Staff staff = positionGraphRepository.findStaffByPositionId(positionId);
-            activityIntegrationService.deleteShiftsAndOpenShift(unitId, staff.getId(), positionEndDate);
-            redisService.invalidateAllTokenOfUser(staff.getUser().getUserName());
-        } catch (Exception ex) {
-            log = ex.getMessage();
-            result = Result.ERROR;
-        }
-        stopped = LocalDateTime.now();
-        userSchedulerJobService.createJobForPositionEnd(schedulerPanelId, unitId, started, stopped, log, result);
-    }
-
-
-
-
     public boolean eligibleForMainEmployment(EmploymentDTO employmentDTO, long employmentId) {
         EmploymentQueryResult employmentQueryResult = employmentGraphRepository.findAllByStaffIdAndBetweenDates(employmentDTO.getStaffId(), employmentDTO.getStartDate().toString(), employmentDTO.getEndDate() == null ? null : employmentDTO.getEndDate().toString(), employmentId, employmentDTO.getEmploymentSubType());
         if (employmentQueryResult != null) {
@@ -665,4 +591,16 @@ public class PositionService {
         position.getUnitPermissions().add(unitPermission);
     }
 
+    public void endPositionProcess() {
+        List<Long> positionIds = positionGraphRepository.findAllPositionsIdByEndDate(getCurrentDateMillis());
+        if(isCollectionNotEmpty(positionIds)){
+            List<ExpiredPositionsQueryResult> expiredPositionsQueryResults = positionGraphRepository.findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(positionIds);
+            accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(positionIds);
+            for (ExpiredPositionsQueryResult expiredPositionsQueryResult : expiredPositionsQueryResults) {
+                for (OrganizationBaseEntity unit : expiredPositionsQueryResult.getUnits()) {
+                    createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true);
+                }
+            }
+        }
+    }
 }
