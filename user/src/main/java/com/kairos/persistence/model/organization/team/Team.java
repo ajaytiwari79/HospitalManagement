@@ -49,12 +49,11 @@ public class Team extends UserBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
 
-    public Team(String name, String description,  ContactAddress contactAddress,LocalDate startDate, LocalDate endDate) {
+
+    public Team(String name, String description,  ContactAddress contactAddress) {
         this.name = name;
         this.description = description;
         this.contactAddress = contactAddress;
-        this.startDate = startDate;
-        this.endDate = endDate;
     }
 
 

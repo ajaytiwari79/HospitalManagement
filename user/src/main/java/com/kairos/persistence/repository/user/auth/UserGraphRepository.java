@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.auth;
 
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -102,6 +103,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     @Query("MATCH (user:User) WHERE ( user.cprNumber={0} OR user.email=~{1} ) RETURN user")
     User findUserByCprNumberOrEmail(String cprNumber, String email);
+
 
     @Query("MATCH (user:User) WHERE user.userName=~{0}  RETURN user ")
     User findUserByUserName(String userName);

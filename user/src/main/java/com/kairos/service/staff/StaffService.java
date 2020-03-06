@@ -767,6 +767,7 @@ public class StaffService {
         Organization organization = organizationService.fetchParentOrganization(organizationBaseEntity.getId());
         Position position = positionGraphRepository.findPositionByOrganizationIdAndUserId(organization.getId(), user.getId());
 
+
         if (isNull(position)) {
 
             Staff staff = new Staff(user.getEmail(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
@@ -800,7 +801,7 @@ public class StaffService {
             }
         }
         position.getUnitPermissions().add(unitPermission);
-        positionGraphRepository.save(position, 2);
+        positionGraphRepository.save(position);
     }
 
     public void updateStaffFromExcel(MultipartFile multipartFile) {

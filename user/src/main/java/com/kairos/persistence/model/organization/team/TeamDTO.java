@@ -42,7 +42,6 @@ public class TeamDTO {
     private LeaderType leaderType;
     private LocalDate startDate;
     private LocalDate endDate;
-
     @AssertTrue(message = "message.same_staff.belongs_to.both_lead")
     public boolean isValid() {
         if(isCollectionEmpty(mainTeamLeaderIds) || isCollectionEmpty(actingTeamLeaderIds)){

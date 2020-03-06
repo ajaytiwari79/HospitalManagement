@@ -122,7 +122,7 @@ public class GroupService {
 
     public List<Map> getStaffListByGroupFilter(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS){
         List<Map> filteredStaff = new ArrayList<>();
-        for(Map staff : staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value,filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false).getStaffList()){
+        for(Map staff : staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value,filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false,null).getStaffList()){
             if(StaffStatusEnum.ACTIVE.toString().equals(staff.get("currentStatus"))) {
                 Map<String, Object> fStaff = new HashMap<>();
                 fStaff.put("id", staff.get("id"));
@@ -146,7 +146,7 @@ public class GroupService {
         for(Group group : groups){
             GroupDTO groupDTO = getGroupDTOFromGroup(group);
             List<FilterSelectionDTO> filterSelectionDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(group.getFiltersData(), FilterSelectionDTO.class);
-            List<Map> staffs = staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value, filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false).getStaffList();
+            List<Map> staffs = staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value, filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false,null).getStaffList();
             staffIds.addAll(staffs.stream().map(map-> Long.valueOf(map.get("id").toString())).collect(Collectors.toSet()));
             excludedStaffs.addAll(groupDTO.getExcludedStaffs());
             groupDTOS.add(groupDTO);

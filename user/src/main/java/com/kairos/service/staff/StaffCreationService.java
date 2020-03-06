@@ -458,4 +458,7 @@ public class StaffCreationService {
             user.setGender(CPRUtil.getGenderFromCPRNumber(staffCreationDTO.getCprNumber()));
         }
     }
+    public Staff getStaffByUnitIdAndUserId(Long unitId,Long userId){
+        return staffGraphRepository.getStaffByUnitIdAndUserId(unitId,userId);
+    }
 }

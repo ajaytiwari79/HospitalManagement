@@ -15,6 +15,7 @@ import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -114,7 +115,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     }
 
     public <T> List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
-                                         Map<FilterType, Set<T>> filters, String searchText, String imagePath,Long loggedInStaffId) {
+                                         Map<FilterType, Set<T>> filters, String searchText, String imagePath,Long loggedInStaffId,LocalDate selectedDate) {
         Map<String, Object> queryParameters = new HashMap<>();
         queryParameters.put("unitId", unitId);
         queryParameters.put("parentOrganizationId", parentOrganizationIds);
@@ -169,11 +170,14 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         if (loggedInStaffId!=null) {
             queryParameters.put("loggedInStaffId", loggedInStaffId);
         }
+        if (selectedDate!=null) {
+            queryParameters.put("selectedDate", selectedDate.toString());
+        }
         queryParameters.put("imagePath", imagePath);
 
         String query = "";
         if (ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
-            query = getSelfRosteringQuery(filters, searchText,loggedInStaffId);
+            query = getSelfRosteringQuery(filters, searchText,loggedInStaffId,selectedDate);
         }else if(ModuleId.Group_TAB_ID.value.equals(moduleId)){
             query = getGroupQuery(filters, searchText);
         } else if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT)).isPresent() && filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITH_EMPLOYMENT.name()) && !filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITHOUT_EMPLOYMENT.name()) && !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
@@ -211,7 +215,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         return listOfString.stream().map(list->Long.valueOf(list.toString())).collect(Collectors.toList());
     }
 
-    private <T> String getSelfRosteringQuery(Map<FilterType, Set<T>> filters, String searchText,Long loggedInStaffId) {
+    private <T> String getSelfRosteringQuery(Map<FilterType, Set<T>> filters, String searchText,Long loggedInStaffId,LocalDate selectedDate) {
         String query = "";
         query = " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId} " +getMatchQueryForStaff(loggedInStaffId)+
                 " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
@@ -219,7 +223,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             query += " MATCH (staff:Staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE id(skill) IN {skillIds} ";
         }
         if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
-            query += " Match (staff)<-[:" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} ";
+            query += " Match (staff)<-[tRel:" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} and DATE(tRel.startDate) <= DATE({selectedDate}) AND (tRel.endDate is null OR DATE(tRel.endDate)>=DATE({selectedDate})) ";
         }
         query +=" WITH user, staff, employment,organization ";
         return query;
