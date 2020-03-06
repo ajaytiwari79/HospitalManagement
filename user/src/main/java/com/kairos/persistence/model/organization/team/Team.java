@@ -46,9 +46,6 @@ public class Team extends UserBaseEntity {
     private boolean isEnabled = true;
     private Set<BigInteger> activityIds=new HashSet<>();
 
-    private LocalDate startDate;
-    private LocalDate endDate;
-
 
     public Team(String name, String description,  ContactAddress contactAddress) {
         this.name = name;
