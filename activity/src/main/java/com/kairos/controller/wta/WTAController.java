@@ -254,7 +254,7 @@ public class WTAController {
     @ApiOperation(value = "Get employment cta wta and accumulated timebank")
     @PostMapping(value =  UNIT_URL+ "/employment_cta_wta_and_accumulated_timebank")
     public ResponseEntity<Map<String, Object>> getEmploymentCtaWtaAndAccumulatedTimebank(@PathVariable long unitId , @RequestBody Map<Long, List<EmploymentLinesDTO>> employmentLinesMap) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getEmploymentCtaWtaAndAccumulatedTimebank(unitId, employmentLinesMap));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getEmploymentCtaWtaAndAccumulatedTimebank(employmentLinesMap));
     }
 
 

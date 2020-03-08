@@ -87,6 +87,24 @@ public class WidgetService {
             exceptionService.dataNotFoundException(REALTIME_DURATION_NOT_CONFIGURED);
         }
         dashBoardWidgetDTO = new DashboardWidgetDTO(null, shiftDTOs, new HashMap<>(), realTimePhase.getRealtimeDuration(), timeTypeDTOS);
+        updatedetailsOfNightWorkers(dashBoardWidgetDTO, shiftDTOs, staffAdditionalInfoDTOS);
+        DashboardWidget dashboardWidget = getDashboardWidget();
+        dashBoardWidgetDTO.setTimeTypeIds(dashboardWidget.getTimeTypeIds());
+        dashBoardWidgetDTO.setWidgetFilterTypes(dashboardWidget.getWidgetFilterTypes());
+        return dashBoardWidgetDTO;
+    }
+
+    private DashboardWidget getDashboardWidget() {
+        DashboardWidget dashboardWidget = widgetMongoRepository.findDashboardWidgetByUserId(UserContext.getUserDetails().getId());
+        if (isNull(dashboardWidget)) {
+            dashboardWidget = new DashboardWidget(new HashSet<>(), newHashSet(CURRENTLY_WORKING, UPCOMING_SHIFTS, ON_LEAVE, RESTING, SLEEPING));
+            dashboardWidget.setUserId(UserContext.getUserDetails().getId());
+            widgetMongoRepository.save(dashboardWidget);
+        }
+        return dashboardWidget;
+    }
+
+    private void updatedetailsOfNightWorkers(DashboardWidgetDTO dashBoardWidgetDTO, List<ShiftWithActivityDTO> shiftDTOs, List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS) {
         if (isCollectionNotEmpty(staffAdditionalInfoDTOS)) {
             Map<Long, StaffAdditionalInfoDTO> idAndStaffMap = staffAdditionalInfoDTOS.stream().filter(distinctByKey(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getId())).collect(Collectors.toMap(StaffAdditionalInfoDTO::getId, v -> v));
             setStaffNightWorker(idAndStaffMap);
@@ -99,15 +117,6 @@ public class WidgetService {
             dashBoardWidgetDTO.setNightTimeSlot(nightTimeSlot);
             dashBoardWidgetDTO.setStaffIdAndstaffInfoMap(idAndStaffMap);
         }
-        DashboardWidget dashboardWidget = widgetMongoRepository.findDashboardWidgetByUserId(UserContext.getUserDetails().getId());
-        if (isNull(dashboardWidget)) {
-            dashboardWidget = new DashboardWidget(new HashSet<>(), newHashSet(CURRENTLY_WORKING, UPCOMING_SHIFTS, ON_LEAVE, RESTING, SLEEPING));
-            dashboardWidget.setUserId(UserContext.getUserDetails().getId());
-            widgetMongoRepository.save(dashboardWidget);
-        }
-        dashBoardWidgetDTO.setTimeTypeIds(dashboardWidget.getTimeTypeIds());
-        dashBoardWidgetDTO.setWidgetFilterTypes(dashboardWidget.getWidgetFilterTypes());
-        return dashBoardWidgetDTO;
     }
 
     private void setStaffNightWorker(Map<Long, StaffAdditionalInfoDTO> idAndStaffMap) {
@@ -168,23 +177,27 @@ public class WidgetService {
 
     private void updateRestingHoursInShift(List<ShiftWithActivityDTO> shiftDTOs) {
         Map<Long, List<ShiftWithActivityDTO>> staffIdAndShiftMap = shiftDTOs.stream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getStaffId, Collectors.toList()));
-        for (Long staffId : staffIdAndShiftMap.keySet()) {
-            List<ShiftWithActivityDTO> shifts = staffIdAndShiftMap.get(staffId);
+        for (Map.Entry<Long,List<ShiftWithActivityDTO>> longListEntry : staffIdAndShiftMap.entrySet()) {
+            List<ShiftWithActivityDTO> shifts = longListEntry.getValue();
             shifts.sort(comparing(ShiftDTO::getStartDate));
             for (int i = 1; i < shifts.size(); i++) {
-                ShiftWithActivityDTO previousShift = shifts.get(i - 1);
-                ShiftWithActivityDTO currentShift = null;
-                if(previousShift.isPresence()){
-                    currentShift = shifts.stream().filter(shiftWithActivityDTO -> previousShift.getEndDate().before(shiftWithActivityDTO.getStartDate()) && (shiftWithActivityDTO.isPresence() || shiftWithActivityDTO.isAbsence())).findFirst().orElse(null);
-                }else if(previousShift.isAbsence()){
-                    currentShift = shifts.stream().filter(shiftWithActivityDTO -> previousShift.getEndDate().before(shiftWithActivityDTO.getStartDate()) && (shiftWithActivityDTO.isPresence())).findFirst().orElse(null);
-                }
-                if(isNotNull(currentShift)) {
-                    Long minutes = DateUtils.getMinutesBetweenDate(previousShift.getEndDate(), currentShift.getStartDate());
-                    if (previousShift.getRestingMinutes() > minutes) {
-                        previousShift.setRestingMinutes(minutes.intValue());
-                    }
-                }
+                updateRestingHours(shifts, i);
+            }
+        }
+    }
+
+    private void updateRestingHours(List<ShiftWithActivityDTO> shifts, int i) {
+        ShiftWithActivityDTO previousShift = shifts.get(i - 1);
+        ShiftWithActivityDTO currentShift = null;
+        if(previousShift.isPresence()){
+            currentShift = shifts.stream().filter(shiftWithActivityDTO -> previousShift.getEndDate().before(shiftWithActivityDTO.getStartDate()) && (shiftWithActivityDTO.isPresence() || shiftWithActivityDTO.isAbsence())).findFirst().orElse(null);
+        }else if(previousShift.isAbsence()){
+            currentShift = shifts.stream().filter(shiftWithActivityDTO -> previousShift.getEndDate().before(shiftWithActivityDTO.getStartDate()) && (shiftWithActivityDTO.isPresence())).findFirst().orElse(null);
+        }
+        if(isNotNull(currentShift)) {
+            Long minutes = DateUtils.getMinutesBetweenDate(previousShift.getEndDate(), currentShift.getStartDate());
+            if (previousShift.getRestingMinutes() > minutes) {
+                previousShift.setRestingMinutes(minutes.intValue());
             }
         }
     }
