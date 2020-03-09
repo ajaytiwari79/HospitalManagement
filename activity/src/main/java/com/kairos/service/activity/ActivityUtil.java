@@ -20,6 +20,8 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ActivityUtil {
 
     private static LocationActivityTab initializeLocationActivityTab(GlideTimeSettingsDTO glideTimeSettingsDTO){
@@ -111,9 +114,6 @@ public class ActivityUtil {
                 break;
             default:
                 break;
-       /*     case "":
-                break;*/
-
         }
         return calculationType;
     }
@@ -220,7 +220,6 @@ public class ActivityUtil {
                 new RulesActivityTab();
 
         rulesActivityTab.setEligibleForStaffingLevel(timeCareActivity.getIsStaffing());
-        List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
         return rulesActivityTab;
     }
 

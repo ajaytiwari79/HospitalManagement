@@ -149,9 +149,10 @@ public class PlannedTimePercentageService implements CounterService {
             shiftDuration+=getTimeDuration(shift.getStartDate(),shift.getEndDate());
         }
         if(isCollectionNotEmpty(shifts)) subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(AppConstants.SHIFT, 100));
-        for (String plannedType : plannedTimeAndPercentageMap.keySet()) {
-            subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(plannedType, getPlannedTimePercentage(shiftDuration,plannedTimeAndPercentageMap.get(plannedType))));
+        for (Map.Entry<String, Double> stringDoubleEntry : plannedTimeAndPercentageMap.entrySet()) {
+            subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(stringDoubleEntry.getKey(), getPlannedTimePercentage(shiftDuration,stringDoubleEntry.getValue())));
         }
+
         return subClusteredBarValue;
     }
 

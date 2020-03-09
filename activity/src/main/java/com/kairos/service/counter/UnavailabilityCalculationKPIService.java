@@ -60,7 +60,7 @@ public class UnavailabilityCalculationKPIService {
                 total = shiftActivityDTOS.size();
                 break;
             case PERCENTAGE_OF_TIMES:
-                total = filterShiftActivity.getShiftActivityDTOS().size() > 0 ? shiftActivityDTOS.size() * 100 / filterShiftActivity.getShiftActivityDTOS().size() : filterShiftActivity.getShiftActivityDTOS().size();
+                total = !filterShiftActivity.getShiftActivityDTOS().isEmpty() ? (double) shiftActivityDTOS.size() * 100 / filterShiftActivity.getShiftActivityDTOS().size() : filterShiftActivity.getShiftActivityDTOS().size();
                 break;
             case PERCENTAGE_OF_HOURS:
                 Set<BigInteger> shiftIds = filterShiftActivity.getShiftActivityDTOS().stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toSet());
