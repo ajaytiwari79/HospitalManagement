@@ -430,8 +430,13 @@ public class KPIBuilderCalculationService implements CounterService {
 
     private long getStaffAgeData(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         StaffKpiFilterDTO staff = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
-        return staff.getStaffAge(asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
+        int age = 0;
+        if(XAxisConfig.AGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
+            age = staff.getStaffAge(asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
+        }
+        return age;
     }
+
 
 
     private double getEscalatedShiftsOrResolvedShifts(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
@@ -1119,10 +1124,10 @@ public class KPIBuilderCalculationService implements CounterService {
             if(filterBasedCriteria.containsKey(TEAM_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(TEAM_TYPE))) {
                 for(StaffKpiFilterDTO staffKpiFilterDTO :staffKpiFilterDTOS){
                     for(TeamDTO teamDTO :staffKpiFilterDTO.getTeams()){
-                        if(filterBasedCriteria.get(TEAM_TYPE).contains(teamDTO.getTeamType().name())){
-                            staffKpiFilterDTOList.add(staffKpiFilterDTO);
-                            break;
-                        }
+                            if (filterBasedCriteria.get(TEAM_TYPE).contains(teamDTO.getTeamType().name())) {
+                                staffKpiFilterDTOList.add(staffKpiFilterDTO);
+                                break;
+                            }
                     }
                 }
                 staffKpiFilterDTOS = staffKpiFilterDTOList;
