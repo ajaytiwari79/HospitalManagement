@@ -381,5 +381,6 @@ public class ActivityMessagesConstants {
     public static final String EMPLOYMENT_NOT_VALID_TO_MARK_SICK = "employment.not.valid.to.mark.sick";
     public static final String CUT_OFF_CONFIGUATION = "activity.cutoff.configuration";
     public static final String ACTIVITY_NOT_ASSIGN_IN_PROTECTED_DAYS_OFF_RULE_TEMPLATE = "activity.not.assign.in.protected.days.off.rule.template";
+    public static final String STAFF_ALREADY_SICK="staff.already.sick";
 
 }

@@ -282,10 +282,10 @@ public class ShiftService extends MongoBaseService {
         //As discuss with Arvind Presence and Absence type of activity cann't be perform in a Shift
         shift.setShiftType(updateShiftType(activityWrapperMap, shift));
         updateAppliedFunctionDetail(activityWrapperMap, shift, functionId);
-        if (!shift.isSickShift() && updateShift && isNotNull(shiftAction) && !shift.getActivities().stream().anyMatch(shiftActivity -> !shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) && newHashSet(PhaseDefaultName.CONSTRUCTION, PhaseDefaultName.DRAFT, PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum())) {
+        if (shift.isSickShift() && updateShift && isNotNull(shiftAction) && !shift.getActivities().stream().anyMatch(shiftActivity -> !shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) && newHashSet(PhaseDefaultName.CONSTRUCTION, PhaseDefaultName.DRAFT, PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum())) {
             shift = updateShiftAfterPublish(shift, shiftAction);
         }
-        if (!shift.isSickShift() && isValidForDraftShiftFunctionality(staffAdditionalInfoDTO, updateShift, phase, shiftAction, planningPeriod)) {
+        if (shift.isSickShift() && isValidForDraftShiftFunctionality(staffAdditionalInfoDTO, updateShift, phase, shiftAction, planningPeriod)) {
             Shift draftShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
             draftShift.setShiftType(updateShiftType(activityWrapperMap, draftShift));
             draftShift.setDraft(true);
@@ -988,7 +988,7 @@ public class ShiftService extends MongoBaseService {
         return new ShiftWithViolatedInfoDTO(shiftDTOS, violatedRulesDTO);
     }
 
-    private ViolatedRulesDTO deleteFullWeekShifts(List<ShiftDTO> shiftDTOS, List<Shift> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public ViolatedRulesDTO deleteFullWeekShifts(List<ShiftDTO> shiftDTOS, List<Shift> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ViolatedRulesDTO violatedRulesDTO = new ViolatedRulesDTO();
         for (Shift shift : shifts) {
             violatedRulesDTO = validateRule(shift, staffAdditionalInfoDTO);

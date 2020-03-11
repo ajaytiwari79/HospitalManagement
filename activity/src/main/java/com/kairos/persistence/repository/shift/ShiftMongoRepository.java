@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.shift;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
@@ -83,4 +84,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     List<Shift> findAllShiftsByEmploymentIdAfterDate(Long employmentId, Date startDate);
 
     Shift findByIdAndDeletedFalseAndDisabledFalse(BigInteger shiftId);
+
+    @Query(value = "{deleted:false,staffId:?0,shiftType:?1, startDate:{$gte:?2}}",exists = true)
+    boolean alreadySickReportedForStaff(Long staffId, ShiftType shiftType,Date selectedDate);
 }

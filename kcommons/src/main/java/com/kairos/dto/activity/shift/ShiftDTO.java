@@ -245,7 +245,9 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
         return !asLocalDate(this.startDate).equals(asLocalDate(this.endDate));
     }
 
-
+    public LocalDate getShiftDate() {
+        return shiftDate=shiftDate==null?this.getActivities().get(0).getStartLocalDate():shiftDate;
+    }
 
     @Override
     public String toString() {
