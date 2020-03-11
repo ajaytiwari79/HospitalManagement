@@ -578,12 +578,12 @@ public class OrganizationService {
         return new OrganizationSkillAndOrganizationTypesDTO(organizationTypeAndSubTypeDTO, skillService.getSkillsOfOrganization(unitId));
     }
 
-    public List<DayType> getDayType(Long unitId, Date date) {
+    public List<DayType> getDayType(Date date) {
         Long countryId = UserContext.getUserDetails().getCountryId();
         return dayTypeService.getDayTypeByDate(countryId, date);
     }
 
-    public List<DayType> getAllDayTypeofOrganization(Long organizationId) {
+    public List<DayType> getAllDayTypeofOrganization() {
         Long countryId = UserContext.getUserDetails().getCountryId();
         return dayTypeService.getAllDayTypeByCountryId(countryId);
     }
@@ -638,7 +638,7 @@ public class OrganizationService {
         return organizationMappingDTO;
     }
 
-    public WTABasicDetailsDTO getWTARelatedInfo(Long countryId, Long organizationId, Long organizationSubTypeId, Long organizationTypeId, Long expertiseId, List<Long> unitIds) {
+    public WTABasicDetailsDTO getWTARelatedInfo(Long countryId, Long organizationId, Long organizationSubTypeId, Long expertiseId, List<Long> unitIds) {
         WTABasicDetailsDTO wtaBasicDetailsDTO = new WTABasicDetailsDTO();
         if (Optional.ofNullable(expertiseId).isPresent()) {
             Expertise expertise = expertiseGraphRepository.findOne(expertiseId, 0);

@@ -2,8 +2,6 @@ package com.kairos.service.external_citizen_import;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.AppConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -27,13 +25,10 @@ import java.util.Map;
 @Transactional
 @Service
 public class AuthService {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
-
     private long lastUpdated ;
-    private final long oneHourMS = 3100000;
+    private static final long ONE_HOUR_MS = 3100000;
     public void kmdAuth()  {
-        if( DateUtils.getCurrentDate().getTime()-lastUpdated < oneHourMS){
+        if( DateUtils.getCurrentDate().getTime()-lastUpdated < ONE_HOUR_MS){
             return;
         }
         dokmdAuth();
@@ -54,7 +49,7 @@ public class AuthService {
         headers.add("Authorization","Basic "+authHeaderCode);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        MultiValueMap<String,String> bodyElements = new LinkedMultiValueMap<String,String>();
+        MultiValueMap<String,String> bodyElements = new LinkedMultiValueMap<>();
         bodyElements.add("customer",AppConstants.KMD_NEXUS_CUSTOMER);
         bodyElements.add("grant_type",AppConstants.KMD_NEXUS_GRANT_TYPE);
         bodyElements.add("username",AppConstants.KMD_NEXUS_USERNAME);

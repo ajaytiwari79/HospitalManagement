@@ -36,6 +36,7 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.wrapper.StaffUnionWrapper;
@@ -65,6 +66,8 @@ public class UnionService {
     private UnitGraphRepository unitGraphRepository;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
+    @Inject
+    private CountryService countryService;
     @Inject
     private ZipCodeGraphRepository zipCodeGraphRepository;
     @Inject
@@ -307,10 +310,6 @@ public class UnionService {
     }
 
     public UnionDTO updateUnion(UnionDTO unionData, long countryId, Long unionId, boolean publish) {
-        Country country = countryGraphRepository.findOne(countryId);
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-        }
         if (organizationGraphRepository.existsByName("(?i)" + unionData.getName(), unionId)) {
             exceptionService.duplicateDataException(MESSAGE_UNION_NAME_EXISTS, unionData.getName());
         }
@@ -331,25 +330,11 @@ public class UnionService {
         List<Long> sectorIds = new ArrayList<>(sectorIDsToBeCreated);
         sectorIDsToBeCreated.removeAll(sectorIdsDb);
         sectorIdsDb.removeAll(sectorIds);
-        if (!sectorIdsDb.isEmpty() && !union.isBoardingCompleted()) {
-            unitGraphRepository.deleteUnionSectorRelationShip(new ArrayList<>(sectorIdsDb), unionId);
-        } else if (!sectorIdsDb.isEmpty() && union.isBoardingCompleted()) {
-            exceptionService.unsupportedOperationException(MESSAGE_SECTOR_UNLINKED);
-        }
-        if (!sectorIDsToBeCreated.isEmpty()) {
-            unitGraphRepository.createUnionSectorRelationShip(sectorIDsToBeCreated, unionId);
-        }
-        if (!sectorDTOS.isEmpty()) {
-            List<Sector> sectors = createSectors(countryId, sectorDTOS);
-            union.getSectors().addAll(sectors);
-            unionData.getSectors().addAll(sectors.stream().map(sector -> new SectorDTO(sector.getId(), sector.getName())).collect(Collectors.toList()));
-
-        }
+        setSectorInfo(unionData, countryId, unionId, union, sectorIDsToBeCreated, sectorDTOS, sectorIdsDb);
         ContactAddress address = null;
         boolean zipCodeUpdated = false;
         boolean municipalityUpdated = false;
         UnionDataQueryResult unionDataQueryResult = unionDataQueryResults.get(0);
-
         if (!Optional.ofNullable(unionData.getMainAddress()).isPresent() && publish) {
             exceptionService.invalidRequestException(MESSAGE_PUBLISH_ADDRESS_MISSING);
         } else if (Optional.ofNullable(unionData.getMainAddress()).isPresent()) {
@@ -377,6 +362,23 @@ public class UnionService {
         organizationGraphRepository.save(union);
         unionData.setId(union.getId());
         return unionData;
+    }
+
+    private void setSectorInfo(UnionDTO unionData, long countryId, Long unionId, Organization union, List<Long> sectorIDsToBeCreated, List<SectorDTO> sectorDTOS, Set<Long> sectorIdsDb) {
+        if (!sectorIdsDb.isEmpty() && !union.isBoardingCompleted()) {
+            unitGraphRepository.deleteUnionSectorRelationShip(new ArrayList<>(sectorIdsDb), unionId);
+        } else if (!sectorIdsDb.isEmpty() && union.isBoardingCompleted()) {
+            exceptionService.unsupportedOperationException(MESSAGE_SECTOR_UNLINKED);
+        }
+        if (!sectorIDsToBeCreated.isEmpty()) {
+            unitGraphRepository.createUnionSectorRelationShip(sectorIDsToBeCreated, unionId);
+        }
+        if (!sectorDTOS.isEmpty()) {
+            List<Sector> sectors = createSectors(countryId, sectorDTOS);
+            union.getSectors().addAll(sectors);
+            unionData.getSectors().addAll(sectors.stream().map(sector -> new SectorDTO(sector.getId(), sector.getName())).collect(Collectors.toList()));
+
+        }
     }
 
     public boolean validateAddress(ContactAddressDTO addressDTO) {

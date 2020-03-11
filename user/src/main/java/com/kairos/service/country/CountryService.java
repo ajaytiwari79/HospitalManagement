@@ -2,6 +2,8 @@ package com.kairos.service.country;
 
 import com.google.api.services.calendar.model.Event;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
@@ -390,7 +392,7 @@ public class CountryService {
         Country country = (Optional.ofNullable(countryId).isPresent()) ? countryGraphRepository.findOne(countryId) :
                 null;
         if (!Optional.ofNullable(country).isPresent()) {
-            logger.error("Finding country by id::" + countryId);
+            logger.error("Finding country by id::{}" , countryId);
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
 
         }
@@ -468,11 +470,11 @@ public class CountryService {
             phases = phaseRestClient.getPhases(countryId);
 
         }
-        Set<BigInteger> activityCategoriesIds = activityTypeDTOS.stream().map(activityTypeDTO -> activityTypeDTO.getCategoryId()).collect(Collectors.toSet());
+        Set<BigInteger> activityCategoriesIds = activityTypeDTOS.stream().map(ActivityTypeDTO::getCategoryId).collect(Collectors.toSet());
         List<ActivityCategoryDTO> activityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId, activityCategoriesIds);
         List<CurrencyDTO> currencies = currencyService.getCurrencies(countryId);
         List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId, false);
-        List<TimeTypeDTO> timeType = timeTypeRestClient.getAllTimeTypes(countryId);//.stream().filter(t -> t.getTimeTypes().equals(TimeTypes.WORKING_TYPE.toValue())).findFirst().get();
+        List<TimeTypeDTO> timeType = timeTypeRestClient.getAllTimeTypes(countryId);
         List<PresenceTypeDTO> plannedTime = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeService.getAllDayTypeByCountryId(countryId);
         List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
@@ -551,8 +553,12 @@ public class CountryService {
        return countryGraphRepository.getCountryIdByUnitId(unitId);
     }
 
-    public List<Long> getAllUnits(long countryId) {
+    public List<Long> getAllUnits() {
         return organizationService.getAllOrganizationIds();
+    }
+
+    public Country findById(Long countryId){
+        return countryGraphRepository.findById(countryId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_COUNTRY_ID_NOTFOUND, countryId)));
     }
 
 }

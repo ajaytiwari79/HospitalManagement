@@ -51,7 +51,6 @@ public class ActivityIntegrationService {
     GenericRestClient genericRestClient;
     @Inject
     RestClientForSchedulerMessages restClientForSchedulerMessages;
-    private Logger logger = LoggerFactory.getLogger(ActivityIntegrationService.class);
 
     public void createDefaultPriorityGroupsFromCountry(long countryId, long unitId) {
         Map<String, Object> countryDetail = new HashMap<>();
@@ -63,7 +62,7 @@ public class ActivityIntegrationService {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/orders_and_activities", null), OrderAndActivityDTO.class);
     }
 
-    public void crateDefaultDataForOrganization(Long unitId, Long parentOrganizationId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
+    public void crateDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
 
         genericRestClient.publish(orgTypeAndSubTypeDTO, unitId, true, IntegrationOperation.CREATE, "/organization_default_data", null);
     }

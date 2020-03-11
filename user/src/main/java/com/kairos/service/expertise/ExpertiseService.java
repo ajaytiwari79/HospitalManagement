@@ -257,7 +257,7 @@ public class ExpertiseService {
         return expertiseQueryResults;
     }
 
-    private boolean validateSeniorityLevels(List<SeniorityLevel> seniorityLevels) {
+    private void validateSeniorityLevels(List<SeniorityLevel> seniorityLevels) {
         Collections.sort(seniorityLevels);
         if (isCollectionNotEmpty(seniorityLevels) && seniorityLevels.get(0).getTo() != null && seniorityLevels.get(0).getTo() <= seniorityLevels.get(0).getFrom()) {
             exceptionService.actionNotPermittedException(PLEASE_ENTER_VALID_SENIORITY_LEVELS);
@@ -269,8 +269,6 @@ public class ExpertiseService {
                 }
             }
         }
-        return true;
-
     }
 
 
@@ -501,15 +499,13 @@ public class ExpertiseService {
     }
 
     //register a job for unassign expertise from activity and this method call when set enddate of publish expertise
-    public boolean registerJobForUnassingExpertiesFromActivity(List<SchedulerPanelDTO> schedulerPanelDTOS) {
+    public void registerJobForUnassingExpertiesFromActivity(List<SchedulerPanelDTO> schedulerPanelDTOS) {
         if (isCollectionNotEmpty(schedulerPanelDTOS)) {
             LOGGER.info("create job for add planning period");
             // using -1 for unitId becounse this is not unit base job
-            schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, -1L, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
-            });
+             schedulerRestClient.publishRequest(schedulerPanelDTOS, -1L, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
             LOGGER.info("successfully job registered of add planning period");
         }
-        return isCollectionNotEmpty(schedulerPanelDTOS);
     }
 
     private boolean isExpertiseLineChanged(ExpertiseLine expertiseLine, List<Long> organizationServiceIds, ExpertiseDTO expertiseDTO) {

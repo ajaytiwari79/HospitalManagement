@@ -460,7 +460,8 @@ public class PermissionService {
                     e.printStackTrace();
                 }
                 modelName = field.getType().getSimpleName();
-            }if(field.isAnnotationPresent(KPermissionRelationshipTo.class)){
+            }
+            if(field.isAnnotationPresent(KPermissionRelationshipTo.class)){
                 fieldName = field.getName();
             }
         }

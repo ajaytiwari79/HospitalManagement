@@ -72,8 +72,8 @@ public class CountryDefaultDataController {
 
     @ApiOperation(value = "Get day types by id")
     @RequestMapping(value = COUNTRY_URL + "/time_slots", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getTimeSlotOfCountry(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotsOfCountry(countryId));
+    public ResponseEntity<Map<String, Object>> getTimeSlotOfCountry() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotsOfCountry());
     }
 
     @ApiOperation(value = "Get day types by id")
