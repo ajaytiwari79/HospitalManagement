@@ -169,7 +169,7 @@ public class ActivityMongoService {
     }
 
     public Tag requiredTagId(){
-        Tag tag = new Tag(new BigInteger("1"),"StaffTag", STAFF, false, 958);;
+        Tag tag = new Tag(1l,"StaffTag", STAFF);;
         return tag;
     }
     //
