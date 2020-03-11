@@ -64,7 +64,7 @@ public class WeeklyEmploymentHoursKPIService {
             if ((employmentWithCtaDetailsDTO.getStartDate().isBefore(startDate) && ObjectUtils.isNull(employmentWithCtaDetailsDTO.getEndDate())) || dateTimeInterval.contains(employmentWithCtaDetailsDTO.getStartDate())) {
                 weeklyHours += Double.valueOf(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours());
             }
-            if (ObjectUtils.isNotNull(employmentWithCtaDetailsDTO.getEndDate()) && (employmentWithCtaDetailsDTO.getStartDate().isBefore(startDate) && employmentWithCtaDetailsDTO.getEndDate().isAfter(startDate)) || dateTimeInterval.containsAndEqualsEndDate(DateUtils.asDate(employmentWithCtaDetailsDTO.getStartDate())) || dateTimeInterval.containsAndEqualsEndDate(DateUtils.asDate(employmentWithCtaDetailsDTO.getEndDate()))) {
+            if (ObjectUtils.isNotNull(employmentWithCtaDetailsDTO.getEndDate()) && ((employmentWithCtaDetailsDTO.getStartDate().isBefore(startDate) && employmentWithCtaDetailsDTO.getEndDate().isAfter(startDate)) || dateTimeInterval.containsAndEqualsEndDate(DateUtils.asDate(employmentWithCtaDetailsDTO.getStartDate())) || dateTimeInterval.containsAndEqualsEndDate(DateUtils.asDate(employmentWithCtaDetailsDTO.getEndDate())))) {
                 weeklyHours += Double.valueOf(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours());
             }
         }
