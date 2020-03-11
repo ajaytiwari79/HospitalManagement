@@ -431,7 +431,7 @@ public class KPIBuilderCalculationService implements CounterService {
     private long getStaffAgeData(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         StaffKpiFilterDTO staff = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
         int age = 0;
-        if(kpiCalculationRelatedInfo.getXAxisConfigs().get(0).equals(XAxisConfig.AGE)) {
+        if(XAxisConfig.AGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
             age = staff.getStaffAge(asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
         }
         return age;
@@ -1124,12 +1124,10 @@ public class KPIBuilderCalculationService implements CounterService {
             if(filterBasedCriteria.containsKey(TEAM_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(TEAM_TYPE))) {
                 for(StaffKpiFilterDTO staffKpiFilterDTO :staffKpiFilterDTOS){
                     for(TeamDTO teamDTO :staffKpiFilterDTO.getTeams()){
-                        if(isNotNull(teamDTO.getTeamType())) {
                             if (filterBasedCriteria.get(TEAM_TYPE).contains(teamDTO.getTeamType().name())) {
                                 staffKpiFilterDTOList.add(staffKpiFilterDTO);
                                 break;
                             }
-                        }
                     }
                 }
                 staffKpiFilterDTOS = staffKpiFilterDTOList;
