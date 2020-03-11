@@ -23,6 +23,8 @@ public class StaffingLevelTimeSlotDTO {
     private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
     private Duration staffingLevelDuration;
 
+
+
     public StaffingLevelTimeSlotDTO(int sequence,int minNoOfStaff, int maxNoOfStaff,
                                     Duration staffingLevelDuration) {
         this.sequence=sequence;
