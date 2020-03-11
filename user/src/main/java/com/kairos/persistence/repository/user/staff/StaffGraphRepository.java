@@ -483,5 +483,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]->(:Position)-[:" + BELONGS_TO + "]->(staff:Staff) WHERE id(organization)={1}" +
             "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={0} RETURN id(staff)")
     Long getStaffIdByUserId(Long userId, Long parentOrganizationId);
+
+    @Query("MATCH(user:User)-[rel:BELONGS_TO]-(staff:Staff)-[rela:BELONGS_TO]-(position:Position)-[relb:HAS_POSITIONS]-(o:Organization)\n" +
+            "WHERE id(o)={0} AND id(user)={1} RETURN staff")
+    Staff getStaffByUnitIdAndUserId(Long unitId,Long userId);
 }
 

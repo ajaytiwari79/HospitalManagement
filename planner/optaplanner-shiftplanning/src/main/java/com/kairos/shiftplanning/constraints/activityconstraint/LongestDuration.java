@@ -1,4 +1,4 @@
-package com.kairos.shiftplanning.constraints.activityConstraint;
+package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
@@ -13,24 +13,22 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ShortestDuration implements Constraint {
+public class LongestDuration implements Constraint {
 
-    private int shortestDuration;
+
+    //By percent
+    private int longestDuration;
     private ScoreLevel level;
     private int weight;
 
-    public ShortestDuration(int shortestDuration, ScoreLevel level, int weight) {
-        this.shortestDuration = shortestDuration;
+    public LongestDuration(int longestDuration, ScoreLevel level, int weight) {
+        this.longestDuration = longestDuration;
         this.level = level;
         this.weight = weight;
     }
 
     public int checkConstraints(Activity activity, ShiftImp shift){
-       /*int minutes = shift.getActivityLineIntervalsList().stream().filter(a->a.getActivity().equals(activity)).mapToInt(a->a.getInterval().toDuration().toStandardMinutes().getMinutes()).sum();
-        if(minutes>0){
-            int duration = Math.round((float)minutes/shift.getMinutes()*100);
-            return duration<shortestDuration?shortestDuration-duration:0;
-        }*/
+
         return 0;
     }
 

@@ -205,6 +205,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_COUNTRY_ID_NOTNULL = "message.country.id.notNull";
     public static final String MESSAGE_COUNTRY_LEVEL_NAME_NOTEMPTY = "message.country.level.name.notEmpty";
     public static final String MESSAGE_COUNTRY_LEVEL_ID_NOTFOUND = "message.country.level.id.notFound";
+    public static final String MESSAGE_COUNTRY_LEVEL_CANNOT_DELETE = "message.country.level.cannot.delete";
     public static final String MESSAGE_COUNTRY_REALTIONTYPE_ID_NOTFOUND = "message.country.realtionType.id.notFound";
     public static final String MESSAGE_COUNTRY_LEVEL_NAME_EXIST  = "message.country.level.name.exist ";
     public static final String MESSAGE_DAYTYPE_NOTFOUND = "message.dayType.notfound";
@@ -272,6 +273,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_TEAMSERVICE_SOMETHINGWRONG = "message.teamservice.somethingwrong";
     public static final String MESSAGE_TEAMSERVICE_TEAM_NOTFOUND = "message.teamservice.team.notFound";
     public static final String STAFF_CAN_NOT_BE_TEAM_LEADER="message.staff.team.leader";
+    public static final String STAFF_ASSIGN_DATE_CONTAIN_BY_TEAM_DATES="message.staff.assign.date.contain.by.team.dates";
     public static final String MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT = "message.teamservice.team.alreadyexists.in.unit";
     public static final String MESSAGE_TIMESLOT_ID_NOTFOUND = "message.timeslot.id.notfound";
     public static final String TIMESLOT_NOT_FOUND  = "timeslot.not.found ";

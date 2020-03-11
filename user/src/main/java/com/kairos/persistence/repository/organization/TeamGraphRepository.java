@@ -37,7 +37,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
             "OPTIONAL MATCH (team)-[staffRel:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) \n" +
-            "WITH team,COLLECT(DISTINCT{staffId:id(teamMembers),teamType:staffRel.teamType}) as staffDetails\n" +
+            "WITH team,COLLECT(DISTINCT{staffId:id(teamMembers),teamType:staffRel.teamType,startDate:staffRel.startDate,endDate:staffRel.endDate}) as staffDetails\n" +
             "OPTIONAL MATCH (team)-[:"+TEAM_HAS_SKILLS+"]->(skills:Skill) with team, COLLECT (id(skills)) as skillIds ,staffDetails\n" +
             "RETURN id(team) as id, team.name as name, team.description as description, team.activityIds as activityIds, skillIds as skillIds,staffDetails as staffDetails")
     TeamDTO getTeamDetailsById(long teamId);

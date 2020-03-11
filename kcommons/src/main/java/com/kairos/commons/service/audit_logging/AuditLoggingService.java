@@ -3,7 +3,6 @@ package com.kairos.commons.service.audit_logging;
 import com.kairos.commons.repository.audit_logging.AuditLoggingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;

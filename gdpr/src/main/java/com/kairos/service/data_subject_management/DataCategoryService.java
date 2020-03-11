@@ -18,11 +18,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_DATACATEGORY;
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_DATANOTFOUND;
+
 
 @Service
 public class DataCategoryService {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(DataCategoryService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataCategoryService.class);
 
     @Inject
     private ExceptionService exceptionService;
@@ -47,7 +50,7 @@ public class DataCategoryService {
 
         DataCategory previousDataCategory = isOrganization ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
         if (Optional.ofNullable(previousDataCategory).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "message.dataCategory", dataCategoryDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_DATACATEGORY, dataCategoryDto.getName());
         }
 
         DataCategory dataCategory = new DataCategory(dataCategoryDto.getName());
@@ -73,11 +76,11 @@ public class DataCategoryService {
 
         DataCategory dataCategory = isOrganization ? dataCategoryRepository.findByUnitIdAndName(referenceId, dataCategoryDto.getName()) : dataCategoryRepository.findByCountryIdName(referenceId, dataCategoryDto.getName());
         if (Optional.ofNullable(dataCategory).isPresent() && !dataCategoryId.equals(dataCategory.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "message.dataCategory", dataCategoryDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_DATACATEGORY, dataCategoryDto.getName());
         }
         dataCategory = dataCategoryRepository.getOne(dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataCategory", dataCategoryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_DATACATEGORY, dataCategoryId);
         }
         dataCategory.setDataElements(dataElementService.updateDataElementAndCreateNewDataElement(referenceId, isOrganization, dataCategoryDto.getDataElements()));
         dataCategory.setName(dataCategoryDto.getName());
@@ -99,7 +102,7 @@ public class DataCategoryService {
         if (updateCount > 0) {
             LOGGER.info("Data Category with id :: {} deleted safely and successfully", dataCategoryId);
         }else{
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataCategory", dataCategoryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_DATACATEGORY, dataCategoryId);
         }
         return true;
 
@@ -114,7 +117,7 @@ public class DataCategoryService {
     public DataCategoryResponseDTO getDataCategoryWithDataElementByCountryIdAndId(Long countryId, Long dataCategoryId) {
         DataCategory dataCategory = dataCategoryRepository.getDataCategoryByCountryIdAndId(countryId, dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataCategory", dataCategoryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_DATACATEGORY, dataCategoryId);
         }
         return ObjectMapperUtils.copyPropertiesByMapper(dataCategory, DataCategoryResponseDTO.class);
 
@@ -128,7 +131,7 @@ public class DataCategoryService {
     public DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, Long dataCategoryId) {
         DataCategory dataCategory = dataCategoryRepository.getDataCategoryByUnitIdAndId(unitId, dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataCategory", dataCategoryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_DATACATEGORY, dataCategoryId);
         }
         return ObjectMapperUtils.copyPropertiesByMapper(dataCategory, DataCategoryResponseDTO.class);
 

@@ -93,6 +93,9 @@ public class ShiftStatusService {
         Object[] objects = getActivitiesAndShiftIds(shiftPublishDTO.getShifts());
         Set<BigInteger> shiftActivitiyIds = ((Set<BigInteger>) objects[1]);
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc((List<BigInteger>) objects[0]);
+        if(isCollectionEmpty(shifts)){
+            exceptionService.dataNotFoundException(MESSAGE_SHIFT_IDS);
+        }
         List<ShiftActivityResponseDTO> shiftActivityResponseDTOS = new ArrayList<>(shifts.size());
         List<ShiftDTO> shiftDTOS = new ArrayList<>(shifts.size());
         Object[] activityDetails = getActivityDetailsMap(shifts);

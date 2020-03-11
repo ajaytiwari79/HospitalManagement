@@ -82,26 +82,7 @@ public class EmploymentJobService {
                 Map<EmploymentIdDTO, EmploymentLine> newEmploymentLineWithParentId = new HashMap<>();
                 List<EmploymentLineEmploymentTypeRelationShip> employmentLineEmploymentTypeRelationShips = new ArrayList<>();
                 for (Employment currentEmployment : employments) {
-                    Optional<EmploymentLine> employmentLine = currentEmployment.getEmploymentLines().stream()
-                            .filter(pl -> !todayDate.isBefore(pl.getStartDate()) && (isNull(pl.getEndDate()) || !todayDate.isAfter(pl.getEndDate())))
-                            .findAny();
-                    if (employmentLine.isPresent()) {
-                        EmploymentLine newEmploymentLine = new EmploymentLine.EmploymentLineBuilder()
-                                .setAvgDailyWorkingHours(employmentLine.get().getAvgDailyWorkingHours())
-                                .setTotalWeeklyMinutes(employmentLine.get().getTotalWeeklyMinutes())
-                                .setHourlyCost(employmentLine.get().getHourlyCost())
-                                .setStartDate(todayDate)
-                                .setFunctions(employmentLine.get().getFunctions())
-                                .setFullTimeWeeklyMinutes(employmentLine.get().getFullTimeWeeklyMinutes())
-                                .setWorkingDaysInWeek(employmentLine.get().getWorkingDaysInWeek())
-                                .setEndDate(employmentLine.get().getEndDate())
-                                .setSeniorityLevel(employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getSeniorityLevel())
-                                .build();
-                        employmentLine.get().setEndDate(todayDate.minusDays(1));
-                        currentEmployment.getEmploymentLines().add(newEmploymentLine);
-                        updateSeniorityLevelOfAllValidEmploymentLine(currentEmployment,employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getSeniorityLevel(),employmentLine.get().getEndDate(),employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getExpertiseEndDate());
-                        newEmploymentLineWithParentId.put(new EmploymentIdDTO(currentEmployment.getId(), null, employmentLine.get().getId()), newEmploymentLine);
-                    }
+                    getEmploymentLineAndSetDetails(todayDate, employmentSeniorityLevelQueryResultMap, newEmploymentLineWithParentId, currentEmployment);
                 }
                 for (Map.Entry<EmploymentIdDTO, EmploymentLine> currentMap : newEmploymentLineWithParentId.entrySet()) {
                     EmploymentSeniorityLevelQueryResult currentObject = employmentSeniorityLevelQueryResultMap.get(currentMap.getKey().getOldEmploymentId());
@@ -120,6 +101,29 @@ public class EmploymentJobService {
         }
     }
 
+    private void getEmploymentLineAndSetDetails(LocalDate todayDate, Map<Long, EmploymentSeniorityLevelQueryResult> employmentSeniorityLevelQueryResultMap, Map<EmploymentIdDTO, EmploymentLine> newEmploymentLineWithParentId, Employment currentEmployment) {
+        Optional<EmploymentLine> employmentLine = currentEmployment.getEmploymentLines().stream()
+                .filter(pl -> !todayDate.isBefore(pl.getStartDate()) && (isNull(pl.getEndDate()) || !todayDate.isAfter(pl.getEndDate())))
+                .findAny();
+        if (employmentLine.isPresent()) {
+            EmploymentLine newEmploymentLine = new EmploymentLine.EmploymentLineBuilder()
+                    .setAvgDailyWorkingHours(employmentLine.get().getAvgDailyWorkingHours())
+                    .setTotalWeeklyMinutes(employmentLine.get().getTotalWeeklyMinutes())
+                    .setHourlyCost(employmentLine.get().getHourlyCost())
+                    .setStartDate(todayDate)
+                    .setFunctions(employmentLine.get().getFunctions())
+                    .setFullTimeWeeklyMinutes(employmentLine.get().getFullTimeWeeklyMinutes())
+                    .setWorkingDaysInWeek(employmentLine.get().getWorkingDaysInWeek())
+                    .setEndDate(employmentLine.get().getEndDate())
+                    .setSeniorityLevel(employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getSeniorityLevel())
+                    .build();
+            employmentLine.get().setEndDate(todayDate.minusDays(1));
+            currentEmployment.getEmploymentLines().add(newEmploymentLine);
+            updateSeniorityLevelOfAllValidEmploymentLine(currentEmployment,employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getSeniorityLevel(),employmentLine.get().getEndDate(),employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getExpertiseEndDate());
+            newEmploymentLineWithParentId.put(new EmploymentIdDTO(currentEmployment.getId(), null, employmentLine.get().getId()), newEmploymentLine);
+        }
+    }
+
     private void updateSeniorityLevelOfAllValidEmploymentLine(Employment currentEmployment, SeniorityLevel seniorityLevel, LocalDate startDate, LocalDate endDate) {
         List<EmploymentLine> employmentLines = currentEmployment.getEmploymentLines().stream()
                 .filter(pl -> !startDate.isAfter(pl.getStartDate()) && (isNull(pl.getEndDate()) || !endDate.isBefore(pl.getEndDate()))).collect(Collectors.toList());
@@ -131,7 +135,6 @@ public class EmploymentJobService {
         String employmentStartDateMax = employmentGraphRepository.getMaxEmploymentStartDate(staffId);
         if (Optional.ofNullable(employmentStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(LocalDate.parse(employmentStartDateMax))) {
             exceptionService.actionNotPermittedException(MESSAGE_POSITION_END_DATE_GREATER_THAN_EMPLOYMENT_START_DATE, employmentStartDateMax);
-
         }
         List<Employment> employments = employmentGraphRepository.getEmploymentsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis).toString());
         ReasonCode reasonCode = reasonCodeGraphRepository.findOne(positionDTO.getReasonCodeId(), 0);
@@ -148,12 +151,8 @@ public class EmploymentJobService {
             employmentGraphRepository.updateEmploymentLineEndDateByEmploymentIds(employments.stream().map(Employment::getId).collect(Collectors.toSet()), DateUtils.getLocalDate(endDateMillis).toString());
         }
         Position position = positionGraphRepository.findByStaffId(staffId);
-//        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, position.getEndDateMillis(), unit.getId(), position.getId(),
-//                unit.getTimeZone());
-
         position.setEndDateMillis(endDateMillis);
         positionGraphRepository.deletePositionReasonCodeRelation(staffId);
-
         position.setReasonCode(reasonCode);
         position.setAccessGroupIdOnPositionEnd(positionDTO.getAccessGroupIdOnPositionEnd());
         employmentGraphRepository.saveAll(employments);

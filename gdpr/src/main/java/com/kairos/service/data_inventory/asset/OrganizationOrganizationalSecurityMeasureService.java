@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_ORGSECURITYMEASURE;
+
 @Service
 public class OrganizationOrganizationalSecurityMeasureService{
 
@@ -101,7 +103,7 @@ public class OrganizationOrganizationalSecurityMeasureService{
 
         List<String> assetsLinked = assetRepository.findAllAssetLinkedWithOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId);
         if (CollectionUtils.isNotEmpty(assetsLinked)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.orgSecurityMeasure", StringUtils.join(assetsLinked, ','));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", MESSAGE_ORGSECURITYMEASURE, StringUtils.join(assetsLinked, ','));
         }
         organizationalSecurityMeasureRepository.deleteByIdAndOrganizationId(orgSecurityMeasureId, unitId);
         return true;
@@ -123,11 +125,11 @@ public class OrganizationOrganizationalSecurityMeasureService{
             if (id.equals(organizationalSecurityMeasure.getId())) {
                 return orgSecurityMeasureDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "message.orgSecurityMeasure", organizationalSecurityMeasure.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_ORGSECURITYMEASURE, organizationalSecurityMeasure.getName());
         }
         Integer resultCount =  organizationalSecurityMeasureRepository.updateMetadataName(orgSecurityMeasureDTO.getName(), id, unitId);
         if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.orgSecurityMeasure", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", MESSAGE_ORGSECURITYMEASURE, id);
         }else{
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, orgSecurityMeasureDTO.getName());
         }

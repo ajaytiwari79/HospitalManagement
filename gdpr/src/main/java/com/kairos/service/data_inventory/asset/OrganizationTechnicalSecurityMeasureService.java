@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_TECHNICALSECURITYMEASURE;
+
 @Service
 public class OrganizationTechnicalSecurityMeasureService {
 
@@ -103,7 +105,7 @@ public class OrganizationTechnicalSecurityMeasureService {
         List<String> assetsLinked = assetRepository.findAllAssetLinkedWithTechnicalSecurityMeasure(unitId, techSecurityMeasureId);
         if (CollectionUtils.isNotEmpty(assetsLinked)) {
 
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.technicalSecurityMeasure", StringUtils.join(assetsLinked, ','));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", MESSAGE_TECHNICALSECURITYMEASURE, StringUtils.join(assetsLinked, ','));
         }
         technicalSecurityMeasureRepository.deleteByIdAndOrganizationId(techSecurityMeasureId, unitId);
         return true;
@@ -123,11 +125,11 @@ public class OrganizationTechnicalSecurityMeasureService {
             if (id.equals(technicalSecurityMeasure.getId())) {
                 return technicalSecurityMeasureDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "message.technicalSecurityMeasure", technicalSecurityMeasure.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_TECHNICALSECURITYMEASURE, technicalSecurityMeasure.getName());
         }
         Integer resultCount = technicalSecurityMeasureRepository.updateMasterMetadataName(technicalSecurityMeasureDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.technicalSecurityMeasure", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", MESSAGE_TECHNICALSECURITYMEASURE, id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, technicalSecurityMeasureDTO.getName());
         }

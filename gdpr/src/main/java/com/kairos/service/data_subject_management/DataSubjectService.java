@@ -12,8 +12,6 @@ import com.kairos.persistence.model.master_data.data_category_element.DataSubjec
 import com.kairos.persistence.repository.master_data.data_category_element.DataSubjectRepository;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectResponseDTO;
 import com.kairos.service.exception.ExceptionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -21,12 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.GdprMessagesConstants.*;
+
 @Service
 public class DataSubjectService {
-
-
-    Logger LOGGER = LoggerFactory.getLogger(DataSubjectService.class);
-
     @Inject
     private DataCategoryService dataCategoryService;
 
@@ -45,7 +41,7 @@ public class DataSubjectService {
 
         DataSubject previousDataSubject = dataSubjectRepository.findByCountryIdAndName(countryId, dataSubjectDto.getName());
         if (Optional.ofNullable(previousDataSubject).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "message.dataSubject", dataSubjectDto.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_DATASUBJECT, dataSubjectDto.getName());
         }
         DataSubject dataSubject = new DataSubject(dataSubjectDto.getName(), dataSubjectDto.getDescription());
         dataSubject.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataSubjectDto.getOrganizationTypes(), OrganizationType.class));
@@ -61,7 +57,7 @@ public class DataSubjectService {
     public DataSubjectResponseDTO getDataSubjectAndMappingWithDataByCountryIdAndId(Long countryId, Long id) {
         DataSubject dataSubject = dataSubjectRepository.getDataSubjectByCountryIdAndId(countryId, id);
         if (!Optional.ofNullable(dataSubject).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataSubject", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_DATASUBJECT, id);
         }
         return prepareDataSubjectResponseDTO(dataSubject, true);
     }
@@ -103,11 +99,11 @@ public class DataSubjectService {
     public MasterDataSubjectDTO updateDataSubjectAndMapping(Long countryId, Long dataSubjectId, MasterDataSubjectDTO dataSubjectDto) {
         DataSubject dataSubject = dataSubjectRepository.findByCountryIdAndName(countryId, dataSubjectDto.getName());
         if (Optional.ofNullable(dataSubject).isPresent() && !dataSubjectId.equals(dataSubject.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "message.dataSubject", dataSubjectDto.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_DATASUBJECT, dataSubjectDto.getName());
         }
         dataSubject = dataSubjectRepository.getDataSubjectByCountryIdAndId(countryId, dataSubjectId);
         if (!Optional.ofNullable(dataSubject).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataSubject", dataSubjectId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_DATASUBJECT, dataSubjectId);
         }
         dataSubject.setName(dataSubjectDto.getName());
         dataSubject.setDescription(dataSubjectDto.getDescription());
@@ -129,7 +125,7 @@ public class DataSubjectService {
 
         DataSubject previousDataSubject = dataSubjectRepository.findByNameAndUnitId(unitId, subjectDTO.getName());
         if (Optional.ofNullable(previousDataSubject).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "message.dataSubject", subjectDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_DATASUBJECT, subjectDTO.getName());
         }
         DataSubject dataSubject = new DataSubject(subjectDTO.getName(), subjectDTO.getDescription(), dataCategoryService.getAllDataCategoriesByIds(subjectDTO.getDataCategories()));
         dataSubject.setOrganizationId(unitId);
@@ -165,7 +161,7 @@ public class DataSubjectService {
 
         DataSubject dataSubject = dataSubjectRepository.findByNameAndUnitId(unitId, dataSubjectDTO.getName());
         if (Optional.ofNullable(dataSubject).isPresent() && !dataSubjectId.equals(dataSubject.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "message.dataSubject", dataSubject.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_DATASUBJECT, dataSubject.getName());
         }
         dataSubject = dataSubjectRepository.getOne(dataSubjectId);
         dataSubject.setName(dataSubjectDTO.getName());
@@ -180,7 +176,7 @@ public class DataSubjectService {
     public DataSubjectResponseDTO getDataSubjectWithDataCategoryAndElementByUnitIdAndId(Long unitId, Long datSubjectId) {
         DataSubject dataSubject = dataSubjectRepository.getDataSubjectByUnitIdAndId(unitId, datSubjectId);
         if (!Optional.ofNullable(dataSubject).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataSubject", datSubjectId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_DATASUBJECT, datSubjectId);
         }
 
         return prepareDataSubjectResponseDTO(dataSubject, false);

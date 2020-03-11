@@ -6,8 +6,8 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.Day;
 import com.kairos.enums.wta.IntervalUnit;
-import com.kairos.shiftplanning.constraints.activityConstraint.CountryHolidayCalender;
-import com.kairos.shiftplanning.constraints.activityConstraint.DayType;
+import com.kairos.shiftplanning.constraints.activityconstraint.CountryHolidayCalender;
+import com.kairos.shiftplanning.constraints.activityconstraint.DayType;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
@@ -339,6 +339,7 @@ public class ShiftPlanningUtility {
         }
         //to add last one
         shiftActivities.add(shiftActivity);
+        shiftActivities.sort(Comparator.comparing(ShiftActivity::getStartTime));
         return shiftActivities;
     }
 

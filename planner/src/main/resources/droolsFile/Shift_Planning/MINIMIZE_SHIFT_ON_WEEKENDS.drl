@@ -11,8 +11,8 @@ salience 20
   when
     $unit:Unit(unitConstraints != null)
     $shifts:List() from collect (ShiftImp(getInterval()!=null));
-    $constraintsPenality: Integer(intValue>0) from ($unit.checkUnitConstraints($shifts,1))
+    $constraintsPenality: Integer(intValue>0) from ($unit.checkConstraints(null,$shifts,ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS))
   then
-   $unit.breakUnitContraints(scoreHolder,kcontext, $constraintsPenality,1);
+   $unit.breakContraints(scoreHolder,kcontext, $constraintsPenality,ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS);
 end
 
