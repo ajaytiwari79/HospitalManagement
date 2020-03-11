@@ -392,21 +392,21 @@ public class WorkTimeAgreementBalancesCalculationService {
                     float scheduledActivityCount = 0;
                     float approveActivityCount = 0;
                     for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
-                        for (ShiftActivityDTO shiftActivityDTO : shiftWithActivityDTO.getActivities()) {
-                            if ((shiftActivityDTO.getStartLocalDate().equals(dateTimeInterval.getStartLocalDate()) || dateTimeInterval.contains(shiftActivityDTO.getStartDate()))) {
-                                if (shiftActivityDTO.getActivityId().equals(vetoAndStopBricksWTATemplate.getStopBrickActivityId())) {
-                                    scheduledActivityCount = scheduledActivityCount + STOP_BRICK_BLOCKING_POINT;
-                                    if (shiftActivityDTO.getStatus().contains(ShiftStatus.APPROVE)) {
-                                        approveActivityCount = approveActivityCount + STOP_BRICK_BLOCKING_POINT;
-                                    }
-                                } else if (shiftActivityDTO.getActivityId().equals(vetoAndStopBricksWTATemplate.getVetoActivityId())) {
-                                    scheduledActivityCount++;
-                                    if (shiftActivityDTO.getStatus().contains(ShiftStatus.APPROVE)) {
-                                        approveActivityCount++;
+                            for (ShiftActivityDTO shiftActivityDTO : shiftWithActivityDTO.getActivities()) {
+                                if ((shiftActivityDTO.getStartLocalDate().equals(dateTimeInterval.getStartLocalDate()) || dateTimeInterval.contains(shiftActivityDTO.getStartDate()))) {
+                                    if (shiftActivityDTO.getActivityId().equals(vetoAndStopBricksWTATemplate.getStopBrickActivityId())) {
+                                        scheduledActivityCount = scheduledActivityCount + STOP_BRICK_BLOCKING_POINT;
+                                        if (shiftActivityDTO.getStatus().contains(ShiftStatus.APPROVE) && !shiftWithActivityDTO.isDraft()) {
+                                            approveActivityCount = approveActivityCount + STOP_BRICK_BLOCKING_POINT;
+                                        }
+                                    } else if (shiftActivityDTO.getActivityId().equals(vetoAndStopBricksWTATemplate.getVetoActivityId())) {
+                                        scheduledActivityCount++;
+                                        if (shiftActivityDTO.getStatus().contains(ShiftStatus.APPROVE)&&!shiftWithActivityDTO.isDraft()) {
+                                            approveActivityCount++;
+                                        }
                                     }
                                 }
                             }
-                        }
                     }
                     float available = vetoAndStopBricksWTATemplate.getTotalBlockingPoints() - scheduledActivityCount;
                         intervalBalances.add(new IntervalBalance(vetoAndStopBricksWTATemplate.getTotalBlockingPoints(), scheduledActivityCount, available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), approveActivityCount));
@@ -545,14 +545,15 @@ public class WorkTimeAgreementBalancesCalculationService {
         int activityCount = 0;
         int approveCount = 0;
         for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
-            for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
-                if ((dateTimeInterval.contains(activity.getStartDate())) && activityIds.contains(activity.getActivityId())) {
-                    activityCount++;
-                    if (activity.getStatus().contains(ShiftStatus.APPROVE)) {
-                        approveCount++;
+                for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
+                    if ((dateTimeInterval.contains(activity.getStartDate())) && activityIds.contains(activity.getActivityId())) {
+                        activityCount++;
+                        if (activity.getStatus().contains(ShiftStatus.APPROVE)&& !shiftWithActivityDTO.isDraft()) {
+                            approveCount++;
+                        }
                     }
                 }
-            }
+
         }
         return new int[]{activityCount, approveCount};
     }
