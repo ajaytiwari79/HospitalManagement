@@ -20,7 +20,6 @@ import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -65,17 +64,6 @@ public class PlannedHoursVsTimeBankService implements CounterService {
     @Inject
     private TimeBankRepository timeBankRepository;
     @Inject private PlanningPeriodService planningPeriodService;
-
-    private Map<Long, Set<DateTimeInterval>> getPlanningPeriodIntervals(List<Long> unitIds, Date startDate, Date endDate) {
-        Map<Long, Set<DateTimeInterval>> unitAndDateTimeIntervalMap = new HashMap<>();
-        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllByUnitIdsAndBetweenDates(unitIds, startDate, endDate);
-        Map<Long, List<PlanningPeriod>> unitAndPlanningPeriodMap = planningPeriods.stream().collect(Collectors.groupingBy(PlanningPeriod::getUnitId, Collectors.toList()));
-        unitIds.forEach(unitId -> {
-            Set<DateTimeInterval>  dateTimeIntervals = unitAndPlanningPeriodMap.getOrDefault(unitId , new ArrayList<>()).stream().map(planningPeriod -> new DateTimeInterval(asDate(planningPeriod.getStartDate()), asDate(planningPeriod.getEndDate()))).collect(Collectors.toSet());
-            unitAndDateTimeIntervalMap.put(unitId, dateTimeIntervals);
-        });
-        return unitAndDateTimeIntervalMap;
-    }
 
     private List<DailyTimeBankEntry> getDailyTimeBankEntryByDate(List<Long> staffIds, LocalDate startDate, LocalDate endDate, Set<DayOfWeek> daysOfWeeks) {
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByStaffIdsAndBetweenDates(staffIds, startDate,endDate);
@@ -131,11 +119,10 @@ public class PlannedHoursVsTimeBankService implements CounterService {
     private Map<Object, Double> calculateDataByKpiRepresentation(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<Long> unitIds,List<StaffKpiFilterDTO> staffKpiFilterDTOS,Set<DayOfWeek> daysOfWeek){
         Map<Object, Double> staffDeltaHours;
         Map<Long, List<StaffKpiFilterDTO>> unitAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.groupingBy(StaffKpiFilterDTO::getUnitId, Collectors.toList()));
-        Map<Long, Set<DateTimeInterval>> planningPeriodIntervel = getPlanningPeriodIntervals(unitIds, dateTimeIntervals.get(0).getStartDate(),dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndDate());
         List<DailyTimeBankEntry> employmentAndDailyTimeBank = getDailyTimeBankEntryByDate(staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getEmployment().stream().map(EmploymentWithCtaDetailsDTO::getId)).collect(Collectors.toList()), dateTimeIntervals.get(0).getStartLocalDate(),dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate(), daysOfWeek);
         switch (applicableKPI.getKpiRepresentation()) {
             case REPRESENT_PER_STAFF:
-                staffDeltaHours = getstaffPlannedAndTimeBankHoursPerStaff(staffIds, dateTimeIntervals, staffKpiFilterDTOS, employmentAndDailyTimeBank);
+                staffDeltaHours = getstaffPlannedAndTimeBankHoursPerStaff(staffIds, dateTimeIntervals, staffKpiFilterDTOS);
                 break;
             case REPRESENT_TOTAL_DATA:
                 staffDeltaHours = getstaffPlannedAndTimeBankHoursOfUnits(dateTimeIntervals, unitIds,  unitAndStaffKpiFilterMap, employmentAndDailyTimeBank);
@@ -148,11 +135,9 @@ public class PlannedHoursVsTimeBankService implements CounterService {
 
     }
 
-    private Map<Object, Double> getstaffPlannedAndTimeBankHoursPerStaff(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<StaffKpiFilterDTO> staffKpiFilterDTOS, List<DailyTimeBankEntry> dailyTimeBankEntries) {
+    private Map<Object, Double> getstaffPlannedAndTimeBankHoursPerStaff(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         Map<Object, Double> staffIdAndDeltaTimeBankMap = new HashedMap();
-
-         dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByStaffIdsAndBetweenDates(staffIds, dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(0).getEndLocalDate().minusDays(1));
-
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByStaffIdsAndBetweenDates(staffIds, dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(0).getEndLocalDate().minusDays(1));
         Map<Long, List<DailyTimeBankEntry>> staffAndDailyTimeBankMap;
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         Map<Long, StaffKpiFilterDTO> staffAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, v -> v));
@@ -232,7 +217,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
         if(REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation())) {
             Map<String, Long> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getFullName, StaffKpiFilterDTO::getId));
             List<BarLineChartKPiDateUnit> barLineChartKPiDateUnits = new ArrayList<>();
-            staffPlannedHoursAndTimeBankHours.entrySet().forEach(entry -> barLineChartKPiDateUnits.add(new BarLineChartKPiDateUnit(entry.getKey().toString(), (Long) staffIdAndNameMap.get(entry.getKey()), entry.getValue(), staffPlannedHours.get(staffIdAndNameMap.get(entry.getKey())))));
+            staffPlannedHoursAndTimeBankHours.entrySet().forEach(entry -> barLineChartKPiDateUnits.add(new BarLineChartKPiDateUnit(entry.getKey().toString(), staffIdAndNameMap.get(entry.getKey()), entry.getValue(), staffPlannedHours.get(staffIdAndNameMap.get(entry.getKey())))));
             kpiDataUnits.addAll(barLineChartKPiDateUnits);
         }else {
             kpiDataUnits = staffPlannedHoursAndTimeBankHours.entrySet().stream().map(entry -> new BarLineChartKPiDateUnit(entry.getKey().toString(), entry.getValue(), staffPlannedHours.get(entry.getKey()))).collect(Collectors.toList());

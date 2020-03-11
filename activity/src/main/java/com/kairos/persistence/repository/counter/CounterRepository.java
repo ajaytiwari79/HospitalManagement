@@ -661,13 +661,6 @@ public class CounterRepository{
         return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboard.class);
     }
 
-//    public boolean allKPIsBelongsToIndividualType(Set<BigInteger> kpiIds, ConfLevel confLevel, Long referenceId) {
-//        String queryField = getRefQueryField(confLevel);
-//        Criteria matchCriteria = Criteria.where(ACTIVE_KPI_ID).in(kpiIds).and(KPI_REPRESENTATION).is(INDIVIDUAL_STAFF).and(AppConstants.DELETED).is(false).and(queryField).is(referenceId).and(LEVEL).is(confLevel);
-//        Query query = new Query(matchCriteria);
-//        return mongoTemplate.find(query, ApplicableKPI.class).size() == kpiIds.size();
-//    }
-
     public <S extends MongoBaseEntity> S save(@Valid S entity) {
         Assert.notNull(entity, "Entity must not be null!");
         /**
@@ -730,8 +723,8 @@ public class CounterRepository{
             return entities;
         } catch(Exception ex){
             LOGGER.error("BulkWriteOperation Exception ::  ", ex);
-            return null;
         }
+        return new ArrayList<>();
     }
 
     public BigInteger nextSequence(String sequenceName){

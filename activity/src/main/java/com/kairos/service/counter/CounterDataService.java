@@ -129,7 +129,7 @@ public class CounterDataService extends MongoBaseService {
         for (Future<CommonRepresentationData> data : kpiResults) {
             try {
                 if(isNotNull(data))kpisData.add(data.get());
-            } catch (InterruptedException|ExecutionException ex) {
+            } catch (InterruptedException | ExecutionException ex) {
                 LOGGER.error("error while generate KPI  data",ex);
             }
         }
@@ -161,14 +161,18 @@ public class CounterDataService extends MongoBaseService {
                 staffFilterBasedCriteria.put(FilterType.TIME_INTERVAL,Arrays.asList(filters.getStartDate(),filters.getEndDate()));
                 staffApplicableKPI.setFrequencyType(DurationType.MONTHS);
             }
-            if(isCollectionNotEmpty(staffApplicableKPI.getFibonacciKPIConfigs())){
-                staffFilterBasedCriteria.put(FilterType.FIBONACCI,staffApplicableKPI.getFibonacciKPIConfigs());
-                if(!staffFilterBasedCriteria.containsKey(FilterType.TIME_INTERVAL) && isNotNull(startDate)){
-                    List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(staffApplicableKPI.getInterval(),  staffApplicableKPI.getValue(), staffApplicableKPI.getFrequencyType(), null,startDate);
-                    staffFilterBasedCriteria.put(TIME_INTERVAL,newArrayList(dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate()));
-                }
-            }
+            updateFibonacciConfig(staffApplicableKPI, startDate, staffFilterBasedCriteria);
             staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
+        }
+    }
+
+    private void updateFibonacciConfig(ApplicableKPI staffApplicableKPI, LocalDate startDate, Map<FilterType, List> staffFilterBasedCriteria) {
+        if(isCollectionNotEmpty(staffApplicableKPI.getFibonacciKPIConfigs())){
+            staffFilterBasedCriteria.put(FilterType.FIBONACCI,staffApplicableKPI.getFibonacciKPIConfigs());
+            if(!staffFilterBasedCriteria.containsKey(FilterType.TIME_INTERVAL) && isNotNull(startDate)){
+                List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(staffApplicableKPI.getInterval(),  staffApplicableKPI.getValue(), staffApplicableKPI.getFrequencyType(), null,startDate);
+                staffFilterBasedCriteria.put(TIME_INTERVAL,newArrayList(dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate()));
+            }
         }
     }
 
@@ -519,7 +523,7 @@ public class CounterDataService extends MongoBaseService {
         copyKpi.setTitle(counterDTO.getTitle());
         copyKpi.setCalculationFormula(counterDTO.getCalculationFormula());
         copyKpi.setFilterTypes(counterDTO.getSelectedFilters().stream().map(FilterCriteria::getType).collect(toList()));
-        save(copyKpi);
+        counterRepository.save(copyKpi);
         List<ApplicableKPI> applicableKPIs = new ArrayList<>();
         if (ConfLevel.COUNTRY.equals(level) || accessGroupPermissionCounterDTO.isCountryAdmin()) {
             applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), refId, null, null, level, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy,counterDTO.getKpiRepresentation(),counterDTO.getInterval(),counterDTO.getValue(),counterDTO.getFrequencyType(),null));
@@ -529,10 +533,10 @@ public class CounterDataService extends MongoBaseService {
         } else if (isNotNull(tabId) && ConfLevel.STAFF.equals(level)) {
             applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), applicableKPIS.get(0).getBaseKpiId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy,counterDTO.getKpiRepresentation(),counterDTO.getInterval(),counterDTO.getValue(),counterDTO.getFrequencyType(),null));
             tabKPIConf = new TabKPIConf(tabId, copyKpi.getId(), null, refId, accessGroupPermissionCounterDTO.getStaffId(), level, new KPIPosition(0, 0), KPIValidity.BASIC, LocationType.FIX, counterDistService.calculatePriority(ConfLevel.UNIT, KPIValidity.BASIC, LocationType.FIX));
-            save(tabKPIConf);
+            counterRepository.save(tabKPIConf);
         }
         applicableKPIS.addAll(applicableKPIs);
-        save(applicableKPIS);
+        counterRepository.saveEntities(applicableKPIS);
         linkKpiToUncategorized(refId, level, copyKpi);
         TabKPIDTO tabKPIDTO = getTabKpiData(copyKpi, counterDTO, accessGroupPermissionCounterDTO);
         if(isNotNull(tabKPIConf)){
@@ -575,7 +579,7 @@ public class CounterDataService extends MongoBaseService {
             } else if (ConfLevel.COUNTRY.equals(level)) {
                 categoryKPIConf = new CategoryKPIConf(copyKpi.getId(), kpiCategory.getId(), refId, null, level);
             }
-            if (isNotNull(categoryKPIConf)) save(categoryKPIConf);
+            if (isNotNull(categoryKPIConf)) counterRepository.save(categoryKPIConf);
         }
     }
 
