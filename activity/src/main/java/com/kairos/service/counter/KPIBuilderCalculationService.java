@@ -1124,9 +1124,11 @@ public class KPIBuilderCalculationService implements CounterService {
             if(filterBasedCriteria.containsKey(TEAM_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(TEAM_TYPE))) {
                 for(StaffKpiFilterDTO staffKpiFilterDTO :staffKpiFilterDTOS){
                     for(TeamDTO teamDTO :staffKpiFilterDTO.getTeams()){
-                        if(filterBasedCriteria.get(TEAM_TYPE).contains(teamDTO.getTeamType().name())){
-                            staffKpiFilterDTOList.add(staffKpiFilterDTO);
-                            break;
+                        if(isNotNull(teamDTO.getTeamType())) {
+                            if (filterBasedCriteria.get(TEAM_TYPE).contains(teamDTO.getTeamType().name())) {
+                                staffKpiFilterDTOList.add(staffKpiFilterDTO);
+                                break;
+                            }
                         }
                     }
                 }
