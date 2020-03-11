@@ -174,7 +174,7 @@ public class CounterDistService extends MongoBaseService {
         List<CategoryKPIConf> newCategoryKPIConfs = new ArrayList<>();
         applicableKPIS.parallelStream().forEach(applicableKPI -> newCategoryKPIConfs.add(new CategoryKPIConf(applicableKPI.getActiveKpiId(), categoryKPIsDetails.getCategoryId(), countryId, unitId, level)));
         if (!newCategoryKPIConfs.isEmpty()) {
-            save(newCategoryKPIConfs);
+            counterRepository.saveEntities(newCategoryKPIConfs);
             counterRepository.removeCategoryKPIEntries(availableCategoryIds, categoryKPIsDetails.getKpiIds());
         }
 
@@ -200,7 +200,7 @@ public class CounterDistService extends MongoBaseService {
             tabKPIConf.setKpiValidity(tabKPIDTO.getKpiValidity());
             tabKPIConf.setPriority(calculatePriority(level, tabKPIDTO.getKpiValidity(), tabKPIDTO.getLocationType()));
         }
-        save(tabKPIConf);
+        counterRepository.save(tabKPIConf);
         return ObjectMapperUtils.copyPropertiesByMapper(tabKPIConf, TabKPIDTO.class);
 
     }
@@ -309,7 +309,7 @@ public class CounterDistService extends MongoBaseService {
         if (entriesToSave.isEmpty()) {
             exceptionService.invalidRequestException(ERROR_KPI_INVALIDDATA);
         }
-        save(entriesToSave);
+        counterRepository.saveEntities(entriesToSave);
         List<ApplicableKPI> applicableKPIS;
         if (accessGroupPermissionCounterDTO.isCountryAdmin()) {
             applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(), ConfLevel.COUNTRY, accessGroupPermissionCounterDTO.getCountryId());
@@ -339,7 +339,7 @@ public class CounterDistService extends MongoBaseService {
         if (entriesToSave.isEmpty()) {
             exceptionService.invalidRequestException(ERROR_KPI_INVALIDDATA);
         }
-        save(entriesToSave);
+        counterRepository.saveEntities(entriesToSave);
     }
 
     public Map<String, Map<BigInteger, BigInteger>> setTabKPIEntries(List<String> tabIds, List<BigInteger> kpiIds, Long countryId, Long unitId, Long staffId, ConfLevel level, boolean isCountryAdmin) {
@@ -375,7 +375,7 @@ public class CounterDistService extends MongoBaseService {
             }
         });
         if(isCollectionNotEmpty(tabKPIConfs)) {
-            save(tabKPIConfs);
+            counterRepository.saveEntities(tabKPIConfs);
         }
     }
 
@@ -415,7 +415,7 @@ public class CounterDistService extends MongoBaseService {
         if (entriesToSave.isEmpty()) {
             exceptionService.invalidRequestException(ERROR_KPI_INVALIDDATA);
         }
-        save(entriesToSave);
+        counterRepository.saveEntities(entriesToSave);
         if (ConfLevel.UNIT.equals(level)) {
             assignKpiToStaffViaAccessGroup(accessGroupKPIConf, refId, unitId, kpiIdAndApplicableKpi, accessGroupMappingDTOS);
         }
@@ -440,7 +440,7 @@ public class CounterDistService extends MongoBaseService {
             }
         }));
         if (!applicableKPISToSave.isEmpty()) {
-            save(applicableKPISToSave);
+            counterRepository.saveEntities(applicableKPISToSave);
         }
     }
 
@@ -456,7 +456,7 @@ public class CounterDistService extends MongoBaseService {
             Map<Long, List<BigInteger>> staffKpiMap = staffAndAccessGroups.stream().collect(Collectors.toMap(AccessGroupPermissionCounterDTO::getStaffId, v -> new ArrayList<>()));
             Map<Long, List<BigInteger>> accessGroupKpiMap = accessGroupMappingDTOS.stream().collect(Collectors.toMap(AccessGroupMappingDTO::getAccessGroupId, AccessGroupMappingDTO::getKpiIds));
             staffAndAccessGroups.forEach(accessGroupsDTO -> accessGroupsDTO.getAccessGroupIds().forEach(accessGroupId -> {
-                if (accessGroupMappingDTO.getAccessGroupId() != accessGroupId) {
+                if (!accessGroupMappingDTO.getAccessGroupId().equals(accessGroupId)) {
                     staffKpiMap.get(accessGroupsDTO.getStaffId()).addAll((accessGroupKpiMap.getOrDefault(accessGroupId, new ArrayList<>())));
                 }
             }));
@@ -476,7 +476,7 @@ public class CounterDistService extends MongoBaseService {
 
     public void addAndRemoveStaffAccessGroupKPISetting(Long unitId, Long accessGroupId, AccessGroupPermissionCounterDTO accessGroupAndStaffDTO, Boolean created) {
         List<BigInteger> kpiIds = counterRepository.getKPISOfAccessGroup(Arrays.asList(accessGroupId), unitId, ConfLevel.UNIT);
-        if (created) {
+        if (Boolean.TRUE.equals(created)) {
             addStaffAccessGroupKPISetting(unitId, accessGroupAndStaffDTO, kpiIds);
         } else {
             removeStaffAccessGroupKPISetting(unitId, accessGroupId, accessGroupAndStaffDTO, kpiIds);
@@ -524,15 +524,15 @@ public class CounterDistService extends MongoBaseService {
         kpiDashboardDTOS=kpiDashboardDTOS.stream().filter(k->!tabs.contains(k.getName())).collect(Collectors.toList());
         List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(), dashboard.getModuleId(), dashboard.getName(), null, unitId, accessGroupAndStaffDTO.getStaffId(), ConfLevel.STAFF, dashboard.isDefaultTab())).collect(Collectors.toList());
         if (!kpiDashboards.isEmpty()) {
-            save(kpiDashboards);
+            counterRepository.saveEntities(kpiDashboards);
         }
         if (!applicableKPISToSave.isEmpty()) {
-            save(applicableKPISToSave);
+            counterRepository.saveEntities(applicableKPISToSave);
         }
     }
     //setting orgType-KPI configuration
 
-    public List<BigInteger> getInitialOrgTypeKPIDataConf(Long orgTypeId, Long countryId) {
+    public List<BigInteger> getInitialOrgTypeKPIDataConf(Long orgTypeId) {
         List<BigInteger> orgTypeKPIEntries = counterRepository.getOrgTypeKPIIdsOrgTypeIds(Arrays.asList(orgTypeId), new ArrayList<>());
         if (orgTypeKPIEntries == null || orgTypeKPIEntries.isEmpty()) return new ArrayList<>();
         return orgTypeKPIEntries;
@@ -557,7 +557,7 @@ public class CounterDistService extends MongoBaseService {
         if (entriesToSave.isEmpty()) {
             exceptionService.invalidRequestException(ERROR_KPI_INVALIDDATA);
         }
-        save(entriesToSave);
+        counterRepository.saveEntities(entriesToSave);
         createApplicableKpiAndCategoryKPIConfiguraionOfUnits(orgTypeKPIConf, kpiIdAndApplicableKpi, orgTypeMappingDTOS);
     }
 
@@ -583,13 +583,13 @@ public class CounterDistService extends MongoBaseService {
             }
         }));
         if (!applicableKPISToSave.isEmpty()) {
-            save(applicableKPISToSave);
+            counterRepository.saveEntities(applicableKPISToSave);
             applicableKPISToSave.forEach(applicableKPI -> {
                 if (isNotNull(kpiCategoryUnitWiseMap.get(applicableKPI.getUnitId()))) {
                     categoryKPIConfs.add(new CategoryKPIConf(applicableKPI.getActiveKpiId(), kpiCategoryUnitWiseMap.get(applicableKPI.getUnitId()).getId(), null, applicableKPI.getUnitId(), ConfLevel.UNIT));
                 }
             });
-            save(categoryKPIConfs);
+            counterRepository.saveEntities(categoryKPIConfs);
         }
     }
 
@@ -649,7 +649,7 @@ public class CounterDistService extends MongoBaseService {
             kpiDashboardsTosave.addAll(kpiDashboards);
         });
         if (!kpiDashboardsTosave.isEmpty()) {
-            save(kpiDashboardsTosave);
+            counterRepository.saveEntities(kpiDashboardsTosave);
         }
         List<String> oldDashboardsIds = kpiDashboardDTOS.stream().map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
         List<DashboardKPIConf> dashboardKPIConfList = counterRepository.getDashboardKPIConfs(applicableKpiIds, oldDashboardsIds, unitId, ConfLevel.UNIT);
@@ -661,9 +661,9 @@ public class CounterDistService extends MongoBaseService {
                 dashboardKPIConfList.stream().forEach(dashboardKPIConf -> dashboardKPIConfToSave.add(new DashboardKPIConf(dashboardKPIConf.getKpiId(), dashboardKPIConf.getModuleId(), null, unitId, staffId, ConfLevel.STAFF, dashboardKPIConf.getPosition())));
             });
         }
-        if (!applicableKpiIds.isEmpty()) save(applicableKPIS);
-        if (!dashboardKPIConfToSave.isEmpty()) save(dashboardKPIConfToSave);
-        if (!tabKPIConfKPIEntries.isEmpty()) save(tabKPIConfKPIEntries);
+        if (!applicableKpiIds.isEmpty()) counterRepository.saveEntities(applicableKPIS);
+        if (!dashboardKPIConfToSave.isEmpty()) counterRepository.saveEntities(dashboardKPIConfToSave);
+        if (!tabKPIConfKPIEntries.isEmpty()) counterRepository.saveEntities(tabKPIConfKPIEntries);
     }
 
     public void createDefaultKpiSetting(Long unitId, DefaultKPISettingDTO defaultKPISettingDTO) {
@@ -711,7 +711,7 @@ public class CounterDistService extends MongoBaseService {
         kpiCategoryDTOS.stream().forEach(kpiCategoryDTO -> categoriesNameMap.put(kpiCategoryDTO.getName(), kpiCategoryDTO.getId()));
         List<KPICategory> kpiCategories = kpiCategoryDTOS.stream().map(category -> new KPICategory(category.getName(), null, unitId, ConfLevel.UNIT)).collect(Collectors.toList());
         if (!kpiCategories.isEmpty()) {
-            save(kpiCategories);
+            counterRepository.saveEntities(kpiCategories);
         }
         kpiCategories.stream().forEach(kpiCategory -> categoriesOldAndNewIds.put(categoriesNameMap.get(kpiCategory.getName()), kpiCategory.getId()));
         List<BigInteger> oldCategoriesIds = kpiCategoryDTOS.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
@@ -731,19 +731,19 @@ public class CounterDistService extends MongoBaseService {
         });
         //due to avoid exception and entity may be blank here so I using multiple conditional statements harish
         if (!applicableKPISToSave.isEmpty()) {
-            save(applicableKPISToSave);
+            counterRepository.saveEntities(applicableKPISToSave);
         }
         if (!accessGroupKPIEntries.isEmpty()) {
-            save(accessGroupKPIEntries);
+            counterRepository.saveEntities(accessGroupKPIEntries);
         }
         if (!categoryKPIConfToSave.isEmpty()) {
-            save(categoryKPIConfToSave);
+            counterRepository.saveEntities(categoryKPIConfToSave);
         }
         if (!dashboardKPIConfToSave.isEmpty()) {
-            save(dashboardKPIConfToSave);
+            counterRepository.saveEntities(dashboardKPIConfToSave);
         }
         if (!tabKPIConfKPIEntries.isEmpty()) {
-            save(tabKPIConfKPIEntries);
+            counterRepository.saveEntities(tabKPIConfKPIEntries);
         }
     }
 
@@ -755,10 +755,10 @@ public class CounterDistService extends MongoBaseService {
         List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
         List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(), dashboard.getModuleId(), dashboard.getName(), null, unitId, null, ConfLevel.UNIT, dashboard.isDefaultTab())).collect(Collectors.toList());
         if (!kpiDashboards.isEmpty()) {
-            save(kpiDashboards);
+            counterRepository.saveEntities(kpiDashboards);
         }
         kpiDashboards.stream().forEach(kpiDashboard -> kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(), kpiDashboard.getParentModuleId())));
-        if (!kpiDashboards.isEmpty()) save(kpiDashboards);
+        if (!kpiDashboards.isEmpty()) counterRepository.saveEntities(kpiDashboards);
     }
 
     public void createDefaultCategory(Long unitId) {
@@ -768,7 +768,7 @@ public class CounterDistService extends MongoBaseService {
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(null, ConfLevel.UNIT, unitId);
         applicableKPIS.parallelStream().forEach(applicableKPI -> newCategoryKPIConfs.add(new CategoryKPIConf(applicableKPI.getActiveKpiId(), kpiCategory.getId(), null, unitId, ConfLevel.UNIT)));
         if (!newCategoryKPIConfs.isEmpty()) {
-            save(newCategoryKPIConfs);
+            counterRepository.saveEntities(newCategoryKPIConfs);
         }
     }
 
@@ -781,7 +781,7 @@ public class CounterDistService extends MongoBaseService {
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(null, ConfLevel.COUNTRY, countryId);
         applicableKPIS.parallelStream().forEach(applicableKPI -> newCategoryKPIConfs.add(new CategoryKPIConf(applicableKPI.getActiveKpiId(), kpiCategory.getId(), countryId, null, ConfLevel.COUNTRY)));
         if (!newCategoryKPIConfs.isEmpty()) {
-            save(newCategoryKPIConfs);
+            counterRepository.saveEntities(newCategoryKPIConfs);
         }
         return true;
     }

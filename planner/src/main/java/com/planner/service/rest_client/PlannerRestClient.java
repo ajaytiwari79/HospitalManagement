@@ -1,5 +1,6 @@
 package com.planner.service.rest_client;
 
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.IntegrationOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ public class PlannerRestClient {
     @Autowired
     private RestTemplate restTemplate;
     private static String activityServiceUrl;
+
     @Value("${gateway.activityservice.url}")
     public  void setActivityServiceUrl(String activityServiceUrl) {
         PlannerRestClient.activityServiceUrl = activityServiceUrl;
@@ -29,7 +31,7 @@ public class PlannerRestClient {
         final String baseUrl = getActivityBaseUrl();
 
         try {
-            String url=baseUrl + unitId +  getURI(t,integrationOperation,pathParams);
+            String url=baseUrl + unitId +  getURI(pathParams);
             logger.info("calling url:{} with http method:{}",url,integrationOperation);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
@@ -40,13 +42,13 @@ public class PlannerRestClient {
                             new HttpEntity<>(t), typeReference);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException(response.getMessage());
+                throw new InvalidRequestException(response.getMessage());
             }
             return response;
         } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
+            logger.error("status {}", e.getStatusCode());
+            logger.error("response {}", e.getResponseBodyAsString());
+            throw new InvalidRequestException("exception occurred in activity micro service " + e.getMessage());
         }
 
     }
@@ -63,7 +65,7 @@ public class PlannerRestClient {
 
         }
     }
-    public static <T>String getURI(T t,IntegrationOperation integrationOperation,Object... pathParams){
+    public static String getURI(Object... pathParams){
         return String.format("/planner/vrp_completed/%s",pathParams);
     }
 

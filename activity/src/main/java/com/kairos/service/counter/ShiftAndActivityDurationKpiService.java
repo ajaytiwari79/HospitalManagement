@@ -171,8 +171,8 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
             shiftDurationMinutes += shift.getDurationMinutes();
         }
         subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(AppConstants.SHIFT, DateUtils.getHoursByMinutes(shiftDurationMinutes.doubleValue())));
-        for (String activityName : activityNameAndTotalDurationMinutesMap.keySet()) {
-            subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(activityName, activityNameAndColorCodeMap.get(activityName), DateUtils.getHoursByMinutes(activityNameAndTotalDurationMinutesMap.get(activityName))));
+        for (Map.Entry<String, Integer> stringIntegerEntry : activityNameAndTotalDurationMinutesMap.entrySet()) {
+            subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(stringIntegerEntry.getKey(), activityNameAndColorCodeMap.get(stringIntegerEntry.getKey()), DateUtils.getHoursByMinutes(stringIntegerEntry.getValue())));
         }
         return subClusteredBarValue;
     }

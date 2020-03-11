@@ -5,7 +5,6 @@ package com.kairos.custom_exception;
  */
 public class DataNotFoundByIdException extends RuntimeException {
 
-    @Deprecated//Please use ExceptionService
     public DataNotFoundByIdException(String message) {
         super(message);
     }

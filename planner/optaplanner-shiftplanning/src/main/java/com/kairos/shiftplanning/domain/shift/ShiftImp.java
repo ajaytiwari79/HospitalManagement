@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 
 @Getter
 @Setter
@@ -81,7 +83,7 @@ public class ShiftImp implements Shift{
 
     @Override
     public DateTime getEnd() {
-        return endTime!=null?endTime.isAfter(startTime)?date.toDateTime(endTime):date.plusDays(1).toDateTime(endTime):null;
+        return endTime!=null? endTime.isAfter(startTime) ? date.toDateTime(endTime) : date.plusDays(1).toDateTime(endTime) :null;
     }
     @Override
     public Integer getMinutes(){
@@ -116,7 +118,6 @@ public class ShiftImp implements Shift{
      * @return totalMissing
      */
     public int missingIntervals(){
-        //System.out.println(assignedActivityLineIntervals.size());
         if(startTime==null) return  0;
         int intervalMins=15;
         Map<Integer,Integer> intervalEntry= new HashMap<>();
@@ -132,7 +133,7 @@ public class ShiftImp implements Shift{
         int totalMissing=0;
         Set<Integer> breaksIndices= getBreaksIndices(intervalMins);
         for(int i=startI;i<endI;i++){
-            if(breaks!=null && breaksIndices.contains(i)) continue;
+            if(breaks!=null && isNotNull(breaksIndices) && breaksIndices.contains(i)) continue;
             if(!intervalEntry.containsKey(i)) totalMissing++;
         }
         return totalMissing;
@@ -156,14 +157,14 @@ public class ShiftImp implements Shift{
         int totalMissing=0;
         Set<Integer> breaksIndices= getBreaksIndices(intervalMins);
         for(int i=startForFirstInterval;i<=startForLastInterval;i++){
-            if(breaks!=null && breaksIndices.contains(i)) continue;
+            if(breaks!=null && isNotNull(breaksIndices) && breaksIndices.contains(i)) continue;
             if(!intervalEntry.containsKey(i)) totalMissing++;
         }
         return totalMissing;
 
     }
     private Set<Integer> getBreaksIndices(int intervalMins){
-        if(breaks==null) return null;
+        if(breaks==null) return new HashSet<>();
         Set<Integer> breaksIndices=new HashSet<>();
         for (ShiftBreak shiftBreak: breaks) {
             int i=0;
@@ -177,17 +178,7 @@ public class ShiftImp implements Shift{
     private int getIndexForTime(LocalTime time, int intervalMins){
         return (time.getHourOfDay()*(60/intervalMins)) + (time.getMinuteOfHour()/intervalMins);
     }
-    private int getBreaksIntervals(int intervalMins) {
-        int breakIntervals=0;
-        if(breaks!=null && !breaks.isEmpty()){
-            for (ShiftBreak shiftBreak:breaks) {
-                if(shiftBreak.getMinutes()!=null){
-                    breakIntervals+=shiftBreak.getMinutes()/intervalMins;
-                }
-            }
-        }
-        return breakIntervals;
-    }
+
     @Override
     public String toString() {
         return "Shift{"+id.toString().substring(0,6)+":"+

@@ -26,22 +26,7 @@ public class PayLevelKPIService {
                for(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO :staffKpiFilterDTO.getEmployment()) {
                    EmploymentLinesDTO currentEmploymentLine = getCurrentlyActiveLine(selectedDate, employmentWithCtaDetailsDTO.getEmploymentLines());
                    if(kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(FilterType.EMPLOYMENT_SUB_TYPE)) {
-                       if (kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).get(0).equals(EmploymentSubType.MAIN.name()) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).size()<2) {
-                           if (ObjectUtils.isNotNull(currentEmploymentLine)) {
-                               if (ObjectUtils.isNotNull(currentEmploymentLine.getEmploymentSubType()) && EmploymentSubType.MAIN.equals(currentEmploymentLine.getEmploymentSubType())) {
-                                   payLevel += currentEmploymentLine.getPayGradeLevel();
-                               }
-                           }
-                       } else if (kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).get(0).equals(EmploymentSubType.SECONDARY.name())&& kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).size()<2) {
-                           if (ObjectUtils.isNotNull(currentEmploymentLine)) {
-                               if (ObjectUtils.isNotNull(currentEmploymentLine.getEmploymentSubType()) && EmploymentSubType.SECONDARY.equals(currentEmploymentLine.getEmploymentSubType())) {
-                                   payLevel += currentEmploymentLine.getPayGradeLevel();
-                               }
-                           }
-                       }
-                       else {
-                           payLevel += currentEmploymentLine.getPayGradeLevel();
-                       }
+                       payLevel = getPayLevel(kpiCalculationRelatedInfo, payLevel, currentEmploymentLine);
                    }
                        else {
                        if (ObjectUtils.isNotNull(currentEmploymentLine)) {
@@ -52,6 +37,31 @@ public class PayLevelKPIService {
 
             }
 
+        return payLevel;
+    }
+
+    private double getPayLevel(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, double payLevel, EmploymentLinesDTO currentEmploymentLine) {
+        if (kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).get(0).equals(EmploymentSubType.MAIN.name()) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).size()<2) {
+            payLevel = getPayLevelByCurrentEmploymentline(payLevel, currentEmploymentLine);
+        } else if (kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).get(0).equals(EmploymentSubType.SECONDARY.name())&& kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).size()<2) {
+            if (ObjectUtils.isNotNull(currentEmploymentLine)) {
+                if (ObjectUtils.isNotNull(currentEmploymentLine.getEmploymentSubType()) && EmploymentSubType.SECONDARY.equals(currentEmploymentLine.getEmploymentSubType())) {
+                    payLevel += currentEmploymentLine.getPayGradeLevel();
+                }
+            }
+        }
+        else {
+            payLevel += currentEmploymentLine.getPayGradeLevel();
+        }
+        return payLevel;
+    }
+
+    private double getPayLevelByCurrentEmploymentline(double payLevel, EmploymentLinesDTO currentEmploymentLine) {
+        if (ObjectUtils.isNotNull(currentEmploymentLine)) {
+            if (ObjectUtils.isNotNull(currentEmploymentLine.getEmploymentSubType()) && EmploymentSubType.MAIN.equals(currentEmploymentLine.getEmploymentSubType())) {
+                payLevel += currentEmploymentLine.getPayGradeLevel();
+            }
+        }
         return payLevel;
     }
 
