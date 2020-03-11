@@ -430,8 +430,13 @@ public class KPIBuilderCalculationService implements CounterService {
 
     private long getStaffAgeData(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         StaffKpiFilterDTO staff = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
-        return staff.getStaffAge(asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
+        int age = 0;
+        if(kpiCalculationRelatedInfo.getXAxisConfigs().get(0).equals(XAxisConfig.AGE)) {
+            age = staff.getStaffAge(asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
+        }
+        return age;
     }
+
 
 
     private double getEscalatedShiftsOrResolvedShifts(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
