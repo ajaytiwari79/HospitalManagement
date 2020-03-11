@@ -1,0 +1,26 @@
+db.getCollection('counter').update({"type":"ACTIVITY_KPI"},{"$push":{"filterTypes":"TEAM_TYPE"}},{multi: true});
+
+db.counter.update({"type":"ACTIVITY_KPI"},{"$set":{"filterTypes" :  [
+		"EMPLOYMENT_TYPE",
+		"EXPERTISE",
+		"TIME_TYPE",
+		"PLANNED_TIME_TYPE",
+		"STAFF_IDS",
+		"ACTIVITY_IDS",
+		"UNIT_IDS",
+		"TIME_INTERVAL",
+		"ACTIVITY_STATUS",
+		"DAYS_OF_WEEK",
+		"DAY_TYPE",
+		"TIME_SLOT",
+		"FUNCTIONS",
+		"VALIDATED_BY",
+		"CALCULATION_TYPE",
+		"CALCULATION_BASED_ON",
+		"CALCULATION_UNIT",
+		"PHASE",
+		"TEAM",
+		"PLANNED_BY",
+		"TEAM_TYPE",
+"TAGS"
+]}});

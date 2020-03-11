@@ -29,10 +29,6 @@ public class KPIUtils {
 
     public static final String DD_MM_YYYY = "dd-MM-yyyy";
     public static final String DD_MMM_YY = "dd-MMM-yy";
-    public static final String WEEk="Week-";
-
-    private KPIUtils() {
-    }
 
     public static List<Long> getLongValue(List<Object> objects) {
         return !(ObjectUtils.isCollectionEmpty(objects)) ? objects.stream().map(o -> ((Integer) o).longValue()).collect(Collectors.toList()) : new ArrayList<>();
@@ -40,6 +36,10 @@ public class KPIUtils {
 
     public static Set<Long> getLongValueSet(List<Object> objects) {
         return !(ObjectUtils.isCollectionEmpty(objects)) ? objects.stream().map(o -> ((Integer) o).longValue()).collect(Collectors.toSet()) : new HashSet<>();
+    }
+
+    public static <G> Set<Long> getLongValueSetBySetOfObjects(Set<G> objects) {
+          return isCollectionNotEmpty(objects) ? objects.stream().map(o -> Long.valueOf(o.toString())).collect(Collectors.toSet()) : new HashSet<>();
     }
 
     public static List<LocalDate> getLocalDate(List<Object> objects) {
@@ -191,7 +191,7 @@ public class KPIUtils {
                     result = getDayOrMonthStringWithFormat(startDate.getDayOfWeek().toString());
                     break;
                 case WEEKS:
-                    result = WEEk + getWeekNoByLocalDate(startDate);
+                    result = "Week-" + getWeekNoByLocalDate(startDate);
                     break;
                 case MONTHS:
                     result = getDayOrMonthStringWithFormat(startDate.getMonth().toString());

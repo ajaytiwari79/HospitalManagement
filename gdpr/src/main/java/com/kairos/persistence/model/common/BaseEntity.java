@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Map;
 
 @MappedSuperclass
 @Getter
@@ -23,14 +25,17 @@ public abstract  class BaseEntity {
     protected Long id;
 
     @CreatedDate
-    private Date createdAt;
+    protected Date createdAt;
 
     @LastModifiedDate
-    private Date updatedAt;
+    protected Date updatedAt;
+
+    @Column
+    @Convert(converter = GDPRTranslationInfoConverter.class)
+    protected Map<String, TranslationInfo> translations;
 
     @JsonIgnore
-    private boolean deleted;
-
+    protected boolean deleted;
 
     public void delete(){
         this.deleted = true;

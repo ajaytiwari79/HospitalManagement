@@ -10,7 +10,6 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
@@ -19,8 +18,6 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rest_client.UserRestClientForScheduler;
-import com.kairos.scheduler_listener.ActivityToSchedulerQueueService;
-import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +28,6 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.constants.AppConstants.*;
@@ -54,21 +50,9 @@ public class ShiftReminderService{
     private SchedulerServiceRestClient schedulerServiceRestClient;
     @Inject
     private UserRestClientForScheduler userRestClientForScheduler;
-    @Inject
-    private ActivityToSchedulerQueueService activityToSchedulerQueueService;
-    @Inject private ActivitySchedulerJobService activitySchedulerJobService;
     @Inject private EnvConfig envConfig;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ShiftReminderService.class);
-
-    public void updateReminderTrigger(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
-        // TODO Find better approach
-        List<BigInteger> jobIds = shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
-        deleteReminderTrigger(jobIds, shift.getUnitId());
-        activitySchedulerJobService.updateJobForShiftReminder(activityWrapperMap, shift);
-    }
-
-
 
     public void deleteReminderTrigger(List<BigInteger> jobIds, Long unitId) {
         // TODO VIPUL please verify when needed

@@ -3,7 +3,6 @@ package com.kairos.rule_validator.activity;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.phase.Phase;
@@ -16,8 +15,6 @@ import java.util.Optional;
 
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_MANAGEMENT_AUTHORITY_PHASE;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFF_EMPLOYMENTTYPE_ABSENT;
-import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
-import static com.kairos.dto.user.access_permission.AccessGroupRole.STAFF;
 
 public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWithActivityDTO> {
 

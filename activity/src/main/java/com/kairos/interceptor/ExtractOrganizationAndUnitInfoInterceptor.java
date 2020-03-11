@@ -1,5 +1,5 @@
 package com.kairos.interceptor;
-import com.kairos.custom_exception.InvalidRequestException;
+
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ LOGGER.error("exception {}",e);
     private void updateUserInfo(HttpServletRequest request, Map<String, String> pathVariables) {
         String orgIdString=isNotNull(pathVariables) ? pathVariables.get("organizationId") : null;
         String unitIdString=isNotNull(pathVariables) ? pathVariables.get("unitId") : null;
-        LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
+        LOGGER.debug("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI()+"[ organizationId ,Unit Id " +orgIdString+" ,"+unitIdString+" ]");
 
         updateOrganizationId(orgIdString);

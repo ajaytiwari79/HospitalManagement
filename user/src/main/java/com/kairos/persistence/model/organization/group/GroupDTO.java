@@ -2,7 +2,6 @@ package com.kairos.persistence.model.organization.group;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,8 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;

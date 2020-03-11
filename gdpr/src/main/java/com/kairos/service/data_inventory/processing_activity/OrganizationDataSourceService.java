@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_DATASOURCE;
+
 
 @Service
 public class OrganizationDataSourceService{
@@ -95,7 +97,7 @@ public class OrganizationDataSourceService{
 
         List<String>  processingActivitiesLinkedWithDataSource = processingActivityRepository.findAllProcessingActivityLinkedWithDataSource(unitId, dataSourceId);
         if (!processingActivitiesLinkedWithDataSource.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.dataSource", StringUtils.join(processingActivitiesLinkedWithDataSource, ','));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", MESSAGE_DATASOURCE, StringUtils.join(processingActivitiesLinkedWithDataSource, ','));
         }
        dataSourceRepository.deleteByIdAndOrganizationId(dataSourceId, unitId);
         return true;
@@ -115,11 +117,11 @@ public class OrganizationDataSourceService{
             if (id.equals(dataSource.getId())) {
                 return dataSourceDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate","message.dataSource",dataSource.getName());
+            exceptionService.duplicateDataException("message.duplicate",MESSAGE_DATASOURCE,dataSource.getName());
         }
         Integer resultCount =  dataSourceRepository.updateMetadataName(dataSourceDTO.getName(), id, unitId);
         if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataSource", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", MESSAGE_DATASOURCE, id);
         }else{
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, dataSourceDTO.getName());
         }

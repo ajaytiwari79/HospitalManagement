@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_ACCESSORPARTY;
+
 @Service
 public class OrganizationAccessorPartyService {
 
@@ -89,7 +91,7 @@ public class OrganizationAccessorPartyService {
 
         List<String> processingActivitiesLinkedWithAccessorParty = processingActivityRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
         if (!processingActivitiesLinkedWithAccessorParty.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.accessorParty", StringUtils.join(processingActivitiesLinkedWithAccessorParty, ','));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", MESSAGE_ACCESSORPARTY, StringUtils.join(processingActivitiesLinkedWithAccessorParty, ','));
         }
         accessorPartyRepository.deleteByIdAndOrganizationId(accessorPartyId, unitId);
         return true;
@@ -110,11 +112,11 @@ public class OrganizationAccessorPartyService {
             if (id.equals(accessorParty.getId())) {
                 return accessorPartyDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "message.accessorParty", accessorParty.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_ACCESSORPARTY, accessorParty.getName());
         }
         Integer resultCount = accessorPartyRepository.updateMetadataName(accessorPartyDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.accessorParty", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", MESSAGE_ACCESSORPARTY, id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, accessorPartyDTO.getName());
         }

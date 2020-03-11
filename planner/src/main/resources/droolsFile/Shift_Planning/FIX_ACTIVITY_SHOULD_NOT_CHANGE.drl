@@ -1,0 +1,17 @@
+package com.kairos.shiftplanning.rules;
+    dialect "java"
+
+import com.kairos.shiftplanning.domain.activity.*;
+import com.kairos.shiftplanning.domain.shift.*;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+global HardMediumSoftLongScoreHolder scoreHolder;
+
+rule "Activity Required Tag"
+salience 20
+ when
+  $ac:Activity(tags != null)
+  $shift:ShiftImp(!activityLineIntervals.isEmpty() && hasIntervalsForActivity($ac))
+  $constraintsPenality: Integer(intValue>0) from ($ac.checkActivityConstraints($shift,8))
+ then
+    $ac.breakActivityContraints(null,scoreHolder,kcontext,$constraintsPenality, 8);
+end

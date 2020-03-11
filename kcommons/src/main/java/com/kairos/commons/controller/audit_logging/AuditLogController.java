@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.Map;
 
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
@@ -41,8 +41,8 @@ public class AuditLogController {
 
     @GetMapping(value = "/get_audit_log_staff/{staffId}")
     public ResponseEntity<Map<String,Object>>getAuditLoggingOfStaff(@PathVariable Long staffId,
-                                                                    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-                                                                    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
+                                                                    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+                                                                    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,context.getBean(AuditLoggingService.class).getAuditLogOfStaff(newArrayList(staffId),startDate,endDate));
 
     }

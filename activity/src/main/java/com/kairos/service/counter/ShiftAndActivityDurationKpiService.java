@@ -8,8 +8,8 @@ import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
-import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
@@ -59,7 +59,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
         List<Long> employmentTypeIds = (List<Long>)filterCriteria[3];
         Set<DayOfWeek> daysOfWeeks = (Set<DayOfWeek>)filterCriteria[4];
         List<BigInteger> activitiesIds = KPIUtils.getBigIntegerValue(filterBasedCriteria.getOrDefault(FilterType.ACTIVITY_IDS, new ArrayList<>()));
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,employmentTypeIds,unitIds,organizationId);
+        Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI,filterDates,staffIds,employmentTypeIds,unitIds,organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>)kpiData[0];
         staffIds = (List<Long>) kpiData[2];
@@ -93,7 +93,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
         Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
         List<Long> staffIds = (List<Long>)filterCriteria[0];
         List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,newArrayList(),newArrayList(organizationId),organizationId);
+        Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI,filterDates,staffIds,newArrayList(),newArrayList(organizationId),organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, newArrayList(organizationId), newArrayList(), newArrayList(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),null);
         Map<Long,Integer> staffIdAndDurationMap = getStaffAndShiftDurationMap(shifts);
@@ -171,8 +171,8 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
             shiftDurationMinutes += shift.getDurationMinutes();
         }
         subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(AppConstants.SHIFT, DateUtils.getHoursByMinutes(shiftDurationMinutes.doubleValue())));
-        for (String activityName : activityNameAndTotalDurationMinutesMap.keySet()) {
-            subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(activityName, activityNameAndColorCodeMap.get(activityName), DateUtils.getHoursByMinutes(activityNameAndTotalDurationMinutesMap.get(activityName))));
+        for (Map.Entry<String, Integer> stringIntegerEntry : activityNameAndTotalDurationMinutesMap.entrySet()) {
+            subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(stringIntegerEntry.getKey(), activityNameAndColorCodeMap.get(stringIntegerEntry.getKey()), DateUtils.getHoursByMinutes(stringIntegerEntry.getValue())));
         }
         return subClusteredBarValue;
     }

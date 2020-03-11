@@ -1,14 +1,15 @@
 package com.kairos.controller.exception_handler;
 
+import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.custom_exception.UnitNotFoundException;
 import com.kairos.wrapper.ResponseEnvelope;
-
-//import com.mindscapehq.raygun4java.core.RaygunClient;
+import com.mindscapehq.raygun4java.core.RaygunClient;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,7 +29,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.ServletRequestBindingException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -41,10 +45,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static com.kairos.constants.CommonConstants.LOCAL_PROFILE;
 import static com.kairos.constants.UserMessagesConstants.INTERNAL_SERVER_ERROR;
 
+//import com.mindscapehq.raygun4java.core.RaygunClient;
+
 @RestControllerAdvice
-@Order(1)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
 
@@ -56,6 +63,8 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     @Inject
     private SendGridMailService mailService;
+    @Inject private EnvConfigCommon envConfigCommon;
+    @Inject private RaygunClient raygunClient;
 
     private String convertMessage(String message, Object... params) {
         for (int i = 0; i < params.length; i++) {
@@ -362,14 +371,16 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     @ExceptionHandler({NullPointerException.class, IllegalArgumentException.class, IllegalStateException.class, Exception.class, MessagingException.class})
-    public ResponseEntity<Object> handleInternal(final Exception ex, final WebRequest request) {
+    public ResponseEnvelope handleInternal(final Exception ex, final WebRequest request) {
         logger.error(ERROR_IN_USER_SERVICE + " ", ex);
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
         mailService.sendMailToBackendOnException(ex);
-        //raygunClient.send(ex);
-        return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+        if (envConfigCommon.getCurrentProfile().equals(LOCAL_PROFILE)) {
+            raygunClient.send(ex);
+        }
+        return errorMessage;//handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
 

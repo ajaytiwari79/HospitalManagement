@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
+import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.utils.CPRUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -60,6 +61,9 @@ public class StaffPersonalDetailQueryResult {
     private Set<AccessGroupRole> roles;
     private List<EmploymentTypeDTO> employmentTypes;
     private Long staffUserId;
+    private List<Long> expertiseIds;
+    private List<Employment> employments;
+    private String privateEmail;
 
     public Integer getAge() {
         this.age=this.cprNumber!=null?Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears():null;

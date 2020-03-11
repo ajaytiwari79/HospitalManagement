@@ -8,9 +8,12 @@ import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import lombok.Data;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
+
+import java.time.LocalDate;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_MEMBER;
 
@@ -18,6 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_
 /**
  * Created by oodles on 6/10/16.
  */
+@Data
 @KPermissionRelatedModel
 @RelationshipEntity(type = TEAM_HAS_MEMBER)
 public class StaffTeamRelationship extends UserBaseEntity {
@@ -33,8 +37,17 @@ public class StaffTeamRelationship extends UserBaseEntity {
     private boolean isEnabled = true;
     private LeaderType leaderType;
     private TeamType teamType;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
-
+    public StaffTeamRelationship(Team team, Staff staff, LeaderType leaderType, TeamType teamType, LocalDate startDate, LocalDate endDate) {
+        this.team = team;
+        this.staff = staff;
+        this.leaderType = leaderType;
+        this.teamType = teamType;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 
     public StaffTeamRelationship() {
         //Default Constructor
@@ -52,6 +65,14 @@ public class StaffTeamRelationship extends UserBaseEntity {
         this.leaderType = leaderType;
     }
 
+    public StaffTeamRelationship(Team team, Staff staff, LeaderType leaderType,LocalDate startDate,LocalDate endDate) {
+        this.team = team;
+        this.staff = staff;
+        this.leaderType = leaderType;
+        this.startDate =startDate;
+        this.endDate =endDate;
+    }
+
     public StaffTeamRelationship(Long id,Team team, Staff staff, LeaderType leaderType, TeamType teamType) {
         this.id=id;
         this.team = team;
@@ -60,45 +81,14 @@ public class StaffTeamRelationship extends UserBaseEntity {
         this.teamType = teamType;
     }
 
-    public Team getTeam() {
-        return team;
-    }
-
-
-    public void setTeam(Team team) {
+    public StaffTeamRelationship(Long id,Team team, Staff staff, LeaderType leaderType, TeamType teamType,LocalDate startDate, LocalDate endDate) {
+        this.id=id;
         this.team = team;
-    }
-
-    public Staff getStaff() {
-        return staff;
-    }
-
-    public void setStaff(Staff staff) {
         this.staff = staff;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public LeaderType getLeaderType() {
-        return leaderType;
-    }
-
-    public void setLeaderType(LeaderType leaderType) {
         this.leaderType = leaderType;
-    }
-
-    public TeamType getTeamType() {
-        return teamType;
-    }
-
-    public void setTeamType(TeamType teamType) {
         this.teamType = teamType;
+        this.startDate =startDate;
+        this.endDate =endDate;
     }
 
 }

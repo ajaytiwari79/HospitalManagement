@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_PROCESSINGPURPOSE;
+
 @Service
 public class OrganizationProcessingPurposeService{
 
@@ -97,7 +99,7 @@ public class OrganizationProcessingPurposeService{
 
         List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
         if (!processingActivities.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.processingPurpose", StringUtils.join(processingActivities,','));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", MESSAGE_PROCESSINGPURPOSE, StringUtils.join(processingActivities,','));
         }
         processingPurposeRepository.deleteByIdAndOrganizationId(processingPurposeId, unitId);
         return true;

@@ -1,5 +1,6 @@
 package com.kairos.service.cta;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.activity.TableConfiguration;
@@ -49,6 +50,7 @@ import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 
 /**
@@ -346,6 +348,31 @@ public class CostTimeAgreementService {
             c.setRuleTemplateCategoryName(ruleTemplateCategoryDTOMap.get(c.getRuleTemplateCategoryId()).getName());
         });
         return new CTARuleTemplateCategoryWrapper(ruleTemplateCategories, ctaRuleTemplateDTOS);
+    }
+
+    public Map<Long,CostTimeAgreement> updateWTACTA(List<Long> oldEmploymentIds, Map<Long, Long> newOldemploymentIdMap){
+        List<CTAResponseDTO> ctaResponseDTOs = costTimeAgreementRepository.getCTAByEmploymentIds(oldEmploymentIds, DateUtils.getCurrentDate());
+        List<CostTimeAgreement> newCTAs = new ArrayList<>();
+        for (CTAResponseDTO cta : ctaResponseDTOs) {
+            CostTimeAgreement newCTA = ObjectMapperUtils.copyPropertiesByMapper(cta, CostTimeAgreement.class);
+            List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(cta.getRuleTemplates(), CTARuleTemplate.class);
+            for (CTARuleTemplate ctaRuleTemplate : ctaRuleTemplates) {
+                ctaRuleTemplate.setId(null);
+            }
+            if (!ctaRuleTemplates.isEmpty()) {
+                ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
+            }
+
+            List<BigInteger> ctaRuleTemplateIds = ctaRuleTemplates.stream().map(ctaRuleTemplate -> ctaRuleTemplate.getId()).collect(Collectors.toList());
+            newCTA.setRuleTemplateIds(ctaRuleTemplateIds);
+            newCTA.setEmploymentId(newOldemploymentIdMap.get(cta.getEmploymentId()));
+            newCTA.setId(null);
+            newCTAs.add(newCTA);
+        }
+        if (!newCTAs.isEmpty()) {
+            costTimeAgreementRepository.saveEntities(newCTAs);
+        }
+        return newCTAs.stream().collect(toMap(k -> k.getEmploymentId(), v -> v));
     }
 
     /**

@@ -2,7 +2,6 @@ package com.kairos.dto.activity.time_bank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
-import com.kairos.dto.activity.shift.Expertise;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;

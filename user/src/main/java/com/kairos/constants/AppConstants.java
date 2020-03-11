@@ -15,6 +15,8 @@ import java.util.List;
  * Created by prabjot on 22/11/16.
  */
 public class AppConstants {
+    public static final String SHIFT_S = "Shift(s)";
+
     private AppConstants() {
     }
 

@@ -25,16 +25,16 @@ public class CORSFilter implements Filter {
     private static final String MAX_AGE = "3600";
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
-            HttpServletResponse resp=(HttpServletResponse)response;
-            resp.addHeader("Access-Control-Allow-Origin",ALLOWED_ORIGIN);
-            resp.addHeader("Access-Control-Allow-Credentials","true");
-            resp.addHeader("Access-Control-Allow-Methods",ALLOWED_METHODS);
-            resp.addHeader("Access-Control-Allow-Headers",ALLOWED_HEADERS);
-            resp.addHeader("Access-Control-Max-Age", MAX_AGE);
-            if(((HttpServletRequest)request).getMethod().equals("OPTIONS")){
-                return;
-            }
-            chain.doFilter(request, response);
+        HttpServletResponse resp=(HttpServletResponse)response;
+        resp.addHeader("Access-Control-Allow-Origin",ALLOWED_ORIGIN);
+        resp.addHeader("Access-Control-Allow-Credentials","true");
+        resp.addHeader("Access-Control-Allow-Methods",ALLOWED_METHODS);
+        resp.addHeader("Access-Control-Allow-Headers",ALLOWED_HEADERS);
+        resp.addHeader("Access-Control-Max-Age", MAX_AGE);
+        if(((HttpServletRequest)request).getMethod().equals("OPTIONS")){
+            return;
+        }
+        chain.doFilter(request, response);
     }
 
     @Override

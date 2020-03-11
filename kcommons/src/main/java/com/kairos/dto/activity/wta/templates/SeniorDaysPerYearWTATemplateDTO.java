@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.wta.templates;
 
+import com.kairos.commons.utils.NotNullOrEmpty;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
@@ -17,6 +18,7 @@ import java.util.List;
 @Setter
 public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private List<AgeRange> ageRange;
+    @NotNullOrEmpty(message = "message.mismatched-ids")
     private List<BigInteger> activityIds;
     private CutOffIntervalUnit cutOffIntervalUnit;
     public float getRecommendedValue() {

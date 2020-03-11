@@ -79,7 +79,8 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     public List<CTAResponseDTO> getAllCTAByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("organizationSubType._id").is(organizationSubTypeId).and(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(CommonConstants.DISABLED).is(false)),
-                lookup("tag", "tags", "_id", "tags")
+                lookup("tag", "tags", "_id", "tags"),
+                lookup(C_TA_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES)
                 );
         return mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class).getMappedResults();
     }
@@ -115,7 +116,6 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     @Override
     public List<CTAResponseDTO> getCTAByUpIds(Set<Long> employmentIds) {
         Query query = new Query(Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds));
-        query.fields().include("name").include(DESCRIPTION).include(EMPLOYMENT_ID).include(START_DATE).include(END_DATE).include(PARENT_ID).include(ORGANIZATION_PARENT_ID);
         return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
 
@@ -162,7 +162,18 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Override
     public List<CTAResponseDTO> getVersionsCTA(List<Long> upIds) {
-        String query = "{\n" +
+        String query = getVersionCTAQuery();
+        Document document = Document.parse(query);
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(EMPLOYMENT_ID).in(upIds).and(DELETED).is(false).and(CommonConstants.DISABLED).is(true)),
+                new CustomAggregationOperation(document)
+        );
+        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
+        return result.getMappedResults();
+    }
+
+    private String getVersionCTAQuery() {
+        return "{\n" +
                 "      $graphLookup: {\n" +
                 "         from: \"costTimeAgreement\",\n" +
                 "         startWith: \"$parentId\",\n" +
@@ -186,13 +197,6 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
                 "           as:\"ruleTemplates\"\n" +
                 "           }\n" +
                 "       }";
-        Document document = Document.parse(query);
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(EMPLOYMENT_ID).in(upIds).and(DELETED).is(false).and(CommonConstants.DISABLED).is(true)),
-                new CustomAggregationOperation(document)
-        );
-        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
-        return result.getMappedResults();
     }
 
     @Override
@@ -208,7 +212,8 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Override
     public List<CTAResponseDTO> getCTAByEmploymentIds(List<Long> employmentIds, Date date) {
-        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).orOperator(Criteria.where(START_DATE).lte(date).and(END_DATE).gte(date),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(date));
+
+        Criteria criteria = date==null?(Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds)):(Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).orOperator(Criteria.where(START_DATE).lte(date).and(END_DATE).gte(date),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(date)));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup(C_TA_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES),

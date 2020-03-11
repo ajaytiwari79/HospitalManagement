@@ -1,10 +1,7 @@
 package com.kairos.service.scheduler;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
-import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
-import com.kairos.enums.scheduler.Result;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.scheduler.queue.producer.KafkaProducer;

@@ -93,6 +93,9 @@ public class ShiftStatusService {
         Object[] objects = getActivitiesAndShiftIds(shiftPublishDTO.getShifts());
         Set<BigInteger> shiftActivitiyIds = ((Set<BigInteger>) objects[1]);
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc((List<BigInteger>) objects[0]);
+        if(isCollectionEmpty(shifts)){
+            exceptionService.dataNotFoundException(MESSAGE_SHIFT_IDS);
+        }
         List<ShiftActivityResponseDTO> shiftActivityResponseDTOS = new ArrayList<>(shifts.size());
         List<ShiftDTO> shiftDTOS = new ArrayList<>(shifts.size());
         Object[] activityDetails = getActivityDetailsMap(shifts);
@@ -249,7 +252,7 @@ public class ShiftStatusService {
             case APPROVE:
                 shiftActivity.getStatus().removeAll(Arrays.asList(PENDING, REQUEST));
                 shiftActivity.getStatus().add(APPROVE);
-                timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,shift.getEmploymentId(),activityIdAndActivityMap,staffAdditionalInfoMap.get(shift.getEmploymentId()));
+                //timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,shift.getEmploymentId(),activityIdAndActivityMap,staffAdditionalInfoMap.get(shift.getEmploymentId()));
                 break;
             case DISAPPROVE:
                 updateShiftOnDisapprove(shift, shiftActivity);
@@ -261,7 +264,7 @@ public class ShiftStatusService {
             case PUBLISH:
                 shiftActivity.getStatus().add(PUBLISH);
                 shiftActivity.getStatus().removeAll(Arrays.asList(REQUEST));
-                timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,shift.getEmploymentId(),activityIdAndActivityMap,staffAdditionalInfoMap.get(shift.getEmploymentId()));
+               // timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,shift.getEmploymentId(),activityIdAndActivityMap,staffAdditionalInfoMap.get(shift.getEmploymentId()));
                 break;
             case VALIDATE:
                 shiftActivity.getStatus().add(VALIDATE);
@@ -345,7 +348,7 @@ public class ShiftStatusService {
                 ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
                 Map<BigInteger,Activity> activityMap = new HashMap<>();
                 activityMap.put(activityWrapper.getActivity().getId(),activityWrapper.getActivity());
-                timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,mainShift.getEmploymentId(),activityMap,staffAdditionalInfoDTO);
+                //timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,mainShift.getEmploymentId(),activityMap,staffAdditionalInfoDTO);
             }
         }
     }

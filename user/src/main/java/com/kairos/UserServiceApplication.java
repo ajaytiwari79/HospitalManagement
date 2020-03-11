@@ -7,16 +7,17 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.kairos.commons.config.mongo.EnableAuditLogging;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.custom_exception.UserExceptionHandler;
+import com.kairos.dto.user_context.UserContextInterceptor;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepositoryImpl;
 import com.kairos.utils.user_context.SchedulerUserContextInterceptor;
-import com.kairos.dto.user_context.UserContextInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -58,6 +59,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableKafka
 @EnableAsync
 @EnableAuditLogging
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 public class UserServiceApplication implements WebMvcConfigurer {
 
 	public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");

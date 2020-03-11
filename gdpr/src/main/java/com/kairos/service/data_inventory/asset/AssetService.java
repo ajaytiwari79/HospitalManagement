@@ -1,6 +1,7 @@
 package com.kairos.service.data_inventory.asset;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.enums.RiskSeverity;
@@ -421,4 +422,15 @@ public class AssetService {
         return assetDTO;
     }
 
+    public Map<String,TranslationInfo> getTranslatedData(Long assetId) {
+        Asset asset = assetRepository.findByIdAndDeletedFalse(assetId);
+        return asset.getTranslations();
+    }
+
+    public TranslationInfo updateTranslation(Long assetId, TranslationInfo translationData) {
+        Asset asset = assetRepository.findByIdAndDeletedFalse(assetId);
+        asset.getTranslations().put(translationData.getName(),translationData);
+        assetRepository.save(asset);
+        return translationData;
+    }
 }

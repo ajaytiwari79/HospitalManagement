@@ -86,8 +86,6 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.LEVEL;
-import static com.kairos.constants.AppConstants.SKILL_ID;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
@@ -143,7 +141,7 @@ public class StaffingLevelService  {
         if (Optional.ofNullable(staffingLevel).isPresent()) {
             if (staffingLevel.getPresenceStaffingLevelInterval().isEmpty()) {
                 List<StaffingLevelInterval> presenceStaffingLevelIntervals = new ArrayList<StaffingLevelInterval>();
-                for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval()) {
+                for (StaffingLevelInterval staffingLevelTimeSlotDTO : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval()) {
                     StaffingLevelInterval presenceStaffingLevelInterval = new StaffingLevelInterval(staffingLevelTimeSlotDTO.getSequence(), staffingLevelTimeSlotDTO.getMinNoOfStaff(),
                             staffingLevelTimeSlotDTO.getMaxNoOfStaff(), staffingLevelTimeSlotDTO.getStaffingLevelDuration()
                     );
@@ -163,7 +161,7 @@ public class StaffingLevelService  {
         //boolean activitiesRankUpdate = staffingLevelActivityRankService.updateStaffingLevelActivityRank(DateUtils.asLocalDate(staffingLevel.getCurrentDate()), staffingLevel.getId(), staffingLevel.getStaffingLevelSetting().getActivitiesRank());
         BeanUtils.copyProperties(staffingLevel, presenceStaffingLevelDTO, new String[]{"presenceStaffingLevelInterval", "absenceStaffingLevelInterval"});
         presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().stream()
-                .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
+                .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
         StaffingLevelPlanningDTO staffingLevelPlanningDTO = new StaffingLevelPlanningDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
         plannerSyncService.publishStaffingLevel(unitId, staffingLevelPlanningDTO, IntegrationOperation.CREATE);
         presenceStaffingLevelDTO.setUpdatedAt(staffingLevel.getUpdatedAt());
@@ -216,7 +214,7 @@ public class StaffingLevelService  {
         Map<BigInteger, BigInteger> childAndParentActivityIdMap = new HashMap<>();
         staffingLevel = StaffingLevelUtil.updateStaffingLevels(staffingLevelId, presenceStaffingLevelDTO, unitId, staffingLevel, childAndParentActivityIdMap);
         staffingLevelMongoRepository.save(staffingLevel);
-        Collections.sort(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval(), Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence));
+        Collections.sort(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval(), Comparator.comparing(StaffingLevelInterval::getSequence));
         StaffingLevelPlanningDTO staffingLevelPlanningDTO = new StaffingLevelPlanningDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
         plannerSyncService.publishStaffingLevel(unitId, staffingLevelPlanningDTO, IntegrationOperation.UPDATE);
         presenceStaffingLevelDTO.setUpdatedAt(staffingLevel.getUpdatedAt());
@@ -308,8 +306,8 @@ public class StaffingLevelService  {
 
         List<PresenceStaffingLevelDto> staffingDtoList = new ArrayList<>();
         PresenceStaffingLevelDto staffingDTO;
-        List<StaffingLevelTimeSlotDTO> staffingLevelTimeSlList = new ArrayList<>();
-        StaffingLevelTimeSlotDTO staffingLevelTimeSlot;
+        List<StaffingLevelInterval> staffingLevelTimeSlList = new ArrayList<>();
+        StaffingLevelInterval staffingLevelTimeSlot;
         Duration duration;
         StaffingLevelSetting staffingLevelSetting;
         LocalTime fromTime;
@@ -368,7 +366,7 @@ public class StaffingLevelService  {
             fromTime = LocalTime.parse(fromTimeS.substring(0, 2) + ":" + fromTimeS.substring(2, 4));
             toTime = LocalTime.parse(toTimeS.substring(0, 2) + ":" + toTimeS.substring(2, 4));
             duration = new Duration(fromTime, toTime);
-            staffingLevelTimeSlot = new StaffingLevelTimeSlotDTO(seq++, Integer.parseInt(singleData.get("min")), Integer.parseInt(singleData.get("max")), duration);
+            staffingLevelTimeSlot = new StaffingLevelInterval(seq++, Integer.parseInt(singleData.get("min")), Integer.parseInt(singleData.get("max")), duration);
 
             activitySet = new HashSet<>();
             Iterator<String> keyFirstItr = singleData.keySet().iterator();
@@ -707,7 +705,7 @@ public class StaffingLevelService  {
         Map[] activityAndParentActivityMap = getActivityAndParentActivityMap(shifts);
         Map<BigInteger,BigInteger> childAndParentActivityIdMap = activityAndParentActivityMap[0];
         Map<BigInteger,Activity> activityMap = activityAndParentActivityMap[1];
-        if(isNull(staffSkillsMap)) {
+        if(isMapEmpty(staffSkillsMap)) {
             List<Long> staffIds = shifts.stream().map(shift-> shift.getStaffId()).collect(Collectors.toList());
             List<StaffPersonalDetail> staffDTOS = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, asLocalDate(staffingLevel.getCurrentDate()), asLocalDate(staffingLevel.getCurrentDate())).getOrDefault(asLocalDate(staffingLevel.getCurrentDate()).toString(),new ArrayList<>());
             staffSkillsMap = isCollectionNotEmpty(staffDTOS) ? staffDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getSkills())) : new HashMap<>();

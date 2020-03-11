@@ -7,19 +7,18 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.common.StaffFilterDataDTO;
-import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
-import com.kairos.dto.activity.wta.basic_details.WTADTO;
-import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
+import com.kairos.enums.cta.AccountType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
@@ -69,8 +68,8 @@ import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.constants.UserMessagesConstants.*;
-import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.FilterType.PAY_GRADE_LEVEL;
+import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 /**
@@ -132,6 +131,7 @@ public class StaffFilterService {
     @Inject
     private UnitService unitService;
 
+
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
 
         return getAllAndFavouriteFiltersFromParent(moduleId, unitId);
@@ -152,9 +152,11 @@ public class StaffFilterService {
         }
         Long countryId = UserContext.getUserDetails().getCountryId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
-        StaffFilterDataDTO staffFilterDataDTO = activityIntegrationService.getStaffFilterDataByUnitId(unitId);
+        if(isNull(staff)){
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
+        }
         return new FiltersAndFavouriteFiltersDTO(
-                getAllFilters(moduleId, countryId, unitId, staffFilterDataDTO),
+                getAllFilters(moduleId, countryId, unitId),
                 getFavouriteFilters(moduleId, staff.getId()));
     }
 
@@ -166,7 +168,7 @@ public class StaffFilterService {
     }
 
     //todo send single call for get activity data
-    private List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId, StaffFilterDataDTO staffFilterDataDTO) {
+    private List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId) {
         ObjectMapper objectMapper = new ObjectMapper();
         switch (filterType) {
             case EMPLOYMENT_TYPE:
@@ -219,22 +221,12 @@ public class StaffFilterService {
                 return dtoToQueryesultConverter(SkillLevel.getListOfSkillLevelForFilters(), objectMapper);
             case ACCESS_GROUPS:
                 return unitService.getAllAccessGroupByUnitIdForFilter(unitId);
-            /*case WTA_RULES:
-                return getWTARules(staffFilterDataDTO.getWtadtos());
-            case CTA_RULES:
-                return getCTARules(staffFilterDataDTO.getCtadtos());*/
+            case CTA_ACCOUNT_TYPE:
+                return getCTAAccounts();
             default:
                 break;
         }
         return new ArrayList<>();
-    }
-
-    private List<FilterSelectionQueryResult> getCTARules(List<CTAResponseDTO> ctadtos) {
-        return ctadtos.stream().map(cta  -> new FilterSelectionQueryResult(cta.getId().toString(),cta.getName())).collect(Collectors.toList());
-    }
-
-    private List<FilterSelectionQueryResult> getWTARules(List<WTAResponseDTO> wtadtos) {
-        return wtadtos.stream().map(wta  -> new FilterSelectionQueryResult(wta.getId().toString(),wta.getName())).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getTags(Long orgId) {
@@ -245,6 +237,10 @@ public class StaffFilterService {
     private List<FilterSelectionQueryResult> getGroups(Long unitId) {
         List<GroupDTO> groups = groupService.getAllGroupsOfUnit(unitId);
         return groups.stream().map(group  -> new FilterSelectionQueryResult(group.getId().toString(),group.getName())).collect(Collectors.toList());
+    }
+
+    private List<FilterSelectionQueryResult> getCTAAccounts() {
+        return Arrays.stream(AccountType.values()).map(accountType -> new FilterSelectionQueryResult(accountType.name(),accountType.toString())).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getTAStatus(){
@@ -310,20 +306,20 @@ public class StaffFilterService {
         }
     }
 
-    private FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId, StaffFilterDataDTO staffFilterDataDTO) {
+    private FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId) {
         FilterQueryResult tempFilterDTO = new FilterQueryResult();
         tempFilterDTO.setName(filterType.name());
         tempFilterDTO.setTitle(filterType.value);
-        tempFilterDTO.setFilterData(getFilterDetailsByFilterType(filterType, countryId, unitId, staffFilterDataDTO));
+        tempFilterDTO.setFilterData(getFilterDetailsByFilterType(filterType, countryId, unitId));
         return tempFilterDTO;
     }
 
-    private List<FilterQueryResult> getAllFilters(String moduleId, Long countryId, Long unitId, StaffFilterDataDTO staffFilterDataDTO) {
+    private List<FilterQueryResult> getAllFilters(String moduleId, Long countryId, Long unitId) {
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
         List<FilterQueryResult> filterDTOs = new ArrayList<>();
         if (Optional.ofNullable(filterGroup).isPresent()) {
             filterGroup.getFilterTypes().forEach(filterType -> {
-                FilterQueryResult tempFilterQueryResult = getFilterDataByFilterType(filterType, countryId, unitId, staffFilterDataDTO);
+                FilterQueryResult tempFilterQueryResult = getFilterDataByFilterType(filterType, countryId, unitId);
                 if (isCollectionNotEmpty(tempFilterQueryResult.getFilterData())) {
                     filterDTOs.add(tempFilterQueryResult);
                 }
@@ -417,7 +413,7 @@ public class StaffFilterService {
         return mapOfFilters;
     }
 
-    public <T> StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId,LocalDate startDate,LocalDate endDate , boolean showAllStaffs) {
+    public <T> StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId, LocalDate startDate, LocalDate endDate , boolean showAllStaffs,LocalDate selectedDate) {
         boolean unit=unitGraphRepository.existsById(unitId);
         Organization organization=organizationService.fetchParentOrganization(unitId);
         if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&
@@ -431,7 +427,7 @@ public class StaffFilterService {
         Map<FilterType, Set<T>> filterTypeSetMap = getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData());
         List<Map> staffListMap=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
                 filterTypeSetMap, staffFilterDTO.getSearchText(),
-                envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),null);
+                envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),null,selectedDate);
 
         staffListMap = filterStaffList(staffListMap, filterTypeSetMap);
         staffEmploymentTypeWrapper.setStaffList(staffListMap);
@@ -462,7 +458,7 @@ public class StaffFilterService {
         if(loggedInStaffId!=null && staffList.stream().noneMatch(k->k.containsKey(loggedInStaffId)) && ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)){
             List<Map> loggedInStaffDetails=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
                     new HashMap<>(), null,
-                    envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),loggedInStaffId);
+                    envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),loggedInStaffId,selectedDate);
             staffList.addAll(loggedInStaffDetails);
         }
         staffEmploymentTypeWrapper.setStaffList(staffList);
@@ -481,7 +477,7 @@ public class StaffFilterService {
 
     private <T> List<Map> getFilteredStaffs(List<Map> staffListMap, FilterType filterType, Map<FilterType, Set<T>> filterData){
         Map ageRangeMap = (Map) filterData.get(filterType).iterator().next();
-        final AgeRangeDTO ageRange = new AgeRangeDTO(Integer.parseInt(ageRangeMap.get(FROM.toLowerCase()).toString()), isNotNull(ageRangeMap.get(TO.toLowerCase())) ? Integer.parseInt(ageRangeMap.get(TO.toLowerCase()).toString()) : null, isNull(ageRangeMap.get(DURATION_TYPE)) ? DurationType.DAYS : DurationType.valueOf(ageRangeMap.get(DURATION_TYPE).toString()));
+        AgeRangeDTO ageRange = new AgeRangeDTO(Integer.parseInt(ageRangeMap.get(FROM.toLowerCase()).toString()), isNotNull(ageRangeMap.get(TO.toLowerCase())) ? Integer.parseInt(ageRangeMap.get(TO.toLowerCase()).toString()) : null, isNull(ageRangeMap.get(DURATION_TYPE)) ? DurationType.DAYS : DurationType.valueOf(ageRangeMap.get(DURATION_TYPE).toString()));
         switch (filterType){
             case AGE:
                 staffListMap =  staffListMap.stream().filter(map -> isNotNull(map.get(DATE_OF_BIRTH)) && validate(asLocalDate(map.get(DATE_OF_BIRTH).toString()), getCurrentLocalDate(), ageRange)).collect(Collectors.toList());
@@ -490,6 +486,8 @@ public class StaffFilterService {
                 staffListMap =   staffListMap.stream().filter(map -> isNotNull(map.get(JOINING_BIRTH)) && validate(asLocalDate(map.get(JOINING_BIRTH).toString()), getCurrentLocalDate(), ageRange)).collect(Collectors.toList());
                 break;
             case BIRTHDAY:
+                ageRange.setTo(ageRange.getFrom());
+                ageRange.setFrom(0);
                 staffListMap =   staffListMap.stream().filter(map -> isNotNull(map.get(DATE_OF_BIRTH)) && validate(getCurrentLocalDate(), asLocalDate(getCurrentLocalDate().toString().substring(0,4) + map.get(DATE_OF_BIRTH).toString().substring(4)), ageRange)).collect(Collectors.toList());
                 break;
             case SENIORITY:
@@ -501,6 +499,7 @@ public class StaffFilterService {
             case PAY_GRADE_LEVEL:
                 staffListMap =   staffListMap.stream().filter(map -> validatePayGrade((List<Map>) map.get(EMPLOYMENTS), ageRange)).collect(Collectors.toList());
                 break;
+
             default:
                 break;
         }
@@ -522,9 +521,11 @@ public class StaffFilterService {
         for (Map employment : employments) {
             for (Map employmentLines : (List<Map>) employment.get(EMPLOYMENT_LINES)) {
                 for (Map payGrades : (List<Map>) employmentLines.get(PAY_GRADES)) {
-                    long payGradeLevel = Long.valueOf(payGrades.get(PAY_GRADE_LEVEL).toString());
-                    if(from <= payGradeLevel && to >= payGradeLevel){
-                        return true;
+                    if(payGrades.containsKey(AppConstants.PAY_GRADE_LEVEL)) {
+                        long payGradeLevel = Long.valueOf(payGrades.get(AppConstants.PAY_GRADE_LEVEL).toString());
+                        if (from <= payGradeLevel && to >= payGradeLevel) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -535,7 +536,7 @@ public class StaffFilterService {
     private boolean validateSeniority(List<Map> expertiseList, AgeRangeDTO expertiseRange) {
         for (Map map : expertiseList) {
             if(map.containsKey(EXPERTISE_START_DATE_IN_MILLIS) && isNotNull(map.get(EXPERTISE_START_DATE_IN_MILLIS))) {
-                Date expertiseStartDate = new Date(Long.getLong(map.get(EXPERTISE_START_DATE_IN_MILLIS).toString()));
+                Date expertiseStartDate = new Date(Long.valueOf(map.get(EXPERTISE_START_DATE_IN_MILLIS).toString()));
                 if (validate(asLocalDate(expertiseStartDate), getCurrentLocalDate(), expertiseRange)) {
                     return true;
                 }

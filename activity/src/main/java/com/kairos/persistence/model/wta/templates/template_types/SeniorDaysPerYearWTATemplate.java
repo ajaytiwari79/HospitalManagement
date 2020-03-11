@@ -13,7 +13,6 @@ import com.kairos.enums.shift.ShiftOperationType;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
-import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -67,7 +66,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
                         if (!isLeaveAvailable) {
                             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                                     new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,
-                                            DurationType.DAYS, String.valueOf(leaveCount));
+                                            DurationType.DAYS.toValue(), String.valueOf(leaveCount));
                             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                         }
                     }
@@ -75,7 +74,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
             } else if (CollectionUtils.containsAny(infoWrapper.getShift().getActivityIds(), activityIds)) {
                 WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                         new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,
-                                DurationType.DAYS, String.valueOf(0));
+                                DurationType.DAYS.toValue(), String.valueOf(0));
                 infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
             }
         }

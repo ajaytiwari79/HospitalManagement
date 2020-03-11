@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.country;
 
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.country.tag.TagQueryResult;
+import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -112,7 +113,13 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag, Long> {
             "return tag\n")
     List<Tag> getOrganizationTagsById(Long orgId, List<Long> tagIds, String masterDataType, boolean deleted);
 
+    @Query("Match (org:OrganizationBaseEntity)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag{countryTag:false,deleted:false})\n" +
+            "WHERE id(org)={0} AND tag.masterDataType ={1}\n" +
+            "return tag\n")
+    List<Tag> getOrganizationTags(Long orgId, String masterDataType);
 
+    @Query("Match (staff)-[:BELONGS_TO_TAGS]-(tag:Tag) WHERE id(staff) IN {0} return id(staff) as id,COLLECT( distinct {id:id(tag),name:tag.name,endDate:tag.endDate,startDate:tag.startDate}) as tags")
+    List<StaffKpiFilterQueryResult> getStaffsTagsByStaffIds(List<Long> staffIds);
 }
 
 

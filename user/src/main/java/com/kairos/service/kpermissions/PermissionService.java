@@ -4,7 +4,6 @@ import com.kairos.annotations.KPermissionRelatedModel;
 import com.kairos.annotations.KPermissionRelationshipFrom;
 import com.kairos.annotations.KPermissionRelationshipTo;
 import com.kairos.commons.annotation.PermissionClass;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.kpermissions.FieldDTO;
 import com.kairos.dto.kpermissions.ModelDTO;
@@ -28,7 +27,6 @@ import com.kairos.persistence.repository.custom_repository.CommonRepositoryImpl;
 import com.kairos.persistence.repository.kpermissions.PermissionFieldRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionModelRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
-import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -40,9 +38,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import java.io.Serializable;
@@ -59,7 +55,6 @@ import static com.kairos.constants.ApplicationConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_ID;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_DATANOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_PERMISSION_FIELD;
-import static com.kairos.utils.PermissionMapperUtils.checkAndReturnValidModel;
 
 @Service
 public class PermissionService {

@@ -1,12 +1,11 @@
 package com.kairos.service.phase;
+
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -310,17 +309,21 @@ public class PhaseService extends MongoBaseService {
         if(isCollectionNotEmpty(localDates)){
         List<PlanningPeriod> planningPeriods=planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId,localDates);
         for(LocalDateTime requestedDate:dates){
-            Phase phase;
-            if(requestedDate.isAfter(untilTentative)){
-               PlanningPeriod planningPeriod= planningPeriods.stream().filter(startDateFilter->startDateFilter.getStartDate().minusDays(1).atStartOfDay().isBefore(requestedDate)).
-                       filter(endDateFilter->endDateFilter.getEndDate().plusDays(1).atStartOfDay().isAfter(requestedDate)).findAny().orElse(null);
-               phase=phaseAndIdMap.get(planningPeriod.getCurrentPhaseId());
+            Phase phase = null;
+            if (requestedDate.isAfter(untilTentative)) {
+                Optional<PlanningPeriod> planningPeriodOptional = planningPeriods.stream().filter(startDateFilter -> startDateFilter.getStartDate().minusDays(1).atStartOfDay().isBefore(requestedDate)).
+                        filter(endDateFilter -> endDateFilter.getEndDate().plusDays(1).atStartOfDay().isAfter(requestedDate)).findAny();
+                if(planningPeriodOptional.isPresent()) {
+                    phase = phaseAndIdMap.get(planningPeriodOptional.get().getCurrentPhaseId());
+                }
+            } else {
+                phase = getActualPhaseApplicableForDate(requestedDate, null, phaseMap, untilTentative, timeZone);
             }
-            else {
-               phase= getActualPhaseApplicableForDate(requestedDate,null,phaseMap,untilTentative,timeZone);
+            if(isNull(phase)){
+                exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PHASES_ON_DATE,unitId,requestedDate);
             }
-            localDatePhaseStatusMap.put(DateUtils.asDate(requestedDate),phase);
-            }
+            localDatePhaseStatusMap.put(DateUtils.asDate(requestedDate), phase);
+        }
         }
         return localDatePhaseStatusMap;
     }

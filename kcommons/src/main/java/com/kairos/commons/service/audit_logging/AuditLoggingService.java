@@ -3,11 +3,9 @@ package com.kairos.commons.service.audit_logging;
 import com.kairos.commons.repository.audit_logging.AuditLoggingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 
 /**
  * Created by pradeep
@@ -23,9 +21,8 @@ public class AuditLoggingService {
         return auditLoggingRepository.getAuditLoggingByType(auditLogType);
     }
 
-    public List<Map> getAuditLogOfStaff(List<Long> staffIds ,LocalDate startDate,LocalDate endDate){
-        return auditLoggingRepository.getAuditLogOfStaff(staffIds,startDate,endDate);
+    public List<Map> getAuditLogOfStaff(List<Long> staffIds , Date startDate, Date endDate){
+        return auditLoggingRepository.getAuditLogOfStaffs(staffIds,startDate,endDate);
     }
-
 
 }

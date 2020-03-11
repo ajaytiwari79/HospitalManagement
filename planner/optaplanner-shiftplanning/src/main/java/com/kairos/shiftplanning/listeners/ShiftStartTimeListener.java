@@ -2,10 +2,12 @@ package com.kairos.shiftplanning.listeners;
 
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import org.joda.time.DateTime;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
@@ -41,26 +43,20 @@ public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
         //Not in use
     }
     private void updateShiftStartAndEndTimes(ScoreDirector scoreDirector, ShiftImp shiftImp){
-        //log.info("{} intervals [{}]",shiftImp.getPrettyId(),shiftImp.getActivityLineIntervalsList());
         if(shiftImp.getActivityLineIntervals().isEmpty()){
             scoreDirector.beforeVariableChanged(shiftImp, START_TIME);
             shiftImp.setStartTime(null);
+            shiftImp.setShiftActivities(new ArrayList<>());
             scoreDirector.afterVariableChanged(shiftImp, START_TIME);
             shiftImp.setEndTime(null);
             return;
         }
+        shiftImp.setShiftActivities(ShiftPlanningUtility.getMergedShiftActivitys(shiftImp.getActivityLineIntervals()));
         DateTime[] startAndEnd=getEarliestStartAndLatestEnd(shiftImp.getActivityLineIntervals());
         scoreDirector.beforeVariableChanged(shiftImp, START_TIME);
         shiftImp.setStartTime(startAndEnd[0].toLocalTime());
         scoreDirector.afterVariableChanged(shiftImp, START_TIME);
         shiftImp.setEndTime(startAndEnd[1].toLocalTime());
-        /*if(new Interval(startAndEnd[0],startAndEnd[1]).toDuration().toStandardMinutes().getMinutes()!=ShiftPlanningUtility.getMinutesFromIntervals(shiftImp.getActivityLineIntervalsList())){
-            log.info("problematic");
-        }*/
-        //log.info("{} setting start and end as: {}--{}",shiftImp.getPrettyId(),startAndEnd[0],startAndEnd[1]);
-        /*if(shiftImp!=null && shiftImp.getActivityLineIntervalsList().size()==1 && shiftImp.getInterval().toDuration().getStandardMinutes()!=15l){
-            log.info("+++++++++++++++++++++++++"+ ShiftPlanningUtility.getIntervalAsString(shiftImp.getInterval()));
-        }*/
 
     }
     private DateTime[] getEarliestStartAndLatestEnd(List<ActivityLineInterval> activityLineIntervals){

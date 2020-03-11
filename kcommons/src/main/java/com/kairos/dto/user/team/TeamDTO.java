@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Getter
@@ -18,4 +18,6 @@ public class TeamDTO {
     private TeamType teamType;
     private LeaderType leaderType;
     private Set<BigInteger> activityIds;
+    private LocalDate startDate;
+    private LocalDate endDate;
 }

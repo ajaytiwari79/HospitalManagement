@@ -13,7 +13,6 @@ import com.kairos.persistence.model.unit_settings.UnitSetting;
 import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
@@ -33,7 +32,7 @@ import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 
 @Service
 @Transactional
-public class UnitSettingService extends MongoBaseService {
+public class UnitSettingService{
 
     @Inject
     private ExceptionService exceptionService;
@@ -51,7 +50,7 @@ public class UnitSettingService extends MongoBaseService {
 
     public UnitAgeSetting createDefaultNightWorkerSettings(Long unitId) {
         UnitAgeSetting unitAgeSetting = new UnitAgeSetting(AppConstants.YOUNGER_AGE, AppConstants.OLDER_AGE, unitId);
-        save(unitAgeSetting);
+        unitAgeSettingMongoRepository.save(unitAgeSetting);
         return unitAgeSetting;
     }
 
@@ -71,7 +70,7 @@ public class UnitSettingService extends MongoBaseService {
         unitAgeSetting.setYounger(unitSettingsDTO.getYounger());
         unitAgeSetting.setOlder(unitSettingsDTO.getOlder());
 
-        save(unitAgeSetting);
+        unitAgeSettingMongoRepository.save(unitAgeSetting);
         return unitSettingsDTO;
     }
 
@@ -87,7 +86,7 @@ public class UnitSettingService extends MongoBaseService {
         UnitSetting unitSetting = unitSettingRepository.findById(unitSettingsId).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_UNIT_SETTING_NOTFOUND, unitSettingsId)));
         unitSetting.setUnitId(unitId);
         unitSetting.setOpenShiftPhaseSetting(unitSettingsDTO.getOpenShiftPhaseSetting());
-        save(unitSetting);
+        unitSettingRepository.save(unitSetting);
         return unitSettingsDTO;
     }
 
@@ -105,7 +104,7 @@ public class UnitSettingService extends MongoBaseService {
                 });
                 OpenShiftPhaseSetting openShiftPhaseSetting = new OpenShiftPhaseSetting(4, openShiftPhases);
                 UnitSetting unitSetting = new UnitSetting(openShiftPhaseSetting, unitId);
-                save(unitSetting);
+                unitSettingRepository.save(unitSetting);
                 return true;
             }
         }
@@ -132,7 +131,7 @@ public class UnitSettingService extends MongoBaseService {
         FlexibleTimeSettings flexibleTimeSettings = ObjectMapperUtils.copyPropertiesByMapper(flexibleTimeSettingDTO, FlexibleTimeSettings.class);
         unitSetting.setUnitId(unitId);
         unitSetting.setFlexibleTimeSettings(flexibleTimeSettings);
-        save(unitSetting);
+        unitSettingRepository.save(unitSetting);
         return flexibleTimeSettingDTO;
     }
 

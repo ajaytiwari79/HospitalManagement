@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static com.kairos.utils.RestClientUrlUtil.getSchedulerBaseUrl;
 import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
 
@@ -48,7 +49,50 @@ public class UserRestClientForScheduler {
 
 
     public <T extends Object, V> V publishRequest(T t, Long id, RestClientUrlType restClientUrlType, HttpMethod httpMethod,MicroService microService, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
-         String baseUrl;
+        String baseUrl = getBaseUrl(id, restClientUrlType, microService, uri);
+        // organizationId
+        String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
+        try {
+            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange;
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(AUTHORIZATION,"bearer "+ tokenAuthService.getAuthToken());
+                HttpEntity<T> httpEntity= new HttpEntity<>(t,headers);
+                restExchange = schedulerServiceRestTemplate.exchange(
+                        url,
+                        httpMethod,
+                        httpEntity, typeReference,pathParams);
+            restExchange = getRestTemplateResponseEnvelopeResponseEntity(t, httpMethod, typeReference, url, restExchange, headers, pathParams);
+            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
+            if (!restExchange.getStatusCode().is2xxSuccessful()) {
+                logger.error("not valid code {}",restExchange.getStatusCode());
+                exceptionService.internalError(response.getMessage());
+            }
+            return response.getData();
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throwException("exception occurred in activity micro service " + e.getMessage());
+        }
+        return null;
+    }
+
+    private <T extends Object, V> ResponseEntity<RestTemplateResponseEnvelope<V>> getRestTemplateResponseEnvelopeResponseEntity(T t, HttpMethod httpMethod, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, String url, ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange, HttpHeaders headers, Object[] pathParams) {
+        HttpEntity<T> httpEntity;
+        if(restExchange.getStatusCode().value()==401) {
+            tokenAuthService.getNewAuthToken();
+            headers.remove(AUTHORIZATION);
+            headers.add(AUTHORIZATION,"bearer "+ tokenAuthService.getNewAuthToken());
+            httpEntity= new HttpEntity<>(t,headers);
+            restExchange = schedulerServiceRestTemplate.exchange(
+                    url,
+                    httpMethod,
+                    httpEntity, typeReference,pathParams);
+        }
+        return restExchange;
+    }
+
+    private String getBaseUrl(Long id, RestClientUrlType restClientUrlType, MicroService microService, String uri) {
+        String baseUrl;
         switch (microService) {
             case USER:
                  baseUrl = getUserServiceBaseUrl(restClientUrlType, id,id) + uri;// make same as its necessary for URL We have already a task to remove the organization
@@ -58,41 +102,7 @@ public class UserRestClientForScheduler {
                 break;
             default: throw new UnsupportedOperationException("Invalid method specified");
         }
-
-        // organizationId
-        String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
-        try {
-            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange;
-                HttpHeaders headers = new HttpHeaders();
-                headers.add(AUTHORIZATION,"bearer "+ tokenAuthService.getAuthToken());
-                HttpEntity<T> httpEntity= new HttpEntity<T>(t,headers);
-                restExchange = schedulerServiceRestTemplate.exchange(
-                        url,
-                        httpMethod,
-                        httpEntity, typeReference,pathParams);
-                if(restExchange.getStatusCode().value()==401) {
-                    tokenAuthService.getNewAuthToken();
-                    headers.remove(AUTHORIZATION);
-                    headers.add(AUTHORIZATION,"bearer "+ tokenAuthService.getNewAuthToken());
-                    httpEntity= new HttpEntity<T>(t,headers);
-                    restExchange = schedulerServiceRestTemplate.exchange(
-                            url,
-                            httpMethod,
-                            httpEntity, typeReference,pathParams);
-                }
-
-            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
-            if (!restExchange.getStatusCode().is2xxSuccessful()) {
-                logger.error("not valid code"+restExchange.getStatusCode());
-                exceptionService.internalError(response.getMessage());
-            }
-            return response.getData();
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
-        }
-
+        return baseUrl;
     }
 
 

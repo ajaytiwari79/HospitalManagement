@@ -22,28 +22,31 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
     @Inject
     private EmploymentJobService employmentJobService;
 
-    private static Logger logger = LoggerFactory.getLogger(SchedulerToUserQueueService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerToUserQueueService.class);
 
     public void execute(KairosSchedulerExecutorDTO job) {
-        logger.info("Job type----------------->"+job.getJobSubType());
+        LOGGER.info("Job type----------------->{}",job.getJobSubType());
         switch(job.getJobSubType()) {
             case INTEGRATION:
-                logger.info("Integration----------------->"+job.getId());
+                LOGGER.info("Integration----------------->{}",job.getId());
                 integrationJobService.runJob(job);
                 break;
-            case EMPLOYMENT_END:
-                positionService.endEmploymentProcess(job.getId(),job.getUnitId(),job.getEntityId().longValue(),DateUtils.getLocalDatetimeFromLong(job.getOneTimeTriggerDateMillis()));
+            case POSITION_END:
+                LOGGER.info("End Position----------------->{}",job.getId());
+                positionService.endPositionProcess();
                 break;
             case QUESTIONAIRE_NIGHTWORKER:
-                logger.info("Questionaire nightworker----------------->"+job.getId());
+                LOGGER.info("Questionaire nightworker----------------->{}",job.getId());
                 break;
             case SENIORITY_LEVEL:
+                LOGGER.info("Update Seniority Level----------------->{}",job.getId());
                 employmentJobService.updateSeniorityLevelOnJobTrigger(job.getId(),job.getUnitId());
                 break;
-            case NIGHT_WORKER:employmentJobService.updateNightWorkers();
+            case NIGHT_WORKER:
+                employmentJobService.updateNightWorkers();
                 break;
             default:
-                logger.error("No exceution route found for jobsubtype");
+                LOGGER.error("No execution route found for jobsubtype");
                 break;
         }
 

@@ -2,6 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.OrganizationType;
@@ -12,7 +13,6 @@ import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.GdprIntegrationService;
-import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

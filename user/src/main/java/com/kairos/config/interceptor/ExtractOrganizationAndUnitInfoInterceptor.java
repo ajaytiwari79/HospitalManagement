@@ -1,6 +1,5 @@
 package com.kairos.config.interceptor;
 
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
@@ -17,7 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.service.auth.UserService.getCurrentUser;
 
 
@@ -39,8 +37,8 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         getCurrentUserDetails();
         String orgIdString=isNotNull(pathVariables) ? pathVariables.get("organizationId") : null;
         String unitIdString=isNotNull(pathVariables) ? pathVariables.get("unitId") : null;
-        LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
-                + "]" + request.getRequestURI()+"[ organizationID ,Unit Id " +orgIdString+" ,"+unitIdString+" ]") ;
+        LOGGER.debug("[preHandle][" + request + "]" + "[" + request.getMethod()
+                + "]" + request.getRequestURI()+"[ organizationID ,Unit Id " +orgIdString+" ,"+unitIdString+" ]"); ;
         updateOrganizationId(orgIdString);
         updateUnitId(unitIdString);
         ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

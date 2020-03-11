@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.staff;
 
-import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import lombok.Getter;
@@ -8,7 +7,6 @@ import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by prabjot on 5/10/17.

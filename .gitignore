@@ -18,3 +18,8 @@ out/
 classes/
 kairosActivity.iml
 *.iml
+scheduler-service/gradlew.bat
+scheduler-service/gradlew
+gdpr/gradlew.bat
+gdpr/gradlew
+.gitignore

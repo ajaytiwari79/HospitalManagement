@@ -21,4 +21,5 @@ public class WorkTimeAgreementBalance {
     public List<WorkTimeAgreementRuleTemplateBalancesDTO> getWorkTimeAgreementRuleTemplateBalances() {
         return isNullOrElse(workTimeAgreementRuleTemplateBalances,new ArrayList());
     }
+
 }

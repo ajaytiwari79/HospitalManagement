@@ -1,7 +1,5 @@
 package com.kairos.shiftplanning.domain.staff;
 
-import com.kairos.shiftplanning.domain.shift.ShiftImp;
-import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -52,9 +50,5 @@ public class IndirectActivity {
     }
     public boolean overlapsInterval(Interval interval){
         return this.getInterval()!=null && interval!=null && interval.overlaps(this.getInterval());
-    }
-
-    public boolean canBePlanned(List<ShiftImp> shifts) {
-        return ShiftPlanningUtility.checkEmployeesAvailability(shifts, employees, startTime);
     }
 }

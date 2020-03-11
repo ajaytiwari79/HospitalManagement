@@ -1,43 +1,30 @@
 package com.kairos.service.organization;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.constants.AppConstants;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
-import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
-import com.kairos.enums.DurationType;
-import com.kairos.enums.FilterType;
 import com.kairos.enums.ModuleId;
 import com.kairos.enums.StaffStatusEnum;
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.group.GroupDTO;
-import com.kairos.persistence.model.user.filter.FilterGroup;
 import com.kairos.persistence.model.user.filter.FilterSelection;
 import com.kairos.persistence.repository.organization.GroupGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
-import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffFilterService;
-import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_NOT_FOUND;
 
@@ -135,7 +122,7 @@ public class GroupService {
 
     public List<Map> getStaffListByGroupFilter(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS){
         List<Map> filteredStaff = new ArrayList<>();
-        for(Map staff : staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value,filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false).getStaffList()){
+        for(Map staff : staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value,filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false,null).getStaffList()){
             if(StaffStatusEnum.ACTIVE.toString().equals(staff.get("currentStatus"))) {
                 Map<String, Object> fStaff = new HashMap<>();
                 fStaff.put("id", staff.get("id"));
@@ -159,7 +146,7 @@ public class GroupService {
         for(Group group : groups){
             GroupDTO groupDTO = getGroupDTOFromGroup(group);
             List<FilterSelectionDTO> filterSelectionDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(group.getFiltersData(), FilterSelectionDTO.class);
-            List<Map> staffs = staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value, filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false).getStaffList();
+            List<Map> staffs = staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value, filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false,null).getStaffList();
             staffIds.addAll(staffs.stream().map(map-> Long.valueOf(map.get("id").toString())).collect(Collectors.toSet()));
             excludedStaffs.addAll(groupDTO.getExcludedStaffs());
             groupDTOS.add(groupDTO);

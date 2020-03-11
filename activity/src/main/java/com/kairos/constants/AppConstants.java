@@ -54,6 +54,7 @@ public class AppConstants {
     //KMD Nexus
     public static final String KMD_NEXUS_CLIENT_ID = "third_party_vendor";
     public static final String KMD_NEXUS_CLIENT_SECRET = "APNaYeGDVGOdjQf-jIFgU59tfkPux2mD6xGpbbAEuUc32ie8FRn7Y2cxcSayV6VafluS0pLu2TyhARFHtdHc-NQ";
+    public static final String SHIFT_S = "Shift(s)";
     public static String KMD_NEXUS_ACCESS_TOKEN = "";
     public static final String KMD_NEXUS_CUSTOMER = "unity";
     public static final String KMD_NEXUS_GRANT_TYPE = "password";
@@ -168,8 +169,10 @@ public class AppConstants {
     public static final String OPENSHIFT_EMAIL_BODY = "Hi, You have been picked for openshift. fibonacii order- %s, Accumulated timebank- %s, Delta Weeklytimebank- %s," +
             " PlannedHoursweek- %s";
     public static final String SHIFT_EMAIL_BODY = "Hi, %s, \n shift %s  will start on %s at %s .";
+    public static final String ABSENCE_ACTIVITY_REMINDER_EMAIL_BODY = "Please plan  activity %s before it expires on %s.\n Count left is %s.";
     public static final String OPENSHIFT_SUBJECT = "Open Shift";
     public static final String SHIFT_NOTIFICATION="Shift Reminder";
+    public static final String ACTIVITY_REMINDER="Activity Reminder";
     public static final String SHIFT_NOTIFICATION_MESSAGE="SHIFT_NOTIFICATION_MESSAGE";
     public static final String NORMAL_TIME="Normal Time";
     public static final String EXTRA_TIME="Extra Time";

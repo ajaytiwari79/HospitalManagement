@@ -218,7 +218,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         return new ActivityConfigurationWrapper(phases, secondLevelTimeTypes, plannedTimeTypes,employmentTypeDTOS);
     }
 
-    public void addPlannedTimeInShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrappers, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public void addPlannedTimeInShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrappers, StaffAdditionalInfoDTO staffAdditionalInfoDTO,boolean shiftTypeChanged) {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
         List<PlannedTime> plannedTimeList = shift.getActivities().stream().flatMap(k -> k.getPlannedTimes().stream()).collect(Collectors.toList());
         Map<DateTimeInterval, PlannedTime> plannedTimeMap = plannedTimeList.stream().filter(distinctByKey(plannedTime -> new DateTimeInterval(plannedTime.getStartDate(), plannedTime.getEndDate()))).collect(toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()), Function.identity()));
@@ -233,7 +233,7 @@ public class ActivityConfigurationService extends MongoBaseService {
             if(isNull(plannedTimeId)){
                 exceptionService.dataNotFoundByIdException(PLANNED_TIME_CANNOT_EMPTY);
             }
-            List<PlannedTime> plannedTimes = isNull(shift.getId()) ? newArrayList(new PlannedTime(plannedTimeId, shiftActivity.getStartDate(), shiftActivity.getEndDate())) : filterPlannedTimes(shiftActivity.getStartDate(), shiftActivity.getEndDate(), plannedTimeMap, plannedTimeId);
+            List<PlannedTime> plannedTimes = isNull(shift.getId()) || shiftTypeChanged ? newArrayList(new PlannedTime(plannedTimeId, shiftActivity.getStartDate(), shiftActivity.getEndDate())) : filterPlannedTimes(shiftActivity.getStartDate(), shiftActivity.getEndDate(), plannedTimeMap, plannedTimeId);
             shiftActivity.setPlannedTimes(plannedTimes);
         }
     }
@@ -311,8 +311,8 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     private List<PlannedTime> filterPlannedTimes(Date startDate, Date endDate, Map<DateTimeInterval, PlannedTime> plannedTimeMap, BigInteger plannedTimeId) {
         DateTimeInterval activityInterval = new DateTimeInterval(startDate, endDate);
-        plannedTimeMap = plannedTimeMap.entrySet().stream().filter(map -> map.getKey().overlaps(activityInterval)).collect(toMap(k -> k.getKey(), k -> k.getValue()));
-        plannedTimeMap = plannedTimeMap.entrySet().stream().sorted(comparing(k -> k.getKey().getStartDate())).collect(toMap(e -> e.getKey(),v->v.getValue(), (e1, e2) -> e2, LinkedHashMap::new));
+        plannedTimeMap = plannedTimeMap.entrySet().stream().filter(map -> map.getKey().overlaps(activityInterval)).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+        plannedTimeMap = plannedTimeMap.entrySet().stream().sorted(comparing(k -> k.getKey().getStartDate())).collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
         List<PlannedTime> plannedTimes = new ArrayList<>();
         final boolean endDateInside = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().containsStartOrEnd(endDate));
         final boolean activityIntervalOverLapped = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().overlaps(activityInterval));

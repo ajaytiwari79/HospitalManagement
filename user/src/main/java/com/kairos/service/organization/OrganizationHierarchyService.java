@@ -6,6 +6,7 @@ import com.kairos.dto.gdpr.filter.FilterAttributes;
 import com.kairos.dto.gdpr.filter.FilterResponseDTO;
 import com.kairos.dto.user.organization.CompanyType;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.common.QueryResult;
@@ -18,7 +19,6 @@ import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.tree_structure.TreeStructureService;
-import com.kairos.dto.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,9 +53,13 @@ public class OrganizationHierarchyService {
 
     public List<QueryResult> generateHierarchy() {
         List<OrganizationWrapper> organizationWrappers = userGraphRepository.getOrganizations(UserContext.getUserDetails().getId());
-        OrganizationBaseEntity hierarchy = organizationGraphRepository.generateHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(toList())).get(0);
-        QueryResult orgHierarchy = setUnitPermission(hierarchy, accessPageService.isHubMember(UserContext.getUserDetails().getId()));
-        return Collections.singletonList(orgHierarchy);
+        List<OrganizationBaseEntity> organizationBaseEntities = organizationGraphRepository.generateHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(toList()));
+        List<QueryResult> queryResults = new ArrayList<>();
+        for(OrganizationBaseEntity hierarchy :organizationBaseEntities) {
+            QueryResult orgHierarchy = setUnitPermission(hierarchy, accessPageService.isHubMember(UserContext.getUserDetails().getId()));
+            queryResults.add(orgHierarchy);
+        }
+        return queryResults;
     }
 
 

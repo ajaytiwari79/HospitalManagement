@@ -6,11 +6,10 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
-import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
-import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
@@ -31,8 +30,6 @@ import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.utils.counter.KPIUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -58,7 +55,6 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
     @Inject
     private CounterHelperService counterHelperService;
 
-    private static Logger LOGGER = LoggerFactory.getLogger(DayTypeAndTimeSlotKpiService.class);
     // use for calculate hours of given days of daytype
     private Double getTotalHoursOfDayType(List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Day> days) {
         Long totalMilliSeconds = 0L;
@@ -88,30 +84,39 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         if (isCollectionNotEmpty(countryHolidayCalenderDTOS)) {
             for (CountryHolidayCalenderDTO countryHolidayCalenderDTO : countryHolidayCalenderDTOS) {
                 if (localDateShiftMap.containsKey(countryHolidayCalenderDTO.getHolidayDate())) {
-                    for (ShiftWithActivityDTO shiftWithActivityDTO : localDateShiftMap.get(countryHolidayCalenderDTO.getHolidayDate())) {
-                        DateTimeInterval dateTimeInterval;
-                        if (AppConstants.NIGHT.equals(timeSlotDTO.getName())) {
-                            LocalDate endDate = asLocalDate(shiftWithActivityDTO.getEndDate()).equals(asLocalDate(shiftWithActivityDTO.getStartDate())) ? asLocalDate(shiftWithActivityDTO.getEndDate()).plusDays(1) : asLocalDate(shiftWithActivityDTO.getEndDate());
-                            dateTimeInterval = new DateTimeInterval(asDate(asLocalDate(shiftWithActivityDTO.getStartDate()), startTime), asDate(endDate, endTime));
-                        } else {
-                            dateTimeInterval = new DateTimeInterval(asDate(asLocalDate(shiftWithActivityDTO.getStartDate()), startTime), asDate(asLocalDate(shiftWithActivityDTO.getStartDate()), endTime));
-                        }
-                        Date startDateOfHolidayType = isNotNull(countryHolidayCalenderDTO.getStartTime()) ? asDate(countryHolidayCalenderDTO.getHolidayDate(), countryHolidayCalenderDTO.getStartTime()) : asDate(countryHolidayCalenderDTO.getHolidayDate());
-                        Date endDateOfHolidayType = isNotNull(countryHolidayCalenderDTO.getEndTime()) ? DateUtils.asDate(countryHolidayCalenderDTO.getHolidayDate(), countryHolidayCalenderDTO.getEndTime()) : asDateEndOfDay(countryHolidayCalenderDTO.getHolidayDate());
-                        endDateOfHolidayType = (startDateOfHolidayType.after(endDateOfHolidayType)) ? getStartOfDay(asDate(countryHolidayCalenderDTO.getHolidayDate().plusDays(1))) : endDateOfHolidayType;
-                        DateTimeInterval dateTimeIntervalOfHolidayType = new DateTimeInterval(startDateOfHolidayType, endDateOfHolidayType).overlap(dateTimeInterval);
-                        DateTimeInterval shiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate());
-                        if (isNotNull(dateTimeIntervalOfHolidayType) && dateTimeIntervalOfHolidayType.overlaps(shiftInterval)) {
-                            totalMilliSeconds += dateTimeIntervalOfHolidayType.overlap(shiftInterval).getMilliSeconds();
-                        }
-                    }
+                    totalMilliSeconds = getTotalHours(localDateShiftMap, timeSlotDTO, totalMilliSeconds, startTime, endTime, countryHolidayCalenderDTO);
                 }
             }
         }
         return DateUtils.getHoursFromTotalMilliSeconds(totalMilliSeconds);
     }
 
+    private Long getTotalHours(Map<LocalDate, List<ShiftWithActivityDTO>> localDateShiftMap, TimeSlotDTO timeSlotDTO, Long totalMilliSeconds, LocalTime startTime, LocalTime endTime, CountryHolidayCalenderDTO countryHolidayCalenderDTO) {
+        for (ShiftWithActivityDTO shiftWithActivityDTO : localDateShiftMap.get(countryHolidayCalenderDTO.getHolidayDate())) {
+            DateTimeInterval dateTimeInterval;
+            dateTimeInterval = getDateTimeIntervalByTimeSlot(timeSlotDTO, startTime, endTime, shiftWithActivityDTO);
+            Date startDateOfHolidayType = isNotNull(countryHolidayCalenderDTO.getStartTime()) ? asDate(countryHolidayCalenderDTO.getHolidayDate(), countryHolidayCalenderDTO.getStartTime()) : asDate(countryHolidayCalenderDTO.getHolidayDate());
+            Date endDateOfHolidayType = isNotNull(countryHolidayCalenderDTO.getEndTime()) ? DateUtils.asDate(countryHolidayCalenderDTO.getHolidayDate(), countryHolidayCalenderDTO.getEndTime()) : asDateEndOfDay(countryHolidayCalenderDTO.getHolidayDate());
+            endDateOfHolidayType = (startDateOfHolidayType.after(endDateOfHolidayType)) ? getStartOfDay(asDate(countryHolidayCalenderDTO.getHolidayDate().plusDays(1))) : endDateOfHolidayType;
+            DateTimeInterval dateTimeIntervalOfHolidayType = new DateTimeInterval(startDateOfHolidayType, endDateOfHolidayType).overlap(dateTimeInterval);
+            DateTimeInterval shiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate());
+            if (isNotNull(dateTimeIntervalOfHolidayType) && dateTimeIntervalOfHolidayType.overlaps(shiftInterval)) {
+                totalMilliSeconds += dateTimeIntervalOfHolidayType.overlap(shiftInterval).getMilliSeconds();
+            }
+        }
+        return totalMilliSeconds;
+    }
 
+    private DateTimeInterval getDateTimeIntervalByTimeSlot(TimeSlotDTO timeSlotDTO, LocalTime startTime, LocalTime endTime, ShiftWithActivityDTO shiftWithActivityDTO) {
+        DateTimeInterval dateTimeInterval;
+        if (AppConstants.NIGHT.equals(timeSlotDTO.getName())) {
+            LocalDate endDate = asLocalDate(shiftWithActivityDTO.getEndDate()).equals(asLocalDate(shiftWithActivityDTO.getStartDate())) ? asLocalDate(shiftWithActivityDTO.getEndDate()).plusDays(1) : asLocalDate(shiftWithActivityDTO.getEndDate());
+            dateTimeInterval = new DateTimeInterval(asDate(asLocalDate(shiftWithActivityDTO.getStartDate()), startTime), asDate(endDate, endTime));
+        } else {
+            dateTimeInterval = new DateTimeInterval(asDate(asLocalDate(shiftWithActivityDTO.getStartDate()), startTime), asDate(asLocalDate(shiftWithActivityDTO.getStartDate()), endTime));
+        }
+        return dateTimeInterval;
+    }
 
 
     private List<CommonKpiDataUnit> getDayTypeAndTimeSlotHours(Long organizationId, Map<FilterType, List> filterBasedCriteria,ApplicableKPI applicableKPI) {
@@ -122,7 +127,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         List<Long> unitIds = (List<Long>)filterCriteria[2];
         List<Long> employmentTypeIds = (List<Long>)filterCriteria[3];
         List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates,null);
-        StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString());
+        StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString(),new ArrayList<>());
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiAllDefaultData(staffEmploymentTypeDTO);
         //filter staffids base on kpi filter rest call
         staffIds = defaultKpiDataDTO.getStaffKpiFilterDTOs().stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
@@ -146,12 +151,6 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         return kpiDataUnits;
     }
 
-
-    @Override
-    public Map<FilterType, List> getApplicableFilters(List<FilterCriteria> availableFilters, Map<FilterType, List> providedFiltersMap) {
-        return null;
-    }
-
     @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getDayTypeAndTimeSlotHours(organizationId, filterBasedCriteria,null);
@@ -162,14 +161,6 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getDayTypeAndTimeSlotHours(organizationId, filterBasedCriteria ,applicableKPI);
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
-    }
-
-
-    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,List<LocalDate> filterDates) {
-        List<Long> staffIds = staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
-        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, newArrayList(organizationId), new ArrayList<>(), new ArrayList<>(), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))),null);
-        Map<Long, Integer> staffAndShiftMinutesMap = shiftWithActivityDTOS.stream().collect(Collectors.groupingBy(shiftWithActivityDTO -> shiftWithActivityDTO.getStaffId(),Collectors.summingInt(shiftWithActivityDTO->shiftWithActivityDTO.getMinutes())));
-        return getFibonacciCalculation(staffAndShiftMinutesMap,sortingOrder);
     }
 
     //use for return hours of timeslot
@@ -193,17 +184,21 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTotalHoursOfTimeSlotByInterval(TimeSlotDTO timeSlotDTO, List<Long> dayTypeIds, Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap,List<DateTimeInterval> dateTimeIntervals,Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap , DurationType frequencyType) {
         Map<Object, List<ClusteredBarChartKpiDataUnit>> intervalAndTotalHours = new HashMap<>();
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
-            Map<LocalDate, List<ShiftWithActivityDTO>> localDateShiftMap = dateTimeIntervalListMap.get(dateTimeInterval).stream().collect(Collectors.groupingBy(k -> asLocalDate(k.getStartDate()), Collectors.toList()));
-            intervalAndTotalHours.putIfAbsent(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval), new ArrayList<>());
-            for (Long dayTypeId : dayTypeIds) {
-                if (daysTypeIdAndDayTypeMap.get(dayTypeId).isHolidayType()) {
-                    intervalAndTotalHours.get(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval)).add(new ClusteredBarChartKpiDataUnit(daysTypeIdAndDayTypeMap.get(dayTypeId).getName(), daysTypeIdAndDayTypeMap.get(dayTypeId).getColorCode(), getTotalHoursOfHolidayDayType(localDateShiftMap, timeSlotDTO, daysTypeIdAndDayTypeMap.get(dayTypeId).getCountryHolidayCalenderData())));
-                } else {
-                    intervalAndTotalHours.get(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval)).add(new ClusteredBarChartKpiDataUnit(daysTypeIdAndDayTypeMap.get(dayTypeId).getName(), daysTypeIdAndDayTypeMap.get(dayTypeId).getColorCode(), getTotalHoursOfDayType(dateTimeIntervalListMap.getOrDefault(dateTimeInterval,new ArrayList<>()), timeSlotDTO, daysTypeIdAndDayTypeMap.get(dayTypeId).getValidDays())));
-                }
-            }
+            getHoursByDayType(timeSlotDTO, dayTypeIds, daysTypeIdAndDayTypeMap, dateTimeIntervalListMap, frequencyType, intervalAndTotalHours, dateTimeInterval);
         }
         return intervalAndTotalHours;
+    }
+
+    private void getHoursByDayType(TimeSlotDTO timeSlotDTO, List<Long> dayTypeIds, Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap, Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, DurationType frequencyType, Map<Object, List<ClusteredBarChartKpiDataUnit>> intervalAndTotalHours, DateTimeInterval dateTimeInterval) {
+        Map<LocalDate, List<ShiftWithActivityDTO>> localDateShiftMap = dateTimeIntervalListMap.get(dateTimeInterval).stream().collect(Collectors.groupingBy(k -> asLocalDate(k.getStartDate()), Collectors.toList()));
+        intervalAndTotalHours.putIfAbsent(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval), new ArrayList<>());
+        for (Long dayTypeId : dayTypeIds) {
+            if (daysTypeIdAndDayTypeMap.get(dayTypeId).isHolidayType()) {
+                intervalAndTotalHours.get(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval)).add(new ClusteredBarChartKpiDataUnit(daysTypeIdAndDayTypeMap.get(dayTypeId).getName(), daysTypeIdAndDayTypeMap.get(dayTypeId).getColorCode(), getTotalHoursOfHolidayDayType(localDateShiftMap, timeSlotDTO, daysTypeIdAndDayTypeMap.get(dayTypeId).getCountryHolidayCalenderData())));
+            } else {
+                intervalAndTotalHours.get(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval)).add(new ClusteredBarChartKpiDataUnit(daysTypeIdAndDayTypeMap.get(dayTypeId).getName(), daysTypeIdAndDayTypeMap.get(dayTypeId).getColorCode(), getTotalHoursOfDayType(dateTimeIntervalListMap.getOrDefault(dateTimeInterval,new ArrayList<>()), timeSlotDTO, daysTypeIdAndDayTypeMap.get(dayTypeId).getValidDays())));
+            }
+        }
     }
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTotalHoursOfTimeSlotByTotalData(List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Long> dayTypeIds, Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap, List<DateTimeInterval> dateTimeIntervals) {
@@ -248,7 +243,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
 
     @Override
     public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, KPI kpi,ApplicableKPI applicableKPI) {
-        return null;
+        return new TreeSet<>();
     }
 
 }

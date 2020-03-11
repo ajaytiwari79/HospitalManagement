@@ -1,7 +1,6 @@
 package com.kairos.interceptor;
 
 
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +56,7 @@ class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapte
         String unitIdString=isNull(pathVariables) ? null : pathVariables.get("unitId");
         String orgIdString=isNull(pathVariables) ? null : pathVariables.get("organizationId");
         String countryIdString = isNull(pathVariables) ? null : pathVariables.get("countryId");
-        LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
+        LOGGER.debug("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI() + "[ organizationID ,Unit Id " + orgIdString + " ," + unitIdString + " ]");
         updateOrganizationId(orgIdString);
         updateCountryId(countryIdString);
@@ -83,7 +82,9 @@ class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapte
         if (unitIdString != null) {
             final Long unitId = Long.valueOf(unitIdString);
             UserContext.setUnitId(unitId);
-            UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
+            if(isNotNull(UserContext.getUserDetails())){
+                UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
+            }
         }
     }
 

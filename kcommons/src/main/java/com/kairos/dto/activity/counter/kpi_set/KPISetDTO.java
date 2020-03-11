@@ -29,6 +29,7 @@ public class KPISetDTO {
     private Long referenceId;
     private ConfLevel confLevel;
     private KPISetType kpiSetType;
+    private String shortName;
 
     public String getName() {
         return name.trim();

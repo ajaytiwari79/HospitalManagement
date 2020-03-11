@@ -8,6 +8,8 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
@@ -15,15 +17,15 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StaffingLevelUtil {
 
     public static StaffingLevel buildPresenceStaffingLevels(PresenceStaffingLevelDto presenceStaffingLevelDTO, Long orgId) {
-        // presenceStaffingLevelDTO.getStaffingLevelSetting().setActivitiesRank(null);
         StaffingLevel staffingLevel = new StaffingLevel(presenceStaffingLevelDTO.getCurrentDate(), presenceStaffingLevelDTO.getWeekCount()
                 , orgId, presenceStaffingLevelDTO.getPhaseId(), presenceStaffingLevelDTO.getStaffingLevelSetting());
 
         Set<StaffingLevelInterval> staffingLevelTimeSlotsList = new LinkedHashSet<>();
-        for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval()) {
+        for (StaffingLevelInterval staffingLevelTimeSlotDTO : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval()) {
             StaffingLevelInterval staffingLevelTimeSlot = new StaffingLevelInterval(staffingLevelTimeSlotDTO.getSequence(), staffingLevelTimeSlotDTO.getMinNoOfStaff(),
                     staffingLevelTimeSlotDTO.getMaxNoOfStaff(), staffingLevelTimeSlotDTO.getStaffingLevelDuration()
             );
@@ -43,7 +45,7 @@ public class StaffingLevelUtil {
                 , unitId, absenceStaffingLevelDto.getPhaseId());
 
         Duration staffingLevelDuration = new Duration(LocalTime.MIN, LocalTime.MAX);
-        List<StaffingLevelInterval> absenceStaffingLevelIntervals = new ArrayList<StaffingLevelInterval>();
+        List<StaffingLevelInterval> absenceStaffingLevelIntervals = new ArrayList<>();
         StaffingLevelInterval absenceStaffingLevelInterval = new StaffingLevelInterval(0, absenceStaffingLevelDto.getMinNoOfStaff(),
                 absenceStaffingLevelDto.getMaxNoOfStaff(), staffingLevelDuration);
         absenceStaffingLevelInterval.setStaffingLevelActivities(absenceStaffingLevelDto.getStaffingLevelActivities());
@@ -58,30 +60,14 @@ public class StaffingLevelUtil {
         staffingLevel.setStaffingLevelSetting(presenceStaffingLevelDTO.getStaffingLevelSetting());
         staffingLevel.setPhaseId(presenceStaffingLevelDTO.getPhaseId());
         Map<Duration, StaffingLevelInterval> durationAndStaffingLevelIntervalMap = staffingLevel.getPresenceStaffingLevelInterval().stream().collect(Collectors.toMap(k -> k.getStaffingLevelDuration(), v -> v));
-        for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval()) {
+        for (StaffingLevelInterval staffingLevelTimeSlotDTO : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval()) {
             StaffingLevelInterval staffingLevelInterval = durationAndStaffingLevelIntervalMap.get(staffingLevelTimeSlotDTO.getStaffingLevelDuration());
             staffingLevelInterval.setMinNoOfStaff(staffingLevelTimeSlotDTO.getMinNoOfStaff());
             staffingLevelInterval.setMaxNoOfStaff(staffingLevelTimeSlotDTO.getMaxNoOfStaff());
             staffingLevelInterval.setSequence(staffingLevelTimeSlotDTO.getSequence());
             staffingLevelInterval.setStaffingLevelSkills(staffingLevelTimeSlotDTO.getStaffingLevelSkills());
             Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMap = staffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.toMap(StaffingLevelActivity::getActivityId, v -> v));
-            Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
-            Map<BigInteger, StaffingLevelStaffMinMax> activityIdStaffMinMaxMap = new HashMap<>();
-            for (StaffingLevelActivity staffingLevelActivity : staffingLevelTimeSlotDTO.getStaffingLevelActivities()) {
-                validateParentChildActivityStaffingLevelMinMaxNumberOfStaff(childAndParentActivityIdMap, activityIdStaffMinMaxMap, staffingLevelActivity);
-                StaffingLevelActivity staffingLevelActivityNew = new StaffingLevelActivity(staffingLevelActivity.getActivityId(), staffingLevelActivity.getName(),
-                        staffingLevelActivity.getMinNoOfStaff(), staffingLevelActivity.getMaxNoOfStaff());
-                if (staffingLevelActivityMap.containsKey(staffingLevelActivity.getActivityId())) {
-                    staffingLevelActivityNew.setAvailableNoOfStaff(staffingLevelActivityMap.get(staffingLevelActivity.getActivityId()).getAvailableNoOfStaff());
-                }
-                staffingLevelActivities.add(staffingLevelActivityNew);
-            }
-            activityIdStaffMinMaxMap.values().forEach(staffingLevelStaffMinMax -> {
-                if (staffingLevelStaffMinMax != null && (staffingLevelStaffMinMax.getMinNoOfStaffParentActivity() < staffingLevelStaffMinMax.getMinNoOfStaffChildActivities() || staffingLevelStaffMinMax.getMaxNoOfStaffParentActivity() < staffingLevelStaffMinMax.getMaxNoOfStaffChildActivities())) {
-                    throw new InvalidRequestException("child staffing level should be less than or equal to parent count for interval : " + staffingLevelTimeSlotDTO.getStaffingLevelDuration().getFrom() + " to "+staffingLevelTimeSlotDTO.getStaffingLevelDuration().getTo());
-                }
-            });
-
+            Set<StaffingLevelActivity> staffingLevelActivities = getStaffingLevelActivities(childAndParentActivityIdMap, staffingLevelTimeSlotDTO, staffingLevelActivityMap);
             staffingLevelInterval.setStaffingLevelActivities(staffingLevelActivities);
         }
         staffingLevel.setUnitId(unitId);
@@ -89,6 +75,26 @@ public class StaffingLevelUtil {
 
         return staffingLevel;
 
+    }
+
+    private static Set<StaffingLevelActivity> getStaffingLevelActivities(Map<BigInteger, BigInteger> childAndParentActivityIdMap, StaffingLevelInterval staffingLevelTimeSlotDTO, Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMap) {
+        Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
+        Map<BigInteger, StaffingLevelStaffMinMax> activityIdStaffMinMaxMap = new HashMap<>();
+        for (StaffingLevelActivity staffingLevelActivity : staffingLevelTimeSlotDTO.getStaffingLevelActivities()) {
+            validateParentChildActivityStaffingLevelMinMaxNumberOfStaff(childAndParentActivityIdMap, activityIdStaffMinMaxMap, staffingLevelActivity);
+            StaffingLevelActivity staffingLevelActivityNew = new StaffingLevelActivity(staffingLevelActivity.getActivityId(), staffingLevelActivity.getName(),
+                    staffingLevelActivity.getMinNoOfStaff(), staffingLevelActivity.getMaxNoOfStaff());
+            if (staffingLevelActivityMap.containsKey(staffingLevelActivity.getActivityId())) {
+                staffingLevelActivityNew.setAvailableNoOfStaff(staffingLevelActivityMap.get(staffingLevelActivity.getActivityId()).getAvailableNoOfStaff());
+            }
+            staffingLevelActivities.add(staffingLevelActivityNew);
+        }
+        activityIdStaffMinMaxMap.values().forEach(staffingLevelStaffMinMax -> {
+            if (staffingLevelStaffMinMax != null && (staffingLevelStaffMinMax.getMinNoOfStaffParentActivity() < staffingLevelStaffMinMax.getMinNoOfStaffChildActivities() || staffingLevelStaffMinMax.getMaxNoOfStaffParentActivity() < staffingLevelStaffMinMax.getMaxNoOfStaffChildActivities())) {
+                throw new InvalidRequestException("child staffing level should be less than or equal to parent count for interval : " + staffingLevelTimeSlotDTO.getStaffingLevelDuration().getFrom() + " to "+staffingLevelTimeSlotDTO.getStaffingLevelDuration().getTo());
+            }
+        });
+        return staffingLevelActivities;
     }
 
     private static StaffingLevelStaffMinMax validateParentChildActivityStaffingLevelMinMaxNumberOfStaff(Map<BigInteger, BigInteger> childAndParentActivityIdMap, Map<BigInteger, StaffingLevelStaffMinMax> activityIdStaffMinMaxMap, StaffingLevelActivity staffingLevelActivity) {
@@ -124,7 +130,7 @@ public class StaffingLevelUtil {
         staffingLevel.setUnitId(unitId);
 
         Duration staffingLevelDuration = new Duration(LocalTime.MIN, LocalTime.MAX);
-        List<StaffingLevelInterval> absenceStaffingLevelIntervals = new ArrayList<StaffingLevelInterval>();
+        List<StaffingLevelInterval> absenceStaffingLevelIntervals = new ArrayList<>();
         StaffingLevelInterval absenceStaffingLevelInterval = new StaffingLevelInterval(0, absenceStaffingLevelDto.getMinNoOfStaff(),
                 absenceStaffingLevelDto.getMaxNoOfStaff(), staffingLevelDuration);
         absenceStaffingLevelInterval.setStaffingLevelActivities(absenceStaffingLevelDto.getStaffingLevelActivities());
@@ -136,7 +142,7 @@ public class StaffingLevelUtil {
     }
 
     public static List<AbsenceStaffingLevelDto> buildAbsenceStaffingLevelDto(List<StaffingLevel> staffingLevels) {
-        List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos = new ArrayList<AbsenceStaffingLevelDto>();
+        List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos = new ArrayList<>();
 
         for (StaffingLevel staffingLevel : staffingLevels) {
             AbsenceStaffingLevelDto absenceStaffingLevelDto = new AbsenceStaffingLevelDto(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount());
@@ -155,7 +161,7 @@ public class StaffingLevelUtil {
 
     public static void sortStaffingLevelActivities(PresenceStaffingLevelDto presenceStaffingLevelDto, Map<BigInteger, Integer> activitiesRankMap) {
 
-        for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO : presenceStaffingLevelDto.getPresenceStaffingLevelInterval()) {
+        for (StaffingLevelInterval staffingLevelTimeSlotDTO : presenceStaffingLevelDto.getPresenceStaffingLevelInterval()) {
             Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMap = staffingLevelTimeSlotDTO.getStaffingLevelActivities().stream().collect(Collectors.toMap(StaffingLevelActivity::getActivityId, Function.identity()));
             StaffingLevelActivity staffingLevelActivities[] = new StaffingLevelActivity[staffingLevelTimeSlotDTO.getStaffingLevelActivities().size()];
             //TODO as discuss with sakshi we need to change rank functionality in staffing level

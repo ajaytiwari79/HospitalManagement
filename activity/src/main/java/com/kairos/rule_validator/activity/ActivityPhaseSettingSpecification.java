@@ -20,7 +20,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.STAFF;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 
 /**

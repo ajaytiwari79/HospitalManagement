@@ -3,7 +3,6 @@ package com.kairos.persistence.model.organization.team;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.team.LeaderType;
 import com.kairos.enums.team.TeamType;
-import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +12,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -40,7 +40,8 @@ public class TeamDTO {
     private List<StaffTeamDTO> staffDetails;
     private TeamType teamType;
     private LeaderType leaderType;
-
+    private LocalDate startDate;
+    private LocalDate endDate;
     @AssertTrue(message = "message.same_staff.belongs_to.both_lead")
     public boolean isValid() {
         if(isCollectionEmpty(mainTeamLeaderIds) || isCollectionEmpty(actingTeamLeaderIds)){

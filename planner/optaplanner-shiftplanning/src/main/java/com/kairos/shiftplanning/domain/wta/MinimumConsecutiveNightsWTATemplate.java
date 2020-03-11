@@ -55,7 +55,7 @@ public class MinimumConsecutiveNightsWTATemplate implements ConstraintHandler, N
         int count = 0;
         int consecutiveNightCount=1;
         ShiftPlanningUtility.sortShifts(shifts);
-        List<LocalDate> localDates= ShiftPlanningUtility.getSortedDates(shifts);
+        List<LocalDate> localDates= ShiftPlanningUtility.getSortedAndUniqueDates(shifts);
 
         for (int i=localDates.size()-1;i>=0;i--){
             if(i!=0){

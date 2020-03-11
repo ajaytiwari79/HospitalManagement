@@ -109,6 +109,13 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.21.0'
     //this is for hot swaping in intelij
     compile('org.springframework.boot:spring-boot-devtools')
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jdbc
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: "${springBootVersion}"
+    // https://mvnrepository.com/artifact/org.liquigraph/liquigraph-spring-boot-starter
+    compile group: 'org.liquigraph', name: 'liquigraph-spring-boot-starter', version: '3.1.0'
+// https://mvnrepository.com/artifact/org.neo4j.driver/neo4j-java-driver
+    compile group: 'org.neo4j.driver', name: 'neo4j-java-driver', version: '1.7.5'
+
 }
 
 dependencyManagement {

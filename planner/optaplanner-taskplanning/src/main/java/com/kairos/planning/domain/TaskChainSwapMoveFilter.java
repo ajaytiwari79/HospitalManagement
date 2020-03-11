@@ -14,39 +14,47 @@ public class TaskChainSwapMoveFilter implements SelectionFilter<TaskPlanningSolu
 			AbstractMove<TaskPlanningSolution> chainSwapMove) {
 		final boolean[] movable = new boolean[]{true};
 		if(chainSwapMove instanceof SubChainSwapMove){
-			SubChainSwapMove<TaskPlanningSolution> subChainSwapMove= (SubChainSwapMove<TaskPlanningSolution>)chainSwapMove;
-			subChainSwapMove.getLeftSubChain().getEntityList().forEach(task->{
-				if(((Task)task).isLocked() && !((Task)task).getEmployee().getId().equals(((Task)subChainSwapMove.getRightSubChain().getFirstEntity()).getEmployee().getId())){
-					movable[0]=false;
-					return;
-				}
-			});
-			if(movable[0]){
-				subChainSwapMove.getRightSubChain().getEntityList().forEach(task->{
-					if(((Task)task).isLocked() && !((Task)task).getEmployee().getId().equals(((Task)subChainSwapMove.getLeftSubChain().getFirstEntity()).getEmployee().getId())){
-						movable[0]=false;
-						return;
-					}
-				});
-			}
+			swapChainMove((SubChainSwapMove<TaskPlanningSolution>) chainSwapMove, movable);
 		} else if(chainSwapMove instanceof SubChainReversingSwapMove){
-			SubChainReversingSwapMove<TaskPlanningSolution> subChainSwapMove= (SubChainReversingSwapMove<TaskPlanningSolution>)chainSwapMove;
-			subChainSwapMove.getLeftSubChain().getEntityList().forEach(task->{
-				if(((Task)task).isLocked() && !((Task)task).getEmployee().getId().equals(((Task)subChainSwapMove.getRightSubChain().getFirstEntity()).getEmployee().getId())){
-					movable[0]=false;
-					return;
-				}
-			});
-			if(movable[0]){
-				subChainSwapMove.getRightSubChain().getEntityList().forEach(task->{
-					if(((Task)task).isLocked() && !((Task)task).getEmployee().getId().equals(((Task)subChainSwapMove.getLeftSubChain().getFirstEntity()).getEmployee().getId())){
-						movable[0]=false;
-						return;
-					}
-				});
-			}
+			swapMoveChange((SubChainReversingSwapMove<TaskPlanningSolution>) chainSwapMove, movable);
 		}
 		return movable[0];
+	}
+
+	private void swapChainMove(SubChainSwapMove<TaskPlanningSolution> chainSwapMove, boolean[] movable) {
+		SubChainSwapMove<TaskPlanningSolution> subChainSwapMove= chainSwapMove;
+		subChainSwapMove.getLeftSubChain().getEntityList().forEach(task->{
+			if(((Task)task).isLocked() && !((Task)task).getEmployee().getId().equals(((Task)subChainSwapMove.getRightSubChain().getFirstEntity()).getEmployee().getId())){
+				movable[0]=false;
+				return;
+			}
+		});
+		if(movable[0]){
+			subChainSwapMove.getRightSubChain().getEntityList().forEach(task->{
+				if(((Task)task).isLocked() && !((Task)task).getEmployee().getId().equals(((Task)subChainSwapMove.getLeftSubChain().getFirstEntity()).getEmployee().getId())){
+					movable[0]=false;
+					return;
+				}
+			});
+		}
+	}
+
+	private void swapMoveChange(SubChainReversingSwapMove<TaskPlanningSolution> chainSwapMove, boolean[] movable) {
+		SubChainReversingSwapMove<TaskPlanningSolution> subChainSwapMove= chainSwapMove;
+		subChainSwapMove.getLeftSubChain().getEntityList().forEach(task->{
+			if(((Task)task).isLocked() && !((Task)task).getEmployee().getId().equals(((Task)subChainSwapMove.getRightSubChain().getFirstEntity()).getEmployee().getId())){
+				movable[0]=false;
+				return;
+			}
+		});
+		if(movable[0]){
+			subChainSwapMove.getRightSubChain().getEntityList().forEach(task->{
+				if(((Task)task).isLocked() && !((Task)task).getEmployee().getId().equals(((Task)subChainSwapMove.getLeftSubChain().getFirstEntity()).getEmployee().getId())){
+					movable[0]=false;
+					return;
+				}
+			});
+		}
 	}
 
 }

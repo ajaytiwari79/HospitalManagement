@@ -1,16 +1,11 @@
 package com.kairos.service.organization;
 
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
-import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -65,14 +60,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -362,7 +354,6 @@ public class CompanyCreationService {
                     if(userByCprNumberOrEmail != null) {
                         user = userByCprNumberOrEmail;
                         reinitializeUserManagerDto(unitManagerDTO, user);
-                        userGraphRepository.save(user);
                         //setAccessGroupInUserAccount(user, organizationBaseEntity.getId(), unitManagerDTO.getAccessGroupId(), union);
                     } else {
                         user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getUserName(), true);
@@ -370,7 +361,10 @@ public class CompanyCreationService {
                     }
                     user.setLastSelectedOrganizationId(isNotNull(unitId) ? unitId : organization.getId());
                     userGraphRepository.save(user);
-                    staffService.setUserAndPosition(organizationBaseEntity, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
+                    Staff parentOrganizationStaff =staffCreationService.getStaffByUnitIdAndUserId(organization.getId(),user.getId());
+                    if(isNull(parentOrganizationStaff)) {
+                        staffService.setUserAndPosition(organizationBaseEntity, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
+                    }
 
                 }
             }
@@ -436,6 +430,9 @@ public class CompanyCreationService {
         }
         if(unitGraphRepository.existsByName("(?i)"+organizationBasicDTO.getName())) {
             exceptionService.duplicateDataException(ERROR_ORGANIZATION_NAME_DUPLICATE, organizationBasicDTO.getName());
+        }
+        if(organizationBasicDTO.getName().length() < 3 ){
+            exceptionService.actionNotPermittedException(ERROR_UNIT_NAME_INSUFFIENT);
         }
         Country country=parentUnit.getCountry();
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(organizationBasicDTO);
@@ -506,6 +503,9 @@ public class CompanyCreationService {
             contactAddress.setZipCode(zipCode);
         }
         if(addressDTO.getMunicipality() != null) {
+            if(isNull(addressDTO.getMunicipality().getId())){
+                exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
+            }
             Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId(), 0);
             if(municipality == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.TimeInterval;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.enums.DurationType;
 import com.kairos.enums.shift.ShiftOperationType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
@@ -73,7 +73,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
                     }
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalCountOfShifts);
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
-                            limitAndCounter[2], DurationType.DAYS,String.valueOf(limitAndCounter[0]));
+                            limitAndCounter[2], AppConstants.SHIFT_S,String.valueOf(limitAndCounter[0]));
                     if(!isValid){
                         break;
                     }

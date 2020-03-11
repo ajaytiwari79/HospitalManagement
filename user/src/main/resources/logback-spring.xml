@@ -23,33 +23,13 @@
         </root>
     </springProfile>-->
 
-    <!--<springProfile name="local">
-        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-        <appender name="ROLLING-FILE"
-                  class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <encoder>
-                <pattern>${FILE_LOG_PATTERN}</pattern>
-            </encoder>
-            <file>${LOG_FILE}</file>
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
-            </rollingPolicy>
-        </appender>
-        <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="ROLLING-FILE"/>
-        </root>
-    </springProfile>-->
-
-
-    <springProfile name="local,development,test,production,qa">
+    <springProfile name="local">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
         <logger name="org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport" level="OFF"/>
         <logger name="org.springframework.data.neo4j.mapping.Neo4jPersistentProperty" level="OFF"/>
         <logger name="org.springframework.data.neo4j.mapping.Neo4jMappingContext" level="OFF"/>
         <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="OFF"/>
         <logger name="org.springframework.context.support.PostProcessorRegistrationDelegate" level="OFF"/>
-        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
         <appender name="ROLLING-FILE"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">
             <encoder>
@@ -66,8 +46,16 @@
         </root>
     </springProfile>
 
-   <!-- <springProfile name="production">
+
+    <springProfile name="development,test,production,qa">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+        <logger name="org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport" level="OFF"/>
+        <logger name="org.springframework.data.neo4j.mapping.Neo4jPersistentProperty" level="OFF"/>
+        <logger name="org.springframework.data.neo4j.mapping.Neo4jMappingContext" level="OFF"/>
+        <logger name="com.kairos.config.security.CustomDefaultTokenServices" level="OFF"/>
+        <logger name="org.neo4j.ogm.drivers.bolt.request.BoltRequest" level="OFF"/>
+        <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="OFF"/>
+        <logger name="org.springframework.context.support.PostProcessorRegistrationDelegate" level="OFF"/>
         <appender name="ROLLING-FILE"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">
             <encoder>
@@ -75,18 +63,14 @@
             </encoder>
             <file>${LOG_FILE}</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-                <timeBasedFileNamingAndTriggeringPolicy
-                        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                    <maxFileSize>10MB</maxFileSize>
-                </timeBasedFileNamingAndTriggeringPolicy>
+                <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
             </rollingPolicy>
         </appender>
-
         <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="ROLLING-FILE"/>
         </root>
-    </springProfile>-->
+    </springProfile>
 
 </configuration>
 

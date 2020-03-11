@@ -1,12 +1,12 @@
 package com.kairos.service.organization_meta_data;
 
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.default_data.SickConfiguration;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.default_data.SickConfigurationRepository;
 import com.kairos.service.country.TimeTypeRestClient;
-import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

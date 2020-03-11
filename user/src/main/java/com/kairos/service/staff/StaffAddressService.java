@@ -1,11 +1,9 @@
 package com.kairos.service.staff;
 
 import com.kairos.dto.user.organization.AddressDTO;
-import com.kairos.dto.user.organization.ZipCodeDTO;
-import com.kairos.dto.user.staff.client.ContactAddressDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -18,23 +16,18 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.DistanceCalculator;
 import com.kairos.utils.FormatUtil;
-import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GEOGRAPHYDATA_NOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_MUNICIPALITY_NOTFOUND;
 
@@ -68,13 +61,15 @@ public class StaffAddressService {
     private ExceptionService exceptionService;
 
      void saveAddress(Staff staff, List<AddressDTO> addressDTOs) {
-        List<ContactAddress> contactAddresses = contactAddressGraphRepository.findAllById(addressDTOs.stream().map(AddressDTO::getId).collect(Collectors.toList()));
+         List<AddressDTO> addressDTOS = addressDTOs.stream().filter(addressDTO -> isNotNull(addressDTO)).collect(Collectors.toList());
+         List<ContactAddress>  contactAddresses = contactAddressGraphRepository.findAllById(addressDTOS.stream().map(AddressDTO::getId).collect(Collectors.toList()));
+
         Map<Long, ContactAddress> contactAddressMap = contactAddresses.stream().collect(Collectors.toMap(ContactAddress::getId, Function.identity()));
-        List<ZipCode> zipCodes = zipCodeGraphRepository.findAllByZipCode(addressDTOs.stream().map(addressDTO -> addressDTO.getZipCode().getZipCode()).collect(Collectors.toList()));
+        List<ZipCode> zipCodes = zipCodeGraphRepository.findAllByZipCode(addressDTOS.stream().map(addressDTO -> addressDTO.getZipCode().getZipCode()).collect(Collectors.toList()));
         Map<Integer, ZipCode> zipCodeMap = zipCodes.stream().collect(Collectors.toMap(ZipCode::getZipCode, Function.identity()));
-        List<Municipality> municipalities = municipalityGraphRepository.findAllById(addressDTOs.stream().map(addressDTO->addressDTO.getMunicipality().getId()).collect(Collectors.toList()));
+        List<Municipality> municipalities = municipalityGraphRepository.findAllById(addressDTOS.stream().map(addressDTO->addressDTO.getMunicipality().getId()).collect(Collectors.toList()));
         Map<Long, Municipality> municipalityMap = municipalities.stream().collect(Collectors.toMap(Municipality::getId, Function.identity()));
-        for (AddressDTO addressDTO : addressDTOs) {
+        for (AddressDTO addressDTO : addressDTOS) {
             ContactAddress contactAddress = contactAddressMap.getOrDefault(addressDTO.getId(), new ContactAddress());
             contactAddress.setPrimary(addressDTO.isPrimary());
             // Verify Address here

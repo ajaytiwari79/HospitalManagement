@@ -1,6 +1,5 @@
 package com.kairos.shiftplanning.domain.activity;
 
-import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLineInterval;
@@ -16,6 +15,7 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
 /*
@@ -36,6 +36,7 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     private Activity activity;
     @PlanningVariable(valueRangeProviderRefs = "shifts", nullable = true)
     private ShiftImp shift;
+    private BigInteger actualShiftId;
 
 
 
@@ -96,6 +97,10 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
         return shift.getBreaks() != null && shift.getBreaks().stream().filter(brk -> brk.getInterval().overlaps(this.getInterval())).findFirst().isPresent();
     }
 
+    public ShiftActivity getShiftActivity(){
+        return new ShiftActivity(this.start,this.activity,this.getEnd());
+    }
+
     @Override
     public int compareTo(ActivityLineInterval o) {
         return this.getStart().compareTo(o.getStart());
@@ -110,14 +115,14 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
         ActivityLineInterval that = (ActivityLineInterval) o;
 
         return new EqualsBuilder()
-                .append(id, that.id)
+                .append(id, that.id).append(this.getStart(),that.getStart()).append(this.getEnd(),that.getEnd()).append(this.getActivity(),that.getActivity())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(id)
+                .append(id).append(this.getStart()).append(this.getEnd()).append(this.getActivity())
                 .toHashCode();
     }
 }

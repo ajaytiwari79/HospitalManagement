@@ -24,7 +24,6 @@ import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.client.Client;
 import com.kairos.dto.user.client.ClientOrganizationIds;
-import com.kairos.dto.user.client.ClientTemporaryAddress;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.day_type.DayType;
@@ -33,6 +32,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
+import com.kairos.dto.user.organization.skill.Skill;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
@@ -48,13 +48,10 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
-import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
 import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.wrapper.task_demand.TaskDemandRequestWrapper;
-import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -69,10 +66,13 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_EMPLOYMENT_NOTFOUND;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFF_NOT_FOUND_BY_USER;
 import static com.kairos.constants.ApiConstants.*;
+
+//import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
 
 
 @Service
@@ -526,11 +526,11 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CLIENT_ID_URL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Client>>() {
         }, clientId);
     }
-
+/*
     public ClientTemporaryAddress updateClientTemporaryAddress(ClientExceptionDTO clientExceptionDto, Long clientId) {
         return genericRestClient.publishRequest(clientExceptionDto, null, RestClientUrlType.UNIT, HttpMethod.POST, UPDATE_CLIENT_TEMP_ADDRESS_BY_CLIENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ClientTemporaryAddress>>() {
         }, clientId);
-    }
+    }*/
 
     public Map<String, Object> getClientDetails(Long citizenId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CLIENT_CITIZEN_ID_INFO, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
@@ -542,7 +542,7 @@ public class UserIntegrationService {
         }, citizenId);
     }
 
-    public TaskDemandVisitWrapper getClientDetailsForTaskDemandVisit(TaskDemandRequestWrapper taskDemandRequestWrapper) {
+   /* public TaskDemandVisitWrapper getClientDetailsForTaskDemandVisit(TaskDemandRequestWrapper taskDemandRequestWrapper) {
         return genericRestClient.publishRequest(taskDemandRequestWrapper, null, RestClientUrlType.UNIT, HttpMethod.POST, GET_CLIENT_INFO, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<TaskDemandVisitWrapper>>() {
         });
     }
@@ -550,7 +550,7 @@ public class UserIntegrationService {
     public TaskDemandVisitWrapper getPrerequisitesForTaskCreation(Long citizenId, Long unitId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CLIENT_CITIZEN_ID_UNIT_ID_TASK_PREREQUISITES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<TaskDemandVisitWrapper>>() {
         }, citizenId, unitId);
-    }
+    }*/
 
     //On user-microservive ClientController organizationId is not actually this function organizationId
     //TODO verify
@@ -912,6 +912,16 @@ public class UserIntegrationService {
     public static CurrentUserDetails getCurrentUser(){
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, "/get_current_user", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CurrentUserDetails>>() {});
     }
+
+    public List<Skill> getSkillsByName(Set<String> skillsOfAllTimeCareActivity, Long countryId) {
+        return genericRestClient.publishRequest(skillsOfAllTimeCareActivity, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/skills_by_name", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Skill>>>() {});
+    }
+
+//    public Long getTotalSumOfPayLevel(Long countryId, List<Long> employmentIds,LocalDate selectedDate) {
+//        List<NameValuePair> queryParamList = new ArrayList<>();
+//        queryParamList.add(new BasicNameValuePair("selectedDate", selectedDate.toString()));
+//        return genericRestClient.publishRequest(employmentIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_total_sum_of_paylevel", queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
+//    }
 }
 
 

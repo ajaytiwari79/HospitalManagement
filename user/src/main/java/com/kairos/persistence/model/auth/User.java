@@ -3,7 +3,6 @@ package com.kairos.persistence.model.auth;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.annotations.KPermissionField;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.user.ChatStatus;
@@ -31,7 +30,6 @@ import java.time.Period;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;

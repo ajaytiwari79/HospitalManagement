@@ -9,7 +9,6 @@ import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
 import com.kairos.persistence.model.priority_group.PriorityGroup;
 import com.kairos.persistence.repository.open_shift.OpenShiftRuleTemplateRepository;
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
-public class OpenShiftRuleTemplateService extends MongoBaseService {
+public class OpenShiftRuleTemplateService{
     @Inject
     private OpenShiftRuleTemplateRepository openShiftRuleTemplateRepository;
     @Inject
@@ -38,14 +37,14 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
         }
         OpenShiftRuleTemplate openShiftRuleTemplate = new OpenShiftRuleTemplate();
         ObjectMapperUtils.copyProperties(openShiftRuleTemplateDTO, openShiftRuleTemplate);
-        save(openShiftRuleTemplate);
+        openShiftRuleTemplateRepository.save(openShiftRuleTemplate);
         List<PriorityGroup> priorityGroups=priorityGroupRepository.findAllByCountryIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(countryId);
         priorityGroups.forEach(priorityGroup -> {
             priorityGroup.setParentId(priorityGroup.getId());
             priorityGroup.setId(null);
             priorityGroup.setRuleTemplateId(openShiftRuleTemplate.getId());
         });
-        save(priorityGroups);
+        priorityGroupRepository.saveEntities(priorityGroups);
         ObjectMapperUtils.copyProperties(openShiftRuleTemplate, openShiftRuleTemplateDTO);
         return openShiftRuleTemplateDTO;
     }
@@ -60,7 +59,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, OPENSHIFTRULETEMPLATE, ruleTemplateId);
         }
         ObjectMapperUtils.copyProperties(openShiftRuleTemplateDTO, openShiftRuleTemplate);
-        save(openShiftRuleTemplate);
+        openShiftRuleTemplateRepository.save(openShiftRuleTemplate);
         ObjectMapperUtils.copyProperties(openShiftRuleTemplate, openShiftRuleTemplateDTO);
         return openShiftRuleTemplateDTO;
     }
@@ -71,7 +70,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, OPENSHIFTRULETEMPLATE, ruleTemplateId);
         }
         openShiftRuleTemplate.setDeleted(true);
-        save(openShiftRuleTemplate);
+        openShiftRuleTemplateRepository.save(openShiftRuleTemplate);
         return true;
     }
 
@@ -87,7 +86,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
                 openShiftRuleTemplate.setId(null);
                 openShiftRuleTemplate.setCountryId(null);
             });
-            save(openShiftRuleTemplates);
+            openShiftRuleTemplateRepository.saveEntities(openShiftRuleTemplates);
             Map<BigInteger,BigInteger> openShiftRuleTemplateParentIdAndIdMap=openShiftRuleTemplates.stream().collect(Collectors.toMap(OpenShiftRuleTemplate::getParentId,OpenShiftRuleTemplate::getId));
             priorityGroups.forEach(priorityGroup -> {
                 priorityGroup.setParentId(priorityGroup.getId());
@@ -97,7 +96,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
                 priorityGroup.setRuleTemplateId(openShiftRuleTemplateParentIdAndIdMap.get(priorityGroup.getRuleTemplateId()));
             });
             if(!priorityGroups.isEmpty()){
-                save(priorityGroups);
+                priorityGroupRepository.saveEntities(priorityGroups);
             }
 
             }
@@ -115,7 +114,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, OPENSHIFTRULETEMPLATE, ruleTemplateId);
         }
         ObjectMapperUtils.copyProperties(openShiftRuleTemplateDTO,openShiftRuleTemplate);
-        save(openShiftRuleTemplate);
+        openShiftRuleTemplateRepository.save(openShiftRuleTemplate);
         ObjectMapperUtils.copyProperties(openShiftRuleTemplate,openShiftRuleTemplateDTO);
         return openShiftRuleTemplateDTO;
     }
@@ -126,7 +125,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, OPENSHIFTRULETEMPLATE, ruleTemplateId);
         }
         openShiftRuleTemplate.setDeleted(true);
-        save(openShiftRuleTemplate);
+        openShiftRuleTemplateRepository.save(openShiftRuleTemplate);
         return true;
     }
 
@@ -159,7 +158,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
         OpenShiftRuleTemplate openShiftRuleTemplate=new OpenShiftRuleTemplate();
         openShiftRuleTemplateDTO.setUnitId(unitId);
         ObjectMapperUtils.copyProperties(openShiftRuleTemplateDTO,openShiftRuleTemplate);
-        save(openShiftRuleTemplate);
+        openShiftRuleTemplateRepository.save(openShiftRuleTemplate);
         List<PriorityGroup> priorityGroups=priorityGroupRepository.findAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNullAndOrderIdIsNull(unitId);
         if(!priorityGroups.isEmpty()){
             priorityGroups.forEach(priorityGroup -> {
@@ -167,7 +166,7 @@ public class OpenShiftRuleTemplateService extends MongoBaseService {
                 priorityGroup.setId(null);
                 priorityGroup.setRuleTemplateId(openShiftRuleTemplate.getId());
             });
-            save(priorityGroups);
+            priorityGroupRepository.saveEntities(priorityGroups);
         }
         openShiftRuleTemplateDTO.setId(openShiftRuleTemplate.getId());
         return openShiftRuleTemplateDTO;

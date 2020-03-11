@@ -2,14 +2,16 @@ package com.kairos.rule_validator.activity;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.enums.Day;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.DayOfWeek;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ACTIVITY_DAYTYPE;
 

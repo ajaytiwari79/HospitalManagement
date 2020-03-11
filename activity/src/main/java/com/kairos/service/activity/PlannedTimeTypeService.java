@@ -1,12 +1,10 @@
 package com.kairos.service.activity;
 
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
-import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +22,7 @@ import java.util.Optional;
  */
 
 @Service
-public class PlannedTimeTypeService extends MongoBaseService {
+public class PlannedTimeTypeService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlannedTimeTypeService.class);
 
@@ -53,9 +51,8 @@ public class PlannedTimeTypeService extends MongoBaseService {
         }
         plannedTimeType = new PlannedTimeType(presenceTypeDTO.getName(), countryId);
         plannedTimeType.setImageName(presenceTypeDTO.getImageName());
-        save(plannedTimeType);
+        plannedTimeTypeRepository.save(plannedTimeType);
         presenceTypeDTO.setId(plannedTimeType.getId());
-        LOGGER.info(plannedTimeType.toString());
         return presenceTypeDTO;
     }
 
@@ -73,7 +70,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
         }
         PlannedTimeType plannedTimeType = presenceTypeOptional.get();
         plannedTimeType.setDeleted(true);
-        save(plannedTimeType);
+        plannedTimeTypeRepository.save(plannedTimeType);
         return true;
     }
 

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_HOSTINGPROVIDER;
+
 
 @Service
 public class OrganizationHostingProviderService {
@@ -101,7 +103,7 @@ public class OrganizationHostingProviderService {
     public Boolean deleteHostingProvider(Long unitId, Long hostingProviderId) {
         List<String> assetNames = assetRepository.findAllAssetLinkedWithDataDisposal(unitId, hostingProviderId);
         if (CollectionUtils.isNotEmpty(assetNames)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.hostingProvide", StringUtils.join(assetNames, ','));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", MESSAGE_HOSTINGPROVIDER, StringUtils.join(assetNames, ','));
         }
         Integer resultCount = hostingProviderRepository.deleteByIdAndOrganizationId(hostingProviderId, unitId);
         if (resultCount > 0) {
@@ -128,11 +130,11 @@ public class OrganizationHostingProviderService {
             if (id.equals(hostingProvider.getId())) {
                 return hostingProviderDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "message.hostingProvide", hostingProvider.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_HOSTINGPROVIDER, hostingProvider.getName());
         }
         Integer resultCount = hostingProviderRepository.updateMetadataName(hostingProviderDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.hostingProvide", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", MESSAGE_HOSTINGPROVIDER, id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, hostingProviderDTO.getName());
         }

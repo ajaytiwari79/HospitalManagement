@@ -1,13 +1,17 @@
 package com.kairos.service.shift;
 
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
+import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
@@ -48,7 +52,7 @@ public class ShiftFilterService {
     @Inject
     private TimeBankService timeBankService;
 
-    public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO) {
+    public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO,List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
         Long unitId = UserContext.getUserDetails().getLastSelectedOrganizationId();
         if (isNull(staffFilterDTO)) {
@@ -56,7 +60,7 @@ public class ShiftFilterService {
             staffFilterDTO.setFiltersData(new ArrayList<>());
         }
         List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(unitId);
-        Map<FilterType, Set<T>> filterTypeMap = staffFilterDTO.getFiltersData().stream().collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
+        Map<FilterType, Set<T>> filterTypeMap = staffFilterDTO.getFiltersData().stream().filter(distinctByKey(filterSelectionDTO -> filterSelectionDTO.getName())).collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
         ShiftFilter timeTypeFilter = getTimeTypeFilter(filterTypeMap);
         ShiftFilter activityTimecalculationTypeFilter = new ActivityTimeCalculationTypeFilter(filterTypeMap);
         ShiftFilter activityStatusFilter = new ActivityStatusFilter(filterTypeMap);
@@ -72,11 +76,15 @@ public class ShiftFilterService {
         ShiftFilter escalationFilter = getEscalationFilter(shiftWithActivityDTOS.stream().map(shift->shift.getId()).collect(Collectors.toList()), filterTypeMap);
         Set<Long> employmentIds = shiftWithActivityDTOS.stream().map(s->s.getEmploymentId()).collect(Collectors.toSet());
         ShiftFilter timeBankBalanceFilter = getTimeBankBalanceFilter(unitId, filterTypeMap, employmentIds);
+        ShiftFilter employmentTypeFilter = getEmploymentTypeFilter(filterTypeMap,staffKpiFilterDTOS);
+        ShiftFilter employmentSubTypeFilter = getEmploymentSubTypeFilter(filterTypeMap,staffKpiFilterDTOS);
         ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(timeAndAttendanceFilter)
                                     .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter).and(escalationFilter)
-                                    .and(timeBankBalanceFilter);
+                                    .and(timeBankBalanceFilter).and(employmentTypeFilter).and(employmentSubTypeFilter);
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);
     }
+
+
 
     private <G> ShiftFilter getTimeBankBalanceFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap, Set<Long> employmentIds) {
         //Update loop in a single call
@@ -147,6 +155,7 @@ public class ShiftFilterService {
         return new ActivityFilter(filterTypeMap, selectedActivityIds);
     }
 
+
     private <G> ShiftFilter getTimeTypeFilter(Map<FilterType, Set<G>> filterTypeMap) {
         Set<BigInteger> timeTypeIds = new HashSet<>();
         if(filterTypeMap.containsKey(TIME_TYPE) && isCollectionNotEmpty(filterTypeMap.get(TIME_TYPE))) {
@@ -154,6 +163,54 @@ public class ShiftFilterService {
             timeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), ids).keySet();
         }
         return new TimeTypeFilter(filterTypeMap, timeTypeIds);
+    }
+
+    private <G> ShiftFilter getEmploymentTypeFilter(Map<FilterType, Set<G>> filterTypeMap,List<StaffKpiFilterDTO> staffKpiFilterDTOS){
+        Map<Long,Long> employmentIdAndEmploymentTypeIdMap = new HashMap<>();
+        if(filterTypeMap.containsKey(EMPLOYMENT_TYPE)&&isCollectionNotEmpty(filterTypeMap.get(EMPLOYMENT_TYPE))){
+            if(isCollectionEmpty(staffKpiFilterDTOS)){
+                filterTypeMap.remove(EMPLOYMENT_TYPE);
+            }else {
+                employmentIdAndEmploymentTypeIdMap = getEmploymentIdAndEmploymentTypeIdMap(staffKpiFilterDTOS);
+            }
+       }
+       return new EmploymentTypeFilter(filterTypeMap,employmentIdAndEmploymentTypeIdMap);
+    }
+
+    private <G> ShiftFilter getEmploymentSubTypeFilter(Map<FilterType, Set<G>> filterTypeMap,List<StaffKpiFilterDTO> staffKpiFilterDTOS){
+        Map<Long,EmploymentSubType> employmentIdAndEmploymentSubTypeIdMap = new HashMap<>();
+        if(filterTypeMap.containsKey(EMPLOYMENT_SUB_TYPE)&&isCollectionNotEmpty(filterTypeMap.get(EMPLOYMENT_SUB_TYPE))) {
+          if(isCollectionNotEmpty(staffKpiFilterDTOS)) {
+              filterTypeMap.remove(EMPLOYMENT_SUB_TYPE);
+          }
+           else {
+               employmentIdAndEmploymentSubTypeIdMap = getEmploymentIdAndEmploymentSubType(staffKpiFilterDTOS);
+            }
+
+        }
+        return new EmploymentSubTypeFilter(filterTypeMap,employmentIdAndEmploymentSubTypeIdMap);
+    }
+
+    private Map<Long, Long> getEmploymentIdAndEmploymentTypeIdMap(List<StaffKpiFilterDTO> staffKpiFilterDTOS){
+        Map<Long,Long> employmentIdAndEmploymentTypeIdMap = new HashMap<>();
+        for(StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS){
+            for(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO :staffKpiFilterDTO.getEmployment()){
+                employmentIdAndEmploymentTypeIdMap.put(employmentWithCtaDetailsDTO.getId(),employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentTypeId());
+            }
+        }
+        return employmentIdAndEmploymentTypeIdMap;
+    }
+
+    private Map<Long, EmploymentSubType> getEmploymentIdAndEmploymentSubType(List<StaffKpiFilterDTO> staffKpiFilterDTOS){
+        Map<Long, EmploymentSubType> employmentIdAndEmploymentSubTypeIdMap = new HashMap<>();
+        for(StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS){
+            for(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO :staffKpiFilterDTO.getEmployment()){
+                List<EmploymentLinesDTO> employmentLinesDTOS = employmentWithCtaDetailsDTO.getEmploymentLines();
+                Collections.sort(employmentLinesDTOS);
+                employmentIdAndEmploymentSubTypeIdMap.put(employmentWithCtaDetailsDTO.getId(),employmentLinesDTOS.get(employmentLinesDTOS.size()-1).getEmploymentSubType());
+            }
+        }
+        return employmentIdAndEmploymentSubTypeIdMap;
     }
 
     private <T> List<BigInteger> getBigInteger(Collection<T> objects) {

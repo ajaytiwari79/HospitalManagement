@@ -87,6 +87,7 @@ public class CounterRepository{
     public static final String KPI_TITLE = "kpi.title";
     public static final String MODULE_ID = "moduleId";
     public static final String LEVEL = "level";
+    private static final String CHILD = "child";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -320,7 +321,7 @@ public class CounterRepository{
         }
         Aggregation aggregation = Aggregation.newAggregation(match(criteria),
                 lookup(COUNTER, KPI_ID1, "_id", "kpis"),
-                project(TAB_ID, POSITION, "id", "size", KPI_VALIDITY, LOCATION_TYPE, PRIORITY, "level").and("kpis").arrayElementAt(0).as("kpi"),
+                project(TAB_ID, POSITION, "id", "size", KPI_VALIDITY, LOCATION_TYPE, PRIORITY, LEVEL).and("kpis").arrayElementAt(0).as("kpi"),
                 Aggregation.sort(Sort.Direction.ASC, PRIORITY));
         AggregationResults<TabKPIDTO> results = mongoTemplate.aggregate(aggregation, TabKPIConf.class, TabKPIDTO.class);
         return results.getMappedResults();
@@ -336,7 +337,7 @@ public class CounterRepository{
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup(COUNTER, KPI_ID1, "_id", "kpis"),
-                project(TAB_ID, POSITION, "id", "size", KPI_VALIDITY, LOCATION_TYPE, PRIORITY, "level").and("kpis").arrayElementAt(0).as("kpi")
+                project(TAB_ID, POSITION, "id", "size", KPI_VALIDITY, LOCATION_TYPE, PRIORITY, LEVEL).and("kpis").arrayElementAt(0).as("kpi")
         );
         AggregationResults<TabKPIDTO> aggregationResults = mongoTemplate.aggregate(aggregation, TabKPIConf.class, TabKPIDTO.class);
         return aggregationResults.getMappedResults();
@@ -356,19 +357,12 @@ public class CounterRepository{
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup(COUNTER, KPI_ID1, "_id", "kpis"),
-                project(TAB_ID, POSITION, "id", "size", KPI_VALIDITY, LOCATION_TYPE, PRIORITY, "level").and("kpis").arrayElementAt(0).as("kpi"),
+                project(TAB_ID, POSITION, "id", "size", KPI_VALIDITY, LOCATION_TYPE, PRIORITY, LEVEL).and("kpis").arrayElementAt(0).as("kpi"),
                 Aggregation.sort(Sort.Direction.ASC, PRIORITY)
         );
         AggregationResults<TabKPIDTO> aggregationResults = mongoTemplate.aggregate(aggregation, TabKPIConf.class, TabKPIDTO.class);
         return aggregationResults.getMappedResults();
     }
-
-    ;
-
-/*
-Criteria.where(LEVEL).is(ConfLevel.COUNTRY.toString()),Criteria.where(LEVEL).is()
-               ,Criteria.where("kpiValidity").is(KPIValidity.MANDATORY.toString()),Criteria.where("kpiValidity").is(KPIValidity.OPTIONAL.toString()));
- */
 
     public List<TabKPIConf> findTabKPIConfigurationByTabIds(List<String> tabIds, List<BigInteger> kpiIds, Long refId, ConfLevel level) {
         String refQueryField = getRefQueryField(level);
@@ -422,7 +416,7 @@ Criteria.where(LEVEL).is(ConfLevel.COUNTRY.toString()),Criteria.where(LEVEL).is(
         mongoTemplate.remove(query, AccessGroupKPIEntry.class);
     }
 
-    public void removeApplicableKPI(List<Long> refIds, List<BigInteger> kpiIds, Long unitId, ConfLevel level) {
+    public void removeApplicableKPI(List<Long> refIds, List<BigInteger> kpiIds, ConfLevel level) {
         String refQueryField = getRefQueryField(level);
         Query query = ConfLevel.STAFF.equals(level) ? new Query(Criteria.where(DELETED).is(false).and(refQueryField).in(refIds).and(BASE_KPI_ID).in(kpiIds).and(LEVEL).in(level)) :
                 new Query(Criteria.where(DELETED).is(false).and(refQueryField).in(refIds).and(BASE_KPI_ID).in(kpiIds));
@@ -636,8 +630,8 @@ Criteria.where(LEVEL).is(ConfLevel.COUNTRY.toString()),Criteria.where(LEVEL).is(
         String refQueryField = getRefQueryField(level);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(refQueryField).is(refId).and(LEVEL).is(level)),
-                Aggregation.group("parentModuleId").push("$$ROOT").as("child"),
-                project().and("$_id").as(MODULE_ID).and("child").as("child").and("child.enable").as("enable").and("child.defaultTab").as("defaultTab")
+                Aggregation.group("parentModuleId").push("$$ROOT").as(CHILD),
+                project().and("$_id").as(MODULE_ID).and(CHILD).as(CHILD).and("child.enable").as("enable").and("child.defaultTab").as("defaultTab")
         );
         AggregationResults<KPIAccessPageDTO> results = mongoTemplate.aggregate(aggregation, KPIDashboard.class, KPIAccessPageDTO.class);
         return results.getMappedResults();
@@ -666,13 +660,6 @@ Criteria.where(LEVEL).is(ConfLevel.COUNTRY.toString()),Criteria.where(LEVEL).is(
         Query query = new Query(matchCriteria);
         return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboard.class);
     }
-
-//    public boolean allKPIsBelongsToIndividualType(Set<BigInteger> kpiIds, ConfLevel confLevel, Long referenceId) {
-//        String queryField = getRefQueryField(confLevel);
-//        Criteria matchCriteria = Criteria.where(ACTIVE_KPI_ID).in(kpiIds).and(KPI_REPRESENTATION).is(INDIVIDUAL_STAFF).and(AppConstants.DELETED).is(false).and(queryField).is(referenceId).and(LEVEL).is(confLevel);
-//        Query query = new Query(matchCriteria);
-//        return mongoTemplate.find(query, ApplicableKPI.class).size() == kpiIds.size();
-//    }
 
     public <S extends MongoBaseEntity> S save(@Valid S entity) {
         Assert.notNull(entity, "Entity must not be null!");
@@ -708,97 +695,36 @@ Criteria.where(LEVEL).is(ConfLevel.COUNTRY.toString()),Criteria.where(LEVEL).is(
 
     public <T extends MongoBaseEntity> List<T> saveEntities(@Valid List<T> entities){
         Assert.notNull(entities, "Entity must not be null!");
-        Assert.notEmpty(entities, "Entity must not be Empty!");
-
         String collectionName = mongoTemplate.getCollectionName(entities.get(0).getClass());
-
-        /**
-         *  Creating BulkWriteOperation object
-         * */
-
         BulkWriteOperation bulkWriteOperation= mongoTemplate.getMongoDbFactory().getLegacyDb().getCollection(collectionName).initializeUnorderedBulkOperation();
-
-        /**
-         *  Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObject)
-         * */
         MongoConverter converter = mongoTemplate.getConverter();
-
         BasicDBObject dbObject;
-
-        /**
-         *  Handling bulk write exceptions
-         * */
         try{
-
             for (T entity: entities) {
-                /**
-                 *  Get class name for sequence class
-                 * */
                 String className = entity.getClass().getSimpleName();
-                /**
-                 *  Set updatedAt time as current time
-                 * */
                 entity.setUpdatedAt(DateUtils.getDate());
-
-
                 if(entity.getId() == null){
                     entity.setCreatedAt(DateUtils.getDate());
-                    /**
-                     *  Set Id if entity don't have Id
-                     * */
-                    if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
-                        //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
-                        className = entity.getClass().getSuperclass().getSimpleName();
-                    }
                     entity.setId(nextSequence(className));
                     entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
                     dbObject = new BasicDBObject();
-
-                    /*
-                     *  Converting entity object to BasicDBObject
-                     * */
                     converter.write(entity, dbObject);
-
-                    /*
-                     *  Adding entity (BasicDBObject)
-                     * */
                     bulkWriteOperation.insert(dbObject);
                 }else {
                     entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
                     dbObject = new BasicDBObject();
-
-                    /*
-                     *  Converting entity object to BasicDBObject
-                     * */
                     converter.write(entity, dbObject);
-
-                    /**
-                     *  Creating BasicDbObject for find query
-                     * */
                     BasicDBObject query = new BasicDBObject();
-
-                    /**
-                     *  Adding query (find by ID)
-                     * */
                     query.put("_id", dbObject.get("_id"));
-
-                    /**
-                     *  Replacing whole Object
-                     * */
                     bulkWriteOperation.find(query).replaceOne(dbObject);
                 }
             }
-
-            /**
-             * Executing the Operation
-             * */
             bulkWriteOperation.execute();
             return entities;
-
         } catch(Exception ex){
             LOGGER.error("BulkWriteOperation Exception ::  ", ex);
-            return null;
         }
+        return new ArrayList<>();
     }
 
     public BigInteger nextSequence(String sequenceName){

@@ -20,8 +20,6 @@ import com.kairos.service.counter.RestingHoursCalculationService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,7 +57,6 @@ public class CounterDistController {
 
     @Inject
     private RestingHoursCalculationService restingHoursCalculationService;
-    private final static Logger logger = LoggerFactory.getLogger(CounterDistController.class);
 
     @GetMapping(COUNTRY_URL + UNIT_URL + "/modules")
     public ResponseEntity<Map<String, Object>> getKPIEnabledTabsForModuleOfCountry(@PathVariable Long countryId, @PathVariable Long unitId) {
@@ -132,12 +129,12 @@ public class CounterDistController {
     }
 
     @PutMapping(COUNTER_UNIT_DIST_URL + TAB + "/{tabId}")
-    public ResponseEntity<Map<String, Object>> UpdateInitialTabKPIDistConfForUnit(@PathVariable Long unitId, @RequestBody TabKPIDTO tabKPIDTO) {
+    public ResponseEntity<Map<String, Object>> updateInitialTabKPIDistConfForUnit(@PathVariable Long unitId, @RequestBody TabKPIDTO tabKPIDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.updateInitialTabKPIDataConf(tabKPIDTO, unitId, ConfLevel.UNIT));
     }
 
     @PutMapping(COUNTER_STAFF_UNIT_DIST_URL + TAB + "/{tabId}")
-    public ResponseEntity<Map<String, Object>> UpdateInitialTabKPIDistConfForCountry(@PathVariable Long unitId, @RequestBody TabKPIDTO tabKPIDTO) {
+    public ResponseEntity<Map<String, Object>> updateInitialTabKPIDistConfForCountry(@PathVariable Long unitId, @RequestBody TabKPIDTO tabKPIDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.updateInitialTabKPIDataConf(tabKPIDTO, unitId, ConfLevel.COUNTRY));
     }
 
@@ -234,7 +231,7 @@ public class CounterDistController {
 
     @GetMapping(COUNTER_COUNTRY_DIST_URL + ORG_TYPE + "/{orgTypeId}")
     public ResponseEntity<Map<String, Object>> getInitialDataForOrgTypeKPIConf(@PathVariable Long countryId, @PathVariable Long orgTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialOrgTypeKPIDataConf(orgTypeId, countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialOrgTypeKPIDataConf(orgTypeId));
     }
 
     @PostMapping(COUNTER_COUNTRY_DIST_URL + ORG_TYPE + "/create_dist_entry")

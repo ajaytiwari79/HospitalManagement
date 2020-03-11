@@ -1,7 +1,6 @@
 package com.planner.controller.unit;
 
 
-import com.kairos.dto.activity.activity.ActivityConstraintDTO;
 import com.kairos.dto.planner.constarints.unit.UnitConstraintDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.constraint.unit.UnitConstraintService;
@@ -12,9 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-
-import java.math.BigInteger;
 import java.util.Map;
+
 import static com.planner.constants.ApiConstants.API_V1;
 
 

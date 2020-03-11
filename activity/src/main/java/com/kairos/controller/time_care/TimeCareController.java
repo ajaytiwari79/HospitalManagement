@@ -2,10 +2,7 @@ package com.kairos.controller.time_care;
 
 import com.kairos.persistence.model.staffing_level.TimeCareStaffingLevelDTO;
 import com.kairos.service.activity.ActivityService;
-import com.kairos.service.task_type.TaskService;
-import com.kairos.service.task_type.TaskTypeService;
 import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
-import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResponse;
 import com.kairos.utils.response.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +27,6 @@ import static com.kairos.constants.ApiConstants.*;
 public class TimeCareController {
 
     @Inject
-    private TaskTypeService taskTypeService;
-    @Inject
-    private TaskService taskService;
-    @Inject
     private ActivityService activityService;
 
 
@@ -45,12 +38,6 @@ public class TimeCareController {
      * @return
      * @params
      */
-
-    @RequestMapping(value = "/unit/{unitId}/time_care/getShifts/{controlPanelId}", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_XML_VALUE})
-    ResponseEntity<Map<String, Object>> getShiftsFromTimeCare(@RequestBody GetWorkShiftsFromWorkPlaceByIdResponse shifts) {
-            logger.info("Executing Shifts getting from Time care count is----> " + shifts.getGetWorkShiftsFromWorkPlaceByIdResult().size());
-            return ResponseHandler.generateResponse(HttpStatus.OK, false, taskService.importShiftsFromTimeCare(shifts));
-    }
 
     @RequestMapping(value = "/time_care/staffing_levels", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_XML_VALUE})
     ResponseEntity<Map<String, Object>> getStaffingLevelsFromTimeCare(@RequestBody List<TimeCareStaffingLevelDTO> timeCareStaffingLevelDTOList) {

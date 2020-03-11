@@ -1,7 +1,10 @@
 package com.kairos.service.country;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.shift.FunctionDTO;
+import com.kairos.dto.user.TranslationDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
@@ -15,7 +18,6 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentFunctionRelationshipRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -218,4 +220,21 @@ public class FunctionService {
     public List<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
         return functionGraphRepository.findAllDateByFunctionIds(unitId, functionIds);
     }
+
+    public Map<String, TranslationInfo> updateTranslation(Long functionId, TranslationDTO translationData) {
+        Function function = functionGraphRepository.findOne(functionId);
+        function.setTranslatedNames(translationData.getTranslatedNames());
+        function.setTranslatedDescriptions(translationData.getTranslatedDescriptions());
+        functionGraphRepository.save(function);
+        return function.getTranslatedData();
+    }
+
+    public Map<String, TranslationInfo> getTranslatedData(Long functionId) {
+        Function function = functionGraphRepository.findOne(functionId);
+        return function.getTranslatedData();
+    }
+
+
+
+
 }

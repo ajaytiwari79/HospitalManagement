@@ -12,7 +12,6 @@ import lombok.Setter;
 import org.joda.time.LocalDate;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Pradeep singh on 5/8/17.
@@ -53,27 +52,12 @@ public class MaximumConsecutiveWorkingNightsWTATemplate implements ConstraintHan
         return nightTimeInterval;
     }
 
-
-    private int getConsecutiveNightShifts(Set<LocalDate> localDates, Shift shift){
-        int count = 0;
-        int i=1;
-        LocalDate prevDayOfShift = shift.getStart().toLocalDate().minusDays(i);
-        while (true){
-            if(localDates.contains(prevDayOfShift)){
-                count++;
-                i++;
-                prevDayOfShift = prevDayOfShift.minusDays(i);
-            }else break;
-        }
-        return count;
-    }
-
     public int checkConstraints(List<Shift> shifts){
         if(shifts.size()<2) return  0;
         int count = 0;
         int consecutiveNightCount = 1;
         ShiftPlanningUtility.sortShifts(shifts);
-        List<LocalDate> localDates=ShiftPlanningUtility.getSortedDates(shifts);
+        List<LocalDate> localDates=ShiftPlanningUtility.getSortedAndUniqueDates(shifts);
         for (int i=localDates.size()-1;i>=0;i--){
             if(i!=0){
                 if(localDates.get(i-1).equals(localDates.get(i).minusDays(1))  && isNightShift(shifts.get(i))&& isNightShift(shifts.get(i-1))){

@@ -6,6 +6,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.LocalDate;
 import java.time.Period;
 
+import static com.kairos.commons.utils.CommonsExceptionUtil.throwException;
+import static com.kairos.constants.CommonMessageConstants.MESSAGE_CPRNUMBER_NOT_VALID;
+
 /**
  * Created by pavan on 14/2/18.
  */
@@ -44,7 +47,9 @@ public class CPRUtil {
         Integer centuryDigit = Integer.parseInt(cprNumber.substring(6, 7));
         LocalDate birthday;
         year = getYearFromCPR(year, centuryDigit);
-
+        if(month>12 || day>31){
+            throwException(MESSAGE_CPRNUMBER_NOT_VALID);
+        }
         birthday = LocalDate.of(year, month, day);
         return birthday;
     }

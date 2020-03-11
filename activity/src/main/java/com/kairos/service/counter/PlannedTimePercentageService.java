@@ -7,8 +7,8 @@ import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
-import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
@@ -60,7 +60,7 @@ public class PlannedTimePercentageService implements CounterService {
         List<Long> unitIds = (List<Long>) filterCriteria[2];
         List<Long> employmentTypeIds = (List<Long>) filterCriteria[3];
         List<BigInteger> plannedTimeIds=(List<BigInteger>) filterCriteria[6];
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
+        Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
         staffIds = (List<Long>) kpiData[2];
@@ -149,9 +149,10 @@ public class PlannedTimePercentageService implements CounterService {
             shiftDuration+=getTimeDuration(shift.getStartDate(),shift.getEndDate());
         }
         if(isCollectionNotEmpty(shifts)) subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(AppConstants.SHIFT, 100));
-        for (String plannedType : plannedTimeAndPercentageMap.keySet()) {
-            subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(plannedType, getPlannedTimePercentage(shiftDuration,plannedTimeAndPercentageMap.get(plannedType))));
+        for (Map.Entry<String, Double> stringDoubleEntry : plannedTimeAndPercentageMap.entrySet()) {
+            subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(stringDoubleEntry.getKey(), getPlannedTimePercentage(shiftDuration,stringDoubleEntry.getValue())));
         }
+
         return subClusteredBarValue;
     }
 

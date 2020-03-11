@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getCareDays;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByActivity;
 
 /**
@@ -69,7 +68,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
                         if (!isLeaveAvailable) {
                             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                                     new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,
-                                            DurationType.DAYS, String.valueOf(leaveCount));
+                                            DurationType.DAYS.toValue(), String.valueOf(leaveCount));
                             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                         }
                     }

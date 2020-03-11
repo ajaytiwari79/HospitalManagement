@@ -3,11 +3,10 @@ package com.kairos.service.shift;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.TimeInterval;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.BreakAction;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -15,7 +14,6 @@ import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
@@ -35,13 +33,12 @@ import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.CommonsExceptionUtil.convertMessage;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ONE_HOUR_MINUTES;
 import static com.kairos.constants.AppConstants.TIME_AND_ATTENDANCE;
-import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
-import static com.kairos.enums.shift.ShiftEscalationReason.BREAK_NOT_HELD;
 
 /**
  * @author pradeep
@@ -234,7 +231,7 @@ public class ShiftBreakService {
     }
 
     public boolean interruptBreak(BigInteger shiftId, BreakAction breakAction) {
-        Shift shift = shiftMongoRepository.findById(shiftId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_SHIFT_ID, shiftId)));
+        Shift shift = shiftMongoRepository.findById(shiftId).orElseThrow(() -> new DataNotFoundByIdException(convertMessage(MESSAGE_SHIFT_ID, shiftId)));
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
         if (TIME_AND_ATTENDANCE.equals(phase.getName())) {
             switch (breakAction) {
@@ -258,7 +255,7 @@ public class ShiftBreakService {
 
     private void updateBreakHeldInShift(ShiftActivity breakActivity, Shift shift, Shift dbShift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         if (isCollectionNotEmpty(dbShift.getBreakActivities())||breakActivity.isBreakNotHeld()) {
-            ShiftActivity shiftActivity = shift.getActivities().stream().filter(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()).contains(breakActivity.getStartDate())).findFirst().get();
+            ShiftActivity shiftActivity = shift.getActivities().stream().filter(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()).contains(breakActivity.getStartDate())).findFirst().orElseThrow(()->new InvalidRequestException(convertMessage(BREAK_NOT_VALID)));
             if (!activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
                 exceptionService.actionNotPermittedException(BREAK_NOT_VALID);
             }

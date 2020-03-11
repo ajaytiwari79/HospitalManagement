@@ -7,6 +7,7 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -49,7 +50,6 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.utils.CPRUtil;
-import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,14 +118,16 @@ public class StaffCreationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffService.class);
 
     private Staff createStaffByUser(User user) {
-        Staff staff = new Staff();
-        staff.setEmail(user.getEmail());
-        staff.setFirstName(user.getFirstName());
-        staff.setLastName(user.getLastName());
-        staff.setUser(user);
-        staff.setContactDetail(user.getContactDetail());
-        staffGraphRepository.save(staff);
-        return staff;
+
+            Staff staff = new Staff();
+            staff.setEmail(user.getEmail());
+            staff.setFirstName(user.getFirstName());
+            staff.setLastName(user.getLastName());
+            staff.setUser(user);
+            staff.setContactDetail(user.getContactDetail());
+            staffGraphRepository.save(staff);
+            return staff;
+
     }
 
     private Staff updateStaffDetailsOnCreationOfStaff(Organization organization, StaffCreationDTO payload) {
@@ -271,10 +273,7 @@ public class StaffCreationService {
             if (staffGraphRepository.isStaffExistsByCPRNumber(payload.getCprNumber(), organization.getId())) {
                 exceptionService.invalidRequestException(ERROR_STAFF_EXISTS_SAME_CPRNUMBER, payload.getCprNumber());
             }
-            User userWithExistingUserName = userGraphRepository.findUserByUserName("(?i)" + payload.getUserName());
-            if (Optional.ofNullable(userWithExistingUserName).isPresent()) {
-                exceptionService.duplicateDataException(MESSAGE_STAFF_USERNAME_ALREADYEXIST);
-            }
+
             user = userGraphRepository.findUserByCprNumber(payload.getCprNumber());
             if (!Optional.ofNullable(user).isPresent()) {
                 user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User(payload.getCprNumber(), payload.getFirstName().trim(), payload.getLastName().trim(), payload.getPrivateEmail(), payload.getUserName()));
@@ -457,5 +456,8 @@ public class StaffCreationService {
             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffCreationDTO.getCprNumber()));
             user.setGender(CPRUtil.getGenderFromCPRNumber(staffCreationDTO.getCprNumber()));
         }
+    }
+    public Staff getStaffByUnitIdAndUserId(Long unitId,Long userId){
+        return staffGraphRepository.getStaffByUnitIdAndUserId(unitId,userId);
     }
 }

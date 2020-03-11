@@ -20,7 +20,7 @@ public class PhaseSettingsService extends MongoBaseService {
     @Inject private PhaseSettingsRepository phaseSettingsRepository;
     @Inject private PhaseService phaseService;
     public List<PhaseSettingsDTO> getPhaseSettings(Long unitId){
-        return phaseSettingsRepository.findAllByUnitIdAndDeletedFalse(unitId, new Sort(Sort.Direction.ASC, "sequence"));
+        return phaseSettingsRepository.findAllByUnitIdAndDeletedFalse(unitId, Sort.by(Sort.Direction.ASC, "sequence"));
     }
 
     public List<PhaseSettingsDTO> updatePhaseSettings(Long unitId, List<PhaseSettingsDTO> phaseSettingsDTOS) {
