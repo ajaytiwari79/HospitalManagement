@@ -33,6 +33,10 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.pay_table.PayGrade;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
+import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
+import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
+import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.response.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -52,6 +56,7 @@ import com.kairos.service.country.CountryService;
 import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -647,6 +652,47 @@ public class ExpertiseService {
             seniorAndChildCareDaysDTOMap.put(expertise.getId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
         }
         return seniorAndChildCareDaysDTOMap;
+    }
+
+    public Expertise getExpertise(Long expertiseId, Long countryId) {
+        Expertise expertise;
+        if (expertiseId == null) {
+            expertise = expertiseGraphRepository.getOneDefaultExpertiseByCountry(countryId);
+        } else {
+            expertise = expertiseGraphRepository.getExpertiesOfCountry(countryId, expertiseId);
+        }
+        if (expertise == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_EXPERTISE_NOTFOUND, expertiseId);
+        }
+        return expertise;
+    }
+
+    public void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
+        List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
+        for (int i = 0; i < staffPersonalDetail.getExpertiseWithExperience().size(); i++) {
+            Expertise expertise = expertiseMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
+            expertise = expertiseGraphRepository.findById(expertise.getId(), 2).orElse(null);
+            StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExperienceInExpertiseDTOMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
+            Long id = null;
+            ExpertiseLine expertiseLine = expertise.getCurrentlyActiveLine(null);
+            if (Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent())
+                id = staffExperienceInExpertiseDTO.getId();
+            Date expertiseStartDate = staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseStartDate();
+            staffExpertiseRelationShips.add(new StaffExpertiseRelationShip(id, staffToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate));
+            boolean isSeniorityLevelMatched = false;
+            for (SeniorityLevel seniorityLevel : expertiseLine.getSeniorityLevel()) {
+                if (staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() >= seniorityLevel.getFrom() * 12 && (seniorityLevel.getTo() == null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() < seniorityLevel.getTo() * 12)) {
+                    isSeniorityLevelMatched = true;
+                    break;
+                }
+            }
+            if (!isSeniorityLevelMatched) {
+                exceptionService.actionNotPermittedException(ERROR_NOSENIORITYLEVELFOUND, "seniorityLevel " + staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
+            }
+        }
+        if (CollectionUtils.isNotEmpty(staffExpertiseRelationShips)) {
+            staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
+        }
     }
 
 }

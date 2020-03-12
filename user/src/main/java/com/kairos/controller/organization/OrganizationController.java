@@ -25,6 +25,7 @@ import com.kairos.service.resources.ResourceService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffCreationService;
 import com.kairos.service.staff.StaffFilterService;
+import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
@@ -85,6 +86,8 @@ public class OrganizationController {
     private StaffFilterService staffFilterService;
     @Inject
     private StaffCreationService staffCreationService;
+    @Inject
+    private StaffRetrievalService staffRetrievalService;
 
 
     @ApiOperation(value = "Get Organization by Id")
@@ -401,7 +404,7 @@ public class OrganizationController {
     @ApiOperation("get unit manager")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getUnitManager(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getUnitManager(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getUnitManager(unitId));
     }
 
     @GetMapping(UNIT_URL + "/address")
