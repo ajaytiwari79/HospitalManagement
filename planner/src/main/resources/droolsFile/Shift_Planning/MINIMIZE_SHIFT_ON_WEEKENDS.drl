@@ -9,7 +9,7 @@ global HardMediumSoftLongScoreHolder scoreHolder;
 rule "Minimize Shift On Weekends"
 salience 20
   when
-    $unit:Unit(unitConstraints != null)
+    $unit:Unit(constraints != null)
     $shifts:List() from collect (ShiftImp(getInterval()!=null));
     $constraintsPenality: Integer(intValue>0) from ($unit.checkConstraints(null,$shifts,ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS))
   then

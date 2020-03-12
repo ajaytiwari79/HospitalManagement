@@ -25,7 +25,7 @@ public class AbsenceAndPresenceAtSameTime implements Constraint {
     }
 
     @Override
-    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+    public <T extends Constraint> int checkConstraints(T t, List<ShiftImp> shifts) {
         Map<Employee,List<ShiftImp>> employeeListMap = shifts.stream().collect(Collectors.groupingBy(ShiftImp::getEmployee));
         for (Map.Entry<Employee, List<ShiftImp>> employeeListEntry : employeeListMap.entrySet()) {
             List<ShiftImp> shiftImps = employeeListEntry.getValue();

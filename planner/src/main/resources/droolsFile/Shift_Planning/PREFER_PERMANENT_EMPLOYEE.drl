@@ -9,9 +9,9 @@ global HardMediumSoftLongScoreHolder scoreHolder;
 rule "Prefer Permannent Employee"
 salience 20
   when
-    $unit:Unit(unitConstraints != null)
+    $unit:Unit(constraints != null)
     $shifts:List() from collect(ShiftImp(employee!=null))
-    $constraintsPenality: Integer(intValue>0) from ($unit.checkConstraints($shifts,ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS))
+    $constraintsPenality: Integer(intValue>0) from ($unit.checkConstraints(null,$shifts,ConstraintSubType.PREFER_PERMANENT_EMPLOYEE))
   then
-   $unit.breakContraints(scoreHolder,kcontext, $constraintsPenality,ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS);
+   $unit.breakContraints(scoreHolder,kcontext, $constraintsPenality,ConstraintSubType.PREFER_PERMANENT_EMPLOYEE);
 end

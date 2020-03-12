@@ -9,6 +9,8 @@ import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import java.util.ArrayList;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 global HardMediumSoftLongScoreHolder scoreHolder;
+
+
 /********Activity Rules*******/
 rule "Max Allocation Per Shift"
 salience 20

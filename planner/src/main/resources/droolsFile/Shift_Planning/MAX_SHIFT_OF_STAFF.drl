@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 global HardMediumSoftLongScoreHolder scoreHolder;
 /********Activity Rules*******/
-rule "Activity Used on a DayType"
+rule "Max Shift of staff"
 salience 20
     when
         $ac:Activity()

@@ -25,8 +25,8 @@ public class Unit {
     private String id;
     Map<ConstraintSubType, Constraint> constraints;
 
-    public int checkConstraints(Activity activity,List<ShiftImp> shifts, ConstraintType constraintType) {
-        return constraints.get(constraintType).checkConstraints(activity,shifts);
+    public <T extends Constraint> int checkConstraints(T object,List<ShiftImp> shifts, ConstraintType constraintType) {
+        return constraints.get(constraintType).checkConstraints(object,shifts);
     }
 
     public void breakContraints( HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, ConstraintType constraintType) {

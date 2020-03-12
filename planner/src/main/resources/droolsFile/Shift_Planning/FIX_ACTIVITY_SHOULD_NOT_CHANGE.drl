@@ -6,7 +6,7 @@ import com.kairos.shiftplanning.domain.shift.*;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 global HardMediumSoftLongScoreHolder scoreHolder;
 
-rule "Activity Required Tag"
+rule "Fix type of activity should not change"
 salience 20
  when
   $ac:Activity(tags != null)

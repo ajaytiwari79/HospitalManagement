@@ -26,7 +26,7 @@ public class NoChangesToStaffWithCareBubble implements Constraint {
     }
 
     @Override
-    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+    public <T extends Constraint> int checkConstraints(T object, List<ShiftImp> shifts) {
         Map<Long,Tag> tagMap = new HashMap<>();
         int count = 0;
         for (ShiftImp shift : shifts) {

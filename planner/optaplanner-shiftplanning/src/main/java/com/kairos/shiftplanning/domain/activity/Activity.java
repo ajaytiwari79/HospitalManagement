@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain.activity;
 
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
@@ -35,7 +36,7 @@ public class Activity {
     private List<Skill> skills;
     private int priority;
     private String name;
-    private Map<ConstraintSubType, Constraint> constraintMap;
+    private Map<ConstraintSubType, Constraint> constraints;
     private TimeType timeType;
     private int order;
     private int rank;
@@ -60,38 +61,25 @@ public class Activity {
         return this.name== ShiftPlanningGenerator.BLANK_ACTIVITY;
     }
     public boolean isTypePresence(){
-        boolean presence=false;
-        switch (timeType.getName()){
-            case "presence":presence=true;
-            break;
-            default: presence=false;
-        }
-        return presence;
+        return TimeTypeEnum.PRESENCE.equals(timeType.getTimeTypeEnum());
     }
     public boolean isTypeAbsence(){
-        boolean absence=true;
-        switch (timeType.getName()){
-            //More to be added here
-            case "presence":absence=false;
-                break;
-            default: absence=true;
-        }
-        return absence;
+        return TimeTypeEnum.ABSENCE.equals(timeType.getTimeTypeEnum());
     }
 
     public int checkActivityConstraints(ShiftImp shift, ConstraintSubType constraintSubType) {
         if(shift.isLocked()) return 0;
-        return constraintMap.get(constraintSubType).checkConstraints(this,shift);
+        return constraints.get(constraintSubType).checkConstraints(this,shift);
     }
 
     public int checkActivityConstraints(List<ShiftImp> shifts, ConstraintSubType constraintSubType) {
-        return constraintMap.get(constraintSubType).checkConstraints(this,shifts);
+        return constraints.get(constraintSubType).checkConstraints(null,shifts);
     }
 
 
     public void breakActivityContraints(ShiftImp shift, HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, ConstraintSubType constraintSubType) {
         log.debug("breaking Activity constraint: {}",constraintSubType);
-        constraintMap.get(constraintSubType).breakLevelConstraints(scoreHolder,kContext,constraintPenality);
+        constraints.get(constraintSubType).breakLevelConstraints(scoreHolder,kContext,constraintPenality);
     }
 
     public void broketaskPriorityConstraints(HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext){
@@ -114,28 +102,14 @@ public class Activity {
     }
 
     public void brokeActivitySkillConstraints(int constraintPenality,HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext) {
-        /*List<Skill> skills = (List<Skill>) CollectionUtils.subtract(this.skills, shiftRequestPhase.getEmployee().getSkillSet());
-        int weight = skills.stream().mapToInt(s -> s.getWeight()).sum();*/
         scoreHolder.addSoftConstraintMatch(kContext, constraintPenality);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-
         if (o == null || getClass() != o.getClass()) return false;
-
-        //Activity activity = (Activity) o;
         return id.equals(((Activity) o).getId());
-
-        /*return new EqualsBuilder()
-                .append(priority, activity.priority)
-                .append(activityCost, activity.activityCost)
-                .append(id, activity.id)
-                .append(skills, activity.skills)
-                .append(name, activity.name)
-                .append(activityConstraints, activity.activityConstraints)
-                .isEquals();*/
     }
 
     @Override
@@ -145,31 +119,8 @@ public class Activity {
                 .append(skills)
                 .append(priority)
                 .append(name)
-                .append(constraintMap)
+                .append(constraints)
                 .toHashCode();
     }
 
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
-    public int getRank() {
-        return rank;
-    }
-
-    public void setRank(int rank) {
-        this.rank = rank;
-    }
-
-    public List<Long> getExpertises() {
-        return expertises;
-    }
-
-    public void setExpertises(List<Long> expertises) {
-        this.expertises = expertises;
-    }
 }

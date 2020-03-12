@@ -44,7 +44,7 @@ public class MaxShiftOfStaff implements Constraint {
     }
 
     @Override
-    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+    public <T extends Constraint> int checkConstraints(T t, List<ShiftImp> shifts) {
         Map<LocalDate,Long> shiftsCount = shifts.stream().collect(Collectors.groupingBy(shift->shift.getStartDate(),Collectors.counting()));
         int value = 0;
         for (Map.Entry<LocalDate, Long> localDateLongEntry : shiftsCount.entrySet()) {

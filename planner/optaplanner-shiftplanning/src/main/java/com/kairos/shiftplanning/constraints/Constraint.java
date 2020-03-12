@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface Constraint extends ConstraintHandler {
     int checkConstraints(Activity activity, ShiftImp shift);
-    int checkConstraints(Activity activity, List<ShiftImp> shifts);
+    <T extends Constraint> int checkConstraints(T t, List<ShiftImp> shifts);
 
 }
