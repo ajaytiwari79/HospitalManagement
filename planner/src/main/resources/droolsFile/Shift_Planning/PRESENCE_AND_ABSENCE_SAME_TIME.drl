@@ -13,9 +13,10 @@ global HardMediumSoftLongScoreHolder scoreHolder;
 rule "Min Length of Activity"
 salience 20
     when
-        $ac:Activity()
-        $shift:ShiftImp(!activityLineIntervals.isEmpty() && hasIntervalsForActivity($ac))
-        $constraintsPenality: Integer(intValue>0) from ($ac.checkActivityConstraints($shift,ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME))
+        $unit:Unit()
+        $emp:Employee()
+        $shifts:ArrayList(size>0) from collect (ShiftImp(isAbsenceActivityApplied() && getInterval()!=null && employee.equals($emp)))
+        $constraintsPenality: Integer(intValue>0) from ($unit.checkActivityConstraints($shift,ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME))
     then
         $ac.breakActivityContraints(null,scoreHolder,kcontext,$constraintsPenality, ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME);
 end

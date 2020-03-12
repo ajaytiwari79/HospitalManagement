@@ -6,7 +6,10 @@ import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * @author pradeep
@@ -47,7 +50,7 @@ public class CTABasicDetailsDTO {
     }
 
     public List<OrganizationBasicDTO> getOrganizations() {
-        return organizations;
+        return isNullOrElse(organizations,new ArrayList<>());
     }
 
     public void setOrganizations(List<OrganizationBasicDTO> organizations) {

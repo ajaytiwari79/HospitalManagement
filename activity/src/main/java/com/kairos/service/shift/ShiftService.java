@@ -203,9 +203,25 @@ public class ShiftService extends MongoBaseService {
             shiftDTO.setShiftType(ShiftType.PRESENCE);
             shiftWithViolatedInfoDTO = saveShift(staffAdditionalInfoDTO, shiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
         }
+
         addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
+        getshiftWithViolatedInfoDTOForSaveAsDraftActionMode(shiftWithViolatedInfoDTO,shiftActionType);
         return shiftWithViolatedInfoDTO;
     }
+
+    // This function is used for the change the status of the draft shift
+    public void getshiftWithViolatedInfoDTOForSaveAsDraftActionMode(ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO,ShiftActionType shiftActionType){
+        Set<ShiftStatus> shiftStatuses = new HashSet<>();
+        if(ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)){
+        for(ShiftDTO shiftDTO :shiftWithViolatedInfoDTO.getShifts()){
+            for(ShiftActivityDTO shiftActivityDTO : shiftDTO.getActivities()){
+                shiftStatuses.add(ShiftStatus.REQUEST);
+                shiftActivityDTO.setStatus(shiftStatuses);
+                }
+            }
+        }
+    }
+
     private void addReasonCode(List<ShiftDTO> shiftDTOS, List<ReasonCodeDTO> reasonCodes) {
         Map<Long, ReasonCodeDTO> reasonCodeDTOMap = reasonCodes.stream().collect(Collectors.toMap(ReasonCodeDTO::getId, v -> v));
         for (ShiftDTO shift : shiftDTOS) {
