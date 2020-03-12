@@ -23,5 +23,5 @@ public interface PaymentTypeGraphRepository extends Neo4jBaseRepository<PaymentT
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(paymentType:PaymentType {isEnabled:true}) WHERE id(country)={0} AND id(paymentType)<>{2} AND paymentType.name =~{1}  " +
             " WITH count(paymentType) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
-    Boolean paymentTypeExistInCountryByName(Long countryId, String name, Long currentPaymentTypeId);
+    boolean paymentTypeExistInCountryByName(Long countryId, String name, Long currentPaymentTypeId);
 }

@@ -620,9 +620,7 @@ public class CompanyCreationService {
     }
 
     private void addStaffsInChatServer(List<Staff> staffList) {
-        staffList.forEach(staff -> {
-            staffService.addStaffInChatServer(staff);
-        })
+        staffList.forEach(staff -> staffService.addStaffInChatServer(staff));
         staffGraphRepository.saveAll(staffList);
     }
 

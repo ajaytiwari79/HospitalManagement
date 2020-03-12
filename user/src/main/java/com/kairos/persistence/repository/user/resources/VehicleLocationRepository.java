@@ -22,7 +22,7 @@ public interface VehicleLocationRepository extends Neo4jBaseRepository<VehicleLo
     @Query("MATCH(vehicleLocation:VehicleLocation{enabled:true}) WHERE id(vehicleLocation)<>{1} AND vehicleLocation.name =~{0}  " +
             " WITH count(vehicleLocation) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
-    Boolean vehicleLocationExistByName(String name, Long currentVehicleLocationId);
+    boolean vehicleLocationExistByName(String name, Long currentVehicleLocationId);
 }
 
 

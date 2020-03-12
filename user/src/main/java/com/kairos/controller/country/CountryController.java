@@ -197,8 +197,8 @@ public class CountryController {
     @PutMapping(value = COUNTRY_URL + "/skill_category")
     @ApiOperation("Update a skillCategory  by id")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateSkillCategoryById(@RequestBody @Validated SkillCategory skillData, @PathVariable Long countryId) {
-        Map<String, Object> updatedSkillCategory = skillCategoryService.updateSkillCategory(skillData, countryId);
+    public ResponseEntity<Map<String, Object>> updateSkillCategoryById(@RequestBody @Validated SkillCategory skillData) {
+        Map<String, Object> updatedSkillCategory = skillCategoryService.updateSkillCategory(skillData);
         if (updatedSkillCategory == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, updatedSkillCategory);
         }

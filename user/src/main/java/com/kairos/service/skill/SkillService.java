@@ -2,6 +2,7 @@ package com.kairos.service.skill;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.SendGridMailService;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -285,8 +286,8 @@ public class SkillService {
 
 
     public void updateStaffSkillLevel(Long staffId, SkillDTO skillDTO) {
-        Skill skill=skillGraphRepository.findById(skillDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage("skill not found")));
-        Staff staff=staffGraphRepository.findById(staffId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage("staff not found")));
+        Skill skill=skillGraphRepository.findById(skillDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage("skill not found")));
+        Staff staff=staffGraphRepository.findById(staffId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage("staff not found")));
         userSkillLevelRelationshipGraphRepository.removeExistingByStaffIdAndSkillId(staffId,skillDTO.getId());
         List<StaffSkillLevelRelationship> staffSkillLevelRelationships=new ArrayList<>(3);
         skillDTO.getSkillLevels().forEach(skillLevelDTO -> staffSkillLevelRelationships.add(new StaffSkillLevelRelationship(staff,skill,skillLevelDTO.getSkillLevel(),skillLevelDTO.getStartDate(),skillLevelDTO.getEndDate(),true)));
@@ -422,7 +423,7 @@ public class SkillService {
      * @param unitId
      * @return
      */
-    public List<? extends Map<String, Object>> assignSkillToStaff(long staffId, List<Long> removedSkillIds, boolean isSelected, long unitId) {
+    public List<Map<String, Object>> assignSkillToStaff(long staffId, List<Long> removedSkillIds, boolean isSelected, long unitId) {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
@@ -436,10 +437,6 @@ public class SkillService {
             staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime());
             response = Collections.emptyList();
         }
-        /*if (staffGraphRepository.checkIfStaffIsTaskGiver(staffId, unitId) != 0) {
-            logger.info("Staff  is TaskGiver: Now Syncing Skills in Visitour");
-            updateSkillsOfStaffInVisitour(staff, unitId);
-        }*/
         return response;
 
     }
