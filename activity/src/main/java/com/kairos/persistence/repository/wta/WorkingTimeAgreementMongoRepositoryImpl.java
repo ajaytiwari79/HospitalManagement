@@ -8,6 +8,7 @@ import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -326,6 +327,34 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
                 match(criteria),
                 lookup(WTA_BASE_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES)
         );
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public List<WTAQueryResultDTO> getAllWTAByEmploymentIdsAndShowRuleToView(Collection<Long> employmentIds,boolean includeRuleForView) {
+        //.orOperator(Criteria.where("startDate").gte(date).and("endDate").lte(date),Criteria.where("endDate").exists(false).and("startDate").gte(date)
+        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds);
+        /*Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup(WTA_BASE_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES)
+        );*/
+        AggregationOperation workingTimeAggregationOperation = Aggregation.match(criteria);
+
+        String ruleTemplateQuery ="{ $lookup: { " +
+                "from: 'wtaBaseRuleTemplate'," +
+                "let: { ruleTemplateIds : '$ruleTemplateIds' }," +
+                "pipeline: [{" +
+                "$match: {$expr: {$and: [" +
+                "{ $eq: ['$ruleTemplateIds', '$_id']}," +
+                "{ $eq: ['checkRuleFromView', 'true']}]}}}]," +
+                "as: 'ruleTemplates'}}";
+        AggregationOperation ruleTemplateAggregationOperation = new CustomAggregationOperation(Document.parse(ruleTemplateQuery));
+        Aggregation aggregation = Aggregation.newAggregation(
+                workingTimeAggregationOperation,
+                ruleTemplateAggregationOperation
+        );
+
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
     }

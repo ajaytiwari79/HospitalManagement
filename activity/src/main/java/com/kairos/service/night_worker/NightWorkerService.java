@@ -5,19 +5,12 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
-import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.night_worker.NightWorkerGeneralResponseDTO;
 import com.kairos.dto.activity.night_worker.QuestionAnswerDTO;
 import com.kairos.dto.activity.night_worker.QuestionnaireAnswerResponseDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
-import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
-import com.kairos.enums.FilterType;
-import com.kairos.enums.StaffWorkingType;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.night_worker.QuestionAnswerPair;
@@ -56,8 +49,6 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_QUESTIONNAIRE_FREQUENCY;
-import static com.kairos.enums.FilterType.CTA_ACCOUNT_TYPE;
-import static com.kairos.enums.FilterType.NIGHT_WORKERS;
 
 /**
  * Created by prerna on 8/5/18.
@@ -414,59 +405,6 @@ public class NightWorkerService {
                 break;
         }
         return interval;
-    }
-
-    public StaffFilterDTO getFilteredStaffNightWorkerDetails(StaffFilterDTO staffFilterDTO, LocalDate startDate, LocalDate endDate) {
-        Set<Long> staffIds = staffFilterDTO.getMapOfStaffAndEmploymentIds().keySet();
-        Map<Long, Boolean> staffIdNightWorkerMap = getStaffIdAndNightWorkerMap(staffIds);
-        Map<FilterType, Set<String>> filterTypeMap = staffFilterDTO.getFiltersData().stream().collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
-
-        if(filterTypeMap.containsKey(NIGHT_WORKERS) && filterTypeMap.get(NIGHT_WORKERS).size() == 1){
-            staffIds = filterTypeMap.get(NIGHT_WORKERS).contains(StaffWorkingType.NOT_NIGHT_WORKER.toString()) ? staffIdNightWorkerMap.keySet().stream().filter(k->!staffIdNightWorkerMap.get(k)).collect(Collectors.toSet()) : staffIdNightWorkerMap.keySet().stream().filter(k->staffIdNightWorkerMap.get(k)).collect(Collectors.toSet());
-            staffIds.forEach(staffId->staffFilterDTO.getMapOfStaffAndEmploymentIds().remove(staffId));
-        }
-        if (staffFilterDTO.isValidFilterForShift()) {
-            List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllByStaffIdsAndDeleteFalse(isCollectionEmpty(staffFilterDTO.getStaffIds()) ? staffIds : staffFilterDTO.getStaffIds(), startDate, endDate);
-            shiftDTOS = shiftFilterService.getShiftsByFilters(shiftDTOS, staffFilterDTO,new ArrayList<>());
-            staffIds = shiftDTOS.stream().map(shiftDTO -> shiftDTO.getStaffId()).collect(Collectors.toSet());
-            staffIds.forEach(staffId->staffFilterDTO.getMapOfStaffAndEmploymentIds().remove(staffId));
-        }
-        Set<Long> filteredStaffIds = filterStaffByCTATemplateAccountType(staffFilterDTO, staffIds, filterTypeMap);
-        staffFilterDTO.setStaffIds(new ArrayList<>(filteredStaffIds));
-        staffFilterDTO.setNightWorkerDetails(staffIdNightWorkerMap.entrySet().stream().filter(x->filteredStaffIds.contains(x.getKey())).collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue)));
-        if(staffFilterDTO.isIncludeWorkTimeAgreement()) {
-            List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getAllWTAByEmploymentIds(staffFilterDTO.getMapOfStaffAndEmploymentIds().values().stream().flatMap(employmentIds -> employmentIds.stream()).collect(Collectors.toList()));
-            List<WTAResponseDTO> wtaResponseDTOS = copyPropertiesOfCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
-            Map<Long, List<WTAResponseDTO>> employmentIdAndwtaQueryResultDTOSMap = wtaResponseDTOS.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId()));
-            staffFilterDTO.setEmploymentIdAndWtaResponseMap(employmentIdAndwtaQueryResultDTOSMap);
-        }
-        return staffFilterDTO;
-    }
-
-    private Set<Long> filterStaffByCTATemplateAccountType(StaffFilterDTO staffFilterDTO, Set<Long> staffIds, Map<FilterType, Set<String>> filterTypeMap) {
-        Set<Long> filteredStaffIds = staffIds;
-        if(filterTypeMap.containsKey(CTA_ACCOUNT_TYPE)){
-            List<CTAResponseDTO> allCTAs = costTimeAgreementRepository.getParentCTAByUpIds(staffFilterDTO.getMapOfStaffAndEmploymentIds().values().stream().flatMap(longs -> longs.stream()).filter(longs -> isNotNull(longs)).collect(Collectors.toList()));
-            Map<Long,List<CTAResponseDTO>>  ctagroup = allCTAs.stream().collect(Collectors.groupingBy(ctaResponseDTO -> ctaResponseDTO.getEmploymentId(),Collectors.toList()));
-            Set<Long> staffFilterDTOList = new HashSet<>();
-            for(Long staffId:staffIds) {
-                List<Long> employmentIDs=staffFilterDTO.getMapOfStaffAndEmploymentIds().get(staffId);
-                for(Long employmentID:employmentIDs) {
-                    List<CTAResponseDTO> CTAs=ctagroup.getOrDefault(employmentID,new ArrayList<>());
-                    for(CTAResponseDTO ctaResponseDTO:CTAs) {
-                        for(CTARuleTemplateDTO CTARule:ctaResponseDTO.getRuleTemplates()) {
-                            if(filterTypeMap.get(CTA_ACCOUNT_TYPE).contains(CTARule.getPlannedTimeWithFactor().getAccountType().toString())){
-                                staffFilterDTOList.add(staffId);
-                            }
-
-                        }
-                    }
-                }
-            }
-            filteredStaffIds = staffFilterDTOList;
-
-        }
-        return filteredStaffIds;
     }
 
     public Map<Long, Boolean> getStaffIdAndNightWorkerMap(Collection<Long> staffIds) {
