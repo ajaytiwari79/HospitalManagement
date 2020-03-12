@@ -25,6 +25,7 @@ import java.util.Map;
 @Transactional
 @Service
 public class AuthService {
+    public static final String PASS_CODE = "password";
     private long lastUpdated ;
     private static final long ONE_HOUR_MS = 3100000;
     public void kmdAuth()  {
@@ -53,7 +54,7 @@ public class AuthService {
         bodyElements.add("customer",AppConstants.KMD_NEXUS_CUSTOMER);
         bodyElements.add("grant_type",AppConstants.KMD_NEXUS_GRANT_TYPE);
         bodyElements.add("username",AppConstants.KMD_NEXUS_USERNAME);
-        bodyElements.add("password",AppConstants.KMD_NEXUS_AUTH);
+        bodyElements.add(PASS_CODE,AppConstants.KMD_NEXUS_AUTH);
         HttpEntity<Map> headersElements = new HttpEntity<>(bodyElements,headers);
 
         String responseEntity = loginTemplate.postForObject(AppConstants.KMD_NEXUS_AUTH_URL,headersElements,String.class,bodyElements);

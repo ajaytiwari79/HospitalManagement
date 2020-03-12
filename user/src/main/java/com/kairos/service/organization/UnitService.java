@@ -98,7 +98,7 @@ public class UnitService {
         Map<String, Object> response = new HashMap<>(2);
         response.put("parentInfo", parentOrgDefaultDetails(organization));
         List<OrganizationBasicResponse> units = organizationService.getOrganizationGdprAndWorkcenter(organizationId);
-        response.put("units", units.size() != 0 ? units : Collections.emptyList());
+        response.put("units", units);
 
         response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
 
