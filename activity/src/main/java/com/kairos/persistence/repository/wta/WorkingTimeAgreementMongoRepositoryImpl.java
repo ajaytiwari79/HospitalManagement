@@ -346,9 +346,10 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
                 "let: { ruleTemplateIds : '$ruleTemplateIds' }," +
                 "pipeline: [{" +
                 "$match: {$expr: {$and: [" +
-                "{ $eq: ['$ruleTemplateIds', '$_id']}," +
-                "{ $eq: ['checkRuleFromView', 'true']}]}}}]," +
-                "as: 'ruleTemplates'}}";
+                "{ $eq: ['$checkRuleFromView', true ]},{ $in: ['$_id','$$ruleTemplateIds']}" +//,{ $eq: ['checkRuleFromView', true ]}
+                "]}}}]," +
+                " as: 'ruleTemplates'}" +
+                "}";
         AggregationOperation ruleTemplateAggregationOperation = new CustomAggregationOperation(Document.parse(ruleTemplateQuery));
         Aggregation aggregation = Aggregation.newAggregation(
                 workingTimeAggregationOperation,
