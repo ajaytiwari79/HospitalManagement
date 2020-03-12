@@ -6,7 +6,6 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.common.StaffFilterDataDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
@@ -15,7 +14,6 @@ import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
-import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
 import com.kairos.enums.cta.AccountType;
@@ -50,8 +48,6 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,7 +74,6 @@ import static com.kairos.enums.shift.ShiftStatus.*;
 @Transactional
 @Service
 public class StaffFilterService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
     private StaffGraphRepository staffGraphRepository;
@@ -294,7 +289,6 @@ public class StaffFilterService {
         convertTimeTypeDTOSToFilterSelectionQueryResult(timeTypeDTOS.get(0).getChildren(), filterSelectionQueryResults);
         convertTimeTypeDTOSToFilterSelectionQueryResult(timeTypeDTOS.get(1).getChildren(), filterSelectionQueryResults);
         return filterSelectionQueryResults;
-        //return timeTypeDTOS.stream().flatMap(timeTypeDTO -> timeTypeDTO.getChildren().stream()).map(timeTypeDTO -> new FilterSelectionQueryResult(timeTypeDTO.getSecondLevelType().toString(),timeTypeDTO.getLabel())).collect(Collectors.toList());
     }
 
     private void convertTimeTypeDTOSToFilterSelectionQueryResult(List<TimeTypeDTO> timeTypeDTOS, List<FilterSelectionQueryResult> filterSelectionQueryResults){
@@ -440,6 +434,18 @@ public class StaffFilterService {
         staffFilterDTO.setIncludeWorkTimeAgreement(ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId));
         staffFilterDTO = activityIntegrationService.getNightWorkerDetails(staffFilterDTO, unitId, startDate, endDate);
         List<Map> staffList = new ArrayList<>();
+        setNightWorkerDetails(staffFilterDTO, staffs, staffList);
+        if(loggedInStaffId!=null && staffList.stream().noneMatch(k->k.containsKey(loggedInStaffId)) && ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)){
+            List<Map> loggedInStaffDetails=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
+                    new HashMap<>(), null,
+                    envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),loggedInStaffId,selectedDate);
+            staffList.addAll(loggedInStaffDetails);
+        }
+        staffEmploymentTypeWrapper.setStaffList(staffList);
+        return staffEmploymentTypeWrapper;
+    }
+
+    private void setNightWorkerDetails(StaffFilterDTO staffFilterDTO, List<Map> staffs, List<Map> staffList) {
         for (Map staffAndModifiable : staffs) {
             if(staffFilterDTO.getNightWorkerDetails().containsKey(staffAndModifiable.get(ID))) {
                 Map<String, Object> staff = ObjectMapperUtils.copyPropertiesByMapper(staffAndModifiable, HashedMap.class);
@@ -455,14 +461,6 @@ public class StaffFilterService {
                 }
             }
         }
-        if(loggedInStaffId!=null && staffList.stream().noneMatch(k->k.containsKey(loggedInStaffId)) && ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)){
-            List<Map> loggedInStaffDetails=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
-                    new HashMap<>(), null,
-                    envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),loggedInStaffId,selectedDate);
-            staffList.addAll(loggedInStaffDetails);
-        }
-        staffEmploymentTypeWrapper.setStaffList(staffList);
-        return staffEmploymentTypeWrapper;
     }
 
     private <T> List<Map> filterStaffList(List<Map> staffListMap, Map<FilterType, Set<T>> filterData) {
@@ -517,20 +515,31 @@ public class StaffFilterService {
 
     private boolean validatePayGrade(List<Map> employments, AgeRangeDTO payGradeRange){
         long from = getDataInDays(payGradeRange.getFrom(), payGradeRange.getDurationType());
-        long to = isNotNull(payGradeRange.getTo()) ? getDataInDays(payGradeRange.getTo(), payGradeRange.getDurationType()) : MAX_LONG_VALUE;
+        long to = getTo(payGradeRange);
         for (Map employment : employments) {
             for (Map employmentLines : (List<Map>) employment.get(EMPLOYMENT_LINES)) {
                 for (Map payGrades : (List<Map>) employmentLines.get(PAY_GRADES)) {
-                    if(payGrades.containsKey(AppConstants.PAY_GRADE_LEVEL)) {
-                        long payGradeLevel = Long.valueOf(payGrades.get(AppConstants.PAY_GRADE_LEVEL).toString());
-                        if (from <= payGradeLevel && to >= payGradeLevel) {
-                            return true;
-                        }
+                    if (payGradeValid(from, to, payGrades)){
+                        return true;
                     }
                 }
             }
         }
         return false;
+    }
+
+    private boolean payGradeValid(long from, long to, Map payGrades) {
+        if(payGrades.containsKey(AppConstants.PAY_GRADE_LEVEL)) {
+            long payGradeLevel = Long.valueOf(payGrades.get(AppConstants.PAY_GRADE_LEVEL).toString());
+            if (from <= payGradeLevel && to >= payGradeLevel) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private long getTo(AgeRangeDTO payGradeRange) {
+        return isNotNull(payGradeRange.getTo()) ? getDataInDays(payGradeRange.getTo(), payGradeRange.getDurationType()) : MAX_LONG_VALUE;
     }
 
     private boolean validateSeniority(List<Map> expertiseList, AgeRangeDTO expertiseRange) {
@@ -548,7 +557,7 @@ public class StaffFilterService {
     private boolean validate(LocalDate fromDate, LocalDate toDate, AgeRangeDTO dateRange){
         long inDays = ChronoUnit.DAYS.between(fromDate, toDate);
         long from = getDataInDays(dateRange.getFrom(), dateRange.getDurationType());
-        long to = isNotNull(dateRange.getTo()) ? getDataInDays(dateRange.getTo(), dateRange.getDurationType()) : MAX_LONG_VALUE;
+        long to = getTo(dateRange);
         return from <= inDays && to >= inDays;
     }
 

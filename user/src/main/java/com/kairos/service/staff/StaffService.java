@@ -1,7 +1,9 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.SendGridMailService;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
@@ -455,24 +457,15 @@ public class StaffService {
     }
 
     public StaffUploadBySheetQueryResult batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
-        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-        if (!Optional.ofNullable(accessGroup).isPresent()) {
-            LOGGER.error("Access group not found");
-            exceptionService.invalidRequestException(ERROR_STAFF_ACCESSGROUP_NOTFOUND, accessGroupId);
-        }
-        if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())) {
-            exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
-        }
+        AccessGroup accessGroup = accessGroupRepository.findById(accessGroupId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(ERROR_STAFF_ACCESSGROUP_NOTFOUND, accessGroupId)));
+        validateAccessGroup(accessGroup);
         List<StaffPersonalDetail> staffList = new ArrayList<>();
         List<StaffPersonalDetail> staffErrorList = new ArrayList<>();
         StaffUploadBySheetQueryResult staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
         staffUploadBySheetQueryResult.setStaffErrorList(staffErrorList);
         staffUploadBySheetQueryResult.setStaffList(staffList);
         Organization organization = organizationService.fetchParentOrganization(unitId);
-        if (organization == null) {
-            LOGGER.info("Organization is null");
-            return null;
-        }
+        Random random=new Random();
         try (InputStream stream = multipartFile.getInputStream()) {
             //Get the workbook instance for XLS file
             XSSFWorkbook workbook = new XSSFWorkbook(stream);
@@ -485,31 +478,12 @@ public class StaffService {
             }
             Set<Long> externalIdsOfStaffToBeSaved = new HashSet<>();
             boolean headerSkipped = false;
-            for (Row row : sheet) { // For each Row.
-                if (!headerSkipped) {
-                    headerSkipped = true;
-                    continue;
-                }
-                Cell cell = row.getCell(2); // Get the Cell at the Index / Column you want.
-                if (cell != null) {
-                    cell.setCellType(Cell.CELL_TYPE_NUMERIC);
-                    if (cell.getNumericCellValue() > 0) {
-                        externalIdsOfStaffToBeSaved.add(new Double(cell.toString()).longValue());
-                    }
-                }
-            }
+            skipHeaders(sheet, externalIdsOfStaffToBeSaved, headerSkipped);
             List<Long> alreadyAddedStaffIds = staffGraphRepository.findStaffByExternalIdIn(externalIdsOfStaffToBeSaved);
-            // TODO get CountryId
             SystemLanguage defaultSystemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(unitId);
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
-                if (String.valueOf(row.getCell(0)) == null || String.valueOf(row.getCell(0)).isEmpty()) {
-                    break;
-                }
-                if (row.getCell(0) == null) {
-                    LOGGER.info("No more rows");
-                    break;
-                }
+                if (validateRow(row)) break;
                 // Skip headers
                 if (row.getRowNum() == 0) {
                     continue;
@@ -523,35 +497,11 @@ public class StaffService {
                 String privateEmail = "";
                 String externalIdValueAsString = "";
                 String userName = "";
-                if (isNotNull(row.getCell(41, Row.RETURN_BLANK_AS_NULL))) {
-                    cprAsLong = new Double(getStringValueOfIndexedCell(row, 41)).longValue();
-                }
-                if (isNotNull(row.getCell(20, Row.RETURN_BLANK_AS_NULL))) {
-                    firstName = getStringValueOfIndexedCell(row, 20);
-                }
-                if (isNotNull(row.getCell(21, Row.RETURN_BLANK_AS_NULL))) {
-                    lastName = getStringValueOfIndexedCell(row, 21);
-                }
-                if (isNotNull(row.getCell(28, Row.RETURN_BLANK_AS_NULL))) {
-                    privateEmail = getStringValueOfIndexedCell(row, 28);
-                }
-
-                if (String.valueOf(row.getCell(19)) == null || String.valueOf(row.getCell(19)).isEmpty()) {
-                    userName = createNewUserName(firstName, lastName);
-
-                } else {
-                    User user = userGraphRepository.findUserByUserName(getStringValueOfIndexedCell(row, 19));
-                    if (Optional.ofNullable(user).isPresent()) {
-                        StaffPersonalDetail staffDTO = new StaffPersonalDetail();
-                        staffDTO.setFirstName(firstName);
-                        staffDTO.setLastName(lastName);
-                        staffDTO.setErrorMessage("UserName already exist");
-                        staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong).toString());
-                        staffErrorList.add(staffDTO);
-                    } else {
-                        userName = getStringValueOfIndexedCell(row, 19);
-                    }
-                }
+                cprAsLong = getCPR(row, cprAsLong);
+                firstName = getFirstName(row, firstName);
+                lastName = getLastName(row, lastName);
+                privateEmail = getStringValue(row, privateEmail, 28);
+                userName = getUserName(staffErrorList, row, cprAsLong, firstName, lastName, userName,random);
                 externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
                 if (isCollectionNotEmpty(missingMandatoryFields) || cprAsLong == null || StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName) || StringUtils.isBlank(privateEmail) || StringUtils.isBlank(externalIdValueAsString)) {
                     StaffPersonalDetail staffDTO = new StaffPersonalDetail();
@@ -564,78 +514,7 @@ public class StaffService {
                     }
                     staffErrorList.add(staffDTO);
                 } else {
-                    Long externalId = (StringUtils.isBlank(externalIdValueAsString)) ? 0 : Long.parseLong(externalIdValueAsString);
-                    if (alreadyAddedStaffIds.contains(externalId)) {
-                        StaffPersonalDetail staffDTO = new StaffPersonalDetail();
-                        staffDTO.setFirstName(firstName);
-                        staffDTO.setLastName(lastName);
-                        staffDTO.setErrorMessage("Duplicate External Id");
-                        staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong).toString());
-                        staffErrorList.add(staffDTO);
-                        continue;
-                    }
-                    // Check if Staff exists in organization with CPR Number
-                    if (staffGraphRepository.isStaffExistsByCPRNumber(cprAsLong.toString(), organization.getId())) {
-                        StaffPersonalDetail staffDTO = new StaffPersonalDetail();
-                        staffDTO.setFirstName(firstName);
-                        staffDTO.setLastName(lastName);
-                        staffDTO.setErrorMessage("Staff already exist with CPR Number " + cprAsLong);
-                        staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong).toString());
-                        staffErrorList.add(staffDTO);
-                        continue;
-                    }
-                    Staff staff = new Staff();
-                    boolean isEmploymentExist = (staff.getId()) != null;
-                    staff.setExternalId(externalId);
-                    staff.setFirstName(firstName);
-                    staff.setLastName(lastName);
-                    staff.setFamilyName(lastName);
-                    if (row.getCell(17) != null) {
-                        staff.setBadgeNumber(getStringValueOfIndexedCell(row, 17));
-                    }
-                    ContactAddress contactAddress = extractContactAddressFromRow(row);
-                    if (!Optional.ofNullable(contactAddress).isPresent()) {
-                        contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(organization);
-                    }
-                    ContactDetail contactDetail = extractContactDetailFromRow(row);
-                    staff.setContactDetail(contactDetail);
-                    staff.setContactAddress(contactAddress);
-                    User user = null;
-                    if (isCollectionEmpty(missingMandatoryFields)) {
-                        user = userGraphRepository.findByEmail("(?i)" + privateEmail);
-                        if (!Optional.ofNullable(user).isPresent()) {
-                            user = new User();
-                            // set User's default language
-                            user.setUserLanguage(defaultSystemLanguage);
-                            user.setFirstName(firstName);
-                            user.setLastName(lastName);
-                            user.setCprNumber(cprAsLong.toString().trim());
-                            user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
-                            user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
-                            user.setUserName(userName);
-                            boolean userNameUpdated = !(String.valueOf(row.getCell(19)) == null || String.valueOf(row.getCell(19)).trim().isEmpty());
-                            user.setUserNameUpdated(userNameUpdated);
-                            if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
-                                //user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
-                                user.setEmail(contactDetail.getPrivateEmail().toLowerCase());
-                            } else {
-                                user.setEmail(user.getFirstName().trim() + KAIROS_EMAIL);
-                            }
-                            String defaultPassword = user.getFirstName().replaceAll("\\s+", "") + DEFAULT_PASSPHRASE_ENDS_WITH;
-                            user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
-                            user.setAccessToken(defaultPassword);
-                        }
-                        user.setUserName(userName);
-                        staff.setUser(user);
-                    }
-                    staffGraphRepository.save(staff);
-                    StaffPersonalDetail staffDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffPersonalDetail.class);
-                    staffDTO.setGender(user.getGender());
-                    staffDTO.setAge(Period.between(CPRUtil.getDateOfBirthFromCPR(user.getCprNumber()), LocalDate.now()).getYears());
-                    staffList.add(staffDTO);
-                    if (!staffGraphRepository.staffAlreadyInUnit(externalId, organization.getId())) {
-                        positionService.createPosition(organization, staff, accessGroupId, DateUtils.getCurrentDateMillis());
-                    }
+                    setInformationAndSaveStaff(accessGroupId, staffList, staffErrorList, organization, alreadyAddedStaffIds, defaultSystemLanguage, row, missingMandatoryFields, cprAsLong, firstName, lastName, privateEmail, externalIdValueAsString, userName);
                 }
             }
             if (isCollectionNotEmpty(staffList)) {
@@ -646,6 +525,166 @@ public class StaffService {
             e.printStackTrace();
         }
         return staffUploadBySheetQueryResult;
+    }
+
+    private String getUserName(List<StaffPersonalDetail> staffErrorList, Row row, Long cprAsLong, String firstName, String lastName, String userName,Random rand) {
+        if (StringUtils.isEmpty(String.valueOf(row.getCell(19)))) {
+            userName = createNewUserName(firstName, lastName,rand);
+
+        } else {
+            userName = getExistingUserName(staffErrorList, row, cprAsLong, firstName, lastName, userName);
+        }
+        return userName;
+    }
+
+    private void validateAccessGroup(AccessGroup accessGroup) {
+        if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())) {
+            exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
+        }
+    }
+
+    private String getExistingUserName(List<StaffPersonalDetail> staffErrorList, Row row, Long cprAsLong, String firstName, String lastName, String userName) {
+        User user = userGraphRepository.findUserByUserName(getStringValueOfIndexedCell(row, 19));
+        if (Optional.ofNullable(user).isPresent()) {
+            StaffPersonalDetail staffDTO = new StaffPersonalDetail();
+            staffDTO.setFirstName(firstName);
+            staffDTO.setLastName(lastName);
+            staffDTO.setErrorMessage("UserName already exist");
+            staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong).toString());
+            staffErrorList.add(staffDTO);
+        } else {
+            userName = getStringValueOfIndexedCell(row, 19);
+        }
+        return userName;
+    }
+
+    private boolean validateRow(Row row) {
+        if (String.valueOf(row.getCell(0)) == null || String.valueOf(row.getCell(0)).isEmpty()) {
+            return true;
+        }
+        if (row.getCell(0) == null) {
+            LOGGER.info("No more rows");
+            return true;
+        }
+        return false;
+    }
+
+    private void skipHeaders(XSSFSheet sheet, Set<Long> externalIdsOfStaffToBeSaved, boolean headerSkipped) {
+        for (Row row : sheet) { // For each Row.
+            if (!headerSkipped) {
+                headerSkipped = true;
+                continue;
+            }
+            Cell cell = row.getCell(2); // Get the Cell at the Index / Column you want.
+            if (cell != null) {
+                cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                if (cell.getNumericCellValue() > 0) {
+                    externalIdsOfStaffToBeSaved.add(new Double(cell.toString()).longValue());
+                }
+            }
+        }
+    }
+
+    private void setInformationAndSaveStaff(Long accessGroupId, List<StaffPersonalDetail> staffList, List<StaffPersonalDetail> staffErrorList, Organization organization, List<Long> alreadyAddedStaffIds, SystemLanguage defaultSystemLanguage, Row row, List<String> missingMandatoryFields, Long cprAsLong, String firstName, String lastName, String privateEmail, String externalIdValueAsString, String userName) {
+        Long externalId = (StringUtils.isBlank(externalIdValueAsString)) ? 0 : Long.parseLong(externalIdValueAsString);
+        if (alreadyAddedStaffIds.contains(externalId)) {
+            StaffPersonalDetail staffDTO = new StaffPersonalDetail();
+            staffDTO.setFirstName(firstName);
+            staffDTO.setLastName(lastName);
+            staffDTO.setErrorMessage("Duplicate External Id");
+            staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong).toString());
+            staffErrorList.add(staffDTO);
+            return;
+        }
+        // Check if Staff exists in organization with CPR Number
+        if (staffGraphRepository.isStaffExistsByCPRNumber(cprAsLong.toString(), organization.getId())) {
+            StaffPersonalDetail staffDTO = new StaffPersonalDetail();
+            staffDTO.setFirstName(firstName);
+            staffDTO.setLastName(lastName);
+            staffDTO.setErrorMessage("Staff already exist with CPR Number " + cprAsLong);
+            staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong).toString());
+            staffErrorList.add(staffDTO);
+            return;
+        }
+        Staff staff = new Staff();
+        staff.setExternalId(externalId);
+        staff.setFirstName(firstName);
+        staff.setLastName(lastName);
+        staff.setFamilyName(lastName);
+        if (row.getCell(17) != null) {
+            staff.setBadgeNumber(getStringValueOfIndexedCell(row, 17));
+        }
+        ContactAddress contactAddress = extractContactAddressFromRow(row);
+        if (!Optional.ofNullable(contactAddress).isPresent()) {
+            contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(organization);
+        }
+        ContactDetail contactDetail = extractContactDetailFromRow(row);
+        staff.setContactDetail(contactDetail);
+        staff.setContactAddress(contactAddress);
+        User user = null;
+        user = setMissingMandatoryFieldInUser(defaultSystemLanguage, row, missingMandatoryFields, cprAsLong, firstName, lastName, privateEmail, userName, staff, contactDetail, user);
+        staffGraphRepository.save(staff);
+        StaffPersonalDetail staffDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffPersonalDetail.class);
+        staffDTO.setGender(user.getGender());
+        staffDTO.setAge(Period.between(CPRUtil.getDateOfBirthFromCPR(user.getCprNumber()), LocalDate.now()).getYears());
+        staffList.add(staffDTO);
+        if (!staffGraphRepository.staffAlreadyInUnit(externalId, organization.getId())) {
+            positionService.createPosition(organization, staff, accessGroupId, DateUtils.getCurrentDateMillis());
+        }
+    }
+
+    private User setMissingMandatoryFieldInUser(SystemLanguage defaultSystemLanguage, Row row, List<String> missingMandatoryFields, Long cprAsLong, String firstName, String lastName, String privateEmail, String userName, Staff staff, ContactDetail contactDetail, User user) {
+        if (isCollectionEmpty(missingMandatoryFields)) {
+            user = userGraphRepository.findByEmail("(?i)" + privateEmail);
+            if (!Optional.ofNullable(user).isPresent()) {
+                user = new User();
+                // set User's default language
+                user.setUserLanguage(defaultSystemLanguage);
+                user.setFirstName(firstName);
+                user.setLastName(lastName);
+                user.setCprNumber(cprAsLong.toString().trim());
+                user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
+                user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
+                user.setUserName(userName);
+                boolean userNameUpdated = !(String.valueOf(row.getCell(19)) == null || String.valueOf(row.getCell(19)).trim().isEmpty());
+                user.setUserNameUpdated(userNameUpdated);
+                if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
+                    user.setEmail(contactDetail.getPrivateEmail().toLowerCase());
+                } else {
+                    user.setEmail(user.getFirstName().trim() + KAIROS_EMAIL);
+                }
+                String defaultPassword = user.getFirstName().replaceAll("\\s+", "") + DEFAULT_PASSPHRASE_ENDS_WITH;
+                user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
+                user.setAccessToken(defaultPassword);
+            }
+            user.setUserName(userName);
+            staff.setUser(user);
+        }
+        return user;
+    }
+
+    private String getStringValue(Row row, String privateEmail, int i) {
+        if (isNotNull(row.getCell(i, Row.RETURN_BLANK_AS_NULL))) {
+            privateEmail = getStringValueOfIndexedCell(row, i);
+        }
+        return privateEmail;
+    }
+
+    private String getLastName(Row row, String lastName) {
+        lastName = getStringValue(row, lastName, 21);
+        return lastName;
+    }
+
+    private String getFirstName(Row row, String firstName) {
+        firstName = getStringValue(row, firstName, 20);
+        return firstName;
+    }
+
+    private Long getCPR(Row row, Long cprAsLong) {
+        if (isNotNull(row.getCell(41, Row.RETURN_BLANK_AS_NULL))) {
+            cprAsLong = new Double(getStringValueOfIndexedCell(row, 41)).longValue();
+        }
+        return cprAsLong;
     }
 
     private ContactAddress extractContactAddressFromRow(Row row) {
@@ -1090,11 +1129,11 @@ public class StaffService {
         return staffEmploymentTypeWrapper;
     }
 
-    public String createNewUserName(String firstName, String lastName) {
+    public String createNewUserName(String firstName, String lastName,Random rand) {
         String newUserName = null;
-        User existingUserName = null;
-        Random rand = new Random();
-        String newGeneratedUserName = null;
+        User existingUserName;
+
+        String newGeneratedUserName;
         while (newUserName == null) {
             newGeneratedUserName = firstName.concat(lastName).concat(String.valueOf(rand.nextInt(1000)));
             existingUserName = userGraphRepository.findUserByUserName(newGeneratedUserName);

@@ -1,9 +1,7 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -13,7 +11,6 @@ import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;

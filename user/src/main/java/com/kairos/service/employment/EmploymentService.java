@@ -19,7 +19,6 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;

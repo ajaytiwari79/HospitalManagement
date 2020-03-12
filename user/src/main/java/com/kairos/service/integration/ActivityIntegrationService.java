@@ -24,8 +24,6 @@ import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

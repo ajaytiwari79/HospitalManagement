@@ -1,10 +1,6 @@
 package com.kairos.dto.activity.shift;
 
 
-import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.activity_tabs.BalanceSettingActivityTabDTO;
-import com.kairos.enums.TimeTypeEnum;
-import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +15,6 @@ import java.util.List;
 import java.util.TimeZone;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 @RunWith(MockitoJUnitRunner.class)
 public class ShiftDTOTest {
 

@@ -1,6 +1,7 @@
 package com.kairos.service.staff;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
@@ -191,7 +192,7 @@ public class StaffRetrievalService {
 
 
     public StaffPersonalDetail getPersonalInfo(long staffId, long unitId) {
-        Staff staff = staffGraphRepository.findById(staffId,2).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_STAFF_IDANDUNITID_NOTFOUND, staffId, unitId)));
+        Staff staff = staffGraphRepository.findById(staffId,2).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_STAFF_IDANDUNITID_NOTFOUND, staffId, unitId)));
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staff.getId()), SectorAndStaffExpertiseQueryResult.class);
         StaffPersonalDetail staffPersonalDetail = ObjectMapperUtils.copyPropertiesByMapper(staff,StaffPersonalDetail.class);
         staffPersonalDetail.setProfilePic((isNotNull(staff.getProfilePic())) ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic() : staff.getProfilePic());
@@ -360,7 +361,6 @@ public class StaffRetrievalService {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
-                                //staffListByRole = staff;
                                 break;
                             } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
@@ -372,7 +372,6 @@ public class StaffRetrievalService {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
-                                // staffListByRole = staff;
                                 break;
                             } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;

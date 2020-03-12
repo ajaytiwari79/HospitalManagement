@@ -2,7 +2,6 @@ package com.kairos.controller.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
-import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.BreakAction;

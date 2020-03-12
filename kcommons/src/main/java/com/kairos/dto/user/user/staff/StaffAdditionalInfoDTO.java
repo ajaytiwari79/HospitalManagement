@@ -21,9 +21,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * Created by oodles on 28/11/17.

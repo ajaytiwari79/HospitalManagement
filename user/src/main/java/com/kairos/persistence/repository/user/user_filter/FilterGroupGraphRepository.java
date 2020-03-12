@@ -17,5 +17,5 @@ public interface FilterGroupGraphRepository extends Neo4jBaseRepository<FilterGr
     FilterGroup getFilterGroupByModuleId(String moduleId);
 
     @Query("MATCH (ap:AccessPage)-[r:"+APPLICABLE_FOR+"]-(fg:FilterGroup{deleted:false}) WHERE ap.moduleId={0} return COUNT(fg)>0")
-    Boolean checkIfFilterGroupExistsForModuleId(String moduleId);
+    boolean checkIfFilterGroupExistsForModuleId(String moduleId);
 }

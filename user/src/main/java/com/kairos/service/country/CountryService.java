@@ -22,8 +22,6 @@ import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
@@ -132,10 +130,7 @@ public class CountryService {
      * @return
      */
     public CountryDTO getCountryById(Long id) {
-        Country country = countryGraphRepository.findOne(id);
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, id);
-        }
+        Country country = findById(id);
         CountryDTO countryDTO = new CountryDTO(country.getId(), country.getName());
         Currency currency = currencyService.getCurrencyByCountryId(id);
         countryDTO.setCurrencyId(currency.getId());
@@ -154,10 +149,6 @@ public class CountryService {
 
         }
         Country currentCountry = countryGraphRepository.findOne(country.getId());
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, country.getId());
-
-        }
         currentCountry.setName(country.getName());
         currentCountry.setCode(country.getCode());
         currentCountry.setGoogleCalendarCode(country.getGoogleCalendarCode());
@@ -200,7 +191,7 @@ public class CountryService {
             logger.info("No Leap Year found");
             end = new DateTime().withYear(year).withDayOfYear(365).getMillis();
         }
-        logger.info("Year Start: " + start + "  Year end:" + end);
+        logger.info("Year Start:{}  Year end:{}" , start , end);
         List<Map<String, Object>> data = countryGraphRepository.getAllCountryHolidaysByYear(countryId, start, end);
         if (!data.isEmpty()) {
             for (Map<String, Object> map : data) {
@@ -224,7 +215,7 @@ public class CountryService {
         try {
             List<Event> eventList = CountryCalenderService.getEventsFromGoogleCalender();
             if (eventList != null) {
-                logger.info("No. of Events received are: " + eventList.size());
+                logger.info("No. of Events received are: {}" , eventList.size());
             }
             CountryHolidayCalender holidayCalender = null;
             for (Event event : eventList) {
@@ -236,7 +227,7 @@ public class CountryService {
                 validateAndSaveHolidayCalender(countryId, calenderList, country, holidayCalender, event);
             }
         } catch (Exception e) {
-            logger.info("Exception occured: " + e.getCause());
+            logger.info("Exception occured: {}" , e.getCause());
             e.printStackTrace();
         }
 
@@ -302,12 +293,7 @@ public class CountryService {
     }
 
     public Level addLevel(long countryId, Level level) {
-        Country country = countryGraphRepository.findOne(countryId);
-        if (country == null) {
-            logger.debug("Finding country by id::{}" , countryId);
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-
-        }
+        Country country = findById(countryId);
         if(levelGraphRepository.levelExistInCountryByName(countryId,"(?i)" + level.getName(),-1L)){
             exceptionService.duplicateDataException("message.country.level.name.exist");
         }
@@ -318,19 +304,16 @@ public class CountryService {
 
     public Level updateLevel(long countryId, long levelId, Level level) {
         Level levelToUpdate = countryGraphRepository.getLevel(countryId, levelId);
-        if (levelToUpdate == null) {
-            logger.debug("Finding level by id::" + levelId);
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_LEVEL_ID_NOTFOUND, levelId);
+        if (levelToUpdate != null) {
+            if(levelGraphRepository.levelExistInCountryByName(countryId,"(?i)" + level.getName(),levelToUpdate.getId())){
+                exceptionService.duplicateDataException("message.country.level.name.exist");
+            }
+            levelToUpdate.setName(level.getName());
+            levelToUpdate.setDescription(level.getDescription());
+            levelGraphRepository.save(levelToUpdate);
 
         }
-        if(levelGraphRepository.levelExistInCountryByName(countryId,"(?i)" + level.getName(),levelToUpdate.getId())){
-            exceptionService.duplicateDataException("message.country.level.name.exist");
-        }
-        levelToUpdate.setName(level.getName());
-        levelToUpdate.setDescription(level.getDescription());
-        // TODO FIX MAKE REPOS
-        levelGraphRepository.save(levelToUpdate);
-        return null;
+        return levelToUpdate;
     }
 
     public boolean deleteLevel(long countryId, long levelId) {
@@ -338,13 +321,10 @@ public class CountryService {
             exceptionService.actionNotPermittedException(MESSAGE_COUNTRY_LEVEL_CANNOT_DELETE);
         }
         Level levelToDelete = countryGraphRepository.getLevel(countryId, levelId);
-        if (levelToDelete == null) {
-            logger.debug("Finding level by id::{}" , levelId);
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_LEVEL_ID_NOTFOUND, levelId);
+        if (levelToDelete != null) {
+            levelToDelete.setEnabled(false);
+            levelGraphRepository.save(levelToDelete);
         }
-
-        levelToDelete.setEnabled(false);
-        levelGraphRepository.save(levelToDelete);
         return true;
     }
 
@@ -353,16 +333,12 @@ public class CountryService {
     }
 
     public RelationTypeDTO addRelationType(Long countryId, RelationTypeDTO relationTypeDTO) {
-        Country country = countryGraphRepository.findOne(countryId);
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-        }
+        Country country = findById(countryId);
 
-        Boolean relationTypeExistInCountryByName = countryGraphRepository.relationTypeExistInCountryByName(countryId, "(?i)" + relationTypeDTO.getName(), -1L);
+        boolean relationTypeExistInCountryByName = countryGraphRepository.relationTypeExistInCountryByName(countryId, "(?i)" + relationTypeDTO.getName(), -1L);
         if (relationTypeExistInCountryByName) {
             exceptionService.duplicateDataException("error.RelationType.name.exist");
         }
-
         List<RelationType> relationTypes = new ArrayList<>();
         //check if getRelationTypes is null then it will not add in array list.
         Optional.ofNullable(country.getRelationTypes()).ifPresent(relationTypesList -> relationTypes.addAll(relationTypesList));
