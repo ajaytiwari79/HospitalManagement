@@ -38,7 +38,7 @@ public class ActivityDayType implements Constraint {
         return isValidForDayType(shift,this.dayTypes) ? 0 : 1;
     }
 
-    public <T extends Constraint> int checkConstraints(T t, List<ShiftImp> shifts) {
+    public int checkConstraints(List<ShiftImp> shifts) {
         return 0;
     }
 

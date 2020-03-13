@@ -15,7 +15,7 @@ salience 20
     when
         $ac:Activity()
         $shift:ShiftImp(!activityLineIntervals.isEmpty() && hasIntervalsForActivity($ac))
-        $constraintsPenality: Integer(intValue>0) from ($ac.checkActivityConstraints($shift,ConstraintSubType.MAX_SHIFT_OF_STAFF))
+        $constraintsPenality: Integer(intValue>0) from ($ac.checkConstraints($shift,ConstraintSubType.MAX_SHIFT_OF_STAFF))
     then
-        $ac.breakActivityContraints(null,scoreHolder,kcontext,$constraintsPenality,ConstraintSubType.MAX_SHIFT_OF_STAFF);
+        $ac.breakContraints(scoreHolder,kcontext,$constraintsPenality,ConstraintSubType.MAX_SHIFT_OF_STAFF);
 end

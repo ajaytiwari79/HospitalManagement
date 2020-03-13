@@ -30,5 +30,5 @@ public class ShortestDuration implements Constraint {
     }
 
     @Override
-    public <T extends Constraint> int checkConstraints(T object, List<ShiftImp> shifts) {return 0;}
+    public int checkConstraints(List<ShiftImp> shifts){return 0;}
 }

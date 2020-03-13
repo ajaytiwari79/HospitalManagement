@@ -43,7 +43,7 @@ public class MaxAllocationPerShift implements Constraint {
     }
 
     @Override
-    public <T extends Constraint> int checkConstraints(T t, List<ShiftImp> shifts) {
+    public int checkConstraints(List<ShiftImp> shifts) {
         return 0;
     }
 }

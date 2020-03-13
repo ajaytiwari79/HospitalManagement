@@ -30,7 +30,7 @@ import java.util.Set;
 @XStreamAlias("Activity")
 public class Activity {
 
-    private static Logger log= LoggerFactory.getLogger(WorkingTimeConstraints.class);
+    private static Logger log= LoggerFactory.getLogger(Activity.class);
 
     private String id;
     private List<Skill> skills;
@@ -67,17 +67,17 @@ public class Activity {
         return TimeTypeEnum.ABSENCE.equals(timeType.getTimeTypeEnum());
     }
 
-    public int checkActivityConstraints(ShiftImp shift, ConstraintSubType constraintSubType) {
+    public int checkConstraints(ShiftImp shift, ConstraintSubType constraintSubType) {
         if(shift.isLocked()) return 0;
         return constraints.get(constraintSubType).checkConstraints(this,shift);
     }
 
-    public int checkActivityConstraints(List<ShiftImp> shifts, ConstraintSubType constraintSubType) {
-        return constraints.get(constraintSubType).checkConstraints(null,shifts);
+    public int checkConstraints(List<ShiftImp> shifts, ConstraintSubType constraintSubType) {
+        return constraints.get(constraintSubType).checkConstraints(shifts);
     }
 
 
-    public void breakActivityContraints(ShiftImp shift, HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, ConstraintSubType constraintSubType) {
+    public void breakContraints( HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, ConstraintSubType constraintSubType) {
         log.debug("breaking Activity constraint: {}",constraintSubType);
         constraints.get(constraintSubType).breakLevelConstraints(scoreHolder,kContext,constraintPenality);
     }

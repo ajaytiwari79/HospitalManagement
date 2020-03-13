@@ -35,7 +35,7 @@ public class PresenceAndAbsenceAtSameTime implements Constraint {
     }
 
     @Override
-    public <T extends Constraint> int checkConstraints(T activity, List<ShiftImp> shifts) {
+    public int checkConstraints(List<ShiftImp> shifts) {
         shifts.sort(Comparator.comparing(ShiftImp::getStartDate));
         List<ShiftActivity> shiftActivities = shifts.stream().flatMap(shiftImp -> shiftImp.getShiftActivities().stream()).sorted(Comparator.comparing(ShiftActivity::getStartTime)).collect(Collectors.toList());
         int contraintPenality = 0;
