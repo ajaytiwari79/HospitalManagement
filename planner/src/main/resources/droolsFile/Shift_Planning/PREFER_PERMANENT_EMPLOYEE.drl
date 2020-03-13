@@ -1,17 +1,23 @@
 package com.kairos.shiftplanning.rules;
  dialect "java"
 
+import com.kairos.shiftplanning.domain.activity.*;
+import com.kairos.shiftplanning.domain.shift.*;
+import com.kairos.shiftplanning.domain.staffing_level.*;
+import com.kairos.shiftplanning.domain.skill.*;
+import com.kairos.shiftplanning.domain.unit.*;
+import com.kairos.enums.constraint.ConstraintSubType;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import java.util.List;
-import com.kairos.shiftplanning.domain.unit.Unit;
-import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 global HardMediumSoftLongScoreHolder scoreHolder;
 
 rule "Prefer Permannent Employee"
 salience 20
   when
-    $unit:Unit(unitConstraints != null)
-    $shifts:List() from collect(ShiftImp(employee!=null))
-    $constraintsPenality: Integer(intValue>0) from ($unit.checkConstraints($shifts,ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS))
+    $unit:Unit(constraints != null)
+    $shifts:List(size>0) from collect(ShiftImp(employee!=null))
+    $constraintsPenality: Integer(intValue>0) from ($unit.checkConstraints($shifts,ConstraintSubType.PREFER_PERMANENT_EMPLOYEE))
   then
-   $unit.breakContraints(scoreHolder,kcontext, $constraintsPenality,ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS);
+   $unit.breakContraints(scoreHolder,kcontext, $constraintsPenality,ConstraintSubType.PREFER_PERMANENT_EMPLOYEE);
 end
