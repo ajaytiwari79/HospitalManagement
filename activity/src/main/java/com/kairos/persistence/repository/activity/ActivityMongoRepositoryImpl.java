@@ -35,8 +35,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
 import static com.kairos.enums.TimeTypeEnum.UNPAID_BREAK;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
@@ -124,6 +123,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private static final String COUNTRY_PARENT_ID = "countryParentId";
     private static final String ID = "id";
     private static final String $_ID = "$id";
+    private static final String TIME_TYPE_ID ="activity.balanceSettingsActivityTab.timeTypeId";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -588,8 +588,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public List<ActivityDTO> findAllActivitiesByCountryIdAndTimeTypes(Long countryId, List<BigInteger> timeTypeIds) {
-        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).in(timeTypeIds).and(DELETED).is(false).and(COUNTRY_ID).is(countryId))
-                , project().and(ID).as(ID).and(NAME).as(NAME));
+        Criteria criteria =isNull(countryId)?Criteria.where(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).in(timeTypeIds):Criteria.where(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).in(timeTypeIds).and(DELETED).is(false).and(COUNTRY_ID).is(countryId);
+        Aggregation aggregation = Aggregation.newAggregation(match(criteria)
+                , project().and(ID).as(ID).and(NAME).as(NAME).and(ACTIVITY_PRIORITY_ID));
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
 

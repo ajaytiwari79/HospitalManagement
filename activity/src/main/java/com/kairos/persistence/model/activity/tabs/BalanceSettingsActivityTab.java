@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.activity.tabs;
 
+import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class BalanceSettingsActivityTab implements Serializable{
     private TimeTypeEnum timeType; // This is used to verify the activity is of  paid break or unpaid break
     private boolean onCallTimePresent ;
     private Boolean negativeDayBalancePresent;
+    private PriorityFor priorityFor;
 
     public BalanceSettingsActivityTab(boolean onCallTimePresent, Boolean negativeDayBalancePresent) {
         this.onCallTimePresent = onCallTimePresent;

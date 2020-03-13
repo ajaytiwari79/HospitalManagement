@@ -395,7 +395,7 @@ public class ActivityService {
             activity.setSkillActivityTab(timeType.getSkillActivityTab());
             activity.setRegions(timeType.getRegions());
             activity.setLevels(timeType.getLevels());
-            activity.setActivityPriorityId(timeType.getActivityPriorityId());
+//            activity.setActivityPriorityId(timeType.getActivityPriorityId());
         }
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setColorPresent(true);
@@ -408,6 +408,7 @@ public class ActivityService {
         activity.getBalanceSettingsActivityTab().setAddTimeTo(generalActivityTabDTO.getAddTimeTo());
         activity.getBalanceSettingsActivityTab().setOnCallTimePresent(generalActivityTabDTO.isOnCallTimePresent());
         activity.getBalanceSettingsActivityTab().setNegativeDayBalancePresent(generalActivityTabDTO.getNegativeDayBalancePresent());
+        activity.getBalanceSettingsActivityTab().setPriorityFor(timeType.getPriorityFor());
         updateActivityCategory(activity, countryId);
         return activity.getBalanceSettingsActivityTab();
     }
@@ -887,6 +888,7 @@ public class ActivityService {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
             }
             activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
+            activity.getBalanceSettingsActivityTab().setPriorityFor(timeType.getPriorityFor());
             activities.add(activity);
         }
         return activities;

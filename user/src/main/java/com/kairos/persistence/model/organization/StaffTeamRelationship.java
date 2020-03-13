@@ -13,6 +13,7 @@ import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_MEMBER;
@@ -39,6 +40,7 @@ public class StaffTeamRelationship extends UserBaseEntity {
     private TeamType teamType;
     private LocalDate startDate;
     private LocalDate endDate;
+    private int sequence;
 
     public StaffTeamRelationship(Team team, Staff staff, LeaderType leaderType, TeamType teamType, LocalDate startDate, LocalDate endDate) {
         this.team = team;

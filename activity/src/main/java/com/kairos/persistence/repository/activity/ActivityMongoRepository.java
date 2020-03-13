@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
@@ -97,4 +98,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{unitId:?0, deleted:false}")
     List<ActivityDTO> getActivitiesByUnitId(Long unitId);
+
+    @Query(value = "{'balanceSettingsActivityTab.priorityFor':?0,activityPriorityId:?1,_id:{$ne: ?2}}",exists = true)
+    boolean isActivityPriorityIdIsExistOrNot(PriorityFor priorityFor,BigInteger priorityId,BigInteger activityId);
 }

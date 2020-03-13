@@ -92,6 +92,8 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_OVERLAP_WITH_FULL_DAY = "message.shift.overlap.with.full_day";
     public static final String ERROR_ACTIVITY_ALREADYUSE_PRIORITY  = "error.activity.alreadyuse.priority";
     public static final String MESSAGE_ACTIVITY_PRIORITY_ID = "message.activity.priority.id";
+    public static final String MESSAGE_DUPLICATE_ACTIVITY_PRIORITY_ID = "message.duplicate.activity.priority.id";
+    public static final String MESSAGE_ACTIVITY_PRIORITY_ID_NOT_SET = "message.activity.priority.id.not.set";
     public static final String MESSAGE_ACTIVITY_PRIORITY_SAME_SEQUENCE  = "message.activity.priority.same.sequence";
     public static final String MESSAGE_ACTIVITY_PRIORITY_SEQUENCE  = "message.activity.priority.sequence";
     public static final String MESSAGE_TIMETYPE_LINKED = "message.timetype.linked";
