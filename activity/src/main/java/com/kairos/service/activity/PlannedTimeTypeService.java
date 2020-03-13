@@ -5,7 +5,6 @@ import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +53,6 @@ public class PlannedTimeTypeService{
         plannedTimeType.setImageName(presenceTypeDTO.getImageName());
         plannedTimeTypeRepository.save(plannedTimeType);
         presenceTypeDTO.setId(plannedTimeType.getId());
-        LOGGER.info(plannedTimeType.toString());
         return presenceTypeDTO;
     }
 

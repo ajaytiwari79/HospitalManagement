@@ -24,6 +24,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.GdprMessagesConstants.*;
+
 @Service
 public class OrganizationAssetTypeService {
 
@@ -61,7 +63,7 @@ public class OrganizationAssetTypeService {
 
         AssetType previousAssetType = assetTypeRepository.findByNameAndOrganizationIdAndSubAssetType(assetTypeDto.getName(), unitId, false);
         if (Optional.ofNullable(previousAssetType).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetTypeDto.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_ASSETTYPE, assetTypeDto.getName());
         }
         checkForDuplicacyInNameOfAssetType(assetTypeDto);
         AssetType assetType = new AssetType(assetTypeDto.getName(),  unitId, false);
@@ -163,7 +165,7 @@ public class OrganizationAssetTypeService {
     public AssetTypeResponseDTO getAssetTypeById(Long unitId, Long id) {
         AssetType assetType = assetTypeRepository.findByIdAndOrganizationIdAndDeleted(id, unitId);
         if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_ASSETTYPE, id);
         }
 
         return buildAssetTypeOrSubTypeResponseData(assetType);
@@ -183,12 +185,12 @@ public class OrganizationAssetTypeService {
 
         AssetType assetType = assetTypeRepository.findByNameAndOrganizationIdAndSubAssetType(assetTypeDto.getName(), unitId, false);
         if (Optional.ofNullable(assetType).isPresent() && !assetTypeId.equals(assetType.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetTypeDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_ASSETTYPE, assetTypeDto.getName());
         }
         checkForDuplicacyInNameOfAssetType(assetTypeDto);
         assetType = assetTypeRepository.findByIdAndOrganizationIdAndDeleted(assetTypeId, unitId);
         if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset type", assetTypeId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_ASSETTYPE, assetTypeId);
         }
         assetType.setName(assetTypeDto.getName());
         assetType.setOrganizationId(unitId);
@@ -257,11 +259,11 @@ public class OrganizationAssetTypeService {
 
         List<String> assetsLinkedWithAssetType = assetRepository.findAllAssetLinkedWithAssetType(unitId, assetTypeId);
         if (CollectionUtils.isNotEmpty(assetsLinkedWithAssetType)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.assetType", StringUtils.join(assetsLinkedWithAssetType, ','));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", MESSAGE_ASSETTYPE, StringUtils.join(assetsLinkedWithAssetType, ','));
         }
         AssetType assetType = assetTypeRepository.findByIdAndOrganizationIdAndDeleted(assetTypeId, unitId);
         if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetTypeId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_ASSETTYPE, assetTypeId);
         }
         assetType.delete();
         assetTypeRepository.save(assetType);

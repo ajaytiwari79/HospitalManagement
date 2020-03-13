@@ -9,6 +9,7 @@ import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.inject.Inject;
@@ -53,20 +54,24 @@ public class NightWorkerMongoRepositoryImpl implements CustomNightWorkerMongoRep
                 lookup("nightWorkerQuestion", "questionAnswerPair.questionId", "_id", QUESTION_ANSWER_PAIR_QUESTION),
                 unwind(QUESTION_ANSWER_PAIR_QUESTION),
 
-                project().and("questionAnswerPair.answer").as("questionAnswerPair.answer").
-                        and("questionAnswerPair.question.question").as(QUESTION_ANSWER_PAIR_QUESTION).
-                        and("questionAnswerPair.question._id").as( "questionAnswerPair.questionId").
-                        and("name").as("name").
-                        and(QUESTIONNAIRE_CREATED_DATE).as(QUESTIONNAIRE_CREATED_DATE).
-                        and("questionAnswerPair.question.createdAt").as("createdDate").
-                        and(SUBMITTED).as(SUBMITTED).
-                        and(SUBMITTED_ON).as(SUBMITTED_ON),
+                getProject(),
                 new CustomAggregationOperation(Document.parse(sortString)),
                 new CustomAggregationOperation(Document.parse(groupString))
         );
 
         AggregationResults<QuestionnaireAnswerResponseDTO> result = mongoTemplate. aggregate (aggregation, NightWorker.class, QuestionnaireAnswerResponseDTO.class);
         return result.getMappedResults();
+    }
+
+    private ProjectionOperation getProject() {
+        return project().and("questionAnswerPair.answer").as("questionAnswerPair.answer").
+                and("questionAnswerPair.question.question").as(QUESTION_ANSWER_PAIR_QUESTION).
+                and("questionAnswerPair.question._id").as( "questionAnswerPair.questionId").
+                and("name").as("name").
+                and(QUESTIONNAIRE_CREATED_DATE).as(QUESTIONNAIRE_CREATED_DATE).
+                and("questionAnswerPair.question.createdAt").as("createdDate").
+                and(SUBMITTED).as(SUBMITTED).
+                and(SUBMITTED_ON).as(SUBMITTED_ON);
     }
 
     public List<QuestionAnswerDTO> getNightWorkerQuestions() {

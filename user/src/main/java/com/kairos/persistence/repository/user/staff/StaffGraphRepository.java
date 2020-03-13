@@ -492,5 +492,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "collect(tags) as tags " +
             "ORDER BY staff.firstName")
     List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId, String dateToCompare);
+
+    @Query("MATCH(user:User)-[rel:BELONGS_TO]-(staff:Staff)-[rela:BELONGS_TO]-(position:Position)-[relb:HAS_POSITIONS]-(o:Organization)\n" +
+            "WHERE id(o)={0} AND id(user)={1} RETURN staff")
+    Staff getStaffByUnitIdAndUserId(Long unitId,Long userId);
 }
 

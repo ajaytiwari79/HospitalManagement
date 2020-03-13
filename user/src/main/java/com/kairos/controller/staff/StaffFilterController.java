@@ -1,6 +1,7 @@
 package com.kairos.controller.staff;
 
 import com.kairos.dto.user.staff.StaffFilterDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.service.staff.StaffFilterService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -67,8 +68,9 @@ public class StaffFilterController {
                                                                    @RequestParam String moduleId,
                                                                    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                                                    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-                                                                   @RequestParam(required = false , name = "showAllStaffs" ,defaultValue = "true")  boolean showAllStaffs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllStaffByUnitId(unitId, staffFilterDTO,moduleId,startDate,endDate,showAllStaffs));
+                                                                   @RequestParam(required = false , name = "showAllStaffs" ,defaultValue = "true")  boolean showAllStaffs,
+                                                                   @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllStaffByUnitId(unitId, staffFilterDTO,moduleId,startDate,endDate,showAllStaffs,selectedDate));
     }
 
 }

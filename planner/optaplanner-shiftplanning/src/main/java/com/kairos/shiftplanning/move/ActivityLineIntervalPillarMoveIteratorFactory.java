@@ -27,8 +27,7 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
     @Override
     public long getSize(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
         ShiftRequestPhasePlanningSolution solution = scoreDirector.getWorkingSolution();
-        int size = solution.getWeekDates().size()* solution.getActivities().size();
-        return size;
+        return (long) solution.getWeekDates().size() * solution.getActivities().size();
     }
     @Override
     public Iterator<? extends Move<ShiftRequestPhasePlanningSolution>> createOriginalMoveIterator(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
@@ -43,7 +42,6 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
      */
     @Override
     public ActivityLineIntervalPillarMoveIterator<? extends Move<ShiftRequestPhasePlanningSolution>> createRandomMoveIterator(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector, Random workingRandom) {
-        long start=System.currentTimeMillis();
         ShiftRequestPhasePlanningSolution solution = scoreDirector.getWorkingSolution();
         List<List<ActivityLineIntervalWrapper>> possibleActivityLineIntervalWrappersList= new ArrayList<>();
         LocalDate date=solution.getWeekDates().get(workingRandom.nextInt(solution.getWeekDates().size()));
@@ -54,11 +52,8 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
             for(Map.Entry<String,List<ActivityLineInterval>> entry:groupedAlis.entrySet()){
                 if(!entry.getKey().startsWith(date.toString("MM/dd/yyyy")+"_"+ activity.getId())) continue;
                 List<ActivityLineInterval> alis=entry.getValue();
-                //int[] randomRange= ShiftPlanningUtility.getRandomRange(alis.size(),workingRandom);
-                //activityLineIntervalsPerDayPerAct.add(alis.subList(randomRange[0],randomRange[1]));
                 activityLineIntervalsPerDay.add(alis);
             }
-
         }
         //TODO we need to merge multiple activitities here to make them a move but they could have different shifts but it's fine.
         mergeMultipleActivityLinesForSingleShift(activityLineIntervalsPerDay,workingRandom);
@@ -68,15 +63,13 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
                 int[] randomRange= ShiftPlanningUtility.getRandomRange(alis.size(),workingRandom);
                 alis=alis.subList(randomRange[0],randomRange[1]);
                 List<ActivityLineIntervalWrapper> activityLineIntervalWrappers=ShiftPlanningUtility.toActivityWrapper(alis,shift);
-                if(activityLineIntervalWrappers.size()==0)
+                if(activityLineIntervalWrappers.isEmpty())
                     continue;
                 possibleActivityLineIntervalWrappersList.add(activityLineIntervalWrappers);
             }
         }
         Collections.shuffle(possibleActivityLineIntervalWrappersList);
-        ActivityLineIntervalPillarMoveIterator activityLineIntervalPillarMoveIterator = new ActivityLineIntervalPillarMoveIterator(possibleActivityLineIntervalWrappersList,workingRandom);
-        //log.info("pillar creation took: {} ms",(System.currentTimeMillis()-start));
-        return activityLineIntervalPillarMoveIterator;
+        return new ActivityLineIntervalPillarMoveIterator(possibleActivityLineIntervalWrappersList,workingRandom);
     }
 
     private void mergeMultipleActivityLinesForSingleShift(List<List<ActivityLineInterval>> activityLineIntervalsPerDay,Random workingRandom) {
@@ -86,29 +79,32 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
             int outerPartitionIndex=workingRandom.nextInt(activityLineIntervalsOuter.size());
             DateTime outersPartitionTime=activityLineIntervalsOuter.get(outerPartitionIndex).getStart();
             for(List<ActivityLineInterval> activityLineIntervalsInner:activityLineIntervalsPerDay){
-                if(activityLineIntervalsInner.get(0).getActivity().isTypeAbsence())continue;
-                if(activityLineIntervalsInner==activityLineIntervalsOuter ||
-                        //activityLineIntervalsInner.get(0).getStart().isAfter(activityLineIntervalsOuter.get(0).getStart())||
-                        activityLineIntervalsInner.get(0).getActivity().getId().equals(activityLineIntervalsOuter.get(0).getActivity().getId()))continue;
-                if(overlaps(activityLineIntervalsOuter,activityLineIntervalsInner)){
-                    List<ActivityLineInterval> mergedAlis=new ArrayList<>();
-                    boolean innerStartsFirst=activityLineIntervalsOuter.get(0).getStart().isAfter(activityLineIntervalsInner.get(0).getStart());
-                    int innerPartitionStart=-1;
-                    for(int i=0;i<activityLineIntervalsInner.size();i++){
-                        ActivityLineInterval ali=activityLineIntervalsInner.get(i);
-                        if(ali.getStart().isEqual(outersPartitionTime)){
-                            innerPartitionStart=i;
-                            break;
-                        }
-                    }
-                    if(innerPartitionStart<0)continue;
-                    mergedAlis.addAll(activityLineIntervalsOuter.subList(0,outerPartitionIndex));
-                    mergedAlis.addAll(activityLineIntervalsInner.subList(innerPartitionStart,activityLineIntervalsInner.size()));
-                    mergedActivityLines.add(mergedAlis);
-                }
+                updateActivityLineInterval(mergedActivityLines, activityLineIntervalsOuter, outerPartitionIndex, outersPartitionTime, activityLineIntervalsInner);
             }
         }
         activityLineIntervalsPerDay.addAll(mergedActivityLines);
+    }
+
+    private void updateActivityLineInterval(List<List<ActivityLineInterval>> mergedActivityLines, List<ActivityLineInterval> activityLineIntervalsOuter, int outerPartitionIndex, DateTime outersPartitionTime, List<ActivityLineInterval> activityLineIntervalsInner) {
+        if(activityLineIntervalsInner.get(0).getActivity().isTypeAbsence()) return;
+        if(activityLineIntervalsInner==activityLineIntervalsOuter ||
+                activityLineIntervalsInner.get(0).getActivity().getId().equals(activityLineIntervalsOuter.get(0).getActivity().getId()))
+            return;
+        if(overlaps(activityLineIntervalsOuter,activityLineIntervalsInner)){
+            List<ActivityLineInterval> mergedAlis=new ArrayList<>();
+            int innerPartitionStart=-1;
+            for(int i=0;i<activityLineIntervalsInner.size();i++){
+                ActivityLineInterval ali=activityLineIntervalsInner.get(i);
+                if(ali.getStart().isEqual(outersPartitionTime)){
+                    innerPartitionStart=i;
+                    break;
+                }
+            }
+            if(innerPartitionStart<0) return;
+            mergedAlis.addAll(activityLineIntervalsOuter.subList(0,outerPartitionIndex));
+            mergedAlis.addAll(activityLineIntervalsInner.subList(innerPartitionStart,activityLineIntervalsInner.size()));
+            mergedActivityLines.add(mergedAlis);
+        }
     }
 
     private boolean overlaps(List<ActivityLineInterval> activityLineIntervalsOuter, List<ActivityLineInterval> activityLineIntervalsInner) {

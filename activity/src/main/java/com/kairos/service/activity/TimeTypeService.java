@@ -67,9 +67,7 @@ public class TimeTypeService extends MongoBaseService {
             exceptionService.actionNotPermittedException(ACTIVITY_ALREADY_EXISTS_TIME_TYPE);
         }
         TimeType upperTimeType = timeTypeMongoRepository.findOneById(upperLevelTimeTypeId);
-        timeTypeDTOs.forEach(timeTypeDTO -> {
-            saveTimeType(countryId, upperTimeType, timeTypeDTO);
-        });
+        timeTypeDTOs.forEach(timeTypeDTO -> saveTimeType(countryId, upperTimeType, timeTypeDTO));
         return timeTypeDTOs;
     }
 
@@ -79,7 +77,7 @@ public class TimeTypeService extends MongoBaseService {
             timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription(), timeTypeDTO.getBackgroundColor(), upperTimeType.getSecondLevelType(), countryId, timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy());
             timeType.setCountryId(countryId);
             timeType.setUpperLevelTimeTypeId(timeTypeDTO.getUpperLevelTimeTypeId());
-            timeType = save(timeType);
+            timeType = timeTypeMongoRepository.save(timeType);
             if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                 upperTimeType.getChildTimeTypeIds().add(timeType.getId());
                 upperTimeType.setLeafNode(false);
@@ -138,7 +136,7 @@ public class TimeTypeService extends MongoBaseService {
             }
             timeType.setActivityCanBeCopiedForOrganizationHierarchy(activityCanBeCopiedForOrganizationHierarchy);
         } else {
-            timeType.setActivityCanBeCopiedForOrganizationHierarchy(Collections.EMPTY_SET);
+            timeType.setActivityCanBeCopiedForOrganizationHierarchy(Collections.emptySet());
         }
     }
 
@@ -339,10 +337,10 @@ public class TimeTypeService extends MongoBaseService {
             if (timeType != null && timeType.getUpperLevelTimeTypeId() == null) {
                 //User Cannot Delete TimeType of Second Level
                 exceptionService.actionNotPermittedException(MESSAGE_TIMETYPE_DELETION_NOTALLOWED, timeType.getLabel());
-            } else {
+            } else if(isNotNull(timeType)){
                 activityCategoryService.removeTimeTypeRelatedCategory(countryId, timeTypeId);
                 timeType.setDeleted(true);
-                save(timeType);
+                timeTypeMongoRepository.save(timeType);
             }
         } else exceptionService.timeTypeLinkedException(MESSAGE_TIMETYPE_LINKED);
         return true;
@@ -364,9 +362,9 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     private void getWorkingTimeType(Long countryId, List<TimeType> workingTimeTypes) {
-        TimeType presenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, PRESENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.PRESENCE, countryId, Collections.EMPTY_SET);
-        TimeType absenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, ABSENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.ABSENCE, countryId, Collections.EMPTY_SET);
-        TimeType breakTimeType = new TimeType(TimeTypes.WORKING_TYPE, "Paid Break", "", AppConstants.WORKING_TYPE_COLOR, PAID_BREAK, countryId, Collections.EMPTY_SET);
+        TimeType presenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, PRESENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.PRESENCE, countryId, Collections.emptySet());
+        TimeType absenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, ABSENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.ABSENCE, countryId, Collections.emptySet());
+        TimeType breakTimeType = new TimeType(TimeTypes.WORKING_TYPE, "Paid Break", "", AppConstants.WORKING_TYPE_COLOR, PAID_BREAK, countryId, Collections.emptySet());
         workingTimeTypes.add(presenceTimeType);
         workingTimeTypes.add(absenceTimeType);
         workingTimeTypes.add(breakTimeType);
@@ -374,19 +372,19 @@ public class TimeTypeService extends MongoBaseService {
 
     private List<TimeType> getNonWorkingTimeTypeTimeTypes(Long countryId) {
         List<TimeType> nonWorkingTimeTypes = new ArrayList<>();
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Volunteer Time", "", AppConstants.NON_WORKING_TYPE_COLOR, VOLUNTEER, countryId, Collections.EMPTY_SET));
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Timebank Off Time", "", AppConstants.NON_WORKING_TYPE_COLOR, TIME_BANK, countryId, Collections.EMPTY_SET));
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Unpaid Break", "", AppConstants.NON_WORKING_TYPE_COLOR, UNPAID_BREAK, countryId, Collections.EMPTY_SET));
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Time between Split Shifts", "", AppConstants.NON_WORKING_TYPE_COLOR, SHIFT_SPLIT_TIME, countryId, Collections.EMPTY_SET));
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Duty-free, Self-Paid", "", AppConstants.NON_WORKING_TYPE_COLOR, SELF_PAID, countryId, Collections.EMPTY_SET));
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Planned Sickness on Freedays", "", AppConstants.NON_WORKING_TYPE_COLOR, PLANNED_SICK_ON_FREE_DAYS, countryId, Collections.EMPTY_SET));
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Unavailable Time", "", AppConstants.NON_WORKING_TYPE_COLOR, UNAVAILABLE_TIME, countryId, Collections.EMPTY_SET));
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Resting Time", "", AppConstants.NON_WORKING_TYPE_COLOR, RESTING_TIME, countryId, Collections.EMPTY_SET));
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Veto", "", AppConstants.NON_WORKING_TYPE_COLOR, VETO, countryId, Collections.EMPTY_SET));
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Stopbrick", "", AppConstants.NON_WORKING_TYPE_COLOR, STOP_BRICK, countryId, Collections.EMPTY_SET));
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Available Time", "", AppConstants.NON_WORKING_TYPE_COLOR, AVAILABLE_TIME, countryId, Collections.EMPTY_SET));
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Protected Days off", "", AppConstants.NON_WORKING_TYPE_COLOR, GAP, countryId, Collections.EMPTY_SET));
-        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Gap", "", AppConstants.NON_WORKING_TYPE_COLOR, VOLUNTEER, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Volunteer Time", "", AppConstants.NON_WORKING_TYPE_COLOR, VOLUNTEER, countryId, Collections.emptySet()));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Timebank Off Time", "", AppConstants.NON_WORKING_TYPE_COLOR, TIME_BANK, countryId, Collections.emptySet()));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Unpaid Break", "", AppConstants.NON_WORKING_TYPE_COLOR, UNPAID_BREAK, countryId, Collections.emptySet()));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Time between Split Shifts", "", AppConstants.NON_WORKING_TYPE_COLOR, SHIFT_SPLIT_TIME, countryId, Collections.emptySet()));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Duty-free, Self-Paid", "", AppConstants.NON_WORKING_TYPE_COLOR, SELF_PAID, countryId, Collections.emptySet()));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Planned Sickness on Freedays", "", AppConstants.NON_WORKING_TYPE_COLOR, PLANNED_SICK_ON_FREE_DAYS, countryId, Collections.emptySet()));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Unavailable Time", "", AppConstants.NON_WORKING_TYPE_COLOR, UNAVAILABLE_TIME, countryId, Collections.emptySet()));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Resting Time", "", AppConstants.NON_WORKING_TYPE_COLOR, RESTING_TIME, countryId, Collections.emptySet()));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Veto", "", AppConstants.NON_WORKING_TYPE_COLOR, VETO, countryId, Collections.emptySet()));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Stopbrick", "", AppConstants.NON_WORKING_TYPE_COLOR, STOP_BRICK, countryId, Collections.emptySet()));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Available Time", "", AppConstants.NON_WORKING_TYPE_COLOR, AVAILABLE_TIME, countryId, Collections.emptySet()));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Protected Days off", "", AppConstants.NON_WORKING_TYPE_COLOR, GAP, countryId, Collections.emptySet()));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Gap", "", AppConstants.NON_WORKING_TYPE_COLOR, VOLUNTEER, countryId, Collections.emptySet()));
         return nonWorkingTimeTypes;
     }
 
@@ -428,13 +426,11 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public TimeCalculationActivityDTO updateTimeCalculationTabOfTimeType(TimeCalculationActivityDTO timeCalculationActivityDTO, BigInteger timeTypeId) {
-        TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab();
-        ObjectMapperUtils.copyProperties(timeCalculationActivityDTO, timeCalculationActivityTab);
+        TimeCalculationActivityTab timeCalculationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(timeCalculationActivityDTO, TimeCalculationActivityTab.class);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
         }
-        //timeCalculationActivityDTO = verifyAndDeleteCompositeActivity(timeCalculationActivityDTO, availableAllowActivity);
         if (!timeCalculationActivityDTO.isAvailableAllowActivity()) {
             timeType.setTimeCalculationActivityTab(timeCalculationActivityTab);
             if (!timeCalculationActivityTab.getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {

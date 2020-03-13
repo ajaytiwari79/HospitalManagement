@@ -309,11 +309,13 @@ public class PhaseService extends MongoBaseService {
         if(isCollectionNotEmpty(localDates)){
         List<PlanningPeriod> planningPeriods=planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId,localDates);
         for(LocalDateTime requestedDate:dates){
-            Phase phase;
+            Phase phase = null;
             if (requestedDate.isAfter(untilTentative)) {
-                PlanningPeriod planningPeriod = planningPeriods.stream().filter(startDateFilter -> startDateFilter.getStartDate().minusDays(1).atStartOfDay().isBefore(requestedDate)).
-                        filter(endDateFilter -> endDateFilter.getEndDate().plusDays(1).atStartOfDay().isAfter(requestedDate)).findAny().orElse(null);
-                phase = phaseAndIdMap.get(planningPeriod.getCurrentPhaseId());
+                Optional<PlanningPeriod> planningPeriodOptional = planningPeriods.stream().filter(startDateFilter -> startDateFilter.getStartDate().minusDays(1).atStartOfDay().isBefore(requestedDate)).
+                        filter(endDateFilter -> endDateFilter.getEndDate().plusDays(1).atStartOfDay().isAfter(requestedDate)).findAny();
+                if(planningPeriodOptional.isPresent()) {
+                    phase = phaseAndIdMap.get(planningPeriodOptional.get().getCurrentPhaseId());
+                }
             } else {
                 phase = getActualPhaseApplicableForDate(requestedDate, null, phaseMap, untilTentative, timeZone);
             }

@@ -10,7 +10,6 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
-import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
@@ -19,12 +18,10 @@ import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
-import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -171,16 +168,24 @@ public class ShiftFilterService {
     private <G> ShiftFilter getEmploymentTypeFilter(Map<FilterType, Set<G>> filterTypeMap,List<StaffKpiFilterDTO> staffKpiFilterDTOS){
         Map<Long,Long> employmentIdAndEmploymentTypeIdMap = new HashMap<>();
         if(filterTypeMap.containsKey(EMPLOYMENT_TYPE)&&isCollectionNotEmpty(filterTypeMap.get(EMPLOYMENT_TYPE))){
-            employmentIdAndEmploymentTypeIdMap = getEmploymentIdAndEmploymentTypeIdMap(staffKpiFilterDTOS);
-
+            if(isCollectionEmpty(staffKpiFilterDTOS)){
+                filterTypeMap.remove(EMPLOYMENT_TYPE);
+            }else {
+                employmentIdAndEmploymentTypeIdMap = getEmploymentIdAndEmploymentTypeIdMap(staffKpiFilterDTOS);
+            }
        }
        return new EmploymentTypeFilter(filterTypeMap,employmentIdAndEmploymentTypeIdMap);
     }
 
     private <G> ShiftFilter getEmploymentSubTypeFilter(Map<FilterType, Set<G>> filterTypeMap,List<StaffKpiFilterDTO> staffKpiFilterDTOS){
         Map<Long,EmploymentSubType> employmentIdAndEmploymentSubTypeIdMap = new HashMap<>();
-        if(filterTypeMap.containsKey(EMPLOYMENT_SUB_TYPE)&&isCollectionNotEmpty(filterTypeMap.get(EMPLOYMENT_SUB_TYPE))){
-            employmentIdAndEmploymentSubTypeIdMap = getEmploymentIdAndEmploymentSubType(staffKpiFilterDTOS);
+        if(filterTypeMap.containsKey(EMPLOYMENT_SUB_TYPE)&&isCollectionNotEmpty(filterTypeMap.get(EMPLOYMENT_SUB_TYPE))) {
+          if(isCollectionNotEmpty(staffKpiFilterDTOS)) {
+              filterTypeMap.remove(EMPLOYMENT_SUB_TYPE);
+          }
+           else {
+               employmentIdAndEmploymentSubTypeIdMap = getEmploymentIdAndEmploymentSubType(staffKpiFilterDTOS);
+            }
 
         }
         return new EmploymentSubTypeFilter(filterTypeMap,employmentIdAndEmploymentSubTypeIdMap);

@@ -1,6 +1,8 @@
 package com.kairos.shiftplanning.domain.unit;
 
-import com.kairos.shiftplanning.constraints.unitConstraint.UnitConstraints;
+import com.kairos.enums.constraint.ConstraintSubType;
+import com.kairos.enums.constraint.ConstraintType;
+import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
@@ -10,8 +12,8 @@ import org.kie.api.runtime.rule.RuleContext;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 
 import java.util.List;
+import java.util.Map;
 
-import static org.reflections.Reflections.log;
 
 @Getter
 @Setter
@@ -19,30 +21,14 @@ import static org.reflections.Reflections.log;
 @XStreamAlias("Unit")
 public class Unit {
     private String id;
-    private UnitConstraints unitConstraints;
+    Map<ConstraintSubType, Constraint> constraints;
 
-    public int checkUnitConstraints(List<ShiftImp> shifts, int index) {
-        switch (index){
-            case 1:return unitConstraints.getShiftOnWeekend().checkConstraints(shifts);
-            case 2:return unitConstraints.getPreferedEmployementType().checkConstraints(shifts);
-
-        }
-        return 0;
+    public int checkConstraints(List<ShiftImp> shifts, ConstraintType constraintType) {
+        return constraints.get(constraintType).checkConstraints(shifts);
     }
 
-    public void breakUnitContraints( HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, int index) {
-        log.debug("breaking Unit constraint: {}", index);
-        switch (index) {
-            case 1:
-                unitConstraints.getShiftOnWeekend().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
-                break;
-            case 2:
-                unitConstraints.getPreferedEmployementType().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
-                break;
-            default:
-                break;
-        }
-
+    public void breakContraints( HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, ConstraintType constraintType) {
+        constraints.get(constraintType).breakLevelConstraints(scoreHolder,kContext,constraintPenality);
     }
 
 }

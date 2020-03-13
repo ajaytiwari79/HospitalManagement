@@ -1,4 +1,4 @@
-package com.kairos.shiftplanning.constraints.activityConstraint;
+package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
@@ -13,8 +13,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
 
 @Getter
 @Setter
@@ -46,7 +44,7 @@ public class MaxShiftOfStaff implements Constraint {
     }
 
     @Override
-    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+    public int checkConstraints(List<ShiftImp> shifts) {
         Map<LocalDate,Long> shiftsCount = shifts.stream().collect(Collectors.groupingBy(shift->shift.getStartDate(),Collectors.counting()));
         int value = 0;
         for (Map.Entry<LocalDate, Long> localDateLongEntry : shiftsCount.entrySet()) {

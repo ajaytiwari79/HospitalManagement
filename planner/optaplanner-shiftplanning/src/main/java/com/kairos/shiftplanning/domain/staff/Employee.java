@@ -4,6 +4,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
 import com.kairos.shiftplanning.domain.shift.Shift;
+import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +31,7 @@ import java.util.Set;
 @XStreamAlias("Employee")
 public class Employee {
     private static final Logger LOGGER = LoggerFactory.getLogger(Employee.class);
-    private String id;
+    private Long id;
     private BigDecimal baseCost;
     transient private WorkingTimeConstraints workingTimeConstraints;
     private PrevShiftsInfo prevShiftsInfo;
@@ -48,9 +50,10 @@ public class Employee {
     private Long employmentTypeId;
     private Long employmentId;
     private Set<Tag> tags;
+    private Map<BigInteger,ShiftImp> actualShiftsMap;
 
 
-    public Employee(String id, String name, Set<Skill> skillSet, Long expertiseId, int totalWeeklyMinutes, int workingDaysInWeek, PaidOutFrequencyEnum paidOutFrequencyEnum, Long employmentTypeId) {
+    public Employee(Long id, String name, Set<Skill> skillSet, Long expertiseId, int totalWeeklyMinutes, int workingDaysInWeek, PaidOutFrequencyEnum paidOutFrequencyEnum, Long employmentTypeId) {
         super();
         this.id = id;
         this.name = name;

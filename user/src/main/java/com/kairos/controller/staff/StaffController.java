@@ -443,13 +443,13 @@ public class StaffController {
     @RequestMapping(method = RequestMethod.PUT, value = "/basic_info")
     @ApiOperation("update staff from excel sheet")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    private ResponseEntity<Map<String, Object>> updateStaffFromExcel(@RequestParam("file") MultipartFile multipartFile) {
+    public ResponseEntity<Map<String, Object>> updateStaffFromExcel(@RequestParam("file") MultipartFile multipartFile) {
         staffService.updateStaffFromExcel(multipartFile);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
 
-    @RequestMapping(value = "/{staffId}/assigned_tasks", method = RequestMethod.GET)
+    @GetMapping(value = "/{staffId}/assigned_tasks")
     @ApiOperation("Get All Task types of a Staff")
     public ResponseEntity<Map<String, Object>> getAssignedTasksOfStaff(@PathVariable long unitId, @PathVariable long staffId, @RequestParam("date") String date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService
@@ -665,4 +665,11 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>>  getStaffEligibleForPlanning(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffForUnitWithEmploymentStatus(unitId));
     }
+    @GetMapping(value = "/endPositionProcess")
+    @ApiOperation("end position process")
+    public ResponseEntity<Map<String, Object>> endPositionProcess() {
+        positionService.endPositionProcess();
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
 }

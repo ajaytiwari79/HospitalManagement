@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.skill.Skill;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +31,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Team extends UserBaseEntity {
 
     private String name;
@@ -42,6 +45,7 @@ public class Team extends UserBaseEntity {
 
     private boolean isEnabled = true;
     private Set<BigInteger> activityIds=new HashSet<>();
+
 
     public Team(String name, String description,  ContactAddress contactAddress) {
         this.name = name;

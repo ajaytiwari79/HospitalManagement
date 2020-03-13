@@ -1,4 +1,4 @@
-package com.kairos.shiftplanning.constraints.activityConstraint;
+package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
@@ -7,8 +7,6 @@ import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.kie.api.runtime.rule.RuleContext;
-import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 
 import java.util.List;
 
@@ -40,13 +38,8 @@ public class ActivityDayType implements Constraint {
         return isValidForDayType(shift,this.dayTypes) ? 0 : 1;
     }
 
-    @Override
-    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+    public int checkConstraints(List<ShiftImp> shifts) {
         return 0;
     }
 
-    @Override
-    public void breakLevelConstraints(HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int contraintPenality) {
-
-    }
 }

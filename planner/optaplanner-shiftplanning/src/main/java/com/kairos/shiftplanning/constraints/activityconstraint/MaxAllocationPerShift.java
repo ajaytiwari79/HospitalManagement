@@ -1,4 +1,4 @@
-package com.kairos.shiftplanning.constraints.activityConstraint;
+package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
@@ -11,45 +11,39 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class MinimumLengthofActivity implements Constraint {
+public class MaxAllocationPerShift implements Constraint {
 
-    //In minutes
-    private int minimumLengthofActivity;
+    private int maxAllocationPerShift;
     private ScoreLevel level;
     private int weight;
 
-    public MinimumLengthofActivity(int minimumLengthofActivity, ScoreLevel level, int weight) {
-        this.minimumLengthofActivity = minimumLengthofActivity;
+    public MaxAllocationPerShift(int maxAllocationPerShift, ScoreLevel level, int weight) {
+        this.maxAllocationPerShift = maxAllocationPerShift;
         this.level = level;
         this.weight = weight;
     }
 
+
     public int checkConstraints(Activity activity, ShiftImp shift){
         List<ActivityLineInterval> alis = shift.getActivityLineIntervals();
         ShiftPlanningUtility.sortActivityLineIntervals(alis);
-        int contMins=0;
-        int totalDiff=0;
+        int allocatedActivityCount = 0;
+        ActivityLineInterval prev=null;
         for(ActivityLineInterval ali:alis){
-            if(ali.getActivity().equals(activity)){
-                contMins+=ali.getDuration();
-            }else if(contMins>0){
-                totalDiff+=minimumLengthofActivity>contMins?minimumLengthofActivity-contMins:0;
-                contMins=0;
+            if(ali.getActivity().equals(activity) && !ali.getActivity().equals(prev==null?null:prev.getActivity())){
+                allocatedActivityCount++;
             }
+            prev=ali;
         }
-        //for last activity
-        if(contMins>0){
-            totalDiff+=minimumLengthofActivity>contMins?minimumLengthofActivity-contMins:0;
-        }
-        return totalDiff/15;
+        return allocatedActivityCount > maxAllocationPerShift?allocatedActivityCount-maxAllocationPerShift:0;
     }
 
     @Override
-    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+    public int checkConstraints(List<ShiftImp> shifts) {
         return 0;
     }
-
 }

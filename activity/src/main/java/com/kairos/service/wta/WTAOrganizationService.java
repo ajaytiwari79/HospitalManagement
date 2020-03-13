@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
+import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -64,8 +65,9 @@ public class WTAOrganizationService extends MongoBaseService {
     private WorkTimeAgreementService workTimeAgreementService;
     @Inject
     private TagMongoRepository tagMongoRepository;
+    @Inject private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(WTAOrganizationService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WTAOrganizationService.class);
 
     public List<WTAResponseDTO> getAllWTAByOrganization(Long unitId) {
         OrganizationDTO organization = userIntegrationService.getOrganizationWithCountryId(unitId);
@@ -87,18 +89,18 @@ public class WTAOrganizationService extends MongoBaseService {
         if (updateDTO.getStartDate().isBefore(LocalDate.now())) {
             exceptionService.actionNotPermittedException(MESSAGE_WTA_START_ENDDATE);
         }
-        WorkingTimeAgreement WTADuplicate = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
-        if (Optional.ofNullable(WTADuplicate).isPresent()) {
-            LOGGER.info("Duplicate WTA name in organization :", wtaId);
+        WorkingTimeAgreement agreement = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
+        if (Optional.ofNullable(agreement).isPresent()) {
+            LOGGER.info("Duplicate WTA name in organization {}", wtaId);
             exceptionService.duplicateDataException(MESSAGE_WTA_NAME_ALREADYEXISTS, updateDTO.getName());
         }
         WorkingTimeAgreement oldWta = workingTimeAgreementMongoRepository.findOne(wtaId);
         if (!Optional.ofNullable(oldWta).isPresent()) {
-            LOGGER.info("wta not found while updating at unit %d", wtaId);
+            LOGGER.info("wta not found while updating at unit {}", wtaId);
             exceptionService.dataNotFoundByIdException(MESSAGE_WTA_ID, wtaId);
         }
         if (oldWta.getExpertise().getId() != updateDTO.getExpertiseId()) {
-            LOGGER.info("Expertise cant be changed at unit level :", wtaId);
+            LOGGER.info("Expertise cant be changed at unit level {}", wtaId);
             exceptionService.actionNotPermittedException("message.expertise.unitlevel.update", wtaId);
         }
         OrganizationDTO organization = userIntegrationService.getOrganizationWithCountryId(unitId);
@@ -112,12 +114,11 @@ public class WTAOrganizationService extends MongoBaseService {
         newWta.setStartDate(oldWta.getStartDate());
         newWta.setEndDate(updateDTO.getStartDate());
         newWta.setCountryParentWTA(null);
-        //ruleTemplateCategoryMongoRepository.detachPreviousRuleTemplates(oldWta.getId());
-        save(newWta);
+        workingTimeAgreementMongoRepository.save(newWta);
         if (Optional.ofNullable(oldWta.getParentId()).isPresent()) {
             WorkingTimeAgreement workingTimeAgreement = workingTimeAgreementMongoRepository.findOne(oldWta.getParentId());
             workingTimeAgreement.setDeleted(true);
-            save(workingTimeAgreement);
+            workingTimeAgreementMongoRepository.save(workingTimeAgreement);
         }
         oldWta.setName(updateDTO.getName());
         oldWta.setDescription(updateDTO.getDescription());
@@ -127,16 +128,7 @@ public class WTAOrganizationService extends MongoBaseService {
         oldWta.setExpertise(oldWta.getExpertise());
         oldWta.setParentId(newWta.getId());
         oldWta.setDisabled(false);
-        List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-        if (isCollectionNotEmpty(updateDTO.getRuleTemplates())) {
-            ruleTemplates = wtaBuilderService.copyRuleTemplates(updateDTO.getRuleTemplates(), true);
-            for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
-                workTimeAgreementService.updateExistingPhaseIdOfWTA(ruleTemplate.getPhaseTemplateValues(), organization.getId(), organization.getCountryId(), true);
-            }
-            save(ruleTemplates);
-            List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
-            oldWta.setRuleTemplateIds(ruleTemplatesIds);
-        }
+        List<WTABaseRuleTemplate> ruleTemplates = createWtaBaseRuleTemplates(updateDTO, oldWta, organization);
         workingTimeAgreementMongoRepository.save(oldWta);
         //Preparing Response for frontend
         oldWta.setParentId(newWta.getParentId());
@@ -152,8 +144,21 @@ public class WTAOrganizationService extends MongoBaseService {
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates);
         ruleTemplateService.assignCategoryToRuleTemplate(organization.getCountryId(), wtaBaseRuleTemplateDTOS);
         wtaResponseDTO.setRuleTemplates(wtaBaseRuleTemplateDTOS);
-        /*oldWta.getExpertise().setCountryId(null);*/
         return wtaResponseDTO;
+    }
+
+    private List<WTABaseRuleTemplate> createWtaBaseRuleTemplates(WTADTO updateDTO, WorkingTimeAgreement oldWta, OrganizationDTO organization) {
+        List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
+        if (isCollectionNotEmpty(updateDTO.getRuleTemplates())) {
+            ruleTemplates = wtaBuilderService.copyRuleTemplates(updateDTO.getRuleTemplates(), true);
+            for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
+                workTimeAgreementService.updateExistingPhaseIdOfWTA(ruleTemplate.getPhaseTemplateValues(), organization.getId(), organization.getCountryId(), true);
+            }
+            wtaBaseRuleTemplateMongoRepository.saveEntities(ruleTemplates);
+            List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
+            oldWta.setRuleTemplateIds(ruleTemplatesIds);
+        }
+        return ruleTemplates;
     }
 
 

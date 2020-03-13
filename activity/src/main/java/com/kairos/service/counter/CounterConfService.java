@@ -39,7 +39,7 @@ public class CounterConfService extends MongoBaseService {
     public void updateCounterCriteria(BigInteger counterId, List<FilterCriteria> criteriaList) {
         Counter counter = (Counter) counterRepository.getEntityById(counterId, Counter.class);
         counter.setCriteriaList(criteriaList);
-        save(counter);
+        counterRepository.save(counter);
     }
 
     private void verifyForValidCounterType(CounterType type) {
@@ -55,7 +55,7 @@ public class CounterConfService extends MongoBaseService {
     public void addCounter(Counter counter) {
         verifyForValidCounterType(counter.getType());
         verifyForCounterDuplicacy(counter.getType());
-        save(counter);
+        counterRepository.save(counter);
     }
 
     private void verifyForCategoryAvailability(List<String> categoryNames, Long refId, ConfLevel level) {
@@ -92,7 +92,7 @@ public class CounterConfService extends MongoBaseService {
         List<KPICategory> kpiCategories = new ArrayList<>();
         categories.stream().forEach(kpiCategoryDTO -> kpiCategories.add(new KPICategory(kpiCategoryDTO.getName(), countryId, unitId, level)));
         if (!kpiCategories.isEmpty()) {
-            save(kpiCategories);
+            counterRepository.saveEntities(kpiCategories);
         }
         return kpiCategories;
     }
@@ -121,7 +121,7 @@ public class CounterConfService extends MongoBaseService {
                 kpiCategory.setName(kpiCategoryDTO.getName());
             }
         }
-        save(kpiCategories);
+        counterRepository.saveEntities(kpiCategories);
         return kpiCategories;
     }
 
@@ -144,7 +144,7 @@ public class CounterConfService extends MongoBaseService {
         for (CategoryKPIConf categoryKPIConf : categoryKPIConfs) {
             categoryKPIConf.setCategoryId(kpiCategory.getId());
         }
-        save(categoryKPIConfs);
+        counterRepository.saveEntities(categoryKPIConfs);
     }
 
     public void addEntries(Long countryId) {
@@ -157,8 +157,8 @@ public class CounterConfService extends MongoBaseService {
         List<CounterType> availableTypes = availableCounters.stream().map(Counter::getType).collect(Collectors.toList());
         List<CounterType> addableCounters = Arrays.stream(CounterType.values()).filter(counterType -> !availableTypes.contains(counterType)).collect(Collectors.toList());
         addableCounters.forEach(counterType -> kpis.add(new KPI(counterType.getName(), null, null, counterType, false, null)));
-        List<KPI> savedKPIs = save(kpis);
+        List<KPI> savedKPIs = counterRepository.saveEntities(kpis);
         List<ApplicableKPI> applicableKPIS = savedKPIs.parallelStream().map(kpi -> new ApplicableKPI(kpi.getId(), kpi.getId(), countryId, null, null, ConfLevel.COUNTRY)).collect(Collectors.toList());
-        save(applicableKPIS);
+        counterRepository.saveEntities(applicableKPIS);
     }
 }

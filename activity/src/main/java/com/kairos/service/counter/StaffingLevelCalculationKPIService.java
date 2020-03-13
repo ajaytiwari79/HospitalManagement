@@ -26,7 +26,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.FilterType.TEAM_TYPE;
 import static com.kairos.enums.kpi.CalculationType.*;
 import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
-import static java.util.Map.Entry.comparingByKey;
 import static java.util.stream.Collectors.toMap;
 
 
@@ -148,14 +147,18 @@ public class StaffingLevelCalculationKPIService {
             }
         }
         if (isCollectionNotEmpty(staffingLevel.getPresenceStaffingLevelInterval())) {
-            for (StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()) {
-                long staffingLevelData = PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()) ? getUnderStaffingLevelData(staffingLevelInterval, activityIds, staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes()) : getOverStaffingLevelData(staffingLevelInterval, activityIds, staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes());
-                Integer hourNumber = staffingLevelInterval.getSequence() / 4;
-                if(staffingLevelDataMap.containsKey(hourNumber)){
-                    staffingLevelDataMap.put(hourNumber,staffingLevelDataMap.get(hourNumber)+staffingLevelData);
-                }else{
-                    staffingLevelDataMap.put(hourNumber,staffingLevelData);
-                }
+            updateCountForPresenceStaffingLevel(kpiCalculationRelatedInfo, activityIds, staffingLevel, staffingLevelDataMap);
+        }
+    }
+
+    private void updateCountForPresenceStaffingLevel(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, Set<BigInteger> activityIds, StaffingLevel staffingLevel, Map<Integer, Long> staffingLevelDataMap) {
+        for (StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()) {
+            long staffingLevelData = PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()) ? getUnderStaffingLevelData(staffingLevelInterval, activityIds, staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes()) : getOverStaffingLevelData(staffingLevelInterval, activityIds, staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes());
+            Integer hourNumber = staffingLevelInterval.getSequence() / 4;
+            if(staffingLevelDataMap.containsKey(hourNumber)){
+                staffingLevelDataMap.put(hourNumber,staffingLevelDataMap.get(hourNumber)+staffingLevelData);
+            }else{
+                staffingLevelDataMap.put(hourNumber,staffingLevelData);
             }
         }
     }
@@ -164,9 +167,9 @@ public class StaffingLevelCalculationKPIService {
         DateTimeInterval totalDataInterval = new DateTimeInterval(kpiCalculationRelatedInfo.getDateTimeIntervals().get(0).getStartDate(), kpiCalculationRelatedInfo.getDateTimeIntervals().get(kpiCalculationRelatedInfo.getDateTimeIntervals().size() - 1).getEndDate());
         Map<Integer,Long> staffingLevelDataMap = getPresenceStaffingLevelDataPerHour(totalDataInterval, kpiCalculationRelatedInfo);
         Map<T,E> staffingLevelMapPerHour = new HashMap<>();
-        for (Integer key : staffingLevelDataMap.keySet()) {
-            String dateTime = getLocalTimeByFormat(getLocalDateTime(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation(),key,0,0));
-            staffingLevelMapPerHour.put((T) dateTime, (E) getValueWithDecimalFormat(getHoursByMinutes(staffingLevelDataMap.get(key))));
+        for (Map.Entry<Integer, Long> integerLongEntry : staffingLevelDataMap.entrySet()) {
+            String dateTime = getLocalTimeByFormat(getLocalDateTime(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation(),integerLongEntry.getKey(),0,0));
+            staffingLevelMapPerHour.put((T) dateTime, (E) getValueWithDecimalFormat(getHoursByMinutes(integerLongEntry.getValue())));
         }
         return staffingLevelMapPerHour;
     }

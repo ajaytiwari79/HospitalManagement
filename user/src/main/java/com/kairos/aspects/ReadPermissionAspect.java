@@ -1,12 +1,10 @@
 package com.kairos.aspects;
 
 import com.kairos.service.access_permisson.AccessPageService;
-import com.kairos.service.kpermissions.PermissionService;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.Collection;
 
 @Aspect
 @Component

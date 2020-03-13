@@ -3,6 +3,7 @@ package com.kairos.controller.scheduler;
 import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
+import com.kairos.service.scheduler.UserSchedulerJobService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -32,6 +33,8 @@ public class SchedulerJobController {
     @Inject
     private JobQueueExecutor schedulerToActivityQueueService;
     @Inject private SendGridMailService sendGridMailService;
+    @Inject
+    private UserSchedulerJobService userSchedulerJobService;
 
     @ApiOperation("scheduler job execution")
     @PostMapping
@@ -45,5 +48,21 @@ public class SchedulerJobController {
 
         }
         return ResponseHandler.generateResponse(HttpStatus.OK,true,true);
+    }
+
+    @ApiOperation(value = "Register job for seniority level")
+    @PostMapping(value = "/register_job_for_seniority_level")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createJobForSeniorityLevel() {
+        userSchedulerJobService.createJobForSeniorityLevel();
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+    }
+
+    @ApiOperation(value = "Register job for position end")
+    @PostMapping(value = "/register_job_for_position_end")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createJobForPositionEnd() {
+        userSchedulerJobService.createJobForPositionEnd();
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 }

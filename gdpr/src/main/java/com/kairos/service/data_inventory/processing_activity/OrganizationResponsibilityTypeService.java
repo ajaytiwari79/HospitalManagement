@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.GdprMessagesConstants.*;
+
 @Service
 public class OrganizationResponsibilityTypeService{
 
@@ -97,7 +99,7 @@ public class OrganizationResponsibilityTypeService{
 
         List<String> processingActivities = processingActivityRepository.findAllProcessingActivityLinkedWithResponsibilityType(unitId, responsibilityTypeId);
         if (!processingActivities.isEmpty()) {
-                exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "message.responsibilityType", StringUtils.join(processingActivities, ','));
+                exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", MESSAGE_RESPONSIBILITYTYPE, StringUtils.join(processingActivities, ','));
         }
         responsibilityTypeRepository.deleteByIdAndOrganizationId(responsibilityTypeId, unitId);
         return true;
@@ -118,11 +120,11 @@ public class OrganizationResponsibilityTypeService{
             if (id.equals(responsibilityType.getId())) {
                 return responsibilityTypeDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "message.responsibilityType", responsibilityType.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_RESPONSIBILITYTYPE, responsibilityType.getName());
         }
         Integer resultCount =  responsibilityTypeRepository.updateMetadataName(responsibilityTypeDTO.getName(), id, unitId);
         if(resultCount <=0){
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.responsibilityType", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_RESPONSIBILITYTYPE, id);
         }else{
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, responsibilityTypeDTO.getName());
         }

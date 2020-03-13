@@ -31,8 +31,9 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
                 LOGGER.info("Integration----------------->{}",job.getId());
                 integrationJobService.runJob(job);
                 break;
-            case EMPLOYMENT_END:
-                positionService.endEmploymentProcess(job.getId(),job.getUnitId(),job.getEntityId().longValue(),DateUtils.getLocalDatetimeFromLong(job.getOneTimeTriggerDateMillis()));
+            case POSITION_END:
+                LOGGER.info("End Position----------------->{}",job.getId());
+                positionService.endPositionProcess();
                 break;
             case QUESTIONAIRE_NIGHTWORKER:
                 LOGGER.info("Questionaire nightworker----------------->{}",job.getId());
@@ -41,7 +42,8 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
                 LOGGER.info("Update Seniority Level----------------->{}",job.getId());
                 employmentJobService.updateSeniorityLevelOnJobTrigger(job.getId(),job.getUnitId());
                 break;
-            case NIGHT_WORKER:employmentJobService.updateNightWorkers();
+            case NIGHT_WORKER:
+                employmentJobService.updateNightWorkers();
                 break;
             default:
                 LOGGER.error("No execution route found for jobsubtype");

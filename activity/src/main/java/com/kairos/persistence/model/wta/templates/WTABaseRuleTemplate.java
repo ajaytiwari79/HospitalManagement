@@ -34,6 +34,7 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     protected Integer staffCanIgnoreCounter;
     protected Integer managementCanIgnoreCounter;
     protected PlanningSetting planningSetting;
+    protected boolean checkRuleFromView;
 
     public WTABaseRuleTemplate(String name,String description) {
         this.name = name;

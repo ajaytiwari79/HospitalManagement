@@ -39,7 +39,7 @@ public class KPIUtils {
     }
 
     public static <G> Set<Long> getLongValueSetBySetOfObjects(Set<G> objects) {
-          return !(ObjectUtils.isCollectionEmpty(objects)) ? objects.stream().map(o -> Long.valueOf(o.toString())).collect(Collectors.toSet()) : new HashSet<>();
+          return isCollectionNotEmpty(objects) ? objects.stream().map(o -> Long.valueOf(o.toString())).collect(Collectors.toSet()) : new HashSet<>();
     }
 
     public static List<LocalDate> getLocalDate(List<Object> objects) {

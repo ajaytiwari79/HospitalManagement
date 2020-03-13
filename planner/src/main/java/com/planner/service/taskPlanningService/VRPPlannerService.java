@@ -60,7 +60,6 @@ public class VRPPlannerService {
         Map<Object,Indictment> indictment = (Map<Object,Indictment>)solutionAndIndictment[1];
         Object[] solvedTasks = getSolvedTasks(solution.getShifts(), indictment);
         VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2],new ArrayList<>());
-        //vrpPlanningSolution.setId(solution.getId());
         vrpPlanningMongoRepository.saveEntity(vrpPlanningSolution);
         /*if(!solver.isTerminateEarly()){
             plannerRestClient.publish(null, vrpTaskPlanningDTO.getSolverConfig().getUnitId(), IntegrationOperation.CREATE, vrpTaskPlanningDTO.getSolverConfig().getId());
@@ -142,45 +141,7 @@ public class VRPPlannerService {
                 planningShifts.add(new PlanningShift(shift.getId(),shift.getEmployee().getId(), DateUtils.getDateByLocalDateAndLocalTime(shift.getLocalDate(), shift.getStartTime().toLocalTime()), Date.from(shift.getPlannedEndTime().atZone(ZoneId.systemDefault()).toInstant())));
                 int i = 0;
                 while (nextTask != null) {
-                    LocalDateTime drivingTimeStart = null;
-                    Indictment indictment = taskIdAndIndictmentMap.get(nextTask.getId());
-                    if (nextTask.isShiftBreak()) {
-                        com.planner.domain.task.Task breakTask = new com.planner.domain.task.Task("dt_" + i + "" + nextTask.getId().toString(), nextTask.getInstallationNo(), new Double(nextTask.getLatitude()), new Double(nextTask.getLongitude()), null, nextTask.getDuration(), nextTask.getStreetName(), new Integer(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
-                        breakTask.setPlannedStartTime(nextTask.getPlannedStartTime());
-                        breakTask.setStaffId(new Long(shift.getEmployee().getId()));
-                        breakTask.setShiftId(shift.getId());
-                        breakTask.setBreakTime(true);
-                        drivingTimeStart = nextTask.getPlannedStartTime().plusMinutes(nextTask.getDuration());
-                        breakTask.setPlannedEndTime(drivingTimeStart);
-                        drivedTaskList.add(breakTask);
-                    } else {
-                        com.planner.domain.task.Task task = new com.planner.domain.task.Task(nextTask.getId().toString(), nextTask.getInstallationNo(), new Double(nextTask.getLatitude()), new Double(nextTask.getLongitude()), null, nextTask.getPlannedDuration(), nextTask.getStreetName(), new Integer(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
-                        task.setPlannedStartTime(nextTask.getPlannedStartTime());
-                        task.setDrivingTime(nextTask.getDrivingTime());
-                        task.setShiftId(shift.getId());
-                        drivingTimeStart = nextTask.getPlannedStartTime().plusMinutes((int) nextTask.getPlannedDuration());
-                        task.setPlannedEndTime(drivingTimeStart);
-                        task.setStaffId(new Long(shift.getEmployee().getId()));
-                        if (indictment != null) {
-                            HardMediumSoftLongScore score = ((HardMediumSoftLongScore) indictment.getScoreTotal());
-                            if (score.getHardScore() < 0 || score.getMediumScore() < 0) {
-                                //excalatedTaskList.add(task);
-                                task.setEscalated(true);
-                            }
-                        }
-                        tasks.add(task);
-                    }
-                    nextTask = nextTask.getNextTask();
-                    if (nextTask != null) {
-                        int drivingMin = nextTask.getDrivingTime();
-                        com.planner.domain.task.Task drivedTask = new com.planner.domain.task.Task("dt_" + i + "" + nextTask.getId().toString(), nextTask.getInstallationNo(), new Double(nextTask.getLatitude()), new Double(nextTask.getLongitude()), null, drivingMin, nextTask.getStreetName(), new Integer(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
-                        drivedTask.setPlannedStartTime(drivingTimeStart);
-                        drivedTask.setDrivingDistance(nextTask.getDrivingDistance());
-                        drivedTask.setShiftId(shift.getId());
-                        drivedTask.setStaffId(new Long(shift.getEmployee().getId()));
-                        drivedTask.setPlannedEndTime(drivingTimeStart.plusMinutes(drivingMin));
-                        drivedTaskList.add(drivedTask);
-                    }
+                    nextTask = getTask(tasks, drivedTaskList, taskIdAndIndictmentMap, shift, nextTask, i);
                     i++;
                 }
 
@@ -188,6 +149,49 @@ public class VRPPlannerService {
             shift.setNextTask(null);
         }
         return new Object[]{planningShifts, tasks, drivedTaskList};
+    }
+
+    private Task getTask(List<com.planner.domain.task.Task> tasks, List<com.planner.domain.task.Task> drivedTaskList, Map<String, Indictment> taskIdAndIndictmentMap, Shift shift, Task nextTask, int i) {
+        LocalDateTime drivingTimeStart = null;
+        Indictment indictment = taskIdAndIndictmentMap.get(nextTask.getId());
+        if (nextTask.isShiftBreak()) {
+            com.planner.domain.task.Task breakTask = new com.planner.domain.task.Task("dt_" + i + "" + nextTask.getId(), nextTask.getInstallationNo(), Double.valueOf(nextTask.getLatitude()), Double.valueOf(nextTask.getLongitude()), null, nextTask.getDuration(), nextTask.getStreetName(), Integer.valueOf(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
+            breakTask.setPlannedStartTime(nextTask.getPlannedStartTime());
+            breakTask.setStaffId(Long.valueOf(shift.getEmployee().getId()));
+            breakTask.setShiftId(shift.getId());
+            breakTask.setBreakTime(true);
+            drivingTimeStart = nextTask.getPlannedStartTime().plusMinutes(nextTask.getDuration());
+            breakTask.setPlannedEndTime(drivingTimeStart);
+            drivedTaskList.add(breakTask);
+        } else {
+            com.planner.domain.task.Task task = new com.planner.domain.task.Task(nextTask.getId().toString(), nextTask.getInstallationNo(), Double.valueOf(nextTask.getLatitude()), Double.valueOf(nextTask.getLongitude()), null, nextTask.getPlannedDuration(), nextTask.getStreetName(), Integer.valueOf(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
+            task.setPlannedStartTime(nextTask.getPlannedStartTime());
+            task.setDrivingTime(nextTask.getDrivingTime());
+            task.setShiftId(shift.getId());
+            drivingTimeStart = nextTask.getPlannedStartTime().plusMinutes((int) nextTask.getPlannedDuration());
+            task.setPlannedEndTime(drivingTimeStart);
+            task.setStaffId(Long.valueOf(shift.getEmployee().getId()));
+            if (indictment != null) {
+                HardMediumSoftLongScore score = ((HardMediumSoftLongScore) indictment.getScoreTotal());
+                if (score.getHardScore() < 0 || score.getMediumScore() < 0) {
+                    //excalatedTaskList.add(task);
+                    task.setEscalated(true);
+                }
+            }
+            tasks.add(task);
+        }
+        nextTask = nextTask.getNextTask();
+        if (nextTask != null) {
+            int drivingMin = nextTask.getDrivingTime();
+            com.planner.domain.task.Task drivedTask = new com.planner.domain.task.Task("dt_" + i + "" + nextTask.getId().toString(), nextTask.getInstallationNo(), Double.valueOf(nextTask.getLatitude()), Double.valueOf(nextTask.getLongitude()), null, drivingMin, nextTask.getStreetName(), Integer.valueOf(nextTask.getHouseNo()), nextTask.getBlock(), nextTask.getFloorNo(), nextTask.getPost(), nextTask.getCity());
+            drivedTask.setPlannedStartTime(drivingTimeStart);
+            drivedTask.setDrivingDistance(nextTask.getDrivingDistance());
+            drivedTask.setShiftId(shift.getId());
+            drivedTask.setStaffId(Long.valueOf(shift.getEmployee().getId()));
+            drivedTask.setPlannedEndTime(drivingTimeStart.plusMinutes(drivingMin));
+            drivedTaskList.add(drivedTask);
+        }
+        return nextTask;
     }
 
 

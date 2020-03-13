@@ -28,6 +28,8 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.GdprMessagesConstants.*;
+
 
 @Service
 public class ClauseService {
@@ -69,7 +71,7 @@ public class ClauseService {
 
         Clause previousClause = isOrganization ? clauseRepository.findByUnitIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription()) : clauseRepository.findByCountryIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription());
         if (Optional.ofNullable(previousClause).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle().toLowerCase());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_CLAUSE, clauseDto.getTitle().toLowerCase());
         }
         if (isOrganization) {
             previousClause = prepareOrganizationClauseData(referenceId, clauseDto, new OrganizationClause());
@@ -143,7 +145,7 @@ public class ClauseService {
 
         Clause clause = isOrganization ? clauseRepository.findByUnitIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription()) : clauseRepository.findByCountryIdAndTitleAndDescription(referenceId, clauseDto.getTitle(), clauseDto.getDescription());
         if (Optional.ofNullable(clause).isPresent() && !clause.getId().equals(clauseId)) {
-            exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_CLAUSE, clauseDto.getTitle());
         }
         Optional<Clause> existingClause = clauseRepository.findById(clauseId);
         if (existingClause.isPresent()) {
@@ -179,7 +181,7 @@ public class ClauseService {
     public ClauseResponseDTO getClauseById(Long countryId, Long id) {
         Clause clause = clauseRepository.findByIdAndCountryId(id, countryId);
         if (!Optional.ofNullable(clause).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_CLAUSE, id);
         }
         return ObjectMapperUtils.copyPropertiesByMapper(clause, ClauseResponseDTO.class);
     }

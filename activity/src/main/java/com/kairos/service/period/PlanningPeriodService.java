@@ -592,6 +592,9 @@ public class PlanningPeriodService extends MongoBaseService {
         List<PeriodDTO> periodDTOS=planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId, startDate, endDate);
         Set<LocalDateTime> localDateTimes=periodDTOS.stream().map(planningPeriodDTO -> asLocalDateTime(asDate(planningPeriodDTO.getEndDate()))).collect(Collectors.toSet());
         Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, localDateTimes);
+        if(isCollectionEmpty(periodDTOS)){
+            exceptionService.dataNotFoundException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
+        }
         for (PeriodDTO planningPeriod : periodDTOS) {
             Phase phase=phaseListByDate.get(asDate(planningPeriod.getEndDate()));
             if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
@@ -840,7 +843,7 @@ public class PlanningPeriodService extends MongoBaseService {
     public DateTimeInterval getPlanningPeriodIntervalByUnitId(Long unitId) {
         PlanningPeriodDTO planningPeriodDTO = planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
         if(isNull(planningPeriodDTO)){
-            exceptionService.dataNotFoundException(MESSAGE_PERIOD_UNIT_ID,unitId);
+            exceptionService.dataNotFoundException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
         }
         return new DateTimeInterval(planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate());
     }
@@ -860,7 +863,7 @@ public class PlanningPeriodService extends MongoBaseService {
     public PlanningPeriod getFirstPlanningPeriod(Long unitId) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getFirstPlanningPeriod(unitId);
         if(isNull(planningPeriod)){
-            exceptionService.dataNotFoundException(MESSAGE_PERIODSETTING_UNIT,unitId);
+            exceptionService.dataNotFoundException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
         }
         return planningPeriod;
     }
@@ -868,7 +871,7 @@ public class PlanningPeriodService extends MongoBaseService {
     public PlanningPeriod getLastPlanningPeriod(Long unitId) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getLastPlanningPeriod(unitId);
         if(isNull(planningPeriod)){
-            exceptionService.dataNotFoundException(MESSAGE_PERIODSETTING_UNIT,unitId);
+            exceptionService.dataNotFoundException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
         }
         return planningPeriod;
     }
@@ -876,7 +879,7 @@ public class PlanningPeriodService extends MongoBaseService {
     public PlanningPeriod findLastPlaningPeriodEndDate(Long unitId) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findLastPlaningPeriodEndDate(unitId);
         if(isNull(planningPeriod)){
-            exceptionService.dataNotFoundException(MESSAGE_PERIODSETTING_UNIT,unitId);
+            exceptionService.dataNotFoundException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
         }
         return planningPeriod;
     }
@@ -892,7 +895,7 @@ public class PlanningPeriodService extends MongoBaseService {
     public PlanningPeriod findCurrentDatePlanningPeriod(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findCurrentDatePlanningPeriod(unitId, startLocalDate, endLocalDate);
         if(isNull(planningPeriod)){
-            exceptionService.dataNotFoundException(MESSAGE_PERIODSETTING_UNIT,unitId);
+            exceptionService.dataNotFoundException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
         }
         return planningPeriod;
     }
@@ -904,7 +907,7 @@ public class PlanningPeriodService extends MongoBaseService {
     public PlanningPeriodDTO findStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId) {
         PlanningPeriodDTO planningPeriodDTO = planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
         if(isNull(planningPeriodDTO)){
-            exceptionService.dataNotFoundException(MESSAGE_PERIODSETTING_UNIT,unitId);
+            exceptionService.dataNotFoundException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
         }
         return planningPeriodDTO;
     }
@@ -924,7 +927,7 @@ public class PlanningPeriodService extends MongoBaseService {
     public PlanningPeriod findFirstRequestPhasePlanningPeriodByUnitId(Long unitId) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
         if(isNull(planningPeriod)){
-            exceptionService.dataNotFoundException(MESSAGE_PERIODSETTING_UNIT,unitId);
+            exceptionService.dataNotFoundException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
         }
         return planningPeriod;
     }
@@ -932,7 +935,7 @@ public class PlanningPeriodService extends MongoBaseService {
     public PlanningPeriod findOneByUnitIdAndDate(Long unitId, Date startDate) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOneByUnitIdAndDate(unitId,startDate);
         if(isNull(planningPeriod)){
-            exceptionService.dataNotFoundException(MESSAGE_PERIODSETTING_UNIT,unitId);
+            exceptionService.dataNotFoundException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
         }
         return planningPeriod;
     }

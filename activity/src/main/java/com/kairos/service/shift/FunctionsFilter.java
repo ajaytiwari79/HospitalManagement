@@ -26,7 +26,7 @@ public class FunctionsFilter <G> implements ShiftFilter {
 
     @Override
     public <T extends ShiftDTO> List<T> meetCriteria(List<T> shiftDTOS) {
-        boolean validFilter = filterCriteriaMap.containsKey(FUNCTIONS) && isCollectionNotEmpty(functionDates);
+        boolean validFilter = filterCriteriaMap.containsKey(FUNCTIONS);
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
             for (ShiftDTO shiftDTO : shiftDTOS) {

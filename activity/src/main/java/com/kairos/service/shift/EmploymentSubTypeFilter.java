@@ -1,10 +1,8 @@
 package com.kairos.service.shift;
 
-import com.kairos.constants.ApiConstants;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
-import com.kairos.utils.counter.KPIUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +12,6 @@ import java.util.Set;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.enums.FilterType.EMPLOYMENT_SUB_TYPE;
-import static com.kairos.enums.FilterType.EMPLOYMENT_TYPE;
 
 public class EmploymentSubTypeFilter <G> implements ShiftFilter {
     private Map<FilterType, Set<G>> filterCriteriaMap;

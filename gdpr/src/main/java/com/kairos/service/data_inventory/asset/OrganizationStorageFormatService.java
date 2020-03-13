@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.GdprMessagesConstants.*;
+
 
 @Service
 public class OrganizationStorageFormatService {
@@ -99,7 +101,7 @@ public class OrganizationStorageFormatService {
 
         List<String> assetsLinked = assetRepository.findAllAssetLinkedWithStorageFormat(unitId, storageFormatId);
         if (CollectionUtils.isNotEmpty(assetsLinked)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "message.storageFormat", StringUtils.join(assetsLinked, ','));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", MESSAGE_STORAGEFORMAT, StringUtils.join(assetsLinked, ','));
         }
         storageFormatRepository.deleteByIdAndOrganizationId(storageFormatId, unitId);
         return true;
@@ -121,11 +123,11 @@ public class OrganizationStorageFormatService {
             if (id.equals(storageFormat.getId())) {
                 return storageFormatDTO;
             }
-            exceptionService.duplicateDataException("message.duplicate", "message.storageFormat", storageFormat.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_STORAGEFORMAT, storageFormat.getName());
         }
         Integer resultCount = storageFormatRepository.updateMetadataName(storageFormatDTO.getName(), id, unitId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.storageFormat", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_STORAGEFORMAT, id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, storageFormatDTO.getName());
         }

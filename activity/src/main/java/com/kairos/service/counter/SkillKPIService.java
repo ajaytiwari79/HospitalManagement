@@ -11,12 +11,9 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Service
@@ -50,24 +47,31 @@ public class SkillKPIService {
 
         for(StaffPersonalDetail staffPersonalDetail :staffPersonalDetails){
             if(staffPersonalDetail.getId().equals(staffId)){
-                for(SkillLevelDTO skillLevelDTO :staffPersonalDetail.getSkills()){
-                    DateTimeInterval dateTimeInterval = new DateTimeInterval(skillLevelDTO.getStartDate(),skillLevelDTO.getEndDate());
-                    if(selectedFromDate.equals(selectedToDate)) {
-                        if (ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
-                            if ((selectedFromDate.isAfter(skillLevelDTO.getStartDate())||selectedFromDate.equals(skillLevelDTO.getStartDate())) && ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
-                                count++;
-                            }
-                        }
-                        if (ObjectUtils.isNotNull(skillLevelDTO.getEndDate())) {
-                            DateTimeInterval dateTimeIntervals = new DateTimeInterval(selectedFromDate,selectedToDate);
-                            if (dateTimeInterval.containsAndEqualsEndDate(asDate(selectedFromDate))||selectedFromDate.equals(skillLevelDTO.getStartDate())||dateTimeInterval.containsInterval(dateTimeIntervals)) {
-                                count++;
-                            }
+                count = getSkillCount(selectedFromDate, selectedToDate, count, staffPersonalDetail);
+            }
+        }
+        return count;
+    }
 
-                        }
-                    }
-
+    private int getSkillCount(LocalDate selectedFromDate, LocalDate selectedToDate, int count, StaffPersonalDetail staffPersonalDetail) {
+        for(SkillLevelDTO skillLevelDTO :staffPersonalDetail.getSkills()){
+            DateTimeInterval dateTimeInterval = new DateTimeInterval(skillLevelDTO.getStartDate(),skillLevelDTO.getEndDate());
+            if(selectedFromDate.equals(selectedToDate)) {
+                if ((selectedFromDate.isAfter(skillLevelDTO.getStartDate()) || selectedFromDate.equals(skillLevelDTO.getStartDate())) && ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
+                    count++;
                 }
+                count = getCountByInterval(selectedFromDate, selectedToDate, count, skillLevelDTO, dateTimeInterval);
+            }
+
+        }
+        return count;
+    }
+
+    private int getCountByInterval(LocalDate selectedFromDate, LocalDate selectedToDate, int count, SkillLevelDTO skillLevelDTO, DateTimeInterval dateTimeInterval) {
+        if (ObjectUtils.isNotNull(skillLevelDTO.getEndDate())) {
+            DateTimeInterval dateTimeIntervals = new DateTimeInterval(selectedFromDate,selectedToDate);
+            if (dateTimeInterval.containsAndEqualsEndDate(asDate(selectedFromDate))||selectedFromDate.equals(skillLevelDTO.getStartDate())||dateTimeInterval.containsInterval(dateTimeIntervals)) {
+                count++;
             }
         }
         return count;
@@ -76,24 +80,28 @@ public class SkillKPIService {
 
     public int getCountOfSkillByMonth(Long staffId, List<StaffPersonalDetail> staffPersonalDetails,LocalDate selectedFromDate, LocalDate selectedToDate){
         DateTimeInterval dateTimeIntervalForMonth = new DateTimeInterval(selectedFromDate,selectedToDate);
-        DateTimeInterval dateTimeInterval = new DateTimeInterval();
         int count=0;
-
         for(StaffPersonalDetail staffPersonalDetail :staffPersonalDetails) {
             if (staffPersonalDetail.getId().equals(staffId)) {
                 for (SkillLevelDTO skillLevelDTO : staffPersonalDetail.getSkills()) {
-                    if(isNotNull(skillLevelDTO.getEndDate())) {
-                        dateTimeInterval = new DateTimeInterval(skillLevelDTO.getStartDate(), skillLevelDTO.getEndDate());
-                        if (dateTimeInterval.containsInterval(dateTimeIntervalForMonth) || dateTimeIntervalForMonth.containsAndEqualsEndDate(asDate(dateTimeInterval.getStartLocalDate())) || dateTimeIntervalForMonth.containsAndEqualsEndDate(asDate(dateTimeInterval.getEndLocalDate()))) {
-                            count++;
-                        }
-                    }
-                    else if (ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
-                        if ((dateTimeIntervalForMonth.contains(skillLevelDTO.getStartDate())||((selectedFromDate.isAfter(skillLevelDTO.getStartDate())||selectedFromDate.equals(skillLevelDTO.getStartDate())) && ObjectUtils.isNull(skillLevelDTO.getEndDate())))) {
-                            count++;
-                        }
-                    }
+                    count = getCount(selectedFromDate, dateTimeIntervalForMonth, count, skillLevelDTO);
                 }
+            }
+        }
+        return count;
+    }
+
+    private int getCount(LocalDate selectedFromDate, DateTimeInterval dateTimeIntervalForMonth, int count, SkillLevelDTO skillLevelDTO) {
+        DateTimeInterval dateTimeInterval;
+        if(isNotNull(skillLevelDTO.getEndDate())) {
+            dateTimeInterval = new DateTimeInterval(skillLevelDTO.getStartDate(), skillLevelDTO.getEndDate());
+            if (dateTimeInterval.containsInterval(dateTimeIntervalForMonth) || dateTimeIntervalForMonth.containsAndEqualsEndDate(asDate(dateTimeInterval.getStartLocalDate())) || dateTimeIntervalForMonth.containsAndEqualsEndDate(asDate(dateTimeInterval.getEndLocalDate()))) {
+                count++;
+            }
+        }
+        else if (ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
+            if ((dateTimeIntervalForMonth.contains(skillLevelDTO.getStartDate())||((selectedFromDate.isAfter(skillLevelDTO.getStartDate())||selectedFromDate.equals(skillLevelDTO.getStartDate())) && ObjectUtils.isNull(skillLevelDTO.getEndDate())))) {
+                count++;
             }
         }
         return count;

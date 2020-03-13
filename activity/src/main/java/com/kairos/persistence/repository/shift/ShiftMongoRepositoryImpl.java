@@ -86,7 +86,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftDTO> findAllShiftsBetweenDuration(Long employmentId, Long staffId, Date startDate, Date endDate, Long unitId) {
         Criteria criteria = where(UNIT_ID).is(unitId).and(EMPLOYMENT_ID).is(employmentId).and(DELETED).is(false).and(DISABLED).is(false).and(STAFF_ID).is(staffId)
                 .and(START_DATE).gte(startDate).lte(endDate);
-        return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
+        return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class,false);
     }
 
     @Override
@@ -181,7 +181,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     public List<ShiftDTO> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate) {
         Criteria criteria = where(UNIT_ID).is(unitId).and(DELETED).is(false).and(DISABLED).is(false).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate);
-        return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
+        return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class,false);
     }
 
     public List<Long> getUnitIdListOfShiftBeforeDate(Date endDate) {
@@ -209,7 +209,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftDTO> findAllShiftsBetweenDurationOfUnitAndStaffId(Long staffId, Date startDate, Date endDate, Long unitId) {
         Criteria criteria = where(UNIT_ID).is(unitId).and(DELETED).is(false).and(DISABLED).is(false).and(STAFF_ID).is(staffId)
                 .and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
-        return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
+        return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class,false);
     }
 
     public List<ShiftCountDTO> getAssignedShiftsCountByEmploymentId(List<Long> employmentIds, Date startDate) {
@@ -564,6 +564,16 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 //            updateActivityInShift(shiftWithActivityDTOS);
 //        }
         return shiftWithActivityDTOS;
+    }
+
+    //fixme this method is a  duplicate of above .
+    private <T extends ShiftDTO> List<T> getShiftWithActivityByCriteria(Criteria criteria,boolean replaceDraftShift,Class classType, boolean addActivityDetails,String... shiftProjection){
+        List<AggregationOperation> aggregationOperations = getShiftWithActivityAggregationOperations(criteria, replaceDraftShift, shiftProjection);
+        List<T> shiftWithActivityDTOS = mongoTemplate.aggregate(Aggregation.newAggregation(aggregationOperations),Shift.class ,classType).getMappedResults();
+        if(addActivityDetails) {
+            updateActivityInShift(shiftWithActivityDTOS);
+        }
+        return new ArrayList<>(shiftWithActivityDTOS);
     }
 
     private <T extends ShiftDTO> void updateActivityInShift(List<T> shiftWithActivityDTOS) {

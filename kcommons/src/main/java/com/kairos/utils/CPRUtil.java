@@ -1,6 +1,5 @@
 package com.kairos.utils;
 
-import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.enums.Gender;
 import org.apache.commons.lang3.StringUtils;
 
