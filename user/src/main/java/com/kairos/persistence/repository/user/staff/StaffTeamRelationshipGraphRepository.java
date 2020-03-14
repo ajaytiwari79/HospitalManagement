@@ -22,6 +22,9 @@ public interface StaffTeamRelationshipGraphRepository extends Neo4jBaseRepositor
     @Query("MATCH(t:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(staff) IN {0} AND id(t)={1} return rel")
     List<StaffTeamRelationship> findByStaffIdsAndTeamId(Collection<Long> staffIds, Long teamId);
 
+    @Query("MATCH(team:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(team)={0} return team,staff,rel")
+    List<StaffTeamRelationship> findByStaffTeamId(Long teamId);
+
     @Query("MATCH(t:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(staff) = {0} AND id(t)<>{1} AND rel.teamType='MAIN'" +
             " RETURN COUNT(rel)>0")
     boolean anyMainTeamExists(Long staffId, Long teamId);

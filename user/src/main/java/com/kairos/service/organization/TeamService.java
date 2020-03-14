@@ -20,6 +20,7 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.repository.custom_repository.CommonRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
@@ -77,6 +78,7 @@ public class TeamService {
     private StaffTeamRelationshipGraphRepository staffTeamRelationshipGraphRepository;
     @Inject
     private AccessGroupService accessGroupService;
+    @Inject private CommonRepository commonRepository;
 
     public TeamDTO createTeam(Long unitId, TeamDTO teamDTO) {
 
@@ -184,7 +186,7 @@ public class TeamService {
 
     public boolean isSequenceExistOrNot(Long teamId,StaffTeamDTO staffTeamDTO){
         List<Long> staffIds =staffGraphRepository.getStaffIdsByTeamId(teamId);
-        List<StaffTeamRelationship> staffTeamRelationships = staffTeamRelationshipGraphRepository.findByStaffIdsAndTeamId(staffIds,teamId);
+        List<StaffTeamRelationship> staffTeamRelationships = staffTeamRelationshipGraphRepository.findByStaffTeamId(teamId);
         boolean isExist =false;
         for(StaffTeamRelationship staffTeamRelationship : staffTeamRelationships){
             if(staffTeamDTO.getSequence()==staffTeamRelationship.getSequence()){
