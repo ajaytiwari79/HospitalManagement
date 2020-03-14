@@ -11,6 +11,7 @@ import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.activity.task.StaffTaskDTO;
+import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.kpermissions.OtherPermissionDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
@@ -24,6 +25,7 @@ import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.Gender;
 import com.kairos.enums.SkillLevel;
 import com.kairos.enums.StaffStatusEnum;
+import com.kairos.enums.data_filters.StaffFilters;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
@@ -1129,7 +1131,7 @@ public class StaffService {
         return staffGraphRepository.getStaffIdByUserId(userId,parentOrganizationId);
     }
 
-    public List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId){
+    public List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId, List<FilterSelectionDTO<StaffFilters>> staffFilters){
         LocalDate localDate = LocalDate.of(2020,01,01);
        String dateToday = DateUtils.formatLocalDate(localDate,"dd-MM-yyyy");
 

@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
 import com.kairos.dto.activity.shift.ShiftSearchDTO;
+import com.kairos.enums.data_filters.StaffFilterSelectionDTO;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.wrapper.shift.StaffShiftDetails;
@@ -29,7 +30,7 @@ public class ShiftPlanningService {
 
     public List<StaffShiftDetails> getShiftPlanningDetailsForUnit(Long unitId, ShiftSearchDTO shiftSearchDTO){
 
-        List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId);
+        List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId,shiftSearchDTO.getStaffFilters());
 
         LOGGER.debug("staff found for planning are {}", staffListWithPersonalDetails );
        final Set<Long> employmentIds = new HashSet<>();
@@ -40,12 +41,13 @@ public class ShiftPlanningService {
         Date fromDate = Date.from(LocalDate.of(2019,01,01).atStartOfDay(ZoneId.systemDefault()).toInstant())  ;
         Date toDate = Date.from(LocalDate.of(2020,12,01).atStartOfDay(ZoneId.systemDefault()).toInstant());
         List<StaffShiftDetails> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsByEmploymentsAndBetweenDuration(employmentIds,fromDate,toDate);
+
         return assignShiftsToStaff(staffListWithPersonalDetails,shiftWithActivityDTOS);
 //        return staffListWithPersonalDetails;
     }
 
-    public List<StaffShiftDetails> getAllStaffEligibleForPlanning(Long unitId){
-      return  userIntegrationService.getAllPlanningStaffForUnit(unitId);
+    public List<StaffShiftDetails> getAllStaffEligibleForPlanning(Long unitId, List<StaffFilterSelectionDTO> staffFilters){
+      return  userIntegrationService.getAllPlanningStaffForUnit(unitId,staffFilters);
     }
 
 

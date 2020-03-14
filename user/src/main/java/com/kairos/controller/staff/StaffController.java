@@ -1,17 +1,18 @@
 package com.kairos.controller.staff;
 
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
+import com.kairos.enums.data_filters.StaffFilters;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
 import com.kairos.persistence.model.staff.StaffSkillDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffEmploymentWithTag;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
 import com.kairos.persistence.model.staff.position.StaffPositionDetail;
@@ -660,10 +661,10 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsDataForPermissionByUnitId(unitId));
     }
 
-    @GetMapping(value = "/get_all_planning_staff")
+    @PostMapping(value = "/get_all_planning_staff")
     @ApiOperation("Get all staff eligible for planning")
-    public ResponseEntity<Map<String, Object>>  getStaffEligibleForPlanning(@PathVariable Long unitId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffForUnitWithEmploymentStatus(unitId));
+    public ResponseEntity<Map<String, Object>>  getStaffEligibleForPlanning(@PathVariable Long unitId, @RequestBody List<FilterSelectionDTO<StaffFilters>> staffFilters){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffForUnitWithEmploymentStatus(unitId,staffFilters));
     }
     @GetMapping(value = "/endPositionProcess")
     @ApiOperation("end position process")
