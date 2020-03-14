@@ -9,6 +9,8 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
@@ -22,7 +24,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_
 /**
  * Created by oodles on 6/10/16.
  */
-@Data
+@Getter
+@Setter
 @KPermissionRelatedModel
 @RelationshipEntity(type = TEAM_HAS_MEMBER)
 public class StaffTeamRelationship extends UserBaseEntity {
