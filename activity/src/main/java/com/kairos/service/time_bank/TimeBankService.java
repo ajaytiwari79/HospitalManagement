@@ -651,7 +651,7 @@ public class TimeBankService{
                 staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                 staffAdditionalInfoDTO.setUnitId(shifts.get(0).getUnitId());
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                updateDailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, false));
+                updateDailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())));
             }
             shiftMongoRepository.saveEntities(shifts);
             if(isCollectionNotEmpty(updateDailyTimeBanks)) {

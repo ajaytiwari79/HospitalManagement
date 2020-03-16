@@ -124,7 +124,7 @@ public class TimeBankCalculationService {
         if (isCollectionNotEmpty(shifts)) {
             Map<Long, DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
             CalculatePlannedHoursAndScheduledHours calculatePlannedHoursAndScheduledHours = new CalculatePlannedHoursAndScheduledHours(staffAdditionalInfoDTO, dateTimeInterval, shifts, validatedByPlanner, anyShiftPublish, dayTypeDTOMap).calculate();
-            anyShiftPublish = calculatePlannedHoursAndScheduledHours.isAnyShiftPublish();
+            anyShiftPublish = calculatePlannedHoursAndScheduledHours.isAnyShiftPublish() || validatedByPlanner;
             int totalDailyPlannedMinutes = calculatePlannedHoursAndScheduledHours.getTotalDailyPlannedMinutes();
             int scheduledMinutesOfTimeBank = calculatePlannedHoursAndScheduledHours.getScheduledMinutesOfTimeBank();
             int totalPublishedDailyPlannedMinutes = calculatePlannedHoursAndScheduledHours.getTotalPublishedDailyPlannedMinutes();

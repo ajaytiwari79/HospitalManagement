@@ -95,4 +95,5 @@ public class SkillKPIServiceTestCase {
         int totalSkill = skillKPIService.getCountOfSkillByMonth(staffIds.get(0),staffPersonalDetails,dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate());
         Assert.assertEquals(1,totalSkill);
     }
+
 }

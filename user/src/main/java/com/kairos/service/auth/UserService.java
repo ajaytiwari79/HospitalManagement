@@ -105,7 +105,7 @@ public class UserService {
     @Inject
     private SendGridMailService sendGridMailService;
     @Inject
-    private TokenService tokenService;
+    private ForgetPasswordTokenService forgetPasswordTokenService;
     @Inject
     private EnvConfig config;
     @Inject
@@ -225,34 +225,10 @@ public class UserService {
         return map;
     }
 
-    public User findByAccessToken(String token) {
-        return userGraphRepository.findByAccessToken(token);
-    }
-
     public User findByForgotPasswordToken(String token) {
         return userGraphRepository.findByForgotPasswordToken(token);
     }
 
-    public User findAndRemoveAccessToken(String accessToken) {
-        return userGraphRepository.findAndRemoveAccessToken(accessToken);
-    }
-
-
-    public User generateTokenToUser(User currentUser) {
-        currentUser.setAccessToken(UUID.randomUUID().toString().toUpperCase());
-        userGraphRepository.save(currentUser);
-        return currentUser;
-    }
-
-    public boolean removeToken(String accessToken) {
-        User user = findByAccessToken(accessToken);
-        if (user == null) {
-            return false;
-        }
-        user.setAccessToken(null);
-        userGraphRepository.save(user);
-        return true;
-    }
 
     public boolean logout(boolean logoutFromAllMachine, HttpServletRequest request) {
         boolean logoutSuccessfull = false;
@@ -329,7 +305,7 @@ public class UserService {
         map.put("id", currentUser.getId());
         map.put("userName", currentUser.getUserName());
         map.put("email", currentUser.getEmail());
-        map.put(ACCESS_TOKEN, currentUser.getAccessToken());
+        /*map.put(ACCESS_TOKEN, currentUser.getAccessToken());*/
         if (currentUser.getCountryList() != null) {
             map.put("countryId", currentUser.getCountryList().get(0).getId());
         }
@@ -352,7 +328,6 @@ public class UserService {
         if (currentUser == null) {
             return null;
         }
-        currentUser = generateTokenToUser(currentUser);
         Unit org = staffGraphRepository.getStaffOrganization(currentUser.getId());
         if (org == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
@@ -360,7 +335,6 @@ public class UserService {
         }
         Map<String, Object> map = new HashMap<>();
         map.put("id", currentUser.getId());
-        map.put(ACCESS_TOKEN, currentUser.getAccessToken());
         map.put("name", currentUser.getFirstName());
         map.put("appId", org.getEstimoteAppId());
         map.put("appToken", org.getEstimoteAppToken());
@@ -383,7 +357,6 @@ public class UserService {
             if (currentUser == null) {
                 return null;
             }
-            currentUser = generateTokenToUser(currentUser);
             Unit org = staffGraphRepository.getStaffOrganization(currentUser.getId());
             if (org == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
@@ -391,7 +364,6 @@ public class UserService {
             }
             Map<String, Object> map = new HashMap<>();
             map.put("id", currentUser.getId());
-            map.put(ACCESS_TOKEN, currentUser.getAccessToken());
             map.put("name", currentUser.getFirstName());
             map.put("organization", org.getId());
             map.put("appId", org.getEstimoteAppId());
@@ -584,7 +556,7 @@ public class UserService {
             }
         }
 
-            String token = tokenService.createForgotPasswordToken(currentUser);
+            String token = forgetPasswordTokenService.createForgotPasswordToken(currentUser);
             Map<String, Object> templateParam = new HashMap<>();
             templateParam.put("receiverName", EMAIL_GREETING + currentUser.getFullName());
             templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName())));
