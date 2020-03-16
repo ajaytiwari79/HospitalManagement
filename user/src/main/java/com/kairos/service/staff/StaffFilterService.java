@@ -188,6 +188,7 @@ public class StaffFilterService {
                 return dtoToQueryesultConverter(Employment.getListOfEmploymentForFilters(), objectMapper);
             case ACTIVITY_TIMECALCULATION_TYPE:
                 return newArrayList(new FilterSelectionQueryResult(FULL_DAY_CALCULATION,StringUtils.capitalize(FULL_DAY_CALCULATION.toLowerCase().replace("_"," "))),new FilterSelectionQueryResult(FULL_WEEK,StringUtils.capitalize(FULL_WEEK.toLowerCase().replace("_"," "))));
+            case ASSIGN_TIME_TYPE:
             case TIME_TYPE:
                 return getAllTimeType(countryId);
             case ACTIVITY_STATUS:
@@ -196,6 +197,8 @@ public class StaffFilterService {
                 return dtoToQueryesultConverter(RealTimeStatus.getListOfRealtimeStatusForFilters(), objectMapper);
             case TIME_SLOT:
                 return getTimeSlots();
+            case ASSIGN_ACTIVITY:
+                return getAllActivity(unitId);
             case ABSENCE_ACTIVITY:
                 return getAnsenceActivity(unitId);
             case  PLANNED_TIME_TYPE:
@@ -227,6 +230,11 @@ public class StaffFilterService {
                 break;
         }
         return new ArrayList<>();
+    }
+
+    private List<FilterSelectionQueryResult> getAllActivity(Long unitId){
+        List<ActivityDTO> activityDTOS = activityIntegrationService.getActivitiesWithCategories(unitId);
+        return activityDTOS.stream().map(activityDTO -> new FilterSelectionQueryResult(activityDTO.getId().toString(),activityDTO.getName())).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getTags(Long orgId) {

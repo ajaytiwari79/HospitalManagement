@@ -16,9 +16,11 @@ import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.night_worker.NightWorkerService;
+import com.kairos.service.staff_settings.StaffActivitySettingService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -51,6 +53,8 @@ public class ShiftFilterService {
     private ShiftValidatorService shiftValidatorService;
     @Inject
     private TimeBankService timeBankService;
+    @Inject
+    private StaffActivitySettingService staffActivitySettingService;
 
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO,List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
@@ -66,6 +70,7 @@ public class ShiftFilterService {
         ShiftFilter activityStatusFilter = new ActivityStatusFilter(filterTypeMap);
         ShiftFilter timeSlotFilter = new TimeSlotFilter(filterTypeMap,timeSlotDTOS);
         ShiftFilter activityFilter = getActivityFilter(unitId, filterTypeMap);
+        ShiftFilter assignActivityFilter = getAssignActivityFilter(unitId, filterTypeMap);
         ShiftFilter plannedTimeTypeFilter=new PlannedTimeTypeFilter(filterTypeMap);
         ShiftFilter timeAndAttendanceFilter = getValidatedFilter(shiftWithActivityDTOS, shiftStateIds, filterTypeMap);
         ShiftFilter functionsFilter = getFunctionFilter(unitId, filterTypeMap);
@@ -80,11 +85,23 @@ public class ShiftFilterService {
         ShiftFilter employmentSubTypeFilter = getEmploymentSubTypeFilter(filterTypeMap,staffKpiFilterDTOS);
         ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(timeAndAttendanceFilter)
                                     .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter).and(escalationFilter)
-                                    .and(timeBankBalanceFilter).and(employmentTypeFilter).and(employmentSubTypeFilter);
+                                    .and(timeBankBalanceFilter).and(employmentTypeFilter).and(employmentSubTypeFilter).and(assignActivityFilter);
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);
     }
 
+    private <G> ShiftFilter getAssignActivityFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap) {
+        List<Long> assignActivitiesStaff = new ArrayList<>();
+        if(filterTypeMap.containsKey(ASSIGN_TIME_TYPE) && isCollectionNotEmpty(filterTypeMap.get(ASSIGN_TIME_TYPE))){
+            Set<BigInteger> timeTypeIds = new HashSet<>(getBigInteger(filterTypeMap.get(ASSIGN_TIME_TYPE)));
 
+        }
+        if(filterTypeMap.containsKey(ASSIGN_ACTIVITY) && isCollectionNotEmpty(filterTypeMap.get(ASSIGN_ACTIVITY))){
+            List<BigInteger> activityIds = filterTypeMap.get(ASSIGN_ACTIVITY).stream().map(s -> new BigInteger(s.toString())).collect(Collectors.toList());
+            List<StaffActivitySetting> staffActivitySettings = staffActivitySettingService.getActivitySettingByUnitIdAndActivityIds(unitId,activityIds);
+            assignActivitiesStaff.addAll(staffActivitySettings.stream().map(StaffActivitySetting::getStaffId).collect(Collectors.toList()));
+        }
+        return new AssignActivityFilter(filterTypeMap, assignActivitiesStaff);
+    }
 
     private <G> ShiftFilter getTimeBankBalanceFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap, Set<Long> employmentIds) {
         //Update loop in a single call
