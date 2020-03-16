@@ -8,6 +8,8 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.attendance.AttendanceTimeSlotDTO;
 import com.kairos.dto.activity.attendance.TimeAndAttendanceDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -203,9 +205,25 @@ public class ShiftService extends MongoBaseService {
             shiftDTO.setShiftType(ShiftType.PRESENCE);
             shiftWithViolatedInfoDTO = saveShift(staffAdditionalInfoDTO, shiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
         }
+
         addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
+        getshiftWithViolatedInfoDTOForSaveAsDraftActionMode(shiftWithViolatedInfoDTO,shiftActionType);
         return shiftWithViolatedInfoDTO;
     }
+
+    // This function is used for the change the status of the draft shift
+    public void getshiftWithViolatedInfoDTOForSaveAsDraftActionMode(ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO,ShiftActionType shiftActionType){
+        Set<ShiftStatus> shiftStatuses = new HashSet<>();
+        if(ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)){
+        for(ShiftDTO shiftDTO :shiftWithViolatedInfoDTO.getShifts()){
+            for(ShiftActivityDTO shiftActivityDTO : shiftDTO.getActivities()){
+                shiftStatuses.add(ShiftStatus.REQUEST);
+                shiftActivityDTO.setStatus(shiftStatuses);
+                }
+            }
+        }
+    }
+
     private void addReasonCode(List<ShiftDTO> shiftDTOS, List<ReasonCodeDTO> reasonCodes) {
         Map<Long, ReasonCodeDTO> reasonCodeDTOMap = reasonCodes.stream().collect(Collectors.toMap(ReasonCodeDTO::getId, v -> v));
         for (ShiftDTO shift : shiftDTOS) {
@@ -835,6 +853,7 @@ public class ShiftService extends MongoBaseService {
         Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
     }
+
 
     public List<ShiftDTO> updateDraftShiftToShift(List<ShiftDTO> shifts, UserAccessRoleDTO userAccessRoleDTO) {
         List<ShiftDTO> shiftDTOS = new ArrayList<>();

@@ -38,8 +38,7 @@ public class ActivityDayType implements Constraint {
         return isValidForDayType(shift,this.dayTypes) ? 0 : 1;
     }
 
-    @Override
-    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+    public int checkConstraints(List<ShiftImp> shifts) {
         return 0;
     }
 

@@ -418,8 +418,8 @@ public class WorkTimeAgreementBalancesCalculationService {
         float approveActivityCount = 0;
         for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
             for (ShiftActivityDTO shiftActivityDTO : shiftWithActivityDTO.getActivities()) {
-                if ((shiftActivityDTO.getStartLocalDate().equals(dateTimeInterval.getStartLocalDate()) || dateTimeInterval.contains(shiftActivityDTO.getStartDate()))) {
-                    float[] approveAndScheduleCount = getCountOfVetoAndStopBricks(shiftActivityDTO,vetoAndStopBricksWTATemplate);
+                if ((shiftActivityDTO.getStartLocalDate().equals(dateTimeInterval.getStartLocalDate()) || dateTimeInterval.contains(shiftActivityDTO.getStartDate()))){
+                    float[] approveAndScheduleCount = getCountOfVetoAndStopBricks(shiftActivityDTO,vetoAndStopBricksWTATemplate,shiftWithActivityDTO);
                     approveActivityCount += approveAndScheduleCount[0];
                     scheduledActivityCount += approveAndScheduleCount[1];
                 }
@@ -429,17 +429,17 @@ public class WorkTimeAgreementBalancesCalculationService {
         intervalBalances.add(new IntervalBalance(vetoAndStopBricksWTATemplate.getTotalBlockingPoints(), scheduledActivityCount, available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), approveActivityCount));
     }
 
-    private float[] getCountOfVetoAndStopBricks(ShiftActivityDTO shiftActivityDTO, VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate) {
+    private float[] getCountOfVetoAndStopBricks(ShiftActivityDTO shiftActivityDTO, VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate,ShiftWithActivityDTO shiftWithActivityDTO) {
         float scheduledActivityCount = 0;
         float approveActivityCount = 0;
         if (shiftActivityDTO.getActivityId().equals(vetoAndStopBricksWTATemplate.getStopBrickActivityId())) {
             scheduledActivityCount = scheduledActivityCount + STOP_BRICK_BLOCKING_POINT;
-            if (shiftActivityDTO.getStatus().contains(ShiftStatus.APPROVE)) {
+            if (shiftActivityDTO.getStatus().contains(ShiftStatus.APPROVE)&&!shiftWithActivityDTO.isDraft()) {
                 approveActivityCount = approveActivityCount + STOP_BRICK_BLOCKING_POINT;
             }
         } else if (shiftActivityDTO.getActivityId().equals(vetoAndStopBricksWTATemplate.getVetoActivityId())) {
             scheduledActivityCount++;
-            if (shiftActivityDTO.getStatus().contains(ShiftStatus.APPROVE)) {
+            if (shiftActivityDTO.getStatus().contains(ShiftStatus.APPROVE)&&!shiftWithActivityDTO.isDraft()) {
                 approveActivityCount++;
             }
         }
@@ -589,7 +589,7 @@ public class WorkTimeAgreementBalancesCalculationService {
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
                 if ((dateTimeInterval.contains(activity.getStartDate())) && activityIds.contains(activity.getActivityId())) {
                     activityCount++;
-                    if (activity.getStatus().contains(ShiftStatus.APPROVE)) {
+                    if (activity.getStatus().contains(ShiftStatus.APPROVE)&&!shiftWithActivityDTO.isDraft()) {
                         approveCount++;
                     }
                 }
