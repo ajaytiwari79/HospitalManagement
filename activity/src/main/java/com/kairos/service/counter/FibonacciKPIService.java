@@ -120,11 +120,6 @@ public class FibonacciKPIService implements CounterService{
     }
 
     @Override
-    public Map<FilterType, List> getApplicableFilters(List<FilterCriteria> availableFilters, Map<FilterType, List> providedFiltersMap) {
-        return null;
-    }
-
-    @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         return null;
     }

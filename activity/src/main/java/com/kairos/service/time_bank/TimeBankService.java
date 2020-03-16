@@ -593,7 +593,7 @@ public class TimeBankService{
     }
 
     private EmploymentWithCtaDetailsDTO getEmploymentDetailDTO(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Long unitId) {
-        return new EmploymentWithCtaDetailsDTO(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO.getEmployment().getTotalWeeklyHours(), staffAdditionalInfoDTO.getEmployment().getTotalWeeklyMinutes(), staffAdditionalInfoDTO.getEmployment().getWorkingDaysInWeek(), staffAdditionalInfoDTO.getEmployment().getStaffId(), staffAdditionalInfoDTO.getEmployment().getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate(), staffAdditionalInfoDTO.getEmployment().getEmploymentLines(), staffAdditionalInfoDTO.getEmployment().getAccumulatedTimebankMinutes(), staffAdditionalInfoDTO.getEmployment().getAccumulatedTimebankDate(),unitId,staffAdditionalInfoDTO.getEmployment().getId());
+        return new EmploymentWithCtaDetailsDTO(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO.getEmployment().getTotalWeeklyHours(), staffAdditionalInfoDTO.getEmployment().getTotalWeeklyMinutes(), staffAdditionalInfoDTO.getEmployment().getWorkingDaysInWeek(), staffAdditionalInfoDTO.getEmployment().getStaffId(), staffAdditionalInfoDTO.getEmployment().getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate(), staffAdditionalInfoDTO.getEmployment().getEmploymentLines(), staffAdditionalInfoDTO.getEmployment().getAccumulatedTimebankMinutes(), staffAdditionalInfoDTO.getEmployment().getAccumulatedTimebankDate(),unitId,staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId());
     }
 
     public void deleteDuplicateEntry() {
@@ -652,7 +652,7 @@ public class TimeBankService{
                 staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                 staffAdditionalInfoDTO.setUnitId(shifts.get(0).getUnitId());
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                updateDailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, false));
+                updateDailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())));
             }
             shiftMongoRepository.saveEntities(shifts);
             if(isCollectionNotEmpty(updateDailyTimeBanks)) {

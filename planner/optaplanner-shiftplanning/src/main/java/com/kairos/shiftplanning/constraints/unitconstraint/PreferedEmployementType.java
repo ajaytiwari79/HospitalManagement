@@ -22,7 +22,7 @@ public class PreferedEmployementType  implements Constraint {
     }
 
     @Override
-    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+    public int checkConstraints(List<ShiftImp> shifts) {
         int numberOfCasualEmployee = 0;
         for(ShiftImp  shift:shifts) {
             if (!this.preferedEmploymentTypeIds.contains(shift.getEmployee().getEmploymentTypeId())) {

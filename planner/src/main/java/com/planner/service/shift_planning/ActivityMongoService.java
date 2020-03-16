@@ -137,7 +137,7 @@ public class ActivityMongoService {
             activity.setId(activityDTO.getId().toString());
             activity.setName(activityDTO.getName());
             activity.setOrder(++order);
-            activity.setConstraintMap(getActivityContraints());
+            activity.setConstraints(getActivityContraints());
             TimeType timeType=ObjectMapperUtils.copyPropertiesByMapper(activityDTO.getTimeType(), TimeType.class);
             timeType.setName(activityDTO.getTimeType().getSecondLevelType().name().toLowerCase());
             activity.setTimeType(timeType);
@@ -169,7 +169,7 @@ public class ActivityMongoService {
     }
 
     public Tag requiredTagId(){
-        Tag tag = new Tag(new BigInteger("1"),"StaffTag", STAFF, false, 958);;
+        Tag tag = new Tag(1l,"StaffTag", STAFF);;
         return tag;
     }
     //

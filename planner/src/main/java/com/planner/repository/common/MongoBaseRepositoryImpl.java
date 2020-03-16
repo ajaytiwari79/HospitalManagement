@@ -20,6 +20,7 @@ import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -84,12 +85,10 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
     }
 
     @Override
-    @Deprecated
     public List<T> findAllNotDeleted() {
         return mongoOperations.find(new Query(Criteria.where(DELETED).exists(false)), entityInformation.getJavaType());
     }
 
-    @Deprecated
     @Override
     public List<T> findAllSolverConfigNotDeletedByType(String solverConfigType) {
         String idType = "country".equalsIgnoreCase(solverConfigType) ? COUNTRY_ID : UNIT_ID;
@@ -172,7 +171,7 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
             for (int i = 0; i < objects.size(); i++) {  //Set id's
                 T entity = objects.get(i);
                 if (entity.getId() == null) {
-                    lastSequenece=lastSequenece.add(new BigInteger("1"));
+                    lastSequenece=lastSequenece.add(BigInteger.valueOf(1l));
                     entity.setId(lastSequenece);
                     dbObject = new BasicDBObject();
                     converter.write(entity, dbObject);
@@ -190,7 +189,7 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
             return objects;
         }catch(Exception ex){
             logger.error("BulkWriteOperation Exception ::  ", ex);
-            return null;
+            return new ArrayList<>();
         }
     }
 

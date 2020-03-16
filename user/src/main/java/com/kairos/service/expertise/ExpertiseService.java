@@ -50,6 +50,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.expertise.FunctionalPaymentGraphRepository;
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.country.CountryService;
@@ -125,6 +126,8 @@ public class ExpertiseService {
     private SchedulerServiceRestClient schedulerRestClient;
     @Inject
     private SectorGraphRepository sectorGraphRepository;
+    @Inject
+    private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
 
 
     public ExpertiseQueryResult saveExpertise(Long countryId, ExpertiseDTO expertiseDTO) {

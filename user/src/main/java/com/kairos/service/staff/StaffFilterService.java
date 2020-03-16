@@ -432,7 +432,7 @@ public class StaffFilterService {
         Map<Long,List<Long>> mapOfStaffAndEmploymentIds = getMapOfStaffAndEmploymentIds(staffs);
         staffFilterDTO.setMapOfStaffAndEmploymentIds(mapOfStaffAndEmploymentIds);
         staffFilterDTO.setIncludeWorkTimeAgreement(ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId));
-        staffFilterDTO = activityIntegrationService.getNightWorkerDetails(staffFilterDTO, unitId, startDate, endDate);
+        staffFilterDTO = activityIntegrationService.getWorkTimeAgreement(staffFilterDTO, unitId, startDate, endDate);
         List<Map> staffList = new ArrayList<>();
         setNightWorkerDetails(staffFilterDTO, staffs, staffList);
         if(loggedInStaffId!=null && staffList.stream().noneMatch(k->k.containsKey(loggedInStaffId)) && ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)){

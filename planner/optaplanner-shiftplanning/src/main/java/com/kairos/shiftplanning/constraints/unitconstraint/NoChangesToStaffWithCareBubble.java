@@ -26,13 +26,13 @@ public class NoChangesToStaffWithCareBubble implements Constraint {
     }
 
     @Override
-    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
+    public int checkConstraints(List<ShiftImp> shifts) {
         Map<Long,Tag> tagMap = new HashMap<>();
         int count = 0;
         for (ShiftImp shift : shifts) {
             Tag tag = tagMap.get(shift.getEmployee().getId());
             if(!tagMap.containsKey(shift.getEmployee().getId())) {
-                Optional<Tag> tagOptional = shift.getEmployee().getTags().stream().filter(t -> t.getId().equals(tagId)).findFirst();
+                Optional<Tag> tagOptional = shift.getEmployee().getTags().stream().filter(tag1 -> tag1.getId().equals(tagId)).findFirst();
                 if(tagOptional.isPresent()){
                     tag = tagOptional.get();
                 }else {

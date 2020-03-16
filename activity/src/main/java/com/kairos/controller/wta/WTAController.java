@@ -3,6 +3,7 @@ package com.kairos.controller.wta;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.wta.WTAOrganizationService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
@@ -254,7 +255,7 @@ public class WTAController {
     @ApiOperation(value = "Get employment cta wta and accumulated timebank")
     @PostMapping(value =  UNIT_URL+ "/employment_cta_wta_and_accumulated_timebank")
     public ResponseEntity<Map<String, Object>> getEmploymentCtaWtaAndAccumulatedTimebank(@PathVariable long unitId , @RequestBody Map<Long, List<EmploymentLinesDTO>> employmentLinesMap) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getEmploymentCtaWtaAndAccumulatedTimebank(unitId, employmentLinesMap));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getEmploymentCtaWtaAndAccumulatedTimebank(employmentLinesMap));
     }
 
 
@@ -288,7 +289,14 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementBalancesCalculationService.updateWTALeaveCountByJob(countryId));
     }
 
-
+    @ApiOperation(value = "get wta details for staff ids")
+    @PostMapping(value = UNIT_URL+"/get_wta_rules_for_staff")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffNightWorkerDetails(@RequestBody StaffFilterDTO staffFilterDTO,
+                                                                          @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                                          @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.getWorkTimeAgreement(staffFilterDTO,startDate,endDate));
+    }
 
 
 }

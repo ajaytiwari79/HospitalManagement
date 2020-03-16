@@ -56,7 +56,6 @@ public class CountrySolverConfigService {
             List<BigInteger> countraintIds = getContraintIds(countrySolverConfigDTO, null);
             countrySolverConfig.setConstraintIds(countraintIds);
             solverConfigRepository.saveEntity(countrySolverConfig);
-            //Now copy same countrySolverConfig at {unit/s} associated with {organizationSubServiceId}
             copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfig);
             countrySolverConfigDTO.setId(countrySolverConfig.getId());
         }
@@ -82,30 +81,34 @@ public class CountrySolverConfigService {
         Map<Long,UnitSolverConfig> unitSolverConfigMap = unitSolverConfigs.stream().collect(Collectors.toMap(UnitSolverConfig::getUnitId,v->v));
         List<CountryConstraint> solverConfigConstraints = constraintsRepository.findAllCountryConstraintByIds(countrySolverConfig.getConstraintIds());
         if (!applicableUnitIdForSolverConfig.isEmpty()) {
-            for (Long unitId : applicableUnitIdForSolverConfig) {
-                if (!unitSolverConfigMap.containsKey(unitId) && phaseDTOMap.containsKey(unitId)) {
-                    UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig, UnitSolverConfig.class);
-                    unitSolverConfig.setId(null);//Unset Id
-                    unitSolverConfig.setUnitId(unitId);
-                    List<UnitConstraint> unitConstraints = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(solverConfigConstraints,UnitConstraint.class);
-                    if(isCollectionNotEmpty(unitConstraints)) {
-                        constraintsRepository.saveList(unitConstraints);
-                    }
-                    List<BigInteger> unitContraintIds = unitConstraints.stream().map(unitConstraint -> unitConstraint.getId()).collect(Collectors.toList());
-                    unitSolverConfig.setConstraintIds(unitContraintIds);
-                    unitSolverConfig.setParentCountrySolverConfigId(countrySolverConfig.getId());
-                    unitSolverConfig.setPhaseId(phaseDTOMap.get(unitId).getId().longValue());
-                    unitSolverConfigList.add(unitSolverConfig);
-                }else {
-                    unitSolverConfigMap.remove(unitId);
-                }
-            }
+            updateUnitSolverConfig(countrySolverConfig, applicableUnitIdForSolverConfig, unitSolverConfigList, phaseDTOMap, unitSolverConfigMap, solverConfigConstraints);
             for (UnitSolverConfig unitSolverConfig : unitSolverConfigMap.values()) {
                 unitSolverConfig.setDeleted(true);
                 unitSolverConfigList.add(unitSolverConfig);
             }
             if (isCollectionNotEmpty(unitSolverConfigList)) {
                 solverConfigRepository.saveList(unitSolverConfigList);
+            }
+        }
+    }
+
+    private void updateUnitSolverConfig(CountrySolverConfig countrySolverConfig, List<Long> applicableUnitIdForSolverConfig, List<UnitSolverConfig> unitSolverConfigList, Map<Long, PhaseDTO> phaseDTOMap, Map<Long, UnitSolverConfig> unitSolverConfigMap, List<CountryConstraint> solverConfigConstraints) {
+        for (Long unitId : applicableUnitIdForSolverConfig) {
+            if (!unitSolverConfigMap.containsKey(unitId) && phaseDTOMap.containsKey(unitId)) {
+                UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig, UnitSolverConfig.class);
+                unitSolverConfig.setId(null);//Unset Id
+                unitSolverConfig.setUnitId(unitId);
+                List<UnitConstraint> unitConstraints = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(solverConfigConstraints,UnitConstraint.class);
+                if(isCollectionNotEmpty(unitConstraints)) {
+                    constraintsRepository.saveList(unitConstraints);
+                }
+                List<BigInteger> unitContraintIds = unitConstraints.stream().map(unitConstraint -> unitConstraint.getId()).collect(Collectors.toList());
+                unitSolverConfig.setConstraintIds(unitContraintIds);
+                unitSolverConfig.setParentCountrySolverConfigId(countrySolverConfig.getId());
+                unitSolverConfig.setPhaseId(phaseDTOMap.get(unitId).getId().longValue());
+                unitSolverConfigList.add(unitSolverConfig);
+            }else {
+                unitSolverConfigMap.remove(unitId);
             }
         }
     }
@@ -137,7 +140,6 @@ public class CountrySolverConfigService {
             countrySolverConfig.setConstraintIds(countraintids);
             countrySolverConfig.setParentSolverConfigId(countrySolverConfigDTO.getId());
             solverConfigRepository.saveEntity(countrySolverConfig);
-            //Now copy same countrySolverConfig at {unit/s} associated with {organizationSubServiceId}
             copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfig);
             countrySolverConfigDTO.setId(countrySolverConfig.getId());
         }
@@ -189,20 +191,15 @@ public class CountrySolverConfigService {
     }
 
     public boolean deleteCountrySolverConfig(BigInteger solverConfigId) {
-        boolean success = solverConfigRepository.safeDeleteById(solverConfigId);
-        if (!success) {
-            //TODO throw exception if required
-        }
-        return success;
+        return solverConfigRepository.safeDeleteById(solverConfigId);
     }
 
     public DefaultDataDTO getDefaultData(Long countryId) {
         List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
-        DefaultDataDTO defaultDataDTO = new DefaultDataDTO()
+        return new DefaultDataDTO()
                 .setOrganizationServicesBuilder(getOrganizationServicesAndItsSubServices(countryId))
                 .setPhaseDTOSBuilder(getAllPhases(countryId)).setTimeTypeEnumSBuilder(newArrayList(PRESENCE,ABSENCE,PAID_BREAK,UNPAID_BREAK))
                 .setConstraintTypesBuilder(getConstraintTypes()).setPlanningProblemsBuilder(planningProblemDTOS);
-        return defaultDataDTO;
     }
 
     public Map<ConstraintType, Set<ConstraintSubType>> getConstraintTypes(){
@@ -238,30 +235,14 @@ public class CountrySolverConfigService {
 
     private List<OrganizationServiceDTO> getOrganizationServicesAndItsSubServices(Long countryId) {
         List<OrganizationServiceQueryResult> organizationServiceQueryResults = userNeo4jRepo.getAllOrganizationServices(countryId);
-        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
-
-        return organizationServiceDTOS;
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
     }
 
     private List<PhaseDTO> getAllPhases(Long countryId) {
-        List<PhaseDTO> phaseDTOS = activityMongoRepository.getAllPhasesByCountryId(countryId);
-        return phaseDTOS;
+        return activityMongoRepository.getAllPhasesByCountryId(countryId);
     }
 
     private boolean preValidateCountrySolverConfigDTO(CountrySolverConfigDTO countrySolverConfigDTO) {
-        //TODO pradeep please update this method
-        /*String result = userNeo4jRepo.validateCountryOrganizationServiceAndSubService(countrySolverConfigDTO.getCountryId(), countrySolverConfigDTO.getOrganizationSubServiceIds());
-
-        if ("countryNotExists".equals(result)) {
-
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Country", countrySolverConfigDTO.getCountryId());
-        } else if () {
-
-        } else if ("relationShipNotValid".equals(result)) {
-
-            exceptionService.relationShipNotValidException("message.relationship.notValid");
-        }
-*/
         if(solverConfigRepository.isNameExistsById(countrySolverConfigDTO.getName(), countrySolverConfigDTO.getId(), true, countrySolverConfigDTO.getCountryId())){
             exceptionService.dataNotFoundByIdException("message.name.alreadyExists");
             return false;

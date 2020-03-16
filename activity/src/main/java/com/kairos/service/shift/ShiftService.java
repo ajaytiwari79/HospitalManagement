@@ -8,6 +8,8 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.attendance.AttendanceTimeSlotDTO;
 import com.kairos.dto.activity.attendance.TimeAndAttendanceDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.tags.TagDTO;
@@ -219,6 +221,7 @@ public class ShiftService extends MongoBaseService {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate(), null);
             shiftWithViolatedInfoDTO = saveShift(staffAdditionalInfoDTO, shiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
         }
+
         addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
         shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
         return shiftWithViolatedInfoDTOS;
@@ -921,6 +924,7 @@ public class ShiftService extends MongoBaseService {
         shiftDetailsService.setLayerInShifts(shiftsMap);
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
     }
+
 
     public List<ShiftDTO> updateDraftShiftToShift(List<ShiftDTO> shifts, UserAccessRoleDTO userAccessRoleDTO) {
         List<ShiftDTO> shiftDTOS = new ArrayList<>();

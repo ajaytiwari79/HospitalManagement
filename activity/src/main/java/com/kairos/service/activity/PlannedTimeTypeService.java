@@ -53,7 +53,6 @@ public class PlannedTimeTypeService{
         plannedTimeType.setImageName(presenceTypeDTO.getImageName());
         plannedTimeTypeRepository.save(plannedTimeType);
         presenceTypeDTO.setId(plannedTimeType.getId());
-        LOGGER.info(plannedTimeType.toString());
         return presenceTypeDTO;
     }
 

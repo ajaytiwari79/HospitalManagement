@@ -1,0 +1,1 @@
+Match(s:Staff)-[r:TEAM_HAS_MEMBER]-(t:Team) where r.teamType IS NULL SET r.teamType="SECONDARY" return r,s,t

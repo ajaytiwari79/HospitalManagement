@@ -17,15 +17,17 @@ public class EmploymentTypeFilter <G> implements ShiftFilter {
 
     private Map<FilterType, Set<G>> filterCriteriaMap;
     private Map<Long,Long> employmentIdAndEmploymentTypeIdMap;
+    private boolean includeEmploymentTypeFilter;
 
-    public EmploymentTypeFilter(Map<FilterType, Set<G>> filterCriteriaMap, Map<Long,Long> selectedEmploymentTypeIds) {
+    public EmploymentTypeFilter(Map<FilterType, Set<G>> filterCriteriaMap, Map<Long,Long> selectedEmploymentTypeIds,boolean includeEmploymentTypeFilter) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.employmentIdAndEmploymentTypeIdMap = selectedEmploymentTypeIds;
+        this.includeEmploymentTypeFilter =includeEmploymentTypeFilter;
     }
 
     @Override
     public <T extends ShiftDTO> List<T> meetCriteria(List<T> shiftDTOS) {
-        boolean validFilter = (filterCriteriaMap.containsKey(EMPLOYMENT_TYPE) && isCollectionNotEmpty(filterCriteriaMap.get(EMPLOYMENT_TYPE)));
+        boolean validFilter = ((filterCriteriaMap.containsKey(EMPLOYMENT_TYPE) && isCollectionNotEmpty(filterCriteriaMap.get(EMPLOYMENT_TYPE)))&&includeEmploymentTypeFilter) ;
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
             for (ShiftDTO shiftDTO : shiftDTOS) {

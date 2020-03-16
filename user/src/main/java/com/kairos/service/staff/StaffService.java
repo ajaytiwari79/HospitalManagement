@@ -572,7 +572,6 @@ public class StaffService {
                 }
                 String defaultPassword = user.getFirstName().replaceAll("\\s+", "") + DEFAULT_PASSPHRASE_ENDS_WITH;
                 user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
-                user.setAccessToken(defaultPassword);
             }
             user.setUserName(userName);
             staff.setUser(user);
