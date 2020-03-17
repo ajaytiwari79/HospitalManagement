@@ -10,7 +10,7 @@ import javax.inject.Inject;
  * Created by vipul on 10/5/18.
  */
 public class CommonsExceptionUtil {
-    @Inject
+
     private static LocaleService localeService;
 
     @Inject
@@ -25,7 +25,6 @@ public class CommonsExceptionUtil {
             } catch (Exception e) {
                 // intentionally left empty
             }
-
         }
         return localeService.getMessage(message, params);
     }

@@ -29,6 +29,11 @@ public class PresenceAndAbsenceAtSameTime implements Constraint {
     private ScoreLevel level;
     private int weight;
 
+    public PresenceAndAbsenceAtSameTime(ScoreLevel level, int weight) {
+        this.level = level;
+        this.weight = weight;
+    }
+
     public int checkConstraints(Activity activity, ShiftImp shift){
         Set<TimeTypeEnum> timeTypeEnumSet = shift.getActivityLineIntervals().stream().map(activityLineInterval -> activityLineInterval.getActivity().getTimeType().getTimeTypeEnum()).collect(Collectors.toSet());
         return timeTypeEnumSet.size();
