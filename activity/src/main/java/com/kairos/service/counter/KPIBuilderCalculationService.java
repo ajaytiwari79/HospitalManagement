@@ -248,6 +248,7 @@ public class KPIBuilderCalculationService implements CounterService {
             return interruptShift;
     }
 
+
     private double getTotalByPlannedTime(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
@@ -359,6 +360,7 @@ public class KPIBuilderCalculationService implements CounterService {
             case PAY_LEVEL_GRADE:
                 return getPayLevelGradeOfMainEmploymentOfStaff(staffId, kpiCalculationRelatedInfo);
             case ABSENCE_REQUEST:
+
             default:
                 break;
         }
