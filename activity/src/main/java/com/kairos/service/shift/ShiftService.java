@@ -908,7 +908,7 @@ public class ShiftService extends MongoBaseService {
             violatedRulesDTO = deleteFullWeekShifts(shiftDTOS, getFullWeekShiftsByDate(shift.getStartDate(), shift.getEmploymentId(), activity), staffAdditionalInfoDTO);
         } else {
             violatedRulesDTO = validateRule(shift, staffAdditionalInfoDTO);
-            if(isCollectionEmpty(violatedRulesDTO.getWorkTimeAgreements())) {
+            if(isCollectionEmpty(violatedRulesDTO.getWorkTimeAgreements()) && isCollectionEmpty(violatedRulesDTO.getActivities())) {
                 shift.setDeleted(true);
                 shiftDTOS.add(deleteShift(shift, staffAdditionalInfoDTO));
             }else{
