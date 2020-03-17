@@ -1,1 +1,1 @@
-MATCH (user:User) SET user.userType="USER_ACCOUNT"
+MATCH(user:User) WHERE user.userType IS NULL Set user.userType="USER_ACCOUNT"
