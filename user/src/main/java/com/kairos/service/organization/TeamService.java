@@ -17,6 +17,7 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -383,5 +384,9 @@ public class TeamService {
 
     public boolean removeStaffsFromTeam(Long teamId, List<Long> staffIds) {
         return teamGraphRepository.removeStaffsFromTeam(staffIds, teamId);
+    }
+
+    public List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds){
+        return teamGraphRepository.getAllStaffToAssignActivitiesByTeam(unitId, activityIds);
     }
 }

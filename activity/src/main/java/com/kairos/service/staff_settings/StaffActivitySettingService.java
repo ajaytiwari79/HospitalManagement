@@ -2,7 +2,10 @@ package com.kairos.service.staff_settings;
 
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.activity.common.StaffFilterDataDTO;
 import com.kairos.dto.activity.shift.StaffActivityResponse;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffAndActivitySettingWrapper;
 import com.kairos.persistence.model.activity.Activity;
@@ -16,6 +19,7 @@ import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.StaffExpertiseSpecification;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
@@ -27,6 +31,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
@@ -42,6 +47,7 @@ public class StaffActivitySettingService extends MongoBaseService {
     @Inject private ActivityService activityService;
     @Inject private OrganizationActivityService organizationActivityService;
     @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private TimeTypeService timeTypeService;
 
     public StaffActivitySettingDTO createStaffActivitySetting(Long unitId,StaffActivitySettingDTO staffActivitySettingDTO){
         activityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
@@ -226,4 +232,21 @@ public class StaffActivitySettingService extends MongoBaseService {
    public List<StaffActivitySetting> getActivitySettingByUnitIdAndActivityIds(Long unitId, List<BigInteger> activityIds){
         return staffActivitySettingRepository.findByUnitIdAndActivityIdAndDeletedFalse(unitId,activityIds);
    }
+
+   public StaffFilterDataDTO getStaffFilterDataDTO(Long unitId, List<BigInteger> timeTypeIds, List<BigInteger> activityIds){
+        StaffFilterDataDTO staffFilterDataDTO = new StaffFilterDataDTO();
+        staffFilterDataDTO.setActivityIds(isCollectionNotEmpty(activityIds) ? activityIds : new ArrayList<>());
+        if(isCollectionNotEmpty(timeTypeIds)) {
+            List<TimeTypeDTO> leafTimeTypes = new ArrayList<>();
+            timeTypeService.getAllLeafTimeTypeByParentTimeTypeIds(timeTypeIds, leafTimeTypes);
+            List<Activity> activities = activityService.findAllByUnitIdAndTimeTypeIds(unitId, leafTimeTypes.stream().map(TimeTypeDTO::getId).collect(Collectors.toList()));
+            staffFilterDataDTO.getActivityIds().addAll(activities.stream().map(Activity::getId).collect(Collectors.toList()));
+        }
+       if(isCollectionNotEmpty(staffFilterDataDTO.getActivityIds())) {
+           List<StaffActivitySetting> staffActivitySettings = getActivitySettingByUnitIdAndActivityIds(unitId,staffFilterDataDTO.getActivityIds());
+           staffFilterDataDTO.setStaffIds(staffActivitySettings.stream().map(StaffActivitySetting::getStaffId).collect(Collectors.toList()));
+       }
+       return staffFilterDataDTO;
+   }
+
 }
