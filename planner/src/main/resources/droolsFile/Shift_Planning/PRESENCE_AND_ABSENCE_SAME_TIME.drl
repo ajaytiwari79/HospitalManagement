@@ -13,13 +13,15 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 
 global HardMediumSoftLongScoreHolder scoreHolder;
 /********Unit Rules*******/
+
+//We need to change it to Unit
 rule "Presence Absence should not at same time"
 salience 20
     when
-        $unit:Unit(constraints != null)
+        $ac:Activity()
         $emp:Employee()
         $shifts:List(size>0) from collect (ShiftImp(getInterval()!=null && employee.equals($emp)))
-        $constraintsPenality: Integer(intValue>0) from ($unit.checkConstraints($shifts,ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME))
+        $constraintsPenality: Integer(intValue>0) from ($ac.checkConstraints($shifts,ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME))
     then
-        $unit.breakContraints(scoreHolder,kcontext,$constraintsPenality, ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME);
+        $ac.breakContraints(scoreHolder,kcontext,$constraintsPenality, ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME);
 end
