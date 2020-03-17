@@ -5,7 +5,6 @@ import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
-import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
@@ -14,16 +13,12 @@ import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
-import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.night_worker.NightWorkerService;
-import com.kairos.service.staff_settings.StaffActivitySettingService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -56,10 +51,6 @@ public class ShiftFilterService {
     private ShiftValidatorService shiftValidatorService;
     @Inject
     private TimeBankService timeBankService;
-    @Inject
-    private StaffActivitySettingService staffActivitySettingService;
-    @Inject
-    private ActivityService activityService;
 
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO,List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
