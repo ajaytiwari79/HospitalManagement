@@ -362,7 +362,7 @@ public class StaffService {
 
     public List<Expertise> assignExpertise(long staffId, StaffPersonalDetail staffPersonalDetail, UserAccessRoleDTO userAccessRoleDTO, Staff staffToUpdate) {
         List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
-        List<Long> expertises = staffPersonalDetail.getSectorWiseExpertise().stream().flatMap(sectorAndStaffExpertiseDTO -> sectorAndStaffExpertiseDTO.getExpertiseWithExperience().stream()).map(StaffExpertiseDTO::getExpertiseId).collect(Collectors.toList());
+        List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExpertiseDTO::getExpertiseId).collect(Collectors.toList());
         if (!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.getManagement()) {
             exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_EXPERTISE_NOTCHANGED);
         }
