@@ -10,6 +10,7 @@ import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
+import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -174,6 +175,7 @@ public class StaffCreationService {
         if (user == null) {
             LOGGER.info("Unit manager is null..creating new user first");
             user = new User(unitManagerDTO.getEmail(), unitManagerDTO.getFirstName().trim(), unitManagerDTO.getLastName().trim(), unitManagerDTO.getEmail(), unitManagerDTO.getContactDetail(), new BCryptPasswordEncoder().encode(password));
+            user.setUserType(UserType.USER_ACCOUNT);
             userGraphRepository.save(user);
             Staff staff = createStaffByUser(user);
             unitManagerDTOMap.put("id", staff.getId());
@@ -333,6 +335,7 @@ public class StaffCreationService {
             user = new User();
             user.setUserLanguage(systemLanguage);
             user.setCountryId(countryService.getCountryIdByUnitId(organization.getId()));
+            user.setUserType(UserType.USER_ACCOUNT);
             userGraphRepository.save(user);
         }
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());

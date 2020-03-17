@@ -19,6 +19,7 @@ import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.user.ChatStatus;
+import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
@@ -139,6 +140,7 @@ public class UserService {
      * @return User
      */
     public User createUser(User user) {
+        user.setUserType(UserType.USER_ACCOUNT);
         return userGraphRepository.save(user);
     }
 

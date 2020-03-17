@@ -84,8 +84,6 @@ public class ShiftFilterService {
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);
     }
 
-
-
     private <G> ShiftFilter getTimeBankBalanceFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap, Set<Long> employmentIds) {
         //Update loop in a single call
         Map<Long,Long> employmentIdAndActualTimeBankData = new HashMap<>();

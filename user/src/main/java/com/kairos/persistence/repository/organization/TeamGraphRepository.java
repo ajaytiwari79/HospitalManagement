@@ -4,6 +4,8 @@ import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.team.TeamDTO;
+import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -11,6 +13,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -140,4 +143,9 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     boolean activityExistInTeamByActivityId(BigInteger activityId);
 
     List<Team> findAllByDeletedFalseAndIsEnabledTrue();
+
+    @Query("MATCH (unit:Unit)-[:" + HAS_TEAMS + "]->(team:Team)-[:" + TEAM_HAS_MEMBER + "]->(teamMembers:Staff) \n" +
+            "WHERE id(unit) = {0} AND ANY(activityId IN team.activityIds WHERE toInteger(activityId) IN {1}) \n" +
+            "RETURN DISTINCT id(teamMembers)")
+    List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds);
 }

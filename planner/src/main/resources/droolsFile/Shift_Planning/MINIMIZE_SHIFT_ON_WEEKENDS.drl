@@ -10,13 +10,17 @@ import java.util.List;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 global HardMediumSoftLongScoreHolder scoreHolder;
 
+
+//We need to change it Unit
 rule "Minimize Shift On Weekends"
 salience 20
   when
-    $unit:Unit(constraints != null)
+    $ac:Activity()
     $shifts:List(size>0) from collect (ShiftImp());
-    $constraintsPenality: Integer(intValue>0) from ($unit.checkConstraints($shifts,ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS))
+    $constraintsPenality: Integer(intValue>0) from ($ac.checkConstraints($shifts,ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS))
   then
-   $unit.breakContraints(scoreHolder,kcontext, $constraintsPenality,ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS);
+   $ac.breakContraints(scoreHolder,kcontext, $constraintsPenality,ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS);
 end
+
+
 

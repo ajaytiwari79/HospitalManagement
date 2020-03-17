@@ -1197,4 +1197,8 @@ public class ActivityService {
     public List<ActivityDTO> getActivitiesByUnitId(Long unitId){
         return activityMongoRepository.getActivitiesByUnitId(unitId);
     }
+
+    public List<Activity>  findAllByUnitIdAndTimeTypeIds(Long unitId, Collection<BigInteger> timeTypeIds){
+        return activityMongoRepository.findAllByUnitIdAndTimeTypeIds(unitId, timeTypeIds);
+    }
 }
