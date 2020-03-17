@@ -15,20 +15,20 @@ public class RestClientUrlUtil {
     private static String userServiceUrl;
     private static String plannerServiceUrl;
     private static String schedulerServiceUrl;
-    private static final String unit="unit/";
+    private static final String UNIT ="unit/";
 
     @Value("${gateway.plannerservice.url}")
-    public static void setPlannerServiceUrl(String plannerServiceUrl) {
+    public void setPlannerServiceUrl(String plannerServiceUrl) {
         RestClientUrlUtil.plannerServiceUrl = plannerServiceUrl;
     }
 
     @Value("${gateway.schedulerservice.url}")
-    public static void setSchedulerServiceUrl(String schedulerServiceUrl) {
+    public void setSchedulerServiceUrl(String schedulerServiceUrl) {
         RestClientUrlUtil.schedulerServiceUrl = schedulerServiceUrl;
     }
 
     @Value("${gateway.userservice.url}")
-    public static void setUserServiceUrl(String userServiceUrl) {
+    public void setUserServiceUrl(String userServiceUrl) {
         RestClientUrlUtil.userServiceUrl = userServiceUrl;
     }
 
@@ -51,7 +51,7 @@ public class RestClientUrlUtil {
         } else {
             if (hasUnitInUrl) {
                 baseUrl = new StringBuilder(userServiceUrl)
-                        .append(unit).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+                        .append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
             } else {
                 baseUrl = new StringBuilder(userServiceUrl).append("country/").append(id).toString();
             }
@@ -65,13 +65,13 @@ public class RestClientUrlUtil {
     }
 
     public static final String getPlannerBaseUrl() {
-        return plannerServiceUrl + unit;
+        return plannerServiceUrl + UNIT;
     }
 
     public final static String getSchedulerBaseUrl(boolean hasUnitInUrl, Long id) {
         String baseUrl;
         if (hasUnitInUrl) {
-            baseUrl = new StringBuilder(schedulerServiceUrl).append(unit).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+            baseUrl = new StringBuilder(schedulerServiceUrl).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
         } else {
             baseUrl = schedulerServiceUrl;
         }
