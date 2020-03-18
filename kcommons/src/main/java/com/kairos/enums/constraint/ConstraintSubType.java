@@ -15,6 +15,7 @@ public enum ConstraintSubType {
     ACTIVITY_REQUIRED_TAG("Activity Required Tag"),
     PRESENCE_AND_ABSENCE_SAME_TIME("Presence and Absence at same time"),
     MAX_SHIFT_OF_STAFF("Maximum shift of staff"),
+    FIX_ACTIVITY_SHOULD_NOT_CHANGE("Fix Activity Should not change"),
 
     //For Shifts
 

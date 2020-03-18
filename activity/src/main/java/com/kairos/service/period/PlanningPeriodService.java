@@ -530,8 +530,8 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         Phase initialNextPhase = phaseMongoRepository.findOne(isNotNull(planningPeriod.getNextPhaseId()) ? planningPeriod.getNextPhaseId() : planningPeriod.getCurrentPhaseId());
         if (PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum()) && PlanningPeriodAction.PUBLISH.equals(planningPeriodAction)) {
-            publishPlanningPeriod(unitId, employmentTypeIds, planningPeriod);
             planningPeriod.getPublishEmploymentIds().addAll(employmentTypeIds);
+            publishPlanningPeriod(unitId, employmentTypeIds, planningPeriod);
         }
         if (PlanningPeriodAction.FLIP.equals(planningPeriodAction)) {
             if(PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())) {
@@ -542,7 +542,7 @@ public class PlanningPeriodService extends MongoBaseService {
             }
             flipPlanningPeriodToNextPhase(unitId, periodId, planningPeriod, initialNextPhase);
         }
-        save(planningPeriod);
+        planningPeriodMongoRepository.save(planningPeriod);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
@@ -830,8 +830,7 @@ public class PlanningPeriodService extends MongoBaseService {
         if (isCollectionNotEmpty(shifts)) {
             for (Shift shift : shifts) {
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
-                    if (!shiftActivity.getStatus().contains(ShiftStatus.PUBLISH))
-                        shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+                    shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
                 }
             }
             shiftMongoRepository.saveEntities(shifts);

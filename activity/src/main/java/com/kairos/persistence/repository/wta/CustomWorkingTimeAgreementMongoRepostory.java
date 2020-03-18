@@ -70,6 +70,8 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getAllWTAByEmploymentIds(Collection<Long> employmentIds);
 
+    List<WTAQueryResultDTO> getAllWTAByEmploymentIdsAndShowRuleToView(Collection<Long> employmentIds,boolean showRuleToView);
+
     List<WTAQueryResultDTO> getAllWTAByDate(Date date);
 
 }

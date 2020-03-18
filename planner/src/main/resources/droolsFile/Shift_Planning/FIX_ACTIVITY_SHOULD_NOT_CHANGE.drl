@@ -6,12 +6,12 @@ import com.kairos.shiftplanning.domain.shift.*;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 global HardMediumSoftLongScoreHolder scoreHolder;
 
-rule "Activity Required Tag"
+rule "Fix type of activity should not change"
 salience 20
  when
   $ac:Activity(tags != null)
   $shift:ShiftImp(!activityLineIntervals.isEmpty() && hasIntervalsForActivity($ac))
-  $constraintsPenality: Integer(intValue>0) from ($ac.checkActivityConstraints($shift,8))
+  $constraintsPenality: Integer(intValue>0) from ($ac.checkConstraints($shift,8))
  then
-    $ac.breakActivityContraints(null,scoreHolder,kcontext,$constraintsPenality, 8);
+    $ac.breakContraints(scoreHolder,kcontext,$constraintsPenality, 8);
 end

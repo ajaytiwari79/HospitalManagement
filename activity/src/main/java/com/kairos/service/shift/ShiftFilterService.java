@@ -84,8 +84,6 @@ public class ShiftFilterService {
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);
     }
 
-
-
     private <G> ShiftFilter getTimeBankBalanceFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap, Set<Long> employmentIds) {
         //Update loop in a single call
         Map<Long,Long> employmentIdAndActualTimeBankData = new HashMap<>();
@@ -168,24 +166,16 @@ public class ShiftFilterService {
     private <G> ShiftFilter getEmploymentTypeFilter(Map<FilterType, Set<G>> filterTypeMap,List<StaffKpiFilterDTO> staffKpiFilterDTOS){
         Map<Long,Long> employmentIdAndEmploymentTypeIdMap = new HashMap<>();
         if(filterTypeMap.containsKey(EMPLOYMENT_TYPE)&&isCollectionNotEmpty(filterTypeMap.get(EMPLOYMENT_TYPE))){
-            if(isCollectionEmpty(staffKpiFilterDTOS)){
-                filterTypeMap.remove(EMPLOYMENT_TYPE);
-            }else {
-                employmentIdAndEmploymentTypeIdMap = getEmploymentIdAndEmploymentTypeIdMap(staffKpiFilterDTOS);
-            }
+            employmentIdAndEmploymentTypeIdMap = getEmploymentIdAndEmploymentTypeIdMap(staffKpiFilterDTOS);
        }
-       return new EmploymentTypeFilter(filterTypeMap,employmentIdAndEmploymentTypeIdMap);
+       return new EmploymentTypeFilter(filterTypeMap,employmentIdAndEmploymentTypeIdMap,isCollectionNotEmpty(staffKpiFilterDTOS));
     }
 
     private <G> ShiftFilter getEmploymentSubTypeFilter(Map<FilterType, Set<G>> filterTypeMap,List<StaffKpiFilterDTO> staffKpiFilterDTOS){
         Map<Long,EmploymentSubType> employmentIdAndEmploymentSubTypeIdMap = new HashMap<>();
         if(filterTypeMap.containsKey(EMPLOYMENT_SUB_TYPE)&&isCollectionNotEmpty(filterTypeMap.get(EMPLOYMENT_SUB_TYPE))) {
-          if(isCollectionNotEmpty(staffKpiFilterDTOS)) {
-              filterTypeMap.remove(EMPLOYMENT_SUB_TYPE);
-          }
-           else {
+
                employmentIdAndEmploymentSubTypeIdMap = getEmploymentIdAndEmploymentSubType(staffKpiFilterDTOS);
-            }
 
         }
         return new EmploymentSubTypeFilter(filterTypeMap,employmentIdAndEmploymentSubTypeIdMap);

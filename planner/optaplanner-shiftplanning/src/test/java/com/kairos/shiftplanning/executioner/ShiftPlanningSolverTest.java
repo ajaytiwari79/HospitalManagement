@@ -3,6 +3,7 @@ package com.kairos.shiftplanning.executioner;
 import com.kairos.dto.planner.constarints.ConstraintDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
@@ -10,6 +11,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.Interval;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -23,23 +25,32 @@ import static com.kairos.enums.constraint.ConstraintSubType.*;
 
 //@PropertySource("/media/pradeep/bak/multiOpta/task-shiftplanning/src/main/resources/taskplanner.properties")
 public class ShiftPlanningSolverTest {
+
+    public static final String FIX_ACTIVITY_SHOULD_NOT_CHANGE = "Fix Activity should not change";
+    public static final String IF_THIS_ACTIVITY_IS_USED_ON_A_TUESDAY = "If this activity is used on a Tuesday";
+    public static final String MAX_SHIFT_OF_STAFF = "Max Shift of Staff";
+    public static final String PRESENCE_AND_ABSENCE_SHOULD_NOT_BE_AT_SAME_TIME = "Presence And Absence should not be at same time";
+    public static final String ACTIVITY_REQUIRED_TAG = "Activity required Tag";
+    public static final String PREFER_PERMAMENT_EMPLOYEE = "Prefer Permament Employee";
+    public static final String MINIMIZE_NO_OF_SHIFT_ON_WEEKEND = "Minimize No of Shift on weekend";
+    public static final String MAX_NUMBER_OF_ALLOCATIONS_PR_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF = "Max number of allocations pr. shift for this activity per staff";
+    public static final String SHORTEST_DURATION_FOR_THIS_ACTIVITY_RELATIVE_TO_SHIFT_LENGTH = "Shortest duration for this activity, relative to shift length";
+    public static final String ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH = "Activity must continous for number of Hours, relative to shift length";
+
     @Test
-    @Ignore
+    //@Ignore
     public void test() {
-        //RequestedTask requestedTask =  new RequestedTask();
-        //requestedTask.loadXMLFromDB();
         SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
         new ShiftPlanningSolver(solverConfigDTO).runSolver();
-
+        Assert.assertEquals(0,0);
     }
 
-    @Test
-    @Ignore
+/*    @Test
+    @Ignore*/
     public void buildBenchmarker() {
         new ShiftPlanningSolver().buildBenchmarker();
     }
-    @Test
-    @Ignore
+
     public void runBenchmarker() {
         new ShiftPlanningSolver().runBenchmarker();
     }
@@ -47,104 +58,21 @@ public class ShiftPlanningSolverTest {
 
     public SolverConfigDTO getSolverConfigDTO(){
         List<ConstraintDTO> constraintDTOS = new ArrayList<>();
-        /*constraintDTOS.add(new ConstraintDTO(null, DURATION_BETWEEN_SHIFTS.toString(), commonDescription+"ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS", ConstraintType.ACTIVITY, ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS, ConstraintLevel.HARD, penaltyHard, PLANNING_PROBLEM_ID, null, COUNTRY_ID, ORGANIZATION_SERVICE_ID, ORGANIZATION_SUB_SERVICE_ID));*/
-        constraintDTOS.add(new ConstraintDTO("Shortest duration for this activity, relative to shift length","Shortest duration for this activity, relative to shift length", ConstraintType.ACTIVITY, ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH, ConstraintLevel.HARD, 5, 5l));
-        constraintDTOS.add(new ConstraintDTO("Max number of allocations pr. shift for this activity per staff", "Max number of allocations pr. shift for this activity per staff",  ConstraintType.ACTIVITY, MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, ConstraintLevel.HARD, 5,5l));
-        constraintDTOS.add(new ConstraintDTO("Minimize No of Shift on weekend", "Minimize No of Shift on weekend",  ConstraintType.ACTIVITY, MINIMIZE_SHIFT_ON_WEEKENDS, ConstraintLevel.HARD, 5,5l));
-        constraintDTOS.add(new ConstraintDTO("Prefer Permament Employee","Shift Assignment Permanent Employee",ConstraintType.ACTIVITY,PREFER_PERMANENT_EMPLOYEE,ConstraintLevel.HARD,2,5l));
-        constraintDTOS.add(new ConstraintDTO("Activity required Tag ", "Activity required tag to Assign",  ConstraintType.ACTIVITY, ACTIVITY_REQUIRED_TAG, ConstraintLevel.HARD, 5,5l));
-
-   //     constraintDTOS.add(new ConstraintDTO("If this activity is used on a Tuesday", "If this activity is used on a Tuesday",  ConstraintType.ACTIVITY, ACTIVITY_VALID_DAYTYPE, ConstraintLevel.SOFT, 4,5l));
+        constraintDTOS.add(new ConstraintDTO(ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH, ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH, ConstraintType.ACTIVITY, ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS, ConstraintLevel.HARD, 5, 5l));
+        constraintDTOS.add(new ConstraintDTO(SHORTEST_DURATION_FOR_THIS_ACTIVITY_RELATIVE_TO_SHIFT_LENGTH,SHORTEST_DURATION_FOR_THIS_ACTIVITY_RELATIVE_TO_SHIFT_LENGTH, ConstraintType.ACTIVITY, ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH, ConstraintLevel.HARD, 5, 5l));
+        constraintDTOS.add(new ConstraintDTO(MAX_NUMBER_OF_ALLOCATIONS_PR_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, MAX_NUMBER_OF_ALLOCATIONS_PR_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF,  ConstraintType.ACTIVITY, MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, ConstraintLevel.HARD, 5,5l));
+        constraintDTOS.add(new ConstraintDTO(MINIMIZE_NO_OF_SHIFT_ON_WEEKEND, MINIMIZE_NO_OF_SHIFT_ON_WEEKEND,  ConstraintType.ACTIVITY, MINIMIZE_SHIFT_ON_WEEKENDS, ConstraintLevel.HARD, 5,5l));
+        constraintDTOS.add(new ConstraintDTO(PREFER_PERMAMENT_EMPLOYEE, PREFER_PERMAMENT_EMPLOYEE,ConstraintType.ACTIVITY,PREFER_PERMANENT_EMPLOYEE,ConstraintLevel.HARD,2,5l));
+        constraintDTOS.add(new ConstraintDTO(ACTIVITY_REQUIRED_TAG, ACTIVITY_REQUIRED_TAG,  ConstraintType.ACTIVITY, ConstraintSubType.ACTIVITY_REQUIRED_TAG, ConstraintLevel.HARD, 5,5l));
+        constraintDTOS.add(new ConstraintDTO(PRESENCE_AND_ABSENCE_SHOULD_NOT_BE_AT_SAME_TIME, PRESENCE_AND_ABSENCE_SHOULD_NOT_BE_AT_SAME_TIME,  ConstraintType.UNIT, PRESENCE_AND_ABSENCE_SAME_TIME, ConstraintLevel.HARD, 5,5l));
+        constraintDTOS.add(new ConstraintDTO(MAX_SHIFT_OF_STAFF, MAX_SHIFT_OF_STAFF,  ConstraintType.ACTIVITY, ConstraintSubType.MAX_SHIFT_OF_STAFF, ConstraintLevel.HARD, 5,5l));
+/*
+        constraintDTOS.add(new ConstraintDTO(FIX_ACTIVITY_SHOULD_NOT_CHANGE, FIX_ACTIVITY_SHOULD_NOT_CHANGE,  ConstraintType.ACTIVITY, ConstraintSubType.FIX_ACTIVITY_SHOULD_NOT_CHANGE, ConstraintLevel.HARD, 5,5l));
+*/
+        constraintDTOS.add(new ConstraintDTO(IF_THIS_ACTIVITY_IS_USED_ON_A_TUESDAY, IF_THIS_ACTIVITY_IS_USED_ON_A_TUESDAY,  ConstraintType.ACTIVITY, ACTIVITY_VALID_DAYTYPE, ConstraintLevel.SOFT, 4,5l));
         return new SolverConfigDTO(constraintDTOS);
     }
 
-	/*@Test
-    @Ignore
-	public  void testKieServiceApi() {
-		KieServicesConfiguration kieServicesConfiguration = new KieServicesConfigurationImpl("http://localhost:8080/kie-server/services/rest/server", "kieserver", "kieserver", 100000000000000l);
-		KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(kieServicesConfiguration);
-	}*/
-
-
-	@Test
-    @Ignore
-    public void sendDataToKairos(){
-        ShiftRequestPhasePlanningSolution solution = new ShiftPlanningGenerator().loadUnsolvedSolutionFromXML("/home/pradeep/Downloads/shift_solution (1).xml");
-        new ShiftPlanningSolver().sendSolutionToKairos(solution);
-    }
-
-    public List<ShiftDTO> getShiftDtos() {
-        List<ShiftDTO> shiftDTOS = new ArrayList<>();
-        IntStream.range(0, 2).forEachOrdered(i -> {
-            ShiftDTO shiftDTO = new ShiftDTO("" + 1, new DateTime().withTimeAtStartOfDay().plusHours(1).toDate(), new DateTime().withTimeAtStartOfDay().plusHours(12).toDate(), new BigInteger("320"));
-            shiftDTO.setSubShifts(getSubShiftDtos());
-            shiftDTOS.add(shiftDTO);
-        });
-        return shiftDTOS;
-    }
-
-    public List<ShiftDTO> getSubShiftDtos() {
-        List<ShiftDTO> shiftDTOS = new ArrayList<>();
-
-        ShiftDTO shiftDTO = new ShiftDTO("" + 1, new DateTime().withTimeAtStartOfDay().plusHours(1).toDate(), new DateTime().withTimeAtStartOfDay().plusHours(2).toDate(), new BigInteger("320"));
-        shiftDTOS.add(shiftDTO);
-
-        shiftDTO = new ShiftDTO("" + 1, new DateTime().withTimeAtStartOfDay().plusHours(2).toDate(), new DateTime().withTimeAtStartOfDay().plusMinutes(30).toDate(), new BigInteger("375"));
-        shiftDTOS.add(shiftDTO);
-
-        shiftDTO = new ShiftDTO("" + 1, new DateTime().withTimeAtStartOfDay().plusHours(2).plusMinutes(30).toDate(), new DateTime().withTimeAtStartOfDay().plusHours(4).toDate(), new BigInteger("327"));
-        shiftDTOS.add(shiftDTO);
-
-        shiftDTO = new ShiftDTO("" + 1, new DateTime().withTimeAtStartOfDay().plusHours(4).toDate(), new DateTime().withTimeAtStartOfDay().plusHours(6).toDate(), new BigInteger("329"));
-        shiftDTOS.add(shiftDTO);
-        return shiftDTOS;
-    }
-
-    @Test public void getQuaterOfMonth(){
-        Interval interval = new Interval(new DateTime(), new DateTime().withDayOfMonth(DateTimeConstants.MARCH).property(DateTimeFieldType.dayOfMonth()).withMaximumValue());
-        System.out.print(interval);
-    }
-
-
-
-    @Test
-    public void getCostOfEmpByShift() {
-        double totalCost = 0;
-        DateTime startTime = new DateTime().withTimeAtStartOfDay().plusHours(22);
-        DateTime endTime = startTime.plusHours(4).plusMinutes(45);
-        double baseCost = 10;
-        int i = 0;
-        double[][] costTimeAgreement = intializeCTA();
-        while (startTime.getHourOfDay() != endTime.getHourOfDay() && startTime.isBefore(endTime)) {
-            totalCost = totalCost + (baseCost * costTimeAgreement[startTime.getDayOfWeek() - 1][startTime.getHourOfDay()]);
-            startTime = startTime.plusHours(1);
-
-        }
-        double minuteCost;
-        if (startTime.getMinuteOfHour() > 0) {
-            minuteCost = (60d - startTime.getMinuteOfHour()) / 60d;
-            totalCost = totalCost - (baseCost * costTimeAgreement[startTime.minusHours(endTime.getHourOfDay()).getDayOfWeek() - 1][startTime.minusHours(endTime.getHourOfDay()).getHourOfDay()]);
-            totalCost = totalCost + (baseCost * costTimeAgreement[startTime.getDayOfWeek() - 1][startTime.getHourOfDay()] * minuteCost);
-        }
-        if (endTime.getMinuteOfHour() > 0) {
-            minuteCost = endTime.getMinuteOfHour() / 60d;
-            totalCost = totalCost + (baseCost * costTimeAgreement[startTime.getDayOfWeek() - 1][startTime.getHourOfDay()] * minuteCost);
-        }
-        System.out.println(totalCost);
-    }
-
-    private double[][] intializeCTA() {
-        //0-1,1-2,2-3,3-4,4-5,5-6,6-7,7-8,8-9,9-10,10-11,11-12,12-13,13-14,14-15,15-16,16-17,17-18,18-19,19-20,20-21,21-22,22-23,23-0
-        double cta[][] =
-                {{1.4d, 1.4d, 1.4d, 1.2d, 1, 1, 1, 1, 1, 1, 1.1d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2},//Monday
-                        {1.4d, 1.4d, 1.4d, 1.2d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2},//Tuesday
-                        {1.2d, 1.2d, 1.3d, 1.6d, 1.2d, 1.2d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2},//Wednesday
-                        {1.2d, 1.2d, 1.2d, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2},//Thursday
-                        {1.3d, 1.3d, 1.3d, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2},//Friday
-                        {1.3d, 1.3d, 1.4d, 1.2d, 1, 1, 1, 1, 1, 1, 1.2d, 1.2d, 1.2d, 1.2d, 1.2d, 2, 2, 2, 2, 2, 2, 2, 3, 3},//Satur
-                        {1.3d, 1.4d, 1.4d, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3}};//Sun
-        return cta;
-    }
 
 
 }

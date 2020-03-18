@@ -4,19 +4,24 @@ import com.kairos.shiftplanning.domain.activity.*;
 import com.kairos.shiftplanning.domain.shift.*;
 import com.kairos.shiftplanning.domain.staffing_level.*;
 import com.kairos.shiftplanning.domain.skill.*;
+import com.kairos.shiftplanning.domain.staff.*;
+import com.kairos.shiftplanning.domain.unit.*;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
-import java.util.ArrayList;
+import java.util.List;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+
 global HardMediumSoftLongScoreHolder scoreHolder;
-/********Activity Rules*******/
-rule "Min Length of Activity"
+/********Unit Rules*******/
+
+//We need to change it to Unit
+rule "Presence Absence should not at same time"
 salience 20
     when
-        $unit:Unit()
+        $ac:Activity()
         $emp:Employee()
-        $shifts:ArrayList(size>0) from collect (ShiftImp(isAbsenceActivityApplied() && getInterval()!=null && employee.equals($emp)))
-        $constraintsPenality: Integer(intValue>0) from ($unit.checkActivityConstraints($shift,ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME))
+        $shifts:List(size>0) from collect (ShiftImp(getInterval()!=null && employee.equals($emp)))
+        $constraintsPenality: Integer(intValue>0) from ($ac.checkConstraints($shifts,ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME))
     then
-        $ac.breakActivityContraints(null,scoreHolder,kcontext,$constraintsPenality, ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME);
+        $ac.breakContraints(scoreHolder,kcontext,$constraintsPenality, ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME);
 end

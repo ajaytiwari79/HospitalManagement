@@ -65,13 +65,13 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{deleted:false,'compositeActivities.activityId':?0}",exists = true)
     boolean existsByActivityIdInCompositeActivitiesAndDeletedFalse(BigInteger id);
 
-    @Query(value = "{'balanceSettingsActivityTab.timeTypeId':?0}, deleted:false}")
+    @Query(value = "{'balanceSettingsActivityTab.timeTypeId':?0, deleted:false}")
     List<Activity>  findAllByTimeTypeId(BigInteger timeTypeId);
 
     @Query(value = "{'_id':{'$in':?0}, 'deleted':false}")
     List<ActivityDTO> findByDeletedFalseAndIdsIn(Collection<BigInteger> activityIds);
 
-    @Query(value = "{'balanceSettingsActivityTab.timeTypeId':?0}, deleted:false}",exists = true)
+    @Query(value = "{'balanceSettingsActivityTab.timeTypeId':?0, deleted:false}",exists = true)
     boolean existsByTimeTypeId(BigInteger timeTypeId);
 
     @Query(value = "{'deleted' : false, 'unitId' :?0,'activityPriorityId':?1 }",exists = true)
@@ -83,7 +83,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{deleted: false, parentId :?0,unitId:{$in:?1 }}",exists = true)
     boolean existsByParentIdAndDeletedFalse( BigInteger activityId,List<Long> unitIds);
 
-    @Query(value = "{'balanceSettingsActivityTab.timeType':?0}, deleted:false}")
+    @Query(value = "{'balanceSettingsActivityTab.timeType':?0, deleted:false}")
     List<Activity>  findAllBySecondLevelTimeType(TimeTypeEnum timeTypeEnum);
 
 
@@ -99,6 +99,11 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{unitId:?0, deleted:false}")
     List<ActivityDTO> getActivitiesByUnitId(Long unitId);
 
+
     @Query(value = "{'balanceSettingsActivityTab.priorityFor':?0,activityPriorityId:?1,_id:{$ne: ?2}}",exists = true)
     boolean isActivityPriorityIdIsExistOrNot(PriorityFor priorityFor,BigInteger priorityId,BigInteger activityId);
+
+    @Query(value = "{unitId:?0, 'balanceSettingsActivityTab.timeTypeId':{$in:?1 }, deleted:false}")
+    List<Activity>  findAllByUnitIdAndTimeTypeIds(Long unitId, Collection<BigInteger> timeTypeIds);
+
 }

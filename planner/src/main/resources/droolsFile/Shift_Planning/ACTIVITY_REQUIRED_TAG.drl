@@ -12,7 +12,7 @@ salience 20
  when
   $ac:Activity(tags != null)
   $shift:ShiftImp(!activityLineIntervals.isEmpty() && hasIntervalsForActivity($ac))
-  $constraintsPenality: Integer(intValue>0) from ($ac.checkActivityConstraints($shift,ConstraintSubType.ACTIVITY_REQUIRED_TAG))
+  $constraintsPenality: Integer(intValue>0) from ($ac.checkConstraints($shift,ConstraintSubType.ACTIVITY_REQUIRED_TAG))
  then
-    $ac.breakActivityContraints(null,scoreHolder,kcontext,$constraintsPenality, ConstraintSubType.ACTIVITY_REQUIRED_TAG);
+    $ac.breakContraints(scoreHolder,kcontext,$constraintsPenality, ConstraintSubType.ACTIVITY_REQUIRED_TAG);
 end

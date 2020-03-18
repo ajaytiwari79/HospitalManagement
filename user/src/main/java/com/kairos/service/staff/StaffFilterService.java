@@ -15,7 +15,6 @@ import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
-import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
 import com.kairos.enums.cta.AccountType;
@@ -45,6 +44,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.GroupService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.organization.TeamService;
 import com.kairos.service.organization.UnitService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
@@ -56,6 +56,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -130,6 +131,8 @@ public class StaffFilterService {
     private OrganizationServiceRepository organizationServiceRepository;
     @Inject
     private UnitService unitService;
+    @Inject
+    private TeamService teamService;
 
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
@@ -188,6 +191,7 @@ public class StaffFilterService {
                 return dtoToQueryesultConverter(Employment.getListOfEmploymentForFilters(), objectMapper);
             case ACTIVITY_TIMECALCULATION_TYPE:
                 return newArrayList(new FilterSelectionQueryResult(FULL_DAY_CALCULATION,StringUtils.capitalize(FULL_DAY_CALCULATION.toLowerCase().replace("_"," "))),new FilterSelectionQueryResult(FULL_WEEK,StringUtils.capitalize(FULL_WEEK.toLowerCase().replace("_"," "))));
+            case ASSIGN_TIME_TYPE:
             case TIME_TYPE:
                 return getAllTimeType(countryId);
             case ACTIVITY_STATUS:
@@ -196,6 +200,8 @@ public class StaffFilterService {
                 return dtoToQueryesultConverter(RealTimeStatus.getListOfRealtimeStatusForFilters(), objectMapper);
             case TIME_SLOT:
                 return getTimeSlots();
+            case ASSIGN_ACTIVITY:
+                return getAllActivity(unitId);
             case ABSENCE_ACTIVITY:
                 return getAnsenceActivity(unitId);
             case  PLANNED_TIME_TYPE:
@@ -227,6 +233,11 @@ public class StaffFilterService {
                 break;
         }
         return new ArrayList<>();
+    }
+
+    private List<FilterSelectionQueryResult> getAllActivity(Long unitId){
+        List<ActivityDTO> activityDTOS = activityIntegrationService.getActivitiesWithCategories(unitId);
+        return activityDTOS.stream().map(activityDTO -> new FilterSelectionQueryResult(activityDTO.getId().toString(),activityDTO.getName())).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getTags(Long orgId) {
@@ -429,7 +440,7 @@ public class StaffFilterService {
                 filterTypeSetMap, staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),null,selectedDate);
 
-        staffListMap = filterStaffList(staffListMap, filterTypeSetMap);
+        staffListMap = filterStaffList(unitId,staffListMap, filterTypeSetMap);
         staffEmploymentTypeWrapper.setStaffList(staffListMap);
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
         List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(), unitId , moduleId , showAllStaffs);
@@ -438,7 +449,7 @@ public class StaffFilterService {
         Map<Long,List<Long>> mapOfStaffAndEmploymentIds = getMapOfStaffAndEmploymentIds(staffs);
         staffFilterDTO.setMapOfStaffAndEmploymentIds(mapOfStaffAndEmploymentIds);
         staffFilterDTO.setIncludeWorkTimeAgreement(ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId));
-        staffFilterDTO = activityIntegrationService.getNightWorkerDetails(staffFilterDTO, unitId, startDate, endDate);
+        staffFilterDTO = activityIntegrationService.getWorkTimeAgreement(staffFilterDTO, unitId, startDate, endDate);
         List<Map> staffList = new ArrayList<>();
         for (Map staffAndModifiable : staffs) {
             if(staffFilterDTO.getNightWorkerDetails().containsKey(staffAndModifiable.get(ID))) {
@@ -465,12 +476,32 @@ public class StaffFilterService {
         return staffEmploymentTypeWrapper;
     }
 
-    private <T> List<Map> filterStaffList(List<Map> staffListMap, Map<FilterType, Set<T>> filterData) {
+    private <T> List<Map> filterStaffList(Long unitId, List<Map> staffListMap, Map<FilterType, Set<T>> filterData) {
         Set<FilterType> appliedFilters = newHashSet(AGE, ORGANIZATION_EXPERIENCE, BIRTHDAY, SENIORITY, EMPLOYED_SINCE, PAY_GRADE_LEVEL);
         for (Map.Entry<FilterType, Set<T>> filterTypeSetEntry : filterData.entrySet()) {
             if(isNotNull(filterTypeSetEntry.getKey()) && appliedFilters.contains(filterTypeSetEntry.getKey())) {
                 staffListMap = getFilteredStaffs(staffListMap, filterTypeSetEntry.getKey(), filterData);
             }
+        }
+        staffListMap = filterStaffByAssignActivity(unitId,staffListMap, filterData);
+        return staffListMap;
+    }
+
+    private <T> List<Map> filterStaffByAssignActivity(Long unitId, List<Map> staffListMap, Map<FilterType, Set<T>> filterTypeMap) {
+        List<BigInteger> activityIds = new ArrayList<>();
+        List<BigInteger> timeTypeIds = new ArrayList<>();
+        if(filterTypeMap.containsKey(ASSIGN_TIME_TYPE) && isCollectionNotEmpty(filterTypeMap.get(ASSIGN_TIME_TYPE))){
+            timeTypeIds.addAll(filterTypeMap.get(ASSIGN_TIME_TYPE).stream().map(s -> new BigInteger(s.toString())).collect(Collectors.toList()));
+        }
+        if(filterTypeMap.containsKey(ASSIGN_ACTIVITY) && isCollectionNotEmpty(filterTypeMap.get(ASSIGN_ACTIVITY))){
+            activityIds.addAll(filterTypeMap.get(ASSIGN_ACTIVITY).stream().map(s -> new BigInteger(s.toString())).collect(Collectors.toList()));
+        }
+        if(isCollectionNotEmpty(activityIds) || isCollectionNotEmpty(timeTypeIds) ){
+            List<Long> assignActivitiesStaff = new ArrayList<>();
+            StaffFilterDataDTO staffFilterDataDTO = activityIntegrationService.getAssignActivityStaffFilterReatedData(unitId, timeTypeIds, activityIds);
+            assignActivitiesStaff.addAll(staffFilterDataDTO.getStaffIds());
+            assignActivitiesStaff.addAll(teamService.getAllStaffToAssignActivitiesByTeam(unitId, staffFilterDataDTO.getActivityIds()));
+            staffListMap = staffListMap.stream().filter(map -> assignActivitiesStaff.contains(Long.valueOf(map.get(ID).toString()))).collect(Collectors.toList());
         }
         return staffListMap;
     }
@@ -499,7 +530,6 @@ public class StaffFilterService {
             case PAY_GRADE_LEVEL:
                 staffListMap =   staffListMap.stream().filter(map -> validatePayGrade((List<Map>) map.get(EMPLOYMENTS), ageRange)).collect(Collectors.toList());
                 break;
-
             default:
                 break;
         }

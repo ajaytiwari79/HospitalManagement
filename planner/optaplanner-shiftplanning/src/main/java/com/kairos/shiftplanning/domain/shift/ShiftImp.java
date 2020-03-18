@@ -201,6 +201,15 @@ public class ShiftImp implements Shift{
     public boolean isAbsenceActivityApplied(){
         return CollectionUtils.isNotEmpty(activityLineIntervals) && new ArrayList<>(activityLineIntervals).get(0).getActivity().isTypeAbsence();
     }
+
+    public boolean isAbsenceActivity(){
+        return shiftActivities.stream().anyMatch(shiftActivity -> shiftActivity.getActivity().isTypeAbsence());
+    }
+
+    public boolean isPresenceActivity(){
+        return shiftActivities.stream().anyMatch(shiftActivity -> shiftActivity.getActivity().isTypePresence());
+    }
+
     public int getMissingBreakTimes(){
         int totalMins=getMinutes();
         if(totalMins<300) return 0;
