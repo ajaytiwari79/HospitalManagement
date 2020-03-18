@@ -32,7 +32,7 @@ public class OrganizationBasicResponse {
     private Long typeId;
     private List<Long> subTypeId;
     // Used in case of child
-    //Map<String, Object> contactAddress;
+
     private StaffPersonalDetailQueryResult unitManager;
     private Long unitTypeId;
     private boolean workcentre;

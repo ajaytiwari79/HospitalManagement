@@ -35,6 +35,8 @@ public class TimeCalculationActivityTab implements Serializable {
     private int historyDuration;
     private LocalTime defaultStartTime;
     private List<Long> dayTypes = new ArrayList<>();
+    private boolean replaceWithPublishedShiftTime;
+    private boolean replaceWithUnapprovedAbsenceRequest;
 
     public TimeCalculationActivityTab(String methodForCalculatingTime, Long fixedTimeValue, Boolean multiplyWith, LocalTime defaultStartTime,Double multiplyWithValue) {
         this.methodForCalculatingTime = methodForCalculatingTime;

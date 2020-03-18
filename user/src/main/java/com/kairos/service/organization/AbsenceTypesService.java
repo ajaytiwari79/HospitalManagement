@@ -24,17 +24,12 @@ public class AbsenceTypesService {
         return absenceTypesRepository.findAll();
     }
 
-
-    public AbsenceTypes getAbsenceTypeByATVTID(Long ATVTID) {
-        return absenceTypesRepository.findByATVTID(ATVTID);
-    }
-
     public AbsenceTypes getAbsenceTypeByName(String name){
         return absenceTypesRepository.findByName(name);
     }
 
-    public AbsenceTypes createAbsenceTypes(Long ATVTID, String name, Long organizationId){
-        AbsenceTypes absenceTypes = new AbsenceTypes(ATVTID, name, organizationId);
+    public AbsenceTypes createAbsenceTypes(Long atvtid, String name, Long organizationId){
+        AbsenceTypes absenceTypes = new AbsenceTypes(atvtid, name, organizationId);
         return absenceTypesRepository.save(absenceTypes);
     }
 

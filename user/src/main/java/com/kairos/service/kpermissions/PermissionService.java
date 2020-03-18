@@ -142,7 +142,7 @@ public class PermissionService {
             }
         });
         modelDTO.getActionPermissions().forEach(actionDTO -> {
-            if(!fields.contains(actionDTO.getActionName())){
+            if(!actions.contains(actionDTO.getActionName())){
                 kPermissionModel.getActionPermissions().add(new KPermissionAction(actionDTO.getActionName(),new HashSet<>()));
             }
         });
@@ -460,7 +460,8 @@ public class PermissionService {
                     e.printStackTrace();
                 }
                 modelName = field.getType().getSimpleName();
-            }if(field.isAnnotationPresent(KPermissionRelationshipTo.class)){
+            }
+            if(field.isAnnotationPresent(KPermissionRelationshipTo.class)){
                 fieldName = field.getName();
             }
         }

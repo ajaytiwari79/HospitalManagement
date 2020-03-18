@@ -111,7 +111,7 @@ public class ExpertiseController {
     @ApiOperation(value = "update a functional payment settings for expertise")
     @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/functional_payment")
     public ResponseEntity<Map<String, Object>> updateFunctionalPayment(@PathVariable Long expertiseId, @RequestBody @Valid FunctionalPaymentDTO functionalPaymentDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.updateFunctionalPayment(expertiseId, functionalPaymentDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.updateFunctionalPayment(functionalPaymentDTO));
     }
 
     @ApiOperation(value = "Add a functional payment settings for functional_payment")

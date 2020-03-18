@@ -35,5 +35,5 @@ public interface LanguageGraphRepository extends Neo4jBaseRepository<Language,Lo
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(language:Language {isEnabled:true}) WHERE id(country)={0} AND id(language)<>{2} AND language.name =~{1}  " +
             " WITH count(language) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
-    Boolean languageExistInCountryByName(Long countryId, String name, Long currentLanguageId);
+    boolean languageExistInCountryByName(Long countryId, String name, Long currentLanguageId);
 }

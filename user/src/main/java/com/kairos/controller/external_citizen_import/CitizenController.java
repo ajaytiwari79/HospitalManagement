@@ -6,9 +6,9 @@ import com.kairos.service.external_citizen_import.CitizenService;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
@@ -36,7 +36,7 @@ public class CitizenController {
      * @return
      * @params
      */
-    @RequestMapping(value = "/preferences/{unitId}", method = RequestMethod.GET)
+    @GetMapping(value = "/preferences/{unitId}")
     public String preferences(@PathVariable long unitId)  {
         authService.kmdAuth();
         logger.info("Importing Citizen from KMD Nexus !!!!----> " );
@@ -49,12 +49,12 @@ public class CitizenController {
      * @return
      * @params
      */
-    @RequestMapping(value = "/grants", method = RequestMethod.GET)
+   @GetMapping(value = "/grants")
     public String getCitizenGrants(){
-        logger.info("Start syncing grants---------> "+ DateUtils.getCurrentDate());
+        logger.info("Start syncing grants---------> {}",DateUtils.getCurrentDate());
         authService.kmdAuth();
         citizenService.getCitizenGrantsFromKMD();
-        logger.info("End syncing grants---------> "+DateUtils.getCurrentDate());
+        logger.info("End syncing grants---------> {}",DateUtils.getCurrentDate());
         return "Citizen Grants Sync";
     }
 
@@ -64,7 +64,7 @@ public class CitizenController {
      * @return
      * @params
      */
-    @RequestMapping(value = "/nextToKin", method = RequestMethod.GET)
+   @GetMapping(value = "/nextToKin")
     public String getCitizensRelativeData(){
         authService.kmdAuth();
         citizenService.getCitizensRelativeContact();
@@ -78,7 +78,7 @@ public class CitizenController {
      * @param unitId
      * @return
      */
-    @RequestMapping(value = "/unit/{unitId}/getShifts/{filterId}", method = RequestMethod.GET)
+   @GetMapping(value = "/unit/{unitId}/getShifts/{filterId}")
     public String getShifts(@PathVariable Long filterId, @PathVariable Long unitId){
         authService.kmdAuth();
         citizenService.getShifts(filterId, unitId);
@@ -90,7 +90,7 @@ public class CitizenController {
      * @param unitId
      * @return
      */
-    @RequestMapping(value = "/unit/{unitId}/getTimeSlots", method = RequestMethod.GET)
+   @GetMapping(value = "/unit/{unitId}/getTimeSlots")
     public String getTimeSlots( @PathVariable Long unitId){
         authService.kmdAuth();
         citizenService.getTimeSlots( unitId);

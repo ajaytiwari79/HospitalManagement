@@ -78,22 +78,27 @@ public class PayTableService {
         PayTableResponse payTable = null;
         if (payTableQueryResults.size() > 1) {
             // multiple payTables are found NOW need to filter by date
-            for (PayTableResponse currentPayTable : payTableQueryResults) {
-                if (Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
-                        (currentPayTable.getEndDateMillis().isAfter(startDate) || currentPayTable.getEndDateMillis().isEqual(startDate))
-                        && (currentPayTable.getStartDateMillis().isBefore(startDate) || currentPayTable.getStartDateMillis().isEqual(startDate))) {
-                    payTable = currentPayTable;
-                    break;
-                }
-                if (!Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
-                        (currentPayTable.getStartDateMillis().isBefore(startDate) || currentPayTable.getStartDateMillis().isEqual(startDate))) {
-                    payTable = currentPayTable;
-                    break;
-                }
-            }
+            payTable = getValidPayTable(startDate, payTableQueryResults, payTable);
         } else if (payTableQueryResults.size() == 1)
             payTable = payTableQueryResults.get(0);
         return new PayTableResponseWrapper(payGroupAreaQueryResults, payTable, functions);
+    }
+
+    private PayTableResponse getValidPayTable(LocalDate startDate, List<PayTableResponse> payTableQueryResults, PayTableResponse payTable) {
+        for (PayTableResponse currentPayTable : payTableQueryResults) {
+            if (Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
+                    (currentPayTable.getEndDateMillis().isAfter(startDate) || currentPayTable.getEndDateMillis().isEqual(startDate))
+                    && (currentPayTable.getStartDateMillis().isBefore(startDate) || currentPayTable.getStartDateMillis().isEqual(startDate))) {
+                payTable = currentPayTable;
+                break;
+            }
+            if (!Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
+                    (currentPayTable.getStartDateMillis().isBefore(startDate) || currentPayTable.getStartDateMillis().isEqual(startDate))) {
+                payTable = currentPayTable;
+                break;
+            }
+        }
+        return payTable;
     }
 
     public List<OrganizationLevelPayGroupAreaDTO> getOrganizationLevelWisePayGroupAreas(Long countryId) {
@@ -150,13 +155,7 @@ public class PayTableService {
     }
 
     private void prepareDates(PayTable payTable, PayTableUpdateDTO payTableDTO) {
-        if (!payTable.getStartDateMillis().equals(payTableDTO.getStartDateMillis())) {
-            // The start date is modified Now We need to compare is it less than today
-            if (payTableDTO.getStartDateMillis().isBefore(DateUtils.getCurrentLocalDate())) {
-                exceptionService.actionNotPermittedException(MESSAGE_STARTDATE_LESSTHAN);
-            }
-            payTable.setStartDateMillis(payTableDTO.getStartDateMillis());
-        }
+        validateAndSetStartDateInPayTable(payTable, payTableDTO);
         // End date
         // If already end date was set  but now no value so we are removing
         if (!Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent() && Optional.ofNullable(payTable.getEndDateMillis()).isPresent()) {
@@ -180,6 +179,16 @@ public class PayTableService {
                 }
                 payTable.setEndDateMillis(payTableDTO.getEndDateMillis());
             }
+        }
+    }
+
+    private void validateAndSetStartDateInPayTable(PayTable payTable, PayTableUpdateDTO payTableDTO) {
+        if (!payTable.getStartDateMillis().equals(payTableDTO.getStartDateMillis())) {
+            // The start date is modified Now We need to compare is it less than today
+            if (payTableDTO.getStartDateMillis().isBefore(DateUtils.getCurrentLocalDate())) {
+                exceptionService.actionNotPermittedException(MESSAGE_STARTDATE_LESSTHAN);
+            }
+            payTable.setStartDateMillis(payTableDTO.getStartDateMillis());
         }
     }
 
@@ -548,17 +557,7 @@ public class PayTableService {
         payTable.setPercentageValue(payTableDTO.getPercentageValue());
         List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(payTableId), PayGradePayGroupAreaRelationShip.class);
         if (CollectionUtils.isNotEmpty(payGradePayGroupAreaRelationShips)) {
-            for (PayGradePayGroupAreaRelationShip current : payGradePayGroupAreaRelationShips) {
-                if (current.getPayGroupAreaAmount() != null) {
-                    BigDecimal valueToAdd = (parentPayTable == null) ? current.getPayGroupAreaAmount().multiply(payTableDTO.getPercentageValue()).divide(new BigDecimal(100)) : publishedPayGroupAreaRelationShipMap.get(current.getPayGrade().getPayGradeLevel().toString() + current.getPayGroupArea().getId()).getPayGroupAreaAmount().multiply(payTableDTO.getPercentageValue()).divide(new BigDecimal(100));
-                    BigDecimal updatedValue = (parentPayTable == null) ? current.getPayGroupAreaAmount().add(valueToAdd) : publishedPayGroupAreaRelationShipMap.get(current.getPayGrade().getPayGradeLevel().toString() + current.getPayGroupArea().getId()).getPayGroupAreaAmount().add(valueToAdd);
-                    current.setPayGroupAreaAmount(updatedValue);
-                    if (payTable.isPublished()) {
-                        current.setId(null);
-                        current.getPayGrade().setId(null);
-                    }
-                }
-            }
+            updateAmountInRelationship(payTableDTO, payTable, parentPayTable, publishedPayGroupAreaRelationShipMap, payGradePayGroupAreaRelationShips);
             if (payTable.isPublished()) {
                 payGradeResponses = createCopyOfPayTableAndAddPayGrade(payTable, null, payGradePayGroupAreaRelationShips);
             } else {
@@ -568,6 +567,20 @@ public class PayTableService {
         }
         Long id = CollectionUtils.isEmpty(payGradeResponses) ? payTable.getId() : payGradeResponses.get(0).getPayTableId();
         return new PayTableUpdateDTO(id, payTable.getName(), payTable.getPercentageValue());
+    }
+
+    private void updateAmountInRelationship(PayTableDTO payTableDTO, PayTable payTable, PayTable parentPayTable, Map<String, PayGradePayGroupAreaRelationShip> publishedPayGroupAreaRelationShipMap, List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips) {
+        for (PayGradePayGroupAreaRelationShip current : payGradePayGroupAreaRelationShips) {
+            if (current.getPayGroupAreaAmount() != null) {
+                BigDecimal valueToAdd = (parentPayTable == null) ? current.getPayGroupAreaAmount().multiply(payTableDTO.getPercentageValue()).divide(new BigDecimal(100)) : publishedPayGroupAreaRelationShipMap.get(current.getPayGrade().getPayGradeLevel().toString() + current.getPayGroupArea().getId()).getPayGroupAreaAmount().multiply(payTableDTO.getPercentageValue()).divide(new BigDecimal(100));
+                BigDecimal updatedValue = (parentPayTable == null) ? current.getPayGroupAreaAmount().add(valueToAdd) : publishedPayGroupAreaRelationShipMap.get(current.getPayGrade().getPayGradeLevel().toString() + current.getPayGroupArea().getId()).getPayGroupAreaAmount().add(valueToAdd);
+                current.setPayGroupAreaAmount(updatedValue);
+                if (payTable.isPublished()) {
+                    current.setId(null);
+                    current.getPayGrade().setId(null);
+                }
+            }
+        }
     }
 
     private void validatePayTableToPublish(Long payTableId, LocalDate publishedDate) {

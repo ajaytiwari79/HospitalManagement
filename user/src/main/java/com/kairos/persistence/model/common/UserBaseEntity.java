@@ -25,7 +25,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public abstract class UserBaseEntity implements Serializable {
+public abstract class UserBaseEntity {
 
     //@GeneratedValue
     @GraphId protected Long id;

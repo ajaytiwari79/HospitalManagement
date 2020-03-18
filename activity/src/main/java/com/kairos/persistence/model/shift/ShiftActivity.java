@@ -14,8 +14,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
-import static com.kairos.commons.utils.ObjectUtils.isEquals;
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * @author pradeep
@@ -69,7 +68,7 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
 
     public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,String timeType) {
         this.activityId = activityId;
-        this.startDate = roundDateByMinutes(startDate,15);;
+        this.startDate = roundDateByMinutes(startDate,15);
         this.endDate = roundDateByMinutes(endDate,15);
         this.activityName = activityName;
         this.timeType = timeType;
@@ -103,6 +102,10 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
         this.childActivities = isNullOrElse(childActivities,new ArrayList<>());
     }
 
+    public Set<ShiftStatus> getStatus() {
+        return isNullOrElse(status,newHashSet());
+    }
+
     @Override
     public int compareTo(ShiftActivity shiftActivity) {
         return this.startDate.compareTo(shiftActivity.startDate);
@@ -113,7 +116,7 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     }
 
     public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+        this.endDate = roundDateByMinutes(endDate,15);
     }
 
     public boolean isShiftActivityChanged(ShiftActivity shiftActivity){

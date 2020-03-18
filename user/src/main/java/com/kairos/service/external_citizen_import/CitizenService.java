@@ -2,7 +2,6 @@ package com.kairos.service.external_citizen_import;
 
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.task.order.OrderGrant;
-import com.kairos.dto.user.organization.ImportTimeSlotListDTO;
 import com.kairos.dto.user.patient.CurrentElements;
 import com.kairos.dto.user.patient.PatientGrant;
 import com.kairos.dto.user.patient.PatientRelative;
@@ -74,6 +73,14 @@ import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANIZATION_ID
 public class CitizenService {
 
     private static final Logger logger = LoggerFactory.getLogger(CitizenService.class);
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String BEARER = "Bearer";
+    public static final String KMD_NEXUS_EXTERNAL_ID = "kmdNexusExternalId";
+    public static final String PARAMETERS = "parameters";
+    public static final String PATHWAY_TYPE_ID = "pathwayTypeId";
+    public static final String CHILDREN = "children";
+    public static final String GRANT_ID = "grantId";
+    public static final String SUPPLIER = "supplier";
 
     @Inject
     private ClientGraphRepository clientGraphRepository;
@@ -136,19 +143,8 @@ public class CitizenService {
             loginTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
             loginTemplate.getMessageConverters().add(stringHttpMessageConverter);
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
-            //headers.setContentType(MediaType.APPLICATION_JSON);
-
-
-            HttpEntity<String> headersElements = new HttpEntity<String>("parameters", headers);
-
-            //    ResponseEntity<String> responseEntity = loginTemplate.exchange(AppConstants.KMD_NEXUS_PATIENT_PREFERENCE, HttpMethod.GET, headersElements, String.class);
-
-            //    JSONObject preferences = new JSONObject(responseEntity.getBody());
-            //    JSONArray citizenList = preferences.getJSONArray("CITIZEN_LIST");
-
-            //  for (int i = 0; i < 1; i++) {
-            //    Long id = citizenList.getJSONObject(i).getLong("id");
+            headers.add(AUTHORIZATION, BEARER + " " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
+            HttpEntity<String> headersElements = new HttpEntity<>(PARAMETERS, headers);
             ResponseEntity<String> filterResponse = loginTemplate.exchange(AppConstants.KMD_NEXUS_PATIENT_FILTER, HttpMethod.GET, headersElements, String.class);
             JSONObject citizensByFilter = new JSONObject(filterResponse.getBody());
             JSONArray pages = citizensByFilter.getJSONArray("pages");
@@ -163,13 +159,9 @@ public class CitizenService {
                     String patientUrl = patients.getJSONObject(k).getJSONObject("_links").getJSONObject("self").getString("href");
                     ResponseEntity<String> patientResponse = loginTemplate.exchange(patientUrl, HttpMethod.GET, headersElements, String.class);
                     PatientWrapper patientWrapper = jsonStringToObject(patientResponse.getBody().toString(), PatientWrapper.class);
-                    //   if(Integer.valueOf(patientWrapper.getId()) != 7) continue;
                     clientService.createCitizenFromExternalService(patientWrapper, unit.getId());
                 }
-
             }
-
-            //   }
             return "success";
         } catch (Exception exception) {
             return exception.getMessage();
@@ -184,11 +176,9 @@ public class CitizenService {
         List<Map<String, Object>> citizenListObject = clientGraphRepository.findAllCitizensFromKMD();
         List<Map<String, Object>> citizens = new ArrayList<>();
         List<Country> countries = countryGraphRepository.findByName("Denmark");
-        Country country = null;
         if (countries.isEmpty()) {
             return;
         }
-        country = countries.get(0);
         for (Map<String, Object> map : citizenListObject) {
             citizens.add((Map<String, Object>) map.get("data"));
         }
@@ -200,11 +190,10 @@ public class CitizenService {
         loginTemplate.getMessageConverters().add(stringHttpMessageConverterNew);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
-        //headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(AUTHORIZATION, BEARER + " " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
 
 
-        HttpEntity<String> headersElements = new HttpEntity<String>("parameters", headers);
+        HttpEntity<String> headersElements = new HttpEntity<String>(PARAMETERS, headers);
         com.kairos.persistence.model.organization.services.OrganizationService service = null;
         com.kairos.persistence.model.organization.services.OrganizationService subService = null;
         Client client = null;
@@ -212,50 +201,48 @@ public class CitizenService {
         for (Map<String, Object> map : citizens) {
             authService.dokmdAuth();
 
-            client = clientGraphRepository.findByKmdNexusExternalId(map.get("kmdNexusExternalId").toString());
+            client = clientGraphRepository.findByKmdNexusExternalId(map.get(KMD_NEXUS_EXTERNAL_ID).toString());
             Unit unit = (Unit) clientGraphRepository.getClientOrganizationIdList(client.getId()).get(0);
 
-            ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_PATIENT_PATHWAY_PREFERENCE, map.get("kmdNexusExternalId").toString()), HttpMethod.GET, headersElements, String.class);
+            ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_PATIENT_PATHWAY_PREFERENCE, map.get(KMD_NEXUS_EXTERNAL_ID).toString()), HttpMethod.GET, headersElements, String.class);
             JSONObject patientPathwayObject = new JSONObject(responseEntity.getBody());
             JSONArray citizenPathwayArray = patientPathwayObject.getJSONArray("CITIZEN_PATHWAY");
             for (int cp = 0; cp < citizenPathwayArray.length(); cp++) {
                 int pathwayFilterId = citizenPathwayArray.getJSONObject(cp).getInt("id");
                 if (pathwayFilterId != 413) continue;
                 try {
-                    ResponseEntity<String> pathwayPreferenceResponseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_PATIENT_PATHWAY, map.get("kmdNexusExternalId").toString()) + pathwayFilterId, HttpMethod.GET, headersElements, String.class);
+                    ResponseEntity<String> pathwayPreferenceResponseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_PATIENT_PATHWAY, map.get(KMD_NEXUS_EXTERNAL_ID).toString()) + pathwayFilterId, HttpMethod.GET, headersElements, String.class);
                     JSONArray patientPathways = new JSONArray(pathwayPreferenceResponseEntity.getBody());
                     for (int i = 0; i < patientPathways.length(); i++) {
 
                         JSONObject patientPathway = patientPathways.getJSONObject(i);
 
                         if (patientPathway.get("type").equals("patientPathwayReference") == true) {
-                            service = organizationServiceRepository.findByKmdExternalId(patientPathway.get("pathwayTypeId").toString());
+                            service = organizationServiceRepository.findByKmdExternalId(patientPathway.get(PATHWAY_TYPE_ID).toString());
                             if (service == null) {
                                 service = new com.kairos.persistence.model.organization.services.OrganizationService();
                                 service.setName(patientPathway.get("name").toString());
-                                Optional serviceOptional = Optional.ofNullable(patientPathway.get("pathwayTypeId"));
-                                if(serviceOptional.isPresent()) service.setKmdExternalId(patientPathway.get("pathwayTypeId").toString());
+                                Optional serviceOptional = Optional.ofNullable(patientPathway.get(PATHWAY_TYPE_ID));
+                                if(serviceOptional.isPresent()) service.setKmdExternalId(patientPathway.get(PATHWAY_TYPE_ID).toString());
                                 service.setImported(true);
                                 service = organizationServiceService.saveImportedServices(service);
                             }
-                            JSONArray pathwayChildren = patientPathway.getJSONArray("children");
-                            boolean hasSubService = false;
+                            JSONArray pathwayChildren = patientPathway.getJSONArray(CHILDREN);
                             if (pathwayChildren.length() > 0) {
                                 for (int pC = 0; pC < pathwayChildren.length(); pC++) {
                                     JSONObject subPatientPathway = pathwayChildren.getJSONObject(pC);
                                     if (subPatientPathway.get("type").equals("patientPathwayReference") == true) {
-                                        hasSubService = true;
-                                        subService = organizationServiceRepository.findByKmdExternalId(subPatientPathway.get("pathwayTypeId").toString());
+                                        subService = organizationServiceRepository.findByKmdExternalId(subPatientPathway.get(PATHWAY_TYPE_ID).toString());
                                         if (subService == null) {
                                             subService = new com.kairos.persistence.model.organization.services.OrganizationService();
                                             subService.setName(subPatientPathway.get("name").toString());
-                                            Optional subServiceOptional = Optional.ofNullable(subPatientPathway.get("pathwayTypeId"));
-                                            if(subServiceOptional.isPresent()) subService.setKmdExternalId(subPatientPathway.get("pathwayTypeId").toString());
+                                            Optional subServiceOptional = Optional.ofNullable(subPatientPathway.get(PATHWAY_TYPE_ID));
+                                            if(subServiceOptional.isPresent()) subService.setKmdExternalId(subPatientPathway.get(PATHWAY_TYPE_ID).toString());
                                             subService.setImported(true);
                                             subService = organizationServiceService.addSubService(service.getId(), subService);
                                             organizationServiceService.updateServiceToOrganization(unit.getId(), subService.getId(), true);
                                         }
-                                        JSONArray subPatientPathwayChildren = subPatientPathway.getJSONArray("children");
+                                        JSONArray subPatientPathwayChildren = subPatientPathway.getJSONArray(CHILDREN);
                                         for (int sPPC = 0; sPPC < subPatientPathwayChildren.length(); sPPC++) {
                                             JSONObject subSubPatientPathway = subPatientPathwayChildren.getJSONObject(sPPC);
                                             getGrantsFromSubPatientPathway(subSubPatientPathway, loginTemplate, headersElements, unit, client, service, subService);
@@ -270,7 +257,7 @@ public class CitizenService {
 
                     }
                 } catch (Exception exception) {
-                    logger.warn("Exception occurs while importing grants from  KMD -> "+exception.getMessage());
+                    logger.warn("Exception occurs while importing grants from  KMD -> {}",exception.getMessage());
 
                 }
             }
@@ -292,11 +279,10 @@ public class CitizenService {
      */
     public void getGrantsFromSubPatientPathway(JSONObject subPatientPathway, RestTemplate loginTemplate, HttpEntity<String> headersElements, Unit unit, Client client, com.kairos.persistence.model.organization.services.OrganizationService service, com.kairos.persistence.model.organization.services.OrganizationService subService) {
 
-        if (subPatientPathway.get("type").equals("orderReference") == true) {
-            // logger.info("subPatientPathway----------> "+subPatientPathway.get("name"));
-            JSONArray grantOrderChildren = subPatientPathway.getJSONArray("children");
+        if (subPatientPathway.get("type").equals("orderReference")) {
+            JSONArray grantOrderChildren = subPatientPathway.getJSONArray(CHILDREN);
             for (int gC = 0; gC < grantOrderChildren.length(); gC++) {
-                int grantOrderId = grantOrderChildren.getJSONObject(gC).getInt("grantId");
+                int grantOrderId = grantOrderChildren.getJSONObject(gC).getInt(GRANT_ID);
                 ResponseEntity<String> grantOrderResponse = loginTemplate.exchange(AppConstants.KMD_NEXUS_PATIENT_ORDER_GRANTS + grantOrderId, HttpMethod.GET, headersElements, String.class);
                 OrderGrant grantOrderObject = jsonStringToObject(grantOrderResponse.getBody(), OrderGrant.class);
                 getGrantObject(grantOrderObject.getOriginatorId(), loginTemplate, headersElements, unit, client, service, subService);
@@ -305,9 +291,9 @@ public class CitizenService {
 
         }
         if (subPatientPathway.get("type").equals("basketReference") == true) {
-            JSONArray grantChildren = subPatientPathway.getJSONArray("children");
+            JSONArray grantChildren = subPatientPathway.getJSONArray(CHILDREN);
             for (int gC = 0; gC < grantChildren.length(); gC++) {
-                int grantId = grantChildren.getJSONObject(gC).getInt("grantId");
+                int grantId = grantChildren.getJSONObject(gC).getInt(GRANT_ID);
                 getGrantObject(grantId, loginTemplate, headersElements, unit, client, service, subService);
 
             }
@@ -338,7 +324,7 @@ public class CitizenService {
         grantTypes.add("Sundhedsloven §138");
         grantTypes.add("Sundhedsloven §140");
         Map<String, Object> grantObject = new HashMap<>();
-        logger.info("grant url----------> " + AppConstants.KMD_NEXUS_PATIENT_GRANTS + grantId);
+        logger.info("grant url----------> {}" , AppConstants.KMD_NEXUS_PATIENT_GRANTS + grantId);
         ResponseEntity<String> grantResponse = loginTemplate.exchange(AppConstants.KMD_NEXUS_PATIENT_GRANTS + grantId, HttpMethod.GET, headersElements, String.class);
         PatientGrant patientGrant = jsonStringToObject(grantResponse.getBody(), PatientGrant.class);
         List<CurrentElements> currentElementsList = patientGrant.getCurrentElements();
@@ -366,8 +352,8 @@ public class CitizenService {
                 case "visitatedDurationInMinutes":
                     grantObject.put("visitatedDuration", currentElements.getNumber());
                     break;
-                case "supplier":
-                    grantObject.put("supplier", currentElements.getSupplier());
+                case SUPPLIER:
+                    grantObject.put(SUPPLIER, currentElements.getSupplier());
                     break;
                 case "description":
                     grantObject.put("description", currentElements.getText());
@@ -377,14 +363,12 @@ public class CitizenService {
             }
         }
         grantObject.put("grantName", patientGrant.getName());
-        grantObject.put("grantId",grantId);
+        grantObject.put(GRANT_ID,grantId);
         grantObject.put("clientId",client.getId());
         grantObject.put("organizationId", unit.getId());
         RepetitionType shiftRepetition = (RepetitionType) grantObject.get("weekDayShifts");
-
-        String pattern = (String) grantObject.get("grantPattern");
         if (grantTypes.contains(grantObject.get("grantTypeNameSection")) && (shiftRepetition.getShifts().size() > 0)) {
-            CitizenSupplier citizenSupplier = (CitizenSupplier) grantObject.get("supplier");
+            CitizenSupplier citizenSupplier = (CitizenSupplier) grantObject.get(SUPPLIER);
             Organization supplier = organizationGraphRepository.findByKmdExternalId(citizenSupplier.getId());
             Optional supplierOptional = Optional.ofNullable(supplier);
             if (!supplierOptional.isPresent()) {
@@ -393,22 +377,14 @@ public class CitizenService {
                 supplier.setCountry(countryGraphRepository.findOne(countryId));
                 supplier.setKmdExternalId(citizenSupplier.getId());
             }
-            if (citizenSupplier.getType().equals("external")) {
-                 //organizationService.createOrganization(supplier, null);
-            } else if (citizenSupplier.getType().equals("organization")) {
-                if (organizationService.checkDuplicationOrganizationRelation(unit.getId(), supplier.getId()) == 0)
+             else if (citizenSupplier.getType().equals("organization") && organizationService.checkDuplicationOrganizationRelation(unit.getId(), supplier.getId()) == 0) {
                    supplier = organizationService.createOrganization(supplier,  false);
             }
 
             if (supplierOptional.isPresent()) grantObject.put("supplierId",supplier.getId());
-            Integer weekDayCount = Integer.valueOf(grantObject.get("grantWeekDays").toString());
-            Integer weekEndCount = Integer.valueOf(grantObject.get("grantWeekEnds").toString());
-            String visitDuration = grantObject.get("visitatedDuration").toString();
-
-
             if (subService == null) {
                 subService = organizationServiceRepository.checkDuplicateSubServiceWithSpecialCharacters(service.getId(), "Sub "+service.getName());
-                logger.info("subservice create wigth same name----> "+subService);
+                logger.info("subservice create wigth same name----> {}",subService);
                 if (subService == null) {
                     subService = new com.kairos.persistence.model.organization.services.OrganizationService();
                     subService.setName("Sub "+service.getName());
@@ -418,12 +394,8 @@ public class CitizenService {
                     organizationServiceService.updateServiceToOrganization(unit.getId(), subService.getId(), true);
                 }
             }
-
-            if (unit != null) {
-
-                Map<String,Object> response = taskDemandRestClient.createGrants( subService.getId(), unit.getId(), grantObject);
-                logger.info("response-------------------> "+response);
-            }
+            Map<String,Object> response = taskDemandRestClient.createGrants( subService.getId(), unit.getId(), grantObject);
+                logger.info("response------------------->{} ",response);
 
 
         }
@@ -434,7 +406,7 @@ public class CitizenService {
     /**
      * This method is used to create Citizen's next to kin details imported from KMD Nexus
      */
-    public String getCitizensRelativeContact() {
+    public void getCitizensRelativeContact() {
         try {
             List<Map<String, Object>> citizenListObject = clientGraphRepository.findAllCitizensFromKMD();
             List<Map<String, Object>> citizens = new ArrayList<>();
@@ -450,19 +422,16 @@ public class CitizenService {
             loginTemplate.getMessageConverters().add(stringHttpMessageConverterNew);
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
-            HttpEntity<String> headersElements = new HttpEntity<String>("parameters", headers);
+            headers.add(AUTHORIZATION, BEARER + " " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
+            HttpEntity<String> headersElements = new HttpEntity<>(PARAMETERS, headers);
             Client client = null;
 
             for (Map<String, Object> map : citizens) {
-                logger.info("citizen----kmdNexusExternalId------> " + map.get("kmdNexusExternalId"));
-                client = clientGraphRepository.findByKmdNexusExternalId(map.get("kmdNexusExternalId").toString());
-                logger.info("client-------------> "+client);
-                ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_PATIENT_RELATIVE_CONTACT, map.get("kmdNexusExternalId").toString()), HttpMethod.GET, headersElements, String.class);
+                logger.info("citizen----kmdNexusExternalId------> {}" , map.get(KMD_NEXUS_EXTERNAL_ID));
+                client = clientGraphRepository.findByKmdNexusExternalId(map.get(KMD_NEXUS_EXTERNAL_ID).toString());
+                logger.info("client-------------> {}",client);
+                ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_PATIENT_RELATIVE_CONTACT, map.get(KMD_NEXUS_EXTERNAL_ID).toString()), HttpMethod.GET, headersElements, String.class);
                 AvailableContacts availableContacts = jsonStringToObject(responseEntity.getBody(), AvailableContacts.class);
-                if (availableContacts.getRelativeContacts().size() == 0) {
-                    //Client nextToKin = client.getNextToKin();
-                }
                 for (RelativeContacts relativeContacts : availableContacts.getRelativeContacts()) {
                     String relativeContactUrl = relativeContacts.get_links().getSelf().getHref();
                     ResponseEntity<String> relativeContactResponse = loginTemplate.exchange(relativeContactUrl, HttpMethod.GET, headersElements, String.class);
@@ -471,11 +440,8 @@ public class CitizenService {
                     clientService.addClientRelativeDetailsFromExternalService(patientRelative, client, unit.getId());
                 }
             }
-            return "Success";
         }catch (Exception exception){
-            logger.warn("exception while adding citizen relative data----> "+exception.getMessage());
-            return exception.getMessage();
-
+            logger.warn("exception while adding citizen relative data---->{} ",exception.getMessage());
         }
 
     }
@@ -490,29 +456,24 @@ public class CitizenService {
         loginTemplate.getMessageConverters().add(stringHttpMessageConverterNew);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
-        //   headers.add("Content-Type" , "application/json");
+        headers.add(AUTHORIZATION, BEARER + " " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
         Map map = new HashMap<String, String>();
         map.put("Content-Type", "application/json");
-        //   headers.setAll(map);
-        HttpEntity<String> headersElements = new HttpEntity<String>(headers);
+        HttpEntity<String> headersElements = new HttpEntity<>(headers);
         ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_CALENDAR_STAFFS_SHIFT_FILTER, filterId), HttpMethod.POST, headersElements, String.class);
         JSONObject jsonObject = new JSONObject(responseEntity.getBody());
         ColumnResource columnResource = jsonStringToObject(jsonObject.get("columnResource").toString(), ColumnResource.class);
         for(ImportShiftDTO shift : columnResource.getShifts()){
             String staffExternalId = shift.getEventResource().getResourceId();
             staffExternalId = staffExternalId.substring(staffExternalId.indexOf("PROFESSIONAL:")+13);
-            logger.info("Staff External Id----> "+staffExternalId);
+            logger.info("Staff External Id----> {}",staffExternalId);
             ResponseEntity<String> staffResponseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_STAFFS_DETAILS, staffExternalId), HttpMethod.GET, headersElements, String.class);
             StaffPersonalDetail staffDTO = jsonStringToObject(staffResponseEntity.getBody(), StaffPersonalDetail.class);
             Staff staff = createStaffFromKMD(unitId, staffDTO);
             taskServiceRestClient.createTaskFromKMD(staff.getId(),shift,unitId);
-            //anil m2 move this method in task micro service
-            //createTaskFromKMD(staff, shift, unitId);
-            logger.info("staff DTO---------> "+staffDTO.getLastName());
+            logger.info("staff DTO---------> {}",staffDTO.getLastName());
 
         }
-        //logger.info("result---------> "+columnResource.getShifts().size());
     }
 
     public Staff createStaffFromKMD(long unitId, StaffPersonalDetail payload) {
@@ -574,21 +535,14 @@ public class CitizenService {
         loginTemplate.getMessageConverters().add(stringHttpMessageConverterNew);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
-        //   headers.add("Content-Type" , "application/json");
+        headers.add(AUTHORIZATION, BEARER + " " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
         Map map = new HashMap<String, String>();
         map.put("Content-Type", "application/json");
-        //   headers.setAll(map);
-        HttpEntity<String> headersElements = new HttpEntity<String>(headers);
+        HttpEntity<String> headersElements = new HttpEntity<>(headers);
         ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_GET_TIME_SLOTS), HttpMethod.GET, headersElements, String.class);
         JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = new JSONArray(responseEntity.getBody());
         jsonObject.put("kmdTimeSlotDTOList", jsonArray);
-        ImportTimeSlotListDTO importTimeSlotListDTO = jsonStringToObject(jsonObject.toString(), ImportTimeSlotListDTO.class);
-        Unit unit = unitGraphRepository.findOne(unitId);
-        importTimeSlotListDTO.getImportTimeSlotDTOList().forEach(kmdTimeSlotDTO -> {
-            //timeSlotService.importTimeSlotsFromKMD( unit,  kmdTimeSlotDTO);
-        });
         timeSlotService.updateTimeSlotType(unitId,false);
     }
 

@@ -25,6 +25,7 @@ import com.kairos.service.country.CountryService;
 import com.kairos.service.country.HousingTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.FormatUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -79,59 +80,23 @@ public class ClientAddressService{
 
 
     public Map<String, Object> getAddressDetails(Long clientId, Long unitId) {
-        //Client client = clientGraphRepository.findOne(clientId, 0);
         Client citizen = clientGraphRepository.getClientByClientIdAndUnitId(clientId,unitId);
         if (citizen == null) {
-            logger.error("Citizen not found : citizenId " + clientId+" unitId "+unitId);
             exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_CITIZEN_NOTFOUND,clientId,unitId);
 
         }
-
         ClientAddressQueryResult clientAddressQueryResult = clientGraphRepository.getAllAddress(clientId);
-
         List<ClientTempAddressQueryResult> clientTempAddressQueryResult = clientGraphRepository.getTemporaryAddress(clientId);
+        Map<String, Object> homeAddressInfo = getHomeAddress(clientAddressQueryResult.getHomeAddress(), clientAddressQueryResult.getHomeZipCode(), clientAddressQueryResult.getHomeAddressMunicipality(), clientAddressQueryResult.getHomeAddressHousingType());
+        Map<String, Object> secondaryAddressInfo = getSecondaryAddressInfo(clientAddressQueryResult);
+        Map<String, Object> partnerAddressInfo = getHomeAddress(clientAddressQueryResult.getPartnerAddress(), clientAddressQueryResult.getPartnerZipCode(), clientAddressQueryResult.getPartnerAddressMunicipality(), clientAddressQueryResult.getPartnerAddressHousingType());
 
-        Map<String, Object> homeAddressInfo = null;
-        if (clientAddressQueryResult.getHomeAddress() != null) {
-            homeAddressInfo = filterAddressResponse(clientAddressQueryResult.getHomeAddress(),
-                    clientAddressQueryResult.getHomeZipCode(), clientAddressQueryResult.getHomeAddressMunicipality(), clientAddressQueryResult.getHomeAddressHousingType());
-            homeAddressInfo.put("municipalities", (clientAddressQueryResult.getHomeZipCode() != null) ?
-                    FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(clientAddressQueryResult.getHomeZipCode().getId())) : Collections.emptyList());
-        }
-
-        Map<String, Object> secondaryAddressInfo = null;
-        if (clientAddressQueryResult.getSecondaryAddress() != null) {
-            secondaryAddressInfo = filterAddressResponse(clientAddressQueryResult.getSecondaryAddress(),
-                    clientAddressQueryResult.getSecondaryZipCode(), clientAddressQueryResult.getSecondaryAddressMunicipality(), clientAddressQueryResult.getSecondaryAddressHousingType());
-            secondaryAddressInfo.put("municipalities", (clientAddressQueryResult.getSecondaryAddress() != null && clientAddressQueryResult.getSecondaryZipCode() != null) ?
-                    FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(clientAddressQueryResult.getSecondaryZipCode().getId())) : Collections.emptyList());
-        }
-
-        Map<String, Object> partnerAddressInfo = null;
-        if (clientAddressQueryResult.getPartnerAddress() != null) {
-            partnerAddressInfo = filterAddressResponse(clientAddressQueryResult.getPartnerAddress(),
-                    clientAddressQueryResult.getPartnerZipCode(), clientAddressQueryResult.getPartnerAddressMunicipality(), clientAddressQueryResult.getPartnerAddressHousingType());
-            partnerAddressInfo.put("municipalities", (clientAddressQueryResult.getPartnerZipCode() != null) ?
-                    FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(clientAddressQueryResult.getPartnerZipCode().getId())) : Collections.emptyList());
-
-        }
-
-        List<Map<String, Object>> temporaryAddressList = new ArrayList<>();
-        for (ClientTempAddressQueryResult tempAddressQueryResult : clientTempAddressQueryResult) {
-            if (tempAddressQueryResult.getTemporaryAddress().isEnabled()) {
-                Map<String, Object> temporaryAddressInfo = filterAddressResponse(tempAddressQueryResult.getTemporaryAddress(),
-                        tempAddressQueryResult.getTemporaryZipCode(), tempAddressQueryResult.getTemporaryAddressMunicipality(), tempAddressQueryResult.getTemporaryAddressHousingType());
-                temporaryAddressInfo.put("municipalities", (tempAddressQueryResult.getTemporaryZipCode() != null) ?
-                        FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(tempAddressQueryResult.getTemporaryZipCode().getId())) : Collections.emptyList());
-                temporaryAddressList.add(temporaryAddressInfo);
-            }
-        }
+        List<Map<String, Object>> temporaryAddressList = getTemporaryAddressList(clientTempAddressQueryResult);
         Map<String, Object> response = new HashMap<>();
         response.put("homeAddress", homeAddressInfo);
         response.put("secondaryAddress", secondaryAddressInfo);
         response.put("partnerAddress", partnerAddressInfo);
         response.put("temporaryAddress", temporaryAddressList);
-
         Long countryId = countryService.getCountryIdByUnitId(unitId);
         if (countryId != null) {
             response.put("zipCodeData", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
@@ -142,7 +107,42 @@ public class ClientAddressService{
         List<HousingTypeDTO> housingTypeList = housingTypeService.getHousingTypeByCountryId(countryId);
         response.put("typeOfHousingData", housingTypeList != null ? housingTypeList : Collections.EMPTY_LIST);
         return response;
+    }
 
+    private List<Map<String, Object>> getTemporaryAddressList(List<ClientTempAddressQueryResult> clientTempAddressQueryResult) {
+        List<Map<String, Object>> temporaryAddressList = new ArrayList<>();
+        for (ClientTempAddressQueryResult tempAddressQueryResult : clientTempAddressQueryResult) {
+            if (tempAddressQueryResult.getTemporaryAddress().isEnabled()) {
+                Map<String, Object> temporaryAddressInfo = filterAddressResponse(tempAddressQueryResult.getTemporaryAddress(),
+                        tempAddressQueryResult.getTemporaryZipCode(), tempAddressQueryResult.getTemporaryAddressMunicipality(), tempAddressQueryResult.getTemporaryAddressHousingType());
+                temporaryAddressInfo.put("municipalities", (tempAddressQueryResult.getTemporaryZipCode() != null) ?
+                        FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(tempAddressQueryResult.getTemporaryZipCode().getId())) : Collections.emptyList());
+                temporaryAddressList.add(temporaryAddressInfo);
+            }
+        }
+        return temporaryAddressList;
+    }
+
+    private Map<String, Object> getSecondaryAddressInfo(ClientAddressQueryResult clientAddressQueryResult) {
+        Map<String, Object> secondaryAddressInfo = null;
+        if (clientAddressQueryResult.getSecondaryAddress() != null) {
+            secondaryAddressInfo = filterAddressResponse(clientAddressQueryResult.getSecondaryAddress(),
+                    clientAddressQueryResult.getSecondaryZipCode(), clientAddressQueryResult.getSecondaryAddressMunicipality(), clientAddressQueryResult.getSecondaryAddressHousingType());
+            secondaryAddressInfo.put("municipalities", (clientAddressQueryResult.getSecondaryAddress() != null && clientAddressQueryResult.getSecondaryZipCode() != null) ?
+                    FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(clientAddressQueryResult.getSecondaryZipCode().getId())) : Collections.emptyList());
+        }
+        return secondaryAddressInfo;
+    }
+
+    private Map<String, Object> getHomeAddress(ContactAddress homeAddress, ZipCode homeZipCode, Municipality homeAddressMunicipality, HousingType homeAddressHousingType) {
+        Map<String, Object> homeAddressInfo = null;
+        if (homeAddress != null) {
+            homeAddressInfo = filterAddressResponse(homeAddress,
+                    homeZipCode, homeAddressMunicipality, homeAddressHousingType);
+            homeAddressInfo.put("municipalities", (homeZipCode != null) ?
+                    FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(homeZipCode.getId())) : Collections.emptyList());
+        }
+        return homeAddressInfo;
     }
 
     private Map<String, Object> filterAddressResponse(ContactAddress contactAddress, ZipCode zipCode, Municipality municipality, HousingType housingType) {
@@ -269,9 +269,7 @@ public class ClientAddressService{
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_CITIZEN_NOTFOUND,clientId,unitId);
-
         }
-
         ContactAddress contactAddress;
         if (HAS_TEMPORARY_ADDRESS.equals(type)) {
             contactAddress = temporaryAddressGraphRepository.findOne(addressId);
@@ -280,15 +278,12 @@ public class ClientAddressService{
         }
         if (contactAddress == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_CONTACTAADDRESS_NOTFOUND);
-
         }
-
         if( addressDTO.isUpdateHouseholdAddress() == false && HAS_HOME_ADDRESS.equals(type)){
             return addNewHomeAddress(addressId, addressDTO, client, unitId, type);
         } else {
             contactAddress = persistAddress(addressDTO, client, contactAddress, unitId);
         }
-
         if (contactAddress == null) {
             return null;
         }
@@ -300,53 +295,63 @@ public class ClientAddressService{
     private ContactAddress persistAddress(AddressDTO addressDTO, Client client, ContactAddress contactAddress, long unitId) {
         ZipCode zipCode;
         if (addressDTO.isVerifiedByGoogleMap()) {
-            if (addressDTO.getZipCode().getZipCode() == 0) {
-                logger.debug("No ZipCode value received");
-                return null;
-            }
-            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCode().getZipCode());
-            if (zipCode == null) {
-                logger.debug("ZipCode Not Found returning null");
-                return null;
-            }
-
-            contactAddress.setLongitude(addressDTO.getLongitude());
-            contactAddress.setLatitude(addressDTO.getLatitude());
-
+            zipCode = validateZipDetails(addressDTO, contactAddress);
+            if (zipCode == null) return null;
         } else {
-            Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(addressDTO, unitId);
-            if (tomtomResponse == null) {
-                return null;
-            }
-            contactAddress.setCountry("Denmark");
-            contactAddress.setVerifiedByVisitour(true);
-            contactAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
-            contactAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
-            zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCode().getId());
-            if (zipCode == null) {
-                logger.debug("ZipCode Not Found returning null");
-                return null;
-            }
+            zipCode = verifyAddressAndSetDetails(addressDTO, contactAddress, unitId);
+            if (zipCode == null) return null;
         }
-
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId());
         if (municipality == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
-
         }
-
-
-        Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
+        Map<String, Object> geographyData = regionGraphRepository.getGeographicData(addressDTO.getMunicipality().getId());
         if (geographyData == null) {
-            logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND,municipality.getId());
-
+            logger.info("Geography  not found with zipcodeId: {}" , zipCode.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND,addressDTO.getMunicipality().getId());
         }
-        logger.info("Geography Data: " + geographyData);
-
         HousingType housingType = (addressDTO.getTypeOfHouseId() == null) ? null : housingTypeGraphRepository.findOne(addressDTO.getTypeOfHouseId());
-
         // Geography Data
+        setContactAddressDetails(addressDTO, contactAddress, zipCode, municipality, geographyData, housingType);
+        return contactAddress;
+    }
+
+    private ZipCode verifyAddressAndSetDetails(AddressDTO addressDTO, ContactAddress contactAddress, long unitId) {
+        ZipCode zipCode;
+        Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(addressDTO, unitId);
+        if (tomtomResponse == null) {
+            return null;
+        }
+        contactAddress.setCountry("Denmark");
+        contactAddress.setVerifiedByVisitour(true);
+        contactAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
+        contactAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
+        zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCode().getId());
+        if (zipCode == null) {
+            logger.debug("ZipCode Not Found returning null");
+            return null;
+        }
+        return zipCode;
+    }
+
+    private ZipCode validateZipDetails(AddressDTO addressDTO, ContactAddress contactAddress) {
+        ZipCode zipCode;
+        if (addressDTO.getZipCode().getZipCode() == 0) {
+            logger.debug("No ZipCode value received");
+            return null;
+        }
+        zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCode().getZipCode());
+        if (zipCode == null) {
+            logger.debug("ZipCode Not Found returning null");
+            return null;
+        }
+
+        contactAddress.setLongitude(addressDTO.getLongitude());
+        contactAddress.setLatitude(addressDTO.getLatitude());
+        return zipCode;
+    }
+
+    private void setContactAddressDetails(AddressDTO addressDTO, ContactAddress contactAddress, ZipCode zipCode, Municipality municipality, Map<String, Object> geographyData, HousingType housingType) {
         contactAddress.setMunicipality(municipality);
         contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
         contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
@@ -360,7 +365,6 @@ public class ClientAddressService{
         contactAddress.setCity(zipCode.getName());
         contactAddress.setDescription(addressDTO.getDescription());
         contactAddress.setLocationName(addressDTO.getLocationName());
-        return contactAddress;
     }
 
     public AccessToLocation addAccessLocationDetails(AccessToLocation contactAddress, long contactAddressId) {
@@ -409,34 +413,21 @@ public class ClientAddressService{
         // Contact AddressDTO
         logger.debug("Updating Access to Location");
         AccessToLocation accessToLocation = accessToLocationGraphRepository.findOne(contactAddress.getId());
-
         if (accessToLocation != null ) {
-            logger.debug("Access to location found" +contactAddress.getAlarmCode());
-            if (contactAddress.getAlarmCode() != null && contactAddress.getAlarmCode() != "") {
-                accessToLocation.setHaveAlarmCode(true);
-            }else{
-                accessToLocation.setHaveAlarmCode(false);
-            }
+            logger.debug("Access to location found {}" ,contactAddress.getAlarmCode());
+            accessToLocation.setHaveAlarmCode(!StringUtils.isEmpty(contactAddress.getAlarmCode()));
             accessToLocation.setAlarmCode(contactAddress.getAlarmCode());
             accessToLocation.setAlarmCodeDescription(contactAddress.getAlarmCodeDescription());
-
             accessToLocation.setHowToAccessAddress(contactAddress.getHowToAccessAddress());
-
             accessToLocation.setKeySystem(contactAddress.getKeySystem());
-
             accessToLocation.setEmergencyCallDeviceType(contactAddress.getEmergencyCallDeviceType());
             accessToLocation.setEmergencyCallNumber(contactAddress.getEmergencyCallNumber());
             accessToLocation.setSerialNumber(contactAddress.getSerialNumber());
-
-
             accessToLocation.setReasonForDailyPhoneCall(contactAddress.getReasonForDailyPhoneCall());
             accessToLocation.setPortPhoneNumber(contactAddress.getPortPhoneNumber());
             accessToLocation.setDailyPhoneCallIsAgreed(contactAddress.isDailyPhoneCallIsAgreed());
             accessToLocation.setReasonForEmergencyCall(contactAddress.getReasonForEmergencyCall());
-
-
             accessToLocation.setRemarks(contactAddress.getRemarks());
-
             // Saving data
             return accessToLocationGraphRepository.save(accessToLocation);
         } else {

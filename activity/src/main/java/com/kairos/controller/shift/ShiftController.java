@@ -2,7 +2,6 @@ package com.kairos.controller.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
-import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.BreakAction;
@@ -164,13 +163,13 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
-    @ApiOperation("API is used to add shift of user when user is sick")
+  /*  @ApiOperation("API is used to add shift of user when user is sick")
     @PostMapping("/staff/{staffId}/shift_on_sick")
     public ResponseEntity<Map<String, Object>> markUserAsSick(@PathVariable Long unitId, @PathVariable Long staffId, @RequestParam("activitySelected") BigInteger activityId,
                                                               @RequestBody Duration duration) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftSickService.createSicknessShiftsOfStaff(unitId, activityId, staffId, duration));
     }
-
+*/
 
     @ApiOperation("update shift by detail view")
     @PutMapping("/shift/update_shift_by_details_view")

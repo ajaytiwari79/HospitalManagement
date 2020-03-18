@@ -39,16 +39,14 @@ public class LanguageLevelService {
 
     public List<Object> getLanguageLevelByCountryId(long countryId) {
         List<Map<String, Object>> data = languageLevelGraphRepository.getLanguageLevelByCountryId(countryId);
-        List<Object> objectList;
+        List<Object> objectList=new ArrayList<>();
         if (data != null) {
-            objectList = new ArrayList<>();
             for (Map<String, Object> map : data) {
                 Object o = map.get("result");
                 objectList.add(o);
             }
-            return objectList;
         }
-        return null;
+        return objectList;
     }
 
 
@@ -56,7 +54,7 @@ public class LanguageLevelService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country != null) {
 
-            Boolean languageLevelExistInCountryByName = languageLevelGraphRepository.languageLevelExistInCountryByName(countryId, "(?i)" + languageLevel.getName(), -1L);
+            boolean languageLevelExistInCountryByName = languageLevelGraphRepository.languageLevelExistInCountryByName(countryId, "(?i)" + languageLevel.getName(), -1L);
             if (languageLevelExistInCountryByName) {
                 exceptionService.duplicateDataException("error.LanguageLevel.name.exist");
             }
@@ -72,7 +70,7 @@ public class LanguageLevelService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country != null) {
 
-            Boolean languageLevelExistInCountryByName = languageLevelGraphRepository.languageLevelExistInCountryByName(countryId, "(?i)" + languageLevel.getName(), languageLevel.getId());
+            boolean languageLevelExistInCountryByName = languageLevelGraphRepository.languageLevelExistInCountryByName(countryId, "(?i)" + languageLevel.getName(), languageLevel.getId());
             if (languageLevelExistInCountryByName) {
                 exceptionService.duplicateDataException("error.LanguageLevel.name.exist");
             }

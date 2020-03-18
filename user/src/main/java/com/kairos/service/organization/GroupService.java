@@ -1,12 +1,14 @@
 package com.kairos.service.organization;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.ModuleId;
 import com.kairos.enums.StaffStatusEnum;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.group.GroupDTO;
@@ -15,8 +17,6 @@ import com.kairos.persistence.repository.organization.GroupGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffFilterService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -33,7 +33,6 @@ import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_NOT_FOUND
  **/
 @Service
 public class GroupService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TeamService.class);
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -63,7 +62,7 @@ public class GroupService {
         if (isNotNull(groupDTO.getName()) && groupGraphRepository.existsByName(unitId,groupId, groupDTO.getName())){
             exceptionService.duplicateDataException(MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT, groupDTO.getName(), unitId);
         }
-        Group group = groupGraphRepository.findById(groupId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_GROUP_NOT_FOUND,groupId)));
+        Group group = groupGraphRepository.findById(groupId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_GROUP_NOT_FOUND,groupId)));
         if(isNotNull(groupDTO.getName())){
             group.setName(groupDTO.getName());
             group.setDescription(groupDTO.getDescription());
@@ -90,7 +89,7 @@ public class GroupService {
 
     public List<GroupDTO> getAllGroupsOfUnit(Long unitId) {
         Unit unit = unitGraphRepository.findOne(unitId);
-        List<Group> groups = isNull(unit) ? new ArrayList<>() : groupGraphRepository.findAllGroupsByIdSAndDeletedFalse(unit.getGroups().stream().map(k->k.getId()).collect(Collectors.toList()));
+        List<Group> groups = isNull(unit) ? new ArrayList<>() : groupGraphRepository.findAllGroupsByIdSAndDeletedFalse(unit.getGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
         List<GroupDTO> groupDTOS = new ArrayList<>();
         for(Group group : groups){
             groupDTOS.add(getGroupDTOFromGroup(group));

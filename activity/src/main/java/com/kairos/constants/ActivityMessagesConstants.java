@@ -371,7 +371,16 @@ public class ActivityMessagesConstants {
     public static final String SHORTCUT_ALREADY_EXISTS_NAME="message.shortcut.already.exists.name";
     public static final String ERROR_BLOCK_SETTING_NOT_FOUND = "error.block.setting.not.found";
     public static final String MESSAGE_BLOCKED_FOR_SHIFT_ENTER_AT_DATE = "message.blocked.for.shift.entered.at.date";
+    public static final String MESSAGE_STAFF_MAIN_EMPLOYMENT_NOT_FOUND= "message.staff.main.employment.notfound";
+    public static final String MESSAGE_STAFF_CARE_DAYS_NOT_FOUND = "message.staff.caredays.setting.notfound";
+    public static final String MESSAGE_ACTIVITY_USEDON_FREEDAY= "message.activity.used.on.freedays";
+    public static final String MESSAGE_ACTIVITY_USEDON_PROTECTEDDAYSOFF= "message.activity.used.on.protecteddaysoff";
+    public static final String MESSAGE_PROTECTEDDAYSOFF_ACTIVITY_NOT_FOUND="message.protected.day.off.activity.not.found";
+    public static final String MESSAGE_ACTIVITY_USEDON_APPROVEABSENCES= "message.activity.usedon.approve.absences";
+    public static final String MESSAGE_NON_WORKING_SICKNESS_ACTIVITY_NOT_FOUND= "message.activity.nonworking.sickness.activity.not.found";
+    public static final String EMPLOYMENT_NOT_VALID_TO_MARK_SICK = "employment.not.valid.to.mark.sick";
     public static final String CUT_OFF_CONFIGUATION = "activity.cutoff.configuration";
     public static final String ACTIVITY_NOT_ASSIGN_IN_PROTECTED_DAYS_OFF_RULE_TEMPLATE = "activity.not.assign.in.protected.days.off.rule.template";
+    public static final String STAFF_ALREADY_SICK="staff.already.sick";
 
 }
