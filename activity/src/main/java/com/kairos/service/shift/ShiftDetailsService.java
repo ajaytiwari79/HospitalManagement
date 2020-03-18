@@ -174,11 +174,8 @@ public class ShiftDetailsService extends MongoBaseService {
 
     public Activity getWorkingSickActivity(ShiftDTO shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         Activity activity = null;
-        if (shift.getActivities().size() == 1) {
-            return activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getActivity();
-        }
         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
-            if (activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().getSecondLevelType().equals(TimeTypeEnum.SICK)) {
+            if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().isSicknessSettingValid()) {
                 return activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
             }
         }
