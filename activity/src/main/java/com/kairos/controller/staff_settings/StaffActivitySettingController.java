@@ -98,4 +98,11 @@ public class StaffActivitySettingController {
     public ResponseEntity<Map<String, Object>> getStaffActivitySettingsByActivityId( @PathVariable Long unitId,@PathVariable BigInteger activityId,@PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.getStaffActivitySettingsByActivityId(unitId,activityId,staffId));
     }
+
+    @ApiOperation("get staff filter data")
+    @PostMapping(value = "/get_staff_filter_data")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffFilterData(@PathVariable Long unitId, @RequestBody Map<String,List<BigInteger>> timeTypeIdsAndActivityIdsMap) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.getStaffFilterDataDTO(unitId, timeTypeIdsAndActivityIdsMap.get("timeTypeIds"), timeTypeIdsAndActivityIdsMap.get("activityIds")));
+    }
 }

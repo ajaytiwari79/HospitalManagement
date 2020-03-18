@@ -7,6 +7,7 @@ import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
+import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -319,6 +320,7 @@ public class CompanyCreationService {
                 user.setUserName(unitManagerDTO.getUserName());
                 user.setLastSelectedOrganizationId(isNotNull(unitId) ? unitId : organization.getId());
                 user.setUserNameUpdated(true);
+                user.setUserType(UserType.USER_ACCOUNT);
                 userGraphRepository.save(user);
             } else {
                 if(unitManagerDTO.getCprNumber() != null) {
@@ -346,6 +348,7 @@ public class CompanyCreationService {
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 user.setUserNameUpdated(true);
                 user.setLastSelectedOrganizationId(isNotNull(unitId) ? unitId : organization.getId());
+                user.setUserType(UserType.USER_ACCOUNT);
                 userGraphRepository.save(user);
                 if(unitManagerDTO.getAccessGroupId() != null) {
                     setAccessGroupInUserAccount(user, organizationBaseEntity.getId(), unitManagerDTO.getAccessGroupId());
@@ -360,6 +363,7 @@ public class CompanyCreationService {
                         reinitializeUserManagerDto(unitManagerDTO, user);
                     } else {
                         user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getUserName(), true);
+                        user.setUserType(UserType.USER_ACCOUNT);
                         setEncryptedPasswordAndAge(unitManagerDTO, user);
                     }
                     user.setLastSelectedOrganizationId(isNotNull(unitId) ? unitId : organization.getId());

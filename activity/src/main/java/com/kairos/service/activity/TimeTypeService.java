@@ -574,4 +574,15 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeMongoRepository.findAllByDeletedFalseAndTimeType(timeTypeEnum);
     }
 
+    public void getAllLeafTimeTypeByParentTimeTypeIds(Collection<BigInteger> timeTypeIds, List<TimeTypeDTO> leafTimeTypes){
+        List<TimeType> timeTypes = timeTypeMongoRepository.findAllByTimeTypeIds(timeTypeIds);
+        for (TimeType timeType : timeTypes) {
+            if(timeType.isLeafNode()){
+                leafTimeTypes.add(ObjectMapperUtils.copyPropertiesByMapper(timeType, TimeTypeDTO.class));
+            }else{
+                getAllLeafTimeTypeByParentTimeTypeIds(timeType.getChildTimeTypeIds(), leafTimeTypes);
+            }
+        }
+    }
+
 }

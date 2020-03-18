@@ -32,10 +32,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
@@ -207,9 +204,11 @@ public class ActivityIntegrationService {
         return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/get_planning_period_range", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<PlanningPeriodDTO>>(){});
     }
 
-    public StaffFilterDataDTO getStaffFilterDataByUnitId(Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/get_staff_filter_data", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffFilterDataDTO>>(){});
+    public StaffFilterDataDTO getAssignActivityStaffFilterReatedData(Long unitId, List<BigInteger> timeTypeIds, List<BigInteger> activityIds) {
+        Map<String,List<BigInteger>> requestBody = new HashMap<>();
+        requestBody.put("timeTypeIds",timeTypeIds);
+        requestBody.put("activityIds",activityIds);
+        return genericRestClient.publishRequest(requestBody, unitId, true, IntegrationOperation.CREATE, "/get_staff_filter_data", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffFilterDataDTO>>(){});
     }
-
 }
 
