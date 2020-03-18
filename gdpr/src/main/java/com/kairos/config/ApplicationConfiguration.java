@@ -18,7 +18,7 @@ public class ApplicationConfiguration {
 
     @Inject
     private EnvConfigCommon envConfigCommon;
-    
+
 
     @Bean
     PermissionSchemaProcessor prePermissionSchemaProcessor(){
