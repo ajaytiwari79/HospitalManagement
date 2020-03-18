@@ -1,11 +1,13 @@
 package com.kairos.persistence.repository.user.staff;
 
+import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.organization.StaffTeamRelationShipQueryResult;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,11 +24,17 @@ public interface StaffTeamRelationshipGraphRepository extends Neo4jBaseRepositor
     @Query("MATCH(t:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(staff) IN {0} AND id(t)={1} return rel")
     List<StaffTeamRelationship> findByStaffIdsAndTeamId(Collection<Long> staffIds, Long teamId);
 
-    @Query("MATCH(team:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(team)={0} return rel")
+    @Query("MATCH(team:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(team)={0} return collect(rel) as staffTeamRelationship")
     List<StaffTeamRelationship> findByStaffTeamId(Long teamId);
 
     @Query("MATCH(t:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(staff) = {0} AND id(t)<>{1} AND rel.teamType='MAIN'" +
             " RETURN COUNT(rel)>0")
     boolean anyMainTeamExists(Long staffId, Long teamId);
+
+    @Query("MATCH(t:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE rel.sequence={0} RETURN COUNT(rel)>0")
+    boolean sequenceIsExists(int Sequence);
+
+
+
 
 }

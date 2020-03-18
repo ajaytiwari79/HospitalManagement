@@ -177,25 +177,18 @@ public class TeamService {
                     new StaffTeamRelationship(staffTeamRelationShipQueryResult.getId(), team, staff, staffTeamRelationShipQueryResult.getLeaderType(), staffTeamDTO.getTeamType());
             staffTeamRelationship.setStartDate(staffTeamDTO.getStartDate());
             staffTeamRelationship.setEndDate(staffTeamDTO.getEndDate());
-            if(!isSequenceExistOrNot(teamId,staffTeamDTO)) {
+            if(!isSequenceExistOrNot(staffTeamDTO)) {
                 staffTeamRelationship.setSequence(staffTeamDTO.getSequence());
+            }else{
+                exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
             }
             staffTeamRelationshipGraphRepository.save(staffTeamRelationship);
         }
         return staffTeamDTOs;
     }
 
-    public boolean isSequenceExistOrNot(Long teamId,StaffTeamDTO staffTeamDTO){
-        List<Long> staffIds =staffGraphRepository.getStaffIdsByTeamId(teamId);
-        List<StaffTeamRelationship> staffTeamRelationships = staffTeamRelationshipGraphRepository.findByStaffTeamId(teamId);
-        boolean isExist =false;
-        for(StaffTeamRelationship staffTeamRelationship : staffTeamRelationships){
-            if(staffTeamDTO.getSequence()==staffTeamRelationship.getSequence()){
-                isExist=true;
-            }else {
-                isExist=false;
-            }
-        }
+    public boolean isSequenceExistOrNot(StaffTeamDTO staffTeamDTO){
+        boolean isExist =staffTeamRelationshipGraphRepository.sequenceIsExists(staffTeamDTO.getSequence());
         return isExist;
     }
 
