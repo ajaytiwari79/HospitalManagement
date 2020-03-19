@@ -390,61 +390,7 @@ public class PositionService {
         return workPlaces;
     }
 
-    private void setAccessGroupWiseInfoInUnits(long staffId, List<Map<String, Object>> units, List<Map<String, Object>> positions, ObjectMapper objectMapper, List<QueryResult> list, List<Long> ids, AccessGroup accessGroup) {
-        for (Map<String, Object> unitData : units) {
-            Map<String, Object> parentUnit = (Map<String, Object>) ((Map<String, Object>) unitData.get("data")).get("parent");
-            long id = (long) parentUnit.get("id");
-            Map<String, Object> position;
-            if (ids.contains(id)) {
-                for (QueryResult queryResult : list) {
-                    if (queryResult.getId() == id) {
-                        List<QueryResult> childs = queryResult.getChildren();
-                        QueryResult child = setInfoInChild(staffId, positions, objectMapper, accessGroup, unitData);
-                        childs.add(child);
-                        break;
-                    }
-                }
-            } else {
-                List<QueryResult> queryResults = new ArrayList<>();
-                QueryResult child = setInfoInChild(staffId, positions, objectMapper, accessGroup, unitData);
-                queryResults.add(child);
-                QueryResult queryResult = new QueryResult((String) parentUnit.get("name"), id, queryResults);
-                position = positionGraphRepository.getPositionOfParticularRole(staffId, queryResult.getId(), accessGroup.getId());
-                if (isEmpty(position)) {
-                    positions.add(position);
-                    queryResult.setAccessable(true);
-                } else {
-                    queryResult.setAccessable(false);
-                }
-                list.add(queryResult);
-            }
-            ids.add(id);
-        }
-    }
 
-    private List<Map<String, Object>> getWorkPlacesForParentOrganization(long staffId, OrganizationBaseEntity unit, List<AccessGroup> accessGroups, List<Map<String, Object>> workPlaces) {
-        List<Map<String, Object>> positions;
-        positions = new ArrayList<>();
-        for (AccessGroup accessGroup : accessGroups) {
-            QueryResult queryResult = new QueryResult();
-            queryResult.setId(unit.getId());
-            queryResult.setName(unit.getName());
-            Map<String, Object> employment = positionGraphRepository.getPositionOfParticularRole(staffId, unit.getId(), accessGroup.getId());
-            if (employment != null && !employment.isEmpty()) {
-                positions.add(employment);
-                queryResult.setAccessable(true);
-            } else {
-                queryResult.setAccessable(false);
-            }
-            Map<String, Object> workPlace = new HashMap<>();
-            workPlace.put("id", accessGroup.getId());
-            workPlace.put("name", accessGroup.getName());
-            workPlace.put("tree", queryResult);
-            workPlace.put("positions", positions);
-            workPlaces.add(workPlace);
-        }
-        return workPlaces;
-    }
 
     private QueryResult setInfoInChild(long staffId, List<Map<String, Object>> positions, ObjectMapper objectMapper, AccessGroup accessGroup, Map<String, Object> unitData) {
         Map<String, Object> position;
