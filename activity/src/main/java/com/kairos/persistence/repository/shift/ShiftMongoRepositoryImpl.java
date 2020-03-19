@@ -575,7 +575,12 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         GroupOperation groupOperation = group("staffId").addToSet("$$ROOT").as("shifts");
         aggregationOperations.add(groupOperation);
         List<StaffShiftDetails> shiftWithActivityDTOS = mongoTemplate.aggregate(Aggregation.newAggregation(aggregationOperations),inputType ,outputMappingType).getMappedResults();
-        return shiftWithActivityDTOS.get(0);
+        if(shiftWithActivityDTOS.size()>0) {
+            return shiftWithActivityDTOS.get(0);
+        }else {
+            return null;
+        }
+
     }
 
 
