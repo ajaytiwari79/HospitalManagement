@@ -208,6 +208,7 @@ public class ShiftService extends MongoBaseService {
         } else {
             shiftWithViolatedInfoDTOS = validateAndCreateShift(shiftDTO, shiftActionType, staffAdditionalInfoDTO, activityWrapper);
         }
+        getshiftWithViolatedInfoDTOForSaveAsDraftActionMode(shiftWithViolatedInfoDTOS,shiftActionType,false);
         return shiftWithViolatedInfoDTOS;
     }
 
@@ -223,8 +224,9 @@ public class ShiftService extends MongoBaseService {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate(), null);
             shiftWithViolatedInfoDTO = saveShift(staffAdditionalInfoDTO, shiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
         }
-
-        addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
+        if(isNotNull(shiftWithViolatedInfoDTO)) {
+            addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
+        }
         shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
         return shiftWithViolatedInfoDTOS;
     }
@@ -783,6 +785,7 @@ public class ShiftService extends MongoBaseService {
                 shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(newArrayList(shiftDTO));
             }
             shiftWithViolatedInfoDTO.setShifts(shiftDTOS);
+
         }
         addReasonCode(shiftWithViolatedInfoDTOS.stream().flatMap(shiftWithViolatedInfoDTO -> shiftWithViolatedInfoDTO.getShifts().stream()).collect(Collectors.toList()), staffAdditionalInfoDTO.getReasonCodes());
         if (!shiftDTO.isDraft()) {
@@ -791,6 +794,7 @@ public class ShiftService extends MongoBaseService {
             }
             shiftValidatorService.escalationCorrectionInShift(shiftDTO, currentShiftStartDate, currentShiftEndDate, shift);
         }
+        getshiftWithViolatedInfoDTOForSaveAsDraftActionMode(shiftWithViolatedInfoDTOS,shiftAction,true);
         return shiftWithViolatedInfoDTOS;
     }
 
@@ -1577,5 +1581,50 @@ public class ShiftService extends MongoBaseService {
             }
         }
     }
+
+    // This function is used for the change the status of the draft shift
+    public void getshiftWithViolatedInfoDTOForSaveAsDraftActionMode(List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS,ShiftActionType shiftActionType,boolean shiftUpdated) {
+        Set<ShiftStatus> shiftStatuses = new HashSet<>();
+        for (ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO : shiftWithViolatedInfoDTOS) {
+            if (isNotNull(shiftWithViolatedInfoDTO)) {
+                for (ShiftDTO shiftDTO : shiftWithViolatedInfoDTO.getShifts()) {
+                    for (ShiftActivityDTO shiftActivityDTO : shiftDTO.getActivities()) {
+                        if (ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
+                            if (ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType) && (ShiftType.NON_WORKING.equals(shiftDTO.getShiftType()) || ShiftType.ABSENCE.equals(shiftDTO.getShiftType()))) {
+                                shiftStatuses.add(ShiftStatus.REQUEST);
+                                shiftActivityDTO.setStatus(shiftStatuses);
+                            } else {
+                                shiftActivityDTO.setStatus(shiftStatuses);
+                            }
+                        } else {
+                            if (ShiftActionType.SAVE.equals(shiftActionType) && (ShiftType.NON_WORKING.equals(shiftDTO.getShiftType()) || ShiftType.ABSENCE.equals(shiftDTO.getShiftType()))) {
+                                if (!shiftUpdated) {
+                                    shiftStatuses.add(ShiftStatus.PUBLISH);
+                                    shiftStatuses.add(ShiftStatus.APPROVE);
+                                    shiftActivityDTO.setStatus(shiftStatuses);
+                                } else {
+                                    shiftStatuses.add(ShiftStatus.APPROVE);
+                                    shiftStatuses.add(ShiftStatus.PUBLISH);
+                                    shiftStatuses.add(ShiftStatus.MOVED);
+                                    shiftActivityDTO.setStatus(shiftStatuses);
+                                }
+                            } else {
+                                if (shiftUpdated) {
+                                    shiftStatuses.add(ShiftStatus.PUBLISH);
+                                    shiftStatuses.add(ShiftStatus.MOVED);
+                                    shiftActivityDTO.setStatus(shiftStatuses);
+                                } else {
+                                    shiftActivityDTO.setStatus(shiftStatuses);
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 
 }
