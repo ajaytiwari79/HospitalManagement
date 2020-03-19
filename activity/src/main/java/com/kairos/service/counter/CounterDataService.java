@@ -78,7 +78,7 @@ import static java.util.stream.Collectors.toList;
 
 
 @Service
-public class CounterDataService extends MongoBaseService {
+public class CounterDataService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CounterDataService.class);
 
     @Inject
@@ -524,6 +524,16 @@ public class CounterDataService extends MongoBaseService {
         copyKpi.setCalculationFormula(counterDTO.getCalculationFormula());
         copyKpi.setFilterTypes(counterDTO.getSelectedFilters().stream().map(FilterCriteria::getType).collect(toList()));
         counterRepository.save(copyKpi);
+        tabKPIConf = getTabKPIConf(tabId, refId, counterDTO, level, copy, accessGroupPermissionCounterDTO, applicableKPIS, tabKPIConf, kpi, copyKpi);
+        linkKpiToUncategorized(refId, level, copyKpi);
+        TabKPIDTO tabKPIDTO = getTabKpiData(copyKpi, counterDTO, accessGroupPermissionCounterDTO);
+        if(isNotNull(tabKPIConf)){
+            tabKPIDTO.setId(tabKPIConf.getId());
+        }
+        return tabKPIDTO;
+    }
+
+    private TabKPIConf getTabKPIConf(String tabId, Long refId, CounterDTO counterDTO, ConfLevel level, boolean copy, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, List<ApplicableKPI> applicableKPIS, TabKPIConf tabKPIConf, KPI kpi, KPI copyKpi) {
         List<ApplicableKPI> applicableKPIs = new ArrayList<>();
         if (ConfLevel.COUNTRY.equals(level) || accessGroupPermissionCounterDTO.isCountryAdmin()) {
             applicableKPIs.add(new ApplicableKPI(copyKpi.getId(), kpi.getId(), refId, null, null, level, new ApplicableFilter(counterDTO.getSelectedFilters(), false), counterDTO.getTitle(), copy,counterDTO.getKpiRepresentation(),counterDTO.getInterval(),counterDTO.getValue(),counterDTO.getFrequencyType(),null));
@@ -537,12 +547,7 @@ public class CounterDataService extends MongoBaseService {
         }
         applicableKPIS.addAll(applicableKPIs);
         counterRepository.saveEntities(applicableKPIS);
-        linkKpiToUncategorized(refId, level, copyKpi);
-        TabKPIDTO tabKPIDTO = getTabKpiData(copyKpi, counterDTO, accessGroupPermissionCounterDTO);
-        if(isNotNull(tabKPIConf)){
-            tabKPIDTO.setId(tabKPIConf.getId());
-        }
-        return tabKPIDTO;
+        return tabKPIConf;
     }
 
     private List<ApplicableKPI> validateAndApplicableKPIS(ConfLevel level, Long refId, String tabId, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, BigInteger kpiId) {

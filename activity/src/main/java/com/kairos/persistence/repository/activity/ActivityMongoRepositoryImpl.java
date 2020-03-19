@@ -126,6 +126,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private static final String COUNTRY_PARENT_ID = "countryParentId";
     private static final String ID = "id";
     private static final String $_ID = "$id";
+    public static final String BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE = "balanceSettingsActivityTab.timeType";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -302,7 +303,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
 
-    public List<ActivityDTO> getAllActivityWithTimeType(Long unitId, List<BigInteger> activityIds) {
+    public List<ActivityDTO> getAllActivityWithTimeType(List<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 //"unitId").is(unitId).and(
                 match(Criteria.where(DELETED).is(false).and(_ID).in(activityIds)),
@@ -322,7 +323,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         customAgregationForCompositeActivity.add(match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(deleted)));
         customAgregationForCompositeActivity.add(lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, _ID, TIME_TYPE_INFO));
         customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(false));
-        //customAgregationForCompositeActivity.add(project("name", "categoryId", "categoryName").and("timeTypeInfo").as("timeTypeInfo").and("childActivities").as("childActivities"));
         customAgregationForCompositeActivity.add(match(Criteria.where("timeTypeInfo.partOfTeam").is(true)));
         Aggregation aggregation = Aggregation.newAggregation(customAgregationForCompositeActivity);
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
@@ -406,7 +406,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public Set<BigInteger> findAllActivitiesByUnitIdAndUnavailableTimeType(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, _ID,
-                        "balanceSettingsActivityTab.timeType"),
+                        BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE),
                 match(Criteria.where(DELETED).is(false).and("balanceSettingsActivityTab.timeType.timeTypes").is("NON_WORKING_TYPE")),
                 // match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("balanceSettingsActivityTab.timeType.timeTypes").is("NON_WORKING_TYPE")),
                 //group("unitId").addToSet("id").as("ids"),
@@ -415,13 +415,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<Map> result = mongoTemplate.aggregate(aggregation, Activity.class, Map.class);
         List<Map> activityIdMap = result.getMappedResults();
-        //List<BigInteger> activityIds = activityIdMap.stream().map(Map:: get("_id")).collect(Collectors.toList());
         Set<BigInteger> activityIds = new HashSet<>();
         for (Map activityMap : activityIdMap) {
             activityIds.add(new BigInteger(activityMap.get(_ID).toString()));
         }
-        //List<BigInteger> activityIds1 = activityIdMap.stream().map(Map::get("_id"))
-        return activityIds;//new HashSet<Long>(result.getMappedResults());
+        return activityIds;
     }
 
     public Activity findByNameIgnoreCaseAndCountryIdAndByDate(String name, Long countryId, LocalDate startDate, LocalDate endDate) {
@@ -830,7 +828,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     @Override
     public List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and("balanceSettingsActivityTab.timeType").is(TimeTypeEnum.ABSENCE)),
+                match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE).is(TimeTypeEnum.ABSENCE)),
                 lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, _ID, ACTIVITY_PRIORITY),
                 project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
                         .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY),

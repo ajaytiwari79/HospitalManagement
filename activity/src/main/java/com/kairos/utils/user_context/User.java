@@ -15,7 +15,7 @@ import static com.kairos.constants.ActivityMessagesConstants.ERROR_USER_PASSCODE
 @Getter
 @Setter
 @NoArgsConstructor
-public class User implements Serializable{
+public class User{
     protected Long id;
 
     protected String cprNumber;

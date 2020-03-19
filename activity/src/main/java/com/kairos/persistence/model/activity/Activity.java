@@ -35,7 +35,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @KPermissionModel
-public class Activity extends MongoBaseEntity implements Serializable {
+public class Activity extends MongoBaseEntity {
 
     @KPermissionField
     private String name;

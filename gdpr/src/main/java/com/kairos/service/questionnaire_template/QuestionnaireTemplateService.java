@@ -238,14 +238,6 @@ public class QuestionnaireTemplateService {
         return templateDto;
     }
 
-    /**
-     * @param referenceId
-     * @param questionnaireTemplateId questionnaire template id
-     * @return Master Questionnaire template with sections list and question list (empty if sections are not present in template)
-     * @description we get  section[ {} ] as query response from mongo on using group operation,
-     * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
-     * and filter section in application layer and send empty array of section []
-     */
     public QuestionnaireTemplateResponseDTO getQuestionnaireTemplateWithSectionsByTemplateIdAndCountryIdOrOrganisationId(Long referenceId, Long questionnaireTemplateId, boolean isOrganization) {
         QuestionnaireTemplate questionnaireTemplate = isOrganization ?
                 questionnaireTemplateRepository.getQuestionnaireTemplateWithSectionsByOrganizationId(referenceId, questionnaireTemplateId) : questionnaireTemplateRepository.getMasterQuestionnaireTemplateWithSectionsByCountryId(referenceId, questionnaireTemplateId);
@@ -273,13 +265,6 @@ public class QuestionnaireTemplateService {
         return questionnaireTemplateResponseDTO;
     }
 
-    /**
-     * @param id
-     * @return Master Questionnaire template with sections list and question list (empty if sections are not present in template)
-     * @description we get  section[ {} ] as query response from mongo on using group operation,
-     * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
-     * and filter section in application layer and send empty array of section []
-     */
     public List<QuestionnaireTemplateResponseDTO> getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(Long id, boolean isOrganization) {
         List<QuestionnaireTemplateResponseDTO> questionnaireTemplateResponseDTOS = new ArrayList<>();
         List<QuestionnaireTemplate> questionnaireTemplates = isOrganization ? questionnaireTemplateRepository.getAllQuestionnaireTemplateWithSectionsAndQuestionsByOrganizationId(id) : questionnaireTemplateRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestionsByCountryId(id);
