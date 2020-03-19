@@ -98,6 +98,7 @@ public class AbsenceShiftService {
             newShiftDTO.setId(shiftDTO.getId());
             newShiftDTO.setShiftType(ShiftType.ABSENCE);
             ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
+            shiftService.addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
             shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
         } else {
             shiftWithViolatedInfoDTOS = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activityWrapper.getActivity(), shiftDTO, absenceReasonCodeId, shiftActionType);
