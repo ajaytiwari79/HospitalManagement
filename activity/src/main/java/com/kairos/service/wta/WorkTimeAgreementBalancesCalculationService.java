@@ -594,7 +594,7 @@ public class WorkTimeAgreementBalancesCalculationService {
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
                 if ((dateTimeInterval.contains(activity.getStartDate())) && activityIds.contains(activity.getActivityId())) {
                     activityCount++;
-                    if (activity.getStatus().contains(ShiftStatus.APPROVE)) {
+                    if (activity.getStatus().contains(ShiftStatus.APPROVE)&&!shiftWithActivityDTO.isDraft()) {
                         approveCount++;
                     }
                 }

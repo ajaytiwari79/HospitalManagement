@@ -64,13 +64,13 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{deleted:false,'compositeActivities.activityId':?0}",exists = true)
     boolean existsByActivityIdInCompositeActivitiesAndDeletedFalse(BigInteger id);
 
-    @Query(value = "{'balanceSettingsActivityTab.timeTypeId':?0}, deleted:false}")
+    @Query(value = "{'balanceSettingsActivityTab.timeTypeId':?0, deleted:false}")
     List<Activity>  findAllByTimeTypeId(BigInteger timeTypeId);
 
     @Query(value = "{'_id':{'$in':?0}, 'deleted':false}")
     List<ActivityDTO> findByDeletedFalseAndIdsIn(Collection<BigInteger> activityIds);
 
-    @Query(value = "{'balanceSettingsActivityTab.timeTypeId':?0}, deleted:false}",exists = true)
+    @Query(value = "{'balanceSettingsActivityTab.timeTypeId':?0, deleted:false}",exists = true)
     boolean existsByTimeTypeId(BigInteger timeTypeId);
 
     @Query(value = "{'deleted' : false, 'unitId' :?0,'activityPriorityId':?1 }",exists = true)
@@ -82,7 +82,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{deleted: false, parentId :?0,unitId:{$in:?1 }}",exists = true)
     boolean existsByParentIdAndDeletedFalse( BigInteger activityId,List<Long> unitIds);
 
-    @Query(value = "{'balanceSettingsActivityTab.timeType':?0}, deleted:false}")
+    @Query(value = "{'balanceSettingsActivityTab.timeType':?0, deleted:false}")
     List<Activity>  findAllBySecondLevelTimeType(TimeTypeEnum timeTypeEnum);
 
 
@@ -95,6 +95,12 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{unitId:?0, 'timeCalculationActivityTab.methodForCalculatingTime':{$in:?1 }, 'rulesActivityTab.approvalAllowedPhaseIds':?2, deleted:false}")
     List<Activity> findAllAbsenceActivities(Long unitId, Set<String> methodForCalculatingTimes, BigInteger phaseId);
 
+    @Query(value = "{'rulesActivityTab.sicknessSettingValid':true,deleted:false ,unitId:?0}",fields ="{'_id':1,'rulesActivityTab':1}")
+    List<Activity> findAllSicknessActivity(Long unitId);
+
     @Query(value = "{unitId:?0, deleted:false}")
     List<ActivityDTO> getActivitiesByUnitId(Long unitId);
+
+    @Query(value = "{unitId:?0, 'balanceSettingsActivityTab.timeTypeId':{$in:?1 }, deleted:false}")
+    List<Activity>  findAllByUnitIdAndTimeTypeIds(Long unitId, Collection<BigInteger> timeTypeIds);
 }

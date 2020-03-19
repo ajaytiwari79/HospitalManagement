@@ -24,8 +24,6 @@ import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,10 +32,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
@@ -51,7 +46,6 @@ public class ActivityIntegrationService {
     GenericRestClient genericRestClient;
     @Inject
     RestClientForSchedulerMessages restClientForSchedulerMessages;
-    private Logger logger = LoggerFactory.getLogger(ActivityIntegrationService.class);
 
     public void createDefaultPriorityGroupsFromCountry(long countryId, long unitId) {
         Map<String, Object> countryDetail = new HashMap<>();
@@ -63,7 +57,7 @@ public class ActivityIntegrationService {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/orders_and_activities", null), OrderAndActivityDTO.class);
     }
 
-    public void crateDefaultDataForOrganization(Long unitId, Long parentOrganizationId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
+    public void crateDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
 
         genericRestClient.publish(orgTypeAndSubTypeDTO, unitId, true, IntegrationOperation.CREATE, "/organization_default_data", null);
     }
@@ -165,12 +159,12 @@ public class ActivityIntegrationService {
         });
     }
 
-    public StaffFilterDTO getNightWorkerDetails(StaffFilterDTO staffFilterDTO, Long unitId,LocalDate startDate,LocalDate endDate) {
+    public StaffFilterDTO getWorkTimeAgreement(StaffFilterDTO staffFilterDTO, Long unitId, LocalDate startDate, LocalDate endDate) {
         List<NameValuePair> param = null;
         if(isNotNull(startDate) && isNotNull(endDate)) {
             param = newArrayList(new BasicNameValuePair("startDate", startDate.toString()), new BasicNameValuePair("endDate", endDate.toString()));
         }
-        return genericRestClient.publishRequest(staffFilterDTO, unitId, true, IntegrationOperation.CREATE, "/get_night_worker_details", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffFilterDTO>>() {
+        return genericRestClient.publishRequest(staffFilterDTO, unitId, true, IntegrationOperation.CREATE, "/get_wta_rules_for_staff", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffFilterDTO>>() {
         });
     }
 
@@ -210,9 +204,11 @@ public class ActivityIntegrationService {
         return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/get_planning_period_range", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<PlanningPeriodDTO>>(){});
     }
 
-    public StaffFilterDataDTO getStaffFilterDataByUnitId(Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/get_staff_filter_data", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffFilterDataDTO>>(){});
+    public StaffFilterDataDTO getAssignActivityStaffFilterReatedData(Long unitId, List<BigInteger> timeTypeIds, List<BigInteger> activityIds) {
+        Map<String,List<BigInteger>> requestBody = new HashMap<>();
+        requestBody.put("timeTypeIds",timeTypeIds);
+        requestBody.put("activityIds",activityIds);
+        return genericRestClient.publishRequest(requestBody, unitId, true, IntegrationOperation.CREATE, "/get_staff_filter_data", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffFilterDataDTO>>(){});
     }
-
 }
 

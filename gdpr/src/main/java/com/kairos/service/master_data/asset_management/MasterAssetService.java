@@ -131,17 +131,7 @@ public class MasterAssetService {
         }
 
         if (Optional.ofNullable(masterAssetDTO.getSubAssetType()).isPresent()) {
-            if (masterAssetDTO.getSubAssetType().getId() != null) {
-                Optional<AssetType> subAssetTypeObj = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(masterAssetDTO.getSubAssetType().getId())).findAny();
-                if (subAssetTypeObj.isPresent()) {
-                    subAssetType = subAssetTypeObj.get();
-                } else {
-                    exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, "message.assetType", masterAssetDTO.getSubAssetType().getId());
-                }
-            } else {
-                subAssetType = new AssetType(masterAssetDTO.getSubAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
-                subAssetType.setSubAssetType(true);
-            }
+            subAssetType = getSubAssetType(countryId, masterAssetDTO, assetType);
             masterAsset.setSubAssetType(subAssetType);
         }
         assetTypeRepository.save(assetType);
@@ -151,6 +141,22 @@ public class MasterAssetService {
             assetTypeRepository.save(subAssetType);
             masterAsset.setSubAssetType(subAssetType);
         }
+    }
+
+    private AssetType getSubAssetType(Long countryId, MasterAssetDTO masterAssetDTO, AssetType assetType) {
+        AssetType subAssetType = null;
+        if (masterAssetDTO.getSubAssetType().getId() != null) {
+            Optional<AssetType> subAssetTypeObj = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(masterAssetDTO.getSubAssetType().getId())).findAny();
+            if (subAssetTypeObj.isPresent()) {
+                subAssetType = subAssetTypeObj.get();
+            } else {
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, "message.assetType", masterAssetDTO.getSubAssetType().getId());
+            }
+        } else {
+            subAssetType = new AssetType(masterAssetDTO.getSubAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
+            subAssetType.setSubAssetType(true);
+        }
+        return subAssetType;
     }
 
 

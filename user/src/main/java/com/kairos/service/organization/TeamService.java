@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
-import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
@@ -17,6 +18,7 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -96,7 +98,7 @@ public class TeamService {
         Municipality municipality;
 
         zipCode = organizationContactAddress.getZipCode();
-        LOGGER.debug("zip code found is " + zipCode);
+        LOGGER.debug("zip code found is {}" , zipCode);
         if (zipCode == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
         }
@@ -104,11 +106,6 @@ public class TeamService {
         if (municipality == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
-        }
-        Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
-        if (geographyData == null) {
-            LOGGER.info("Geography  not found with zipcodeId: " + zipCode.getId());
-            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
         }
         contactAddress = new ContactAddress(municipality, organizationContactAddress.getContactAddress().getLongitude(), organizationContactAddress.getContactAddress().getLatitude(),
                 organizationContactAddress.getContactAddress().getProvince(), organizationContactAddress.getContactAddress().getRegionName(), organizationContactAddress.getContactAddress().getCity(),
@@ -217,11 +214,7 @@ public class TeamService {
 
     public boolean addStaffInTeam(long teamId, long staffId, boolean isAssigned) {
 
-        Staff staff = staffGraphRepository.findOne(staffId);
-        Team team = teamGraphRepository.findOne(teamId, 0);
-        if (staff == null || team == null) {
-            exceptionService.internalServerError(ERROR_TEAMSERVICE_STAFFORTEAM_NOTEMPTY);
-        }
+        Staff staff = staffGraphRepository.findById(staffId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(ERROR_TEAMSERVICE_STAFFORTEAM_NOTEMPTY)));
         int countOfRel = teamGraphRepository.countRelBetweenStaffAndTeam(teamId, staffId);
         if (countOfRel == 0) {
 
@@ -316,11 +309,7 @@ public class TeamService {
     }
 
     public TeamDTO updateTeamGeneralDetails(long teamId, TeamDTO teamDTO) {
-
-        Team team = teamGraphRepository.findOne(teamId);
-        if (team == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_TEAM_NOTFOUND, teamId);
-        }
+        Team team = teamGraphRepository.findById(teamId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_TEAMSERVICE_TEAM_NOTFOUND, teamId)));
         team.setName(teamDTO.getName());
         teamGraphRepository.save(team);
         return teamDTO;
@@ -383,5 +372,9 @@ public class TeamService {
 
     public boolean removeStaffsFromTeam(Long teamId, List<Long> staffIds) {
         return teamGraphRepository.removeStaffsFromTeam(staffIds, teamId);
+    }
+
+    public List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds){
+        return teamGraphRepository.getAllStaffToAssignActivitiesByTeam(unitId, activityIds);
     }
 }

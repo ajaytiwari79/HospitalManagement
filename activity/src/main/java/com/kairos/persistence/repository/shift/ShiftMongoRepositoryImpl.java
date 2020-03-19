@@ -82,8 +82,16 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return mongoTemplate.find(query, Shift.class);
     }
 
+    @Override
+    public List<Shift> findAllSicknessShiftByEmploymentIdAndActivityIds(Long staffId,Collection<BigInteger> activityIds,Date startDate) {
+        Criteria criteria = where(DELETED).is(false).and("draft").is(false).and(START_DATE).gte(startDate).and("staffId").is(staffId);
+        Query query = new Query(criteria);
+        query.with(Sort.by(Sort.Direction.ASC,"startDate"));
+        return mongoTemplate.find(query, Shift.class);
+    }
+
     public List<ShiftDTO> findAllShiftsBetweenDuration(Long employmentId, Long staffId, Date startDate, Date endDate, Long unitId) {
-        Criteria criteria = where(UNIT_ID).is(unitId).and(EMPLOYMENT_ID).is(employmentId).and(DELETED).is(false).and(DISABLED).is(false).and(STAFF_ID).is(staffId)
+        Criteria criteria = where(UNIT_ID).is(unitId).and(EMPLOYMENT_ID).is(employmentId).and(DELETED).is(false).and(STAFF_ID).is(staffId)
                 .and(START_DATE).gte(startDate).lte(endDate);
         return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class,false);
     }
@@ -92,10 +100,10 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(Set<Long> employmentIds, Date startDate, Date endDate, Set<BigInteger> activityIds) {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
-            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false)
+            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and("shiftType").ne(ShiftType.SICK)
                     .and(START_DATE).lte(endDate).and(END_DATE).gte(startDate);
         } else {
-            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false)
+            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and("shiftType").ne(ShiftType.SICK)
                     .and(START_DATE).gte(startDate).orOperator(Criteria.where(END_DATE).gte(startDate));
         }
         return getShiftWithActivityByCriteria(criteria.and(ACTIVITIES_ACTIVITY_ID).in(activityIds),false,ShiftWithActivityDTO.class);
@@ -173,8 +181,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
 
     public List<ShiftDTO> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate) {
-        Criteria criteria = where(UNIT_ID).is(unitId).and(DELETED).is(false).and(DISABLED).is(false).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate);
-        return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class,false);
+        Criteria criteria = where(UNIT_ID).is(unitId).and(DELETED).is(false).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate);
+        return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
     }
 
     public List<Long> getUnitIdListOfShiftBeforeDate(Date endDate) {
@@ -182,7 +190,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 match(where(DELETED).is(false).and(DISABLED).is(false).and(END_DATE).lte(endDate)),
                 project().and(UNIT_ID).as(UNIT_ID),
                 group(UNIT_ID),
-
                 sort(Sort.Direction.ASC, UNIT_ID));
         AggregationResults<HashMap> result = mongoTemplate.aggregate(aggregation, Shift.class, HashMap.class);
         return (List<Long>) result.getMappedResults().get(0).values();
@@ -200,7 +207,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
 
     public List<ShiftDTO> findAllShiftsBetweenDurationOfUnitAndStaffId(Long staffId, Date startDate, Date endDate, Long unitId) {
-        Criteria criteria = where(UNIT_ID).is(unitId).and(DELETED).is(false).and(DISABLED).is(false).and(STAFF_ID).is(staffId)
+        Criteria criteria = where(UNIT_ID).is(unitId).and(DELETED).is(false).and(STAFF_ID).is(staffId)
                 .and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
         return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class,false);
     }
@@ -222,7 +229,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     public List<ShiftResponseDTO> findAllByIdGroupByDate(List<BigInteger> shiftIds) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(where("_id").in(shiftIds)),
+                match(where("_id").in(shiftIds).and(DISABLED).is(false)),
                 project().and(DateOperators.dateOf(START_DATE).toString("%Y-%m-%d")).as(CURRENT_DATE)
                         .and("$$ROOT").as("shift"),
                 group(CURRENT_DATE).push("shift").as(SHIFTS_LIST),
@@ -237,7 +244,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public void deleteShiftsAfterDate(Long staffId, LocalDateTime employmentEndDate) {
 
         Query query = new Query();
-        query.addCriteria(where(STAFF_ID).is(staffId).and(START_DATE).gt(employmentEndDate));
+        query.addCriteria(where(STAFF_ID).is(staffId).and(START_DATE).gt(employmentEndDate).and(DISABLED).is(false));
         Update update = new Update();
         update.set(DELETED, true);
         mongoTemplate.updateMulti(query, update, Shift.class);
@@ -259,14 +266,14 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     @Override
     public Shift findShiftByShiftActivityId(BigInteger shiftActivityId) {
         Query query = new Query();
-        query.addCriteria(where("activities._id").is(shiftActivityId));
+        query.addCriteria(where("activities._id").is(shiftActivityId).and(DISABLED).is(false));
         return mongoTemplate.findOne(query, Shift.class);
 
     }
 
     @Override
     public List<Shift> findShiftByShiftActivityIdAndBetweenDate(Collection<BigInteger> shiftActivityIds,LocalDate startDate,LocalDate endDate,Long staffId) {
-        Criteria criteria = Criteria.where(DELETED).is(false).orOperator(where(ACTIVITIES_ACTIVITY_ID).in(shiftActivityIds),where("activities.childActivities.activityId").in(shiftActivityIds));
+        Criteria criteria = Criteria.where(DELETED).is(false).orOperator(where(ACTIVITIES_ACTIVITY_ID).in(shiftActivityIds),where("activities.childActivities.activityId").in(shiftActivityIds).and(DISABLED).is(false));
         if(isNotNull(startDate) && isNotNull(endDate)){
             criteria = criteria.and(START_DATE).gte(startDate).lte(endDate);
         }
@@ -297,13 +304,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public void deleteShiftAfterRestorePhase(BigInteger planningPeriodId, BigInteger phaseId) {
-        Query query = new Query(where(PLANNING_PERIOD_ID).is(planningPeriodId).and("phaseId").is(phaseId));
+        Query query = new Query(where(PLANNING_PERIOD_ID).is(planningPeriodId).and("phaseId").is(phaseId).and(DISABLED).is(false));
         mongoTemplate.remove(query, Shift.class);
     }
 
     @Override
     public void deleteShiftBetweenDatesByEmploymentId(Long employmentId,Date startDate,Date endDate,Collection<BigInteger> shiftIds) {
-        Query query = new Query(where(EMPLOYMENT_ID).is(employmentId).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate).and("_id").nin(shiftIds));
+        Query query = new Query(where(EMPLOYMENT_ID).is(employmentId).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate).and("_id").nin(shiftIds).and(DISABLED).is(false));
         Update update = Update.update(DELETED,true);
         mongoTemplate.updateMulti(query,update, Shift.class);
     }
@@ -311,7 +318,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<ShiftWithActivityDTO> findAllShiftsByIds(List<BigInteger> shiftIds ) {
-        return getShiftWithActivityByCriteria(Criteria.where(DELETED).is(false).and("id").in(shiftIds),false,ShiftWithActivityDTO.class);
+        return getShiftWithActivityByCriteria(Criteria.where(DELETED).is(false).and("id").in(shiftIds).and(DISABLED).is(false),false,ShiftWithActivityDTO.class);
     }
 
     public List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(Collection<Long> staffIds, LocalDate startDate, LocalDate endDate){
@@ -324,18 +331,18 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<ShiftWithActivityDTO> findAllDraftShiftsByIds(List<BigInteger> shiftIds,boolean draftShift ) {
-        Criteria criteria = Criteria.where(DELETED).is(false).and("id").in(shiftIds).and(DRAFT_SHIFT).exists(draftShift);
+        Criteria criteria = Criteria.where(DELETED).is(false).and("id").in(shiftIds).and(DRAFT_SHIFT).exists(draftShift).and(DISABLED).is(false);
         return getShiftWithActivityByCriteria(criteria,true,ShiftWithActivityDTO.class);
     }
 
     public List<Shift> findAllShiftsByCurrentPhaseAndPlanningPeriod(BigInteger planningPeriodId, BigInteger phaseId) {
-        Query query = new Query(where(PLANNING_PERIOD_ID).is(planningPeriodId).and("phaseId").is(phaseId));
+        Query query = new Query(where(PLANNING_PERIOD_ID).is(planningPeriodId).and("phaseId").is(phaseId).and(DISABLED).is(false));
         return mongoTemplate.find(query, Shift.class);
     }
 
     @Override
     public List<ShiftWithActivityDTO> findAllShiftBetweenDurationByUnitId(Long unitId, Date startDate, Date endDate) {
-        return getShiftWithActivityByCriteria(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(START_DATE).gte(startDate).lte(endDate),false,ShiftWithActivityDTO.class);
+        return getShiftWithActivityByCriteria(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(DISABLED).is(false).and(START_DATE).gte(startDate).lte(endDate),false,ShiftWithActivityDTO.class);
     }
 
     public static Document shiftWithActivityGroup() {
@@ -382,7 +389,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public void updateRemarkInShiftActivity(BigInteger shiftActivityId, String remark) {
         Update update = new Update().set("activities.$.remarks", remark);
         update.set("updatedAt", DateUtils.getDate());
-        mongoTemplate.findAndModify(new Query(new Criteria("activities.id").is(shiftActivityId)), update, Shift.class);
+        mongoTemplate.findAndModify(new Query(new Criteria("activities.id").is(shiftActivityId).and(DISABLED).is(false)), update, Shift.class);
     }
 
     @Override
@@ -517,7 +524,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId, Long unitId, List<Long> employmentIds, List<ShiftStatus> shiftStatus) {
-        Query query = new Query(where(DELETED).is(false).and(PLANNING_PERIOD_ID).is(planningPeriodId).and(UNIT_ID).is(unitId)
+        Query query = new Query(where(DELETED).is(false).and(PLANNING_PERIOD_ID).is(planningPeriodId).and(UNIT_ID).is(unitId).and(DISABLED).is(false)
                 .and(EMPLOYMENT_ID).in(employmentIds)
                 .and(ACTIVITIES).elemMatch(where("status").nin(shiftStatus)));
         return mongoTemplate.find(query, Shift.class);
@@ -533,7 +540,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public boolean absenceShiftExistsByDate(Long unitId, Date startDate, Date endDate, Long staffId) {
-        Criteria criteria = where(UNIT_ID).is(unitId).and(DELETED).is(false).and(STAFF_ID).is(staffId).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate);
+        Criteria criteria = where(UNIT_ID).is(unitId).and(DELETED).is(false).and(STAFF_ID).is(staffId).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate).and(DISABLED).is(false);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup(ACTIVITIES, ACTIVITIES_ACTIVITY_ID, "_id", ACTIVITY),
@@ -600,7 +607,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     private Map<BigInteger, ActivityDTO> getActivityDTOMap(Set<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(DELETED).is(false).and("_id").in(activityIds)),
+                match(Criteria.where(DELETED).is(false).and("_id").in(activityIds).and(DISABLED).is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", TIME_TYPE)
                 ,project("name","description","countryId","expertises","organizationTypes","organizationSubTypes","regions","levels","employmentTypes","tags","state", UNIT_ID,"parentId","isParentActivity","generalActivityTab","balanceSettingsActivityTab","rulesActivityTab","individualPointsActivityTab","timeCalculationActivityTab","notesActivityTab","communicationActivityTab","bonusActivityTab","skillActivityTab","optaPlannerSettingActivityTab","ctaAndWtaSettingsActivityTab","locationActivityTab","phaseSettingsActivityTab")
                         .and(TIME_TYPE).arrayElementAt(0).as(TIME_TYPE));

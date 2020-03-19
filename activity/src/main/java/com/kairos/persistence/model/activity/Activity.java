@@ -3,6 +3,9 @@ package com.kairos.persistence.model.activity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.KPermissionField;
+import com.kairos.annotations.KPermissionModel;
+import com.kairos.annotations.KPermissionSubModel;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.tabs.*;
@@ -31,9 +34,12 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@KPermissionModel
 public class Activity extends MongoBaseEntity {
 
+    @KPermissionField
     private String name;
+    @KPermissionField
     private String description;
     private Long countryId;
     private List<Long> expertises;
@@ -42,6 +48,7 @@ public class Activity extends MongoBaseEntity {
     private List<Long> regions;
     private List<Long> levels;
     private List<Long> employmentTypes;
+    @KPermissionField
     private List<BigInteger> tags = new ArrayList<>();
     private ActivityStateEnum state = ActivityStateEnum.DRAFT;
 
@@ -50,21 +57,33 @@ public class Activity extends MongoBaseEntity {
     private BigInteger parentId;
     @JsonIgnore
     private boolean isParentActivity = true;
+    @KPermissionSubModel
     private GeneralActivityTab generalActivityTab;
+    @KPermissionSubModel
     private BalanceSettingsActivityTab balanceSettingsActivityTab;
-
+    @KPermissionSubModel
     private IndividualPointsActivityTab individualPointsActivityTab;
 
     private Set<BigInteger> childActivityIds=new HashSet<>();
+    @KPermissionSubModel
     private NotesActivityTab notesActivityTab;
+    @KPermissionSubModel
     private CommunicationActivityTab communicationActivityTab;
+    @KPermissionSubModel
     private BonusActivityTab bonusActivityTab;
+    @KPermissionSubModel
     private RulesActivityTab rulesActivityTab;
+    @KPermissionSubModel
     private TimeCalculationActivityTab timeCalculationActivityTab;
+    @KPermissionSubModel
     private SkillActivityTab skillActivityTab;
+    @KPermissionSubModel
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
+    @KPermissionSubModel
     private OptaPlannerSettingActivityTab optaPlannerSettingActivityTab;
+    @KPermissionSubModel
     private CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab;
+    @KPermissionSubModel
     private LocationActivityTab locationActivityTab;
     private BigInteger countryParentId;
     @JsonIgnore

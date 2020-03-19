@@ -1,6 +1,7 @@
 package com.kairos.service.staff;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
@@ -79,6 +80,7 @@ import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FormatUtil;
+import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -191,7 +193,7 @@ public class StaffRetrievalService {
 
 
     public StaffPersonalDetail getPersonalInfo(long staffId, long unitId) {
-        Staff staff = staffGraphRepository.findById(staffId,2).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_STAFF_IDANDUNITID_NOTFOUND, staffId, unitId)));
+        Staff staff = staffGraphRepository.findById(staffId,2).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_STAFF_IDANDUNITID_NOTFOUND, staffId, unitId)));
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staff.getId()), SectorAndStaffExpertiseQueryResult.class);
         StaffPersonalDetail staffPersonalDetail = ObjectMapperUtils.copyPropertiesByMapper(staff,StaffPersonalDetail.class);
         staffPersonalDetail.setProfilePic((isNotNull(staff.getProfilePic())) ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic() : staff.getProfilePic());
@@ -360,7 +362,6 @@ public class StaffRetrievalService {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
-                                //staffListByRole = staff;
                                 break;
                             } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
@@ -372,7 +373,6 @@ public class StaffRetrievalService {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
-                                // staffListByRole = staff;
                                 break;
                             } else if (AccessGroupRole.STAFF.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;
@@ -757,4 +757,48 @@ public class StaffRetrievalService {
         }
         return staffExperienceInExpertiseDTOList;
     }
+
+    public StaffEmploymentTypeWrapper getStaffListAndLoginUserStaffIdByUnitId(Long unitId) {
+        Organization organization = organizationService.fetchParentOrganization(unitId);
+        Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
+        StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
+        staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
+        staffEmploymentTypeWrapper.setStaffList(staffGraphRepository.findAllStaffBasicDetailsByOrgIdAndUnitId(organization.getId(), unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()));
+        return staffEmploymentTypeWrapper;
+    }
+
+    public List<StaffPersonalDetailQueryResult> getStaffInfoById(long staffId, long unitId) {
+        List<StaffPersonalDetailQueryResult> staffPersonalDetailList = staffGraphRepository.getStaffInfoById(unitId, staffId);
+        if (!Optional.ofNullable(staffPersonalDetailList).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFFANDUNIT_ID_NOTFOUND, staffId, unitId);
+        }
+        return staffPersonalDetailList;
+    }
+
+    public List<StaffPersonalDetailQueryResult> getAllStaffByUnitId(Long unitId, Boolean allStaffRequired) {
+        List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults;
+        if (allStaffRequired) {
+            Organization parentUnit = organizationService.fetchParentOrganization(unitId);
+            // unit is parent so fetching all staff from itself
+            staffPersonalDetailQueryResults = staffGraphRepository.getAllStaffByUnitId(parentUnit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        } else {
+            staffPersonalDetailQueryResults = staffGraphRepository.getAllStaffHavingEmploymentByUnitId(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        }
+        return staffPersonalDetailQueryResults;
+    }
+
+    public Map<String, Object> getUnitManager(long unitId) {
+        Organization organization = organizationService.fetchParentOrganization(unitId);
+        List<Map<String, Object>> unitManagers;
+        unitManagers = staffGraphRepository.getUnitManagers(organization.getId(), unitId);
+        List<Map<String, Object>> unitManagerList = new ArrayList<>();
+        for (Map<String, Object> unitManager : unitManagers) {
+            unitManagerList.add((Map<String, Object>) unitManager.get("data"));
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("unitManager", unitManagerList);
+        map.put("accessGroups", accessGroupRepository.getAccessGroups(unitId));
+        return map;
+    }
+
 }

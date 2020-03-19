@@ -80,8 +80,8 @@ public class ExpertiseUnitService {
             List<Long> expertiseIds = expertises.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
             List<ExpertiseLocationStaffQueryResult> locations = organizationLocationRelationShipGraphRepository.getExpertisesLocationInOrganization(expertiseIds, unitId);
             List<ExpertiseLocationStaffQueryResult> staffs = staffGraphRepository.findAllUnionRepresentativeOfExpertiseInUnit(expertiseIds, organizationService.fetchParentOrganization(unitId).getId());
-            Map<Long, Map<String, Object>> staffMap = staffs.stream().collect(Collectors.toMap(current -> current.getExpertiseId(), v -> v.getStaff()));
-            Map<Long, Location> locationMap = locations.stream().collect(Collectors.toMap(current -> current.getExpertiseId(), v -> v.getLocation()));
+            Map<Long, Map<String, Object>> staffMap = staffs.stream().collect(Collectors.toMap(ExpertiseLocationStaffQueryResult::getExpertiseId, ExpertiseLocationStaffQueryResult::getStaff));
+            Map<Long, Location> locationMap = locations.stream().collect(Collectors.toMap(ExpertiseLocationStaffQueryResult::getExpertiseId, ExpertiseLocationStaffQueryResult::getLocation));
             expertises.forEach(current -> {
                 current.setUnionRepresentative(staffMap.get(current.getId()));
                 current.setUnionLocation(locationMap.get(current.getId()));
@@ -113,6 +113,13 @@ public class ExpertiseUnitService {
 
     public List<ExpertiseQueryResult> findAllExpertiseWithUnits() {
         return expertiseGraphRepository.findAllExpertiseWithUnitIds();
+    }
+
+    public List<Long> getExpertiseIdsByUnit(Long unitId){
+        List<Long> allUnitIds = organizationBaseRepository.fetchAllUnitIds(unitId);
+        OrganizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(allUnitIds);
+        return expertiseGraphRepository.getExpertiseIdsByServices(servicesAndLevel.getServicesId());
+
     }
 
 

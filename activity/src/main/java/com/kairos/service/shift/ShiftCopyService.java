@@ -4,6 +4,7 @@ import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
@@ -169,7 +170,13 @@ public class ShiftCopyService extends MongoBaseService {
                 Date endDate = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getEndDate()));
                 if ((shiftCreationStartDate.equals(staffEmployment.getStartDate()) || shiftCreationStartDate.isAfter(staffEmployment.getStartDate())) &&
                         (staffEmployment.getEndDate() == null || shiftCreationStartDate.equals(staffEmployment.getEndDate()) || shiftCreationStartDate.isBefore(staffEmployment.getEndDate()))) {
-                    ShiftWithActivityDTO shiftWithActivityDTO = shiftService.convertIntoShiftWithActivity(sourceShift, activityMap,shiftCreationStartDate);
+                    ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift,ShiftDTO.class);
+                    shiftDTO.getActivities().forEach(act->{
+                        act.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(act.getStartDate())));
+                        act.setEndDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(act.getEndDate())));
+                    });
+
+                    ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityMap,sourceShift);
                     shiftWithActivityDTO.setEndDate(endDate);
                     shiftWithActivityDTO.setStartDate(startDate);
                     shiftWithActivityDTO.setStaffId(staffEmployment.getStaff().getId());
@@ -184,7 +191,7 @@ public class ShiftCopyService extends MongoBaseService {
                 shiftResponse = addShift(validationMessages, sourceShift, staffEmployment, startDate, endDate, newShifts, activityMap, dataWrapper, activityConfigurations, planningPeriod);
                 if (shiftResponse.isSuccess()) {
                     successfullyCopiedShifts.add(shiftResponse);
-                    newCreatedShiftWithActivityDTOs.add(shiftService.convertIntoShiftWithActivity(newShifts.get(counter), activityMap,shiftCreationStartDate));
+                    newCreatedShiftWithActivityDTOs.add(convertIntoShiftWithActivity(newShifts.get(counter), activityMap,shiftCreationStartDate));
                 } else {
                     errorInCopyingShifts.add(shiftResponse);
                 }
@@ -204,6 +211,17 @@ public class ShiftCopyService extends MongoBaseService {
 
         }
         return statusMap;
+    }
+
+    public ShiftWithActivityDTO convertIntoShiftWithActivity(Shift sourceShift, Map<BigInteger, ActivityWrapper> activityMap,LocalDate shiftCreationStartDate) {
+        ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift, ShiftWithActivityDTO.class);
+        shiftWithActivityDTO.getActivities().forEach(s -> {
+            s.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(s.getStartDate())));
+            s.setEndDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(s.getEndDate())));
+            ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activityMap.get(s.getActivityId()).getActivity(), ActivityDTO.class);
+            s.setActivity(activityDTO);
+        });
+        return shiftWithActivityDTO;
     }
 
     private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffEmploymentDetails staffEmployment, Date startDate, Date endDate, List<Shift> newShifts,  Map<BigInteger, ActivityWrapper> activityMap, StaffEmploymentUnitDataWrapper dataWrapper, List<ActivityConfiguration> activityConfigurations, PlanningPeriodDTO planningPeriod) {

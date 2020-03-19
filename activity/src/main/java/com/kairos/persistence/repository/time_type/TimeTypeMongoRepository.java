@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -53,7 +54,7 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     boolean timeTypeAlreadyExistsByLabelAndCountryId(BigInteger timeTypeId,String timeTypeName, Long countryId);
 
     @Query("{id:{$in:?0},deleted : false}")
-    List<TimeType> findAllByTimeTypeIds(Set<BigInteger> id);
+    List<TimeType> findAllByTimeTypeIds(Collection<BigInteger> id);
 
     @Query("{upperLevelTimeTypeId:{ $in:?0},deleted : false}")
     List<TimeType> findAllChildTimeTypeByParentId(List<BigInteger> timeTypeIds);
@@ -64,4 +65,8 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     boolean existsByIdAndCountryIdAndDeletedFalse(BigInteger id, Long countryId);
 
     boolean existsByIdAndPartOfTeam(BigInteger id, boolean partOfTeam);
+
+
+    @Query(value = "{deleted:false, sicknessSettingValid:true}")
+    List<TimeType> findAllSickTimeTypes();
 }

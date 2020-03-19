@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.user.auth;
 
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
-import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;

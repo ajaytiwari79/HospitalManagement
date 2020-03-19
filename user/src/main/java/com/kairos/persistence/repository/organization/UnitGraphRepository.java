@@ -464,11 +464,11 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
 
     @Query("MATCH (org{isEnable:true}) WHERE org.desiredUrl=~{0}\n" +
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
-    Boolean checkOrgExistWithUrl(String desiredUrl);
+    boolean checkOrgExistWithUrl(String desiredUrl);
 
     @Query("MATCH (org{isEnable:true}) WHERE org.name=~{0}\n" +
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
-    Boolean checkOrgExistWithName(String name);
+    boolean checkOrgExistWithName(String name);
 
     // This 8 is hardCoded because we only need to get the last Integer value of the organization's company Id
     // OOD-KAI-01    OOD-KAI-    >>  8

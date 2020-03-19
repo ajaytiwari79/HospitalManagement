@@ -247,6 +247,7 @@ public class TimeBankService{
         Date endDate = isNotNull(endDateTime) ? getEndOfDay(endDateTime) : null;
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(null,staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate,null);
         List<DailyTimeBankEntry> dailyTimeBankEntries = new ArrayList<>();
+        staffAdditionalInfoDTO.getEmployment().setFunctionId(null);
         if(isCollectionNotEmpty(shiftWithActivityDTOS)) {
             shiftWithActivityDTOS = shiftWithActivityDTOS.stream().sorted(Comparator.comparing(ShiftWithActivityDTO::getStartDate)).collect(Collectors.toList());
             if(isNull(endDate)) {
@@ -319,8 +320,8 @@ public class TimeBankService{
         Date endDate = asDate(ZonedDateTime.now().withYear(year).with(TemporalAdjusters.lastDayOfYear()).truncatedTo(ChronoUnit.DAYS).with(LocalTime.MAX));
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentId, startDate, endDate);
         TimeBankDTO timeBankDTO = timeBankCalculationService.getTimeBankOverview(unitId, employmentId, startDate, endDate, dailyTimeBankEntries, employmentWithCtaDetailsDTO);
-            Long actualTimebankMinutes = getAccumulatedTimebankAndDelta(employmentId, unitId, true);
-            timeBankDTO.setActualTimebankMinutes(actualTimebankMinutes);
+        Long actualTimebankMinutes = getAccumulatedTimebankAndDelta(employmentId, unitId, true);
+        timeBankDTO.setActualTimebankMinutes(actualTimebankMinutes);
         PlanningPeriodDTO planningPeriodDTO = planningPeriodService.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
         timeBankDTO.setPlanningPeriodStartDate(planningPeriodDTO.getStartDate());
         timeBankDTO.setPlanningPeriodEndDate(planningPeriodDTO.getEndDate());

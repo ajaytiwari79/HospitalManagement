@@ -4,8 +4,6 @@ import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ClientTemporaryAddress;
 import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.user.region.Municipality;
-import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
@@ -19,11 +17,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_CLIENT_ADDRESSTYPE_NOTFOUND;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
@@ -89,47 +86,6 @@ public class AddressVerificationService {
     }
 
 
-    public Map<String, Object> verifyAddressClientException(AddressDTO contactAddress, long unitId) {
-        logger.info("Finding zipcode with value:" + contactAddress.getZipCode().getZipCode());
-        Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        ZipCode zipCode = zipCodeGraphRepository.findByZipCode(contactAddress.getZipCode().getZipCode());
-        String municipalityName;
-        if(contactAddress.getMunicipality().getId() != null){
-            Municipality municipality = municipalityGraphRepository.findOne(contactAddress.getMunicipality().getId());
-            if(municipality == null){
-                exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
-
-            }
-            municipalityName = municipality.getName();
-        } else {
-            municipalityName = contactAddress.getMunicipality().getName();
-        }
-
-        if (zipCode == null) {
-            exceptionService.zipCodeNotFoundException(MESSAGE_ZIPCODE_NOTFOUND);
-
-        }
-        logger.info("Verifying with Information \n house: " +
-                contactAddress.getHouseNumber() + "\n City:" +
-                contactAddress.getMunicipality().getName() +
-                "\n ZipCode: " + zipCode.getName() +
-                "\n Street: " + contactAddress.getStreet());
-
-        Map<String, Object> addressToVerify = new HashMap<>();
-        addressToVerify.put("country", "DK");
-        addressToVerify.put("zip", zipCode.getZipCode());
-        addressToVerify.put("city", municipalityName);
-        addressToVerify.put("street", contactAddress.getStreet());
-        addressToVerify.put("hnr", contactAddress.getHouseNumber());
-        /*Map<String, Object> geoCodeResponse = scheduler.getGeoCode(addressToVerify, flsCredentials);
-
-        if ((boolean) geoCodeResponse.get("isAddressVerified")) {
-            logger.debug("GeoCode Response from TOM TOM : " + geoCodeResponse);
-            return geoCodeResponse;
-        }*/
-        logger.debug("Address not verified with TOMTOM");
-        return null;
-    }
 
     /*
     By Yasir

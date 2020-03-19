@@ -183,5 +183,4 @@
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
                     teamService.isActivityAssignedToTeam(activityId));
         }
-
     }

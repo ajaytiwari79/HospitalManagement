@@ -22,7 +22,7 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class EmploymentServiceUnitTest {
     @InjectMocks
-    EmploymentService employmentService;
+    EmploymentDetailsValidatorService employmentDetailsValidatorService;
     @Mock
     ExceptionService exceptionService;
     static List<Employment> employments = new ArrayList<Employment>();
@@ -37,45 +37,45 @@ public class EmploymentServiceUnitTest {
     }
 
     @Test
-    public void validateUnitEmploymentPositionWithExpertiseWithoutEndDate() throws Exception {
+    public void validateUnitEmploymentPositionWithExpertiseWithoutEndDate() {
         employmentDTO = new EmploymentDTO( 733L, LocalDate.of(2018,12,02), null, 100, 10.2f, new BigDecimal(10.2f), 10.2d, null);
-        boolean result = employmentService.validateEmploymentWithExpertise(employments, employmentDTO);
+        boolean result = employmentDetailsValidatorService.validateEmploymentWithExpertise(employments, employmentDTO);
         Assert.assertTrue(result);
     }
 
     @Test
-    public void validateUnitEmploymentPositionWithExpertiseWithEndDates() throws Exception {
+    public void validateUnitEmploymentPositionWithExpertiseWithEndDates() {
         employmentDTO = new EmploymentDTO(733L,LocalDate.of(2018,12,02), LocalDate.of(2019,06,02), 100, 10.2f, new BigDecimal(10.2f), 10.2d, null);
         employments.get(1).setEndDate(LocalDate.now().plusDays(100));
-        boolean result= employmentService.validateEmploymentWithExpertise(employments, employmentDTO);
+        boolean result= employmentDetailsValidatorService.validateEmploymentWithExpertise(employments, employmentDTO);
         Assert.assertTrue(result);
     }
 
     @Test
-    public void validateUnitEmploymentPositionWithExpertiseWithEndDate() throws Exception {
-        employmentService.validateEmploymentWithExpertise(employments, employmentDTO);
+    public void validateUnitEmploymentPositionWithExpertiseWithEndDate() {
+        employmentDetailsValidatorService.validateEmploymentWithExpertise(employments, employmentDTO);
         Employment uep5 = new Employment(LocalDate.now(), LocalDate.now().plusDays(5));
         employments.add(uep5);
-        boolean result= employmentService.validateEmploymentWithExpertise(employments, employmentDTO);
+        boolean result= employmentDetailsValidatorService.validateEmploymentWithExpertise(employments, employmentDTO);
         Assert.assertTrue(result);
     }
 
     @Test
-    public void validateUnitEmploymentPositionWithExpertiseOverLapCase() throws Exception {
+    public void validateUnitEmploymentPositionWithExpertiseOverLapCase() {
         employments.clear();
         Employment uep5 = new Employment(LocalDate.now(), LocalDate.now().plusDays(5));
         employments.add(uep5);
-        boolean result = employmentService.validateEmploymentWithExpertise(employments, employmentDTO);
+        boolean result = employmentDetailsValidatorService.validateEmploymentWithExpertise(employments, employmentDTO);
         Assert.assertTrue(result);
     }
 
 
     @Test
-    public void validateUnitEmploymentPositionWithExpertiseWithoutOverLap() throws Exception {
+    public void validateUnitEmploymentPositionWithExpertiseWithoutOverLap() {
         employments.clear();
         Employment uep5 = new Employment(LocalDate.now(), LocalDate.now().plusDays(5));
         employments.add(uep5);
-        boolean result =  employmentService.validateEmploymentWithExpertise(employments, employmentDTO);
+        boolean result =  employmentDetailsValidatorService.validateEmploymentWithExpertise(employments, employmentDTO);
         Assert.assertTrue(result);
     }
 

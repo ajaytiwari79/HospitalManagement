@@ -2,7 +2,6 @@ package com.kairos.service.scheduler;
 
 
 import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.service.employment.EmploymentJobService;
 import com.kairos.service.staff.PositionService;

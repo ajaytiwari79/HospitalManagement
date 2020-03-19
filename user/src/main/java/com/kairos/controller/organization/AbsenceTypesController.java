@@ -37,10 +37,10 @@ public class AbsenceTypesController {
     @ApiOperation(value = "Save Absence Types")
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> createAbsenceTypes(@RequestBody Map<String, Object> data){
-        String ATVTID = (String) data.get("ATVTID");
+        String atvtid = (String) data.get("atvtid");
         String organisationId = (String) data.get("organisationId");
         String name = (String) data.get("name");
-       AbsenceTypes absenceTypes = absenceTypesService.createAbsenceTypes(Long.parseLong(ATVTID), name, Long.parseLong(organisationId));
+       AbsenceTypes absenceTypes = absenceTypesService.createAbsenceTypes(Long.parseLong(atvtid), name, Long.parseLong(organisationId));
        // return RequestHandler.generateResponse(HttpStatus.OK,true, "success");
         return  ResponseHandler.generateResponse(HttpStatus.OK,true, absenceTypes.getATVTID());
 

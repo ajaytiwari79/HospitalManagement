@@ -19,6 +19,7 @@ import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.user.ChatStatus;
+import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
@@ -145,6 +146,7 @@ public class UserService {
      * @return User
      */
     public User createUser(User user) {
+        user.setUserType(UserType.USER_ACCOUNT);
         return userGraphRepository.save(user);
     }
 
@@ -469,30 +471,7 @@ public class UserService {
             permissionData.setHubPermissions(unitPermissionMap);
 
         } else {
-            List<UserPermissionQueryResult> unitWisePermissions;
-            Long countryId = UserContext.getUserDetails().getCountryId();
-            List<DayType> dayTypes = dayTypeService.getCurrentApplicableDayType(countryId);
-            Set<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
-            boolean checkDayType = true;
-            List<AccessGroup> accessGroups = accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
-            for (AccessGroup currentAccessGroup : accessGroups) {
-                if (!currentAccessGroup.isAllowedDayTypes()) {
-                    checkDayType = false;
-                    break;
-                }
-            }
-            if (checkDayType) {
-                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds, organizationId);
-            } else {
-                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, organizationId);
-            }
-            HashMap<Long, Object> unitPermission = new HashMap<>();
-
-            for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
-                unitPermission.put(userPermissionQueryResult.getUnitId(),
-                        prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), userPermissionQueryResult.isParentOrganization()));
-            }
-            permissionData.setOrganizationPermissions(unitPermission);
+            loadUnitPermissions(organizationId, currentUserId, permissionData);
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
         permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
@@ -500,7 +479,34 @@ public class UserService {
         Organization parent = organizationService.fetchParentOrganization(organizationId);
         permissionData.setStaffId(staffGraphRepository.getStaffIdByUserId(currentUserId,parent.getId()));
         updateChatStatus(ChatStatus.ONLINE);
-         return permissionData;
+        return permissionData;
+    }
+
+    private void loadUnitPermissions(Long organizationId, long currentUserId, UnitWiseStaffPermissionsDTO permissionData) {
+        List<UserPermissionQueryResult> unitWisePermissions;
+        Long countryId = UserContext.getUserDetails().getCountryId();
+        List<DayType> dayTypes = dayTypeService.getCurrentApplicableDayType(countryId);
+        Set<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
+        boolean checkDayType = true;
+        List<AccessGroup> accessGroups = accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
+        for (AccessGroup currentAccessGroup : accessGroups) {
+            if (!currentAccessGroup.isAllowedDayTypes()) {
+                checkDayType = false;
+                break;
+            }
+        }
+        if (checkDayType) {
+            unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds, organizationId);
+        } else {
+            unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, organizationId);
+        }
+        HashMap<Long, Object> unitPermission = new HashMap<>();
+
+        for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
+            unitPermission.put(userPermissionQueryResult.getUnitId(),
+                    prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), userPermissionQueryResult.isParentOrganization()));
+        }
+        permissionData.setOrganizationPermissions(unitPermission);
     }
 
 

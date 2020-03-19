@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Objects;
 

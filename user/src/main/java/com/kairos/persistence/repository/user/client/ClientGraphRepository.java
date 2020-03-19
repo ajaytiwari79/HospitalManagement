@@ -324,10 +324,6 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
             "detach delete clientContactPerson")
     void deleteContactPersonForService(Long organizationId, Long clientId);
 
-    @Query("Match (n:ClientContactPerson)-[:CLIENT_CONTACT_PERSON_STAFF]->(s:Staff) where id(s)={0}\n" +
-            "Match (n)<-[:CLIENT_CONTACT_PERSON_RELATION_TYPE]-(client:Client) return id(client) as id,client.firstName as firstName,client.lastName as lastName")
-    List<ClientMinimumDTO> getCitizenListForThisContactPerson(Long staffId);
-
     // TO check if home address exists for client
     @Query("Match  (c:Client) WHERE id(c) = {0}  RETURN EXISTS((c)-[:" + HAS_HOME_ADDRESS + "]->(:ContactAddress))")
     boolean isHomeAddressExists(long clientId);

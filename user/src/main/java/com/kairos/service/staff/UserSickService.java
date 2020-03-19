@@ -28,8 +28,8 @@ public class UserSickService {
     @Inject
     private SickConfigurationService sickConfigurationService;
 
-    public List<StaffResultDTO> getStaffAndUnitSickSettings(Long UserId, String sickSettingsRequired) {
-        List<StaffInformationQueryResult> staffUnitWrappers = staffGraphRepository.getAllStaffsAndUnitDetailsByUserId(UserId);
+    public List<StaffResultDTO> getStaffAndUnitSickSettings(Long userId, String sickSettingsRequired) {
+        List<StaffInformationQueryResult> staffUnitWrappers = staffGraphRepository.getAllStaffsAndUnitDetailsByUserId(userId);
         List<StaffResultDTO> staffResults = new ArrayList<>();
         if (Optional.ofNullable(staffUnitWrappers).isPresent()) {
             staffResults = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffUnitWrappers, StaffResultDTO.class);

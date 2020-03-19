@@ -53,7 +53,7 @@ public class IntegrationService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public TimeCare saveTimeCareIntegrationData(Long unitId, TimeCare timeCare){
-        logger.info("timecare------> "+timeCare.getIntegrationId());
+        logger.info("timecare------> {}",timeCare.getIntegrationId());
             TimeCare timeCare1 = timeCareGraphRepository.findByOrganizationId(unitId);
             if(timeCare1 == null) timeCare1 = new TimeCare();
             timeCare1.setIntegrationId(timeCare.getIntegrationId());
@@ -76,9 +76,8 @@ public class IntegrationService {
     }
 
     public Twillio saveTwillioIntegrationData (Long unitId, Twillio twillio){
-        logger.info("twillio----account--> "+twillio.getAccountId());
+        logger.info("twillio----account--> {}",twillio.getAccountId());
         Twillio twillio1 = twillioGraphRepository.findByOrganizationId(unitId);
-        if (twillio1 == null) twillio1 = new Twillio();
         twillio1 = Twillio.copyProperties(twillio,Twillio.getInstance());
         twillio1.setOrganizationId(unitId);
         twillioGraphRepository.save(twillio1);
