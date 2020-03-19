@@ -213,7 +213,6 @@ public class ShiftService extends MongoBaseService {
 
     private List<ShiftWithViolatedInfoDTO> validateAndCreateShift(ShiftDTO shiftDTO, ShiftActionType shiftActionType, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
         if ((CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
             shiftDTO.setStartDate(asDate(shiftDTO.getShiftDate()));
             boolean shiftOverlappedWithNonWorkingType = shiftValidatorService.validateStaffDetailsAndShiftOverlapping(staffAdditionalInfoDTO, shiftDTO, activityWrapper, false);
@@ -221,15 +220,14 @@ public class ShiftService extends MongoBaseService {
         } else {
             boolean shiftOverlappedWithNonWorkingType = shiftValidatorService.validateStaffDetailsAndShiftOverlapping(staffAdditionalInfoDTO, shiftDTO, activityWrapper, false);
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate(), null);
-            shiftWithViolatedInfoDTO = saveShift(staffAdditionalInfoDTO, shiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
+            ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = saveShift(staffAdditionalInfoDTO, shiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
+            addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
+            shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
         }
-
-        addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
-        shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
         return shiftWithViolatedInfoDTOS;
     }
 
-    private void addReasonCode(List<ShiftDTO> shiftDTOS, List<ReasonCodeDTO> reasonCodes) {
+    public void addReasonCode(List<ShiftDTO> shiftDTOS, List<ReasonCodeDTO> reasonCodes) {
         Map<Long, ReasonCodeDTO> reasonCodeDTOMap = reasonCodes.stream().collect(Collectors.toMap(ReasonCodeDTO::getId, v -> v));
         for (ShiftDTO shift : shiftDTOS) {
             Set<BigInteger> multipleActivityCount = new HashSet<>();
