@@ -108,6 +108,12 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return getShiftWithActivityByCriteria(criteria,false,Shift.class,false);
     }
 
+    public StaffShiftDetails getAllShiftsForOneStaffWithEmploymentsAndBetweenDuration(Set<Long> employmentIds, Date startDate, Date endDate){
+        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false)
+                .and(START_DATE).lte(endDate).and(END_DATE).gte(startDate);
+        return getShiftForOneStaffWithByCriteria(criteria,false,Shift.class,StaffShiftDetails.class);
+    }
+
     @Override
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(BigInteger shiftId,Long employmentId, Date startDate, Date endDate,Boolean draftShift) {
         return findAllShiftsBetweenDurationByEmploymentIds(shiftId,newArrayList(employmentId),startDate,endDate,draftShift);
@@ -555,7 +561,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return new ArrayList<>(shiftWithActivityDTOS);
     }
 
-    //fixme this method is a  duplicate of below method
+    //fixme this method is a  duplicate of above method
     private List<StaffShiftDetails> getShiftWithActivityByCriteria(Criteria criteria, boolean replaceDraftShift, Class classType, boolean addActivityDetails){
         List<AggregationOperation> aggregationOperations = getShiftWithActivityAggregationOperations(criteria, replaceDraftShift, new String[]{});
             GroupOperation groupOperation = group("staffId").addToSet("$$ROOT").as("shifts");
@@ -564,15 +570,23 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return shiftWithActivityDTOS;
     }
 
+    private StaffShiftDetails getShiftForOneStaffWithByCriteria(Criteria criteria, boolean replaceDraftShift, Class inputType,Class outputMappingType){
+        List<AggregationOperation> aggregationOperations = getShiftWithActivityAggregationOperations(criteria, replaceDraftShift, new String[]{});
+        GroupOperation groupOperation = group("staffId").addToSet("$$ROOT").as("shifts");
+        aggregationOperations.add(groupOperation);
+        List<StaffShiftDetails> shiftWithActivityDTOS = mongoTemplate.aggregate(Aggregation.newAggregation(aggregationOperations),inputType ,outputMappingType).getMappedResults();
+        return shiftWithActivityDTOS.get(0);
+    }
 
-    private <T extends ShiftDTO> List<T> getShiftWithActivityByCriteria(Criteria criteria,boolean replaceDraftShift,Class classType, boolean addActivityDetails,String... shiftProjection){
+
+   /* private <T extends ShiftDTO> List<T> getShiftWithActivityByCriteria(Criteria criteria,boolean replaceDraftShift,Class classType, boolean addActivityDetails,String... shiftProjection){
         List<AggregationOperation> aggregationOperations = getShiftWithActivityAggregationOperations(criteria, replaceDraftShift, shiftProjection);
         List<T> shiftWithActivityDTOS = mongoTemplate.aggregate(Aggregation.newAggregation(aggregationOperations),Shift.class ,classType).getMappedResults();
         if(addActivityDetails) {
             updateActivityInShift(shiftWithActivityDTOS);
         }
         return new ArrayList<>(shiftWithActivityDTOS);
-    }
+    }*/
 
     private <T extends ShiftDTO> void updateActivityInShift(List<T> shiftWithActivityDTOS) {
         Set<BigInteger> activityIds = new HashSet<>();

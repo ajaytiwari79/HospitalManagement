@@ -1,6 +1,8 @@
 package com.kairos.controller.organization;
 
 import com.kairos.dto.activity.shift.ShiftSearchDTO;
+import com.kairos.dto.user_context.CurrentUserDetails;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.service.organization.ShiftPlanningService;
 import com.kairos.wrapper.shift.StaffShiftDetails;
 import io.swagger.annotations.Api;
@@ -19,8 +21,24 @@ public class ShiftPlanningController {
     @Inject
     private ShiftPlanningService shiftPlanningService;
 
-    @PostMapping(value = "/search/shifts")
-    public List<StaffShiftDetails> shiftsAndPlanningSettings(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO){
-       return shiftPlanningService.getShiftPlanningDetailsForUnit(unitId,searchDTO);
+    @PostMapping(value = "/search/shifts/staff/{staffId}")
+    public StaffShiftDetails getShiftPlanningDetailsForOneStaff(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO){
+        CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
+        Long loggedInUserId = currentUserDetails.getId();
+        searchDTO.setLoggedInUserId(loggedInUserId);
+        return shiftPlanningService.getShiftPlanningDetailsForOneStaff(unitId,searchDTO);
     }
+
+    @PostMapping(value = "/search/shifts")
+    public List<StaffShiftDetails> shiftsAndPlanningSettingsForAllStaff(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO,@RequestParam String selectionType){
+        CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
+        Long loggedInUserId = currentUserDetails.getId();
+        searchDTO.setLoggedInUserId(loggedInUserId);
+        if(selectionType.equals("individual")){
+            return shiftPlanningService.getUnitPlanningAndShiftForSelectedStaff(unitId,searchDTO);
+        }else {
+            return shiftPlanningService.getShiftPlanningDetailsForUnit(unitId, searchDTO);
+        }
+    }
+
 }

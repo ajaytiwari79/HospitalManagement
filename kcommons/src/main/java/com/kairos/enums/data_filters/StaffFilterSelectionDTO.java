@@ -22,4 +22,8 @@ public class StaffFilterSelectionDTO<T> {
         this.name = name;
         this.value = value;
     }
+
+    public String toString(){
+        return this.name.value + " and value "+this.getValue();
+    }
 }

@@ -29,6 +29,8 @@ public interface CustomShiftMongoRepository {
 
     List<StaffShiftDetails> findAllShiftsByEmploymentsAndBetweenDuration(Set<Long> employmentIds, Date startDate, Date endDate );
 
+    StaffShiftDetails getAllShiftsForOneStaffWithEmploymentsAndBetweenDuration(Set<Long> employmentIds, Date startDate, Date endDate);
+
     List<ShiftDTO> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate);
 
     List<Long> getUnitIdListOfShiftBeforeDate(Date date);

@@ -16,6 +16,7 @@ import java.util.List;
 public class StaffEmploymentWithTag {
 
     private Long id;
+    private Long userId;
     private String firstName;
     private String lastName;
     private List<Employment> employments;

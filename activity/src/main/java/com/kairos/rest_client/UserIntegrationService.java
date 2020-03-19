@@ -57,6 +57,8 @@ import com.kairos.wrapper.shift.StaffShiftDetails;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -82,6 +84,7 @@ import static com.kairos.constants.ApiConstants.*;
 @Transactional
 public class UserIntegrationService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserIntegrationService.class);
     @Inject
     private GenericRestClient genericRestClient;
     @Inject
@@ -924,10 +927,9 @@ public class UserIntegrationService {
 //        return genericRestClient.publishRequest(employmentIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_total_sum_of_paylevel", queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
 //    }
     public List<StaffShiftDetails> getAllPlanningStaffForUnit(Long unitId, List<StaffFilterSelectionDTO> filterSelectionDTOS){
-//       StaffShiftDetails[] staffShiftDetails = restTemplate.getForObject("http://localdev.kairosplanning.com/kairos/user/api/v1/unit/1172/staff/get_all_planning_staff?moduleId=12",StaffShiftDetails[].class);
+        LOGGER.debug("filter selections being sent {}",filterSelectionDTOS);
         return genericRestClient.publishRequest(filterSelectionDTOS, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/staff/get_all_planning_staff", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffShiftDetails>>>() {
         });
-//        return Arrays.asList(staffShiftDetails);
     }
 
 

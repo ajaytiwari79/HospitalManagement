@@ -23,8 +23,13 @@ public class StaffShiftDetails implements Serializable {
     private Long id;
     private String firstName;
     private String lastName;
+    private Long userId;
     private List<EmploymentDTO> employments;
     private List<Tag> tags;
     private List<ShiftWithActivityDTO> shifts;
+
+    public String toString(){
+        return this.firstName + this.getUserId();
+    }
 
 }

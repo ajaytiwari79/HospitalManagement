@@ -12,7 +12,10 @@ import java.util.List;
 @Getter
 @Setter
 public class ShiftSearchDTO {
+    private Long loggedInUserId;
     private String searchText;
+    private Long selectedStaffId;
+    private boolean multiStaff;
     private List<StaffFilterSelectionDTO> staffFilters;
     private List<FilterSelectionDTO> filtersData;
 }
