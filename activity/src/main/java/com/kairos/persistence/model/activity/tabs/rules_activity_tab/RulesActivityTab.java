@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class RulesActivityTab implements Serializable {
+public class RulesActivityTab  {
 
 
     private boolean eligibleForFinalSchedule;

@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
-public class NotesActivityTab implements Serializable{
+public class NotesActivityTab {
     private String content;
     private String originalDocumentName;
     private String modifiedDocumentName;

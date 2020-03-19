@@ -91,16 +91,6 @@ public class OrganizationHostingTypeService {
     }
 
 
-    public Boolean deleteHostingType(Long unitId, BigInteger hostingTypeId) {
-
-      /*  List<AssetBasicResponseDTO> assetsLinkedWithHostingType = assetMongoRepository.findAllAssetLinkedWithHostingType(unitId, hostingTypeId);
-        if (CollectionUtils.isNotEmpty(assetsLinkedWithHostingType)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Type", new StringBuilder(assetsLinkedWithHostingType.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
-        }
-        hostingTypeMongoRepository.safeDeleteById(hostingTypeId);*/
-        return true;
-    }
-
 
     /**
      * @param

@@ -20,7 +20,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GeneralActivityTab implements Serializable {
+public class GeneralActivityTab  {
 
     private String name;
     private String code;

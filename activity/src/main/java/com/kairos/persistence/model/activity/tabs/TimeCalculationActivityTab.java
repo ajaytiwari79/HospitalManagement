@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TimeCalculationActivityTab implements Serializable {
+public class TimeCalculationActivityTab  {
 
     private String methodForCalculatingTime;
     private TimeCalaculationType fullDayCalculationType;

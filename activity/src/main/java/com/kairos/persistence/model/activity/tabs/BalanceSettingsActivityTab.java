@@ -14,7 +14,7 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BalanceSettingsActivityTab implements Serializable{
+public class BalanceSettingsActivityTab{
 
 
     private Integer addTimeTo;

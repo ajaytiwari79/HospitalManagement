@@ -20,7 +20,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ResourceWrapper implements Serializable {
+public class ResourceWrapper {
     private Long id;
     private String registrationNumber;
     private String number;

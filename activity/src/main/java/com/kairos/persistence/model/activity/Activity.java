@@ -31,7 +31,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Activity extends MongoBaseEntity implements Serializable {
+public class Activity extends MongoBaseEntity {
 
     private String name;
     private String description;
