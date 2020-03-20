@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-class User implements Serializable{
+class User{
     private Long id;
 
     private String cprNumber;

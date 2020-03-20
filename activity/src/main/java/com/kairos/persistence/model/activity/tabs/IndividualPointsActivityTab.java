@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IndividualPointsActivityTab implements Serializable{
+public class IndividualPointsActivityTab {
 
     //method for calculating individual points
     private String individualPointsCalculationMethod;

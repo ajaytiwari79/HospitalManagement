@@ -9,8 +9,6 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.attendance.AttendanceTimeSlotDTO;
 import com.kairos.dto.activity.attendance.TimeAndAttendanceDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
-import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.tags.TagDTO;
@@ -208,13 +206,11 @@ public class ShiftService extends MongoBaseService {
         } else {
             shiftWithViolatedInfoDTOS = validateAndCreateShift(shiftDTO, shiftActionType, staffAdditionalInfoDTO, activityWrapper);
         }
-        getshiftWithViolatedInfoDTOForSaveAsDraftActionMode(shiftWithViolatedInfoDTOS,shiftActionType,false);
         return shiftWithViolatedInfoDTOS;
     }
 
     private List<ShiftWithViolatedInfoDTO> validateAndCreateShift(ShiftDTO shiftDTO, ShiftActionType shiftActionType, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
         if ((CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
             shiftDTO.setStartDate(asDate(shiftDTO.getShiftDate()));
             boolean shiftOverlappedWithNonWorkingType = shiftValidatorService.validateStaffDetailsAndShiftOverlapping(staffAdditionalInfoDTO, shiftDTO, activityWrapper, false);
@@ -222,16 +218,14 @@ public class ShiftService extends MongoBaseService {
         } else {
             boolean shiftOverlappedWithNonWorkingType = shiftValidatorService.validateStaffDetailsAndShiftOverlapping(staffAdditionalInfoDTO, shiftDTO, activityWrapper, false);
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate(), null);
-            shiftWithViolatedInfoDTO = saveShift(staffAdditionalInfoDTO, shiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
-        }
-        if(isNotNull(shiftWithViolatedInfoDTO)) {
+            ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = saveShift(staffAdditionalInfoDTO, shiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
             addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
+            shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
         }
-        shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
         return shiftWithViolatedInfoDTOS;
     }
 
-    private void addReasonCode(List<ShiftDTO> shiftDTOS, List<ReasonCodeDTO> reasonCodes) {
+    public void addReasonCode(List<ShiftDTO> shiftDTOS, List<ReasonCodeDTO> reasonCodes) {
         Map<Long, ReasonCodeDTO> reasonCodeDTOMap = reasonCodes.stream().collect(Collectors.toMap(ReasonCodeDTO::getId, v -> v));
         for (ShiftDTO shift : shiftDTOS) {
             Set<BigInteger> multipleActivityCount = new HashSet<>();
@@ -264,8 +258,10 @@ public class ShiftService extends MongoBaseService {
         List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(shiftDTO.getId() != null, mainShift, activityWrapperMap, staffAdditionalInfoDTO, wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets(), mainShift);
         mainShift.setBreakActivities(breakActivities);
 
+
         activityConfigurationService.addPlannedTimeInShift(mainShift, activityWrapperMap, staffAdditionalInfoDTO, false);
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(mainShift, ShiftDTO.class);
+        shiftDTO.setShiftType(updateShiftType(activityWrapperMap,mainShift));
         ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityWrapperMap, null);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false);
         if ((PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
@@ -301,6 +297,7 @@ public class ShiftService extends MongoBaseService {
         todoService.updateStatusOfShiftActivityIfApprovalRequired(activityWrapperMap, shift, updateShift);
         payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
+        updateStatusForShift(shift,shiftAction,updateShift);
         shiftMongoRepository.save(shift);
         shiftStateService.createShiftStateByPhase(Arrays.asList(shift), phase);
         return shift;
@@ -711,6 +708,7 @@ public class ShiftService extends MongoBaseService {
             shiftMongoRepository.delete(shift);
             return new ArrayList<>();
         }
+
         boolean ruleCheckRequired = shift.isShiftUpdated(ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class));
         Date currentShiftStartDate = shift.getStartDate();
         Date currentShiftEndDate = shift.getEndDate();
@@ -725,12 +723,14 @@ public class ShiftService extends MongoBaseService {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         ActivityWrapper absenceActivityWrapper = getAbsenceTypeOfActivityIfPresent(shiftDTO.getActivities(), activityWrapperMap);
+        boolean updatingSameActivity =true;
         if (isNotNull(absenceActivityWrapper)) {
-            boolean updatingSameActivity = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(absenceActivityWrapper.getActivity().getId())).findAny().isPresent();
+            updatingSameActivity = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(absenceActivityWrapper.getActivity().getId())).findAny().isPresent();
+        }
             if (!updatingSameActivity) {
                 shiftWithViolatedInfoDTOS = absenceShiftService.createAbsenceTypeShift(absenceActivityWrapper, shiftDTO, staffAdditionalInfoDTO, shiftOverlappedWithNonWorkingType, shiftAction);
             }
-        } else {
+        else {
             if (isNull(staffAdditionalInfoDTO.getUnitId())) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNIT, shiftDTO.getStaffId(), shiftDTO.getUnitId());
             }
@@ -785,6 +785,7 @@ public class ShiftService extends MongoBaseService {
                 shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(newArrayList(shiftDTO));
             }
             shiftWithViolatedInfoDTO.setShifts(shiftDTOS);
+            shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
 
         }
         addReasonCode(shiftWithViolatedInfoDTOS.stream().flatMap(shiftWithViolatedInfoDTO -> shiftWithViolatedInfoDTO.getShifts().stream()).collect(Collectors.toList()), staffAdditionalInfoDTO.getReasonCodes());
@@ -794,7 +795,6 @@ public class ShiftService extends MongoBaseService {
             }
             shiftValidatorService.escalationCorrectionInShift(shiftDTO, currentShiftStartDate, currentShiftEndDate, shift);
         }
-        getshiftWithViolatedInfoDTOForSaveAsDraftActionMode(shiftWithViolatedInfoDTOS,shiftAction,true);
         return shiftWithViolatedInfoDTOS;
     }
 
@@ -1583,48 +1583,48 @@ public class ShiftService extends MongoBaseService {
     }
 
     // This function is used for the change the status of the draft shift
-    public void getshiftWithViolatedInfoDTOForSaveAsDraftActionMode(List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS,ShiftActionType shiftActionType,boolean shiftUpdated) {
+    public void updateStatusForShift(Shift shift, ShiftActionType shiftActionType, boolean shiftUpdated) {
         Set<ShiftStatus> shiftStatuses = new HashSet<>();
-        for (ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO : shiftWithViolatedInfoDTOS) {
-            if (isNotNull(shiftWithViolatedInfoDTO)) {
-                for (ShiftDTO shiftDTO : shiftWithViolatedInfoDTO.getShifts()) {
-                    for (ShiftActivityDTO shiftActivityDTO : shiftDTO.getActivities()) {
+                    for (ShiftActivity shiftActivity : shift.getActivities()) {
                         if (ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
-                            if (ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType) && (ShiftType.NON_WORKING.equals(shiftDTO.getShiftType()) || ShiftType.ABSENCE.equals(shiftDTO.getShiftType()))) {
+                            if (ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType) && (ShiftType.NON_WORKING.equals(shift.getShiftType()) || ShiftType.ABSENCE.equals(shift.getShiftType()))) {
                                 shiftStatuses.add(ShiftStatus.REQUEST);
-                                shiftActivityDTO.setStatus(shiftStatuses);
-                            } else {
-                                shiftActivityDTO.setStatus(shiftStatuses);
+                                shiftActivity.setStatus(shiftStatuses);
                             }
-                        } else {
-                            if (ShiftActionType.SAVE.equals(shiftActionType) && (ShiftType.NON_WORKING.equals(shiftDTO.getShiftType()) || ShiftType.ABSENCE.equals(shiftDTO.getShiftType()))) {
+                            else {
+                                shiftActivity.setStatus(shiftStatuses);
+                            }
+                        }
+                        else if (ShiftActionType.SAVE.equals(shiftActionType) && (ShiftType.NON_WORKING.equals(shift.getShiftType()) || ShiftType.ABSENCE.equals(shift.getShiftType()))) {
                                 if (!shiftUpdated) {
                                     shiftStatuses.add(ShiftStatus.PUBLISH);
                                     shiftStatuses.add(ShiftStatus.APPROVE);
-                                    shiftActivityDTO.setStatus(shiftStatuses);
+                                    shiftActivity.setStatus(shiftStatuses);
                                 } else {
                                     shiftStatuses.add(ShiftStatus.APPROVE);
                                     shiftStatuses.add(ShiftStatus.PUBLISH);
                                     shiftStatuses.add(ShiftStatus.MOVED);
-                                    shiftActivityDTO.setStatus(shiftStatuses);
-                                }
-                            } else {
-                                if (shiftUpdated) {
-                                    shiftStatuses.add(ShiftStatus.PUBLISH);
-                                    shiftStatuses.add(ShiftStatus.MOVED);
-                                    shiftActivityDTO.setStatus(shiftStatuses);
-                                } else {
-                                    shiftActivityDTO.setStatus(shiftStatuses);
+                                    shiftActivity.setStatus(shiftStatuses);
                                 }
                             }
-
+                       else if(ShiftActionType.SAVE.equals((shiftActionType)) && ShiftType.PRESENCE.equals(shift.getShiftType())){
+                           if(shiftUpdated) {
+                               shiftStatuses.add(ShiftStatus.PUBLISH);
+                               shiftStatuses.add(ShiftStatus.MOVED);
+                               shiftActivity.setStatus(shiftStatuses);
+                           }
                         }
-                    }
-                }
-            }
+                        else {
+                            if ((ShiftType.NON_WORKING.equals(shift.getShiftType()) || ShiftType.ABSENCE.equals(shift.getShiftType()))&&isNull(shiftActionType)) {
+                                shiftStatuses.add(ShiftStatus.REQUEST);
+                                shiftActivity.setStatus(shiftStatuses);
+                            }else{
+                                shiftActivity.setStatus(shiftStatuses);
+                            }
+                        }
+
         }
     }
-
 
 
 }

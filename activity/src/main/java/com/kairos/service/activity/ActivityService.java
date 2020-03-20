@@ -83,7 +83,6 @@ import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.phase.PhaseActivityDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -375,13 +374,7 @@ public class ActivityService {
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
         }
-        if (!timeType.getBackgroundColor().equals(activity.getGeneralActivityTab().getBackgroundColor())) {
-            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()), null, null, null);
-            updateShiftActivityBackGroundColor(activity, timeType, shifts);
-            if (isCollectionNotEmpty(shifts)) {
-                shiftMongoRepository.saveEntities(shifts);
-            }
-        }
+        updateBackgroundColorInActivityAndShift(activity, timeType);
         if(isNotNull(generalActivityTabDTO.getTimeTypeId()) && !generalActivityTabDTO.getTimeTypeId().equals(activity.getBalanceSettingsActivityTab().getTimeTypeId())){
             if (activity.getState().equals(ActivityStateEnum.PUBLISHED)) {
                 exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED, activity.getId());
@@ -406,13 +399,27 @@ public class ActivityService {
         if (countryId == null) {
             countryId = userIntegrationService.getCountryIdOfOrganization(activity.getUnitId());
         }
+        updateBalanceSettingDetails(generalActivityTabDTO, activity, timeType);
+        updateActivityCategory(activity, countryId);
+        return activity.getBalanceSettingsActivityTab();
+    }
+
+    private void updateBalanceSettingDetails(GeneralActivityTabDTO generalActivityTabDTO, Activity activity, TimeType timeType) {
         activity.getBalanceSettingsActivityTab().setTimeTypeId(generalActivityTabDTO.getTimeTypeId());
         activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
         activity.getBalanceSettingsActivityTab().setAddTimeTo(generalActivityTabDTO.getAddTimeTo());
         activity.getBalanceSettingsActivityTab().setOnCallTimePresent(generalActivityTabDTO.isOnCallTimePresent());
         activity.getBalanceSettingsActivityTab().setNegativeDayBalancePresent(generalActivityTabDTO.getNegativeDayBalancePresent());
-        updateActivityCategory(activity, countryId);
-        return activity.getBalanceSettingsActivityTab();
+    }
+
+    private void updateBackgroundColorInActivityAndShift(Activity activity, TimeType timeType) {
+        if (!timeType.getBackgroundColor().equals(activity.getGeneralActivityTab().getBackgroundColor())) {
+            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()), null, null, null);
+            updateShiftActivityBackGroundColor(activity, timeType, shifts);
+            if (isCollectionNotEmpty(shifts)) {
+                shiftMongoRepository.saveEntities(shifts);
+            }
+        }
     }
 
     private void updateShiftActivityBackGroundColor(Activity activity, TimeType timeType, List<Shift> shifts) {
@@ -904,7 +911,7 @@ public class ActivityService {
         for (Activity countryActivity : countryActivities) {
             Optional<Activity> result = unitActivities.stream().filter(unitActivity -> unitActivity.getExternalId().equals(countryActivity.getExternalId())).findFirst();
             if (!result.isPresent()) {
-                Activity activity = SerializationUtils.clone(countryActivity);
+                Activity activity = ObjectMapperUtils.copyPropertiesByMapper(countryActivity,Activity.class);
                 activity.setId(null);
                 activity.setParentId(countryActivity.getId());
                 activity.setCountryParentId(countryActivity.getId());

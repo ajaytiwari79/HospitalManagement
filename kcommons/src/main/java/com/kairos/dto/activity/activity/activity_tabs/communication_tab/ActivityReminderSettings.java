@@ -7,7 +7,7 @@ import java.util.Comparator;
 /**
  * CreatedBy vipulpandey on 6/10/18
  **/
-public class ActivityReminderSettings implements Serializable,Comparator<ActivityReminderSettings> {
+public class ActivityReminderSettings implements Comparator<ActivityReminderSettings> {
     private byte sequence;
     private BigInteger id;
     private FrequencySettings sendReminder; // this is used for settings before days and value settings

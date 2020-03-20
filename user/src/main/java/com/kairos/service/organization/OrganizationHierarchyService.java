@@ -50,10 +50,11 @@ public class OrganizationHierarchyService {
 
     public List<QueryResult> generateHierarchy() {
         List<OrganizationWrapper> organizationWrappers = userGraphRepository.getOrganizations(UserContext.getUserDetails().getId());
-        List<OrganizationBaseEntity> organizationBaseEntities = organizationGraphRepository.generateHierarchy(organizationWrappers.stream().map(OrganizationWrapper::getId).collect(toList()));
+        boolean isHubMember = accessPageService.isHubMember(UserContext.getUserDetails().getId());
         List<QueryResult> queryResults = new ArrayList<>();
-        for(OrganizationBaseEntity hierarchy :organizationBaseEntities) {
-            QueryResult orgHierarchy = setUnitPermission(hierarchy, accessPageService.isHubMember(UserContext.getUserDetails().getId()));
+        for (OrganizationWrapper organizationWrapper : organizationWrappers) {
+            Organization hierarchy = organizationGraphRepository.generateHierarchy(organizationWrapper.getId()).get(0);
+            QueryResult orgHierarchy = setUnitPermission(hierarchy, isHubMember);
             queryResults.add(orgHierarchy);
         }
         return queryResults;

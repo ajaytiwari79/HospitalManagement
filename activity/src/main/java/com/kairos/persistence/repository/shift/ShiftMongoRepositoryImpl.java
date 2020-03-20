@@ -555,7 +555,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return new ArrayList<>(shiftWithActivityDTOS);
     }
 
-    //fixme this method is a  duplicate of above .
     private <T extends ShiftDTO> List<T> getShiftWithActivityByCriteria(Criteria criteria,boolean replaceDraftShift,Class classType, boolean addActivityDetails,String... shiftProjection){
         List<AggregationOperation> aggregationOperations = getShiftWithActivityAggregationOperations(criteria, replaceDraftShift, shiftProjection);
         List<T> shiftWithActivityDTOS = mongoTemplate.aggregate(Aggregation.newAggregation(aggregationOperations),Shift.class ,classType).getMappedResults();
