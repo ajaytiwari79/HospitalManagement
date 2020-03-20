@@ -61,11 +61,6 @@ public class OrganizationHierarchyService {
     }
 
 
-    /**
-     * @param parentOrganizationId
-     * @param organizationHierarchyFilterDTO
-     * @return
-     */
     public QueryResult generateOrganizationHierarchyByFilter() {
         //TODO need to fix the complete query as per the current structure, currently filters won't work
        return generateHierarchy().get(0);
