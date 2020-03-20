@@ -281,4 +281,15 @@ public class ShiftBreakService {
     }
 
 
+
+    public void updateBreak(Shift shift, Shift shift1, ShiftActivity shiftActivity) {
+        ShiftActivity breakActivity = shift.getBreakActivities().stream().filter(k -> k.getStartDate().before(shiftActivity.getEndDate())).findFirst().orElse(null);
+        shift.getBreakActivities().remove(breakActivity);
+        if (breakActivity != null) {
+            shift1.setBreakActivities(Arrays.asList(breakActivity));
+        }
+    }
+
+
+
 }

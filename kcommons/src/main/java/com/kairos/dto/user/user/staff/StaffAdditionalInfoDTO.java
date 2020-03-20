@@ -1,5 +1,6 @@
 package com.kairos.dto.user.user.staff;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -11,6 +12,7 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.enums.StaffStatusEnum;
+import com.kairos.utils.CPRUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,8 +21,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * Created by oodles on 28/11/17.
@@ -103,5 +104,10 @@ public class StaffAdditionalInfoDTO {
 
     public Long getUnitId() {
         return isNull(unitId) ? this.employment.getUnitId() : unitId;
+    }
+
+    @JsonIgnore
+    public int getStaffAgeByDate(LocalDate localDate) {
+        return isNotNull(cprNumber) ? CPRUtil.getAgeByCPRNumberAndStartDate(this.cprNumber, localDate) : 0;
     }
 }

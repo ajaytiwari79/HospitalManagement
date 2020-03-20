@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CommunicationActivityTab implements Serializable {
+public class CommunicationActivityTab  {
     private boolean allowCommunicationReminder;
     private boolean notifyAfterDeleteActivity;
     private List<ActivityReminderSettings> activityReminderSettings;

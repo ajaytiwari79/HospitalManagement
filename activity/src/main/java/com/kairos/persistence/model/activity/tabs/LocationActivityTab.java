@@ -17,7 +17,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocationActivityTab implements Serializable {
+public class LocationActivityTab  {
     private Set<ActivityGlideTimeDetails> glideTimeForCheckIn;
     private Set<ActivityGlideTimeDetails> glideTimeForCheckOut;
 

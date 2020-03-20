@@ -3,6 +3,7 @@ package com.kairos.service.staff;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
@@ -13,7 +14,6 @@ import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.employment_type.EmploymentStatus;
-import com.kairos.enums.scheduler.Result;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.auth.User;
@@ -59,16 +59,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
@@ -184,7 +179,7 @@ public class PositionService {
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
-        OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_UNIT_NOTFOUND, unitId)));
+        OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_UNIT_NOTFOUND, unitId)));
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
@@ -302,10 +297,6 @@ public class PositionService {
 
 
     public List<Map<String, Object>> getWorkPlaces(long staffId, long unitId) {
-        Staff staff = staffGraphRepository.findOne(staffId);
-        if (staff == null) {
-            return null;
-        }
         Organization organization=organizationGraphRepository.findOrganizationOfStaff(staffId);
         OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
         List<AccessGroup> accessGroups;
@@ -397,6 +388,21 @@ public class PositionService {
             workPlaces.add(workPlace);
         }
         return workPlaces;
+    }
+
+
+
+    private QueryResult setInfoInChild(long staffId, List<Map<String, Object>> positions, ObjectMapper objectMapper, AccessGroup accessGroup, Map<String, Object> unitData) {
+        Map<String, Object> position;
+        QueryResult child = objectMapper.convertValue(((Map<String, Object>) unitData.get("data")).get("child"), QueryResult.class);
+        position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
+        if (position != null && !position.isEmpty()) {
+            positions.add(position);
+            child.setAccessable(true);
+        } else {
+            child.setAccessable(false);
+        }
+        return child;
     }
 
     public Staff editWorkPlace(long staffId, List<Long> teamId) {

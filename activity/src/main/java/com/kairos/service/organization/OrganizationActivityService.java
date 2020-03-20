@@ -329,6 +329,7 @@ public class OrganizationActivityService extends MongoBaseService {
                 activityCopied.setActivityPriorityId(unitActivityPriority.getId());
             }
         }
+        updateSkills(activityCopied);
         // activityCopied.setCompositeActivities(null);
         return activityCopied;
     }
@@ -422,6 +423,10 @@ public class OrganizationActivityService extends MongoBaseService {
         List<DayType> dayTypes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeEmploymentTypeWrapper.getDayTypes(), DayType.class);
         Activity activity = activityMongoRepository.findOne(activityId);
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
+        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        if(isNotNull(timeType)){
+            rulesActivityTab.setSicknessSettingValid(timeType.isSicknessSettingValid());
+        }
         return new ActivityTabsWrapper(rulesActivityTab, dayTypes, dayTypeEmploymentTypeWrapper.getEmploymentTypes());
     }
 
@@ -582,7 +587,7 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         activities = activities.stream().filter(k -> isCollectionNotEmpty(k.getChildActivityIds())).collect(Collectors.toList());
         if (isCollectionNotEmpty(activities)) {
-            List<String> activityNames = activities.stream().map(k -> k.getName()).collect(Collectors.toList());
+            List<String> activityNames = activities.stream().map(ActivityDTO::getName).collect(Collectors.toList());
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_PARENT, activityNames);
         }
 
@@ -592,5 +597,13 @@ public class OrganizationActivityService extends MongoBaseService {
         Set<BigInteger> activityList = userIntegrationService.getTeamActivitiesOfStaff(unitId, staffId);
         activityList.addAll(staffPersonalizedActivities.stream().map(ActivityWithCompositeDTO::getActivityId).collect(Collectors.toSet()));
         return activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(new ArrayList<>(activityList));
+    }
+
+    private void updateSkills(Activity activityCopied){
+        ActivityDTO activityDTO=userIntegrationService.getAllSkillsByUnit(activityCopied.getUnitId());
+        List<ActivitySkill> activitySkills=activityCopied.getSkillActivityTab().getActivitySkills().stream().filter(k->activityDTO.getSkills().contains(k.getSkillId())).collect(Collectors.toList());
+        List<Long> expertiseIds=activityCopied.getExpertises().stream().filter(k->activityDTO.getExpertises().contains(k)).collect(Collectors.toList());
+        activityCopied.getSkillActivityTab().setActivitySkills(activitySkills);
+        activityCopied.setExpertises(expertiseIds);
     }
 }

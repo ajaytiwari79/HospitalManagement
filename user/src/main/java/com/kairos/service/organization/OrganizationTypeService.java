@@ -13,8 +13,6 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.OrganizationTypeAndSubTypeDto;
 import com.kairos.wrapper.UpdateOrganizationTypeDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +28,6 @@ import static com.kairos.constants.UserMessagesConstants.*;
 @Transactional
 @Service
 public class OrganizationTypeService{
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Inject
     private OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
@@ -129,16 +126,15 @@ public class OrganizationTypeService{
     }
 
     public List<Object> getOrgSubTypesByTypeId(Long organizationTypeId) {
+        List<Object> response = new ArrayList<>();
         List<Map<String, Object>> queryResponse = organizationTypeGraphRepository.getOrganizationSubTypeByTypeId(organizationTypeId);
         if (!queryResponse.isEmpty()) {
-            List<Object> response = new ArrayList<>();
             for (Map<String, Object> map : queryResponse) {
                 Object o = map.get("result");
                 response.add(o);
             }
-            return response;
         }
-        return null;
+        return response;
     }
 
     /**
@@ -156,8 +152,6 @@ public class OrganizationTypeService{
         } else {
             organizationTypeGraphRepository.deleteSkillFromOrgType(orgTypeId, skillId, DateUtils.getCurrentDateMillis());
         }
-
-        // TODO remove As per request of FE its added for now
         return organizationTypeGraphRepository.getSkillsOfOrganizationType(orgTypeId);
     }
 
@@ -167,7 +161,7 @@ public class OrganizationTypeService{
      * @param orgTypeId
      * @return
      */
-    public List<OrgTypeSkillQueryResult> getSkillsByOrganizationTypeId(long countryId, long orgTypeId) {
+    public List<OrgTypeSkillQueryResult> getSkillsByOrganizationTypeId( long orgTypeId) {
         return organizationTypeGraphRepository.getSkillsOfOrganizationType(orgTypeId);
     }
 
@@ -191,9 +185,7 @@ public class OrganizationTypeService{
     public List<OrganizationTypeAndSubTypeDto> getAllOrganizationTypeAndServiceAndSubServices(Long countryId) {
         List<Map> organizationType = organizationTypeGraphRepository.getAllOrganizationTypeAndServiceAndSubServices(countryId);
         List<OrganizationTypeAndSubTypeDto> list = new ArrayList<>();
-        organizationType.forEach(o -> {
-            list.add(ObjectMapperUtils.copyPropertiesByMapper(o.get("organizationType"), OrganizationTypeAndSubTypeDto.class));
-        });
+        organizationType.forEach(o -> list.add(ObjectMapperUtils.copyPropertiesByMapper(o.get("organizationType"), OrganizationTypeAndSubTypeDto.class)));
         return list;
     }
 

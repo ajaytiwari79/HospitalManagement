@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.SENIO
 @NodeEntity
 @Getter
 @Setter
-public class FunctionalPaymentMatrix extends UserBaseEntity implements Serializable {
+public class FunctionalPaymentMatrix extends UserBaseEntity  {
 
     @Relationship(type = HAS_PAY_GROUP_AREA)
     private Set<PayGroupArea> payGroupAreas;

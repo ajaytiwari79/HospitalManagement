@@ -2,6 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
@@ -260,7 +261,7 @@ public class OrganizationService {
     }
 
     public boolean updateOrganizationGeneralDetails(OrganizationGeneral organizationGeneral, long unitId) {
-        OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findById(unitId).orElseThrow(()-> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_UNIT_ID_NOTFOUND, unitId)));
+        OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findById(unitId).orElseThrow(()-> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_UNIT_ID_NOTFOUND, unitId)));
         OwnershipType ownershipType = null;
         ContractType contractType = null;
         IndustryType industryType = null;
@@ -578,12 +579,12 @@ public class OrganizationService {
         return new OrganizationSkillAndOrganizationTypesDTO(organizationTypeAndSubTypeDTO, skillService.getSkillsOfOrganization(unitId));
     }
 
-    public List<DayType> getDayType(Long unitId, Date date) {
+    public List<DayType> getDayType(Date date) {
         Long countryId = UserContext.getUserDetails().getCountryId();
         return dayTypeService.getDayTypeByDate(countryId, date);
     }
 
-    public List<DayType> getAllDayTypeofOrganization(Long organizationId) {
+    public List<DayType> getAllDayTypeofOrganization() {
         Long countryId = UserContext.getUserDetails().getCountryId();
         return dayTypeService.getAllDayTypeByCountryId(countryId);
     }
@@ -638,7 +639,7 @@ public class OrganizationService {
         return organizationMappingDTO;
     }
 
-    public WTABasicDetailsDTO getWTARelatedInfo(Long countryId, Long organizationId, Long organizationSubTypeId, Long organizationTypeId, Long expertiseId, List<Long> unitIds) {
+    public WTABasicDetailsDTO getWTARelatedInfo(Long countryId, Long organizationId, Long organizationSubTypeId, Long expertiseId, List<Long> unitIds) {
         WTABasicDetailsDTO wtaBasicDetailsDTO = new WTABasicDetailsDTO();
         if (Optional.ofNullable(expertiseId).isPresent()) {
             Expertise expertise = expertiseGraphRepository.findOne(expertiseId, 0);

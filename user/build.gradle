@@ -35,7 +35,7 @@ apply plugin: 'application'
 version = "$projectVersion-SNAPSHOT"
 sourceCompatibility = 1.8
 mainClassName = 'com.kairos.UserServiceApplication'
-applicationDefaultJvmArgs = ["-Xdiag","-Xms1024m", "-Xmx1048m"]
+applicationDefaultJvmArgs = ["-Xdiag","-Xms724m", "-Xmx748m"]
 
 
 repositories {

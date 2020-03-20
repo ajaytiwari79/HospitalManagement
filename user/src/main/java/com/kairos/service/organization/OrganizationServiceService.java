@@ -1,8 +1,10 @@
 package com.kairos.service.organization;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.OrganizationType;
@@ -127,26 +129,20 @@ public class OrganizationServiceService {
         response.put("id", subService.getId());
         response.put("name", subService.getName());
         response.put("description", subService.getDescription());
-        LOGGER.info("Sending Response: " + response);
+        LOGGER.info("Sending Response: {}" , response);
 
         return subService;
 
     }
 
     public Map<String, Object> addCountrySubService(final long serviceId, OrganizationService subService) {
-        OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
-        if (organizationService == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND);
-
-        }
-
+        OrganizationService organizationService = organizationServiceRepository.findById(serviceId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND)));
         String name = "(?i)" + subService.getName();
         if (organizationServiceRepository.checkDuplicateSubService(organizationService.getId(), name) != null) {
             exceptionService.duplicateDataException(MESSAGE_ORGANIZATIONSERVICE_SUBSERVICE_DUPLICATED);
 
         }
 
-        LOGGER.info("Creating : " + subService.getName() + " In " + organizationService.getName());
         List<OrganizationService> subServicesList = organizationService.getOrganizationSubService();
 
         if (subServicesList != null) {
@@ -177,11 +173,8 @@ public class OrganizationServiceService {
     }
 
     public Map<String, Object> updateServiceToOrganization(long id, long organizationServiceId, boolean isSelected) {
-        Unit unit=unitGraphRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND,"Unit",id)));
-        OrganizationService organizationService = organizationServiceRepository.findOne(organizationServiceId);
-        if (organizationService == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND);
-        }
+        Unit unit=unitGraphRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND,"Unit",id)));
+        OrganizationService organizationService = organizationServiceRepository.findById(organizationServiceId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND)));
         if (isSelected) {
             LOGGER.info("check if already exist-------> ");
             if (unitGraphRepository.isServiceAlreadyExist(id, organizationService.getId()) == 0) {
@@ -191,7 +184,7 @@ public class OrganizationServiceService {
             }
             addDefaultCustomNameRelationShipOfServiceForOrganization(organizationService.getId(), id);
             //call to create asset for org.
-            List<Long> orgSubTypeIds = unit.getOrganizationSubTypes().stream().map(unitSubType -> unitSubType.getId()).collect(Collectors.toList());
+            List<Long> orgSubTypeIds = unit.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList());
             gdprIntegrationService.createDefaultAssetForUnit(UserContext.getUserDetails().getCountryId(),unit.getId(), orgSubTypeIds,organizationServiceId);
         } else {
             unitGraphRepository.removeServiceFromOrganization(id, organizationService.getId());
@@ -201,16 +194,15 @@ public class OrganizationServiceService {
 
 
     public List<Object> getOrgServicesByOrgType(long orgType) {
+        List<Object> objectList = new ArrayList<>();
         List<Map<String, Object>> organizationServices = organizationServiceRepository.getOrgServicesByOrgType(orgType);
         if (organizationServices != null) {
-            List<Object> objectList = new ArrayList<>();
             for (Map<String, Object> map : organizationServices) {
                 Object o = map.get(RESULT);
                 objectList.add(o);
             }
-            return objectList;
         }
-        return null;
+        return objectList;
     }
 
     public List<Object> linkOrgServiceWithOrgType(long orgTypeId, long serviceId) {
@@ -226,7 +218,6 @@ public class OrganizationServiceService {
                     objectList.add(o);
 
                 }
-                return objectList;
             } else {
                 LOGGER.info("Not  Selected now Selecting ");
                 organizationTypeGraphRepository.selectService(orgTypeId, serviceId);
@@ -235,10 +226,9 @@ public class OrganizationServiceService {
                     Object o = map.get(RESULT);
                     objectList.add(o);
                 }
-                return objectList;
             }
         }
-        return null;
+        return objectList;
     }
 
     private int checkIfServiceExistsWithOrganizationType(long orgTypeId, long serviceId) {
@@ -293,16 +283,15 @@ public class OrganizationServiceService {
      * @return list of Organization services and Children SubServices
      */
     public List<Object> getOrgServicesByOrgSubTypesIds(Set<Long> orgTypesIds) {
+        List<Object> objectList = new ArrayList<>();
         List<Map<String, Object>> organizationServices = organizationServiceRepository.getOrgServicesByOrgSubTypesIds(orgTypesIds);
         if (organizationServices != null) {
-            List<Object> objectList = new ArrayList<>();
             for (Map<String, Object> map : organizationServices) {
                 Object o = map.get(RESULT);
                 objectList.add(o);
             }
-            return objectList;
         }
-        return null;
+        return objectList;
     }
 
 

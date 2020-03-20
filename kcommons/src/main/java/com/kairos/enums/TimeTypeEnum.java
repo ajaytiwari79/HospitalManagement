@@ -21,4 +21,5 @@ public enum TimeTypeEnum {
     RESTING_TIME,
     PROTECTED_DAYS_OFF,
     GAP
+
 }

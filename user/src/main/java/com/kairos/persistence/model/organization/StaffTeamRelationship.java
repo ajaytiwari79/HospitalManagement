@@ -40,19 +40,6 @@ public class StaffTeamRelationship extends UserBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
 
-    public StaffTeamRelationship(Team team, Staff staff, LeaderType leaderType, TeamType teamType, LocalDate startDate, LocalDate endDate) {
-        this.team = team;
-        this.staff = staff;
-        this.leaderType = leaderType;
-        this.teamType = teamType;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
-
-    public StaffTeamRelationship() {
-        //Default Constructor
-    }
-
 
     public StaffTeamRelationship(Team team, Staff staff) {
         this.team = team;
@@ -65,15 +52,7 @@ public class StaffTeamRelationship extends UserBaseEntity {
         this.leaderType = leaderType;
     }
 
-    public StaffTeamRelationship(Team team, Staff staff, LeaderType leaderType,LocalDate startDate,LocalDate endDate) {
-        this.team = team;
-        this.staff = staff;
-        this.leaderType = leaderType;
-        this.startDate =startDate;
-        this.endDate =endDate;
-    }
-
-    public StaffTeamRelationship(Long id,Team team, Staff staff, LeaderType leaderType, TeamType teamType) {
+     public StaffTeamRelationship(Long id,Team team, Staff staff, LeaderType leaderType, TeamType teamType) {
         this.id=id;
         this.team = team;
         this.staff = staff;

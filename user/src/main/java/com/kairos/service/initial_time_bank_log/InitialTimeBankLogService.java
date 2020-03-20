@@ -2,6 +2,7 @@ package com.kairos.service.initial_time_bank_log;
 
 import com.kairos.dto.user.initial_time_bank_log.InitialTimeBankLogDTO;
 import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.initial_time_bank_log.InitialTimeBankLog;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.initial_time_bank_log.InitialTimeBankLogRepository;
@@ -31,10 +32,9 @@ public class InitialTimeBankLogService {
     public boolean saveInitialTimeBankLog(Long employmentId,Long updatedInitialBalanceInMinutes) {
         List<InitialTimeBankLog> previousInitialTimeBankLogs=initialTimeBankLogRepository.getInitialTimeBankLogByEmployment(employmentId);
         Long previousInitialBalanceInMinutes = 0L;
-        if(previousInitialTimeBankLogs.size() > 0){
+        if(!previousInitialTimeBankLogs.isEmpty()){
             previousInitialBalanceInMinutes=previousInitialTimeBankLogs.get(0).getUpdatedInitialBalanceInMinutes();
-
-            if(previousInitialBalanceInMinutes == updatedInitialBalanceInMinutes){
+            if(previousInitialBalanceInMinutes.equals(updatedInitialBalanceInMinutes)){
                 return false;
             }
         }
@@ -45,13 +45,11 @@ public class InitialTimeBankLogService {
 
     public List<InitialTimeBankLogDTO> getInitialTimeBalanceByEmployment(Long employmentId) {
         List<InitialTimeBankLog> initialTimeBankLogs = initialTimeBankLogRepository.getInitialTimeBankLogByEmployment(employmentId);
-        List<Long> userIds=initialTimeBankLogs.stream().map(initialTimeBankLog -> initialTimeBankLog.getCreatedBy()).collect(Collectors.toList());
+        List<Long> userIds=initialTimeBankLogs.stream().map(UserBaseEntity::getCreatedBy).collect(Collectors.toList());
         List<User> users=userGraphRepository.findAllById(userIds);
-        Map<Long,String> userFullNameMap=users.stream().collect(Collectors.toMap(user -> user.getId(), user -> user.getFirstName() + " " + user.getLastName()));
+        Map<Long,String> userFullNameMap=users.stream().collect(Collectors.toMap(UserBaseEntity::getId, user -> user.getFirstName() + " " + user.getLastName()));
         List<InitialTimeBankLogDTO> initialTimeBankLogDTOs = new ArrayList<>();
-        initialTimeBankLogs.forEach(initialTimeBankLog->{
-            initialTimeBankLogDTOs.add(new InitialTimeBankLogDTO(initialTimeBankLog.getId(),initialTimeBankLog.getEmploymentId(),initialTimeBankLog.getPreviousInitialBalanceInMinutes(),initialTimeBankLog.getUpdatedInitialBalanceInMinutes(),initialTimeBankLog.getCreationDate(),initialTimeBankLog.getCreatedBy(),userFullNameMap.get(initialTimeBankLog.getCreatedBy())));
-        });
+        initialTimeBankLogs.forEach(initialTimeBankLog-> initialTimeBankLogDTOs.add(new InitialTimeBankLogDTO(initialTimeBankLog.getId(),initialTimeBankLog.getEmploymentId(),initialTimeBankLog.getPreviousInitialBalanceInMinutes(),initialTimeBankLog.getUpdatedInitialBalanceInMinutes(),initialTimeBankLog.getCreationDate(),initialTimeBankLog.getCreatedBy(),userFullNameMap.get(initialTimeBankLog.getCreatedBy()))));
         return initialTimeBankLogDTOs;
     }
 

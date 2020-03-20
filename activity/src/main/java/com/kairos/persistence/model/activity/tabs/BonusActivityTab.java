@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BonusActivityTab implements Serializable{
+public class BonusActivityTab{
     private String bonusHoursType;
     private boolean overRuleCtaWta;
 

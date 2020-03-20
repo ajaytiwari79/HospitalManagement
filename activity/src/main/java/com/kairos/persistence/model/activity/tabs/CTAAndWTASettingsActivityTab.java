@@ -14,6 +14,6 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CTAAndWTASettingsActivityTab implements Serializable{
+public class CTAAndWTASettingsActivityTab{
     private  boolean eligibleForCostCalculation;
 }

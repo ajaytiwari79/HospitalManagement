@@ -74,7 +74,7 @@ public class SkillCategoryService {
         return  skillCategoryGraphRepository.findAll();
     }
 
-    public Map<String, Object> updateSkillCategory(SkillCategory skillCategory, Long countryId) {
+    public Map<String, Object> updateSkillCategory(SkillCategory skillCategory) {
 
         if (skillCategory!=null){
             SkillCategory currentCategory= skillCategoryGraphRepository.findOne(skillCategory.getId());

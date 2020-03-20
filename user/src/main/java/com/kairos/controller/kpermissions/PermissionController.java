@@ -24,7 +24,7 @@ public class PermissionController {
     @Inject
     private PermissionService permissionService;
 
-    @RequestMapping(value = "/create_permission_schema",method = RequestMethod.POST)
+    @PostMapping(value = "/create_permission_schema")
     public ResponseEntity createFLPSchema(@Valid @RequestBody List<ModelDTO> modelDTO)  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissionSchema(modelDTO));

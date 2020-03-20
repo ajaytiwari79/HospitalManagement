@@ -250,6 +250,10 @@ public class ShiftValidatorService {
         }
         shift.setTimeType(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getTimeType());
         activitySpecification.validateRules(shift);
+        ActivityRuleViolation activityRuleViolation = shiftService.validateAndUpdateSicknessShift(activityWrapperMap,shift,staffAdditionalInfoDTO);
+        if(isCollectionNotEmpty(activityRuleViolation.getErrorMessages())){
+                ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
+    }
         return new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
     }
 
@@ -777,20 +781,22 @@ public class ShiftValidatorService {
         return shiftActivities;
     }
 
-    public ShiftWithViolatedInfoDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId) {
+    public List<ShiftWithViolatedInfoDTO> validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId) {
         BigInteger shiftStateId = shiftDTO.getId();
         Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
         boolean validate = validateGracePeriod(shiftDTO, validatedByStaff, unitId, actualPhases);
         if (!validate) {
             exceptionService.invalidRequestException(MESSAGE_SHIFT_CANNOT_UPDATE);
         }
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.updateShift(shiftDTO, true, !validatedByStaff, null);
+        List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = shiftService.updateShift(shiftDTO, true, !validatedByStaff, null);
         shiftDTO.setId(shiftStateId);
-        shiftDTO = validateShiftStateAfterValidatingWtaRule(shiftDTO, validatedByStaff, actualPhases);
-        shiftDTO.setEscalationReasons(shiftWithViolatedInfoDTO.getShifts().get(0).getEscalationReasons());
-        shiftDTO.setRestingMinutes(shiftWithViolatedInfoDTO.getShifts().get(0).getRestingMinutes());
-        shiftWithViolatedInfoDTO.setShifts(newArrayList(shiftDTO));
-        return shiftWithViolatedInfoDTO;
+        for (ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO : shiftWithViolatedInfoDTOS) {
+            shiftDTO = validateShiftStateAfterValidatingWtaRule(shiftDTO, validatedByStaff, actualPhases);
+            shiftDTO.setEscalationReasons(shiftWithViolatedInfoDTO.getShifts().get(0).getEscalationReasons());
+            shiftDTO.setRestingMinutes(shiftWithViolatedInfoDTO.getShifts().get(0).getRestingMinutes());
+            shiftWithViolatedInfoDTO.setShifts(newArrayList(shiftDTO));
+        }
+        return shiftWithViolatedInfoDTOS;
     }
 
     public ShiftDTO validateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, Boolean
@@ -908,7 +914,7 @@ public class ShiftValidatorService {
                 overlappedShifts.get(0).setEndDate(asDateEndOfDay(asLocalDate(overlappedShifts.get(0).getStartDate())));
             }
         }
-        if (!CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) && isShiftOverlap(overlappedShifts, shiftInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
+        if (!CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) && isNull(activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting()) && isShiftOverlap(overlappedShifts, shiftInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
             shiftOverlappedWithNonWorkingType = true;
         }
         return shiftOverlappedWithNonWorkingType;
@@ -971,7 +977,7 @@ public class ShiftValidatorService {
     public void checkAbsenceTypeShift(ShiftDTO shiftDTO, ActivityWrapper activityWrapper) {
         Date startDate = null;
         Date endDate = null;
-        List<Shift> shiftList = new ArrayList<>();
+        List<Shift> shiftList;
         startDate = isNull(shiftDTO.getStartDate()) ? asDateStartOfDay(shiftDTO.getShiftDate()) : shiftDTO.getStartDate();
         endDate = isNull(shiftDTO.getEndDate()) ? asDateEndOfDay(shiftDTO.getShiftDate()) : shiftDTO.getEndDate();
 

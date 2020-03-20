@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TimeCalculationActivityTab implements Serializable {
+public class TimeCalculationActivityTab  {
 
     private String methodForCalculatingTime;
     private TimeCalaculationType fullDayCalculationType;
@@ -35,6 +35,8 @@ public class TimeCalculationActivityTab implements Serializable {
     private int historyDuration;
     private LocalTime defaultStartTime;
     private List<Long> dayTypes = new ArrayList<>();
+    private boolean replaceWithPublishedShiftTime;
+    private boolean replaceWithUnapprovedAbsenceRequest;
 
     public TimeCalculationActivityTab(String methodForCalculatingTime, Long fixedTimeValue, Boolean multiplyWith, LocalTime defaultStartTime,Double multiplyWithValue) {
         this.methodForCalculatingTime = methodForCalculatingTime;

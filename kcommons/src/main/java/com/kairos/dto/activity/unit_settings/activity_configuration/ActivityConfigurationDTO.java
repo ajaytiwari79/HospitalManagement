@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
 
@@ -20,7 +19,6 @@ public class ActivityConfigurationDTO {
     private PresencePlannedTime presencePlannedTime;
     private AbsencePlannedTime absencePlannedTime;
     private NonWorkingPlannedTime nonWorkingPlannedTime;
-    @Indexed
     private Long countryId;
 }
 

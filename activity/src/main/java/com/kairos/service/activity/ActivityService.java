@@ -46,6 +46,7 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
@@ -82,7 +83,6 @@ import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.phase.PhaseActivityDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -374,13 +374,7 @@ public class ActivityService {
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
         }
-        if (!timeType.getBackgroundColor().equals(activity.getGeneralActivityTab().getBackgroundColor())) {
-            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()), null, null, null);
-            updateShiftActivityBackGroundColor(activity, timeType, shifts);
-            if (isCollectionNotEmpty(shifts)) {
-                shiftMongoRepository.saveEntities(shifts);
-            }
-        }
+        updateBackgroundColorInActivityAndShift(activity, timeType);
         if(isNotNull(generalActivityTabDTO.getTimeTypeId()) && !generalActivityTabDTO.getTimeTypeId().equals(activity.getBalanceSettingsActivityTab().getTimeTypeId())){
             if (activity.getState().equals(ActivityStateEnum.PUBLISHED)) {
                 exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED, activity.getId());
@@ -397,19 +391,35 @@ public class ActivityService {
             activity.setLevels(timeType.getLevels());
             activity.setActivityPriorityId(timeType.getActivityPriorityId());
         }
+        activity.getRulesActivityTab().setSicknessSettingValid(timeType.isSicknessSettingValid());
+        activity.getRulesActivityTab().setSicknessSetting(timeType.getRulesActivityTab().getSicknessSetting());
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setColorPresent(true);
         Long countryId = activity.getCountryId();
         if (countryId == null) {
             countryId = userIntegrationService.getCountryIdOfOrganization(activity.getUnitId());
         }
+        updateBalanceSettingDetails(generalActivityTabDTO, activity, timeType);
+        updateActivityCategory(activity, countryId);
+        return activity.getBalanceSettingsActivityTab();
+    }
+
+    private void updateBalanceSettingDetails(GeneralActivityTabDTO generalActivityTabDTO, Activity activity, TimeType timeType) {
         activity.getBalanceSettingsActivityTab().setTimeTypeId(generalActivityTabDTO.getTimeTypeId());
         activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
         activity.getBalanceSettingsActivityTab().setAddTimeTo(generalActivityTabDTO.getAddTimeTo());
         activity.getBalanceSettingsActivityTab().setOnCallTimePresent(generalActivityTabDTO.isOnCallTimePresent());
         activity.getBalanceSettingsActivityTab().setNegativeDayBalancePresent(generalActivityTabDTO.getNegativeDayBalancePresent());
-        updateActivityCategory(activity, countryId);
-        return activity.getBalanceSettingsActivityTab();
+    }
+
+    private void updateBackgroundColorInActivityAndShift(Activity activity, TimeType timeType) {
+        if (!timeType.getBackgroundColor().equals(activity.getGeneralActivityTab().getBackgroundColor())) {
+            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()), null, null, null);
+            updateShiftActivityBackGroundColor(activity, timeType, shifts);
+            if (isCollectionNotEmpty(shifts)) {
+                shiftMongoRepository.saveEntities(shifts);
+            }
+        }
     }
 
     private void updateShiftActivityBackGroundColor(Activity activity, TimeType timeType, List<Shift> shifts) {
@@ -435,6 +445,7 @@ public class ActivityService {
             activityCategoryRepository.save(category);
         }
         activity.getGeneralActivityTab().setCategoryId(category.getId());
+        activityMongoRepository.save(activity);
     }
 
     public TimeCalculationActivityDTO updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO, boolean availableAllowActivity) {
@@ -527,10 +538,12 @@ public class ActivityService {
         Activity activity = findActivityById(rulesActivityDTO.getActivityId());
         checkEligibleStaffLevelDetails(rulesActivityDTO, activity);
         updateCutoffDetails(rulesActivityDTO, rulesActivityTab);
+        rulesActivityTab.setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO.getSicknessSetting(),SicknessSetting.class));
         if(activity.getRulesActivityTab().isEligibleForStaffingLevel() != rulesActivityTab.isEligibleForStaffingLevel() && !rulesActivityTab.isEligibleForStaffingLevel()){
             removedActivityFromStaffingLevelOfChildActivity(activity.getChildActivityIds());
             staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()));
         }
+        rulesActivityTab.setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO.getSicknessSetting(),SicknessSetting.class));
         activity.setRulesActivityTab(rulesActivityTab);
         if (!activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
             activity.getTimeCalculationActivityTab().setDayTypes(activity.getRulesActivityTab().getDayTypes());
@@ -898,7 +911,7 @@ public class ActivityService {
         for (Activity countryActivity : countryActivities) {
             Optional<Activity> result = unitActivities.stream().filter(unitActivity -> unitActivity.getExternalId().equals(countryActivity.getExternalId())).findFirst();
             if (!result.isPresent()) {
-                Activity activity = SerializationUtils.clone(countryActivity);
+                Activity activity = ObjectMapperUtils.copyPropertiesByMapper(countryActivity,Activity.class);
                 activity.setId(null);
                 activity.setParentId(countryActivity.getId());
                 activity.setCountryParentId(countryActivity.getId());
@@ -1016,20 +1029,27 @@ public class ActivityService {
         return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, counters);
     }
 
-    public void updateBackgroundColorInShifts(String newTimeTypeColor, String existingTimeTypeColor,BigInteger timeTypeId) {
-        if(!existingTimeTypeColor.equals(newTimeTypeColor)){
+    public void updateBackgroundColorInShifts(TimeTypeDTO timeTypeDTO, String existingTimeTypeColor,BigInteger timeTypeId) {
+        if(!existingTimeTypeColor.equals(timeTypeDTO.getBackgroundColor())){
             new Thread(() -> {
-                Set<BigInteger> activityIds = updateColorInActivity(newTimeTypeColor, timeTypeId);
-                updateColorInShift(newTimeTypeColor,activityIds);
+                Set<BigInteger> activityIds = updateColorInActivity(timeTypeDTO, timeTypeId);
+                updateColorInShift(timeTypeDTO.getBackgroundColor(),activityIds);
+
             }).start();
 
         }
     }
 
-    private Set<BigInteger> updateColorInActivity(String newTimeTypeColor,BigInteger timeTypeId) {
+    public Set<BigInteger> updateColorInActivity(TimeTypeDTO timeTypeDTO,BigInteger timeTypeId) {
         List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
         if (isCollectionNotEmpty(activities)) {
-            activities.forEach(activity -> activity.getGeneralActivityTab().setBackgroundColor(newTimeTypeColor));
+            activities.forEach(activity -> {
+                activity.getGeneralActivityTab().setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                activity.getRulesActivityTab().setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
+                if(isNotNull(timeTypeDTO.getRulesActivityTab())){
+                    activity.getRulesActivityTab().setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(timeTypeDTO.getRulesActivityTab().getSicknessSetting(), SicknessSetting.class));
+                }
+            });
             activityMongoRepository.saveEntities(activities);
         }
         return activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());

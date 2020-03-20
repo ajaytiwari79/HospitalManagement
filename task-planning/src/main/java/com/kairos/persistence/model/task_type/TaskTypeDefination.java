@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * Created by prabjot on 7/10/16.
  */
-public class TaskTypeDefination implements Serializable {
+public class TaskTypeDefination  {
 
     private TaskTypeEnum.TaskTypeStatus taskTypeStatus;
 

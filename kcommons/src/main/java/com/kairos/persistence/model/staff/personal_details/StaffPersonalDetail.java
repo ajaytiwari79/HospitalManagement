@@ -68,7 +68,7 @@ public class StaffPersonalDetail {
     private AddressDTO contactAddress;
     private AddressDTO secondaryContactAddress;
     private Set<Long> teamIdsOfStaff;
-//    @NotBlank(message = "error.Staff.userName.notnull")
+    //@NotBlank(message = "error.Staff.userName.notnull")
     private String userName;
     private boolean userNameUpdated;
     private List<TeamDTO> teams;

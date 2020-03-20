@@ -316,14 +316,14 @@ public class RuletemplateUtils {
 
     public static int getConsecutiveDaysInDate(List<LocalDate> localDates) {
         if (localDates.size() < 2) return 0;
-        int count = 1;
+        int count = 0;
         int max = 0;
         int l = 1;
         while (l < localDates.size()) {
             if (localDates.get(l - 1).equals(localDates.get(l).minusDays(1))) {
                 count++;
             } else {
-                count = 1;
+                count = 0;
             }
             if (count > max) {
                 max = count;

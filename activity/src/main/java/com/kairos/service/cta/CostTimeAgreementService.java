@@ -144,24 +144,7 @@ public class CostTimeAgreementService {
             Map<Long, Map<Long, BigInteger>> unitActivities = activityService.getListOfActivityIdsOfUnitByParentIds(activityIds, unitIds);
             for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
                 //TODO Refactor Tag assignment in WTA
-                ctaResponseDTO.setTags(null);
-                CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
-                // Set activity Ids according to unit activity Ids
-                organisationCTA.setId(null);
-                assignOrganisationActivitiesToRuleTemplate(ctaResponseDTO.getRuleTemplates(), unitActivities.get(organisationCTA.getId()));
-                organisationCTA.setOrganization(new WTAOrganization(organizationId, "", ""));
-                organisationCTA.setParentCountryCTAId(ctaResponseDTO.getId());
-                updateExistingPhaseIdOfCTA(ctaResponseDTO.getRuleTemplates(), organizationId, countryId);
-                List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(ctaResponseDTO.getRuleTemplates(), CTARuleTemplate.class);
-                List<BigInteger> ruleTemplateIds = new ArrayList<>();
-                if (CollectionUtils.isNotEmpty(ruleTemplates)) {
-                    ruleTemplates.forEach(ctaRuleTemplate -> {
-                        ctaRuleTemplate.setId(null);
-                    });
-                    ctaRuleTemplateRepository.saveEntities(ruleTemplates);
-                    ruleTemplateIds = ruleTemplates.stream().map(rt -> rt.getId()).collect(Collectors.toList());
-                }
-                organisationCTA.setRuleTemplateIds(ruleTemplateIds);
+                CostTimeAgreement organisationCTA = createCloneCostTimeAgreementForOrganization(countryId, organizationId, unitActivities, ctaResponseDTO);
                 costTimeAgreements.add(organisationCTA);
             }
         }
@@ -169,6 +152,28 @@ public class CostTimeAgreementService {
             costTimeAgreementRepository.saveEntities(costTimeAgreements);
         }
 
+    }
+
+    private CostTimeAgreement createCloneCostTimeAgreementForOrganization(Long countryId, Long organizationId, Map<Long, Map<Long, BigInteger>> unitActivities, CTAResponseDTO ctaResponseDTO) {
+        ctaResponseDTO.setTags(null);
+        CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
+        // Set activity Ids according to unit activity Ids
+        organisationCTA.setId(null);
+        assignOrganisationActivitiesToRuleTemplate(ctaResponseDTO.getRuleTemplates(), unitActivities.get(organisationCTA.getId()));
+        organisationCTA.setOrganization(new WTAOrganization(organizationId, "", ""));
+        organisationCTA.setParentCountryCTAId(ctaResponseDTO.getId());
+        updateExistingPhaseIdOfCTA(ctaResponseDTO.getRuleTemplates(), organizationId, countryId);
+        List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(ctaResponseDTO.getRuleTemplates(), CTARuleTemplate.class);
+        List<BigInteger> ruleTemplateIds = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(ruleTemplates)) {
+            ruleTemplates.forEach(ctaRuleTemplate -> {
+                ctaRuleTemplate.setId(null);
+            });
+            ctaRuleTemplateRepository.saveEntities(ruleTemplates);
+            ruleTemplateIds = ruleTemplates.stream().map(rt -> rt.getId()).collect(Collectors.toList());
+        }
+        organisationCTA.setRuleTemplateIds(ruleTemplateIds);
+        return organisationCTA;
     }
 
     public Map<Long, Map<PhaseDefaultName, BigInteger>> getMapOfPhaseIdsAndUnitByParentIds(List<Long> unitIds) {
@@ -288,21 +293,10 @@ public class CostTimeAgreementService {
     }
 
     private CTAResponseDTO updateEmploymentCTAWhenCalculatedValueChanged(CostTimeAgreement oldCTA, CollectiveTimeAgreementDTO ctaDTO) {
-        if (!ctaDTO.getStartDate().equals(oldCTA.getStartDate())) {
-            boolean ctaExists = costTimeAgreementRepository.ctaExistsByEmploymentIdAndDatesAndNotEqualToId(oldCTA.getId(), oldCTA.getEmploymentId(), asDate(ctaDTO.getStartDate()), isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()) : null);
-            if (ctaExists) {
-                exceptionService.duplicateDataException("error.cta.invalid", ctaDTO.getStartDate(), isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()) : "");
-            }
-        }
+        validateCtaOnUpdateEmploymentCta(oldCTA, ctaDTO);
         ctaDTO.setId(null);
         CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(ctaDTO, CostTimeAgreement.class);
-        List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
-        if (!ctaRuleTemplates.isEmpty()) {
-            ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
-            ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
-            List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
-            costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
-        }
+        List<CTARuleTemplate> ctaRuleTemplates = getCtaRuleTemplates(ctaDTO, costTimeAgreement);
         costTimeAgreement.setId(oldCTA.getId());
         oldCTA.setId(null);
         oldCTA.setDisabled(true);
@@ -330,6 +324,26 @@ public class CostTimeAgreementService {
         versionCTA.setRuleTemplates(existingCtaRuleTemplatesDTOS);
         responseCTA.setVersions(Arrays.asList(versionCTA));
         return responseCTA;
+    }
+
+    private void validateCtaOnUpdateEmploymentCta(CostTimeAgreement oldCTA, CollectiveTimeAgreementDTO ctaDTO) {
+        if (!ctaDTO.getStartDate().equals(oldCTA.getStartDate())) {
+            boolean ctaExists = costTimeAgreementRepository.ctaExistsByEmploymentIdAndDatesAndNotEqualToId(oldCTA.getId(), oldCTA.getEmploymentId(), asDate(ctaDTO.getStartDate()), isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()) : null);
+            if (ctaExists) {
+                exceptionService.duplicateDataException("error.cta.invalid", ctaDTO.getStartDate(), isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()) : "");
+            }
+        }
+    }
+
+    private List<CTARuleTemplate> getCtaRuleTemplates(CollectiveTimeAgreementDTO ctaDTO, CostTimeAgreement costTimeAgreement) {
+        List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
+        if (!ctaRuleTemplates.isEmpty()) {
+            ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
+            ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
+            List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
+            costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
+        }
+        return ctaRuleTemplates;
     }
 
 

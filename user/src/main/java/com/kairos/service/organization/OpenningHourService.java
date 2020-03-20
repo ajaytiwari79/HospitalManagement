@@ -1,5 +1,7 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.persistence.model.organization.DayType;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.OrganizationSetting;
@@ -12,7 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_UNIT_ID_NOTFOUND;
 
@@ -73,28 +78,19 @@ public class OpenningHourService {
     public List<Object> getOrganizationHolidays(long unitId) {
         Long id = countryGraphRepository.getCountryIdByUnitId(unitId);
         List<Object> response = new ArrayList<>();
-        if (id != null) {
             List<Map<String, Object>> data = countryGraphRepository.getAllCountryHolidays(id);
-            ;
             for (Map map : data) {
                 Object o = map.get("result");
                 response.add(o);
             }
             return response;
-        }
-        return null;
     }
 
 
     public boolean setDefaultOpeningHours(long unitId) {
-        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? unitGraphRepository.findOne(unitId) : null;
-        if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
-
-        }
+        Unit unit = unitGraphRepository.findById(unitId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_UNIT_ID_NOTFOUND,unitId)));
         OrganizationSetting organizationSetting = getDefaultSettings();
         unit.setOrganizationSetting(organizationSetting);
-
         unitGraphRepository.save(unit);
         return true;
     }

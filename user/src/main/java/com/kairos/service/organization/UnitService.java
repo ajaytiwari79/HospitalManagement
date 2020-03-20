@@ -1,5 +1,7 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.*;
 import com.kairos.persistence.model.country.Country;
@@ -33,6 +35,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANISATION_NOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANIZATION_ID_NOTFOUND;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
@@ -95,7 +98,7 @@ public class UnitService {
         Map<String, Object> response = new HashMap<>(2);
         response.put("parentInfo", parentOrgDefaultDetails(organization));
         List<OrganizationBasicResponse> units = organizationService.getOrganizationGdprAndWorkcenter(organizationId);
-        response.put("units", units.size() != 0 ? units : Collections.emptyList());
+        response.put("units", units);
 
         response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
 
@@ -177,6 +180,10 @@ public class UnitService {
             unit.getAccessGroups().forEach(accessGroup -> accessGroupFilters.add(new FilterSelectionQueryResult(accessGroup.getId().toString(), accessGroup.getName())));
         }
         return accessGroupFilters;
+    }
+
+    public Unit findByUnitId(Long unitId){
+        return unitGraphRepository.findById(unitId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANISATION_NOTFOUND)));
     }
 
 }

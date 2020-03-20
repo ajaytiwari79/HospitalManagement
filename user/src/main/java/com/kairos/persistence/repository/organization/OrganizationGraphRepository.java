@@ -1,4 +1,5 @@
-package com.kairos.persistence.repository.organization;/*
+package com.kairos.persistence.repository.organization;
+/*
  *Created By Pavan on 27/5/19
  *
  */
@@ -27,12 +28,12 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Organization findHub();
 
 
-    @Query("MATCH(o{isEnable:true,boardingCompleted: true}) where id(o) IN {0} "+
+    @Query("MATCH(o{isEnable:true,boardingCompleted: true}) where id(o) = {0} "+
             "OPTIONAL MATCH(o)-[orgRel:"+HAS_SUB_ORGANIZATION+"*]->(org:Organization{isEnable:true,boardingCompleted: true}) " +
             "OPTIONAL MATCH(o)-[unitRel:"+HAS_UNIT+"]->(u:Unit{isEnable:true,boardingCompleted: true}) " +
             "OPTIONAL MATCH(org)-[orgUnitRel:"+HAS_UNIT+"]->(un:Unit{isEnable:true,boardingCompleted: true}) " +
             "RETURN o,org,orgRel,unitRel,u,orgUnitRel,un")
-    List<OrganizationBaseEntity> generateHierarchy(Collection<Long> ids);
+    List<Organization> generateHierarchy(Long id);
 
     @Query("MATCH (union:Organization{union:true,isEnable:true}) WHERE id (union)={0}  RETURN union")
     Organization findByIdAndUnionTrueAndIsEnableTrue(Long unionId);

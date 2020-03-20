@@ -4,7 +4,7 @@ import com.kairos.enums.DurationType;
 
 import java.io.Serializable;
 
-public class DurationField implements Serializable {
+public class DurationField  {
     private Integer value;
     private DurationType type;
 

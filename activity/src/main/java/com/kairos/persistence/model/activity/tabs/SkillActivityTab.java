@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SkillActivityTab implements Serializable {
+public class SkillActivityTab  {
 
     private List<ActivitySkill> activitySkills = new ArrayList<>();
 

@@ -171,9 +171,9 @@ public class ShiftTemplateService{
         return true;
     }
 
-    public ShiftWithViolatedInfoDTO createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO) {
+    public List<ShiftWithViolatedInfoDTO> createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO) {
         List<ShiftDTO> shifts = new ArrayList<>();
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO();
+        List<ShiftWithViolatedInfoDTO>  shiftWithViolatedInfoDTOS = new ArrayList<>();
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftDTO.getTemplate().getId());
         Set<BigInteger> individualShiftTemplateIds = shiftTemplate.getIndividualShiftTemplateIds();
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
@@ -192,19 +192,21 @@ public class ShiftTemplateService{
                 shiftActivities.add(shiftActivity);
             });
             newShiftDTO.setActivities(shiftActivities);
-            ShiftWithViolatedInfoDTO result = shiftService.createShift(unitId, newShiftDTO,null);
-            shiftWithViolatedInfoDTO.setShifts(result.getShifts());
+            List<ShiftWithViolatedInfoDTO> result = shiftService.createShift(unitId, newShiftDTO,null);
+            for (ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO : result) {
+                shiftWithViolatedInfoDTO.setShifts(shiftWithViolatedInfoDTO.getShifts());
 
-            if (CollectionUtils.isNotEmpty(result.getViolatedRules().getActivities())) {
-                shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(result.getViolatedRules().getActivities());
+                if (CollectionUtils.isNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())) {
+                    shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(shiftWithViolatedInfoDTO.getViolatedRules().getActivities());
+                }
+                if (CollectionUtils.isNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements())) {
+                    shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().addAll(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
+                }
+                //shifts.addAll(shiftWithViolatedInfoDTO.getShifts());
             }
-            if (CollectionUtils.isNotEmpty(result.getViolatedRules().getWorkTimeAgreements())) {
-                shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().addAll(result.getViolatedRules().getWorkTimeAgreements());
-            }
-            shifts.addAll(result.getShifts());
+            shiftWithViolatedInfoDTOS.addAll(result);
         });
-        shiftWithViolatedInfoDTO.setShifts(shifts);
-        return shiftWithViolatedInfoDTO;
+        return shiftWithViolatedInfoDTOS;
     }
 
 

@@ -54,6 +54,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.GdprMessagesConstants.*;
+
 @Service
 public class AssessmentService {
 
@@ -114,7 +116,7 @@ public class AssessmentService {
 
         Asset asset = assetRepository.findByIdAndOrganizationIdAndDeletedFalse(assetId, unitId);
         if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "message.asset", assetId);
         } else if (!asset.isActive()) {
             exceptionService.invalidRequestException("message.asset.inactive");
         } else if (!Optional.ofNullable(assessmentDTO.getRelativeDeadlineDuration()).isPresent() || !Optional.ofNullable(assessmentDTO.getRelativeDeadlineType()).isPresent()) {
@@ -164,11 +166,11 @@ public class AssessmentService {
      * @param assessmentDTO        Assessment Dto contain detail about who assign assessment and to whom assessment is assigned
      * @return
      */
-    public AssessmentDTO launchAssessmentForProcessingActivity(Long unitId, Long processingActivityId, AssessmentDTO assessmentDTO, boolean subProcessingActivity) {
+    public AssessmentDTO launchAssessmentForProcessingActivity(Long unitId, Long processingActivityId, AssessmentDTO assessmentDTO) {
 
         ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedAndIsSubProcessingActivity(processingActivityId, unitId, false);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.ProcessingActivity", processingActivityId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "message.ProcessingActivity", processingActivityId);
         } else if (!processingActivity.isActive()) {
             exceptionService.invalidRequestException("message.processing.activity.inactive");
         }
@@ -394,7 +396,7 @@ public class AssessmentService {
 
         Assessment assessment = assessmentRepository.findByOrganizationIdAndId(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "Assessment", assessmentId);
         }
         QuestionnaireTemplate assessmentQuestionnaireTemplate = assessment.getQuestionnaireTemplate();
         List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessmentQuestionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class);
@@ -498,7 +500,7 @@ public class AssessmentService {
 
         Assessment assessment = assessmentRepository.findByOrganizationIdAndId(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assessment", assessmentId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "message.assessment", assessmentId);
         } else if (AssessmentStatus.COMPLETED.equals(assessment.getAssessmentStatus())) {
             exceptionService.invalidRequestException("message.assessment.completed.cannot.fill.answer");
         } else if ((AssessmentStatus.NEW.equals(assessment.getAssessmentStatus()) && AssessmentStatus.COMPLETED.equals(status)) || AssessmentStatus.NEW.equals(status)) {
@@ -507,13 +509,13 @@ public class AssessmentService {
 
         UserVO currentUser = new UserVO(UserContext.getUserDetails().getId(), UserContext.getUserDetails().getUserName(), UserContext.getUserDetails().getEmail(), UserContext.getUserDetails().getFirstName(), UserContext.getUserDetails().getLastName());
         if ((AssessmentStatus.IN_PROGRESS.equals(status) && AssessmentStatus.IN_PROGRESS.equals(assessment.getAssessmentStatus())) && !currentUser.equals(assessment.getAssessmentLastAssistBy())) {
-            exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
+            exceptionService.invalidRequestException(MESSAGE_NOTAUTHORIZED_TOCHANGE_ASSESSMENT_STATUS);
         }
         validateAssessmentAnswer(assessment, assessmentAnswerValueObjects);
         assessment.setAssessmentStatus(status);
         if (AssessmentStatus.COMPLETED.equals(status)) {
             if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
-                exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
+                exceptionService.invalidRequestException(MESSAGE_NOTAUTHORIZED_TOCHANGE_ASSESSMENT_STATUS);
             }
             assessment.setCompletedDate(LocalDate.now());
         }
@@ -571,20 +573,20 @@ public class AssessmentService {
         switch (assessmentStatus) {
             case IN_PROGRESS:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
-                    exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
+                    exceptionService.invalidRequestException(MESSAGE_ASSESSMENT_INVALID_STATUS, assessment.getAssessmentStatus(), assessmentStatus);
                 }
                 break;
             case COMPLETED:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
-                    exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
+                    exceptionService.invalidRequestException(MESSAGE_ASSESSMENT_INVALID_STATUS, assessment.getAssessmentStatus(), assessmentStatus);
                 } else if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
-                    exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
+                    exceptionService.invalidRequestException(MESSAGE_NOTAUTHORIZED_TOCHANGE_ASSESSMENT_STATUS);
                 }
                 mapAssessmentAnswerToAssetOrProcessingActivity(assessment);
                 break;
             case NEW:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.IN_PROGRESS) || assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
-                    exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
+                    exceptionService.invalidRequestException(MESSAGE_ASSESSMENT_INVALID_STATUS, assessment.getAssessmentStatus(), assessmentStatus);
                 }
                 break;
             default:
@@ -606,7 +608,7 @@ public class AssessmentService {
                 if (Optional.ofNullable(assetAssessmentAnswer.getAttributeName()).isPresent()) {
                     saveAssessmentAnswerAsAssetValueOnCompletionOfAssessment(AssetAttributeName.valueOf(assetAssessmentAnswer.getAttributeName()), assetAssessmentAnswer.getValue(), asset);
                 } else {
-                    exceptionService.invalidRequestException("message.assessment.answer.attribute.null");
+                    exceptionService.invalidRequestException(MESSAGE_ASSESSMENT_ANSWER_ATTRIBUTE_NULL);
                 }
             });
             assetRepository.save(asset);
@@ -618,7 +620,7 @@ public class AssessmentService {
                 if (Optional.ofNullable(processingActivityAssessmentAnswer.getAttributeName()).isPresent()) {
                     saveAssessmentAnswerAsProcessingActivityValueOnCompletionOfAssessment(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentAnswer.getAttributeName()), processingActivityAssessmentAnswer.getValue(), processingActivity);
                 } else {
-                    exceptionService.invalidRequestException("message.assessment.answer.attribute.null");
+                    exceptionService.invalidRequestException(MESSAGE_ASSESSMENT_ANSWER_ATTRIBUTE_NULL);
                 }
             });
             processingActivityRepository.save(processingActivity);
