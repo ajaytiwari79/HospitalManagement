@@ -297,7 +297,7 @@ public class ShiftService extends MongoBaseService {
         todoService.updateStatusOfShiftActivityIfApprovalRequired(activityWrapperMap, shift, updateShift);
         payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
-        updateStatusForShift(shift,shiftAction,updateShift);
+        shiftDetailsService.updateStatusForShift(shift,shiftAction,updateShift);
         shiftMongoRepository.save(shift);
         shiftStateService.createShiftStateByPhase(Arrays.asList(shift), phase);
         return shift;
@@ -1581,50 +1581,5 @@ public class ShiftService extends MongoBaseService {
             }
         }
     }
-
-    // This function is used for the change the status of the draft shift
-    public void updateStatusForShift(Shift shift, ShiftActionType shiftActionType, boolean shiftUpdated) {
-        Set<ShiftStatus> shiftStatuses = new HashSet<>();
-                    for (ShiftActivity shiftActivity : shift.getActivities()) {
-                        if (ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
-                            if (ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType) && (ShiftType.NON_WORKING.equals(shift.getShiftType()) || ShiftType.ABSENCE.equals(shift.getShiftType()))) {
-                                shiftStatuses.add(ShiftStatus.REQUEST);
-                                shiftActivity.setStatus(shiftStatuses);
-                            }
-                            else {
-                                shiftActivity.setStatus(shiftStatuses);
-                            }
-                        }
-                        else if (ShiftActionType.SAVE.equals(shiftActionType) && (ShiftType.NON_WORKING.equals(shift.getShiftType()) || ShiftType.ABSENCE.equals(shift.getShiftType()))) {
-                                if (!shiftUpdated) {
-                                    shiftStatuses.add(ShiftStatus.PUBLISH);
-                                    shiftStatuses.add(ShiftStatus.APPROVE);
-                                    shiftActivity.setStatus(shiftStatuses);
-                                } else {
-                                    shiftStatuses.add(ShiftStatus.APPROVE);
-                                    shiftStatuses.add(ShiftStatus.PUBLISH);
-                                    shiftStatuses.add(ShiftStatus.MOVED);
-                                    shiftActivity.setStatus(shiftStatuses);
-                                }
-                            }
-                       else if(ShiftActionType.SAVE.equals((shiftActionType)) && ShiftType.PRESENCE.equals(shift.getShiftType())){
-                           if(shiftUpdated) {
-                               shiftStatuses.add(ShiftStatus.PUBLISH);
-                               shiftStatuses.add(ShiftStatus.MOVED);
-                               shiftActivity.setStatus(shiftStatuses);
-                           }
-                        }
-                        else {
-                            if ((ShiftType.NON_WORKING.equals(shift.getShiftType()) || ShiftType.ABSENCE.equals(shift.getShiftType()))&&isNull(shiftActionType)) {
-                                shiftStatuses.add(ShiftStatus.REQUEST);
-                                shiftActivity.setStatus(shiftStatuses);
-                            }else{
-                                shiftActivity.setStatus(shiftStatuses);
-                            }
-                        }
-
-        }
-    }
-
 
 }
