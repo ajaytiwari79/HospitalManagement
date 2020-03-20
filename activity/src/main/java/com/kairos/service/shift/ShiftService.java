@@ -9,8 +9,6 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.attendance.AttendanceTimeSlotDTO;
 import com.kairos.dto.activity.attendance.TimeAndAttendanceDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
-import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.tags.TagDTO;
@@ -260,6 +258,7 @@ public class ShiftService extends MongoBaseService {
         List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(shiftDTO.getId() != null, mainShift, activityWrapperMap, staffAdditionalInfoDTO, wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets(), mainShift);
         mainShift.setBreakActivities(breakActivities);
 
+
         activityConfigurationService.addPlannedTimeInShift(mainShift, activityWrapperMap, staffAdditionalInfoDTO, false);
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(mainShift, ShiftDTO.class);
         shiftDTO.setShiftType(updateShiftType(activityWrapperMap,mainShift));
@@ -300,6 +299,7 @@ public class ShiftService extends MongoBaseService {
         todoService.updateStatusOfShiftActivityIfApprovalRequired(activityWrapperMap, shift, updateShift);
         payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
+        shiftDetailsService.updateStatusForShift(shift,shiftAction,updateShift);
         shiftMongoRepository.save(shift);
         shiftStateService.createShiftStateByPhase(Arrays.asList(shift), phase);
         return shift;
@@ -710,6 +710,7 @@ public class ShiftService extends MongoBaseService {
             shiftMongoRepository.delete(shift);
             return new ArrayList<>();
         }
+
         boolean ruleCheckRequired = shift.isShiftUpdated(ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class));
         Date currentShiftStartDate = shift.getStartDate();
         Date currentShiftEndDate = shift.getEndDate();
@@ -786,6 +787,7 @@ public class ShiftService extends MongoBaseService {
             }
             shiftWithViolatedInfoDTO.setShifts(shiftDTOS);
             shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
+
         }
         addReasonCode(shiftWithViolatedInfoDTOS.stream().flatMap(shiftWithViolatedInfoDTO -> shiftWithViolatedInfoDTO.getShifts().stream()).collect(Collectors.toList()), staffAdditionalInfoDTO.getReasonCodes());
         if (!shiftDTO.isDraft()) {
