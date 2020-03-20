@@ -1131,7 +1131,7 @@ public class StaffService {
 
     public List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId, List<StaffFilterSelectionDTO> staffFilters){
         LOGGER.debug("filters received are {} ",staffFilters);
-        LocalDate localDate = LocalDate.of(2020,01,01);
+        LocalDate localDate = LocalDate.now();
        String dateToday = DateUtils.formatLocalDate(localDate,"dd-MM-yyyy");
 
         return staffGraphRepository.getAllStaffForUnitWithEmploymentStatus(unitId,dateToday);
