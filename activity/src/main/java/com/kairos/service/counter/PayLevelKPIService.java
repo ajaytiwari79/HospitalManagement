@@ -12,12 +12,20 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
-import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Service
 public class PayLevelKPIService {
+
+    public double getPayLevelGradeOfMainEmploymentOfStaff(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        if(isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())){
+            LocalDate startDate =kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
+            return getPayLevelOfMainEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,startDate);
+        }else {
+            return getPayLevelOfMainEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
+        }
+    }
 
     public double getPayLevelOfMainEmploymentOfStaff(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo,LocalDate selectedDate){
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = isNotNull(staffId) ? Arrays.asList(kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().getOrDefault(staffId, new StaffKpiFilterDTO())) : kpiCalculationRelatedInfo.getStaffKpiFilterDTOS();

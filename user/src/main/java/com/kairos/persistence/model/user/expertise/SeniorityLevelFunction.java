@@ -12,7 +12,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.FOR_S
 @NodeEntity
 @Getter
 @Setter
-public class SeniorityLevelFunction extends UserBaseEntity  implements Serializable {
+public class SeniorityLevelFunction extends UserBaseEntity   {
     @Relationship(type = FOR_SENIORITY_LEVEL)
     private SeniorityLevel seniorityLevel;
 }

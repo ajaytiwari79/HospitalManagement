@@ -10,7 +10,7 @@ import java.io.Serializable;
  * Created by pankaj on 4/3/17.
  */
 @Document(collection = "kairos_sequence")
-public class MongoSequence implements Serializable {
+public class MongoSequence  {
 
     @Id
     private String id;

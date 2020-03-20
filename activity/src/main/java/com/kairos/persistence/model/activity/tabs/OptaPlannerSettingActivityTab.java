@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OptaPlannerSettingActivityTab implements Serializable {
+public class OptaPlannerSettingActivityTab  {
 
     private int maxThisActivityPerShift;
     private int minLength;

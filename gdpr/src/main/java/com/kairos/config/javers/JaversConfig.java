@@ -83,21 +83,6 @@ class JaversConfig {
         return new JpaHibernateConnectionProvider();
     }
 
-   /* @Bean
-    public MongoClient mongo() {
-
-        BSON.addEncodingHook(BigInteger.class, new BigIntegerTransformer());
-        CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
-                CodecRegistries.fromProviders(new BigIntegerCodecProvider()),
-                MongoClient.getDefaultCodecRegistry()
-        );
-        MongoClientOptions.Builder builder = MongoClientOptions.builder()
-                .codecRegistry(codecRegistry);
-        final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential(environment.getDbUserName(), environment.getDataBaseName(), environment.getDbPassword().toCharArray()));
-        return new MongoClient(new ServerAddress(environment.getDbHost(), environment.getDbPort()), credentialList, builder.build());
-
-    }
-*/
     @Bean
     @ConditionalOnProperty(name = "javers.auditableAspectEnabled", havingValue = "true", matchIfMissing = true)
     public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {

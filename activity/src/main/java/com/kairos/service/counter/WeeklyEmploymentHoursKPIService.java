@@ -13,10 +13,21 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Service
 public class WeeklyEmploymentHoursKPIService {
+
+    public double getWeeklyHoursOfEmployment(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        if (isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())) {
+            LocalDate startDate = kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
+            LocalDate endDate = kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
+            return getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo, startDate, endDate);
+        } else {
+            return getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo, asLocalDate(kpiCalculationRelatedInfo.getStartDate()), asLocalDate(kpiCalculationRelatedInfo.getEndDate()));
+        }
+    }
 
     public Double getWeeklyHoursOfEmployment(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, LocalDate startDate, LocalDate endDate) {
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = isNotNull(staffId) ? Arrays.asList(kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().getOrDefault(staffId, new StaffKpiFilterDTO())) : kpiCalculationRelatedInfo.getStaffKpiFilterDTOS();

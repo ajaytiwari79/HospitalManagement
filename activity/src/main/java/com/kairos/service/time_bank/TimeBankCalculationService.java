@@ -73,6 +73,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoField;
@@ -1010,6 +1011,7 @@ public class TimeBankCalculationService {
         endDate = isNull(employmentWithCtaDetailsDTO.getEndDate()) ? endDate : endDate.isBefore(employmentWithCtaDetailsDTO.getEndDate()) ? endDate : employmentWithCtaDetailsDTO.getEndDate();
         Map<java.time.LocalDate, PhaseDefaultName> datePhaseDefaultNameMap = getDatePhaseDefaultName(employmentStartDate, endDate, employmentWithCtaDetailsDTO.getUnitId());
         Set<PhaseDefaultName> validPhaseForActualTimeBank = newHashSet(PUZZLE, CONSTRUCTION);
+        Map<java.time.LocalDate, Boolean> publishPlanningPeriodDateMap = getDateWisePublishPlanningPeriod(employmentWithCtaDetailsDTO.getEmploymentTypeId(), employmentStartDate, endDate, employmentWithCtaDetailsDTO.getUnitId());
         while (employmentStartDate.isBefore(endDate) || employmentStartDate.equals(endDate)) {
             int totalTimeBankMinutes;
             long publishedBalancesMinutes = 0;
@@ -1023,7 +1025,7 @@ public class TimeBankCalculationService {
             } else {
                 totalTimeBankMinutes = -getContractualMinutesByDate(planningPeriodInterval, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines());
             }
-            if (!employmentStartDate.isAfter(firstRequestPhasePlanningPeriodEndDate) || validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate))) {
+            if (employmentStartDate.isAfter(LocalDate.now()) && (!employmentStartDate.isAfter(firstRequestPhasePlanningPeriodEndDate) && !publishPlanningPeriodDateMap.get(employmentStartDate) && validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate)))) {
                 expectedTimebankMinutes += totalTimeBankMinutes;
             }
             CTARuletemplateBonus ctaRuletemplateBonus = getCTABonusDistributions(ctaRuletemplateNameAndMinutesMap, ctaRuleTemplateDTOS);

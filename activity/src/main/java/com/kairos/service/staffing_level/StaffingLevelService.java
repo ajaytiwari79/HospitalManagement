@@ -510,7 +510,7 @@ public class StaffingLevelService  {
         Object[] objects = getStaffingLevelDto(staffingLevels);
         shiftPlanningInfo.put("staffingLevel", (List<ShiftPlanningStaffingLevelDTO>) objects[0]);
         List<BigInteger> activityIds = new ArrayList<BigInteger>((Set<BigInteger>) objects[1]);
-        List<ActivityDTO> activityDTOS = activityMongoRepositoryImpl.getAllActivityWithTimeType(unitId, activityIds);
+        List<ActivityDTO> activityDTOS = activityMongoRepositoryImpl.getAllActivityWithTimeType(activityIds);
         shiftPlanningInfo.put("unitId", unitId);
         shiftPlanningInfo.put("activities", activityDTOS);
         Set<Long> expertiseIds = activityDTOS.stream().flatMap(a -> a.getExpertises().stream()).collect(Collectors.toSet());

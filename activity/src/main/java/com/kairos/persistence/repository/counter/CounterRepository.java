@@ -663,14 +663,7 @@ public class CounterRepository{
 
     public <S extends MongoBaseEntity> S save(@Valid S entity) {
         Assert.notNull(entity, "Entity must not be null!");
-        /**
-         *  Get class name for sequence class
-         * */
         String className = entity.getClass().getSimpleName();
-
-        /**
-         *  Set Id if entity don't have Id
-         * */
         if(entity.getId() == null){
             if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
                 //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
@@ -685,9 +678,6 @@ public class CounterRepository{
         }else {
             entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
         }
-        /**
-         *  Set updatedAt time as current time
-         * */
         entity.setUpdatedAt(DateUtils.getDate());
         mongoTemplate.save(entity);
         return entity;
@@ -700,31 +690,36 @@ public class CounterRepository{
         MongoConverter converter = mongoTemplate.getConverter();
         BasicDBObject dbObject;
         try{
-            for (T entity: entities) {
-                String className = entity.getClass().getSimpleName();
-                entity.setUpdatedAt(DateUtils.getDate());
-                if(entity.getId() == null){
-                    entity.setCreatedAt(DateUtils.getDate());
-                    entity.setId(nextSequence(className));
-                    entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
-                    dbObject = new BasicDBObject();
-                    converter.write(entity, dbObject);
-                    bulkWriteOperation.insert(dbObject);
-                }else {
-                    entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
-                    dbObject = new BasicDBObject();
-                    converter.write(entity, dbObject);
-                    BasicDBObject query = new BasicDBObject();
-                    query.put("_id", dbObject.get("_id"));
-                    bulkWriteOperation.find(query).replaceOne(dbObject);
-                }
-            }
+            updateBulkOperation(entities, bulkWriteOperation, converter);
             bulkWriteOperation.execute();
             return entities;
         } catch(Exception ex){
             LOGGER.error("BulkWriteOperation Exception ::  ", ex);
         }
         return new ArrayList<>();
+    }
+
+    private <T extends MongoBaseEntity> void updateBulkOperation(@Valid List<T> entities, BulkWriteOperation bulkWriteOperation, MongoConverter converter) {
+        BasicDBObject dbObject;
+        for (T entity: entities) {
+            String className = entity.getClass().getSimpleName();
+            entity.setUpdatedAt(DateUtils.getDate());
+            if(entity.getId() == null){
+                entity.setCreatedAt(DateUtils.getDate());
+                entity.setId(nextSequence(className));
+                entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+                dbObject = new BasicDBObject();
+                converter.write(entity, dbObject);
+                bulkWriteOperation.insert(dbObject);
+            }else {
+                entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+                dbObject = new BasicDBObject();
+                converter.write(entity, dbObject);
+                BasicDBObject query = new BasicDBObject();
+                query.put("_id", dbObject.get("_id"));
+                bulkWriteOperation.find(query).replaceOne(dbObject);
+            }
+        }
     }
 
     public BigInteger nextSequence(String sequenceName){
