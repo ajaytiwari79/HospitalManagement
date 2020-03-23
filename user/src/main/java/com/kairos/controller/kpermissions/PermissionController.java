@@ -58,4 +58,10 @@ public class PermissionController {
 
     }
 
+    @PutMapping(value = "/validate_permission")
+    public ResponseEntity validatePermission(@RequestParam Long referenceId, @RequestParam ConfLevel confLevel)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getDefaultDataOfPermission(referenceId,confLevel));
+
+    }
+
 }
