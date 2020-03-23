@@ -507,6 +507,11 @@ public class StaffFilterService {
             assignActivitiesStaff.addAll(teamService.getAllStaffToAssignActivitiesByTeam(unitId, staffFilterDataDTO.getActivityIds()));
             staffListMap = staffListMap.stream().filter(map -> assignActivitiesStaff.contains(Long.valueOf(map.get(ID).toString()))).collect(Collectors.toList());
         }
+        if(filterTypeMap.containsKey(GROUPS) && isCollectionNotEmpty(filterTypeMap.get(GROUPS))){
+            List<Long> groupIds = filterTypeMap.get(GROUPS).stream().map(s -> Long.valueOf(s.toString())).collect(Collectors.toList());
+            Set<Long> staffIds = groupService.getAllStaffIdsByGroupIds(unitId,groupIds);
+            staffListMap = staffListMap.stream().filter(map -> staffIds.contains(Long.valueOf(map.get(ID).toString()))).collect(Collectors.toList());
+        }
         return staffListMap;
     }
 
