@@ -72,14 +72,13 @@ public class ShiftFilterService {
         ShiftFilter realTimeStatusFilter = getSickTimeTypeFilter(unitId, filterTypeMap);
         ShiftFilter plannedByFilter = getPlannedByFilter(unitId,filterTypeMap);
         ShiftFilter phaseFilter = new PhaseFilter(filterTypeMap);
-        ShiftFilter groupFilter = getGroupFilter(unitId, filterTypeMap);
         ShiftFilter escalationFilter = getEscalationFilter(shiftWithActivityDTOS.stream().map(shift->shift.getId()).collect(Collectors.toList()), filterTypeMap);
         Set<Long> employmentIds = shiftWithActivityDTOS.stream().map(s->s.getEmploymentId()).collect(Collectors.toSet());
         ShiftFilter timeBankBalanceFilter = getTimeBankBalanceFilter(unitId, filterTypeMap, employmentIds);
         ShiftFilter employmentTypeFilter = getEmploymentTypeFilter(filterTypeMap,staffKpiFilterDTOS);
         ShiftFilter employmentSubTypeFilter = getEmploymentSubTypeFilter(filterTypeMap,staffKpiFilterDTOS);
         ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(timeAndAttendanceFilter)
-                                    .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter).and(escalationFilter)
+                                    .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(escalationFilter)
                                     .and(timeBankBalanceFilter).and(employmentTypeFilter).and(employmentSubTypeFilter);
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);
     }
@@ -103,15 +102,6 @@ public class ShiftFilterService {
             shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
         }
         return new EscalationFilter(shiftViolatedRulesMap, filterTypeMap);
-    }
-
-    private <G> ShiftFilter getGroupFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap) {
-        Set<Long> groupMembers = new HashSet<>();
-        if(filterTypeMap.containsKey(GROUPS) && isCollectionNotEmpty(filterTypeMap.get(GROUPS))) {
-            List<Long> groupIds = filterTypeMap.get(GROUPS).stream().map(s -> new Long(s.toString())).collect(Collectors.toList());
-            groupMembers = userIntegrationService.getAllStaffIdsByGroupIds(unitId, groupIds);
-        }
-        return new GroupFilter(groupMembers,filterTypeMap);
     }
 
     private <G> ShiftFilter getSickTimeTypeFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap) {

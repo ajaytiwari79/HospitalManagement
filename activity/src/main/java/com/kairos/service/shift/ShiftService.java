@@ -299,7 +299,7 @@ public class ShiftService extends MongoBaseService {
         todoService.updateStatusOfShiftActivityIfApprovalRequired(activityWrapperMap, shift, updateShift);
         payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
-        shiftDetailsService.updateStatusForShift(shift,shiftAction,updateShift);
+        //shiftDetailsService.updateStatusForShift(shift,shiftAction,updateShift);
         shiftMongoRepository.save(shift);
         shiftStateService.createShiftStateByPhase(Arrays.asList(shift), phase);
         return shift;
