@@ -23,7 +23,7 @@ plugins {
 ext {
 	versionslf4j='1.7.23'
 	springCloudVersion = 'Finchley.M8'
-	versionoptaplannerbom='7.20.0.Final'
+	versionoptaplannerbom='7.34.0.Final'
 	versionlogback='1.2.3'
 }
 
