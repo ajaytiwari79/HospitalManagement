@@ -6,6 +6,7 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.common.StaffFilterDataDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
@@ -28,6 +29,7 @@ import com.kairos.persistence.model.organization.services.OrganizationServicesAn
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.filter.*;
+import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -203,7 +205,7 @@ public class StaffFilterService {
             case TIME_SLOT:
                 return getTimeSlots();
             case ASSIGN_ACTIVITY:
-                return getAllActivity(unitId);
+                return getAllActivity(unitId,countryId);
             case ABSENCE_ACTIVITY:
                 return getAnsenceActivity(unitId);
             case  PLANNED_TIME_TYPE:
@@ -237,9 +239,9 @@ public class StaffFilterService {
         return new ArrayList<>();
     }
 
-    private List<FilterSelectionQueryResult> getAllActivity(Long unitId){
-        List<ActivityDTO> activityDTOS = activityIntegrationService.getActivitiesWithCategories(unitId);
-        return activityDTOS.stream().map(activityDTO -> new FilterSelectionQueryResult(activityDTO.getId().toString(),activityDTO.getName())).collect(Collectors.toList());
+    private List<FilterSelectionQueryResult> getAllActivity(Long unitId, Long countryId){
+       ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = activityIntegrationService.getAllActivitiesAndTimeTypesByUnit(unitId, countryId);
+        return activityWithTimeTypeDTOS.getActivityDTOS().stream().map(activityDTO -> new FilterSelectionQueryResult(activityDTO.getId().toString(),activityDTO.getName())).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getTags(Long orgId) {
@@ -507,9 +509,16 @@ public class StaffFilterService {
         if(isCollectionNotEmpty(activityIds) || isCollectionNotEmpty(timeTypeIds) ){
             List<Long> assignActivitiesStaff = new ArrayList<>();
             StaffFilterDataDTO staffFilterDataDTO = activityIntegrationService.getAssignActivityStaffFilterReatedData(unitId, timeTypeIds, activityIds);
-            assignActivitiesStaff.addAll(staffFilterDataDTO.getStaffIds());
+            if(isCollectionNotEmpty(staffFilterDataDTO.getStaffIds())) {
+                assignActivitiesStaff.addAll(staffFilterDataDTO.getStaffIds());
+            }
             assignActivitiesStaff.addAll(teamService.getAllStaffToAssignActivitiesByTeam(unitId, staffFilterDataDTO.getActivityIds()));
             staffListMap = staffListMap.stream().filter(map -> assignActivitiesStaff.contains(Long.valueOf(map.get(ID).toString()))).collect(Collectors.toList());
+        }
+        if(filterTypeMap.containsKey(GROUPS) && isCollectionNotEmpty(filterTypeMap.get(GROUPS))){
+            List<Long> groupIds = filterTypeMap.get(GROUPS).stream().map(s -> Long.valueOf(s.toString())).collect(Collectors.toList());
+            Set<Long> staffIds = groupService.getAllStaffIdsByGroupIds(unitId,groupIds);
+            staffListMap = staffListMap.stream().filter(map -> staffIds.contains(Long.valueOf(map.get(ID).toString()))).collect(Collectors.toList());
         }
         return staffListMap;
     }
