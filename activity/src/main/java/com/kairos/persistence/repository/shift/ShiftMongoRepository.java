@@ -83,7 +83,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{deleted:false,employmentId:?0, startDate:{$gte:?1}}")
     List<Shift> findAllShiftsByEmploymentIdAfterDate(Long employmentId, Date startDate);
 
-    Shift findByIdAndDeletedFalseAndDisabledFalse(BigInteger shiftId);
+    Shift findByIdAndDeletedFalse(BigInteger shiftId);
 
     @Query(value = "{deleted:false,staffId:?0,shiftType:?1, startDate:{$gte:?2}}",exists = true)
     boolean alreadySickReportedForStaff(Long staffId, ShiftType shiftType,Date selectedDate);
