@@ -25,7 +25,6 @@ public class FilterSelectionDTO<T> {
     private Set<T> value;
     private int sequence;
 
-
     private String moduleId;
 
     public FilterSelectionDTO(FilterType name, Set<T> value) {

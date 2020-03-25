@@ -7,7 +7,6 @@ import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
-import com.kairos.enums.data_filters.StaffFilterSelectionDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
 import com.kairos.persistence.model.staff.StaffSkillDTO;
@@ -645,8 +644,8 @@ public class StaffController {
 
     @PostMapping(value = "/get_all_planning_staff")
     @ApiOperation("Get all staff eligible for planning")
-    public ResponseEntity<Map<String, Object>>  getStaffEligibleForPlanning(@PathVariable Long unitId, @RequestBody List<StaffFilterSelectionDTO> staffFilters){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffForUnitWithEmploymentStatus(unitId,staffFilters));
+    public ResponseEntity<Map<String, Object>>  getStaffEligibleForPlanning(@PathVariable Long unitId, @RequestBody StaffFilterDTO staffFilterDetails){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffForUnitWithEmploymentStatus(unitId,staffFilterDetails));
     }
     @GetMapping(value = "/endPositionProcess")
     @ApiOperation("end position process")

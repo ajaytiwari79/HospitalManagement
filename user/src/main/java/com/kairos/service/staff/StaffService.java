@@ -18,11 +18,7 @@ import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.EmploymentSubType;
-import com.kairos.enums.Gender;
-import com.kairos.enums.SkillLevel;
-import com.kairos.enums.StaffStatusEnum;
-import com.kairos.enums.data_filters.StaffFilterSelectionDTO;
+import com.kairos.enums.*;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -47,6 +43,7 @@ import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.repository_impl.StaffGraphRepositoryImpl;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -175,6 +172,13 @@ public class StaffService {
     private TagGraphRepository tagGraphRepository;
     @Inject
     private ExpertiseService expertiseService;
+
+    @Inject
+    private StaffGraphRepositoryImpl staffGraphRepositoryImpl;
+
+    @Inject
+    private StaffFilterService staffFilterService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffService.class);
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
@@ -992,12 +996,14 @@ public class StaffService {
         return staffGraphRepository.getStaffIdByUserId(userId,parentOrganizationId);
     }
 
-    public List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId, List<StaffFilterSelectionDTO> staffFilters){
-        LOGGER.debug("filters received are {} ",staffFilters);
+    public <T> List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId,StaffFilterDTO staffFilterDetails){
+
+        LOGGER.info("filters received are {} ",staffFilterDetails.getFiltersData());
         LocalDate localDate = LocalDate.now();
        String dateToday = DateUtils.formatLocalDate(localDate,"dd-MM-yyyy");
 
-        return staffGraphRepository.getAllStaffForUnitWithEmploymentStatus(unitId,dateToday);
+        Map<FilterType,Set<T>> filterTypeSetMap = staffFilterService.getMapOfFiltersToBeAppliedWithValue(staffFilterDetails.getModuleId(),staffFilterDetails.getFiltersData());
+        return staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap,unitId,dateToday);
     }
 
 }

@@ -1,31 +1,35 @@
  package com.kairos.persistence.repository.repository_impl;
 
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
-import com.kairos.enums.Employment;
-import com.kairos.enums.FilterType;
-import com.kairos.enums.ModuleId;
-import com.kairos.persistence.model.staff.StaffEmploymentQueryResult;
-import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
-import com.kairos.persistence.repository.user.staff.CustomStaffGraphRepository;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.neo4j.ogm.model.Result;
-import org.neo4j.ogm.session.Session;
-import org.springframework.stereotype.Repository;
+ import com.kairos.commons.utils.ObjectMapperUtils;
+ import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+ import com.kairos.enums.Employment;
+ import com.kairos.enums.FilterType;
+ import com.kairos.enums.ModuleId;
+ import com.kairos.persistence.model.staff.StaffEmploymentQueryResult;
+ import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
+ import com.kairos.persistence.model.staff.personal_details.StaffEmploymentWithTag;
+ import com.kairos.persistence.repository.user.staff.CustomStaffGraphRepository;
+ import org.apache.commons.collections.CollectionUtils;
+ import org.apache.commons.lang3.StringUtils;
+ import org.neo4j.ogm.model.Result;
+ import org.neo4j.ogm.session.Session;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ import org.springframework.stereotype.Repository;
 
-import javax.inject.Inject;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+ import javax.inject.Inject;
+ import java.time.LocalDate;
+ import java.util.*;
+ import java.util.stream.Collectors;
+ import java.util.stream.StreamSupport;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StaffGraphRepositoryImpl.class);
     @Inject
     private Session session;
 
@@ -210,6 +214,77 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class, query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map>toList());
     }
+
+    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(Map<FilterType,Set<T>> filters, Long unitId, String today){
+
+        Map<String,Object> queryParameters = new HashMap<>();
+        queryParameters.put("unitId",unitId);
+        queryParameters.put("today",today);
+        StringBuilder query = new StringBuilder();
+        StringBuilder returnData = new StringBuilder();
+
+        query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment)-[:IN_UNIT]-(unit:Unit)\n" +
+                "WHERE id(unit)={unitId} AND ( employments.endDate > '{today}' OR employments.endDate is null ) \n");
+
+        returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ")
+                    .append(" id(user) as userId, ")
+                   .append(" collect( distinct employments) as employments ");
+
+        if (Optional.ofNullable(filters.get(FilterType.STAFF_STATUS)).isPresent() && filters.get(FilterType.STAFF_STATUS).size()!=0) {
+            queryParameters.put("statusNames",filters.get(FilterType.STAFF_STATUS));
+            query.append(" AND staff.currentStatus in {statusNames} ");
+        }
+        if (Optional.ofNullable(filters.get(FilterType.GENDER)).isPresent() && filters.get(FilterType.GENDER).size()!=0) {
+            queryParameters.put("genderList", filters.get(FilterType.GENDER));
+            query.append(" AND user.gender in {genderList} ");
+        }
+        if (Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent() && filters.get(FilterType.TEAM).size()!=0) {
+            queryParameters.put("teamIds", convertListOfStringIntoLong(filters.get(FilterType.TEAM)));
+            query.append(" WITH staff,employments,user MATCH (staff)<-[:TEAM_HAS_MEMBER]-(team:Team) where id(team) in {teamIds} ");
+        }
+        if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent() && filters.get(FilterType.EXPERTISE).size()!=0) {
+            queryParameters.put("expertiseIds", convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
+            query.append(" WITH staff,employments,user MATCH (staff)-[:STAFF_HAS_EXPERTISE]->(expertise:Expertise) where id(expertise) in {expertiseIds}");
+        }
+        if (Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent() && filters.get(FilterType.SKILLS).size()!=0) {
+            queryParameters.put("skillIds", convertListOfStringIntoLong(filters.get(FilterType.SKILLS)));
+            query.append(" WITH staff,employments,user MATCH (staff)-[:STAFF_HAS_SKILLS]->(skills:Skill) where id(skills) in {skillIds}");
+        }
+
+        if (Optional.ofNullable(filters.get(FilterType.TAGS)).isPresent() && filters.get(FilterType.TAGS).size()!=0) {
+            queryParameters.put("tagIds", convertListOfStringIntoLong(filters.get(FilterType.TAGS)));
+            query.append(" WITH staff,employments,user MATCH (staff)-[:BELONGS_TO_TAGS]->(tags:Tag) where id(tags) in {tagIds}");
+            returnData.append(" , collect( distinct tags) as tags ");
+        }
+
+        if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()  && filters.get(FilterType.EMPLOYMENT_TYPE).size()!=0) {
+            queryParameters.put("employmentTypeIds", convertListOfStringIntoLong(filters.get(FilterType.EMPLOYMENT_TYPE)));
+            query.append(" WITH staff,employments,tags,user MATCH (employmentType:EmploymentType)<-[:HAS_EMPLOYMENT_TYPE]-(el:EmploymentLine)<-[:HAS_EMPLOYMENT_LINES]-(employments) WHERE id(employmentType) in {employmentTypeIds}");
+
+        }
+
+        if (Optional.ofNullable(filters.get(FilterType.SKILL_LEVEL)).isPresent()) {
+            queryParameters.put("skillLevels",
+                    filters.get(FilterType.SKILL_LEVEL));
+        }
+        if (Optional.ofNullable(filters.get(FilterType.ACCESS_GROUPS)).isPresent()) {
+            queryParameters.put("accessGroupIds",
+                    convertListOfStringIntoLong(filters.get(FilterType.ACCESS_GROUPS)));
+        }
+
+        returnData.append(" ORDER BY staff.firstName");
+        query.append(returnData);
+
+        Result staffEmployments =  session.query(query.toString(),queryParameters);
+        LOGGER.info("staff with employments found are {}",staffEmployments.queryResults());
+       List<StaffEmploymentWithTag> staffEmploymentWithTags = new ArrayList<>();
+        Iterator si = staffEmployments.iterator();
+        while (si.hasNext()){
+            staffEmploymentWithTags.add(ObjectMapperUtils.copyPropertiesByMapper(si.next(),StaffEmploymentWithTag.class));
+        }
+        return staffEmploymentWithTags;
+    }
+
 
     public <T> List<Long> convertListOfStringIntoLong(Set<T> listOfString) {
         return listOfString.stream().map(list->Long.valueOf(list.toString())).collect(Collectors.toList());

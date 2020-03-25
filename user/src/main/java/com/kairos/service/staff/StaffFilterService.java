@@ -50,6 +50,8 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,6 +79,9 @@ import static com.kairos.enums.shift.ShiftStatus.*;
 @Transactional
 @Service
 public class StaffFilterService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StaffFilterService.class);
+
 
     @Inject
     private StaffGraphRepository staffGraphRepository;
@@ -411,9 +416,12 @@ public class StaffFilterService {
         Map<FilterType, Set<T>> mapOfFilters = new HashMap<>();
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
+        LOGGER.info("filter group searched is {}",filterGroup);
         filters.forEach(filterSelection -> {
-            if (!filterSelection.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
+            if (filterGroup!=null && !filterSelection.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
                     filterSelection.getName())) {
+                mapOfFilters.put(filterSelection.getName(), filterSelection.getValue());
+            }else{
                 mapOfFilters.put(filterSelection.getName(), filterSelection.getValue());
             }
         });

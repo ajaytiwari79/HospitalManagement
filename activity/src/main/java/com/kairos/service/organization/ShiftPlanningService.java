@@ -1,7 +1,6 @@
 package com.kairos.service.organization;
 
 import com.kairos.dto.activity.shift.ShiftSearchDTO;
-import com.kairos.enums.data_filters.StaffFilterSelectionDTO;
 import com.kairos.enums.shift.ShiftFilterDurationType;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -28,7 +27,7 @@ public class ShiftPlanningService {
 
     public List<StaffShiftDetails> getShiftPlanningDetailsForUnit(Long unitId, ShiftSearchDTO shiftSearchDTO){
 
-        List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId,shiftSearchDTO.getStaffFilters());
+        List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId,shiftSearchDTO);
         LOGGER.debug("staff found for planning are {}", staffListWithPersonalDetails );
 
        final Set<Long> employmentIds = new HashSet<>();
@@ -41,7 +40,7 @@ public class ShiftPlanningService {
     }
 
     public StaffShiftDetails getShiftPlanningDetailsForOneStaff(Long unitId, ShiftSearchDTO shiftSearchDTO){
-        List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId,shiftSearchDTO.getStaffFilters());
+        List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId,shiftSearchDTO);
         LOGGER.debug("staff found for planning are {}", staffListWithPersonalDetails );
         int i=0;
         StaffShiftDetails matchedStaff = null;
@@ -65,7 +64,7 @@ public class ShiftPlanningService {
 
 
     public List<StaffShiftDetails> getUnitPlanningAndShiftForSelectedStaff(Long unitId, ShiftSearchDTO shiftSearchDTO){
-        List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId,shiftSearchDTO.getStaffFilters());
+        List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId,shiftSearchDTO);
 
         int i=-1;
         StaffShiftDetails matchedStaff = null;
@@ -142,8 +141,8 @@ public class ShiftPlanningService {
 
 
 
-    public List<StaffShiftDetails> getAllStaffEligibleForPlanning(Long unitId, List<StaffFilterSelectionDTO> staffFilters){
-      return  userIntegrationService.getAllPlanningStaffForUnit(unitId,staffFilters);
+    public List<StaffShiftDetails> getAllStaffEligibleForPlanning(Long unitId, ShiftSearchDTO shiftSearchDTO){
+      return  userIntegrationService.getAllPlanningStaffForUnit(unitId,shiftSearchDTO);
     }
 
 

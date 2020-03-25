@@ -47,7 +47,6 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.MasterDataTypeEnum;
-import com.kairos.enums.data_filters.StaffFilterSelectionDTO;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
@@ -933,9 +932,9 @@ public class UserIntegrationService {
 //        queryParamList.add(new BasicNameValuePair("selectedDate", selectedDate.toString()));
 //        return genericRestClient.publishRequest(employmentIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_total_sum_of_paylevel", queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
 //    }
-    public List<StaffShiftDetails> getAllPlanningStaffForUnit(Long unitId, List<StaffFilterSelectionDTO> filterSelectionDTOS){
-        LOGGER.debug("filter selections being sent {}",filterSelectionDTOS);
-        return genericRestClient.publishRequest(filterSelectionDTOS, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/staff/get_all_planning_staff", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffShiftDetails>>>() {
+    public List<StaffShiftDetails> getAllPlanningStaffForUnit(Long unitId, ShiftSearchDTO shiftSearchDTO){
+        LOGGER.debug("filter selections being sent {}",shiftSearchDTO);
+        return genericRestClient.publishRequest(shiftSearchDTO, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/staff/get_all_planning_staff", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffShiftDetails>>>() {
         });
     }
 
