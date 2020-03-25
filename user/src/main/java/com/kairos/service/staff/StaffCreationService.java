@@ -1,6 +1,8 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
@@ -133,14 +135,8 @@ public class StaffCreationService {
 
     private Staff updateStaffDetailsOnCreationOfStaff(Organization organization, StaffCreationDTO payload) {
         StaffQueryResult staffQueryResult;
-
         staffQueryResult = staffGraphRepository.getStaffByExternalIdInOrganization(organization.getId(), payload.getExternalId());
-        Staff staff;
-        if (Optional.ofNullable(staffQueryResult).isPresent()) {
-            staff = staffQueryResult.getStaff();
-        } else {
-            staff = new Staff();
-        }
+        Staff staff=Optional.ofNullable(staffQueryResult).isPresent()?staffQueryResult.getStaff():new Staff();
         staff.setEmail(payload.getPrivateEmail());
         staff.setInactiveFrom(payload.getInactiveFrom());
         staff.setExternalId(payload.getExternalId());
@@ -173,7 +169,6 @@ public class StaffCreationService {
         ObjectMapper mapper = new ObjectMapper();
         Map unitManagerDTOMap = mapper.convertValue(unitManagerDTO, Map.class);
         if (user == null) {
-            LOGGER.info("Unit manager is null..creating new user first");
             user = new User(unitManagerDTO.getEmail(), unitManagerDTO.getFirstName().trim(), unitManagerDTO.getLastName().trim(), unitManagerDTO.getEmail(), unitManagerDTO.getContactDetail(), new BCryptPasswordEncoder().encode(password));
             user.setUserType(UserType.USER_ACCOUNT);
             userGraphRepository.save(user);
@@ -349,6 +344,14 @@ public class StaffCreationService {
         position.setStartDateMillis(DateUtils.getCurrentDateMillis());
         organization.getPositions().add(position);
         organizationGraphRepository.save(organization);
+        addPermission(organization, staffCreationData, position);
+        staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
+        positionGraphRepository.save(position);
+        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(position.getStaff().getId())), organization.getId());
+        return user;
+    }
+
+    private void addPermission(Organization organization, StaffCreationDTO staffCreationData, Position position) {
         if(staffCreationData.getAccessGroupId() != null) {
             UnitPermission unitPermission = new UnitPermission();
             unitPermission.setOrganization(organization);
@@ -358,25 +361,13 @@ public class StaffCreationService {
             }
             position.getUnitPermissions().add(unitPermission);
         }
-        staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
-        positionGraphRepository.save(position);
-        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(position.getStaff().getId())), organization.getId());
-        return user;
     }
 
     public boolean importStaffFromTimeCare(List<TimeCareStaffDTO> timeCareStaffDTOS, String externalId) {
-        Organization organization = organizationGraphRepository.findByExternalId(externalId);
-        if (organization == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_EXTERNALID_NOTFOUND);
-        }
-        List<TimeCareStaffDTO> timeCareStaffByWorkPlace = timeCareStaffDTOS.stream().filter(timeCareStaffDTO -> timeCareStaffDTO.getParentWorkPlaceId().equals(externalId)).
-                collect(Collectors.toList());
+        Organization organization = organizationGraphRepository.findByExternalId(externalId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_EXTERNALID_NOTFOUND)));
+        List<TimeCareStaffDTO> timeCareStaffByWorkPlace = timeCareStaffDTOS.stream().filter(timeCareStaffDTO -> timeCareStaffDTO.getParentWorkPlaceId().equals(externalId)).collect(Collectors.toList());
         ObjectMapper objectMapper = new ObjectMapper();
         AccessGroup accessGroup = accessGroupRepository.findTaskGiverAccessGroup(organization.getId());
-        if (accessGroup == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_TASKGIVER_ACCESGROUP_NOTPRESENT);
-
-        }
         SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organization.getId());
         for (TimeCareStaffDTO timeCareStaffDTO : timeCareStaffByWorkPlace) {
             String email = (timeCareStaffDTO.getEmail() == null) ? timeCareStaffDTO.getFirstName() + KAIROS_EMAIL : timeCareStaffDTO.getEmail();

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -49,7 +50,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "MATCH (user)<-[:"+BELONGS_TO+"]-(:Staff)<-[:"+BELONGS_TO+"]-(:Position)<-[:"+ HAS_POSITIONS +"]-(organization:Organization{isEnable:true,boardingCompleted: true,deleted:false}) RETURN user")
     User findUserByEmailInAnyOrganization(String email);
 
-    User findByKmdExternalId(Long kmdExternalId);
+    Optional<User> findByKmdExternalId(Long kmdExternalId);
 
     @Query("MATCH (staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(staff)={0} RETURN user")
     User getUserByStaffId(Long staffId);

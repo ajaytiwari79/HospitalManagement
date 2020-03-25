@@ -423,19 +423,13 @@ public class StaffFilterService {
     public <T> StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId, LocalDate startDate, LocalDate endDate , boolean showAllStaffs,LocalDate selectedDate) {
         boolean unit=unitGraphRepository.existsById(unitId);
         Organization organization=organizationService.fetchParentOrganization(unitId);
-        if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&
-                !filterGroupGraphRepository.checkIfFilterGroupExistsForModuleId(staffFilterDTO.getModuleId())) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_FILTER_SETTING_NOTFOUND);
-        }
+        validateFilter(staffFilterDTO);
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
         staffEmploymentTypeWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
         List<Long> allOrgIds=unit?Arrays.asList(organization.getId()):organizationGraphRepository.findAllOrganizationIdsInHierarchy(organization.getId());
         Map<FilterType, Set<T>> filterTypeSetMap = getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData());
-        List<Map> staffListMap=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
-                filterTypeSetMap, staffFilterDTO.getSearchText(),
-                envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),null,selectedDate);
-
+        List<Map> staffListMap=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId, filterTypeSetMap, staffFilterDTO.getSearchText(), envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),null,selectedDate);
         staffListMap = filterStaffList(unitId,staffListMap, filterTypeSetMap);
         staffEmploymentTypeWrapper.setStaffList(staffListMap);
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
@@ -449,13 +443,17 @@ public class StaffFilterService {
         List<Map> staffList = new ArrayList<>();
         setNightWorkerDetails(staffFilterDTO, staffs, staffList);
         if(loggedInStaffId!=null && staffList.stream().noneMatch(k->k.containsKey(loggedInStaffId)) && ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)){
-            List<Map> loggedInStaffDetails=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
-                    new HashMap<>(), null,
-                    envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),loggedInStaffId,selectedDate);
+            List<Map> loggedInStaffDetails=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId, new HashMap<>(), null, envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),loggedInStaffId,selectedDate);
             staffList.addAll(loggedInStaffDetails);
         }
         staffEmploymentTypeWrapper.setStaffList(staffList);
         return staffEmploymentTypeWrapper;
+    }
+
+    private void validateFilter(StaffFilterDTO staffFilterDTO) {
+        if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() && !filterGroupGraphRepository.checkIfFilterGroupExistsForModuleId(staffFilterDTO.getModuleId())) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_FILTER_SETTING_NOTFOUND);
+        }
     }
 
     private void setNightWorkerDetails(StaffFilterDTO staffFilterDTO, List<Map> staffs, List<Map> staffList) {

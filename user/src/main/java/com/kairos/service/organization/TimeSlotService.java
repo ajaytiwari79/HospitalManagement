@@ -134,16 +134,7 @@ public class TimeSlotService {
     }
 
     public List<TimeSlotSet> updateTimeSlotSet(Long unitId, Long timeSlotSetId, TimeSlotSetDTO timeSlotSetDTO) {
-        Unit unit = unitGraphRepository.findOne(unitId, 0);
-        if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.unitNotFoundException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
-
-        }
-        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOne(timeSlotSetId);
-        if (!Optional.ofNullable(timeSlotSet).isPresent()) {
-            logger.error("Invalid time slot id {}" , timeSlotSetId);
-            exceptionService.dataNotFoundByIdException(MESSAGE_TIMESLOT_ID_NOTFOUND);
-        }
+        TimeSlotSet timeSlotSet = timeSlotSetRepository.findById(timeSlotSetId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_TIMESLOT_ID_NOTFOUND)));
         List<TimeSlotSet> timeSlotSetsToUpdate = new ArrayList<>();
         if(timeSlotSet.getTimeSlotType().equals(TimeSlotType.TASK_PLANNING)) {
             List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findTimeSlotSetByStartDateBetween(unitId, timeSlotSet.getStartDate().toString(),
@@ -179,13 +170,7 @@ public class TimeSlotService {
     }
 
     public List<TimeSlotDTO> updateTimeSlot(List<TimeSlotDTO> timeSlotDTOS, Long timeSlotSetId) {
-
-        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOne(timeSlotSetId);
-        if (timeSlotSet == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_TIMESLOT_ID_NOTFOUND);
-
-        }
-
+        TimeSlotSet timeSlotSet = timeSlotSetRepository.findById(timeSlotSetId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_TIMESLOT_ID_NOTFOUND)));
         List<TimeSlotDTO> timeSlotsToUpdate = new ArrayList<>();
         List<TimeSlotDTO> timeSlotsToCreate = new ArrayList<>();
         for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
@@ -200,19 +185,9 @@ public class TimeSlotService {
             timeSlotGraphRepository.updateTimeSlot(timeSlotSetId, timeSlotDTO.getId(), timeSlotDTO.getName(), timeSlotDTO.getStartHour(),
                     timeSlotDTO.getStartMinute(), timeSlotDTO.getEndHour(), timeSlotDTO.getEndMinute(), timeSlotDTO.isShiftStartTime());
         }
-
         ObjectMapper objectMapper = new ObjectMapper();
         List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
-        for (TimeSlotDTO timeSlotDTO : timeSlotsToCreate) {
-
-            TimeSlot timeSlot = new TimeSlot(timeSlotDTO.getName());
-            TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = objectMapper.convertValue
-                    (timeSlotDTO, TimeSlotSetTimeSlotRelationship.class);
-            timeSlotSetTimeSlotRelationship.setId(null);
-            timeSlotSetTimeSlotRelationship.setTimeSlotSet(timeSlotSet);
-            timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
-            timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
-        }
+        prepareTimeSlotSetRelationShip(timeSlotSet, timeSlotsToCreate, objectMapper, timeSlotSetTimeSlotRelationships);
         timeSlotRelationshipGraphRepository.saveAll(timeSlotSetTimeSlotRelationships);
 
         List<TimeSlotDTO> newCreatedTimeSlots = new ArrayList<>();
@@ -222,6 +197,18 @@ public class TimeSlotService {
             newCreatedTimeSlots.add(timeSlotDTO);
         }
         return newCreatedTimeSlots;
+    }
+
+    private void prepareTimeSlotSetRelationShip(TimeSlotSet timeSlotSet, List<TimeSlotDTO> timeSlotsToCreate, ObjectMapper objectMapper, List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships) {
+        for (TimeSlotDTO timeSlotDTO : timeSlotsToCreate) {
+            TimeSlot timeSlot = new TimeSlot(timeSlotDTO.getName());
+            TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = objectMapper.convertValue
+                    (timeSlotDTO, TimeSlotSetTimeSlotRelationship.class);
+            timeSlotSetTimeSlotRelationship.setId(null);
+            timeSlotSetTimeSlotRelationship.setTimeSlotSet(timeSlotSet);
+            timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
+            timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
+        }
     }
 
     public boolean deleteTimeSlotSet(Long unitId, Long timeSlotSetId) {

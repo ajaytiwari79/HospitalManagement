@@ -51,24 +51,12 @@ public class ApiExternalStaffService {
             Long externalId = Long.valueOf(String.valueOf(data.get("externalId")));
             Long orgnaizationId = Long.valueOf(String.valueOf(data.get("organizationId")));
             String badge = String.valueOf(data.get("employmentNumber"));
-
-            Staff staff = new Staff();
-            staff.setFirstName(firstName);
-            staff.setLastName(lastName);
-            staff.setFamilyName(nickName);
-            staff.setExternalId(externalId);
-            staff.setOrganizationId(orgnaizationId);
-            staff.setBadgeNumber(badge);
-            staff = staffGraphRepository.save(staff);
+            Staff staff = initializeStaff(firstName, lastName, nickName, externalId, orgnaizationId, badge);
             List<Long> staffList = new ArrayList<>(1);
             staffList.add(staff.getId());
-            logger.info("Creating Staff using organizationId " + orgnaizationId);
-
+            logger.info("Creating Staff using organizationId {}" , orgnaizationId);
             Organization parent = organizationService.fetchParentOrganization(orgnaizationId);
-
             positionGraphRepository.createPositions(parent.getId(), staffList, orgnaizationId);
-
-
             AddressDTO address = new AddressDTO();
             address.setCity("Odense");
             address.setCountry("Denmark");
@@ -82,6 +70,18 @@ public class ApiExternalStaffService {
             return staff;
         }
         return null;
+    }
+
+    private Staff initializeStaff(String firstName, String lastName, String nickName, Long externalId, Long orgnaizationId, String badge) {
+        Staff staff = new Staff();
+        staff.setFirstName(firstName);
+        staff.setLastName(lastName);
+        staff.setFamilyName(nickName);
+        staff.setExternalId(externalId);
+        staff.setOrganizationId(orgnaizationId);
+        staff.setBadgeNumber(badge);
+        staff = staffGraphRepository.save(staff);
+        return staff;
     }
 
     public void updateExternalId(long staffId, long externalId) {

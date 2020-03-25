@@ -245,13 +245,7 @@ public class PayTableService {
 
     private List<PayGradeResponse> createCopyOfPayTableAndAddPayGrade(PayTable payTable, PayGradeDTO payGradeDTO, List<PayGradePayGroupAreaRelationShip> payGradesPayGroupAreaRelationShips) {
         List<PayGradeResponse> payGradeResponses = new ArrayList<>();
-        PayTable copiedPayTable = new PayTable();
-        BeanUtils.copyProperties(payTable, copiedPayTable);
-        copiedPayTable.setId(null);
-        copiedPayTable.setPayTable(payTable);
-        copiedPayTable.setPayGrades(null);
-        copiedPayTable.setPercentageValue(payTable.getPercentageValue());
-        payTable.setPercentageValue(null);
+        PayTable copiedPayTable = initializeCopiedPayTable(payTable);
         if (payGradeDTO != null) {
             payGradeResponses.add(addPayGradeInCurrentPayTable(copiedPayTable, payGradeDTO));
         }
@@ -261,22 +255,7 @@ public class PayTableService {
         //copying all previous and then adding in pay Table as well.
         List<PayGrade> payGradesObjects = new ArrayList<>();
         if (CollectionUtils.isEmpty(payGradesPayGroupAreaRelationShips)) {
-            for (PayGrade currentPayGrade : payTable.getPayGrades()) {
-                PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
-                List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
-                HashSet<PayTableMatrixQueryResult> payTableMatrix = payGradeGraphRepository.getPayGradeMatrixByPayGradeId(currentPayGrade.getId());
-
-                payTableMatrix.forEach(currentObj -> {
-                    PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
-                            = new PayGradePayGroupAreaRelationShip(newPayGrade, new PayGroupArea(currentObj.getPayGroupAreaId(), currentObj.getPayGroupAreaName()), currentObj.getPayGroupAreaAmount());
-                    payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
-                });
-                payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
-                payGradesObjects.add(newPayGrade);
-                PayGradeResponse payGradeResponse =
-                        new PayGradeResponse(copiedPayTable.getId(), newPayGrade.getPayGradeLevel(), newPayGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), newPayGrade.isPublished());
-                payGradeResponses.add(payGradeResponse);
-            }
+            createPayGradePayGroupAreaRelationShip(payTable, payGradeResponses, copiedPayTable, payGradesObjects);
         } else {
             Set<PayGrade> payGrades = payGradesPayGroupAreaRelationShips.stream().map(PayGradePayGroupAreaRelationShip::getPayGrade).collect(Collectors.toSet());
             payGradeGraphRepository.saveAll(payGrades);
@@ -292,6 +271,34 @@ public class PayTableService {
             payGradeResponses.add(new PayGradeResponse(copiedPayTable.getId()));
         }
         return payGradeResponses;
+    }
+
+    private PayTable initializeCopiedPayTable(PayTable payTable) {
+        PayTable copiedPayTable = new PayTable();
+        BeanUtils.copyProperties(payTable, copiedPayTable);
+        copiedPayTable.setId(null);
+        copiedPayTable.setPayTable(payTable);
+        copiedPayTable.setPayGrades(null);
+        copiedPayTable.setPercentageValue(payTable.getPercentageValue());
+        payTable.setPercentageValue(null);
+        return copiedPayTable;
+    }
+
+    private void createPayGradePayGroupAreaRelationShip(PayTable payTable, List<PayGradeResponse> payGradeResponses, PayTable copiedPayTable, List<PayGrade> payGradesObjects) {
+        for (PayGrade currentPayGrade : payTable.getPayGrades()) {
+            PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
+            List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
+            HashSet<PayTableMatrixQueryResult> payTableMatrix = payGradeGraphRepository.getPayGradeMatrixByPayGradeId(currentPayGrade.getId());
+            payTableMatrix.forEach(currentObj -> {
+                PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip = new PayGradePayGroupAreaRelationShip(newPayGrade, new PayGroupArea(currentObj.getPayGroupAreaId(), currentObj.getPayGroupAreaName()), currentObj.getPayGroupAreaAmount());
+                payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
+            });
+            payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
+            payGradesObjects.add(newPayGrade);
+            PayGradeResponse payGradeResponse =
+                    new PayGradeResponse(copiedPayTable.getId(), newPayGrade.getPayGradeLevel(), newPayGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), newPayGrade.isPublished());
+            payGradeResponses.add(payGradeResponse);
+        }
     }
 
     private PayGradeResponse addPayGradeInCurrentPayTable(PayTable payTable, PayGradeDTO payGradeDTO) {
@@ -437,44 +444,17 @@ public class PayTableService {
         List<PayGradeResponse> payGradeResponses = new ArrayList<>();
         List<PayGrade> payGradesObjects = new ArrayList<>();
         // creating a new PayTable
-        PayTable payTableByMapper = new PayTable();
-        BeanUtils.copyProperties(payTable, payTableByMapper);
-        payTableByMapper.setId(null);
-        payTableByMapper.setPayTable(payTable);
-        payTableByMapper.setPayGrades(null);
-        payTableByMapper.setPublished(false);
-        payTable.setHasTempCopy(true);
-        payTable.setEditable(false);
-        payTableByMapper.setHasTempCopy(false);
-        payTableGraphRepository.save(payTableByMapper);
+        PayTable payTableByMapper = preparePayTableByMapper(payTable);
         Set<Long> payGroupAreaIds = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
         List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreaIds);
         List<PayGroupAreaDTO> payGroupAreaDTOS = payGradeGraphRepository.getPayGradeDataByIdAndPayGroupArea(payGradeId, new ArrayList<>(payGroupAreaIds));
         Map<Long, BigDecimal> payGradePublishedAmountMap = getMapOfPayGroupAreaAmount(payGroupAreaDTOS);
         for (PayGrade currentPayGrade : payTable.getPayGrades()) {
             PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
-            List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
-
-            if (payGradeDTO.getPayGradeId().equals(currentPayGrade.getId())) {
-                // user has changed the value in  this pay Grade area of payTable
-                for (PayGroupAreaDTO currentPayGroupArea : payGradeDTO.getPayGroupAreas()) {
-                    PayGroupArea payGroupArea = payGroupAreas.stream().filter(payGroupArea1 -> payGroupArea1.getId().equals(currentPayGroupArea.getPayGroupAreaId())).findFirst().get();
-                    PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
-                            = new PayGradePayGroupAreaRelationShip(newPayGrade, payGroupArea, currentPayGroupArea.getPayGroupAreaAmount());
-                    payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
-                }
-            } else {
-                HashSet<PayTableMatrixQueryResult> payTableMatrix = payGradeGraphRepository.getPayGradeMatrixByPayGradeId(currentPayGrade.getId());
-                payTableMatrix.forEach(currentObj -> {
-                    PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
-                            = new PayGradePayGroupAreaRelationShip(newPayGrade, new PayGroupArea(currentObj.getPayGroupAreaId(), currentObj.getPayGroupAreaName()), currentObj.getPayGroupAreaAmount());
-                    payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
-                });
-            }
+            List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = getPayGradePayGroupAreaRelationShips(payGradeDTO, payGroupAreas, currentPayGrade, newPayGrade);
             payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
             payGradesObjects.add(newPayGrade);
-            PayGradeResponse payGradeResponse =
-                    new PayGradeResponse(payTableByMapper.getId(), newPayGrade.getPayGradeLevel(), newPayGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), newPayGrade.isPublished());
+            PayGradeResponse payGradeResponse = new PayGradeResponse(payTableByMapper.getId(), newPayGrade.getPayGradeLevel(), newPayGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), newPayGrade.isPublished());
             if (currentPayGrade.getId().equals(payGradeId)) {
                 payGradeResponse.getPayGroupAreas().forEach(current -> current.setPublishedAmount(payGradePublishedAmountMap.get(current.getPayGroupAreaId())));
             }
@@ -485,28 +465,55 @@ public class PayTableService {
         return payGradeResponses;
     }
 
+    private List<PayGradePayGroupAreaRelationShip> getPayGradePayGroupAreaRelationShips(PayGradeDTO payGradeDTO, List<PayGroupArea> payGroupAreas, PayGrade currentPayGrade, PayGrade newPayGrade) {
+        List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
+
+        if (payGradeDTO.getPayGradeId().equals(currentPayGrade.getId())) {
+            // user has changed the value in  this pay Grade area of payTable
+            for (PayGroupAreaDTO currentPayGroupArea : payGradeDTO.getPayGroupAreas()) {
+                PayGroupArea payGroupArea = payGroupAreas.stream().filter(payGroupArea1 -> payGroupArea1.getId().equals(currentPayGroupArea.getPayGroupAreaId())).findFirst().get();
+                PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip = new PayGradePayGroupAreaRelationShip(newPayGrade, payGroupArea, currentPayGroupArea.getPayGroupAreaAmount());
+                payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
+            }
+        } else {
+            HashSet<PayTableMatrixQueryResult> payTableMatrix = payGradeGraphRepository.getPayGradeMatrixByPayGradeId(currentPayGrade.getId());
+            payTableMatrix.forEach(currentObj -> {
+                PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip = new PayGradePayGroupAreaRelationShip(newPayGrade, new PayGroupArea(currentObj.getPayGroupAreaId(), currentObj.getPayGroupAreaName()), currentObj.getPayGroupAreaAmount());
+                payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
+            });
+        }
+        return payGradePayGroupAreaRelationShips;
+    }
+
+    private PayTable preparePayTableByMapper(PayTable payTable) {
+        PayTable payTableByMapper = new PayTable();
+        BeanUtils.copyProperties(payTable, payTableByMapper);
+        payTableByMapper.setId(null);
+        payTableByMapper.setPayTable(payTable);
+        payTableByMapper.setPayGrades(null);
+        payTableByMapper.setPublished(false);
+        payTable.setHasTempCopy(true);
+        payTable.setEditable(false);
+        payTableByMapper.setHasTempCopy(false);
+        payTableGraphRepository.save(payTableByMapper);
+        return payTableByMapper;
+    }
+
     public List<PayTable> publishPayTable(Long payTableId, LocalDate publishedDate) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         validateDetails(payTable);
         List<PayTable> response = new ArrayList<>();
         PayTable parentPayTable = payTableGraphRepository.getPermanentPayTableByPayTableId(payTableId);
         if (Optional.ofNullable(parentPayTable).isPresent()) {
-            LocalDate endDate;
-            if (DateUtils.getLocalDate().equals(publishedDate) || parentPayTable.getStartDateMillis().equals(publishedDate)) {
-                endDate = publishedDate;
-            } else {
-                endDate = publishedDate.minusDays(1);
-            }
+            LocalDate endDate = getEndDateToSet(publishedDate, parentPayTable);
             payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), endDate.toString());
             validatePayTableToPublish(payTableId, publishedDate);
             parentPayTable.setEndDateMillis(endDate);
             parentPayTable.setHasTempCopy(false);
             parentPayTable.setPayTable(null);
             response.add(parentPayTable);
-
         } else if (!payTable.getStartDateMillis().equals(publishedDate)) {
             exceptionService.actionNotPermittedException(MESSAGE_PAYTABLE_PUBLISHED_SAMEDATE);
-
         }
         payTable.setPayTable(null);
         payTable.setPublished(true);
@@ -521,6 +528,16 @@ public class PayTableService {
         }
         response.add(payTable);
         return response;
+    }
+
+    private LocalDate getEndDateToSet(LocalDate publishedDate, PayTable parentPayTable) {
+        LocalDate endDate;
+        if (DateUtils.getLocalDate().equals(publishedDate) || parentPayTable.getStartDateMillis().equals(publishedDate)) {
+            endDate = publishedDate;
+        } else {
+            endDate = publishedDate.minusDays(1);
+        }
+        return endDate;
     }
 
     private void validateDetails(PayTable payTable) {

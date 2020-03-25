@@ -21,7 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_B
 @Getter
 @Setter
 @NoArgsConstructor
-public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel>,Serializable {
+public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel> {
     private Integer from; // this is stored as years
     private Integer to;   // this is stored as years
 

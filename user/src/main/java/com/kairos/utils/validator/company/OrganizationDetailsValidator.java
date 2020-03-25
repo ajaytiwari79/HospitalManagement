@@ -47,7 +47,6 @@ public class OrganizationDetailsValidator {
     }
 
     public static void validateUserDetails(List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults, ExceptionService exceptionService) {
-        if(ObjectUtils.isCollectionNotEmpty(staffPersonalDetailQueryResults)) {
             staffPersonalDetailQueryResults.forEach(staffPersonalDetailDTO -> {
                 if (!Optional.ofNullable(staffPersonalDetailDTO.getCprNumber()).isPresent() || staffPersonalDetailDTO.getCprNumber().length() != 10) {
                     exceptionService.invalidRequestException(ERROR_CPRNUMBER_NOTNULL, staffPersonalDetailDTO.getOrganizationId());
@@ -65,9 +64,6 @@ public class OrganizationDetailsValidator {
                     exceptionService.invalidRequestException(ERROR_ORGANIZATION_UNITMANAGER_ACCESSGROUP_NOTNULL, staffPersonalDetailDTO.getOrganizationId());
                 }
             });
-        }else{
-            exceptionService.invalidRequestException(ERROR_USER_DETAILS_MISSING);
-        }
     }
 
     public static void validateAddressDetails(List<OrganizationContactAddress> organizationContactAddresses, ExceptionService exceptionService) {
