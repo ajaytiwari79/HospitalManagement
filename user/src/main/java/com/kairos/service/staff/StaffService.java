@@ -610,7 +610,7 @@ public class StaffService {
         if (Optional.ofNullable(cell).isPresent()) {
             cell.setCellType(Cell.CELL_TYPE_STRING);
             ZipCode zipCode = zipCodeGraphRepository.findByZipCode((StringUtils.isBlank(cell.getStringCellValue())) ? 0 : Integer.parseInt(cell.getStringCellValue()));
-            if (zipCode != null) {setInformationAndSaveStaff
+            if (zipCode != null) {
                 ContactAddress contactAddress = new ContactAddress();
                 contactAddress.setZipCode(zipCode);
                 String address = row.getCell(23).getStringCellValue();
@@ -645,7 +645,7 @@ public class StaffService {
     private String getStringValueOfIndexedCell(Row row, int cellIndex) {
         Cell cellValue = row.getCell(cellIndex);
         cellValue.setCellType(Cell.CELL_TYPE_STRING);
-        return cellValue.getStringCellValue().trim();extractContactAddressFromRow
+        return cellValue.getStringCellValue().trim();
     }
 
     private ContactDetail extractContactDetailFromRow(Row row) {
