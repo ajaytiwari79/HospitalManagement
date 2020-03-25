@@ -1,5 +1,6 @@
  package com.kairos.persistence.repository.repository_impl;
 
+ import com.kairos.commons.utils.DateUtils;
  import com.kairos.commons.utils.ObjectMapperUtils;
  import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
  import com.kairos.enums.Employment;
@@ -174,9 +175,11 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         if (loggedInStaffId!=null) {
             queryParameters.put("loggedInStaffId", loggedInStaffId);
         }
-        if (selectedDate!=null) {
-            queryParameters.put("selectedDate", selectedDate.toString());
+        if (selectedDate==null) {
+            String dateToday = DateUtils.formatLocalDate(LocalDate.now(),"yyyy-MM-dd");
+            selectedDate = LocalDate.parse(dateToday);
         }
+        queryParameters.put("selectedDate", selectedDate.toString());
         queryParameters.put("imagePath", imagePath);
 
         String query = "";
@@ -240,7 +243,11 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         if (Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent() && filters.get(FilterType.TEAM).size()!=0) {
             queryParameters.put("teamIds", convertListOfStringIntoLong(filters.get(FilterType.TEAM)));
-            query.append(" WITH staff,employments,user MATCH (staff)<-[:TEAM_HAS_MEMBER]-(team:Team) where id(team) in {teamIds} ");
+            query.append(" WITH staff,employments,user MATCH (staff)<-[teamRel:TEAM_HAS_MEMBER]-(team:Team) where id(team) in {teamIds} ");
+            if(Optional.ofNullable(filters.get(FilterType.MAIN_TEAM)).isPresent()){
+                query.append(" AND teamRel.teamType='MAIN')");
+            }
+
         }
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent() && filters.get(FilterType.EXPERTISE).size()!=0) {
             queryParameters.put("expertiseIds", convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
@@ -254,24 +261,30 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         if (Optional.ofNullable(filters.get(FilterType.TAGS)).isPresent() && filters.get(FilterType.TAGS).size()!=0) {
             queryParameters.put("tagIds", convertListOfStringIntoLong(filters.get(FilterType.TAGS)));
             query.append(" WITH staff,employments,user MATCH (staff)-[:BELONGS_TO_TAGS]->(tags:Tag) where id(tags) in {tagIds}");
-            returnData.append(" , collect( distinct tags) as tags ");
         }
 
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()  && filters.get(FilterType.EMPLOYMENT_TYPE).size()!=0) {
             queryParameters.put("employmentTypeIds", convertListOfStringIntoLong(filters.get(FilterType.EMPLOYMENT_TYPE)));
-            query.append(" WITH staff,employments,tags,user MATCH (employmentType:EmploymentType)<-[:HAS_EMPLOYMENT_TYPE]-(el:EmploymentLine)<-[:HAS_EMPLOYMENT_LINES]-(employments) WHERE id(employmentType) in {employmentTypeIds}");
+            query.append(" WITH staff,employments,user MATCH (employmentType:EmploymentType)<-[:HAS_EMPLOYMENT_TYPE]-(el:EmploymentLine)<-[:HAS_EMPLOYMENT_LINES]-(employments) WHERE id(employmentType) in {employmentTypeIds}");
 
         }
 
-        if (Optional.ofNullable(filters.get(FilterType.SKILL_LEVEL)).isPresent()) {
+      /*  if (Optional.ofNullable(filters.get(FilterType.SKILL_LEVEL)).isPresent()) {
             queryParameters.put("skillLevels",
                     filters.get(FilterType.SKILL_LEVEL));
+        }*/
+        if (Optional.ofNullable(filters.get(FilterType.ACCESS_GROUPS)).isPresent() && filters.get(FilterType.ACCESS_GROUPS).size()!=0) {
+            queryParameters.put("accessGroupIds", convertListOfStringIntoLong(filters.get(FilterType.ACCESS_GROUPS)));
+            query.append("WITH staff,employments,user MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroups:AccessGroup)\n" +
+                    " where id(accessGroups) IN {accessGroupIds} ") ;
         }
-        if (Optional.ofNullable(filters.get(FilterType.ACCESS_GROUPS)).isPresent()) {
-            queryParameters.put("accessGroupIds",
-                    convertListOfStringIntoLong(filters.get(FilterType.ACCESS_GROUPS)));
+        if(Optional.ofNullable(filters.get(FilterType.FUNCTIONS)).isPresent() && filters.get(FilterType.FUNCTIONS).size()!=0) {
+            queryParameters.put("functionIds",filters.get(FilterType.FUNCTIONS));
+            query.append("WITH staff,employments,user MATCH (staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false})-[:HAS_EMPLOYMENT_LINES]->(employmentLine:EmploymentLine)-[:APPLICABLE_FUNCTION]->(function:Function)\n" +
+                    " where id(function) IN {functionIds}");
         }
-
+        query.append(" WITH staff,employments,user MATCH (staff)-[:BELONGS_TO_TAGS]-(selectedTags:Tag) ");
+        returnData.append(" , collect( distinct selectedTags) as tags ");
         returnData.append(" ORDER BY staff.firstName");
         query.append(returnData);
 
