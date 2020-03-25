@@ -169,10 +169,10 @@ public class TimeBankCalculationService {
         dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(bonusOfProtectedDaysOff);
         dailyTimeBankEntry.setCtaBonusMinutesOfTimeBank(bonusOfProtectedDaysOff);
         dailyTimeBankEntry.setPlannedMinutesOfTimebank(bonusOfProtectedDaysOff);
+        dailyTimeBankEntry.setPublishedSomeActivities(false);
         dailyTimeBankEntry.setContractualMinutes(contractualMinutes);
         dailyTimeBankEntry.setScheduledMinutesOfTimeBank(MINIMUM_VALUE);
         dailyTimeBankEntry.setDeltaTimeBankMinutes(-contractualMinutes);
-        dailyTimeBankEntry.setPublishedSomeActivities(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() > MINIMUM_VALUE);
         dailyTimeBankEntry.setTimeBankCTADistributionList(isCollectionNotEmpty(timeBankCTADistributionList) ?timeBankCTADistributionList :new ArrayList<>());
         dailyTimeBankEntry.setDraftDailyTimeBankEntry(null);
         dailyTimeBankEntry.setTimeBankOffMinutes(0);
