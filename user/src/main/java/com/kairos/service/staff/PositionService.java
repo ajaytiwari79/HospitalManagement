@@ -185,7 +185,7 @@ public class PositionService {
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
         Position position = positionGraphRepository.findPosition(parentUnit.getId(), staffId);
         if (!Optional.ofNullable(position).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_EMPLOYMENT_NOTFOUND, staffId)
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_EMPLOYMENT_NOTFOUND, staffId);
         }
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO;
         boolean flsSyncStatus = false;

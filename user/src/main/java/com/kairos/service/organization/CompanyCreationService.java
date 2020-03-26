@@ -478,10 +478,11 @@ public class CompanyCreationService {
     }
 
     private boolean doesUnitManagerInfoAvailable(OrganizationBasicDTO organizationBasicDTO) {
+        boolean isExist =false;
         if(organizationBasicDTO.getUnitManager() != null && (organizationBasicDTO.getUnitManager().getEmail() != null || organizationBasicDTO.getUnitManager().getLastName() != null || organizationBasicDTO.getUnitManager().getFirstName() != null || organizationBasicDTO.getUnitManager().getCprNumber() != null || organizationBasicDTO.getUnitManager().getAccessGroupId() != null)) {
-            return true;
+            isExist = true;
         }
-        return false;
+        return isExist;
     }
 
     private void setDefaultDataFromParentOrganization(Unit unit, Organization parentUnit, OrganizationBasicDTO organizationBasicDTO) {

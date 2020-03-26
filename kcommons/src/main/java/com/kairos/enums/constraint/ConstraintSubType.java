@@ -16,6 +16,7 @@ public enum ConstraintSubType {
     PRESENCE_AND_ABSENCE_SAME_TIME("Presence and Absence at same time"),
     MAX_SHIFT_OF_STAFF("Maximum shift of staff"),
     FIX_ACTIVITY_SHOULD_NOT_CHANGE("Fix Activity Should not change"),
+    MAX_LENGTH_OF_SHIFT_IN_NIGHT_TIMESLOT("Max length of shift in night time slot"),
 
     //For Shifts
 

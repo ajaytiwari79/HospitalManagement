@@ -20,6 +20,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.custom_repository.CommonRepositoryImpl;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionFieldRepository;
@@ -62,7 +63,7 @@ public class PermissionService {
     @Inject
     private ExceptionService exceptionService;
 
-    @Inject private MongoBaseRepository commonRepository;
+    @Inject private ActivityMongoRepository commonRepository;
     @Inject private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject private TeamGraphRepository teamGraphRepository;
     @Inject private EmploymentTypeGraphRepository employmentTypeGraphRepository;
@@ -364,15 +365,14 @@ public class PermissionService {
                 return;
             }
             FieldPermissionHelperDTO fieldPermissionHelperDTO=new FieldPermissionHelperDTO(objects,fieldLevelPermissions);
-            FieldPermissionHelper fieldPermissionHelper = new FieldPermissionHelper(objects,fieldLevelPermissions);
-            updateObjectsPropertiesBeforeSave(fieldPermissionHelper,fieldLevelPermissions);
+            updateObjectsPropertiesBeforeSave(fieldPermissionHelperDTO,fieldLevelPermissions);
         }catch (Exception e){
             LOGGER.error(e.getMessage());
         }
     }
 
 
-    public <T extends UserBaseEntity,E extends UserBaseEntity> void updateObjectsPropertiesBeforeSave(FieldPermissionHelper fieldPermissionHelper,Set<FieldLevelPermission> fieldLevelPermissions){
+    public <T extends MongoBaseEntity,E extends MongoBaseEntity> void updateObjectsPropertiesBeforeSave(FieldPermissionHelperDTO fieldPermissionHelper,Set<FieldLevelPermission> fieldLevelPermissions){
         for (T object : (List<T>)fieldPermissionHelper.getObjects()) {
             if(object.getClass().isAnnotationPresent(com.kairos.annotations.KPermissionModel.class) || object.getClass().isAnnotationPresent(PermissionClass.class)){
                 E databaseObject = (E)fieldPermissionHelper.getMapOfDataBaseObject().get(object.getId());
@@ -449,7 +449,7 @@ public class PermissionService {
             Map<ID,E> mapOfDataBaseObject = new HashMap<>();
             if(fieldLevelPermissions.contains(FieldLevelPermission.WRITE)){
                 for (Map.Entry<Class, Set<ID>> classIdSetEntry : objectIdsMap.entrySet()) {
-                    Collection<E> databaseObject = commonRepository.findByIds(classIdSetEntry.getKey(),(Collection<? extends Serializable>) classIdSetEntry.getValue(),2);
+                    Collection<E> databaseObject = commonRepository.findAllById((Collection<? extends Serializable>) classIdSetEntry.getValue()).;
                     for (E object : databaseObject) {
                         try {
                             ID id = (ID) object.getClass().getMethod("getId").invoke(object);

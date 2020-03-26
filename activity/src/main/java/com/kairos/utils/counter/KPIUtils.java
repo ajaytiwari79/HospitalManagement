@@ -139,7 +139,7 @@ public class KPIUtils {
 
     public static LocalDate getLastDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
         LocalDate currentDate = date;
-        LocalDate lastDate = getPriviousLocaDateByDurationType(date, durationType, 1);
+        LocalDate lastDate = getPriviousLocaDateByDurationType(date, durationType);
         dateTimeIntervals.add(new DateTimeInterval(asDate(lastDate), getEndOfDayDateFromLocalDate(currentDate)));
         return lastDate.minusDays(1);
     }

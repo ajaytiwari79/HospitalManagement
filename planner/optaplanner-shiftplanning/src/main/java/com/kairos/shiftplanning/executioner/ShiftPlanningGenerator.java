@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.executioner;
 
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.Day;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.constraint.ConstraintSubType;
@@ -7,6 +8,7 @@ import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.constraints.activityconstraint.*;
+import com.kairos.shiftplanning.constraints.unitconstraint.MaxLengthOfShiftInNightTimeSlot;
 import com.kairos.shiftplanning.constraints.unitconstraint.PreferedEmployementType;
 import com.kairos.shiftplanning.constraints.unitconstraint.ShiftOnWeekend;
 import com.kairos.shiftplanning.domain.activity.Activity;
@@ -208,6 +210,7 @@ public class ShiftPlanningGenerator {
         ActivityDayType activityDayType = new ActivityDayType(dayTypes,ScoreLevel.SOFT,5);
         ActivityRequiredTag activityRequiredTag = new ActivityRequiredTag(requiredTagId(),ScoreLevel.HARD,1);
         Map<ConstraintSubType, Constraint> constraintMap = new HashMap<>();
+        TimeSlot timeSlot = new TimeSlot(23,7);
         constraintMap.put(ConstraintSubType.ACTIVITY_LONGEST_DURATION_RELATIVE_TO_SHIFT_LENGTH,longestDuration);
         constraintMap.put(ConstraintSubType.ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH,shortestDuration);
         constraintMap.put(ConstraintSubType.MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF,maxAllocationPerShift);
@@ -219,7 +222,7 @@ public class ShiftPlanningGenerator {
         constraintMap.put(ConstraintSubType.MAX_SHIFT_OF_STAFF,new MaxShiftOfStaff(1,ScoreLevel.SOFT,-6));
         constraintMap.put(ConstraintSubType.PREFER_PERMANENT_EMPLOYEE,new PreferedEmployementType(newHashSet(123l),ScoreLevel.SOFT,-4));
         constraintMap.put(ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS,new ShiftOnWeekend(ScoreLevel.SOFT,-4,newHashSet(DayOfWeek.SATURDAY,DayOfWeek.SUNDAY)));
-
+        constraintMap.put(ConstraintSubType.MAX_LENGTH_OF_SHIFT_IN_NIGHT_TIMESLOT,new MaxLengthOfShiftInNightTimeSlot(ScoreLevel.SOFT,-4,timeSlot,5));
         return constraintMap;
     }
     public  Tag requiredTagId(){

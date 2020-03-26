@@ -5,8 +5,9 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
-import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -24,8 +25,6 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +47,6 @@ import static java.util.stream.Collectors.toMap;
 @Transactional
 public class ShiftDetailsService extends MongoBaseService {
 
-    private final Logger logger = LoggerFactory.getLogger(ShiftDetailsService.class);
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
@@ -181,6 +179,9 @@ public class ShiftDetailsService extends MongoBaseService {
         }
         return activity;
     }
+
+    // This function is used for the change the status of the draft shift
+
 
 
 }

@@ -81,8 +81,7 @@ public class ShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> saveOrDeleteShiftAfterValidation(@PathVariable Long unitId,
                                                                         @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo,
-                                                                        @RequestParam(value = "validatedByStaff", required = false) Boolean validatedByStaff,
-                                                                        @RequestParam(value = "updateShiftState", required = false) boolean updateShiftState,
+                                                                        @RequestParam(value = "validatedByStaff", required = false) Boolean validatedByStaff, @RequestParam(value = "updateShiftState", required = false) boolean updateShiftState,
                                                                         @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType,
                                                                         @RequestParam(required = false) TodoType todoType) {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = ShiftActionType.DELETE.equals(shiftActionType) ? shiftService.deleteShiftAfterValidation(shiftWithViolatedInfo) : shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, validatedByStaff, updateShiftState, unitId, shiftActionType,todoType);
