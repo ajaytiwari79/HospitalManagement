@@ -343,10 +343,7 @@ public class ShiftStatusService {
             } else if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
                     shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? ShiftStatus.APPROVE : REQUEST);
-                    shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? PUBLISH : null);
                 }
-            }else {
-                shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? PUBLISH : null);
             }
             if(shiftActivity.getStatus().contains(APPROVE)){
                 ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
