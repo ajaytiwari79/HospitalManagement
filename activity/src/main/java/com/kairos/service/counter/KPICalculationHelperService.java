@@ -18,7 +18,7 @@ import static com.kairos.dto.activity.counter.enums.XAxisConfig.HOURS;
 import static com.kairos.enums.shift.ShiftType.PRESENCE;
 
 @Service
-public class KPICalculationHelperService {
+public class KPICalculationHelperService implements KPIService{
 
     public int calculateCareBubble(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, Long staffId) {
         int calculateValue = 0;
@@ -56,5 +56,10 @@ public class KPICalculationHelperService {
             }
         }
         return false;
+    }
+
+    @Override
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+        return calculateCareBubble(kpiCalculationRelatedInfo, dateTimeInterval, staffId);
     }
 }

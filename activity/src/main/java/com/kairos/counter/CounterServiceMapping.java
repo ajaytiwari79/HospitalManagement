@@ -1,14 +1,23 @@
 package com.kairos.counter;
 
 import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.enums.kpi.CalculationType;
+import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.service.counter.*;
+import com.kairos.service.shift.ShiftBreakService;
+import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.kairos.enums.kpi.CalculationType.*;
 
 
 /*
@@ -20,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CounterServiceMapping {
     private final static Logger LOGGER = LoggerFactory.getLogger(CounterServiceMapping.class);
     private Map<CounterType, CounterService> counters = new ConcurrentHashMap<>();
+    private Map<CalculationType, KPIService> kpiServiceMap = new ConcurrentHashMap<>();
 
     @Inject
     public void setCounterService(RestingHoursCalculationService restingHoursCalculationService) {
@@ -82,9 +92,82 @@ public class CounterServiceMapping {
     }
 
     @Inject
-    public void setActivityKPIService(KPIBuilderCalculationService KPIBuilderCalculationService) {
-        LOGGER.info("Enum mapping for activity KPI per interval : "+this.counters);
-        this.counters.put(CounterType.ACTIVITY_KPI, KPIBuilderCalculationService);
+    public void setKPIBuilderCalculationService(KPIBuilderCalculationService kpiBuilderCalculationService) {
+        this.counters.put(CounterType.ACTIVITY_KPI, kpiBuilderCalculationService);
+    }
+
+    @Inject
+    public void setActualTimebankKPIService(ActualTimebankKPIService actualTimebankKPIService) {
+        this.kpiServiceMap.put(ACTUAL_TIMEBANK,actualTimebankKPIService);
+    }
+
+    @Inject
+    public void setPayLevelKPIService(PayLevelKPIService payLevelKPIService) {
+        this.kpiServiceMap.put(PAY_LEVEL_GRADE,payLevelKPIService);
+    }
+
+    @Inject
+    public void setShiftBreakService(ShiftBreakService shiftBreakService) {
+        this.kpiServiceMap.put(BREAK_INTERRUPT,shiftBreakService);
+    }
+
+    @Inject
+    public void setShiftEscalationService(ShiftEscalationService shiftEscalationService) {
+        this.kpiServiceMap.put(ESCALATION_RESOLVED_SHIFTS,shiftEscalationService);
+        this.kpiServiceMap.put(ESCALATED_SHIFTS,shiftEscalationService);
+    }
+
+    @Inject
+    public void setSkillKPIService(SkillKPIService skillKPIService) {
+        this.kpiServiceMap.put(STAFF_SKILLS_COUNT,skillKPIService);
+    }
+
+    @Inject
+    public void setStaffingLevelCalculationKPIService(StaffingLevelCalculationKPIService staffingLevelCalculationKPIService) {
+        this.kpiServiceMap.put(PRESENCE_OVER_STAFFING,staffingLevelCalculationKPIService);
+        this.kpiServiceMap.put(PRESENCE_UNDER_STAFFING,staffingLevelCalculationKPIService);
+        this.kpiServiceMap.put(ABSENCE_OVER_STAFFING,staffingLevelCalculationKPIService);
+        this.kpiServiceMap.put(ABSENCE_UNDER_STAFFING,staffingLevelCalculationKPIService);
+    }
+
+    @Inject
+    public void setTimeBankService(TimeBankService timeBankService) {
+        this.kpiServiceMap.put(DELTA_TIMEBANK,timeBankService);
+        this.kpiServiceMap.put(STAFFING_LEVEL_CAPACITY,timeBankService);
+    }
+
+    @Inject
+    public void setUnavailabilityCalculationKPIService(UnavailabilityCalculationKPIService unavailabilityCalculationKPIService) {
+        this.kpiServiceMap.put(UNAVAILABILITY,unavailabilityCalculationKPIService);
+    }
+
+    @Inject
+    public void setWeeklyEmploymentHoursKPIService(WeeklyEmploymentHoursKPIService weeklyEmploymentHoursKPIService) {
+        this.kpiServiceMap.put(TOTAL_WEEKLY_HOURS,weeklyEmploymentHoursKPIService);
+    }
+
+    @Inject
+    public void setStaffAgeKPIService(StaffAgeKPIService staffAgeKPIService) {
+        this.kpiServiceMap.put(STAFF_AGE,staffAgeKPIService);
+    }
+
+    @Inject
+    public void setStaffChildCountKPIService(StaffChildCountKPIService staffChildCountKPIService) {
+        this.kpiServiceMap.put(SUM_OF_CHILDREN,staffChildCountKPIService);
+    }
+
+    @Inject
+    public void setWorkTimeAgreementBalancesCalculationService(WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService) {
+        this.kpiServiceMap.put(PROTECTED_DAYS_OFF,workTimeAgreementBalancesCalculationService);
+        this.kpiServiceMap.put(CARE_DAYS,workTimeAgreementBalancesCalculationService);
+        this.kpiServiceMap.put(SENIORDAYS,workTimeAgreementBalancesCalculationService);
+        this.kpiServiceMap.put(TOTAL_ABSENCE_DAYS,workTimeAgreementBalancesCalculationService);
+        this.kpiServiceMap.put(CHILD_CARE_DAYS,workTimeAgreementBalancesCalculationService);
+
+    }
+
+    public KPIService getKpiServiceMap(CalculationType calculationType) {
+        return kpiServiceMap.get(calculationType);
     }
 
     public CounterService getService(CounterType counterType){

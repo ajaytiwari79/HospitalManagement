@@ -14,10 +14,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Service
-public class SkillKPIService {
+public class SkillKPIService implements KPIService{
 
     @Inject
     private KPIBuilderCalculationService kpiBuilderCalculationService;
@@ -107,4 +108,8 @@ public class SkillKPIService {
         return count;
     }
 
+    @Override
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+        return getCountOfSkillOfStaffIdOnSelectedDate(staffId, asLocalDate(kpiCalculationRelatedInfo.getStartDate()), asLocalDate(kpiCalculationRelatedInfo.getEndDate()), kpiCalculationRelatedInfo);
+    }
 }

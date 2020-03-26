@@ -2,6 +2,7 @@ package com.kairos.controller.time_bank;
 
 
 import com.kairos.constants.ApiConstants;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -96,9 +97,10 @@ public class TimeBankController {
 
     //remove after test qa
     @ApiOperation("update time bank of protected days off")
-    @GetMapping("/test_timebank")
-    public ResponseEntity<Map<String,Object>> testApiForProtecrtedDaysOFf(@PathVariable Long unitId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().updateTimeBankAgainstProtectedDaysOffSetting());
+    @PutMapping("/test_timebank")
+    public ResponseEntity<Map<String,Object>> testApiForProtecrtedDaysOFf(@PathVariable Long unitId, @RequestBody StaffFilterDTO staffFilterDTO){
+
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
     }
 
 

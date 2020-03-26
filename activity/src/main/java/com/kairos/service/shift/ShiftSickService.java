@@ -5,6 +5,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftStatus;
@@ -96,7 +97,7 @@ public class ShiftSickService extends MongoBaseService {
         if(shiftNeedsToAddForDays==0){
             shiftNeedsToAddForDays = 1;
         }
-        if(!MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType())){
+        if(!EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType())){
             exceptionService.dataNotFoundException(EMPLOYMENT_NOT_VALID_TO_MARK_SICK);
         }
         Date startDate = asDate(shiftDTO.getShiftDate(), LocalTime.MIDNIGHT);

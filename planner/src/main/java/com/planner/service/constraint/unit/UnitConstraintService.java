@@ -48,7 +48,7 @@ public class UnitConstraintService {
     public List<UnitConstraintDTO> getunitconstraints(){
         List<UnitConstraintDTO> unitConstraintDTOS = new ArrayList<>();
         for(int i=0;i < ConstraintSubType.values().length;i++) {
-            PlanningSetting planningSetting1 = new PlanningSetting(HARD, 2);
+            PlanningSetting planningSetting1 = new PlanningSetting(HARD, 2,false);
             UnitConstraintDTO unitConstraintDTO1 = new UnitConstraintDTO(planningSetting1, ConstraintSubType.values()[i]);
             unitConstraintDTOS.add(unitConstraintDTO1);
         }

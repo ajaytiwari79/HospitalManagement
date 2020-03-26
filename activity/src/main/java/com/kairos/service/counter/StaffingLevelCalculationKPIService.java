@@ -33,7 +33,7 @@ import static java.util.stream.Collectors.toMap;
  * Created By G.P.Ranjan on 24/12/19
  **/
 @Service
-public class StaffingLevelCalculationKPIService {
+public class StaffingLevelCalculationKPIService implements KPIService{
     @Inject
     private StaffingLevelService staffingLevelService;
     @Inject
@@ -172,5 +172,10 @@ public class StaffingLevelCalculationKPIService {
             staffingLevelMapPerHour.put((T) dateTime, (E) getValueWithDecimalFormat(getHoursByMinutes(integerLongEntry.getValue())));
         }
         return staffingLevelMapPerHour;
+    }
+
+    @Override
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+        return getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
     }
 }

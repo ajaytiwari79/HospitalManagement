@@ -21,7 +21,7 @@ import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollect
 import static com.kairos.enums.FilterType.CALCULATION_UNIT;
 
 @Service
-public class UnavailabilityCalculationKPIService {
+public class UnavailabilityCalculationKPIService implements KPIService{
 
     @Inject
     private TimeTypeService timeTypeService;
@@ -74,4 +74,8 @@ public class UnavailabilityCalculationKPIService {
         return total;
     }
 
+    @Override
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+        return getUnavailabilityCalculationData(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
+    }
 }
