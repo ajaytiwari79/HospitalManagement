@@ -6,6 +6,8 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.attendance.AttendanceTimeSlotDTO;
 import com.kairos.dto.activity.attendance.TimeAndAttendanceDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
@@ -297,9 +299,9 @@ public class ShiftService extends MongoBaseService {
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         shift.setId(isNull(shift.getId()) ? shiftMongoRepository.nextSequence(Shift.class.getSimpleName()) : shift.getId());
         todoService.updateStatusOfShiftActivityIfApprovalRequired(activityWrapperMap, shift, updateShift);
+//        updateStatusForShift(shift,shiftAction,updateShift,activityWrapperMap,staffAdditionalInfoDTO,planningPeriod);
         payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
-        updateStatusForShift(shift,shiftAction,updateShift);
         shiftMongoRepository.save(shift);
         shiftStateService.createShiftStateByPhase(Arrays.asList(shift), phase);
         return shift;
@@ -1584,67 +1586,84 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public void updateStatusForShift(Shift shift, ShiftActionType shiftActionType, boolean shiftUpdated) {
-        Shift shift1 =isNotNull(shift.getDraftShift())?shift.getDraftShift():shift;
-        Set<ShiftStatus> shiftStatuses = new HashSet<>();
-        for (ShiftActivity shiftActivity : shift1.getActivities()) {
-            updatedStatus(shift, shiftActionType, shiftUpdated, shiftStatuses, shiftActivity);
-        }
-    }
-
-    private void updatedStatus(Shift shift, ShiftActionType shiftActionType, boolean shiftUpdated, Set<ShiftStatus> shiftStatuses, ShiftActivity shiftActivity) {
-        if (ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
-            updateStatusOfAbsenceDraftShiftAndPresenceDraftShift(shift, shiftActionType, shiftStatuses, shiftActivity);
-        }
-        else if (ShiftActionType.SAVE.equals(shiftActionType) && (ShiftType.NON_WORKING.equals(shift.getShiftType()) || ShiftType.ABSENCE.equals(shift.getShiftType()))) {
-            updateStatusOfAbsenceShiftOfUpdateShiftAndNewShift(shiftUpdated, shiftStatuses, shiftActivity);
-        }
-        else if(ShiftActionType.SAVE.equals((shiftActionType)) && ShiftType.PRESENCE.equals(shift.getShiftType())){
-            updateStatusOfPresenceShiftAfterTheUpdateofShift(shiftUpdated, shiftStatuses, shiftActivity);
-        }
-//        else {
-//            updateStatusOfActualShift(shift, shiftActionType, shiftStatuses, shiftActivity);
+//    public void updateStatusForShift(Shift shift, ShiftActionType shiftActionType, boolean shiftUpdated,Map<BigInteger, ActivityWrapper> activityWrapperMap,StaffAdditionalInfoDTO staffAdditionalInfoDTO,PlanningPeriod planningPeriod) {
+//        Shift shift1 =isNotNull(shift.getDraftShift())?shift.getDraftShift():shift;
+//        Set<ShiftStatus> shiftStatuses = new HashSet<>();
+//        for (ShiftActivity shiftActivity : shift1.getActivities()) {
+//            updatedStatus(shift, shiftActionType, shiftUpdated, shiftStatuses, shiftActivity,activityWrapperMap,staffAdditionalInfoDTO,planningPeriod);
 //        }
-    }
+//    }
 
-    private void updateStatusOfAbsenceDraftShiftAndPresenceDraftShift(Shift shift, ShiftActionType shiftActionType, Set<ShiftStatus> shiftStatuses, ShiftActivity shiftActivity) {
-        if (ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType) && (ShiftType.NON_WORKING.equals(shift.getShiftType()) || ShiftType.ABSENCE.equals(shift.getShiftType()))) {
-            shiftStatuses.add(ShiftStatus.REQUEST);
-            shiftActivity.setStatus(shiftStatuses);
-        }
-        else {
-            shiftActivity.setStatus(shiftStatuses);
-        }
-    }
-
-    private void updateStatusOfActualShift(Shift shift, ShiftActionType shiftActionType, Set<ShiftStatus> shiftStatuses, ShiftActivity shiftActivity) {
-        if ((ShiftType.NON_WORKING.equals(shift.getShiftType()) || ShiftType.ABSENCE.equals(shift.getShiftType()))&&isNull(shiftActionType)) {
-            shiftStatuses.add(ShiftStatus.REQUEST);
-            shiftActivity.setStatus(shiftStatuses);
-        }else{
-            shiftActivity.setStatus(shiftStatuses);
-        }
-    }
-
-    private void updateStatusOfPresenceShiftAfterTheUpdateofShift(boolean shiftUpdated, Set<ShiftStatus> shiftStatuses, ShiftActivity shiftActivity) {
-        if(shiftUpdated) {
-            shiftStatuses.add(ShiftStatus.PUBLISH);
-            shiftStatuses.add(ShiftStatus.MOVED);
-            shiftActivity.setStatus(shiftStatuses);
-        }
-    }
-
-    private void updateStatusOfAbsenceShiftOfUpdateShiftAndNewShift(boolean shiftUpdated, Set<ShiftStatus> shiftStatuses, ShiftActivity shiftActivity) {
-        if (!shiftUpdated) {
-            shiftStatuses.add(ShiftStatus.PUBLISH);
-            shiftStatuses.add(ShiftStatus.APPROVE);
-            shiftActivity.setStatus(shiftStatuses);
-        } else {
-            shiftStatuses.add(ShiftStatus.APPROVE);
-            shiftStatuses.add(ShiftStatus.PUBLISH);
-            shiftStatuses.add(ShiftStatus.MOVED);
-            shiftActivity.setStatus(shiftStatuses);
-        }
-    }
+//    private void updatedStatus(Shift shift, ShiftActionType shiftActionType, boolean shiftUpdated, Set<ShiftStatus> shiftStatuses, ShiftActivity shiftActivity, Map<BigInteger, ActivityWrapper> activityWrapperMap,StaffAdditionalInfoDTO staffAdditionalInfoDTO,PlanningPeriod planningPeriod) {
+//        boolean isApprovalRequired =(isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(shift.getPhaseId()));
+//
+//        boolean isHasAccessToApproved =UserContext.getUserDetails().isManagement();
+//
+//        boolean isPlanningPeriodPublished =planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId());
+//
+//        if (isPlanningPeriodPublished) {
+//            if(isApprovalRequired){
+//              shiftActivity.getStatus().clear();
+//              shiftStatuses.add(ShiftStatus.PUBLISH);
+//              shiftActivity.setStatus(shiftStatuses);
+//            }else {
+//                shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+//            }
+//        }
+//        else if (ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
+//            updateStatusOfAbsenceDraftShiftAndPresenceDraftShift(shiftActionType, shiftStatuses, shiftActivity,isApprovalRequired,isHasAccessToApproved,shiftUpdated);
+//        }
+//        else if (ShiftActionType.SAVE.equals(shiftActionType) && isApprovalRequired) {
+//            updateStatusOfAbsenceShiftOfUpdateShiftAndNewShift(shiftUpdated, shiftStatuses, shiftActivity,shift,isHasAccessToApproved,isPlanningPeriodPublished);
+//        }
+//        else if(ShiftActionType.SAVE.equals((shiftActionType)) && !isApprovalRequired){
+//            updateStatusOfPresenceShiftAfterTheUpdateofShift(shiftUpdated, shiftStatuses, shiftActivity,shift,isHasAccessToApproved);
+//        }else{
+//            if(isHasAccessToApproved) {
+//                if (isApprovalRequired) {
+//                    shiftStatuses.add(ShiftStatus.APPROVE);
+//                    shiftStatuses.add(ShiftStatus.PUBLISH);
+//                    shiftActivity.setStatus(shiftStatuses);
+//                } else {
+//                    shiftStatuses.add(ShiftStatus.PUBLISH);
+//                    shiftActivity.setStatus(shiftStatuses);
+//                }
+//            }
+//            else {
+//                shiftStatuses.add(ShiftStatus.REQUEST);
+//                shiftActivity.setStatus(shiftStatuses);
+//            }
+//        }
+//    }
+//
+//    private void updateStatusOfAbsenceDraftShiftAndPresenceDraftShift(ShiftActionType shiftActionType, Set<ShiftStatus> shiftStatuses, ShiftActivity shiftActivity,boolean isApprovalrequired,boolean isHasAccessToApproved,boolean updatedShift) {
+//        if(isHasAccessToApproved) {
+//
+//        }else{
+//            shiftStatuses.add(ShiftStatus.REQUEST);
+//            shiftActivity.setStatus(shiftStatuses);
+//        }
+//
+//    }
+//
+//
+//    private void updateStatusOfPresenceShiftAfterTheUpdateofShift(boolean shiftUpdated, Set<ShiftStatus> shiftStatuses, ShiftActivity shiftActivity,Shift shift,boolean isHasAccessToApproved) {
+//        if(isHasAccessToApproved) {
+//
+//        }else{
+//            shiftStatuses.add(ShiftStatus.REQUEST);
+//            shiftActivity.setStatus(shiftStatuses);
+//        }
+//    }
+//
+//    private void updateStatusOfAbsenceShiftOfUpdateShiftAndNewShift(boolean shiftUpdated, Set<ShiftStatus> shiftStatuses, ShiftActivity shiftActivity,Shift shift,boolean isHasAccessToApproved,boolean isPlanningPeriodPublished) {
+//        if(isHasAccessToApproved) {
+//
+//        }else {
+//            shiftStatuses.add(ShiftStatus.REQUEST);
+//            shiftActivity.setStatus(shiftStatuses);
+//        }
+//    }
+//
 
 }
