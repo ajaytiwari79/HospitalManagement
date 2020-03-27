@@ -2,6 +2,7 @@ package com.kairos.enums.shift;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,7 +20,7 @@ public enum ShiftStatus {
         return null;
 
     }
-    public static List<ShiftStatus> getAllStatusExceptRequestAndPending() {
-        return Stream.of(ShiftStatus.values()).filter(current->(!(current.equals(REQUEST)|| current.equals(UNPUBLISH) || current.equals(MOVED) || current.equals(REJECT)))).collect(Collectors.toList());
+    public static Set<ShiftStatus> getAllStatusExceptRequestAndPending() {
+        return Stream.of(ShiftStatus.values()).filter(current->(!(current.equals(REQUEST)|| current.equals(UNPUBLISH) || current.equals(MOVED) || current.equals(REJECT)||current.equals(PUBLISH)))).collect(Collectors.toSet());
     }
 }
