@@ -109,24 +109,24 @@ public class TodoService {
             todo.setApprovedOn(getDate());
             todoRepository.save(todo);
         }else{
-            if(UserContext.getUserDetails().isManagement()){
-            shift=isNotNull(shift.getDraftShift())?shift.getDraftShift():shift;
-            Set<ShiftStatus> shiftStatuses = new HashSet<>();
-            for(ShiftActivity shiftActivity :shift.getActivities()) {
-                if (shiftUpdate && ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
-                    if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
-                        shiftStatuses.add(ShiftStatus.REQUEST);
-                        shiftActivity.setStatus(shiftStatuses);
-                    }
-                    else {
-                        shiftActivity.setStatus(shiftStatuses);
-                    }
+            updateShiftStatusIfShiftUpdate(activityWrapperMap, shift, shiftUpdate, shiftActionType, phase);
+
+        }
+    }
+
+    private void updateShiftStatusIfShiftUpdate(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, boolean shiftUpdate, ShiftActionType shiftActionType, Phase phase) {
+        if(UserContext.getUserDetails().isManagement()){
+        shift=isNotNull(shift.getDraftShift())?shift.getDraftShift():shift;
+        for(ShiftActivity shiftActivity :shift.getActivities()) {
+            if (shiftUpdate && ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
+                if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
+                    shiftActivity.setStatus(newHashSet(ShiftStatus.REQUEST));
+                }
+                else {
+                    shiftActivity.setStatus(new HashSet<>());
                 }
             }
-
-
-            }
-
+        }
         }
     }
 
