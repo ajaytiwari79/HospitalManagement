@@ -338,12 +338,26 @@ public class ShiftStatusService {
     public void updateStatusOfShiftIfPhaseValid(PlanningPeriod planningPeriod, Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
 
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
+
             if (planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) {
-                shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+                if(!activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
+                    shiftActivity.getStatus().add(PUBLISH);
+                }else {
+                    if(shiftActivity.getStatus().contains(REQUEST)) {
+                        Set<ShiftStatus> shiftStatuses = new HashSet<>();
+                        shiftStatuses.add(APPROVE);
+                        shiftStatuses.add(PUBLISH);
+                        shiftActivity.setStatus(shiftStatuses);
+                    }
+                }
             } else if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
                     shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? ShiftStatus.APPROVE : REQUEST);
                 }
+            }else if(shiftActivity.getStatus().contains(REQUEST)){
+                Set<ShiftStatus> shiftStatuses = new HashSet<>();
+                shiftStatuses.add(APPROVE);
+                shiftActivity.setStatus(shiftStatuses);
             }
             if(shiftActivity.getStatus().contains(APPROVE)){
                 ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
