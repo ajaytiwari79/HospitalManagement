@@ -155,8 +155,7 @@ public class TodoService {
                 if(shift.isDraft()) {
                     shiftActivity.getStatus().add(ShiftStatus.REQUEST);
                 }else if(planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())&&UserContext.getUserDetails().isManagement()){
-                    shiftActivity.getStatus().add(ShiftStatus.APPROVE);
-                    shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+                    shiftActivity.getStatus().addAll(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH));
                 }
                 else{
                     shiftActivity.getStatus().add(ShiftStatus.APPROVE);

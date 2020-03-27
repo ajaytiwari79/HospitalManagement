@@ -344,8 +344,7 @@ public class ShiftStatusService {
                     shiftActivity.getStatus().add(PUBLISH);
                 }else {
                     if(shiftActivity.getStatus().contains(REQUEST)) {
-                        Set<ShiftStatus> shiftStatuses = newHashSet(APPROVE,PUBLISH);
-                        shiftActivity.setStatus(shiftStatuses);
+                        shiftActivity.setStatus(newHashSet(APPROVE,PUBLISH));
                     }
                 }
             } else if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
@@ -353,9 +352,8 @@ public class ShiftStatusService {
                     shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? ShiftStatus.APPROVE : REQUEST);
                 }
             }else if(shiftActivity.getStatus().contains(REQUEST)){
-                Set<ShiftStatus> shiftStatuses = newHashSet(APPROVE);
-                shiftActivity.setStatus(shiftStatuses);
-            }else if(shiftActivity.getStatus().contains(APPROVE)){
+                shiftActivity.setStatus(newHashSet(APPROVE));
+            } else if(shiftActivity.getStatus().contains(APPROVE)){
                 ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
                 Map<BigInteger,Activity> activityMap = new HashMap<>();
                 activityMap.put(activityWrapper.getActivity().getId(),activityWrapper.getActivity());
