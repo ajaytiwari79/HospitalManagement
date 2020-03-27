@@ -58,7 +58,7 @@ import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.activity.ActivityService;
+//import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
@@ -159,8 +159,8 @@ public class KPIBuilderCalculationService implements CounterService {
     private StaffingLevelCalculationKPIService staffingLevelCalculationKPIService;
     @Inject
     private SkillKPIService skillKPIService;
-    @Inject
-    private ActivityService activityService;
+//    @Inject
+//    private ActivityService activityService;
     @Inject
     private PayLevelKPIService payLevelKPIService;
     @Inject
