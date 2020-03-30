@@ -20,13 +20,9 @@ import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.todo.TodoDTO;
-import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
-import com.kairos.dto.user.country.experties.ExpertiseLineDTO;
-import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -48,7 +44,6 @@ import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
@@ -58,7 +53,7 @@ import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
-//import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
@@ -78,7 +73,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
-import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -102,7 +96,6 @@ import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.kpi.CalculationType.*;
 import static com.kairos.enums.kpi.KPIRepresentation.INDIVIDUAL_STAFF;
 import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
-import static com.kairos.enums.shift.ShiftType.PRESENCE;
 import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
 import static com.kairos.enums.wta.WTATemplateType.*;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
@@ -171,6 +164,7 @@ public class KPIBuilderCalculationService implements CounterService {
     private ShiftBreakService shiftBreakService;
     @Inject private ShiftEscalationService shiftEscalationService;
     @Inject private KPICalculationHelperService kpiCalculationHelperService;
+    @Inject private TimeBankOffKPI timeBankOffKPI;
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_BASED_ON))) {
@@ -295,6 +289,8 @@ public class KPIBuilderCalculationService implements CounterService {
                 return skillKPIService.getCountOfSkillOfStaffIdOnSelectedDate(staffId, asLocalDate(kpiCalculationRelatedInfo.getStartDate()), asLocalDate(kpiCalculationRelatedInfo.getEndDate()), kpiCalculationRelatedInfo);
             case PAY_LEVEL_GRADE:
                 return payLevelKPIService.getPayLevelGradeOfMainEmploymentOfStaff(staffId, kpiCalculationRelatedInfo);
+            case TODO_STATUS:
+                return  timeBankOffKPI.getCountAndHoursAndPercentageOfTODOS(staffId,kpiCalculationRelatedInfo);
             case ABSENCE_REQUEST:
             default:
                 break;
@@ -792,6 +788,7 @@ public class KPIBuilderCalculationService implements CounterService {
         private DateTimeInterval planningPeriodInterval;
         private List<TodoDTO> todoDTOS;
         private Map<BigInteger, List<TodoDTO>> activityIdAndTodoListMap;
+        private Map<BigInteger,List<TodoDTO>> timeTypeTodoListMap;
         private Set<BigInteger> activityIds;
         private Boolean isDraft;
         private Map<String, List<StaffPersonalDetail>> selectedDatesAndStaffDTOSMap;
@@ -822,6 +819,7 @@ public class KPIBuilderCalculationService implements CounterService {
             getDailyTimeBankEntryByDate();
             getWtaRuleDetails();
             getActivityTodoList();
+            getTimeTypeTodoList();
             updateActivityAndTimeTypeAndPlannedTimeMap();
             planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
             getDailyTimeBankEntryByEmploymentId();
@@ -830,6 +828,20 @@ public class KPIBuilderCalculationService implements CounterService {
         public void getActivityTodoList() {
             todoDTOS = todoService.getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
             activityIdAndTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
+        }
+
+        public void getTimeTypeTodoList(){
+            Map<BigInteger,List<TodoDTO>> timeTypeTodoListMap = new HashMap<>();
+            List<Activity> activities =activityMongoRepository.findAllActivitiesByIds(activityIds);
+            Map<BigInteger,BigInteger> activityTimeTypeIdsMap =activities.stream().collect(Collectors.toMap(activity ->activity.getId(),activity -> activity.getBalanceSettingsActivityTab().getTimeTypeId()));
+            for(Map.Entry<BigInteger,BigInteger> activityTimeTypeEntry :activityTimeTypeIdsMap.entrySet()){
+                for(Map.Entry<BigInteger,List<TodoDTO>> entry :activityIdAndTodoListMap.entrySet()){
+                    if(activityTimeTypeEntry.getKey().equals(entry.getKey())){
+                        timeTypeTodoListMap.put(activityTimeTypeEntry.getValue(),entry.getValue());
+                    }
+                }
+            }
+
         }
 
         public CalculationType getCalculationType() {
@@ -989,13 +1001,20 @@ public class KPIBuilderCalculationService implements CounterService {
             activityIdAndTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
         }
 
-        private void updateTodoDtosByStaffId(Long staffId) {
+        public void updateTodoDtosByStaffId(Long staffId) {
             List<TodoDTO> todoDTOList = staffIdAndTodoMap.get(staffId);
             if (isNotNull(todoDTOList)) {
                 activityIdAndTodoListMap = todoDTOList.stream().collect(Collectors.groupingBy(k -> k.getSubEntityId(), Collectors.toList()));
             } else {
                 activityIdAndTodoListMap = new HashMap<>(0);
             }
+        }
+        public void updateTimeTodosDtosByStaffId(Long StaffId){
+            List<TodoDTO> todoDTOList = staffIdAndTodoMap.get(StaffId);
+            if (isNotNull(todoDTOList)) {
+                activityIdAndTodoListMap = todoDTOList.stream().collect(Collectors.groupingBy(k -> k.getSubEntityId(), Collectors.toList()));
+            }
+
         }
 
         public List<TodoDTO> getTodosByStaffIdAndInterval(Long staffId, DateTimeInterval dateTimeInterval) {
