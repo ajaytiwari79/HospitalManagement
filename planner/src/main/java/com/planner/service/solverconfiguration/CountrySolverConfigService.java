@@ -52,7 +52,7 @@ public class CountrySolverConfigService {
     public CountrySolverConfigDTO createCountrySolverConfig(Long countryId,CountrySolverConfigDTO countrySolverConfigDTO) {
         countrySolverConfigDTO.setCountryId(countryId);
         if (preValidateCountrySolverConfigDTO(countrySolverConfigDTO)) {
-            CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
+            CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesOrCloneByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             List<BigInteger> countraintIds = getContraintIds(countrySolverConfigDTO, null);
             countrySolverConfig.setConstraintIds(countraintIds);
             solverConfigRepository.saveEntity(countrySolverConfig);
@@ -95,10 +95,10 @@ public class CountrySolverConfigService {
     private void updateUnitSolverConfig(CountrySolverConfig countrySolverConfig, List<Long> applicableUnitIdForSolverConfig, List<UnitSolverConfig> unitSolverConfigList, Map<Long, PhaseDTO> phaseDTOMap, Map<Long, UnitSolverConfig> unitSolverConfigMap, List<CountryConstraint> solverConfigConstraints) {
         for (Long unitId : applicableUnitIdForSolverConfig) {
             if (!unitSolverConfigMap.containsKey(unitId) && phaseDTOMap.containsKey(unitId)) {
-                UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig, UnitSolverConfig.class);
+                UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesOrCloneByMapper(countrySolverConfig, UnitSolverConfig.class);
                 unitSolverConfig.setId(null);//Unset Id
                 unitSolverConfig.setUnitId(unitId);
-                List<UnitConstraint> unitConstraints = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(solverConfigConstraints,UnitConstraint.class);
+                List<UnitConstraint> unitConstraints = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(solverConfigConstraints,UnitConstraint.class);
                 if(isCollectionNotEmpty(unitConstraints)) {
                     constraintsRepository.saveList(unitConstraints);
                 }
@@ -128,7 +128,7 @@ public class CountrySolverConfigService {
         SolverConfig solverConfig = solverConfigRepository.findByIdNotDeleted(countrySolverConfigDTO.getId());
         countrySolverConfigDTO.setCountryId(countryId);
         if (solverConfig != null && preValidateCountrySolverConfigDTO(countrySolverConfigDTO)) {
-            CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
+            CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesOrCloneByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             countrySolverConfig.setId(null);//UnSet
             List<CountryConstraint> solverConfigConstraints = constraintsRepository.findAllCountryConstraintByIds(solverConfig.getConstraintIds());
             List<CountryConstraint> countryConstraints = new ArrayList<>();
@@ -156,7 +156,7 @@ public class CountrySolverConfigService {
         countrySolverConfigDTO.setCountryId(countryId);
         SolverConfig solverConfig = solverConfigRepository.findByIdNotDeleted(countrySolverConfigDTO.getId());
         if (solverConfig != null && preValidateCountrySolverConfigDTO(countrySolverConfigDTO)) {
-            CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
+            CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesOrCloneByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
             List<BigInteger> countraintids = getContraintIds(countrySolverConfigDTO, solverConfig);
             countrySolverConfig.setConstraintIds(countraintids);
             solverConfigRepository.saveEntity(countrySolverConfig);
@@ -195,7 +195,7 @@ public class CountrySolverConfigService {
     }
 
     public DefaultDataDTO getDefaultData(Long countryId) {
-        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
+        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
         return new DefaultDataDTO()
                 .setOrganizationServicesBuilder(getOrganizationServicesAndItsSubServices(countryId))
                 .setPhaseDTOSBuilder(getAllPhases(countryId)).setTimeTypeEnumSBuilder(newArrayList(PRESENCE,ABSENCE,PAID_BREAK,UNPAID_BREAK))
@@ -235,7 +235,7 @@ public class CountrySolverConfigService {
 
     private List<OrganizationServiceDTO> getOrganizationServicesAndItsSubServices(Long countryId) {
         List<OrganizationServiceQueryResult> organizationServiceQueryResults = userNeo4jRepo.getAllOrganizationServices(countryId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
     }
 
     private List<PhaseDTO> getAllPhases(Long countryId) {

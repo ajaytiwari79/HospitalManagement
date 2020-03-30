@@ -17,7 +17,7 @@ import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Service
-public class WeeklyEmploymentHoursKPIService {
+public class WeeklyEmploymentHoursKPIService implements KPIService{
 
     public double getWeeklyHoursOfEmployment(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if (isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())) {
@@ -82,4 +82,8 @@ public class WeeklyEmploymentHoursKPIService {
         return weeklyHours;
     }
 
+    @Override
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+        return getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo);
+    }
 }

@@ -11,13 +11,15 @@ import org.slf4j.LoggerFactory;
 @Setter
 @NoArgsConstructor
 public class PlanningSetting {
-    Logger log= LoggerFactory.getLogger(PlanningSetting .class);
+
     private ConstraintLevel constraintLevel;
     private int constraintWeight;
+    private boolean mandatory;
 
-    public PlanningSetting(ConstraintLevel constraintLevel,int constraintWeight){
+    public PlanningSetting(ConstraintLevel constraintLevel,int constraintWeight,boolean mandatory){
         this.constraintLevel =constraintLevel;
         this.constraintWeight = constraintWeight;
+        this.mandatory  = mandatory;
     }
 
 

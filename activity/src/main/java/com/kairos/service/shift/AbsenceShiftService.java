@@ -127,7 +127,7 @@ public class AbsenceShiftService {
                 shiftDTO.getActivities().get(0).setEndDate(endDate);
 
                 shiftDTO.setEndDate(endDate);
-                newShiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftDTO.class);
+                newShiftDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftDTO, ShiftDTO.class);
             } else {
                 newShiftDTO = calculateAverageShiftByActivity(shiftQueryResultsInInterval, activity,
                         staffAdditionalInfoDTO, absenceReasonCodeId,shiftDate,shiftDTO.getActivities().get(0));
@@ -214,7 +214,7 @@ public class AbsenceShiftService {
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
             ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityWrapperMap,null);
             ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false);
-            Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
+            Shift shift = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftDTO, Shift.class);
             Optional<PlanningPeriod> planningPeriodByShift = planningPeriods.stream().filter(planningPeriod -> new DateTimeInterval(asDate(planningPeriod.getStartDate()), asDate(planningPeriod.getEndDate())).contains(shift.getStartDate()) || planningPeriod.getEndDate().equals(asLocalDate(shift.getStartDate()))).findAny();
             if (!planningPeriodByShift.isPresent()) {
                 exceptionService.actionNotPermittedException("message.shift.planning.period.exits", shift.getStartDate());
@@ -231,7 +231,7 @@ public class AbsenceShiftService {
         Phase phase = phaseMapByDate.get(shiftDTOS.get(0).getActivities().get(0).getStartDate());
         if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || !isRuleViolated(shiftWithViolatedInfoDTOS)) {
             shiftService.saveShiftWithActivity(phaseMapByDate, shifts, staffAdditionalInfoDTO);
-            shiftDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shifts, ShiftDTO.class);
+            shiftDTOS = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(shifts, ShiftDTO.class);
             shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
             shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS);
             shiftDTOS.forEach(shiftDTO -> shiftWithViolatedInfoDTOS.add(new ShiftWithViolatedInfoDTO(newArrayList(shiftDTO))));

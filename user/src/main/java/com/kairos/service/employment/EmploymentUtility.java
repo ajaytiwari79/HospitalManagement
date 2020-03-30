@@ -17,15 +17,15 @@ import java.util.Optional;
 public class EmploymentUtility {
     public static com.kairos.dto.activity.shift.StaffEmploymentDetails convertEmploymentObject(EmploymentQueryResult employment) {
         com.kairos.dto.activity.shift.StaffEmploymentDetails employmentDetails = new com.kairos.dto.activity.shift.StaffEmploymentDetails();
-        employmentDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
-        EmploymentLinesQueryResult currentEmploymentLine = ObjectMapperUtils.copyPropertiesByMapper(employment.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
-        employmentDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(currentEmploymentLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
+        employmentDetails.setExpertise(ObjectMapperUtils.copyPropertiesOrCloneByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
+        EmploymentLinesQueryResult currentEmploymentLine = ObjectMapperUtils.copyPropertiesOrCloneByMapper(employment.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
+        employmentDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesOrCloneByMapper(currentEmploymentLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
         employmentDetails.setId(employment.getId());
         employmentDetails.setStartDate(employment.getStartDate());
 
-        employmentDetails.setAppliedFunctions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employment.getAppliedFunctions(),FunctionDTO.class));
+        employmentDetails.setAppliedFunctions(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(employment.getAppliedFunctions(),FunctionDTO.class));
         employmentDetails.setEndDate(employment.getEndDate());
-        employmentDetails.setEmploymentLines(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employment.getEmploymentLines(), EmploymentLinesDTO.class));
+        employmentDetails.setEmploymentLines(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(employment.getEmploymentLines(), EmploymentLinesDTO.class));
         employmentDetails.setFullTimeWeeklyMinutes(currentEmploymentLine.getFullTimeWeeklyMinutes());
         employmentDetails.setTotalWeeklyMinutes(currentEmploymentLine.getTotalWeeklyMinutes());
         employmentDetails.setTotalWeeklyHours(currentEmploymentLine.getTotalWeeklyHours());
@@ -37,16 +37,16 @@ public class EmploymentUtility {
         employmentDetails.setAccumulatedTimebankMinutes(employment.getAccumulatedTimebankMinutes());
         employmentDetails.setAccumulatedTimebankDate(employment.getAccumulatedTimebankDate());
         employmentDetails.setEmploymentSubType(employment.getEmploymentSubType());
-        List<FunctionDTO> appliedFunctionDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employment.getAppliedFunctions(), FunctionDTO.class);
+        List<FunctionDTO> appliedFunctionDTOS = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(employment.getAppliedFunctions(), FunctionDTO.class);
         employmentDetails.setAppliedFunctions(appliedFunctionDTOS);
         return employmentDetails;
     }
 
     public static void convertStaffEmploymentObject(StaffEmploymentDetails employment, com.kairos.dto.activity.shift.StaffEmploymentDetails employmentDetails, List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes ) {
-        employmentDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
-        employmentDetails.setStaff(ObjectMapperUtils.copyPropertiesByMapper(employment.getStaff(), com.kairos.dto.user.staff.staff.Staff.class));
-        EmploymentLinesQueryResult currentEmploymentLine = ObjectMapperUtils.copyPropertiesByMapper(employment.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
-        com.kairos.dto.activity.shift.EmploymentType employmentType =ObjectMapperUtils.copyPropertiesByMapper(currentEmploymentLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class);
+        employmentDetails.setExpertise(ObjectMapperUtils.copyPropertiesOrCloneByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
+        employmentDetails.setStaff(ObjectMapperUtils.copyPropertiesOrCloneByMapper(employment.getStaff(), com.kairos.dto.user.staff.staff.Staff.class));
+        EmploymentLinesQueryResult currentEmploymentLine = ObjectMapperUtils.copyPropertiesOrCloneByMapper(employment.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
+        com.kairos.dto.activity.shift.EmploymentType employmentType =ObjectMapperUtils.copyPropertiesOrCloneByMapper(currentEmploymentLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class);
         Optional<ExpertisePlannedTimeQueryResult> plannedTimeQueryResult=expertisePlannedTimes.stream().filter(
                 current -> current.getEmploymentTypes().stream()
                         .anyMatch(employmentTypeOfExpertise -> employmentType.getId().equals(employmentTypeOfExpertise.getId()))).findAny();

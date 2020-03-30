@@ -16,7 +16,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneByMapper;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -99,7 +99,7 @@ public class BankService{
         StaffBankDetails staffOfficialBank = staffBankDetailsRepository.findByStaffIdAndDeletedFalse(staffId);
         List<PensionProviderDTO> pensionProviderDTOS = pensionProviderRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
         StaffPensionProviderDetails staffPensionProvider = staffPensionProviderRepository.findByStaffIdAndDeletedFalse(staffId);
-        return new StaffBankAndPensionProviderDetailsDTO(bankDTOS, copyPropertiesByMapper(staffOfficialBank, StaffBankDetailsDTO.class), pensionProviderDTOS, copyPropertiesByMapper(staffPensionProvider, StaffPensionProviderDetailsDTO.class));
+        return new StaffBankAndPensionProviderDetailsDTO(bankDTOS, copyPropertiesOrCloneByMapper(staffOfficialBank, StaffBankDetailsDTO.class), pensionProviderDTOS, copyPropertiesOrCloneByMapper(staffPensionProvider, StaffPensionProviderDetailsDTO.class));
     }
 
     public boolean linkBankDetailsForStaff(Long staffId, StaffBankAndPensionProviderDetailsDTO staffBankDetailsDTO){
@@ -140,7 +140,7 @@ public class BankService{
         Long countryId = userIntegrationService.getCountryIdOfOrganization(organizationId);
         List<BankDTO> bankDTOS = bankRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
         OrganizationBankDetails organizationBankDetails = organizationBankDetailsRepository.findByOrganizationIdAndDeletedFalse(organizationId);
-        return new OrganizationBankDetailsAndBanksDTO(bankDTOS, copyPropertiesByMapper(organizationBankDetails, OrganizationBankDetailsDTO.class));
+        return new OrganizationBankDetailsAndBanksDTO(bankDTOS, copyPropertiesOrCloneByMapper(organizationBankDetails, OrganizationBankDetailsDTO.class));
     }
 
     public boolean linkBankDetailsForOrganization(Long organizationId, OrganizationBankDetailsDTO organizationBankDetailsDTO) {

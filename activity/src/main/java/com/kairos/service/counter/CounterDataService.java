@@ -47,7 +47,6 @@ import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
@@ -133,7 +132,6 @@ public class CounterDataService {
                 LOGGER.error("error while generate KPI  data",ex);
             }
         }
-
         return isNotNull(kpisData) ? kpisData.stream().collect(Collectors.toMap(CommonRepresentationData::getCounterId, kpiData -> kpiData)) : new HashMap<>();
     */return new HashMap();
     }
@@ -205,7 +203,7 @@ public class CounterDataService {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTER_KPI_NOTFOUND);
         }
         List<FilterCriteria> criteriaList = new ArrayList<>();
-        KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
+        KPIDTO kpi = ObjectMapperUtils.copyPropertiesOrCloneByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
         getSelectedFilterDefaultData(level, criteriaList, kpi, defaultKpiDataDTO);
         setKpiProperty(applicableKPIS.get(0), criteriaList, kpi);
@@ -520,7 +518,7 @@ public class CounterDataService {
         List<ApplicableKPI> applicableKPIS = validateAndApplicableKPIS(level,refId, tabId,accessGroupPermissionCounterDTO,kpiId);
         TabKPIConf tabKPIConf = null;
         KPI kpi = validateAndGetKpiForCopy(refId, kpiId, counterDTO, level, accessGroupPermissionCounterDTO);
-        KPI copyKpi = ObjectMapperUtils.copyPropertiesByMapper(kpi, KPI.class);
+        KPI copyKpi = ObjectMapperUtils.copyPropertiesOrCloneByMapper(kpi, KPI.class);
         copyKpi.setId(null);
         copyKpi.setTitle(counterDTO.getTitle());
         copyKpi.setCalculationFormula(counterDTO.getCalculationFormula());
@@ -595,7 +593,7 @@ public class CounterDataService {
         AccessGroupPermissionCounterDTO  accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         TabKPIDTO tabKPIDTO = new TabKPIDTO();
         KPI kpi = counterRepository.getKPIByid(kpiId);
-        tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(kpi, KPIDTO.class));
+        tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesOrCloneByMapper(kpi, KPIDTO.class));
         filterCriteria.setKpiIds(Arrays.asList(kpiId));
         refId = ConfLevel.UNIT.equals(level) ? refId : UserContext.getUserDetails().getLastSelectedOrganizationId();
         Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteria, refId, accessGroupPermissionCounterDTO.getStaffId());
@@ -612,7 +610,7 @@ public class CounterDataService {
 
     private TabKPIDTO getTabKpiData(KPI copyKpi, CounterDTO counterDTO, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO) {
         TabKPIDTO tabKPIDTO = new TabKPIDTO();
-        tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(copyKpi, KPIDTO.class));
+        tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesOrCloneByMapper(copyKpi, KPIDTO.class));
         tabKPIDTO.getKpi().setSelectedFilters(counterDTO.getSelectedFilters());
         Map<BigInteger, CommonRepresentationData> data = generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilters(), Arrays.asList(copyKpi.getId()), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin(),counterDTO.getKpiRepresentation(),counterDTO.getInterval(),counterDTO.getValue(),counterDTO.getFrequencyType()), UserContext.getUserDetails().getLastSelectedOrganizationId(), accessGroupPermissionCounterDTO.getStaffId());
         if(isNotNull(data)) {
