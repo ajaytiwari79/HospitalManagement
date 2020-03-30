@@ -355,7 +355,7 @@ public class TimeSlotService {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
         }
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getUnitTimeSlotsByType(unit.getId(), unit.getTimeSlotMode(),TimeSlotType.SHIFT_PLANNING);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(timeSlotWrappers,TimeSlotDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(timeSlotWrappers,TimeSlotDTO.class);
     }
 
     public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotExternalId(Long unitId, Long kmdExternalId) {
@@ -385,7 +385,7 @@ public class TimeSlotService {
         List<TimeSlotSet> timeSlotSets= timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(organizationBaseEntity.getId(), organizationBaseEntity.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
         if(isNotEmpty(timeSlotSets)) {
             List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
-            timeSlotDTOS= ObjectMapperUtils.copyPropertiesOfCollectionByMapper(timeSlotWrappers, TimeSlotDTO.class);
+            timeSlotDTOS= ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(timeSlotWrappers, TimeSlotDTO.class);
         }else{
             logger.info("Time Slot is not present for organization {}", organizationBaseEntity.getName());
         }

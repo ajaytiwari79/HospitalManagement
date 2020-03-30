@@ -17,6 +17,7 @@ public enum ConstraintSubType {
     MAX_SHIFT_OF_STAFF("Maximum shift of staff"),
     FIX_ACTIVITY_SHOULD_NOT_CHANGE("Fix Activity Should not change"),
     MAX_LENGTH_OF_SHIFT_IN_NIGHT_TIMESLOT("Max length of shift in night time slot"),
+    DISLIKE_NIGHT_SHIFS_FOR_NON_NIGHT_WORKERS("Dislike night shifts for non night workers"),
 
     //For Shifts
 

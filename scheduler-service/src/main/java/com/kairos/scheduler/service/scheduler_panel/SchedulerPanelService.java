@@ -118,7 +118,7 @@ public class SchedulerPanelService extends MongoBaseService {
         }
         List<SchedulerPanel> schedulerPanels = new ArrayList<>();
         for (SchedulerPanelDTO schedulerPanelDTO : schedulerPanelDTOs) {
-            SchedulerPanel schedulerPanel = ObjectMapperUtils.copyPropertiesByMapper(schedulerPanelDTO, SchedulerPanel.class);
+            SchedulerPanel schedulerPanel = ObjectMapperUtils.copyPropertiesOrCloneByMapper(schedulerPanelDTO, SchedulerPanel.class);
             //ObjectMapperUtils.copyProperties(schedulerPanelDTO, schedulerPanel);
             if (Optional.ofNullable(schedulerPanelDTO.getIntegrationConfigurationId()).isPresent()) {
                 Optional<IntegrationSettings> integrationConfigurationOpt = integrationConfigurationRepository.findById(schedulerPanelDTO.getIntegrationConfigurationId());
@@ -169,7 +169,7 @@ public class SchedulerPanelService extends MongoBaseService {
             dynamicCronScheduler.setCronScheduling(schedulerPanel, timezone);
         }
         //      System.out.println("log-----> "+logger.toString());
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(schedulerPanels, SchedulerPanelDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(schedulerPanels, SchedulerPanelDTO.class);
     }
 
 
@@ -219,7 +219,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
         dynamicCronScheduler.stopCronJob(SCHEDULER + panel.getId());
         dynamicCronScheduler.startCronJob(panel, timezone);
-        return ObjectMapperUtils.copyPropertiesByMapper(panel, SchedulerPanelDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(panel, SchedulerPanelDTO.class);
     }
 
 
@@ -309,7 +309,7 @@ public class SchedulerPanelService extends MongoBaseService {
         if (!schedulerPanelOpt.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound", schedulerPanelId);
         }
-        schedulerPanelDTO = ObjectMapperUtils.copyPropertiesByMapper(schedulerPanelOpt.get(), SchedulerPanelDTO.class);
+        schedulerPanelDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(schedulerPanelOpt.get(), SchedulerPanelDTO.class);
 
         return schedulerPanelDTO;
     }
@@ -322,7 +322,7 @@ public class SchedulerPanelService extends MongoBaseService {
     public List<SchedulerPanelDTO> getSchedulerPanelByUnitId(long unitId) {
         //List<Map<String, Object>> controlPanels = schedulerPanelRepository.findByUnitId(unitId);
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByUnitIdAndDeletedFalse(unitId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(schedulerPanels, SchedulerPanelDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(schedulerPanels, SchedulerPanelDTO.class);
 
     }
 

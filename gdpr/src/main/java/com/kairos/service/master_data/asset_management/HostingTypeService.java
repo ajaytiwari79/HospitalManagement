@@ -60,7 +60,7 @@ public class HostingTypeService {
             hostingTypeRepository.saveAll(hostingTypes);
         }
 
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(hostingTypes, HostingTypeDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(hostingTypes, HostingTypeDTO.class);
 
     }
 

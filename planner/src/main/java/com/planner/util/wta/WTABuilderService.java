@@ -15,28 +15,28 @@ public class WTABuilderService {
         WTABaseRuleTemplate wtaBaseRuleTemplate = new WTABaseRuleTemplate();
         switch (ruleTemplate.getWtaTemplateType()) {
             case SHIFT_LENGTH:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ShiftLengthWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, ShiftLengthWTATemplate.class);
                 break;
             case CONSECUTIVE_WORKING_PARTOFDAY:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ConsecutiveWorkWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, ConsecutiveWorkWTATemplate.class);
                 break;
             case REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ConsecutiveRestPartOfDayWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, ConsecutiveRestPartOfDayWTATemplate.class);
                 break;
             case NUMBER_OF_PARTOFDAY:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, NumberOfPartOfDayShiftsWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, NumberOfPartOfDayShiftsWTATemplate.class);
                 break;
             case DAYS_OFF_IN_PERIOD:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, DaysOffInPeriodWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, DaysOffInPeriodWTATemplate.class);
                 break;
             case AVERAGE_SHEDULED_TIME:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, AverageScheduledTimeWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, AverageScheduledTimeWTATemplate.class);
                 break;
             case VETO_AND_STOP_BRICKS:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, VetoPerPeriodWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, VetoPerPeriodWTATemplate.class);
                 break;
             case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, NumberOfWeekendShiftsInPeriodWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, NumberOfWeekendShiftsInPeriodWTATemplate.class);
                 break;
             /*case CARE_DAYS_CHECK:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,ChildCareDayCheckWTATemplate.class);
@@ -45,25 +45,25 @@ public class WTABuilderService {
               //  wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, DailyRestingTimeWTATemplate.class);
                 break;
             case DURATION_BETWEEN_SHIFTS:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, DurationBetweenShiftsWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, DurationBetweenShiftsWTATemplate.class);
                 break;
             case WEEKLY_REST_PERIOD:
                // wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, WeeklyRestPeriodWTATemplate.class);
                 break;
             case SHORTEST_AND_AVERAGE_DAILY_REST:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ShortestAndAverageDailyRestWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, ShortestAndAverageDailyRestWTATemplate.class);
                 break;
             case NUMBER_OF_SHIFTS_IN_INTERVAL:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ShiftsInIntervalWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, ShiftsInIntervalWTATemplate.class);
                 break;
             case TIME_BANK:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, TimeBankWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, TimeBankWTATemplate.class);
                 break;
             case SENIOR_DAYS_PER_YEAR:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, SeniorDaysPerYearWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, SeniorDaysPerYearWTATemplate.class);
                 break;
             case CHILD_CARE_DAYS_CHECK:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ChildCareDaysCheckWTATemplate.class);
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, ChildCareDaysCheckWTATemplate.class);
                 break;
             default:
                 throw new IllegalStateException("Invalid TEMPLATE");

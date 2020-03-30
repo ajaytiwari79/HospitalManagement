@@ -8,6 +8,7 @@ import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.constraints.activityconstraint.*;
+import com.kairos.shiftplanning.constraints.unitconstraint.DislikeNightShiftsForNonNightWorkers;
 import com.kairos.shiftplanning.constraints.unitconstraint.MaxLengthOfShiftInNightTimeSlot;
 import com.kairos.shiftplanning.constraints.unitconstraint.PreferedEmployementType;
 import com.kairos.shiftplanning.constraints.unitconstraint.ShiftOnWeekend;
@@ -223,6 +224,7 @@ public class ShiftPlanningGenerator {
         constraintMap.put(ConstraintSubType.PREFER_PERMANENT_EMPLOYEE,new PreferedEmployementType(newHashSet(123l),ScoreLevel.SOFT,-4));
         constraintMap.put(ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS,new ShiftOnWeekend(ScoreLevel.SOFT,-4,newHashSet(DayOfWeek.SATURDAY,DayOfWeek.SUNDAY)));
         constraintMap.put(ConstraintSubType.MAX_LENGTH_OF_SHIFT_IN_NIGHT_TIMESLOT,new MaxLengthOfShiftInNightTimeSlot(ScoreLevel.SOFT,-4,timeSlot,5));
+        constraintMap.put(ConstraintSubType.DISLIKE_NIGHT_SHIFS_FOR_NON_NIGHT_WORKERS,new DislikeNightShiftsForNonNightWorkers(ScoreLevel.SOFT,-4,timeSlot));
         return constraintMap;
     }
     public  Tag requiredTagId(){
@@ -254,9 +256,11 @@ public class ShiftPlanningGenerator {
         Employee employee = getEmployee("145","Sachin Verma",123l,createTags1());
         employees.add(employee);
         Employee employee2 = getEmployee("160","Pradeep Singh",126l,createTags2());
+        employee2.setNightWorker(true);
         employees.add(employee2);
 
         Employee employee3 = getEmployee("170", "Arvind Das", 123l, createTags2());
+        employee3.setNightWorker(true);
         employees.add(employee3);
 
         Employee employee4 = getEmployee("180","Ulrik",126l,createTags3());

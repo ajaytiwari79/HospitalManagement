@@ -46,7 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_QUESTIONNAIRE_FREQUENCY;
 
@@ -95,7 +95,7 @@ public class NightWorkerService {
         // TODO set night worker details only if Staff is employed (Employment has been created)
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
         if (Optional.ofNullable(nightWorker).isPresent()) {
-            return ObjectMapperUtils.copyPropertiesByMapper(nightWorker, NightWorkerGeneralResponseDTO.class);
+            return ObjectMapperUtils.copyPropertiesOrCloneByMapper(nightWorker, NightWorkerGeneralResponseDTO.class);
         } else {
             return new NightWorkerGeneralResponseDTO(false);
         }
@@ -129,7 +129,7 @@ public class NightWorkerService {
             }});
         }
         nightWorkerMongoRepository.save(nightWorker);
-        return ObjectMapperUtils.copyPropertiesByMapper(nightWorker, NightWorkerGeneralResponseDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(nightWorker, NightWorkerGeneralResponseDTO.class);
     }
 
     public QuestionnaireAnswerResponseDTO updateNightWorkerQuestionnaire(BigInteger questionnaireId, QuestionnaireAnswerResponseDTO answerResponseDTO) {
@@ -143,7 +143,7 @@ public class NightWorkerService {
             answerResponseDTO.setSubmitted(true);
             answerResponseDTO.setSubmittedOn(staffQuestionnaire.getSubmittedOn());
         }
-        staffQuestionnaire.setQuestionAnswerPair(copyPropertiesOfCollectionByMapper(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
+        staffQuestionnaire.setQuestionAnswerPair(copyPropertiesOrCloneCollectionByMapper(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
         staffQuestionnaireMongoRepository.save(staffQuestionnaire);
         return answerResponseDTO;
     }
@@ -152,7 +152,7 @@ public class NightWorkerService {
         List<QuestionAnswerDTO> questionnaire = nightWorkerMongoRepository.getNightWorkerQuestions();
         StaffQuestionnaire staffQuestionnaire = new StaffQuestionnaire(
                 prepareNameOfQuestionnaireSet(),
-                copyPropertiesOfCollectionByMapper(questionnaire, QuestionAnswerPair.class));
+                copyPropertiesOrCloneCollectionByMapper(questionnaire, QuestionAnswerPair.class));
         staffQuestionnaireMongoRepository.save(staffQuestionnaire);
         return staffQuestionnaire;
     }

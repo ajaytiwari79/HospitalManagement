@@ -859,7 +859,7 @@ public class UserIntegrationService {
 
     public Set<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
         Set<Object> data= genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Object>>>() {});
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(data,LocalDate.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(data,LocalDate.class);
     }
 
     public Set<BigInteger> getSickSettingsOfUnit(Long unitId) {

@@ -114,6 +114,6 @@ public class PublicLegalDocumentService {
 
     public PublicLegalDocumentDTO getLegalDocumentById(long docId){
         Optional<PublicLegalDocument> publicLegalDocument = publicLegalDocumentRepository.findById(docId);
-        return ObjectMapperUtils.copyPropertiesByMapper(publicLegalDocument.get(),PublicLegalDocumentDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(publicLegalDocument.get(),PublicLegalDocumentDTO.class);
     }
 }

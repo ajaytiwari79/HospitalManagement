@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +57,7 @@ public class OrganizationHostingTypeService {
             }
             hostingTypeRepository.saveAll(hostingTypes);
         }
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(hostingTypes, HostingTypeDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(hostingTypes, HostingTypeDTO.class);
     }
 
 

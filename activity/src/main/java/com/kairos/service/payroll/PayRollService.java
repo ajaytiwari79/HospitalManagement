@@ -72,7 +72,7 @@ public class PayRollService extends MongoBaseService {
             payRoll.getCountryIds().remove(countryId);
         }
         payRollRepository.save(payRoll);
-        return ObjectMapperUtils.copyPropertiesByMapper(payRoll,PayRollDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(payRoll,PayRollDTO.class);
 
     }
 
