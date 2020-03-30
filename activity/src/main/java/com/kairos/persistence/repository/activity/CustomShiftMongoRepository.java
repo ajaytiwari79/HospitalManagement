@@ -101,6 +101,4 @@ public interface CustomShiftMongoRepository {
 
     void updateValidateDetailsOfShift(BigInteger shiftId, AccessGroupRole accessGroupRole, LocalDate localDate);
 
-    <T> List<T> getShiftByCriteria(Date startDate, Date endDate, Map<FilterType, Set<T>> filterTypeMap, Class className);
-
 }
