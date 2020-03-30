@@ -56,6 +56,7 @@ import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.shift.ShiftBreakService;
 import com.kairos.service.shift.ShiftFilterService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
@@ -150,12 +151,10 @@ public class KPIBuilderCalculationService implements CounterService {
     private ActivityService activityService;
     @Inject
     private AuditLoggingService auditLoggingService;
-    @Inject private AbsencePlanningKPIService absencePlanningKPIService;
-    @Inject private StaffingLevelCalculationKPIService staffingLevelCalculationKPIService;
     @Inject
     private ShiftBreakService shiftBreakService;
     @Inject private ShiftEscalationService shiftEscalationService;
-    @Inject private KPICalculationHelperService kpiCalculationHelperService;
+    @Inject private UnavailabilityCalculationKPIService unavailabilityCalculationKPIService;
     @Inject private TimeBankOffKPI timeBankOffKPI;
     @Inject
     private CounterServiceMapping counterServiceMapping;
@@ -248,8 +247,8 @@ public class KPIBuilderCalculationService implements CounterService {
                 break;
             case DELTA_TIMEBANK:
                 return timeBankService.getTotalTimeBankOrContractual(staffId, dateTimeInterval, kpiCalculationRelatedInfo, false);
-            case ACTUAL_TIMEBANK:
-                return timeBankService.getActualTimeBank(staffId, kpiCalculationRelatedInfo);
+//            case ACTUAL_TIMEBANK:
+//                return timeBankService.getActualTimeBank(staffId, kpiCalculationRelatedInfo);
             case STAFFING_LEVEL_CAPACITY:
                 return timeBankService.getTotalTimeBankOrContractual(staffId, dateTimeInterval, kpiCalculationRelatedInfo, true);
             case UNAVAILABILITY:
@@ -265,25 +264,25 @@ public class KPIBuilderCalculationService implements CounterService {
             case ESCALATED_SHIFTS:
             case ESCALATION_RESOLVED_SHIFTS:
                 return shiftEscalationService.getEscalatedShiftsOrResolvedShifts(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
-            case STAFF_AGE:
-                return getStaffAgeData(staffId, kpiCalculationRelatedInfo);
-            case SUM_OF_CHILDREN:
-                return getChildrenCount(staffId, kpiCalculationRelatedInfo);
-            case WORKED_ON_PUBLIC_HOLIDAY:
-                return kpiCalculationHelperService.getWorkedOnPublicHolidayCount(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+//            case STAFF_AGE:
+//                return getStaffAgeData(staffId, kpiCalculationRelatedInfo);
+//            case SUM_OF_CHILDREN:
+//                return getChildrenCount(staffId, kpiCalculationRelatedInfo);
+//            case WORKED_ON_PUBLIC_HOLIDAY:
+//                return kpiCalculationHelperService.getWorkedOnPublicHolidayCount(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             case PRESENCE_OVER_STAFFING:
             case PRESENCE_UNDER_STAFFING:
             case ABSENCE_OVER_STAFFING:
             case ABSENCE_UNDER_STAFFING:
                 return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
-            case CARE_BUBBLE:
-                return kpiCalculationHelperService.calculateCareBubble(kpiCalculationRelatedInfo, dateTimeInterval, staffId);
-            case TOTAL_WEEKLY_HOURS:
-                return weeklyEmploymentHoursKPIService.getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo);
+//            case CARE_BUBBLE:
+//                return kpiCalculationHelperService.calculateCareBubble(kpiCalculationRelatedInfo, dateTimeInterval, staffId);
+//            case TOTAL_WEEKLY_HOURS:
+//                return weeklyEmploymentHoursKPIService.getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo);
             case STAFF_SKILLS_COUNT:
                 return skillKPIService.getCountOfSkillOfStaffIdOnSelectedDate(staffId, asLocalDate(kpiCalculationRelatedInfo.getStartDate()), asLocalDate(kpiCalculationRelatedInfo.getEndDate()), kpiCalculationRelatedInfo);
-            case PAY_LEVEL_GRADE:
-                return payLevelKPIService.getPayLevelGradeOfMainEmploymentOfStaff(staffId, kpiCalculationRelatedInfo);
+//            case PAY_LEVEL_GRADE:
+//                return payLevelKPIService.getPayLevelGradeOfMainEmploymentOfStaff(staffId, kpiCalculationRelatedInfo);
             case TODO_STATUS:
                 return  timeBankOffKPI.getCountAndHoursAndPercentageOfTODOS(staffId,kpiCalculationRelatedInfo);
             case ABSENCE_REQUEST:
@@ -748,16 +747,10 @@ public class KPIBuilderCalculationService implements CounterService {
         private List<EmploymentSubType> employmentSubTypes = new ArrayList<>();
         private CalculationType currentCalculationType;
         private DateTimeInterval planningPeriodInterval;
-<<<<<<< HEAD
-        private List<TodoDTO> todoDTOS;
-        private Map<BigInteger, List<TodoDTO>> activityIdAndTodoListMap;
-        private Map<BigInteger,List<TodoDTO>> timeTypeTodoListMap;
-        private Set<BigInteger> activityIds;
-=======
         private List<TodoDTO> todoDTOS = new ArrayList<>();
         private Map<BigInteger, List<TodoDTO>> activityIdAndTodoListMap = new HashMap<>();
         private Set<BigInteger> activityIds = new HashSet<>();
->>>>>>> a05ac182729eb1e5ee696894cfd5afb729febe97
+        private Map<BigInteger,List<TodoDTO>> timeTypeTodoListMap =new HashMap<>();
         private Boolean isDraft;
         private List<CountryHolidayCalenderDTO> holidayCalenders = new ArrayList<>();
         private List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>();
