@@ -330,12 +330,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
     }
 
-    public <T> List<T> getShiftByCriteria(Date startDate,Date endDate,Map<FilterType, Set<T>> filterTypeMap,Class className){
-        Criteria criteria = Criteria.where("startDate").gte(startDate).and("endDate").lte(endDate);
-        filterTypeMap.entrySet().forEach(filterTypeSetEntry -> filterTypeSetEntry.getKey().updateCriteria(criteria,filterTypeSetEntry.getValue()));
-        return (List<T>) mongoTemplate.find(new Query(criteria),Shift.class);
-    }
-
     @Override
     public List<ShiftWithActivityDTO> findAllDraftShiftsByIds(List<BigInteger> shiftIds,boolean draftShift ) {
         Criteria criteria = Criteria.where(DELETED).is(false).and("id").in(shiftIds).and(DRAFT_SHIFT).exists(draftShift).and(DISABLED).is(false);
