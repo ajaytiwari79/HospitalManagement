@@ -257,7 +257,7 @@ public class PhaseService extends MongoBaseService {
         return phaseDTO;
     }
 
-    public List<ShiftStatus> getAllApplicablePhaseStatus() {
+    public Set<ShiftStatus> getAllApplicablePhaseStatus() {
         return ShiftStatus.getAllStatusExceptRequestAndPending();
     }
 

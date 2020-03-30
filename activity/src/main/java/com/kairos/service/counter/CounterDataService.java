@@ -117,7 +117,7 @@ public class CounterDataService {
         } else {
             getStaffKPiFilterAndApplicableKpi(filters, staffId, kpiIdAndApplicableKPIMap, kpis, staffKpiFilterCritera,null);
         }
-        for (BigInteger kpiId : new HashSet<>(filters.getKpiIds())) {
+        /*for (BigInteger kpiId : new HashSet<>(filters.getKpiIds())) {
             if(kpiIdAndApplicableKPIMap.containsKey(kpiId)) {
                 Callable<CommonRepresentationData> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId), kpiIdAndApplicableKPIMap.get(kpiId));
                 Future<CommonRepresentationData> responseData = executorService.submit(data);
@@ -133,6 +133,7 @@ public class CounterDataService {
             }
         }
         return isNotNull(kpisData) ? kpisData.stream().collect(Collectors.toMap(CommonRepresentationData::getCounterId, kpiData -> kpiData)) : new HashMap<>();
+    */return new HashMap();
     }
 
 
@@ -663,9 +664,9 @@ public class CounterDataService {
                 ApplicableKPI applicableKPI = kpiIdAndApplicableKPIMap.get(kpiId);
                 applicableKPI.setDateForKPISetCalculation(startDate);
                 applicableKPI.setKpiRepresentation(DurationType.HOURS.equals(filters.getFrequencyType())? KPIRepresentation.REPRESENT_PER_INTERVAL:KPIRepresentation.REPRESENT_PER_STAFF);
-                Callable<KPIResponseDTO> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedDataOfKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId), kpiIdAndApplicableKPIMap.get(kpiId));
+                /*Callable<KPIResponseDTO> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedDataOfKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId), kpiIdAndApplicableKPIMap.get(kpiId));
                 Future<KPIResponseDTO> responseData = executorService.submit(data);
-                kpiResults.add(responseData);
+                kpiResults.add(responseData);*/
             }
         }
         return kpiResults;

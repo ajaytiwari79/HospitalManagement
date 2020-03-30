@@ -553,16 +553,25 @@ public class ShiftValidatorService {
         }
     }
 
-    public void updateStatusOfShiftActvity(Shift oldStateOfShift, ShiftDTO shiftDTO) {
+    public void updateStatusOfShiftActvity(Shift oldStateOfShift, ShiftDTO shiftDTO,Map<BigInteger, ActivityWrapper> activityWrapperMap,Phase phase) {
         boolean valid = false;
+
         Map<String, ShiftActivityDTO> activityIdAndShiftActivityDTOMap = shiftDTO.getActivities().stream().collect(Collectors.toMap(shiftActivityDTO -> shiftActivityDTO.getActivityId() + "" + shiftActivityDTO.getStartDate(), v -> v));
         for (ShiftActivity shiftActivity : oldStateOfShift.getActivities()) {
+            boolean isApprovalRequired =activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId());
             String key = shiftActivity.getActivityId() + "" + shiftActivity.getStartDate();
             if (activityIdAndShiftActivityDTOMap.containsKey(key) && (!shiftActivity.getStartDate().equals(activityIdAndShiftActivityDTOMap.get(key).getStartDate()) || !shiftActivity.getEndDate().equals(activityIdAndShiftActivityDTOMap.get(key).getEndDate()))) {
                 if (shiftActivity.getStatus().contains(ShiftStatus.FIX)) {
                     valid = true;
-                } else if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) {
-                    activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId() + "" + shiftActivity.getStartDate()).getStatus().add(ShiftStatus.MOVED);
+                } else if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)|| (!oldStateOfShift.isDraft()&&isCollectionEmpty(shiftActivity.getStatus()))||shiftActivity.getStatus().contains(ShiftStatus.APPROVE)) {
+                    ShiftActivityDTO shiftActivityDTO = activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId() + "" + shiftActivity.getStartDate());
+                    shiftActivityDTO.getStatus().add(ShiftStatus.MOVED);
+                }
+            }if(isApprovalRequired && !activityIdAndShiftActivityDTOMap.containsKey(key)&&(shiftActivity.getStatus().contains(ShiftStatus.APPROVE)&& shiftActivity.getStatus().contains(ShiftStatus.APPROVE))){
+                for(ShiftActivityDTO shiftActivityDTO :shiftDTO.getActivities()){
+                    shiftActivity.getStatus().remove(ShiftStatus.APPROVE);
+                    shiftActivityDTO.setStatus(shiftActivity.getStatus());
+                    shiftActivityDTO.getStatus().add(ShiftStatus.MOVED);
                 }
             }
             if (valid) {
