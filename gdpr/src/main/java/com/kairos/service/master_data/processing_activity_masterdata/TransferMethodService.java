@@ -60,7 +60,7 @@ public class TransferMethodService {
             }
             transferMethodRepository.saveAll(transferMethods);
         }
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(transferMethods, TransferMethodDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(transferMethods, TransferMethodDTO.class);
     }
 
     /**

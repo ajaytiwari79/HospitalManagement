@@ -6,6 +6,7 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.common.StaffFilterDataDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
@@ -198,7 +199,7 @@ public class StaffFilterService {
             case TIME_SLOT:
                 return getTimeSlots();
             case ASSIGN_ACTIVITY:
-                return getAllActivity(unitId);
+                return getAllActivity(unitId,countryId);
             case ABSENCE_ACTIVITY:
                 return getAnsenceActivity(unitId);
             case  PLANNED_TIME_TYPE:
@@ -232,9 +233,9 @@ public class StaffFilterService {
         return new ArrayList<>();
     }
 
-    private List<FilterSelectionQueryResult> getAllActivity(Long unitId){
-        List<ActivityDTO> activityDTOS = activityIntegrationService.getActivitiesWithCategories(unitId);
-        return activityDTOS.stream().map(activityDTO -> new FilterSelectionQueryResult(activityDTO.getId().toString(),activityDTO.getName())).collect(Collectors.toList());
+    private List<FilterSelectionQueryResult> getAllActivity(Long unitId, Long countryId){
+       ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = activityIntegrationService.getAllActivitiesAndTimeTypesByUnit(unitId, countryId);
+        return activityWithTimeTypeDTOS.getActivityDTOS().stream().map(activityDTO -> new FilterSelectionQueryResult(activityDTO.getId().toString(),activityDTO.getName())).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getTags(Long orgId) {
@@ -355,7 +356,7 @@ public class StaffFilterService {
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(staffFilterDTO.getModuleId());
         StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter(staffFilterDTO.getName(),
-                ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffFilterDTO.getFiltersData(), FilterSelection.class), filterGroup);
+                ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(staffFilterDTO.getFiltersData(), FilterSelection.class), filterGroup);
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         staff.addFavouriteFilters(staffFavouriteFilter);
         staffGraphRepository.save(staff);
@@ -384,7 +385,7 @@ public class StaffFilterService {
         staffGraphRepository.detachStaffFavouriteFilterDetails(staffFavouriteFilter.getId());
         List<FilterSelectionDTO> filters = favouriteFilterDTO.getFiltersData();
         filters.forEach(filterSelection -> filterSelection.setId(null));
-        staffFavouriteFilter.setFiltersData(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(filters, FilterSelection.class));
+        staffFavouriteFilter.setFiltersData(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(filters, FilterSelection.class));
         staffFavouriteFilter.setName(favouriteFilterDTO.getName());
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         return favouriteFilterDTO;
@@ -461,7 +462,7 @@ public class StaffFilterService {
     private void setNightWorkerDetails(StaffFilterDTO staffFilterDTO, List<Map> staffs, List<Map> staffList) {
         for (Map staffAndModifiable : staffs) {
             if(staffFilterDTO.getNightWorkerDetails().containsKey(staffAndModifiable.get(ID))) {
-                Map<String, Object> staff = ObjectMapperUtils.copyPropertiesByMapper(staffAndModifiable, HashedMap.class);
+                Map<String, Object> staff = ObjectMapperUtils.copyPropertiesOrCloneByMapper(staffAndModifiable, HashedMap.class);
                 staff.put(NIGHT_WORKER, staffFilterDTO.getNightWorkerDetails().get(((Integer) ((Map) staff).get(ID)).longValue()));
                 staffList.add(staff);
                 if(staffFilterDTO.isIncludeWorkTimeAgreement()){
@@ -499,9 +500,16 @@ public class StaffFilterService {
         if(isCollectionNotEmpty(activityIds) || isCollectionNotEmpty(timeTypeIds) ){
             List<Long> assignActivitiesStaff = new ArrayList<>();
             StaffFilterDataDTO staffFilterDataDTO = activityIntegrationService.getAssignActivityStaffFilterReatedData(unitId, timeTypeIds, activityIds);
-            assignActivitiesStaff.addAll(staffFilterDataDTO.getStaffIds());
+            if(isCollectionNotEmpty(staffFilterDataDTO.getStaffIds())) {
+                assignActivitiesStaff.addAll(staffFilterDataDTO.getStaffIds());
+            }
             assignActivitiesStaff.addAll(teamService.getAllStaffToAssignActivitiesByTeam(unitId, staffFilterDataDTO.getActivityIds()));
             staffListMap = staffListMap.stream().filter(map -> assignActivitiesStaff.contains(Long.valueOf(map.get(ID).toString()))).collect(Collectors.toList());
+        }
+        if(filterTypeMap.containsKey(GROUPS) && isCollectionNotEmpty(filterTypeMap.get(GROUPS))){
+            List<Long> groupIds = filterTypeMap.get(GROUPS).stream().map(s -> Long.valueOf(s.toString())).collect(Collectors.toList());
+            Set<Long> staffIds = groupService.getAllStaffIdsByGroupIds(unitId,groupIds);
+            staffListMap = staffListMap.stream().filter(map -> staffIds.contains(Long.valueOf(map.get(ID).toString()))).collect(Collectors.toList());
         }
         return staffListMap;
     }

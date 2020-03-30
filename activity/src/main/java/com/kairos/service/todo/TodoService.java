@@ -99,8 +99,8 @@ public class TodoService {
     public void updateStatusOfShiftActivityIfApprovalRequired(Map<BigInteger, ActivityWrapper> activityWrapperMap,Shift shift, boolean shiftUpdate) {
         if (!shiftUpdate && UserContext.getUserDetails().isManagement()) {
             shift.getActivities().forEach(shiftActivity -> {
-                updateStatusIfApprovalRequired(activityWrapperMap, shiftActivity);
-                shiftActivity.getChildActivities().forEach(childActivity -> updateStatusIfApprovalRequired(activityWrapperMap, childActivity));
+                updateStatusIfApprovalRequired(activityWrapperMap, shiftActivity, shift);
+                shiftActivity.getChildActivities().forEach(childActivity -> updateStatusIfApprovalRequired(activityWrapperMap, childActivity, shift));
             });
             Activity activity = activityMongoRepository.findOne(shift.getActivities().get(0).getActivityId());
             TodoSubtype todoSubtype = FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_DAY : FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_WEEK : TodoSubtype.ABSENCE_WITH_TIME;
@@ -122,9 +122,16 @@ public class TodoService {
         }
     }
 
-    private void updateStatusIfApprovalRequired(Map<BigInteger,ActivityWrapper> activityMap, ShiftActivity shiftActivity) {
+    private void updateStatusIfApprovalRequired(Map<BigInteger,ActivityWrapper> activityMap, ShiftActivity shiftActivity, Shift shift) {
         if (activityMap.containsKey(shiftActivity.getActivityId())) {
-            shiftActivity.getStatus().add(ShiftStatus.APPROVE);
+            Activity activity = activityMap.get(shiftActivity.getActivityId()).getActivity();
+            if(isCollectionNotEmpty(activity.getRulesActivityTab().getApprovalAllowedPhaseIds()) && activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(shift.getPhaseId())){
+                if(shift.isDraft()) {
+                    shiftActivity.getStatus().add(ShiftStatus.REQUEST);
+                }else{
+                    shiftActivity.getStatus().add(ShiftStatus.APPROVE);
+                }
+            }
         }
     }
 

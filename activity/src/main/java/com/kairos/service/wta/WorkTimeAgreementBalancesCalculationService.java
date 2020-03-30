@@ -842,6 +842,6 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
 
     @Override
     public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
-        return getLeaveCount(staffId, dateTimeInterval, kpiCalculationRelatedInfo, null);
+        return getLeaveCount(staffId, dateTimeInterval, kpiCalculationRelatedInfo, (YAxisConfig) t);
     }
 }

@@ -138,7 +138,7 @@ public class OrganizationAssetTypeService {
      * @return List<OrganizationLevelRiskDTO> - List of RiskResponse DTO.
      */
     public List<OrganizationLevelRiskDTO> buildAssetTypeRisksResponse(List<Risk> risks) {
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(risks, OrganizationLevelRiskDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(risks, OrganizationLevelRiskDTO.class);
     }
 
 

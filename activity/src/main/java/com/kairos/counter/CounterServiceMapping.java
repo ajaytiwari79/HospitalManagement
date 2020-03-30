@@ -137,6 +137,16 @@ public class CounterServiceMapping {
     }
 
     @Inject
+    public void setCareBubbleKPICalculationService(CareBubbleKPICalculationService careBubbleKPICalculationService) {
+        this.kpiServiceMap.put(CARE_BUBBLE,careBubbleKPICalculationService);
+    }
+
+    @Inject
+    public void setWorkOnPublicHolidayKPICalculationService(WorkOnPublicHolidayKPICalculationService workOnPublicHolidayKPICalculationService) {
+        this.kpiServiceMap.put(WORKED_ON_PUBLIC_HOLIDAY,workOnPublicHolidayKPICalculationService);
+    }
+
+    @Inject
     public void setUnavailabilityCalculationKPIService(UnavailabilityCalculationKPIService unavailabilityCalculationKPIService) {
         this.kpiServiceMap.put(UNAVAILABILITY,unavailabilityCalculationKPIService);
     }

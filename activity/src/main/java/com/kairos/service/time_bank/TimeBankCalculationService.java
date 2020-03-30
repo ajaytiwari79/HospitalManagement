@@ -1309,7 +1309,7 @@ public class TimeBankCalculationService {
             for (PlannedTime plannedTime : shiftActivity.getPlannedTimes()) {
                 if (breakActivity.getInterval().overlaps(plannedTime.getInterval())) {
                     DateTimeInterval breakDateTimeInterval = breakActivity.getInterval().overlap(plannedTime.getInterval());
-                    PlannedTime breakPlannedTime = ObjectMapperUtils.copyPropertiesByMapper(plannedTime, PlannedTime.class);
+                    PlannedTime breakPlannedTime = ObjectMapperUtils.copyPropertiesOrCloneByMapper(plannedTime, PlannedTime.class);
                     breakPlannedTime.setStartDate(breakDateTimeInterval.getStartDate());
                     breakPlannedTime.setEndDate(breakDateTimeInterval.getEndDate());
                     plannedTimes.add(breakPlannedTime);
@@ -1324,7 +1324,7 @@ public class TimeBankCalculationService {
 
         private boolean updateShiftActivityByBreakInterval(List<ShiftActivityDTO> updatedShiftActivities, ShiftActivityDTO shiftActivity, List<DateTimeInterval> dateTimeIntervals,boolean scheduledHourAdded) {
             for (DateTimeInterval timeInterval : dateTimeIntervals) {
-                ShiftActivityDTO updatedShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivity, ShiftActivityDTO.class);
+                ShiftActivityDTO updatedShiftActivity = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftActivity, ShiftActivityDTO.class);
                 updatedShiftActivity.setStartDate(timeInterval.getStartDate());
                 updatedShiftActivity.setEndDate(timeInterval.getEndDate());
                 List<PlannedTime> plannedTimes = new ArrayList<>();

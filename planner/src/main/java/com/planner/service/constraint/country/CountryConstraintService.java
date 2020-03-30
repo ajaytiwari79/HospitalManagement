@@ -44,7 +44,7 @@ public class CountryConstraintService {
 
     public CountryConstraintDTO createCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
         if (preValidateCountryConstraintDTO(countryConstraintDTO, true)) {
-            CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
+            CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesOrCloneByMapper(countryConstraintDTO, CountryConstraint.class);
             constraintsRepository.saveEntity(countryConstraint);
             //Now copy same Constraints on units
             createUnitConstraintByOrganizationServiceAndSubService(countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId(), countryConstraint);
@@ -66,7 +66,7 @@ public class CountryConstraintService {
         List<UnitConstraint> unitConstraintList = new ArrayList<>();
         if (!applicableUnitIdForConstraint.isEmpty()) {
             for (Long unitId : applicableUnitIdForConstraint) {
-                UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraint, UnitConstraint.class);
+                UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesOrCloneByMapper(countryConstraint, UnitConstraint.class);
                 unitConstraint.setId(null);//Unset Id
                 unitConstraint.setUnitId(unitId);
               //  unitConstraint.setParentCountryConstraintId(countryConstraint.getId());
@@ -82,7 +82,7 @@ public class CountryConstraintService {
     public CountryConstraintDTO copyCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(countryConstraintDTO.getId());
         if (constraint != null && preValidateCountryConstraintDTO(countryConstraintDTO, true)) {
-            CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
+            CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesOrCloneByMapper(countryConstraintDTO, CountryConstraint.class);
             countryConstraint.setParentConstraintId(countryConstraintDTO.getId());
             countryConstraint.setId(null);//Unset Id
             constraintsRepository.saveEntity(countryConstraint);
@@ -95,13 +95,13 @@ public class CountryConstraintService {
 
     public List<CountryConstraint> getAllCountryConstraintByCountryId(Long countryId) {
         List<Constraint> constraintList = constraintsRepository.findAllObjectsNotDeletedById(true, countryId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(constraintList, CountryConstraint.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(constraintList, CountryConstraint.class);
     }
 
     public void updateCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(countryConstraintDTO.getId());
         if (constraint != null && preValidateCountryConstraintDTO(countryConstraintDTO, false)) {
-            CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
+            CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesOrCloneByMapper(countryConstraintDTO, CountryConstraint.class);
             constraintsRepository.saveEntity(countryConstraint);
         }
     }

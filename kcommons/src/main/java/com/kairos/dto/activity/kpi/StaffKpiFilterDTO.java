@@ -5,14 +5,17 @@ package com.kairos.dto.activity.kpi;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
+import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.utils.CPRUtil.getAgeByCPRNumberAndStartDate;
@@ -32,7 +35,7 @@ public class StaffKpiFilterDTO {
     private List<DayTypeDTO> dayTypeDTOS;
     private List<TeamDTO> teams;
     private List<TagDTO> tags;
-
+    private List<SkillLevelDTO> skills = new ArrayList<>();
     private List<StaffChildDetailDTO> staffChildDetails;
     private long payTableAmount;
 
@@ -46,6 +49,10 @@ public class StaffKpiFilterDTO {
     }
     public boolean isTagValid(Set<Long> tagIds){
         return tags.stream().anyMatch(tag->tagIds.contains(tag.getId()));
+    }
+
+    public List<SkillLevelDTO> getSkillsByLocalDate(LocalDate localDate){
+        return this.skills.stream().filter(skillLevelDTO -> skillLevelDTO.isValidSkillsByLocalDate(localDate)).collect(Collectors.toList());
     }
 
 }

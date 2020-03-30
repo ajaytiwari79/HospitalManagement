@@ -25,7 +25,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
-import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -61,11 +60,6 @@ public class OrganizationHierarchyService {
     }
 
 
-    /**
-     * @param parentOrganizationId
-     * @param organizationHierarchyFilterDTO
-     * @return
-     */
     public QueryResult generateOrganizationHierarchyByFilter() {
         //TODO need to fix the complete query as per the current structure, currently filters won't work
        return generateHierarchy().get(0);
@@ -106,7 +100,7 @@ public class OrganizationHierarchyService {
                     break;
                 default:
             }
-            List<FilterAttributes> filterAttributes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper((List<Map>) filterTypeDataMap.get(filterType), FilterAttributes.class);
+            List<FilterAttributes> filterAttributes = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper((List<Map>) filterTypeDataMap.get(filterType), FilterAttributes.class);
             filterResponseDTO.setFilterData(filterAttributes);
             filterResponseDTOList.add(filterResponseDTO);
         }
@@ -118,7 +112,7 @@ public class OrganizationHierarchyService {
         Set<Long> organizationIds = new HashSet<>();
         List<StaffAccessGroupQueryResult> staffAccessGroupQueryResults = accessPageService.getAccessPermission(UserContext.getUserDetails().getId(), getAllUnitIds(organizationHierarchy, organizationIds));
         Map<Long, Boolean> unitPermissionMap = staffAccessGroupQueryResults.stream().collect(Collectors.toMap(StaffAccessGroupQueryResult::getUnitId, StaffAccessGroupQueryResult::isHasPermission));
-        QueryResult data = ObjectMapperUtils.copyPropertiesByMapper(organizationHierarchy, QueryResult.class);
+        QueryResult data = ObjectMapperUtils.copyPropertiesOrCloneByMapper(organizationHierarchy, QueryResult.class);
         boolean hub = ((organizationHierarchy instanceof Organization) && ((Organization) organizationHierarchy).isKairosHub());
         Long hubId=unitGraphRepository.getHubIdByOrganizationId(organizationHierarchy.getId());
         setPermission(data, unitPermissionMap, countryAdmin, hub ? 0 : 1,hubId,(organizationHierarchy instanceof Unit));

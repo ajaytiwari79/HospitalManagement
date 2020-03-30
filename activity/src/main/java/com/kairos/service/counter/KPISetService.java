@@ -69,7 +69,7 @@ public class KPISetService {
         verifyDetails(referenceId, confLevel, kpiSetDTO);
         kpiSetDTO.setReferenceId(referenceId);
         kpiSetDTO.setConfLevel(confLevel);
-        KPISet kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetDTO, KPISet.class);
+        KPISet kpiSet = ObjectMapperUtils.copyPropertiesOrCloneByMapper(kpiSetDTO, KPISet.class);
         kpiSetRepository.save(kpiSet);
         kpiSetDTO.setId(kpiSet.getId());
         return kpiSetDTO;
@@ -83,7 +83,7 @@ public class KPISetService {
         verifyDetails(referenceId, confLevel, kpiSetDTO);
         kpiSetDTO.setReferenceId(referenceId);
         kpiSetDTO.setConfLevel(confLevel);
-        kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetDTO, KPISet.class);
+        kpiSet = ObjectMapperUtils.copyPropertiesOrCloneByMapper(kpiSetDTO, KPISet.class);
         kpiSetRepository.save(kpiSet);
         return kpiSetDTO;
     }
@@ -222,6 +222,7 @@ public class KPISetService {
                         kpiResponseDTO = counterDataService.generateKPISetCalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId(),startDate);
                     }
                     if (isNotNull(kpiResponseDTO)) {
+                        kpiResponseDTO.setKpiName(applicableKPI.getTitle());
                         kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(), kpiResponseDTO);
                     }
                 }

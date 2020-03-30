@@ -66,7 +66,7 @@ public class ShiftTemplateService{
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOs = shiftTemplateDTO.getShiftList();
         List<IndividualShiftTemplate> individualShiftTemplates = new ArrayList<>();
         individualShiftTemplateDTOs.forEach(individualShiftTemplateDTO -> {
-            IndividualShiftTemplate individualShiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO, IndividualShiftTemplate.class);
+            IndividualShiftTemplate individualShiftTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(individualShiftTemplateDTO, IndividualShiftTemplate.class);
             individualShiftTemplates.add(individualShiftTemplate);
         });
         individualShiftTemplateRepository.saveEntities(individualShiftTemplates);
@@ -84,7 +84,7 @@ public class ShiftTemplateService{
 
     public List<ShiftTemplateDTO> getAllShiftTemplates(Long unitId) {
         List<ShiftTemplate> shiftTemplates = shiftTemplateRepository.findAllByUnitIdAndCreatedByAndDeletedFalse(unitId, UserContext.getUserDetails().getId());
-        List<ShiftTemplateDTO> shiftTemplateDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftTemplates, ShiftTemplateDTO.class);
+        List<ShiftTemplateDTO> shiftTemplateDTOS = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(shiftTemplates, ShiftTemplateDTO.class);
         Set<BigInteger> individualShiftTemplateIds = shiftTemplates.stream().flatMap(e -> e.getIndividualShiftTemplateIds().stream()).collect(Collectors.toSet());
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
         Set<BigInteger> activityIds = individualShiftTemplateDTOS.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toSet());
@@ -111,7 +111,7 @@ public class ShiftTemplateService{
         shiftTemplateDTO.setId(shiftTemplateId);
         shiftTemplateDTO.setIndividualShiftTemplateIds(shiftTemplate.getIndividualShiftTemplateIds());
         shiftTemplateDTO.setUnitId(unitId);
-        shiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(shiftTemplateDTO, ShiftTemplate.class);
+        shiftTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftTemplateDTO, ShiftTemplate.class);
         shiftTemplate.setCreatedBy(userInfo);
         shiftTemplateRepository.save(shiftTemplate);
         return shiftTemplateDTO;
@@ -139,7 +139,7 @@ public class ShiftTemplateService{
             exceptionService.dataNotFoundByIdException(MESSAGE_INDIVIDUAL_SHIFTTEMPLATE_ABSENT, individualShiftTemplateId);
         }
         individualShiftTemplateDTO.setId(shiftDayTemplate.get().getId());
-        IndividualShiftTemplate individualShiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO, IndividualShiftTemplate.class);
+        IndividualShiftTemplate individualShiftTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(individualShiftTemplateDTO, IndividualShiftTemplate.class);
         individualShiftTemplate.setId(shiftDayTemplate.get().getId());
         individualShiftTemplateRepository.save(individualShiftTemplate);
         return individualShiftTemplateDTO;
@@ -150,7 +150,7 @@ public class ShiftTemplateService{
         if (!Optional.ofNullable(shiftTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_INDIVIDUAL_SHIFTTEMPLATE_ABSENT, shiftTemplateId);
         }
-        IndividualShiftTemplate individualShiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO, IndividualShiftTemplate.class);
+        IndividualShiftTemplate individualShiftTemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(individualShiftTemplateDTO, IndividualShiftTemplate.class);
         individualShiftTemplateRepository.save(individualShiftTemplate);
         shiftTemplate.getIndividualShiftTemplateIds().add(individualShiftTemplate.getId());
         shiftTemplateRepository.save(shiftTemplate);
@@ -178,7 +178,7 @@ public class ShiftTemplateService{
         Set<BigInteger> individualShiftTemplateIds = shiftTemplate.getIndividualShiftTemplateIds();
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
         individualShiftTemplateDTOS.forEach(individualShiftTemplateDTO -> {
-            ShiftDTO newShiftDTO = ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO, ShiftDTO.class);
+            ShiftDTO newShiftDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(individualShiftTemplateDTO, ShiftDTO.class);
             newShiftDTO.setActivities(null);
             newShiftDTO.setId(null);
             newShiftDTO.setStaffId(shiftDTO.getStaffId());
