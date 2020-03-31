@@ -88,10 +88,10 @@ public class MasterProcessingActivityService {
      * @return
      */
     private void setMetadataOfMasterProcessingActivity(MasterProcessingActivityDTO masterProcessingActivityDto, MasterProcessingActivity masterProcessingActivity) {
-        masterProcessingActivity.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(new ArrayList<>(masterProcessingActivityDto.getOrganizationTypes()), OrganizationType.class));
-        masterProcessingActivity.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(new ArrayList<>(masterProcessingActivityDto.getOrganizationSubTypes()), OrganizationSubType.class));
-        masterProcessingActivity.setOrganizationServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(new ArrayList<>(masterProcessingActivityDto.getOrganizationServices()), ServiceCategory.class));
-        masterProcessingActivity.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(new ArrayList<>(masterProcessingActivityDto.getOrganizationSubServices()), SubServiceCategory.class));
+        masterProcessingActivity.setOrganizationTypes(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterProcessingActivityDto.getOrganizationTypes()), OrganizationType.class));
+        masterProcessingActivity.setOrganizationSubTypes(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterProcessingActivityDto.getOrganizationSubTypes()), OrganizationSubType.class));
+        masterProcessingActivity.setOrganizationServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterProcessingActivityDto.getOrganizationServices()), ServiceCategory.class));
+        masterProcessingActivity.setOrganizationSubServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterProcessingActivityDto.getOrganizationSubServices()), SubServiceCategory.class));
     }
 
 
@@ -309,7 +309,7 @@ public class MasterProcessingActivityService {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_PROCESSING_ACTIVITY, processingActivityId);
         }
         if (!processingActivityRiskDTO.getRisks().isEmpty()) {
-            List<Risk> processingActivityRisks = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(processingActivityRiskDTO.getRisks(), Risk.class);
+            List<Risk> processingActivityRisks = ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivityRiskDTO.getRisks(), Risk.class);
             processingActivityRisks.forEach(risk -> risk.setCountryId(countryId));
             masterProcessingActivity.setRisks(processingActivityRisks);
         }
@@ -363,14 +363,14 @@ public class MasterProcessingActivityService {
             masterProcessingActivityRiskResponseDTO.setMainParent(isParentProcessingActivity);
             masterProcessingActivityRiskResponseDTO.setName(processingActivity.getName());
             if (!isParentProcessingActivity) {
-                masterProcessingActivityRiskResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class));
+                masterProcessingActivityRiskResponseDTO.setRisks(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class));
             }
             List<MasterProcessingActivity> subProcessingActivities = processingActivity.getSubProcessingActivities();
             if (!subProcessingActivities.isEmpty()) {
                 subProcessingActivityRiskResponseDTOS = prepareMasterProcessingActivityRiskResponseDTOData(subProcessingActivities, false);
             }
             if (isParentProcessingActivity) {
-                subProcessingActivityRiskResponseDTOS.add(0, new MasterProcessingActivityRiskResponseDTO(masterProcessingActivityRiskResponseDTO.getId(), masterProcessingActivityRiskResponseDTO.getName(), masterProcessingActivityRiskResponseDTO.getMainParent(), ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class), masterProcessingActivityRiskResponseDTO.getSuggestedDate(), masterProcessingActivityRiskResponseDTO.getSuggestedDataStatus()));
+                subProcessingActivityRiskResponseDTOS.add(0, new MasterProcessingActivityRiskResponseDTO(masterProcessingActivityRiskResponseDTO.getId(), masterProcessingActivityRiskResponseDTO.getName(), masterProcessingActivityRiskResponseDTO.getMainParent(), ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class), masterProcessingActivityRiskResponseDTO.getSuggestedDate(), masterProcessingActivityRiskResponseDTO.getSuggestedDataStatus()));
                 masterProcessingActivityRiskResponseDTO.setProcessingActivities(subProcessingActivityRiskResponseDTOS);
             }
             processingActivityRiskResponseDTOS.add(masterProcessingActivityRiskResponseDTO);
@@ -414,9 +414,9 @@ public class MasterProcessingActivityService {
 
     private void addMetaDataToSuggestedProcessingActivity(OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO, MasterProcessingActivity processingActivity) {
         processingActivity.setOrganizationTypes(Arrays.asList(new OrganizationType(orgTypeSubTypeServicesAndSubServicesDTO.getId(), orgTypeSubTypeServicesAndSubServicesDTO.getName())));
-        processingActivity.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypeDTOS(), OrganizationSubType.class));
-        processingActivity.setOrganizationServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationServices(), ServiceCategory.class));
-        processingActivity.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubServices(), SubServiceCategory.class));
+        processingActivity.setOrganizationSubTypes(ObjectMapperUtils.copyCollectionPropertiesByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypeDTOS(), OrganizationSubType.class));
+        processingActivity.setOrganizationServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationServices(), ServiceCategory.class));
+        processingActivity.setOrganizationSubServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubServices(), SubServiceCategory.class));
     }
 
     /**

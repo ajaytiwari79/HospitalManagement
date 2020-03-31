@@ -69,7 +69,7 @@ public class KPISetService {
         verifyDetails(referenceId, confLevel, kpiSetDTO);
         kpiSetDTO.setReferenceId(referenceId);
         kpiSetDTO.setConfLevel(confLevel);
-        KPISet kpiSet = ObjectMapperUtils.copyPropertiesOrCloneByMapper(kpiSetDTO, KPISet.class);
+        KPISet kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetDTO, KPISet.class);
         kpiSetRepository.save(kpiSet);
         kpiSetDTO.setId(kpiSet.getId());
         return kpiSetDTO;
@@ -83,7 +83,7 @@ public class KPISetService {
         verifyDetails(referenceId, confLevel, kpiSetDTO);
         kpiSetDTO.setReferenceId(referenceId);
         kpiSetDTO.setConfLevel(confLevel);
-        kpiSet = ObjectMapperUtils.copyPropertiesOrCloneByMapper(kpiSetDTO, KPISet.class);
+        kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetDTO, KPISet.class);
         kpiSetRepository.save(kpiSet);
         return kpiSetDTO;
     }

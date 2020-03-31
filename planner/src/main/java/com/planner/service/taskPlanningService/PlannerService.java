@@ -142,7 +142,7 @@ public class PlannerService {
        /* vrpPlanningSolution.setSolverConfigId(solverConfigId);
         vrpPlanningMongoRepository.saveEntity(vrpPlanningSolution);*/
 /*
-        */return ObjectMapperUtils.copyPropertiesOrCloneByMapper(solution,VrpTaskPlanningDTO.class);
+        */return ObjectMapperUtils.copyPropertiesByMapper(solution,VrpTaskPlanningDTO.class);
     }
 
     public VRPIndictmentDTO getIndictmentBySolverConfigId(BigInteger solverConfigId){

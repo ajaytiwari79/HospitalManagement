@@ -49,8 +49,8 @@ public class ShortcutService {
             exceptionService.duplicateDataException(SHORTCUT_ALREADY_EXISTS_NAME, shortcutDTO.getName());
         }
         shortcutDTO.setTabKPIs(getTabKPIs(shortcutDTO.getTabKPIs().stream().map(tabKPIDTO -> tabKPIDTO.getTabId()).collect(Collectors.toList()), new ArrayList<>(), shortcutDTO.getStaffId(), shortcutDTO.getUnitId()));
-        Shortcut shortcut = shortcutsMongoRepository.save(ObjectMapperUtils.copyPropertiesOrCloneByMapper(shortcutDTO, Shortcut.class));
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(shortcut, ShortcutDTO.class);
+        Shortcut shortcut = shortcutsMongoRepository.save(ObjectMapperUtils.copyPropertiesByMapper(shortcutDTO, Shortcut.class));
+        return ObjectMapperUtils.copyPropertiesByMapper(shortcut, ShortcutDTO.class);
     }
 
     public ShortcutDTO updateShortcut(BigInteger shortcutId , String name , ShortcutDTO shortcutDTO){
@@ -65,7 +65,7 @@ public class ShortcutService {
         if(ObjectUtils.isNotNull(name)){
             shortcut.setName(name);
         }else {
-            shortcut=ObjectMapperUtils.copyPropertiesOrCloneByMapper(shortcutDTO, Shortcut.class);
+            shortcut=ObjectMapperUtils.copyPropertiesByMapper(shortcutDTO, Shortcut.class);
         }
         shortcutsMongoRepository.save(shortcut);
         return shortcutDTO;
@@ -106,7 +106,7 @@ public class ShortcutService {
         shortcut.setName(name);
         shortcut.setId(null);
         shortcutsMongoRepository.save(shortcut);
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(shortcut, ShortcutDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(shortcut, ShortcutDTO.class);
     }
 
 }

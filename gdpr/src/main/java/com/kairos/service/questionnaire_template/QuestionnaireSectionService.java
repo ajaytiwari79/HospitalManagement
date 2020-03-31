@@ -89,7 +89,7 @@ public class QuestionnaireSectionService {
                     {
                         QuestionnaireSection questionnaireSection;
                         if (Optional.ofNullable(questionnaireSectionDTO.getId()).isPresent()) {
-                            questionnaireSection = ObjectMapperUtils.copyPropertiesOrCloneByMapper(questionnaireSectionDTO, QuestionnaireSection.class);
+                            questionnaireSection = ObjectMapperUtils.copyPropertiesByMapper(questionnaireSectionDTO, QuestionnaireSection.class);
                         } else {
                             questionnaireSection = isOrganization ? new QuestionnaireSection(questionnaireSectionDTO.getTitle(), null, referenceId)
                                     : new QuestionnaireSection(questionnaireSectionDTO.getTitle(), referenceId, null);
@@ -111,7 +111,7 @@ public class QuestionnaireSectionService {
 
                 Question question;
                 if (Optional.ofNullable(questionDTO.getId()).isPresent()) {
-                    question = ObjectMapperUtils.copyPropertiesOrCloneByMapper(questionDTO, Question.class);
+                    question = ObjectMapperUtils.copyPropertiesByMapper(questionDTO, Question.class);
                 } else {
                     question = isOrganization ? new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed(), null, referenceId)
                             : new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed(), referenceId, null);

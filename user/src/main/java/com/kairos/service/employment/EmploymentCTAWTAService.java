@@ -102,7 +102,7 @@ public class EmploymentCTAWTAService {
             List<FunctionDTO> functionDTOs = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.get().getId(), selectedDate.toString(), appliedSeniorityLevel.getId(), unitId);
             seniorityLevel.setFunctions(functionDTOs);
         }
-        ExpertiseDTO expertiseDTO=ObjectMapperUtils.copyPropertiesOrCloneByMapper(currentExpertise,ExpertiseDTO.class);
+        ExpertiseDTO expertiseDTO=ObjectMapperUtils.copyPropertiesByMapper(currentExpertise,ExpertiseDTO.class);
         expertiseDTO.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
         expertiseDTO.setNumberOfWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
 

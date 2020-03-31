@@ -49,7 +49,7 @@ public class UnitSolverConfigService {
     public UnitSolverConfigDTO createUnitSolverConfig(UnitSolverConfigDTO unitSolverConfigDTO,Long unitId) {
         unitSolverConfigDTO.setUnitId(unitId);
         if (preValidateUnitSolverConfigDTO(unitSolverConfigDTO)) {
-            UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesOrCloneByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
+            UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
             List<BigInteger> countraintids = getConstraintsIds(unitSolverConfigDTO, null);
             unitSolverConfig.setConstraintIds(countraintids);
             solverConfigRepository.saveEntity(unitSolverConfig);
@@ -61,7 +61,7 @@ public class UnitSolverConfigService {
     public UnitSolverConfigDTO copyUnitSolverConfig(UnitSolverConfigDTO unitSolverConfigDTO) {
         SolverConfig constraint = solverConfigRepository.findByIdNotDeleted(unitSolverConfigDTO.getId());
         if (constraint != null && preValidateUnitSolverConfigDTO(unitSolverConfigDTO)) {
-            UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesOrCloneByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
+            UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
             unitSolverConfig.setParentSolverConfigId(unitSolverConfigDTO.getId());
             unitSolverConfig.setId(null);//Unset Id
             List<BigInteger> countraintids = getConstraintsIds(unitSolverConfigDTO, null);
@@ -83,7 +83,7 @@ public class UnitSolverConfigService {
         SolverConfig solverConfig = solverConfigRepository.findByIdNotDeleted(unitSolverConfigDTO.getId());
         boolean nameExists = solverConfigRepository.isNameExistsById(unitSolverConfigDTO.getName(), unitSolverConfigDTO.getId(), false, unitSolverConfigDTO.getUnitId());
         if (isNotNull(solverConfig) && !nameExists) {
-            UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesOrCloneByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
+            UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
             List<BigInteger> countraintids = getConstraintsIds(unitSolverConfigDTO, solverConfig);
             unitSolverConfig.setConstraintIds(countraintids);
             solverConfigRepository.saveEntity(unitSolverConfig);
@@ -124,10 +124,10 @@ public class UnitSolverConfigService {
     }
 
     public DefaultDataDTO getDefaultData(Long unitId) {
-        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
+        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
       //  Long countryId=userNeo4jRepo.getCountryIdByUnitId(unitId);
         DefaultDataDTO defaultDataDTO = new DefaultDataDTO()
-                .setOrganizationServicesBuilder(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(userNeo4jRepo.getAllOrganizationServicesByUnitId(unitId),OrganizationServiceDTO.class))
+                .setOrganizationServicesBuilder(ObjectMapperUtils.copyCollectionPropertiesByMapper(userNeo4jRepo.getAllOrganizationServicesByUnitId(unitId),OrganizationServiceDTO.class))
 
                 //get All Phases
                 .setPhaseDTOSBuilder(getAllPhases(unitId))

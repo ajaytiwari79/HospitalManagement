@@ -21,7 +21,7 @@ public class GeneralSettingService {
     private GeneralSettingGraphRepository generalSettingGraphRepository;
 
     public GeneralSettingDTO updateGeneralSetting(GeneralSettingDTO generalSettingDTO) {
-        GeneralSetting generalSetting = ObjectMapperUtils.copyPropertiesOrCloneByMapper(generalSettingDTO, GeneralSetting.class);
+        GeneralSetting generalSetting = ObjectMapperUtils.copyPropertiesByMapper(generalSettingDTO, GeneralSetting.class);
         generalSettingGraphRepository.save(generalSetting);
         generalSettingDTO.setId(generalSetting.getId());
         return generalSettingDTO;
@@ -30,7 +30,7 @@ public class GeneralSettingService {
     public List<GeneralSettingDTO> getGeneralSetting() {
         List<GeneralSettingDTO> generalSettingDTOS = new ArrayList<>();
         for(GeneralSetting generalSetting : generalSettingGraphRepository.findAll()){
-            generalSettingDTOS.add(ObjectMapperUtils.copyPropertiesOrCloneByMapper(generalSetting, GeneralSettingDTO.class));
+            generalSettingDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(generalSetting, GeneralSettingDTO.class));
         }
         return generalSettingDTOS;
     }

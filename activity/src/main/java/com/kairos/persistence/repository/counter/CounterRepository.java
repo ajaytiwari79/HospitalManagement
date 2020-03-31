@@ -250,7 +250,7 @@ public class CounterRepository{
         String queryField = getRefQueryField(level);
         Criteria matchCriteria = categoryIds == null ? Criteria.where(DELETED).is(false).and(queryField).is(refId) : Criteria.where(DELETED).is(false).and("_id").in(categoryIds).and(queryField).is(refId);
         Query query = new Query(matchCriteria);
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(mongoTemplate.find(query, KPICategory.class), KPICategoryDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, KPICategory.class), KPICategoryDTO.class);
     }
 
 
@@ -308,7 +308,7 @@ public class CounterRepository{
         } else {
             query = new Query(Criteria.where(DELETED).is(false).and(TAB_ID).in(tabIds).and(KPI_ID1).in(kpiIds).and(refQueryField).is(refId).and(LEVEL).is(level));
         }
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(mongoTemplate.find(query, TabKPIConf.class), TabKPIMappingDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, TabKPIConf.class), TabKPIMappingDTO.class);
     }
 
     public List<TabKPIDTO> getTabKPIIdsByTabIds(String tabId, Long refId, Long countryId, ConfLevel level) {
@@ -472,7 +472,7 @@ public class CounterRepository{
         } else {
             query = new Query(Criteria.where(DELETED).is(false).and(ORG_TYPE_ID).in(orgTypeIds).and(KPI_ID1).in(kpiIds));
         }
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(mongoTemplate.find(query, OrgTypeKPIEntry.class), OrgTypeMappingDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, OrgTypeKPIEntry.class), OrgTypeMappingDTO.class);
     }
 
 
@@ -500,7 +500,7 @@ public class CounterRepository{
         } else {
             query = new Query(Criteria.where(DELETED).is(false).and(ACCESS_GROUP_ID).in(accessGroupIds).and(KPI_ID1).in(kpiIds).and(queryField).is(refId));
         }
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(mongoTemplate.find(query, AccessGroupKPIEntry.class), AccessGroupMappingDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, AccessGroupKPIEntry.class), AccessGroupMappingDTO.class);
     }
 
     public List<BigInteger> getAccessGroupKPIIdsAccessGroupIds(List<Long> accessGroupIds, List<BigInteger> kpiIds, ConfLevel level, Long refId) {
@@ -609,7 +609,7 @@ public class CounterRepository{
     public List<CounterDTO> getAllCounterBySupportedModule(ModuleType supportedModuleType) {
         Query query = new Query(Criteria.where(DELETED).is(false).and("supportedModuleTypes").in(supportedModuleType));
         query.fields().include("id").include(TITLE);
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(mongoTemplate.find(query, Counter.class), CounterDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, Counter.class), CounterDTO.class);
     }
 
     //dashboard tab
@@ -623,7 +623,7 @@ public class CounterRepository{
         String refQueryField = getRefQueryField(level);
         Criteria matchCriteria = dashBoardIds == null ? Criteria.where(DELETED).is(false).and(refQueryField).is(refId).and(LEVEL).is(level) : Criteria.where(DELETED).is(false).and(MODULE_ID).in(dashBoardIds).and(refQueryField).is(refId).and(LEVEL).is(level);
         Query query = new Query(matchCriteria);
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
     public List<KPIAccessPageDTO> getKPIAcceccPage(Long refId, ConfLevel level) {
@@ -646,19 +646,19 @@ public class CounterRepository{
     public List<KPIDashboardDTO> getKPIDashboard(long unitId, ConfLevel level, Long staffId) {
         Criteria matchCriteria = Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).and(STAFF_ID).is(staffId).and(LEVEL).is(level);
         Query query = new Query(matchCriteria);
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
     public List<KPIDashboardDTO> getKPIDashboardsOfStaffs(Long unitId, ConfLevel level, List<Long> staffIds) {
         Criteria matchCriteria = Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).and(STAFF_ID).in(staffIds).and(LEVEL).is(level);
         Query query = new Query(matchCriteria);
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
     public List<KPIDashboard> getKPIDashboardsOfStaffAndUnits(List<Long> unitIds, ConfLevel level, List<Long> staffIds) {
         Criteria matchCriteria = Criteria.where(DELETED).is(false).and(UNIT_ID).in(unitIds).and(STAFF_ID).in(staffIds).and(LEVEL).is(level);
         Query query = new Query(matchCriteria);
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboard.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboard.class);
     }
 
     public <S extends MongoBaseEntity> S save(@Valid S entity) {
