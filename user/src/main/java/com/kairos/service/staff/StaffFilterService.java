@@ -29,7 +29,6 @@ import com.kairos.persistence.model.organization.services.OrganizationServicesAn
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.filter.*;
-import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -357,7 +356,7 @@ public class StaffFilterService {
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(staffFilterDTO.getModuleId());
         StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter(staffFilterDTO.getName(),
-                ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(staffFilterDTO.getFiltersData(), FilterSelection.class), filterGroup);
+                ObjectMapperUtils.copyCollectionPropertiesByMapper(staffFilterDTO.getFiltersData(), FilterSelection.class), filterGroup);
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         staff.addFavouriteFilters(staffFavouriteFilter);
         staffGraphRepository.save(staff);
@@ -386,7 +385,7 @@ public class StaffFilterService {
         staffGraphRepository.detachStaffFavouriteFilterDetails(staffFavouriteFilter.getId());
         List<FilterSelectionDTO> filters = favouriteFilterDTO.getFiltersData();
         filters.forEach(filterSelection -> filterSelection.setId(null));
-        staffFavouriteFilter.setFiltersData(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(filters, FilterSelection.class));
+        staffFavouriteFilter.setFiltersData(ObjectMapperUtils.copyCollectionPropertiesByMapper(filters, FilterSelection.class));
         staffFavouriteFilter.setName(favouriteFilterDTO.getName());
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         return favouriteFilterDTO;
@@ -463,7 +462,7 @@ public class StaffFilterService {
     private void setNightWorkerDetails(StaffFilterDTO staffFilterDTO, List<Map> staffs, List<Map> staffList) {
         for (Map staffAndModifiable : staffs) {
             if(staffFilterDTO.getNightWorkerDetails().containsKey(staffAndModifiable.get(ID))) {
-                Map<String, Object> staff = ObjectMapperUtils.copyPropertiesOrCloneByMapper(staffAndModifiable, HashedMap.class);
+                Map<String, Object> staff = ObjectMapperUtils.copyPropertiesByMapper(staffAndModifiable, HashedMap.class);
                 staff.put(NIGHT_WORKER, staffFilterDTO.getNightWorkerDetails().get(((Integer) ((Map) staff).get(ID)).longValue()));
                 staffList.add(staff);
                 if(staffFilterDTO.isIncludeWorkTimeAgreement()){

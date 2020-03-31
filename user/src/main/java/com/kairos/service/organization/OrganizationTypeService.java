@@ -185,7 +185,7 @@ public class OrganizationTypeService{
     public List<OrganizationTypeAndSubTypeDto> getAllOrganizationTypeAndServiceAndSubServices(Long countryId) {
         List<Map> organizationType = organizationTypeGraphRepository.getAllOrganizationTypeAndServiceAndSubServices(countryId);
         List<OrganizationTypeAndSubTypeDto> list = new ArrayList<>();
-        organizationType.forEach(o -> list.add(ObjectMapperUtils.copyPropertiesOrCloneByMapper(o.get("organizationType"), OrganizationTypeAndSubTypeDto.class)));
+        organizationType.forEach(o -> list.add(ObjectMapperUtils.copyPropertiesByMapper(o.get("organizationType"), OrganizationTypeAndSubTypeDto.class)));
         return list;
     }
 

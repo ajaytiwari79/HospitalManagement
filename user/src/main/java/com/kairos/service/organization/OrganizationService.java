@@ -191,7 +191,7 @@ public class OrganizationService {
 
     public OrganizationDTO getOrganizationWithCountryId(long id) {
         OrganizationBaseEntity unit = organizationBaseRepository.findOne(id);
-        OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(unit, OrganizationDTO.class);
+        OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(unit, OrganizationDTO.class);
         organizationDTO.setCountryId(countryGraphRepository.getCountryIdByUnitId(id));
         organizationDTO.setParentOrganization(unit instanceof Organization);
         organizationDTO.setTagDTOS(tagService.getTagsByOrganizationIdAndMasterDataType(id, MasterDataTypeEnum.STAFF));
@@ -352,10 +352,10 @@ public class OrganizationService {
         List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
         for (OrganizationBasicResponse organizationData : organizationQueryResult) {
                 if (organizationContactAddressMap.containsKey(organizationData.getId())) {
-                    AddressDTO addressDTO=ObjectMapperUtils.copyPropertiesOrCloneByMapper(organizationContactAddressMap.get(organizationData.getId()).getContactAddress(),AddressDTO.class);
+                    AddressDTO addressDTO=ObjectMapperUtils.copyPropertiesByMapper(organizationContactAddressMap.get(organizationData.getId()).getContactAddress(),AddressDTO.class);
                     organizationData.setContactAddress(addressDTO);
-                    addressDTO.setMunicipality(ObjectMapperUtils.copyPropertiesOrCloneByMapper(organizationContactAddressMap.get(organizationData.getId()).getMunicipality(),MunicipalityDTO.class));
-                    addressDTO.setZipCode(ObjectMapperUtils.copyPropertiesOrCloneByMapper(organizationContactAddressMap.get(organizationData.getId()).getZipCode(),ZipCodeDTO.class));
+                    addressDTO.setMunicipality(ObjectMapperUtils.copyPropertiesByMapper(organizationContactAddressMap.get(organizationData.getId()).getMunicipality(),MunicipalityDTO.class));
+                    addressDTO.setZipCode(ObjectMapperUtils.copyPropertiesByMapper(organizationContactAddressMap.get(organizationData.getId()).getZipCode(),ZipCodeDTO.class));
             }
             Optional<StaffPersonalDetailQueryResult> currentStaff = staffPersonalDetailQueryResults.stream().filter(staffPersonalDetailDTO -> staffPersonalDetailDTO.getOrganizationId().equals(organizationData.getId())).findFirst();
             organizationData.setUnitManager(currentStaff.isPresent() ? currentStaff.get() : null);
@@ -635,7 +635,7 @@ public class OrganizationService {
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
         OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         organizationMappingDTO.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(unitId, false));
-        organizationMappingDTO.setExpertise(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(staffRetrievalService.getExpertisesOfUnitByCountryId(countryId, unitId), Expertise.class));
+        organizationMappingDTO.setExpertise(ObjectMapperUtils.copyCollectionPropertiesByMapper(staffRetrievalService.getExpertisesOfUnitByCountryId(countryId, unitId), Expertise.class));
         return organizationMappingDTO;
     }
 
@@ -756,7 +756,7 @@ public class OrganizationService {
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(unitId);
         List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(organizationBaseEntity);
-        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(dayTypes,DayTypeDTO.class);
+        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
         return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS, timeSlotDTOS, countryId);
     }
 
@@ -783,7 +783,7 @@ public class OrganizationService {
 
     public List<UnitAndParentOrganizationAndCountryDTO> getParentOrganizationAndCountryIdsOfUnit() {
         List<Map<String, Object>> parentOrganizationAndCountryData = unitGraphRepository.getUnitAndParentOrganizationAndCountryIds();
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(parentOrganizationAndCountryData, UnitAndParentOrganizationAndCountryDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(parentOrganizationAndCountryData, UnitAndParentOrganizationAndCountryDTO.class);
     }
 
     public CTABasicDetailsDTO getCTABasicDetailInfo(Long expertiseId, Long organizationSubTypeId, Long countryId, List<Long> unitIds) {
@@ -867,8 +867,8 @@ public class OrganizationService {
     public SelfRosteringMetaData getPublicHolidaysReasonCodeAndDayTypeUnitId(long unitId) {
         Long countryId = UserContext.getUserDetails().getCountryId();
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
-        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(reasonCodeGraphRepository.findReasonCodeByUnitId(unitId), ReasonCodeDTO.class);
-        return new SelfRosteringMetaData(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(dayTypeService.getAllDayTypeByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
+        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeGraphRepository.findReasonCodeByUnitId(unitId), ReasonCodeDTO.class);
+        return new SelfRosteringMetaData(ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypeService.getAllDayTypeByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
     }
 
     public boolean isUnit(Long unitId) {

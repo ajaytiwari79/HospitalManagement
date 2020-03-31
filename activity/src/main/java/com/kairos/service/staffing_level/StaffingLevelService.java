@@ -218,7 +218,7 @@ public class StaffingLevelService  {
         StaffingLevelPlanningDTO staffingLevelPlanningDTO = new StaffingLevelPlanningDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
         plannerSyncService.publishStaffingLevel(unitId, staffingLevelPlanningDTO, IntegrationOperation.UPDATE);
         presenceStaffingLevelDTO.setUpdatedAt(staffingLevel.getUpdatedAt());
-       return ObjectMapperUtils.copyPropertiesOrCloneByMapper(updateStaffingLevelAvailableStaffCount(asLocalDate(presenceStaffingLevelDTO.getCurrentDate()),unitId),PresenceStaffingLevelDto.class);
+       return ObjectMapperUtils.copyPropertiesByMapper(updateStaffingLevelAvailableStaffCount(asLocalDate(presenceStaffingLevelDTO.getCurrentDate()),unitId),PresenceStaffingLevelDto.class);
     }
 
     public StaffingLevel updateStaffingLevelAvailableStaffCount(LocalDate localDate,Long unitId) {
@@ -227,12 +227,12 @@ public class StaffingLevelService  {
         Date endDate = getEndOfDay(startDate);
 
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse( startDate, endDate, newArrayList(unitId));
-        List<ShiftDTO>  shiftDTOS = shiftService.updateDraftShiftToShift(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(shifts, ShiftDTO.class),userAccessRoleDTO);
+        List<ShiftDTO>  shiftDTOS = shiftService.updateDraftShiftToShift(ObjectMapperUtils.copyCollectionPropertiesByMapper(shifts, ShiftDTO.class),userAccessRoleDTO);
         StaffingLevel staffingLevel=staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(UserContext.getUnitId(),startDate);
         if (isNull(staffingLevel)) {
             staffingLevel = createDefaultStaffingLevel(unitId, startDate);
         }
-        return updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(shiftDTOS,Shift.class),null);
+        return updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftDTOS,Shift.class),null);
 
     }
 
@@ -797,7 +797,7 @@ public class StaffingLevelService  {
         }
         Set<BigInteger> activityIds = staffingLevelFromTemplateDTO.getActivitiesByDate().stream().flatMap(s -> s.getActivityIds().stream()).collect(Collectors.toSet());
         List<BigInteger> parentActivityIds=new ArrayList<>();
-        List<ActivityValidationError> activityValidationErrors = staffingLevelTemplateService.validateActivityRules(activityIds, ObjectMapperUtils.copyPropertiesOrCloneByMapper(staffingLevelTemplate, StaffingLevelTemplateDTO.class),parentActivityIds);
+        List<ActivityValidationError> activityValidationErrors = staffingLevelTemplateService.validateActivityRules(activityIds, ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate, StaffingLevelTemplateDTO.class),parentActivityIds);
         Map<BigInteger, ActivityValidationError> activityValidationErrorMap = activityValidationErrors.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         List<DateWiseActivityDTO> dateWiseActivityDTOS = staffingLevelFromTemplateDTO.getActivitiesByDate();
         filterIncorrectDataByDates(dateWiseActivityDTOS, staffingLevelTemplate.getValidity().getStartDate(), staffingLevelTemplate.getValidity().getEndDate(), activityValidationErrors);
@@ -817,7 +817,7 @@ public class StaffingLevelService  {
             List<StaffingLevelInterval> staffingLevelIntervals = new ArrayList<>();
             for (StaffingLevelInterval staffingLevelInterval : staffingLevelTemplate.getPresenceStaffingLevelInterval()) {
                 Set<StaffingLevelActivity> selectedActivitiesForCurrentDate = new HashSet<>();
-                StaffingLevelInterval currentInterval = ObjectMapperUtils.copyPropertiesOrCloneByMapper(staffingLevelInterval, StaffingLevelInterval.class);
+                StaffingLevelInterval currentInterval = ObjectMapperUtils.copyPropertiesByMapper(staffingLevelInterval, StaffingLevelInterval.class);
                 int min = 0;
                 int max = 0;
                 for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
@@ -863,7 +863,7 @@ public class StaffingLevelService  {
         if (staffingLevel != null) {
             staffingLevel.setPresenceStaffingLevelInterval(staffingLevelIntervals);
         } else {
-            staffingLevel = ObjectMapperUtils.copyPropertiesOrCloneByMapper(staffingLevelTemplate, StaffingLevel.class);
+            staffingLevel = ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate, StaffingLevel.class);
             staffingLevel.setId(null);
             staffingLevel.setPresenceStaffingLevelInterval(staffingLevelIntervals);
             staffingLevel.setWeekCount(getWeekNumberByLocalDate(currentDate.getLocalDate()));
