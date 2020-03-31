@@ -104,7 +104,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.CommonsExceptionUtil.convertMessage;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
@@ -284,7 +284,7 @@ public class ActivityService {
         validateActivityDetails(countryId, generalDTO);
         Activity activity = findActivityById(generalDTO.getActivityId());
         generalDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
-        GeneralActivityTab generalTab = ObjectMapperUtils.copyPropertiesByMapper(generalDTO,GeneralActivityTab.class);
+        GeneralActivityTab generalTab = ObjectMapperUtils.copyPropertiesOrCloneByMapper(generalDTO,GeneralActivityTab.class);
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getGeneralActivityTab().getModifiedIconName());
         }
@@ -297,7 +297,7 @@ public class ActivityService {
         activity.setDescription(generalTab.getDescription());
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         generalTab.setTags(null);
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
         generalActivityTabWithTagDTO.setTags(null);
         if (!activity.getTags().isEmpty()) {
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
@@ -344,7 +344,7 @@ public class ActivityService {
         Activity activity = findActivityById(activityId);
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
         generalTab.setTags(null);
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
         generalActivityTabWithTagDTO.setTags(null);
         if (!activity.getTags().isEmpty()) {
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
@@ -449,7 +449,7 @@ public class ActivityService {
     }
 
     public TimeCalculationActivityDTO updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO, boolean availableAllowActivity) {
-        TimeCalculationActivityTab timeCalculationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(timeCalculationActivityDTO,TimeCalculationActivityTab.class);
+        TimeCalculationActivityTab timeCalculationActivityTab = ObjectMapperUtils.copyPropertiesOrCloneByMapper(timeCalculationActivityDTO,TimeCalculationActivityTab.class);
         Activity activity = findActivityById(new BigInteger(String.valueOf(timeCalculationActivityDTO.getActivityId())));
         verifyAndDeleteCompositeActivity(timeCalculationActivityDTO, availableAllowActivity);
         if (!timeCalculationActivityDTO.isAvailableAllowActivity()) {
@@ -520,7 +520,7 @@ public class ActivityService {
     }
 
     public ActivityTabsWrapper updateIndividualPointsTab(IndividualPointsActivityTabDTO individualPointsDTO) {
-        IndividualPointsActivityTab individualPointsActivityTab = ObjectMapperUtils.copyPropertiesByMapper(individualPointsDTO,IndividualPointsActivityTab.class);
+        IndividualPointsActivityTab individualPointsActivityTab = ObjectMapperUtils.copyPropertiesOrCloneByMapper(individualPointsDTO,IndividualPointsActivityTab.class);
         Activity activity = findActivityById(new BigInteger(String.valueOf(individualPointsDTO.getActivityId())));
         activity.setIndividualPointsActivityTab(individualPointsActivityTab);
         activityMongoRepository.save(activity);
@@ -534,16 +534,16 @@ public class ActivityService {
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO,boolean updateFromOrg) {
         validateActivityTimeRules( rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
-        RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
+        RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesOrCloneByMapper(rulesActivityDTO, RulesActivityTab.class);
         Activity activity = findActivityById(rulesActivityDTO.getActivityId());
         checkEligibleStaffLevelDetails(rulesActivityDTO, activity);
         updateCutoffDetails(rulesActivityDTO, rulesActivityTab);
-        rulesActivityTab.setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO.getSicknessSetting(),SicknessSetting.class));
+        rulesActivityTab.setSicknessSetting(ObjectMapperUtils.copyPropertiesOrCloneByMapper(rulesActivityDTO.getSicknessSetting(),SicknessSetting.class));
         if(activity.getRulesActivityTab().isEligibleForStaffingLevel() != rulesActivityTab.isEligibleForStaffingLevel() && !rulesActivityTab.isEligibleForStaffingLevel()){
             removedActivityFromStaffingLevelOfChildActivity(activity.getChildActivityIds());
             staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()));
         }
-        rulesActivityTab.setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO.getSicknessSetting(),SicknessSetting.class));
+        rulesActivityTab.setSicknessSetting(ObjectMapperUtils.copyPropertiesOrCloneByMapper(rulesActivityDTO.getSicknessSetting(),SicknessSetting.class));
         activity.setRulesActivityTab(rulesActivityTab);
         if (!activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
             activity.getTimeCalculationActivityTab().setDayTypes(activity.getRulesActivityTab().getDayTypes());
@@ -639,7 +639,7 @@ public class ActivityService {
     public ActivityTabsWrapper updateCommunicationTabOfActivity(CommunicationActivityDTO communicationActivityDTO, boolean updateFromOrg) {
         validateReminderSettings(communicationActivityDTO.getActivityReminderSettings());
         validateReminderSettings(communicationActivityDTO.getActivityCutoffReminderSettings());
-        CommunicationActivityTab communicationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(communicationActivityDTO,CommunicationActivityTab.class);
+        CommunicationActivityTab communicationActivityTab = ObjectMapperUtils.copyPropertiesOrCloneByMapper(communicationActivityDTO,CommunicationActivityTab.class);
         if(!communicationActivityTab.isAllowActivityCutoffReminder()){
             communicationActivityTab.setActivityCutoffReminderSettings(new ArrayList<>());
         }
@@ -789,7 +789,7 @@ public class ActivityService {
         List<PresenceTypeDTO> plannedTimes = plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
         List<ActivityConfiguration> activityConfigurations = activityConfigurationService.findAllByUnitIdAndDeletedFalse(unitId);
         return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),
-                publicHolidayDayTypeWrapper.getPublicHolidays(), firstRequestPhasePlanningPeriodEndDate, plannedTimes, phaseSettingsActivityTab, copyPropertiesOfCollectionByMapper(activityConfigurations, ActivityConfigurationDTO.class));
+                publicHolidayDayTypeWrapper.getPublicHolidays(), firstRequestPhasePlanningPeriodEndDate, plannedTimes, phaseSettingsActivityTab, copyPropertiesOrCloneCollectionByMapper(activityConfigurations, ActivityConfigurationDTO.class));
     }
 
     private SelfRosteringMetaData getSelfRosteringMetaData(long unitId) {
@@ -911,7 +911,7 @@ public class ActivityService {
         for (Activity countryActivity : countryActivities) {
             Optional<Activity> result = unitActivities.stream().filter(unitActivity -> unitActivity.getExternalId().equals(countryActivity.getExternalId())).findFirst();
             if (!result.isPresent()) {
-                Activity activity = ObjectMapperUtils.copyPropertiesByMapper(countryActivity,Activity.class);
+                Activity activity = ObjectMapperUtils.copyPropertiesOrCloneByMapper(countryActivity,Activity.class);
                 activity.setId(null);
                 activity.setParentId(countryActivity.getId());
                 activity.setCountryParentId(countryActivity.getId());
@@ -971,7 +971,7 @@ public class ActivityService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
         }
 
-        Activity activityCopied = ObjectMapperUtils.copyPropertiesByMapper(activityFromDatabase, Activity.class);
+        Activity activityCopied = ObjectMapperUtils.copyPropertiesOrCloneByMapper(activityFromDatabase, Activity.class);
         activityCopied.setId(null);
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.setCountryParentId(activityFromDatabase.getCountryParentId() == null ? activityFromDatabase.getId() : activityFromDatabase.getCountryParentId());
@@ -1047,7 +1047,7 @@ public class ActivityService {
                 activity.getGeneralActivityTab().setBackgroundColor(timeTypeDTO.getBackgroundColor());
                 activity.getRulesActivityTab().setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
                 if(isNotNull(timeTypeDTO.getRulesActivityTab())){
-                    activity.getRulesActivityTab().setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(timeTypeDTO.getRulesActivityTab().getSicknessSetting(), SicknessSetting.class));
+                    activity.getRulesActivityTab().setSicknessSetting(ObjectMapperUtils.copyPropertiesOrCloneByMapper(timeTypeDTO.getRulesActivityTab().getSicknessSetting(), SicknessSetting.class));
                 }
             });
             activityMongoRepository.saveEntities(activities);

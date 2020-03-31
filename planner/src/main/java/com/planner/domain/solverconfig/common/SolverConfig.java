@@ -5,6 +5,7 @@ import com.planner.domain.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,8 @@ public class SolverConfig extends MongoBaseEntity {
     protected List<BigInteger> constraintIds;
     protected BigInteger parentSolverConfigId;//copiedFrom
     protected TimeTypeEnum typeOfTimeType;
+    protected LocalDate startDate;
+    protected LocalDate endDate;
 
 
     public SolverConfig() {

@@ -29,12 +29,12 @@ public class IntegrationConfigurationService extends MongoBaseService {
 
     public IntegrationSettingsDTO addIntegrationConfiguration(IntegrationSettings integrationSettings){
         save(integrationSettings);
-        return ObjectMapperUtils.copyPropertiesByMapper(integrationSettings,IntegrationSettingsDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(integrationSettings,IntegrationSettingsDTO.class);
     }
 
     public List<IntegrationSettingsDTO> getAllIntegrationServices(){
 
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(integrationConfigurationRepository.findAllAndIsEnabledTrue(),IntegrationSettingsDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(integrationConfigurationRepository.findAllAndIsEnabledTrue(),IntegrationSettingsDTO.class);
     }
 
     public boolean deleteIntegrationService(BigInteger integrationServiceId){
@@ -59,7 +59,7 @@ public class IntegrationConfigurationService extends MongoBaseService {
         objectToUpdate.setUniqueKey(integrationSettings.getUniqueKey());
         save(objectToUpdate);
 
-        return ObjectMapperUtils.copyPropertiesByMapper(objectToUpdate,IntegrationSettingsDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(objectToUpdate,IntegrationSettingsDTO.class);
     }
 
 

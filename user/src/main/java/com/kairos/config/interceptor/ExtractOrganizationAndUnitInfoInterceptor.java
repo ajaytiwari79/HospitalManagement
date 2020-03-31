@@ -53,7 +53,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
 
     private void getCurrentUserDetails() {
         try {
-            CurrentUserDetails currentUserDetails = ObjectMapperUtils.copyPropertiesByMapper(userService.getCurrentUser(), CurrentUserDetails.class);
+            CurrentUserDetails currentUserDetails = ObjectMapperUtils.copyPropertiesOrCloneByMapper(userService.getCurrentUser(), CurrentUserDetails.class);
             if(isNotNull(UserContext.getUserDetails()) && isNotNull(currentUserDetails)) {
                 UserContext.setUserDetails(currentUserDetails);
             }

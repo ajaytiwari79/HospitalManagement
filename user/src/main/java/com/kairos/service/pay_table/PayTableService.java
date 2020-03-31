@@ -549,13 +549,13 @@ public class PayTableService {
         Map<String, PayGradePayGroupAreaRelationShip> publishedPayGroupAreaRelationShipMap = null;
         if (!payTable.isPublished() && payTable.getPayTable() != null) {
             parentPayTable = payTable.getPayTable();
-            List<PayGradePayGroupAreaRelationShip> publishedPayGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(parentPayTable.getId()), PayGradePayGroupAreaRelationShip.class);
+            List<PayGradePayGroupAreaRelationShip> publishedPayGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(parentPayTable.getId()), PayGradePayGroupAreaRelationShip.class);
             publishedPayGroupAreaRelationShipMap = publishedPayGradePayGroupAreaRelationShips.stream().collect(Collectors.toMap(k -> k.getPayGrade().getPayGradeLevel().toString() + k.getPayGroupArea().getId(), v -> v));
         }
 
         List<PayGradeResponse> payGradeResponses = null;
         payTable.setPercentageValue(payTableDTO.getPercentageValue());
-        List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(payTableId), PayGradePayGroupAreaRelationShip.class);
+        List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(payTableId), PayGradePayGroupAreaRelationShip.class);
         if (CollectionUtils.isNotEmpty(payGradePayGroupAreaRelationShips)) {
             updateAmountInRelationship(payTableDTO, payTable, parentPayTable, publishedPayGroupAreaRelationShipMap, payGradePayGroupAreaRelationShips);
             if (payTable.isPublished()) {

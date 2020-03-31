@@ -218,7 +218,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     private ActivityDTO retrieveBasicDetails(Activity activity) {
         ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
-        activityDTO.setBalanceSettingsActivityTab(ObjectMapperUtils.copyPropertiesByMapper(activity.getBalanceSettingsActivityTab(), BalanceSettingActivityTabDTO.class));
+        activityDTO.setBalanceSettingsActivityTab(ObjectMapperUtils.copyPropertiesOrCloneByMapper(activity.getBalanceSettingsActivityTab(), BalanceSettingActivityTabDTO.class));
         BeanUtils.copyProperties(activity, activityDTO);
         /*Optional<TimeType> timeType=timeTypeMongoRepository.findById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
         if(timeType.isPresent()){
@@ -281,7 +281,7 @@ public class OrganizationActivityService extends MongoBaseService {
         //generalTab.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         logger.info("activityId " + activityId);
         generalTab.setTags(null);
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
         if (isCollectionNotEmpty(activity.getTags())) {
             List<TagDTO> tags = new ArrayList<>();
             tags.addAll(tagMongoRepository.getTagsById(activity.getTags()));
@@ -375,7 +375,7 @@ public class OrganizationActivityService extends MongoBaseService {
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         generalTab.setTags(null);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
+        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
         if (!activity.getTags().isEmpty()) {
             List<TagDTO> tags = new ArrayList<>();
             tags.addAll(tagMongoRepository.getTagsById(activity.getTags()));
@@ -420,7 +420,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long unitId) {
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypesAtUnit(unitId);
-        List<DayType> dayTypes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeEmploymentTypeWrapper.getDayTypes(), DayType.class);
+        List<DayType> dayTypes = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(dayTypeEmploymentTypeWrapper.getDayTypes(), DayType.class);
         Activity activity = activityMongoRepository.findOne(activityId);
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
         TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());

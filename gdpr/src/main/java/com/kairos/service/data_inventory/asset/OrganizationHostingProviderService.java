@@ -66,7 +66,7 @@ public class OrganizationHostingProviderService {
             }
            hostingProviderRepository.saveAll(hostingProviderList);
         }
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(hostingProviderList, HostingProviderDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(hostingProviderList, HostingProviderDTO.class);
 
     }
 

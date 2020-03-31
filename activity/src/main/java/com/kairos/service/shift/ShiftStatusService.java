@@ -121,7 +121,7 @@ public class ShiftStatusService {
                 if (shift.isDeleted()) {
                     shiftDTOS.addAll(shiftService.deleteAllLinkedShifts(shift.getId()).getShifts());
                 } else {
-                    shiftDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class));
+                    shiftDTOS.add(ObjectMapperUtils.copyPropertiesOrCloneByMapper(shift, ShiftDTO.class));
                 }
 
             }
@@ -338,14 +338,22 @@ public class ShiftStatusService {
     public void updateStatusOfShiftIfPhaseValid(PlanningPeriod planningPeriod, Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
 
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
+
             if (planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) {
-                shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+                if(!activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
+                    shiftActivity.getStatus().add(PUBLISH);
+                }else {
+                    if(shiftActivity.getStatus().contains(REQUEST)) {
+                        shiftActivity.setStatus(newHashSet(APPROVE,PUBLISH));
+                    }
+                }
             } else if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
                     shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? ShiftStatus.APPROVE : REQUEST);
                 }
-            }
-            if(shiftActivity.getStatus().contains(APPROVE)){
+            }else if(shiftActivity.getStatus().contains(REQUEST)){
+                shiftActivity.setStatus(newHashSet(APPROVE));
+            } else if(shiftActivity.getStatus().contains(APPROVE)){
                 ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
                 Map<BigInteger,Activity> activityMap = new HashMap<>();
                 activityMap.put(activityWrapper.getActivity().getId(),activityWrapper.getActivity());

@@ -204,7 +204,7 @@ public class ShiftValidatorService {
         if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaffId().equals(shift.getStaffId())) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PERMISSION);
         }
-        Shift mainShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
+        Shift mainShift = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shift, Shift.class);
         shift.setPhaseId(phase.getId());
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap, CREATE);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
@@ -274,7 +274,7 @@ public class ShiftValidatorService {
         WTAQueryResultDTO wtaQueryResultDTO = workTimeAgreementService.getWTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), DateUtils.onlyDate(shift.getActivities().get(0).getStartDate()));
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTO.getRuleTemplates().stream().filter(this::isValidWTARuleForDelete).collect(Collectors.toList());
         if (isCollectionNotEmpty(wtaBaseRuleTemplates)) {
-            ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class), activityWrapperMap,null);
+            ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ObjectMapperUtils.copyPropertiesOrCloneByMapper(shift, ShiftDTO.class), activityWrapperMap,null);
             RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shiftWithActivityDTO, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap, ShiftOperationType.DELETE);
             List<ShiftActivity>[] shiftActivities = shift.getShiftActivitiesForValidatingStaffingLevel(shift);
             for (ShiftActivity shiftActivity : shiftActivities[0]) {
@@ -298,7 +298,7 @@ public class ShiftValidatorService {
         int scheduledMinutes = 0;
         int durationMinutes = 0;
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
-            ShiftActivity shiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivityDTO, ShiftActivity.class);
+            ShiftActivity shiftActivity = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftActivityDTO, ShiftActivity.class);
             timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), staffAdditionalInfoDTO.getEmployment(), false);
             shiftActivityDTO.setScheduledMinutes(shiftActivity.getScheduledMinutes());
             shiftActivityDTO.setDurationMinutes(shiftActivity.getDurationMinutes());
@@ -528,7 +528,7 @@ public class ShiftValidatorService {
         List<Long> dayTypeIds = ruleTemplateSpecificInfo.getShift().getActivities().stream().flatMap(shiftActivityDTO -> activityWiseDayType.containsKey(shiftActivityDTO.getActivity().getId()) ? activityWiseDayType.get(shiftActivityDTO.getActivity().getId()).stream() : shiftActivityDTO.getActivity().getRulesActivityTab().getDayTypes().stream()).collect(Collectors.toList());
         Set<DayOfWeek> validDays = isCollectionNotEmpty(dayTypeIds) ? getValidDays(dayTypeDTOMap, dayTypeIds) : new HashSet<>();
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftWithActivityDTO.getUnitId(), ruleTemplateSpecificInfo.getShift().getActivities().get(0).getStartDate(), ruleTemplateSpecificInfo.getShift().getActivities().get(0).getEndDate());
-        Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftWithActivityDTO, Shift.class);
+        Shift shift = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftWithActivityDTO, Shift.class);
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, ruleTemplateSpecificInfo,new StaffingLevelHelper());
         }
@@ -553,16 +553,25 @@ public class ShiftValidatorService {
         }
     }
 
-    public void updateStatusOfShiftActvity(Shift oldStateOfShift, ShiftDTO shiftDTO) {
+    public void updateStatusOfShiftActvity(Shift oldStateOfShift, ShiftDTO shiftDTO,Map<BigInteger, ActivityWrapper> activityWrapperMap,Phase phase) {
         boolean valid = false;
+
         Map<String, ShiftActivityDTO> activityIdAndShiftActivityDTOMap = shiftDTO.getActivities().stream().collect(Collectors.toMap(shiftActivityDTO -> shiftActivityDTO.getActivityId() + "" + shiftActivityDTO.getStartDate(), v -> v));
         for (ShiftActivity shiftActivity : oldStateOfShift.getActivities()) {
+            boolean isApprovalRequired =activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId());
             String key = shiftActivity.getActivityId() + "" + shiftActivity.getStartDate();
             if (activityIdAndShiftActivityDTOMap.containsKey(key) && (!shiftActivity.getStartDate().equals(activityIdAndShiftActivityDTOMap.get(key).getStartDate()) || !shiftActivity.getEndDate().equals(activityIdAndShiftActivityDTOMap.get(key).getEndDate()))) {
                 if (shiftActivity.getStatus().contains(ShiftStatus.FIX)) {
                     valid = true;
-                } else if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) {
-                    activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId() + "" + shiftActivity.getStartDate()).getStatus().add(ShiftStatus.MOVED);
+                } else if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)|| (!oldStateOfShift.isDraft()&&isCollectionEmpty(shiftActivity.getStatus()))||shiftActivity.getStatus().contains(ShiftStatus.APPROVE)) {
+                    ShiftActivityDTO shiftActivityDTO = activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId() + "" + shiftActivity.getStartDate());
+                    shiftActivityDTO.getStatus().add(ShiftStatus.MOVED);
+                }
+            }if(isApprovalRequired && !activityIdAndShiftActivityDTOMap.containsKey(key)&&(shiftActivity.getStatus().contains(ShiftStatus.APPROVE)&& shiftActivity.getStatus().contains(ShiftStatus.APPROVE))){
+                for(ShiftActivityDTO shiftActivityDTO :shiftDTO.getActivities()){
+                    shiftActivity.getStatus().remove(ShiftStatus.APPROVE);
+                    shiftActivityDTO.setStatus(shiftActivity.getStatus());
+                    shiftActivityDTO.getStatus().add(ShiftStatus.MOVED);
                 }
             }
             if (valid) {
@@ -766,8 +775,8 @@ public class ShiftValidatorService {
         List<ShiftActivityDTO> shiftActivities = new ArrayList<>();
         try {
             for (int i = 0; i < arrivedShiftActivities.size(); i++) {
-                ShiftActivityDTO currentShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(arrivedShiftActivities.get(i), ShiftActivityDTO.class);
-                ShiftActivityDTO existingShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(existingShiftActivities.get(i), ShiftActivityDTO.class);
+                ShiftActivityDTO currentShiftActivity = ObjectMapperUtils.copyPropertiesOrCloneByMapper(arrivedShiftActivities.get(i), ShiftActivityDTO.class);
+                ShiftActivityDTO existingShiftActivity = ObjectMapperUtils.copyPropertiesOrCloneByMapper(existingShiftActivities.get(i), ShiftActivityDTO.class);
                 if (!currentShiftActivity.getActivityId().equals(existingShiftActivity.getActivityId())) {
                     currentShiftActivity.setStartDate(existingShiftActivity.getStartDate());
                     shiftActivities.add(existingShiftActivity);
@@ -816,7 +825,7 @@ public class ShiftValidatorService {
             shiftDTO.setShiftStatePhaseId(shiftState.getShiftStatePhaseId());
             shiftDTO.setShiftId(shiftState.getShiftId());
         }
-        shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
+        shiftState = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftDTO, ShiftState.class);
         List<BigInteger> activityIds = shiftState.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList());
         List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
@@ -839,7 +848,7 @@ public class ShiftValidatorService {
             shiftStateMongoRepository.save(shiftState);
         }
         shiftMongoRepository.updateValidateDetailsOfShift(shiftState.getShiftId(),shiftState.getAccessGroupRole(),shiftState.getValidated());
-        shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
+        shiftDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftState, ShiftDTO.class);
         if (validatedByStaff) {
             shiftDTO.setEditable(true);
         }

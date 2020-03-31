@@ -65,7 +65,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         queryParameters.put("maxDate", staffIncludeFilterDTO.getMaxOpenShiftDate());
         queryParameters.put("employmentTypeIds", staffIncludeFilterDTO.getEmploymentTypeIds());
         List<Map> result=StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , staffFilterQuery, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(result,StaffEmploymentQueryResult.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(result,StaffEmploymentQueryResult.class);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         Result results=session.query( stringBuilder.toString(), queryParameters);
         List<StaffKpiFilterQueryResult> staffKpiFilterQueryResults= new ArrayList<>();
         results.forEach(result->
-            staffKpiFilterQueryResults.add(ObjectMapperUtils.copyPropertiesByMapper(result,StaffKpiFilterQueryResult.class))
+            staffKpiFilterQueryResults.add(ObjectMapperUtils.copyPropertiesOrCloneByMapper(result,StaffKpiFilterQueryResult.class))
         );
         return staffKpiFilterQueryResults;
     }

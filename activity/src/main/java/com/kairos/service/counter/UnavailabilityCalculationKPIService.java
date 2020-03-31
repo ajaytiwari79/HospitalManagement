@@ -17,11 +17,11 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper;
 import static com.kairos.enums.FilterType.CALCULATION_UNIT;
 
 @Service
-public class UnavailabilityCalculationKPIService {
+public class UnavailabilityCalculationKPIService implements KPIService{
 
     @Inject
     private TimeTypeService timeTypeService;
@@ -54,7 +54,7 @@ public class UnavailabilityCalculationKPIService {
     }
 
     private double getTotalByCalculationUnitOfUnavailibilityShift(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity, List<ShiftActivityDTO> shiftActivityDTOS, double total) {
-        XAxisConfig calculationUnit = (XAxisConfig) ((List)copyPropertiesOfCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
+        XAxisConfig calculationUnit = (XAxisConfig) ((List) copyPropertiesOrCloneCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
         switch (calculationUnit) {
             case COUNT:
                 total = shiftActivityDTOS.size();
@@ -74,4 +74,8 @@ public class UnavailabilityCalculationKPIService {
         return total;
     }
 
+    @Override
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+        return getUnavailabilityCalculationData(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
+    }
 }

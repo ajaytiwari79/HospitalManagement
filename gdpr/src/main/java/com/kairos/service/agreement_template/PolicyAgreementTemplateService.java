@@ -109,11 +109,11 @@ public class PolicyAgreementTemplateService {
             policyAgreementTemplate.setOrganizationId(referenceId);
         } else {
             MasterAgreementTemplateDTO agreementTemplateDTO = (MasterAgreementTemplateDTO) policyAgreementTemplateDto;
-            policyAgreementTemplate.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(agreementTemplateDTO.getOrganizationTypes(), OrganizationType.class));
-            policyAgreementTemplate.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(agreementTemplateDTO.getOrganizationSubTypes(), OrganizationSubType.class));
-            policyAgreementTemplate.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(agreementTemplateDTO.getOrganizationServices(), ServiceCategory.class));
-            policyAgreementTemplate.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(agreementTemplateDTO.getOrganizationSubServices(), SubServiceCategory.class));
-            policyAgreementTemplate.setAccountTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(agreementTemplateDTO.getAccountTypes(), AccountType.class));
+            policyAgreementTemplate.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(agreementTemplateDTO.getOrganizationTypes(), OrganizationType.class));
+            policyAgreementTemplate.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(agreementTemplateDTO.getOrganizationSubTypes(), OrganizationSubType.class));
+            policyAgreementTemplate.setOrganizationServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(agreementTemplateDTO.getOrganizationServices(), ServiceCategory.class));
+            policyAgreementTemplate.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(agreementTemplateDTO.getOrganizationSubServices(), SubServiceCategory.class));
+            policyAgreementTemplate.setAccountTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(agreementTemplateDTO.getAccountTypes(), AccountType.class));
             policyAgreementTemplate.setCountryId(referenceId);
         }
         return policyAgreementTemplate;
@@ -153,14 +153,14 @@ public class PolicyAgreementTemplateService {
         List<PolicyAgreementTemplateResponseDTO> policyAgreementTemplateResponseDTOS = new ArrayList<>();
         List<PolicyAgreementTemplate> policyAgreementTemplates = policyAgreementRepository.findAllAgreementTemplateAndGeneralAgreementByCountryId(countryId);
         policyAgreementTemplates.forEach(policyAgreementTemplate -> {
-            PolicyAgreementTemplateResponseDTO policyAgreementTemplateResponseDTO = new PolicyAgreementTemplateResponseDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), ObjectMapperUtils.copyPropertiesByMapper(policyAgreementTemplate.getTemplateType(), TemplateTypeResponseDTO.class));
+            PolicyAgreementTemplateResponseDTO policyAgreementTemplateResponseDTO = new PolicyAgreementTemplateResponseDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), ObjectMapperUtils.copyPropertiesOrCloneByMapper(policyAgreementTemplate.getTemplateType(), TemplateTypeResponseDTO.class));
             policyAgreementTemplateResponseDTO.setGeneralAgreementTemplate(policyAgreementTemplate.isGeneralAgreementTemplate());
             if (!policyAgreementTemplate.isGeneralAgreementTemplate()) {
-                policyAgreementTemplateResponseDTO.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(policyAgreementTemplate.getOrganizationTypes(), OrganizationTypeDTO.class));
-                policyAgreementTemplateResponseDTO.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(policyAgreementTemplate.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
-                policyAgreementTemplateResponseDTO.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(policyAgreementTemplate.getOrganizationServices(), ServiceCategoryDTO.class));
-                policyAgreementTemplateResponseDTO.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(policyAgreementTemplate.getOrganizationSubServices(), SubServiceCategoryDTO.class));
-                policyAgreementTemplateResponseDTO.setAccountTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(policyAgreementTemplate.getAccountTypes(), AccountTypeVO.class));
+                policyAgreementTemplateResponseDTO.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(policyAgreementTemplate.getOrganizationTypes(), OrganizationTypeDTO.class));
+                policyAgreementTemplateResponseDTO.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(policyAgreementTemplate.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
+                policyAgreementTemplateResponseDTO.setOrganizationServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(policyAgreementTemplate.getOrganizationServices(), ServiceCategoryDTO.class));
+                policyAgreementTemplateResponseDTO.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(policyAgreementTemplate.getOrganizationSubServices(), SubServiceCategoryDTO.class));
+                policyAgreementTemplateResponseDTO.setAccountTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(policyAgreementTemplate.getAccountTypes(), AccountTypeVO.class));
             }
             policyAgreementTemplateResponseDTOS.add(policyAgreementTemplateResponseDTO);
         });
@@ -175,7 +175,7 @@ public class PolicyAgreementTemplateService {
     public List<PolicyAgreementTemplateResponseDTO> getAllAgreementTemplateByUnitId(Long unitId) {
 
         List<PolicyAgreementTemplate> templates = policyAgreementRepository.findAllByOrganizationId(unitId);
-        return templates.stream().map(policyAgreementTemplate -> new PolicyAgreementTemplateResponseDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), ObjectMapperUtils.copyPropertiesByMapper(policyAgreementTemplate.getTemplateType(), TemplateTypeResponseDTO.class))).collect(Collectors.toList());
+        return templates.stream().map(policyAgreementTemplate -> new PolicyAgreementTemplateResponseDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), ObjectMapperUtils.copyPropertiesOrCloneByMapper(policyAgreementTemplate.getTemplateType(), TemplateTypeResponseDTO.class))).collect(Collectors.toList());
     }
 
 
@@ -204,11 +204,11 @@ public class PolicyAgreementTemplateService {
             template.setTemplateType(templateTypeRepository.getOne(policyAgreementTemplateDto.getTemplateTypeId()));
             if (!isOrganization) {
                 MasterAgreementTemplateDTO agreementTemplateDTO = (MasterAgreementTemplateDTO) policyAgreementTemplateDto;
-                template.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(agreementTemplateDTO.getOrganizationTypes(), OrganizationType.class));
-                template.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(agreementTemplateDTO.getOrganizationSubTypes(), OrganizationSubType.class));
-                template.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(agreementTemplateDTO.getOrganizationServices(), ServiceCategory.class));
-                template.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(agreementTemplateDTO.getOrganizationSubServices(), SubServiceCategory.class));
-                template.setAccountTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(agreementTemplateDTO.getAccountTypes(), AccountType.class));
+                template.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(agreementTemplateDTO.getOrganizationTypes(), OrganizationType.class));
+                template.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(agreementTemplateDTO.getOrganizationSubTypes(), OrganizationSubType.class));
+                template.setOrganizationServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(agreementTemplateDTO.getOrganizationServices(), ServiceCategory.class));
+                template.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(agreementTemplateDTO.getOrganizationSubServices(), SubServiceCategory.class));
+                template.setAccountTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(agreementTemplateDTO.getAccountTypes(), AccountType.class));
             }
             policyAgreementRepository.save(template);
         } catch (EntityNotFoundException nfe) {
@@ -235,19 +235,19 @@ public class PolicyAgreementTemplateService {
         List<ClauseBasicResponseDTO> clauseListForPolicyAgreementTemplate;
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = prepareAgreementSectionResponseDTO(template.getAgreementSections());
         if (isOrganization || template.isGeneralAgreementTemplate()) {
-            clauseListForPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(template.isGeneralAgreementTemplate() ? clauseRepository.findAllClauseByCountryIdAndTemplateTypeId(referenceId, Arrays.asList(template.getTemplateType().getId())) : clauseRepository.findAllClauseByUnitIdAndTemplateTypeId(referenceId, Arrays.asList(template.getTemplateType().getId())), ClauseBasicResponseDTO.class);
+            clauseListForPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(template.isGeneralAgreementTemplate() ? clauseRepository.findAllClauseByCountryIdAndTemplateTypeId(referenceId, Arrays.asList(template.getTemplateType().getId())) : clauseRepository.findAllClauseByUnitIdAndTemplateTypeId(referenceId, Arrays.asList(template.getTemplateType().getId())), ClauseBasicResponseDTO.class);
         } else {
             List<Long> organizationTypeIds = template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList());
             List<Long> organizationSubTypeIds = template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList());
             List<Long> serviceCategoryIds = template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList());
             List<Long> subServiceCategoryIds = template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList());
-            clauseListForPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(clauseRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationTypeIds, organizationSubTypeIds, serviceCategoryIds, subServiceCategoryIds, template.getTemplateType().getId()), ClauseBasicResponseDTO.class);
+            clauseListForPolicyAgreementTemplate = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(clauseRepository.findAllClauseByAgreementTemplateMetadataAndCountryId(referenceId, organizationTypeIds, organizationSubTypeIds, serviceCategoryIds, subServiceCategoryIds, template.getTemplateType().getId()), ClauseBasicResponseDTO.class);
         }
         agreementTemplateResponse.setClauseListForTemplate(clauseListForPolicyAgreementTemplate);
         agreementTemplateResponse.setIncludeContentPage(template.isIncludeContentPage());
         agreementTemplateResponse.setAgreementSections(agreementSectionResponseDTOS);
         agreementTemplateResponse.setCoverPageAdded(template.isCoverPageAdded());
-        agreementTemplateResponse.setCoverPageData(ObjectMapperUtils.copyPropertiesByMapper(template.getCoverPageData(), CoverPageVO.class));
+        agreementTemplateResponse.setCoverPageData(ObjectMapperUtils.copyPropertiesOrCloneByMapper(template.getCoverPageData(), CoverPageVO.class));
         agreementTemplateResponse.setSignatureComponentAdded(template.isSignatureComponentAdded());
         agreementTemplateResponse.setSignatureComponentLeftAlign(template.isSignatureComponentLeftAlign());
         agreementTemplateResponse.setSignatureComponentRightAlign(template.isSignatureComponentRightAlign());
@@ -297,7 +297,7 @@ public class PolicyAgreementTemplateService {
     public List<GeneralAgreementTemplateResponseDTO> getAllGeneralAgreementTemplate() {
         List<PolicyAgreementTemplate> policyAgreementTemplates = policyAgreementRepository.findAllGeneralAgreementTemplate();
         return policyAgreementTemplates.stream().map(policyAgreementTemplate ->
-                new GeneralAgreementTemplateResponseDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), ObjectMapperUtils.copyPropertiesByMapper(policyAgreementTemplate.getTemplateType(), TemplateTypeResponseDTO.class),
+                new GeneralAgreementTemplateResponseDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), ObjectMapperUtils.copyPropertiesOrCloneByMapper(policyAgreementTemplate.getTemplateType(), TemplateTypeResponseDTO.class),
                         policyAgreementTemplate.isGeneralAgreementTemplate(), prepareAgreementSectionResponseDTO(policyAgreementTemplate.getAgreementSections())
                 )).collect(Collectors.toList());
 

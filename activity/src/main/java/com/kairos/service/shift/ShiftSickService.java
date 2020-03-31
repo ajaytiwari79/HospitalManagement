@@ -5,6 +5,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftStatus;
@@ -43,7 +44,6 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.enums.EmploymentSubType.MAIN;
 import static com.kairos.enums.sickness.ReplaceSickShift.PROTECTED_DAYS_OFF;
 
 
@@ -96,7 +96,7 @@ public class ShiftSickService extends MongoBaseService {
         if(shiftNeedsToAddForDays==0){
             shiftNeedsToAddForDays = 1;
         }
-        if(!MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType())){
+        if(!EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType())){
             exceptionService.dataNotFoundException(EMPLOYMENT_NOT_VALID_TO_MARK_SICK);
         }
         Date startDate = asDate(shiftDTO.getShiftDate(), LocalTime.MIDNIGHT);
@@ -106,12 +106,12 @@ public class ShiftSickService extends MongoBaseService {
         if(isNotNull(realTimeShift)){
             Map<BigInteger,ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(Arrays.asList(realTimeShift),shiftDTO);
             replaceWithSick(realTimeShift,activityWrapperMap.get(shiftDTO.getActivities().get(0).getActivityId()));
-            shiftService.updateShift(ObjectMapperUtils.copyPropertiesByMapper(realTimeShift,ShiftDTO.class),false,false,ShiftActionType.SAVE);
+            shiftService.updateShift(ObjectMapperUtils.copyPropertiesOrCloneByMapper(realTimeShift,ShiftDTO.class),false,false,ShiftActionType.SAVE);
             i=1;
         }
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         while ( i<shiftNeedsToAddForDays) {
-                ShiftDTO shiftDTO1 = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftDTO.class);
+                ShiftDTO shiftDTO1 = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftDTO,ShiftDTO.class);
                 shiftDTO1.setShiftDate(shiftDTO1.getShiftDate().plusDays(i));
                 setStartAndEndDate(shiftDTO1);
                 ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, shiftDTO1, phase, false, ShiftActionType.SAVE);
@@ -161,7 +161,7 @@ public class ShiftSickService extends MongoBaseService {
         Set<BigInteger> allActivityIds=getAllActivityIds(shiftMap);
         List<ActivityWrapper> activityWrappers=activityRepository.findActivitiesAndTimeTypeByActivityId(allActivityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-        BigInteger activityId = shiftDetailsService.getWorkingSickActivity(ObjectMapperUtils.copyPropertiesByMapper(shifts.get(0),ShiftDTO.class),activityWrapperMap).getId();
+        BigInteger activityId = shiftDetailsService.getWorkingSickActivity(ObjectMapperUtils.copyPropertiesOrCloneByMapper(shifts.get(0),ShiftDTO.class),activityWrapperMap).getId();
         Optional<Activity> activityOptional = sicknessActivity.stream().filter(activity -> activity.getId().equals(activityId)).findFirst();
         if(activityOptional.isPresent()){
             Activity activity = activityOptional.get();
@@ -214,7 +214,7 @@ public class ShiftSickService extends MongoBaseService {
             }
 
         });
-        shiftService.createShifts(activity.getUnitId(),ObjectMapperUtils.copyPropertiesOfCollectionByMapper(allShiftsToUpdate,ShiftDTO.class),ShiftActionType.SAVE);
+        shiftService.createShifts(activity.getUnitId(),ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(allShiftsToUpdate,ShiftDTO.class),ShiftActionType.SAVE);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(allShiftsToDelete.get(0).getStartDate()), allShiftsToDelete.get(0).getStaffId(), allShiftsToDelete.get(0).getEmploymentId(), Collections.emptySet());
         shiftService.deleteFullWeekShifts(new ArrayList<>(),allShiftsToDelete,staffAdditionalInfoDTO);
         shiftMongoRepository.saveEntities(allShiftsToDelete);

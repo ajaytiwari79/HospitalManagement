@@ -42,6 +42,7 @@ public class Activity {
     private int rank;
     private List<Long> expertises;
     private Set<Tag> tags;
+    private Long teamId;
 
 
 

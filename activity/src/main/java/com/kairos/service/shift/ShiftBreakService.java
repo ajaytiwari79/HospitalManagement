@@ -23,6 +23,7 @@ import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.service.counter.KPIBuilderCalculationService;
+import com.kairos.service.counter.KPIService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
  * @date - 18/9/18
  */
 @Service
-public class ShiftBreakService {
+public class ShiftBreakService implements KPIService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ShiftBreakService.class);
     @Inject
     private BreakSettingMongoRepository breakSettingMongoRepository;
@@ -291,5 +292,8 @@ public class ShiftBreakService {
     }
 
 
-
+    @Override
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+        return getNumberOfBreakInterrupt(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+    }
 }

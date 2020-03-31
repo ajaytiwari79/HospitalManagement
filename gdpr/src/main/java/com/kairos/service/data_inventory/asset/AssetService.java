@@ -214,7 +214,7 @@ public class AssetService {
         Map<Long, OrganizationLevelRiskDTO> riskIdMap = new HashMap<>();
         risks.forEach(risk -> {
             if (!Optional.ofNullable(risk.getId()).isPresent()) {
-                Risk assetTypeRisk = ObjectMapperUtils.copyPropertiesByMapper(risk, Risk.class);
+                Risk assetTypeRisk = ObjectMapperUtils.copyPropertiesOrCloneByMapper(risk, Risk.class);
                 assetTypeRisks.add(assetTypeRisk);
             } else {
                 riskIdMap.put(risk.getId(), risk);
@@ -307,13 +307,13 @@ public class AssetService {
             assetResponseDTO.setSuggested(asset.isSuggested());
             assetResponseDTO.setAssetOwner(asset.getAssetOwner());
             assetResponseDTO.setAssetAssessor(asset.getAssetAssessor());
-            assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
-            assetResponseDTO.setOrgSecurityMeasures(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(asset.getOrgSecurityMeasures(), OrganizationalSecurityMeasureResponseDTO.class));
-            assetResponseDTO.setTechnicalSecurityMeasures(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(asset.getTechnicalSecurityMeasures(), TechnicalSecurityMeasureResponseDTO.class));
-            assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
-            assetResponseDTO.setHostingProvider(ObjectMapperUtils.copyPropertiesByMapper(asset.getHostingProvider(), HostingProviderResponseDTO.class));
-            assetResponseDTO.setHostingType(ObjectMapperUtils.copyPropertiesByMapper(asset.getHostingType(), HostingTypeResponseDTO.class));
-            assetResponseDTO.setDataDisposal(ObjectMapperUtils.copyPropertiesByMapper(asset.getDataDisposal(), DataDisposalResponseDTO.class));
+            assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
+            assetResponseDTO.setOrgSecurityMeasures(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(asset.getOrgSecurityMeasures(), OrganizationalSecurityMeasureResponseDTO.class));
+            assetResponseDTO.setTechnicalSecurityMeasures(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(asset.getTechnicalSecurityMeasures(), TechnicalSecurityMeasureResponseDTO.class));
+            assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
+            assetResponseDTO.setHostingProvider(ObjectMapperUtils.copyPropertiesOrCloneByMapper(asset.getHostingProvider(), HostingProviderResponseDTO.class));
+            assetResponseDTO.setHostingType(ObjectMapperUtils.copyPropertiesOrCloneByMapper(asset.getHostingType(), HostingTypeResponseDTO.class));
+            assetResponseDTO.setDataDisposal(ObjectMapperUtils.copyPropertiesOrCloneByMapper(asset.getDataDisposal(), DataDisposalResponseDTO.class));
             if (Optional.ofNullable(asset.getAssetType()).isPresent()) {
                 assetResponseDTO.setAssetType(new AssetTypeBasicResponseDTO(asset.getAssetType().getId(), asset.getAssetType().getName(), asset.getAssetType().isSubAssetType(), isCollectionNotEmpty(asset.getAssetType().getRisks()) ? organizationAssetTypeService.buildAssetTypeRisksResponse(asset.getAssetType().getRisks()) : new ArrayList<>()));
             }
