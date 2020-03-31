@@ -11,19 +11,21 @@ import org.joda.time.Interval;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
+import java.math.BigInteger;
+
 @Getter
 @Setter
 @PlanningEntity
 @XStreamAlias("ShiftBreak")
 public class ShiftBreak {
-    private String id;
+    private BigInteger id;
     @PlanningVariable(valueRangeProviderRefs = "possibleStartDateTimes",nullable = true)
     private DateTime startTime;
     private int order;
     private ShiftImp shift;
     private int duration;
     public ShiftBreak(){}
-    public ShiftBreak(String id, int order, int duration, ShiftImp shift) {
+    public ShiftBreak(BigInteger id, int order, int duration, ShiftImp shift) {
         this.id = id;
         this.order = order;
         this.duration=duration;

@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain.wta;
 
+import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.wta.WTATemplateType;
 import lombok.Getter;
@@ -30,6 +31,9 @@ public class WTABaseRuleTemplate{
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected Integer staffCanIgnoreCounter;
     protected Integer managementCanIgnoreCounter;
+    protected PlanningSetting planningSetting;
+    protected boolean checkRuleFromView;
+
 
     public WTABaseRuleTemplate(String name, String description) {
         this.name = name;

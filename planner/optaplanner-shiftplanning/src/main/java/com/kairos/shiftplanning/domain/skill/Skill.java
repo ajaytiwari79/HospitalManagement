@@ -14,12 +14,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @XStreamAlias("Skill")
 public class Skill {
 
-	private String id;
+	private Long id;
 	private String name;
 	private SkillType skillType;
 	private int weight;
 
-	public Skill(String id, String name, SkillType skillType) {
+	public Skill(Long id, String name, SkillType skillType) {
 		this.id = id;
 		this.name = name;
 		this.skillType = skillType;

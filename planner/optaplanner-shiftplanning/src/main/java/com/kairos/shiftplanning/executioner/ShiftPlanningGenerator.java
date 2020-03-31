@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -147,13 +148,13 @@ public class ShiftPlanningGenerator {
                 continue;
             }
             if(shift.getMinutes()>= FIRST_BREAK_THRESHOLD_MINUTES){
-                shift.getBreaks().add(new ShiftBreak(UUID.randomUUID().toString(), 1, BREAK_DURATION_30,shift));
+                shift.getBreaks().add(new ShiftBreak(BigInteger.valueOf(UUID.randomUUID().timestamp()), 1, BREAK_DURATION_30,shift));
             }
             if(shift.getMinutes()>= SECOND_BREAK_THRESHOLD_MINUTES){
-                shift.getBreaks().add(new ShiftBreak(UUID.randomUUID().toString(), 2, BREAK_DURATION_15,shift));
+                shift.getBreaks().add(new ShiftBreak(BigInteger.valueOf(UUID.randomUUID().timestamp()), 2, BREAK_DURATION_15,shift));
             }
             if(shift.getMinutes()>= THIRD_BREAK_THRESHOLD_MINUTES){
-                shift.getBreaks().add(new ShiftBreak(UUID.randomUUID().toString(), 3, BREAK_DURATION_15,shift));
+                shift.getBreaks().add(new ShiftBreak(BigInteger.valueOf(UUID.randomUUID().timestamp()), 3, BREAK_DURATION_15,shift));
             }
         }
         return shifts.stream().flatMap(s->s.getBreaks().stream()).collect(Collectors.toList());
@@ -192,7 +193,7 @@ public class ShiftPlanningGenerator {
             for(LocalDate date:getPlanningDays()) {
                 ShiftImp sa = new ShiftImp();
                 sa.setEmployee(emp);
-                sa.setId(UUID.randomUUID());
+                sa.setId(BigInteger.valueOf(UUID.randomUUID().timestamp()));
                 sa.setDate(date);
                 shiftList.add(sa);
             }
@@ -433,21 +434,21 @@ public class ShiftPlanningGenerator {
 
     private Set<Skill> createSkillSet(){
         Set<Skill> skillSet= new HashSet<>();
-        skillSet.add(new Skill("101l","Cleaner", SkillType.BASIC));
-        skillSet.add(new Skill("102l","Washer", SkillType.BASIC));
+        skillSet.add(new Skill(101l,"Cleaner", SkillType.BASIC));
+        skillSet.add(new Skill(102l,"Washer", SkillType.BASIC));
         return skillSet;
     }
     private Set<Skill> createSkillSet2(){
         Set<Skill> skillSet= new HashSet<>();
-        skillSet.add(new Skill("111l","Car Cleaner", SkillType.BASIC));
-        skillSet.add(new Skill("112l","Car Washer", SkillType.BASIC));
+        skillSet.add(new Skill(111l,"Car Cleaner", SkillType.BASIC));
+        skillSet.add(new Skill(112l,"Car Washer", SkillType.BASIC));
         return skillSet;
     }
 
     public TimeType[] createTimeTypes(){
         TimeType[] timeTypes= new TimeType[4];
-        timeTypes[0]= new TimeType(UUID.randomUUID().toString(),"presence", TimeTypeEnum.PRESENCE );
-        timeTypes[1]= new TimeType(UUID.randomUUID().toString(),"absence",TimeTypeEnum.ABSENCE);
+        timeTypes[0]= new TimeType(BigInteger.valueOf(UUID.randomUUID().timestamp()),"presence", TimeTypeEnum.PRESENCE );
+        timeTypes[1]= new TimeType(BigInteger.valueOf(UUID.randomUUID().timestamp()),"absence",TimeTypeEnum.ABSENCE);
         return timeTypes;
     }
     private List<Activity> getActivities(){
@@ -457,13 +458,13 @@ public class ShiftPlanningGenerator {
         Set<Tag> tags3 = createTags3();
         Set<Tag> tags4 = createTags4();
         List<Activity> activityPlannerEntities = new ArrayList<>();
-        Activity activity = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[0], 1,10, null,tags1);
+        Activity activity = new Activity(BigInteger.valueOf(UUID.randomUUID().timestamp()),new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[0], 1,10, null,tags1);
         activity.setConstraints(getActivityContraints());
-        Activity activity2 =new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Team B",timeTypes[0], 2,9, null, tags2);
+        Activity activity2 =new Activity(BigInteger.valueOf(UUID.randomUUID().timestamp()),new ArrayList<>(createSkillSet2()),2,"Team B",timeTypes[0], 2,9, null, tags2);
         activity2.setConstraints(getActivityContraints());
-        Activity activity3 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Day Off",timeTypes[1], 3,2, null,tags3 );
+        Activity activity3 = new Activity(BigInteger.valueOf(UUID.randomUUID().timestamp()),new ArrayList<>(createSkillSet2()),2,"Day Off",timeTypes[1], 3,2, null,tags3 );
         activity3.setConstraints(getActivityContraints());
-        Activity activity4 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2, BLANK_ACTIVITY,timeTypes[0], 4,1, null,tags4);
+        Activity activity4 = new Activity(BigInteger.valueOf(UUID.randomUUID().timestamp()),new ArrayList<>(createSkillSet2()),2, BLANK_ACTIVITY,timeTypes[0], 4,1, null,tags4);
         activity4.setConstraints(getActivityContraints());
         activityPlannerEntities.add(activity);
         activityPlannerEntities.add(activity2);
@@ -528,7 +529,7 @@ public class ShiftPlanningGenerator {
         unitConstraints.put(ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS,shiftOnWeekend);
         Unit unit =new Unit();
         unit.setConstraints(unitConstraints);
-        unit.setId("1");
+        unit.setId(1l);
         return unit;
     }
 

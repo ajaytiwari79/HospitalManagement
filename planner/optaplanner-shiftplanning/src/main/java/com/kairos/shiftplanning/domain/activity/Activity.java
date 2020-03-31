@@ -20,6 +20,7 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +33,7 @@ public class Activity {
 
     private static Logger log= LoggerFactory.getLogger(Activity.class);
 
-    private String id;
+    private BigInteger id;
     private List<Skill> skills;
     private int priority;
     private String name;
@@ -46,7 +47,7 @@ public class Activity {
 
 
 
-    public Activity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises, Set<Tag> tags) {
+    public Activity(BigInteger id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises, Set<Tag> tags) {
         this.id = id;
         this.skills = skills;
         this.priority = priority;

@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigInteger;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,7 +17,7 @@ import lombok.Setter;
 public class TimeType {
 
 
-    private String id;
+    private BigInteger id;
     private String name;
     private TimeTypeEnum timeTypeEnum;
 

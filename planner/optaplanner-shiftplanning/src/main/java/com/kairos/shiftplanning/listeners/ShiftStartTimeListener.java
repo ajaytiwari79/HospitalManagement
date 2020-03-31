@@ -1,14 +1,18 @@
 package com.kairos.shiftplanning.listeners;
 
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import org.joda.time.DateTime;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
     public static final String START_TIME = "startTime";
@@ -47,11 +51,18 @@ public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
             scoreDirector.beforeVariableChanged(shiftImp, START_TIME);
             shiftImp.setStartTime(null);
             shiftImp.setShiftActivities(new ArrayList<>());
+            shiftImp.setActivityIds(new HashSet<>());
+            shiftImp.setActivitiesPlannedTimeIds(new HashSet<>());
+            shiftImp.setActivitiesTimeTypeIds(new HashSet<>());
             scoreDirector.afterVariableChanged(shiftImp, START_TIME);
             shiftImp.setEndTime(null);
             return;
         }
-        shiftImp.setShiftActivities(ShiftPlanningUtility.getMergedShiftActivitys(shiftImp.getActivityLineIntervals()));
+        Object[] objects = ShiftPlanningUtility.getMergedShiftActivitys(shiftImp.getActivityLineIntervals());
+        shiftImp.setShiftActivities((List<ShiftActivity>)objects[0]);
+        shiftImp.setActivityIds((Set<BigInteger>)objects[1]);
+        shiftImp.setActivitiesPlannedTimeIds((Set<BigInteger>)objects[2]);
+        shiftImp.setActivitiesTimeTypeIds((Set<BigInteger>)objects[3]);
         DateTime[] startAndEnd=getEarliestStartAndLatestEnd(shiftImp.getActivityLineIntervals());
         scoreDirector.beforeVariableChanged(shiftImp, START_TIME);
         shiftImp.setStartTime(startAndEnd[0].toLocalTime());

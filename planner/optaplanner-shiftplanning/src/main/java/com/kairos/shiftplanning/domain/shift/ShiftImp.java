@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain.shift;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
@@ -22,6 +23,7 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -33,7 +35,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @XStreamAlias("ShiftImp")
 public class ShiftImp implements Shift{
     private static Logger log= LoggerFactory.getLogger(ShiftImp.class);
-    private UUID id;
+    private BigInteger id;
     private Employee employee;
     @CustomShadowVariable(variableListenerClass = ShiftStartTimeListener.class,
           sources = @PlanningVariableReference(variableName = "activityLineIntervals"))
@@ -50,11 +52,15 @@ public class ShiftImp implements Shift{
     private List<ActivityLineInterval> activityLineIntervals = new ArrayList<>();
     @XStreamConverter(JodaLocalDateConverter.class)
     private LocalDate date;
-
+    private int scheduledMinutes;
+    private int durationMinutes;
+    private int plannedMinutesOfTimebank;
     private boolean isLocked;
     private boolean isCreatedByStaff;
     private List<ShiftActivity> shiftActivities;
-
+    private Set<BigInteger> activitiesTimeTypeIds = new HashSet<>();
+    private Set<BigInteger> activityIds = new HashSet<>();
+    private Set<BigInteger> activitiesPlannedTimeIds = new HashSet<>();
     public ShiftImp(Employee employee, LocalDate date) {
         this.employee = employee;
         this.date = date;
