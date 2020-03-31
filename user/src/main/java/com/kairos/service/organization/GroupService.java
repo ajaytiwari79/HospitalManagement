@@ -15,6 +15,7 @@ import com.kairos.persistence.model.organization.group.GroupDTO;
 import com.kairos.persistence.model.user.filter.FilterSelection;
 import com.kairos.persistence.repository.organization.GroupGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.organization.filter_group.FilterSelectionGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffFilterService;
 import org.springframework.stereotype.Service;
@@ -46,17 +47,21 @@ public class GroupService {
     @Inject
     private StaffFilterService staffFilterService;
 
+    @Inject
+    private FilterSelectionGraphRepository filterSelectionGraphRepository;
+
     public GroupDTO createGroup(Long unitId, GroupDTO groupDTO) {
         Unit unit = unitGraphRepository.findOne(unitId);
-        if (groupGraphRepository.existsByName(unitId,-1L, groupDTO.getName())){
+        if (groupGraphRepository.existsByName(unitId, -1L, groupDTO.getName())) {
             exceptionService.duplicateDataException(MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT, groupDTO.getName(), unitId);
         }
-        Group group = new Group(groupDTO.getName(),groupDTO.getDescription());
+        Group group = new Group(groupDTO.getName(), groupDTO.getDescription());
         unit.getGroups().add(group);
         unitGraphRepository.save(unit);
         groupDTO.setId(group.getId());
         return groupDTO;
     }
+
 
     public GroupDTO updateGroup(Long unitId, Long groupId, GroupDTO groupDTO) {
         if (isNotNull(groupDTO.getName()) && groupGraphRepository.existsByName(unitId,groupId, groupDTO.getName())){
@@ -95,6 +100,16 @@ public class GroupService {
             groupDTOS.add(getGroupDTOFromGroup(group));
         }
         return groupDTOS;
+    }
+
+
+    public List<FilterSelection> getFilterGroupsOfUnit(Long unitId,boolean isDeleted){
+        return filterSelectionGraphRepository.findAllByUnitAndDeleted(unitId,isDeleted);
+    }
+
+    public Set<FilterSelection> getSelectedFilterGroupsOfUnit(Long unitId,Set<Long> filterGroupIds,boolean isGroupDeleted){
+        Set<FilterSelection> filterSelectionSet = filterSelectionGraphRepository.findAllByUnitAndSelectedGroupsAndDeleted(unitId,filterGroupIds,isGroupDeleted);
+        return filterSelectionSet;
     }
 
     private GroupDTO getGroupDTOFromGroup(Group group) {
@@ -142,6 +157,7 @@ public class GroupService {
         Set<Long> excludedStaffs = new HashSet<>();
         List<Group> groups = groupGraphRepository.findAllGroupsByIdSAndDeletedFalse(groupIds);
         List<GroupDTO> groupDTOS = new ArrayList<>();
+
         for(Group group : groups){
             GroupDTO groupDTO = getGroupDTOFromGroup(group);
             List<FilterSelectionDTO> filterSelectionDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(groupDTO.getFiltersData(), FilterSelectionDTO.class);
@@ -150,6 +166,7 @@ public class GroupService {
             excludedStaffs.addAll(groupDTO.getExcludedStaffs());
             groupDTOS.add(groupDTO);
         }
+
         staffIds.removeAll(excludedStaffs);
         return staffIds;
     }

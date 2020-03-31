@@ -218,11 +218,13 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class, query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map>toList());
     }
 
-    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(Map<FilterType,Set<T>> filters, Long unitId, String today){
+    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType,Set<T>> filters,final Long unitId,final String today){
 
         Map<String,Object> queryParameters = new HashMap<>();
         queryParameters.put("unitId",unitId);
         queryParameters.put("today",today);
+
+
         StringBuilder query = new StringBuilder();
         StringBuilder returnData = new StringBuilder();
 

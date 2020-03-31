@@ -22,6 +22,7 @@ public class FilterSelection extends UserBaseEntity {
     private FilterType name;
     private List<String> value;
     private int sequence;
+//    private FilterType.FilterComparisonType filterComparisonType = FilterType.FilterComparisonType.CONTAINS;
 
     public FilterSelection(FilterType name, List<String> value) {
         this.name = name;

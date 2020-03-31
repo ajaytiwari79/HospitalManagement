@@ -40,6 +40,7 @@ import com.kairos.persistence.model.user.employment.query_result.EmploymentQuery
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
+import com.kairos.persistence.model.user.filter.FilterSelection;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -59,6 +60,7 @@ import com.kairos.service.auth.UserService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.organization.GroupService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.redis.RedisService;
@@ -71,6 +73,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -178,6 +181,9 @@ public class StaffService {
 
     @Inject
     private StaffFilterService staffFilterService;
+
+    @Inject
+    private GroupService groupService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffService.class);
 
@@ -1002,8 +1008,77 @@ public class StaffService {
         LocalDate localDate = LocalDate.now();
        String dateToday = DateUtils.formatLocalDate(localDate,"dd-MM-yyyy");
 
-        Map<FilterType,Set<T>> filterTypeSetMap = staffFilterService.getMapOfFiltersToBeAppliedWithValue(staffFilterDetails.getModuleId(),staffFilterDetails.getFiltersData());
+        final Map<FilterType,Set<T>> filterTypeSetMap = staffFilterService.getMapOfFiltersToBeAppliedWithValue(staffFilterDetails.getModuleId(),staffFilterDetails.getFiltersData());
+
+        if(Optional.ofNullable(filterTypeSetMap.get(FilterType.GROUPS)).isPresent() && filterTypeSetMap.get(FilterType.GROUPS).size()!=0){
+            updateFilterTypeCriteriaListByGroups(unitId,filterTypeSetMap);
+        }
+
         return staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap,unitId,dateToday);
+    }
+
+   private <T>  Map<FilterType,Set<T>> updateFilterTypeCriteriaListByGroups(final Long unitId,final  Map<FilterType,Set<T>> filterTypeSetMap){
+        Set<Long> groupIds = (Set<Long>) filterTypeSetMap.get(FilterType.GROUPS);
+        Set<FilterSelection> filterSelections = groupService.getSelectedFilterGroupsOfUnit(unitId,groupIds,false);
+        Set<Map<String,Number>> age =null ,organizationExperience=null,timeBankBalance=null,seniorityLevel=null,payGradeLevel=null ;
+       Set<Map<String,String>> employedSince=null,birthday=null;
+
+        for(FilterSelection filterSelection:filterSelections){
+            if(Optional.ofNullable(filterTypeSetMap.get(filterSelection.getName())).isPresent() ){
+                filterTypeSetMap.get(filterSelection.getName()).add((T) filterSelection.getId());
+            }
+            else if(filterSelection.getName().equals(FilterType.AGE)){
+                age.add(compareBuilder(filterSelection.getValue().get(0)));
+                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) age);
+            }
+            else if(filterSelection.getName().equals(FilterType.EMPLOYED_SINCE)){
+                employedSince.add(compareBuilder(filterSelection.getValue().get(0)));
+                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) employedSince);
+            }
+            else if(filterSelection.getName().equals(FilterType.ORGANIZATION_EXPERIENCE)){
+                organizationExperience.add(compareBuilder(filterSelection.getValue().get(0)));
+                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) organizationExperience);
+            }
+            else if(filterSelection.getName().equals(FilterType.TIME_BANK_BALANCE)){
+                timeBankBalance.add(compareBuilder(filterSelection.getValue().get(0)));
+                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) timeBankBalance);
+            }
+            else if(filterSelection.getName().equals(FilterType.SENIORITY)){
+                seniorityLevel.add(compareBuilder(filterSelection.getValue().get(0)));
+                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) seniorityLevel);
+            }
+            else if(filterSelection.getName().equals(FilterType.PAY_GRADE_LEVEL)){
+                payGradeLevel.add(compareBuilder(filterSelection.getValue().get(0)));
+                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) payGradeLevel);
+            }
+            else if(filterSelection.getName().equals(FilterType.BIRTHDAY)){
+                birthday.add(compareBuilder(filterSelection.getValue().get(0)));
+                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) birthday);
+            }
+        }
+
+     return filterTypeSetMap;
+    }
+
+
+    private  <T> Map<String,T> compareBuilder(final String comparableData){
+
+        Map<String,T> customQueryMap= new HashMap<>();
+        JSONObject jsonObject = new JSONObject(comparableData);
+
+        if(jsonObject.get("from")!=null){
+            customQueryMap.put(">", (T) jsonObject.get("from"));
+            customQueryMap.put("<", (T) (jsonObject.get("to") == null ? jsonObject.get("from") :jsonObject.get("to")));
+        }else if(jsonObject.get("moreThan")!=null){
+            customQueryMap.put(">", (T) jsonObject.get("moreThan"));
+        }else if (jsonObject.get("lessThan")!=null){
+            customQueryMap.put("<", (T) jsonObject.get("lessThan"));
+        }
+
+        LOGGER.debug(" custom query maop prepared is {}",customQueryMap);
+        return  customQueryMap;
+
+
     }
 
 }
