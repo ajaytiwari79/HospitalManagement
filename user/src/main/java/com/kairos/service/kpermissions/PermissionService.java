@@ -5,10 +5,7 @@ import com.kairos.annotations.KPermissionRelationshipFrom;
 import com.kairos.annotations.KPermissionRelationshipTo;
 import com.kairos.commons.annotation.PermissionClass;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.kpermissions.FieldDTO;
-import com.kairos.dto.kpermissions.ModelDTO;
-import com.kairos.dto.kpermissions.OtherPermissionDTO;
-import com.kairos.dto.kpermissions.PermissionDTO;
+import com.kairos.dto.kpermissions.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
@@ -50,6 +47,7 @@ import java.util.stream.StreamSupport;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApplicationConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_ID;
@@ -164,15 +162,15 @@ public class PermissionService {
         List<KPermissionModel> kPermissionModels = new ArrayList();
         permissionModelRepository.findAll().iterator().forEachRemaining(kPermissionModels::add);
         kPermissionModels = kPermissionModels.stream().filter(it -> !it.isPermissionSubModel()).collect(Collectors.toList());
-        return copyPropertiesOfCollectionByMapper(kPermissionModels, ModelDTO.class);
+        return copyPropertiesOrCloneCollectionByMapper(kPermissionModels, ModelDTO.class);
     }
 
     public Map<String, Object> getPermissionSchema(List<Long> accessGroupIds){
         Map<String, Object> permissionSchemaMap = new HashMap<>();
         List<KPermissionModel> kPermissionModels = getkPermissionModels();
-        permissionSchemaMap.put(PERMISSIONS_SCHEMA, copyPropertiesOfCollectionByMapper(kPermissionModels, ModelDTO.class));
+        permissionSchemaMap.put(PERMISSIONS_SCHEMA, copyPropertiesOrCloneCollectionByMapper(kPermissionModels, ModelDTO.class));
         permissionSchemaMap.put(PERMISSIONS, FieldLevelPermission.values());
-        permissionSchemaMap.put(PERMISSION_DATA, copyPropertiesOfCollectionByMapper(getModelPermission(newArrayList(),accessGroupIds,false),ModelDTO.class));
+        permissionSchemaMap.put(PERMISSION_DATA, copyPropertiesOrCloneCollectionByMapper(getModelPermission(newArrayList(),accessGroupIds,false),ModelDTO.class));
             return permissionSchemaMap;
     }
 
@@ -284,6 +282,21 @@ public class PermissionService {
         return getModelPermissionQueryResults(kPermissionModels, modelPermissionMap, fieldLevelPermissionMap,organizationCategory,hubMember);
     }
 
+
+
+    private <T> Set<String> getModelNames(List<T> objects) {
+        return objects.stream().map(model->{
+            if(model.getClass().isAnnotationPresent(com.kairos.annotations.KPermissionModel.class)) {
+                return model.getClass().getSimpleName();
+            }else if(model.getClass().isAnnotationPresent(PermissionClass.class)){
+                PermissionClass permissionClass = model.getClass().getAnnotation(PermissionClass.class);
+                return permissionClass.name();
+            }else if(model.getClass().isAnnotationPresent(KPermissionRelatedModel.class)){
+                //return getRelationShipModelPermissionModelName(model.getClass());
+            }
+            return "";
+        }).collect(Collectors.toSet());
+    }
     private List<ModelPermissionQueryResult> getModelPermissionQueryResults(List<KPermissionModel> kPermissionModels, Map<Long, ModelPermissionQueryResult> modelPermissionMap, Map<Long, FieldPermissionQueryResult> fieldLevelPermissionMap,OrganizationCategory organizationCategory, boolean hubMember) {
         List<ModelPermissionQueryResult> modelPermissionQueryResults = new ArrayList<>();
         for (KPermissionModel kPermissionModel : kPermissionModels) {
@@ -410,10 +423,10 @@ public class PermissionService {
             unions = organizationService.getAllUnionsByOrganizationOrCountryId(DEFAULT_ID, refrenceId);
         }
         Long countryId = ConfLevel.COUNTRY.equals(confLevel) ? refrenceId : organizationDTO.getCountryId();
-        List<ExpertiseDTO> expertises = copyPropertiesOfCollectionByMapper(expertiseGraphRepository.getExpertiesOfCountry(countryId),ExpertiseDTO.class);
-        List<EmploymentTypeDTO> employmentTypeDTOS = copyPropertiesOfCollectionByMapper(employmentTypeGraphRepository.getEmploymentTypeByCountry(countryId,false), EmploymentTypeDTO.class);
-        List<UnionDTO> unionDTOS = copyPropertiesOfCollectionByMapper(unions,UnionDTO.class);
-        List<TeamDTO> teamDTOS = copyPropertiesOfCollectionByMapper(teamGraphRepository.findAllTeamsInOrganization(refrenceId), TeamDTO.class);
+        List<ExpertiseDTO> expertises = copyPropertiesOrCloneCollectionByMapper(expertiseGraphRepository.getExpertiesOfCountry(countryId),ExpertiseDTO.class);
+        List<EmploymentTypeDTO> employmentTypeDTOS = copyPropertiesOrCloneCollectionByMapper(employmentTypeGraphRepository.getEmploymentTypeByCountry(countryId,false), EmploymentTypeDTO.class);
+        List<UnionDTO> unionDTOS = copyPropertiesOrCloneCollectionByMapper(unions,UnionDTO.class);
+        List<TeamDTO> teamDTOS = copyPropertiesOrCloneCollectionByMapper(teamGraphRepository.findAllTeamsInOrganization(refrenceId), TeamDTO.class);
         return new PermissionDefaultDataDTO(expertises,unionDTOS,employmentTypeDTOS,teamDTOS,isNull(organizationDTO) ? newArrayList() : organizationDTO.getTagDTOS(),newArrayList(StaffStatusEnum.values()));
     }
 
@@ -491,7 +504,7 @@ public class PermissionService {
             List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
             hubMember = UserContext.getUserDetails().isHubMember();
             List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember);
-            List<ModelDTO> modelDTOS = copyPropertiesOfCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
+            List<ModelDTO> modelDTOS = copyPropertiesOrCloneCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
             modelMap = modelDTOS.stream().collect(Collectors.toMap(k -> k.getModelName(), v -> v));
             Map[] mapArray = getObjectByIds(objects,fieldLevelPermissions);
             mapOfDataBaseObject = mapArray[0];
@@ -570,5 +583,31 @@ public class PermissionService {
         }catch (Exception e){
             LOGGER.error(e.getMessage());
         }
+    }
+
+    public <T> FieldPermissionUserData fetchPermission(List<T> objects,Long unitId){
+        List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
+        boolean hubMember = UserContext.getUserDetails().isHubMember();
+        Set<String> modelNames=getModelNames(objects);
+        List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember);
+        List<ModelDTO> modelDTOS = copyPropertiesOrCloneCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
+        Organization parentOrganisation=organizationService.fetchParentOrganization(unitId);
+        Long currentUserStaffId = staffService.getStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganisation.getId());
+        return new FieldPermissionUserData(modelDTOS,currentUserStaffId);
+    }
+
+
+    private <T> Set<String> getModelNames(List<T> objects) {
+        return objects.stream().map(model->{
+            if(model.getClass().isAnnotationPresent(com.kairos.annotations.KPermissionModel.class)) {
+                return model.getClass().getSimpleName();
+            }else if(model.getClass().isAnnotationPresent(PermissionClass.class)){
+                PermissionClass permissionClass = model.getClass().getAnnotation(PermissionClass.class);
+                return permissionClass.name();
+            }else if(model.getClass().isAnnotationPresent(KPermissionRelatedModel.class)){
+                //return getRelationShipModelPermissionModelName(model.getClass());
+            }
+            return "";
+        }).collect(Collectors.toSet());
     }
 }

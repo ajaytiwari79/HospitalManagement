@@ -64,4 +64,10 @@ public class PermissionController {
 
     }
 
+    @PutMapping(value = "unit/{unitId}/fetch_permissions")
+    public <T> ResponseEntity fetchPermission(@RequestBody List<T> objects,@PathVariable Long unitId)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.fetchPermission(objects,unitId));
+
+    }
+
 }

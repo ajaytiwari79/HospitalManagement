@@ -22,6 +22,8 @@ import org.springframework.util.Assert;
 import javax.validation.Valid;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -177,6 +179,13 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 			save(entity);
 		}
 		return entities;
+	}
+
+	@Override
+	public Collection<T> findAllById(Collection<ID>  id){
+		Assert.notNull("The given sort must not be null!");
+		Query query = new Query(Criteria.where(DELETED).is(false));
+		return mongoOperations.find(query,entityInformation.getJavaType(),entityInformation.getCollectionName());
 	}
 
 
