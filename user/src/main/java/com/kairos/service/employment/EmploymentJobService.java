@@ -126,7 +126,7 @@ public class EmploymentJobService {
 
     private void updateSeniorityLevelOfAllValidEmploymentLine(Employment currentEmployment, SeniorityLevel seniorityLevel, LocalDate startDate, LocalDate endDate) {
         List<EmploymentLine> employmentLines = currentEmployment.getEmploymentLines().stream()
-                .filter(pl -> !startDate.isAfter(pl.getStartDate()) && (isNull(pl.getEndDate()) || !endDate.isBefore(pl.getEndDate()))).collect(Collectors.toList());
+                .filter(pl -> !startDate.isAfter(pl.getStartDate()) && (isNull(pl.getEndDate()) || isNull(endDate) || !endDate.isBefore(pl.getEndDate()))).collect(Collectors.toList());
         employmentLines.forEach(employmentLine -> employmentLine.setSeniorityLevel(seniorityLevel));
     }
 
