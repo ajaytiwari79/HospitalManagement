@@ -153,7 +153,7 @@ public class KPIBuilderCalculationService implements CounterService {
     private ShiftBreakService shiftBreakService;
     @Inject private ShiftEscalationService shiftEscalationService;
     @Inject private UnavailabilityCalculationKPIService unavailabilityCalculationKPIService;
-    @Inject private TimeBankOffKPI timeBankOffKPI;
+    @Inject private TimeBankOffKPIService timeBankOffKPIService;
     @Inject
     private CounterServiceMapping counterServiceMapping;
 
@@ -243,47 +243,6 @@ public class KPIBuilderCalculationService implements CounterService {
             case TOTAL_MINUTES:
                 methodParam = ShiftActivityDTO::getMinutes;
                 break;
-            case DELTA_TIMEBANK:
-                return timeBankService.getTotalTimeBankOrContractual(staffId, dateTimeInterval, kpiCalculationRelatedInfo, false);
-//            case ACTUAL_TIMEBANK:
-//                return timeBankService.getActualTimeBank(staffId, kpiCalculationRelatedInfo);
-            case STAFFING_LEVEL_CAPACITY:
-                return timeBankService.getTotalTimeBankOrContractual(staffId, dateTimeInterval, kpiCalculationRelatedInfo, true);
-            case UNAVAILABILITY:
-                return unavailabilityCalculationKPIService.getUnavailabilityCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
-            case PROTECTED_DAYS_OFF:
-            case CARE_DAYS:
-            case SENIORDAYS:
-            case TOTAL_ABSENCE_DAYS:
-            case CHILD_CARE_DAYS:
-                return workTimeAgreementBalancesCalculationService.getLeaveCount(staffId, dateTimeInterval, kpiCalculationRelatedInfo, null);
-            case BREAK_INTERRUPT:
-                return shiftBreakService.getNumberOfBreakInterrupt(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
-            case ESCALATED_SHIFTS:
-            case ESCALATION_RESOLVED_SHIFTS:
-                return shiftEscalationService.getEscalatedShiftsOrResolvedShifts(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
-//            case STAFF_AGE:
-//                return getStaffAgeData(staffId, kpiCalculationRelatedInfo);
-//            case SUM_OF_CHILDREN:
-//                return getChildrenCount(staffId, kpiCalculationRelatedInfo);
-//            case WORKED_ON_PUBLIC_HOLIDAY:
-//                return kpiCalculationHelperService.getWorkedOnPublicHolidayCount(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
-            case PRESENCE_OVER_STAFFING:
-            case PRESENCE_UNDER_STAFFING:
-            case ABSENCE_OVER_STAFFING:
-            case ABSENCE_UNDER_STAFFING:
-                return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
-//            case CARE_BUBBLE:
-//                return kpiCalculationHelperService.calculateCareBubble(kpiCalculationRelatedInfo, dateTimeInterval, staffId);
-//            case TOTAL_WEEKLY_HOURS:
-//                return weeklyEmploymentHoursKPIService.getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo);
-            case STAFF_SKILLS_COUNT:
-                return skillKPIService.getCountOfSkillOfStaffIdOnSelectedDate(staffId, asLocalDate(kpiCalculationRelatedInfo.getStartDate()), asLocalDate(kpiCalculationRelatedInfo.getEndDate()), kpiCalculationRelatedInfo);
-//            case PAY_LEVEL_GRADE:
-//                return payLevelKPIService.getPayLevelGradeOfMainEmploymentOfStaff(staffId, kpiCalculationRelatedInfo);
-            case TODO_STATUS:
-                return  timeBankOffKPI.getCountAndHoursAndPercentageOfTODOS(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
-            case ABSENCE_REQUEST:
             default:
                 return counterServiceMapping.getKpiServiceMap(kpiCalculationRelatedInfo.getCalculationType()).get(staffId,dateTimeInterval,kpiCalculationRelatedInfo,null);
         }
@@ -772,6 +731,7 @@ public class KPIBuilderCalculationService implements CounterService {
             getTodoDetails();
             getDailyTimeBankEntryByDate();
             getActivityTodoList();
+            updateActivityIdMap();
             getTimeTypeTodoList();
             updateActivityAndTimeTypeAndPlannedTimeMap();
             planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
@@ -785,26 +745,32 @@ public class KPIBuilderCalculationService implements CounterService {
             }
         }
 
+
         public void getTimeTypeTodoList(){
-            if (CollectionUtils.containsAny(yAxisConfigs,newHashSet(YAxisConfig.PLANNING_QUALITY_LEVEL,ABSENCE_REQUEST,YAxisConfig.TIME_TYPE))) {
-                todoDTOS = todoService.getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            if (CollectionUtils.containsAny(yAxisConfigs,newHashSet(YAxisConfig.TIME_TYPE))) {
+                getUpdateTodoStatus();
                 if(filterBasedCriteria.containsKey(DAYS_OF_WEEK)){
                     todoDTOS=todoDTOS.stream().filter(todoDTO -> daysOfWeeks.contains(asLocalDate(todoDTO.getRequestedOn()).getDayOfWeek())).collect(Collectors.toList());
                 }
-                staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
                 getTimeTypeIdTodoMap();
+                staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
             }
 
         }
 
         private void getTimeTypeIdTodoMap() {
-            Set<BigInteger> timeTypeIds =isCollectionNotEmpty(filterBasedCriteria.get(TIME_TYPE))?getBigIntegerSet(filterBasedCriteria.get(TIME_TYPE)):new HashSet<>();
-            Set<BigInteger> lowerLevelTimeTypeIds =timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(),timeTypeIds).keySet();
-            List<Activity> activities = activityMongoRepository.findAllByUnitIdAndTimeTypeIds(unitId,lowerLevelTimeTypeIds);
-            Set<BigInteger> activityIds =activities.stream().map(Activity::getId).collect(Collectors.toSet());
+            Set<BigInteger> activityIds =activityMap.keySet();
             if(isCollectionNotEmpty(todoDTOS)) {
                 todoDTOS = todoDTOS.stream().filter(todoDTO -> activityIds.contains(todoDTO.getSubEntityId())).collect(Collectors.toList());
                 timeTypeTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
+            }
+        }
+        private void updateActivityIdMap(){
+            if(CollectionUtils.containsAny(yAxisConfigs,newHashSet(YAxisConfig.TIME_TYPE))) {
+                Set<BigInteger> timeTypeIds = isCollectionNotEmpty(filterBasedCriteria.get(TIME_TYPE)) ? getBigIntegerSet(filterBasedCriteria.get(TIME_TYPE)) : new HashSet<>();
+                Set<BigInteger> lowerLevelTimeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), timeTypeIds).keySet();
+                List<Activity> activities = activityMongoRepository.findAllByUnitIdAndTimeTypeIds(unitId, lowerLevelTimeTypeIds);
+                activityMap = activities.stream().collect(Collectors.toMap(Activity::getId, v -> v));
             }
         }
 
@@ -813,7 +779,11 @@ public class KPIBuilderCalculationService implements CounterService {
             if(isNotNull(staffId)){
                 todoDTOS=staffIdAndTodoMap.get(staffId);
             }
-            getTimeTypeIdTodoMap();
+            if(isCollectionNotEmpty(todoDTOS)) {
+                timeTypeTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
+            }else {
+                timeTypeTodoListMap = new HashMap<>();
+            }
         }
 
 
@@ -955,7 +925,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
         public void getTodoDetails() {
             if (CollectionUtils.containsAny(yAxisConfigs,newHashSet(YAxisConfig.PLANNING_QUALITY_LEVEL,ABSENCE_REQUEST,YAxisConfig.ACTIVITY))) {
-                todoDTOS = todoService.getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+                getUpdateTodoStatus();
                 if(filterBasedCriteria.containsKey(DAYS_OF_WEEK)){
                     todoDTOS=todoDTOS.stream().filter(todoDTO -> daysOfWeeks.contains(asLocalDate(todoDTO.getRequestedOn()).getDayOfWeek())).collect(Collectors.toList());
                 }
@@ -965,6 +935,19 @@ public class KPIBuilderCalculationService implements CounterService {
                 }
                 staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
                 activityIdAndTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
+            }
+        }
+
+        private void getUpdateTodoStatus() {
+            if(filterBasedCriteria.containsKey(ACTIVITY_STATUS)&& !XAxisConfig.PERCENTAGE.equals(xAxisConfigs.get(0))&&filterBasedCriteria.getOrDefault(ACTIVITY_STATUS,new ArrayList()).size()<2) {
+                todoDTOS = todoService.getAllTodoByDateTimeIntervalAndApproveStatus(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),filterBasedCriteria.get(ACTIVITY_STATUS).get(0));
+            }else if(filterBasedCriteria.getOrDefault(ACTIVITY_STATUS,new ArrayList()).size()>1 && !XAxisConfig.PERCENTAGE.equals(xAxisConfigs.get(0))){
+                todoDTOS =todoService.getAllTodoByDateTimeIntervalAndStatus(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            }else if(!filterBasedCriteria.containsKey(ACTIVITY_STATUS)&& !XAxisConfig.PERCENTAGE.equals(xAxisConfigs.get(0))){
+                todoDTOS =todoService.getAllTodoByDateTimeIntervalAndStatus(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            }
+            else{
+                todoDTOS=todoService.getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
             }
         }
 
