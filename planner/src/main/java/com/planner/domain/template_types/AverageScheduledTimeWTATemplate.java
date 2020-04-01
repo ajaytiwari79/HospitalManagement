@@ -9,9 +9,9 @@ import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
 import com.kairos.enums.wta.WTATemplateType;
-
+import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanning.domain.wta.WTABaseRuleTemplate;
-import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,10 +24,8 @@ import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import static com.kairos.constants.AppConstants.*;
-import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
-import static com.kairos.service.shift.ShiftValidatorService.throwException;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
+import static com.kairos.commons.utils.CommonsExceptionUtil.throwException;
+import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -62,31 +60,27 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    @Override
-    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
+    public void validateRules(Unit unit, ShiftImp shiftImp,List<ShiftImp> shiftImps) {
         if(!isDisabled()) {
             if (intervalLength == 0l || StringUtils.isEmpty(intervalUnit)) {
                 throwException("message.ruleTemplate.interval.notNull");
             }
-            if (isValidForPhase(infoWrapper.getPhaseId(), this.phaseTemplateValues) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds()) && CollectionUtils.containsAny(plannedTimeIds,infoWrapper.getShift().getActivitiesPlannedTimeIds())) {
+            if (isValidForPhase(unit.getPhase().getId(), this.phaseTemplateValues) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds()) && CollectionUtils.containsAny(plannedTimeIds,infoWrapper.getShift().getActivitiesPlannedTimeIds())) {
                 DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-                infoWrapper.getShifts().add(infoWrapper.getShift());
-                List<ShiftWithActivityDTO> shifts = getShiftsByInterval(interval, infoWrapper.getShifts(), null);
-                shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
+                shiftImps.add(shiftImp);
+                List<ShiftImp> shifts = getShiftsByInterval(interval, shiftImps, null);
+                shifts = filterShiftsByPlannedTypeAndTimeTypeIds(shiftImps, timeTypeIds, plannedTimeIds);
                 List<DateTimeInterval> intervals = getIntervals(interval);
-                Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
+                Integer[] limitAndCounter = getValueByPhaseAndCounter(unit, phaseTemplateValues, this);
                 for (DateTimeInterval dateTimeInterval : intervals) {
                     int totalMin = 0;
-                    for (ShiftWithActivityDTO shift : shifts) {
+                    for (ShiftImp shift : shifts) {
                         if (dateTimeInterval.overlaps(shift.getDateTimeInterval())) {
                             totalMin += getValueAccordingShiftLengthAndAverageSetting(shiftLengthAndAverageSetting, shift);
                         }
                     }
-                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin/(int)intervalLength);
-                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS.toValue(),getHoursByMinutes(limitAndCounter[0],this.name));
-                    if(!isValid){
-                        break;
-                    }
+                    int penality = isValid(minMaxSetting, limitAndCounter[0], totalMin/(int)intervalLength);
+
                 }
             }
         }

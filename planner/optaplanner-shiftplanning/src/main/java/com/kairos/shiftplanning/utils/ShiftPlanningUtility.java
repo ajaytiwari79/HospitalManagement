@@ -6,13 +6,11 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
-import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
@@ -37,6 +35,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -58,12 +57,14 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.kairos.commons.utils.CommonsExceptionUtil.throwException;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.constants.CommonConstants.CAMELCASE_DAYS;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ShiftPlanningUtility {
@@ -137,7 +138,52 @@ public class ShiftPlanningUtility {
         }
         Integer availableCounter = 0;
         return new Integer[]{availableCounter,totalCounterValue};
+    }
 
+    public static List<ShiftImp> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftImp> shifts, TimeInterval timeInterval) {
+        List<ShiftImp> updatedShifts = new ArrayList<>();
+        shifts.forEach(s -> {
+            if (dateTimeInterval.containsAndEqualsEndDate(s.getStart().toDate()) && (timeInterval == null || timeInterval.contains(s.getStart().getMinuteOfDay()))) {
+                updatedShifts.add(s);
+            }
+        });
+        return updatedShifts;
+    }
+
+    public static DateTimeInterval getIntervalByRuleTemplate(ShiftWithActivityDTO shift, String intervalUnit, long intervalValue) {
+        DateTimeInterval interval = null;
+        if (intervalValue == 0 || StringUtils.isEmpty(intervalUnit)) {
+            throwException(MESSAGE_RULETEMPLATE_INTERVAL_NOTNULL);
+        }
+        switch (intervalUnit) {
+            case CAMELCASE_DAYS:
+                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
+                break;
+            case WEEKS:
+                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
+                break;
+            case MONTHS:
+                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
+                break;
+            case YEARS:
+                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
+                break;
+            default:
+                break;
+        }
+        return interval;
+    }
+
+    public static List<ShiftImp> filterShiftsByPlannedTypeAndTimeTypeIds(List<ShiftImp> shifts, Set<BigInteger> timeTypeIds, Set<BigInteger> plannedTimeIds) {
+        List<ShiftImp> shiftImps = new ArrayList<>();
+        shifts.forEach(shift -> {
+            boolean isValidShift = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds())) && (CollectionUtils.isNotEmpty(plannedTimeIds) && CollectionUtils.containsAny(plannedTimeIds, shift.getActivitiesPlannedTimeIds()));
+            if (isValidShift) {
+                shiftImps.add(shift);
+            }
+
+        });
+        return shiftImps;
     }
 
     public static boolean isValidForDay(List<Long> dayTypeIds, Unit unit,DateTime shiftDate) {
@@ -163,7 +209,7 @@ public class ShiftPlanningUtility {
         return returnValue;
     }
 
-    public static TimeInterval getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
+    public static TimeInterval getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftImp shift) {
         TimeInterval timeInterval = null;
         for (PartOfDay partOfDay : partOfDays) {
             if (timeSlotWrapperMap.containsKey(partOfDay.getValue())) {
@@ -172,7 +218,7 @@ public class ShiftPlanningUtility {
                     int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
                     int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
                     TimeInterval interval = new TimeInterval(startMinutesOfInterval, endMinutesOfInterval);
-                    int minuteOfTheDay = DateUtils.asZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
+                    int minuteOfTheDay = shift.getStart().getMinuteOfDay();
                     if (minuteOfTheDay == (int) interval.getStartFrom() || interval.contains(minuteOfTheDay)) {
                         timeInterval = interval;
                         break;

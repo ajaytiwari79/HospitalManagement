@@ -3,9 +3,6 @@ package com.planner.domain.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.TimeInterval;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.enums.DurationType;
-import com.kairos.enums.shift.ShiftOperationType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
@@ -13,7 +10,6 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanning.domain.wta.WTABaseRuleTemplate;
-import com.planner.domain.shift_planning.Shift;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -22,10 +18,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
-import static org.apache.xmlbeans.impl.store.CharUtil.isValid;
+
 
 
 /**
@@ -60,13 +57,11 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     public void validateRules(Unit unit, ShiftImp shiftImp) {
         if (!isDisabled() && isValidForPhase(unit.getPhase().getId(), this.phaseTemplateValues)) {
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, unit.getTimeSlotWrapperMap(), shiftImp);
-            if (timeInterval != null) {
-                boolean isValidShift = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, unit.getShift().getActivitiesTimeTypeIds()));
+            if (isNull(timeInterval)) {
+                boolean isValidShift = isCollectionEmpty(timeTypeIds) || CollectionUtils.containsAny(timeTypeIds, shiftImp.getActivitiesTimeTypeIds());
                 if (isValidShift && isValidForDay(dayTypeIds, unit,shiftImp.getStart())) {
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(unit, phaseTemplateValues, this);
-                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], getValueAccordingShiftLengthAndAverageSetting(shiftLengthAndAverageSetting, shiftImp));
-
-
+                    int penality = isValid(minMaxSetting, limitAndCounter[0], getValueAccordingShiftLengthAndAverageSetting(shiftLengthAndAverageSetting, shiftImp));
                 }
             }
         }
