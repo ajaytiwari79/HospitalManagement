@@ -1,6 +1,7 @@
 package com.kairos.shiftplanning.domain.staff;
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
 import com.kairos.shiftplanning.domain.shift.Shift;
@@ -11,6 +12,7 @@ import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.joda.time.DateTime;
@@ -28,6 +30,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @XStreamAlias("Employee")
 public class Employee {
     private static final Logger LOGGER = LoggerFactory.getLogger(Employee.class);
@@ -49,6 +52,8 @@ public class Employee {
     private PaidOutFrequencyEnum paidOutFrequencyEnum;
     private Long employmentTypeId;
     private Long employmentId;
+    private SeniorAndChildCareDays seniorAndChildCareDays;
+    private List<StaffChildDetail> staffChildDetails;
     private Set<Tag> tags;
     private Map<BigInteger,ShiftImp> actualShiftsMap;
     private Set<Team> teams;
@@ -69,8 +74,6 @@ public class Employee {
 
     public String toString() {
         return "E:" + id;
-    }
-    public Employee() {
     }
 
     public Long getEmploymentId() {

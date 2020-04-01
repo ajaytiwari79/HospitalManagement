@@ -56,6 +56,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -65,6 +66,7 @@ import java.util.stream.IntStream;
 import static com.kairos.commons.utils.CommonsExceptionUtil.throwException;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.constants.CommonConstants.*;
+import static com.kairos.shiftplanning.constants.ShiftPlanningMessageConstants.MESSAGE_RULETEMPLATE_INTERVAL_NOTNULL;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ShiftPlanningUtility {
@@ -138,6 +140,18 @@ public class ShiftPlanningUtility {
         }
         Integer availableCounter = 0;
         return new Integer[]{availableCounter,totalCounterValue};
+    }
+
+    public static DateTimeInterval getIntervalByActivity(ShiftImp shiftImp, List<BigInteger> activityIds) {
+        LocalDate shiftDate = shiftImp.getStart().toLocalDate();
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(shiftDate, DateUtils.asDate(shiftDate.plusDays(1)));
+        for (BigInteger activityId : activityIds) {
+            if (activityWrapperMap.containsKey(activityId)) {
+                Activity activity = activityWrapperMap.get(activityId).getActivity();
+                dateTimeInterval = getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(), activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue(),shiftStartDate);
+            }
+        }
+        return dateTimeInterval;
     }
 
     public static List<ShiftImp> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftImp> shifts, TimeInterval timeInterval) {
@@ -529,14 +543,14 @@ public class ShiftPlanningUtility {
 
     }
 
-    public static Interval getPossibleBreakStartInterval(ShiftBreak shiftBreak, ShiftImp shift) {
+    public static DateTimeInterval getPossibleBreakStartInterval(ShiftBreak shiftBreak, ShiftImp shift) {
         switch (shiftBreak.getOrder()) {
             case 1:
-                return new Interval(shift.getStart().plusMinutes(FIRST_BREAK_START_MINUTES), shift.getStart().plusMinutes(FIRST_BREAK_END_MINUTES));
+                return new DateTimeInterval(shift.getStart().plusMinutes(FIRST_BREAK_START_MINUTES), shift.getStart().plusMinutes(FIRST_BREAK_END_MINUTES));
             case 2:
-                return new Interval(shift.getStart().plusMinutes(SECOND_BREAK_START_MINUTES), shift.getStart().plusMinutes(SECOND_BREAK_END_MINUTES));
+                return new DateTimeInterval(shift.getStart().plusMinutes(SECOND_BREAK_START_MINUTES), shift.getStart().plusMinutes(SECOND_BREAK_END_MINUTES));
             case 3:
-                return new Interval(shift.getStart().plusMinutes(THIRD_BREAK_START_MINUTES), shift.getStart().plusMinutes(THIRD_BREAK_END_MINUTES));
+                return new DateTimeInterval(shift.getStart().plusMinutes(THIRD_BREAK_START_MINUTES), shift.getStart().plusMinutes(THIRD_BREAK_END_MINUTES));
             default:
                 break;
         }
@@ -733,7 +747,7 @@ public class ShiftPlanningUtility {
         return activityLineInterval.getActivity().getOrder() * 2 - 1;
     }
 
-    public static boolean intervalConstainsTimeIncludingEnd(Interval interval, DateTime dateTime) {
+    public static boolean intervalConstainsTimeIncludingEnd(DateTimeInterval interval, ZonedDateTime dateTime) {
         return interval.contains(dateTime) || interval.getEnd().isEqual(dateTime);
     }
 

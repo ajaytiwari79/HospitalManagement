@@ -1,6 +1,7 @@
 package com.kairos.shiftplanning.domain.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
@@ -15,7 +16,6 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
-import org.joda.time.*;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
 import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
@@ -24,8 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 
@@ -78,18 +82,18 @@ public class ShiftImp implements Shift{
     public boolean containsActivity(IndirectActivity indirectActivity){
         return availableThisInterval(indirectActivity.getInterval());
     }
-    public boolean overlapsInterval(Interval interval){
+    public boolean overlapsInterval(DateTimeInterval interval){
         return interval!=null && this.getInterval()!=null && this.getInterval().overlaps(interval);
     }
 
     @Override
-    public DateTime getStart() {
-        return startTime!=null?date.toDateTime(startTime):null;
+    public ZonedDateTime getStart() {
+        return startTime!=null?asZoneDateTime(date,startTime):null;
     }
 
     @Override
-    public DateTime getEnd() {
-        return endTime!=null? endTime.isAfter(startTime) ? date.toDateTime(endTime) : date.plusDays(1).toDateTime(endTime) :null;
+    public ZonedDateTime getEnd() {
+        return endTime!=null? endTime.isAfter(startTime) ? asZoneDateTime(date,endTime) : asZoneDateTime(date.plusDays(1),endTime) :null;
     }
     @Override
     public Integer getMinutes(){

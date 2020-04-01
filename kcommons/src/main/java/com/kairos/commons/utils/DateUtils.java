@@ -372,6 +372,11 @@ public  class DateUtils {
                 ZoneId.systemDefault());
     }
 
+    public static ZonedDateTime asZoneDateTime(LocalDate localDate,LocalTime localTime) {
+        return ZonedDateTime.of(localDate,localTime,
+                ZoneId.systemDefault());
+    }
+
     public static Date asDate(ZonedDateTime dateTime) {
         return Date.from(dateTime.toInstant());
     }

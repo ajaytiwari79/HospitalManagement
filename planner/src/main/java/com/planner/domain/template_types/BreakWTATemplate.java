@@ -1,4 +1,4 @@
-33333622333package com.planner.domain.template_types;
+package com.planner.domain.template_types;
 /*
  *Created By Pavan on 25/10/18
  *
@@ -34,11 +34,5 @@ public class BreakWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = WTATemplateType.WTA_FOR_BREAKS_IN_SHIFT;
     }
 
-    @Override
-    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
-        BreakWTATemplate breakWTATemplate = (BreakWTATemplate)wtaBaseRuleTemplate;
-        return (this != breakWTATemplate) && !(breakGapMinutes == breakWTATemplate.breakGapMinutes &&
-                Objects.equals(breakAvailability, breakWTATemplate.breakAvailability));
-    }
 
 }

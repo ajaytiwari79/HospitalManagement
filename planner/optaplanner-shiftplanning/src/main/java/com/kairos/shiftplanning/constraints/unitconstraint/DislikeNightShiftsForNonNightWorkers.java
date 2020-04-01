@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 @Getter
 @Setter
@@ -20,7 +21,7 @@ public class DislikeNightShiftsForNonNightWorkers implements Constraint {
     private int weight;
     private TimeSlot nightTimeSlot;
 
-    private boolean shiftTimeContainsInNightInterval(DateTime shiftTime){
+    private boolean shiftTimeContainsInNightInterval(ZonedDateTime shiftTime){
         return new Interval(shiftTime.withTimeAtStartOfDay().plusHours(nightTimeSlot.getStartHour()).plusMinutes(nightTimeSlot.getStartMinute()),shiftTime.withTimeAtStartOfDay().plusDays(1).plusHours(nightTimeSlot.getStartHour()).plusMinutes(nightTimeSlot.getStartMinute())).contains(shiftTime);
     }
 

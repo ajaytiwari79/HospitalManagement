@@ -25,6 +25,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 import static com.kairos.commons.utils.CommonsExceptionUtil.throwException;
+import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
 
 /**
@@ -65,7 +66,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
             if (intervalLength == 0l || StringUtils.isEmpty(intervalUnit)) {
                 throwException("message.ruleTemplate.interval.notNull");
             }
-            if (isValidForPhase(unit.getPhase().getId(), this.phaseTemplateValues) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds()) && CollectionUtils.containsAny(plannedTimeIds,infoWrapper.getShift().getActivitiesPlannedTimeIds())) {
+            if (isValidForPhase(unit.getPhase().getId(), this.phaseTemplateValues) && CollectionUtils.containsAny(timeTypeIds, shiftImp.getActivitiesTimeTypeIds()) && CollectionUtils.containsAny(plannedTimeIds,shiftImp.getActivitiesPlannedTimeIds())) {
                 DateTimeInterval interval = getIntervalByRuleTemplate(shiftImp, intervalUnit, intervalLength);
                 shiftImps.add(shiftImp);
                 List<ShiftImp> shifts = getShiftsByInterval(interval, shiftImps, null);
@@ -109,18 +110,6 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         intervals.add(new DateTimeInterval(interval.getStart(),nextEnd));
         intervals.add(new DateTimeInterval(nextEnd.minusDays(1),getNextDateOfInterval(nextEnd).minusDays(1)));
         return intervals;
-    }
-
-    @Override
-    public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
-        AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = (AverageScheduledTimeWTATemplate)wtaBaseRuleTemplate;
-        return (this != averageScheduledTimeWTATemplate) && !(intervalLength == averageScheduledTimeWTATemplate.intervalLength &&
-                Float.compare(averageScheduledTimeWTATemplate.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(intervalUnit, averageScheduledTimeWTATemplate.intervalUnit) &&
-                Objects.equals(plannedTimeIds, averageScheduledTimeWTATemplate.plannedTimeIds) &&
-                Objects.equals(timeTypeIds, averageScheduledTimeWTATemplate.timeTypeIds) &&
-                Objects.equals(partOfDays, averageScheduledTimeWTATemplate.partOfDays) &&
-                minMaxSetting == averageScheduledTimeWTATemplate.minMaxSetting && Objects.equals(this.phaseTemplateValues,averageScheduledTimeWTATemplate.phaseTemplateValues));
     }
 
 }

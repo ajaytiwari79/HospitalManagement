@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain.activity;
 
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.shiftplanning.constraints.Constraint;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +46,9 @@ public class Activity {
     private List<Long> expertises;
     private Set<Tag> tags;
     private Long teamId;
+    private LocalDate cutOffStartFrom;
+    private CutOffIntervalUnit cutOffIntervalUnit;
+    private Integer cutOffdayValue;
 
 
 
