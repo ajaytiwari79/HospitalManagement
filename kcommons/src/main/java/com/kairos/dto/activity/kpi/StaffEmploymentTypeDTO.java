@@ -23,6 +23,7 @@ public class StaffEmploymentTypeDTO {
     private String endDate;
     private List<Long> tagIds;
     private Map<FilterType, List> filterBasedCriteria;
+    private boolean includeDataForKPIs;
 
     public StaffEmploymentTypeDTO(List<Long> employmentTypeIds, Long organizationId, String startDate, String endDate) {
         this.employmentTypeIds = employmentTypeIds;
