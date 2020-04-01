@@ -40,7 +40,7 @@ public class ExpertiseNightWorkerSettingService{
     private UserIntegrationService userIntegrationService;
 
     public ExpertiseNightWorkerSettingDTO createExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
-        ExpertiseNightWorkerSetting expertiseNightWorkerSetting = ObjectMapperUtils.copyPropertiesOrCloneByMapper(nightWorkerSettingDTO, ExpertiseNightWorkerSetting.class);
+        ExpertiseNightWorkerSetting expertiseNightWorkerSetting = ObjectMapperUtils.copyPropertiesByMapper(nightWorkerSettingDTO, ExpertiseNightWorkerSetting.class);
         expertiseNightWorkerSettingRepository.save(expertiseNightWorkerSetting);
         nightWorkerSettingDTO.setId(expertiseNightWorkerSetting.getId());
         return nightWorkerSettingDTO;
@@ -53,7 +53,7 @@ public class ExpertiseNightWorkerSettingService{
             expertiseNightWorkerSetting = new ExpertiseNightWorkerSetting(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()),0, DurationType.WEEKS,0,0, XAxisConfig.HOURS,countryId,expertiseId);
         }
         expertiseNightWorkerSetting.setTimeSlot(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()));
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
     }
 
     public ExpertiseNightWorkerSettingDTO updateExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
@@ -117,7 +117,7 @@ public class ExpertiseNightWorkerSettingService{
         Map<Long, ExpertiseNightWorkerSettingDTO> expertiseSettingMap = new HashMap<>();
         expertiseNightWorkerSettings.stream().forEach(expertiseNightWorkerSetting -> {
             expertiseSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),
-                    ObjectMapperUtils.copyPropertiesOrCloneByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class)
+                    ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class)
             );
         });
 
@@ -147,6 +147,6 @@ public class ExpertiseNightWorkerSettingService{
             expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndDeletedFalseAndCountryIdExistsTrue(expertiseId);
         }
         expertiseNightWorkerSetting.setTimeSlot(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()));
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
     }
 }

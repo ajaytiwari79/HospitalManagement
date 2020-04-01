@@ -37,7 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
@@ -70,7 +70,7 @@ public class RequestAbsenceService {
     public List<ShiftWithActivityDTO> createOrUpdateRequestAbsence(RequestAbsenceDTO requestAbsenceDTO){
         Optional<Shift> shiftOptional = shiftMongoRepository.findById(requestAbsenceDTO.getShiftId());
         verifyRequestAbsence(requestAbsenceDTO, shiftOptional);
-        RequestAbsence requestAbsence = copyPropertiesOrCloneByMapper(requestAbsenceDTO,RequestAbsence.class);
+        RequestAbsence requestAbsence = copyPropertiesByMapper(requestAbsenceDTO,RequestAbsence.class);
         Activity activity = activityMongoRepository.findOne(requestAbsence.getActivityId());
         requestAbsence.setActivityName(activity.getName());
         Shift shift = shiftOptional.get();
@@ -207,7 +207,7 @@ public class RequestAbsenceService {
             shiftActivityList = updateShiftActivity(activityWrapper,dateTimeInterval,shiftActivities,shiftActivity);
         }
         shift.setActivities(shiftActivityList);
-        ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shift,ShiftDTO.class);
+        ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftDTO.class);
         shiftDTO.setShiftDate(asLocalDate(shift.getStartDate()));
         return shiftService.updateShift(shiftDTO,false,false,null);
     }
@@ -218,7 +218,7 @@ public class RequestAbsenceService {
         if(shiftActivity.getInterval().overlaps(dateTimeInterval)){
             List<DateTimeInterval> dateTimeIntervals = shiftActivity.getInterval().minusInterval(dateTimeInterval);
             for (DateTimeInterval timeInterval : dateTimeIntervals) {
-                ShiftActivity updatedShiftActivity = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftActivity,ShiftActivity.class);
+                ShiftActivity updatedShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivity,ShiftActivity.class);
                 updatedShiftActivity.setPlannedTimes(new ArrayList<>());
                 updatedShiftActivity.setId(null);
                 updatedShiftActivity.setStartDate(timeInterval.getStartDate());

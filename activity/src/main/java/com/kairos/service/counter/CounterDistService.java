@@ -201,7 +201,7 @@ public class CounterDistService extends MongoBaseService {
             tabKPIConf.setPriority(calculatePriority(level, tabKPIDTO.getKpiValidity(), tabKPIDTO.getLocationType()));
         }
         counterRepository.save(tabKPIConf);
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(tabKPIConf, TabKPIDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(tabKPIConf, TabKPIDTO.class);
 
     }
 

@@ -112,7 +112,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = WTABuilderService.copyRuleTemplatesToDTO(wtaBaseRuleTemplates);
         List<TagDTO> tagDTOS = tagMongoRepository.findAllTagsByIdIn(ruleTemplateCategoryDTO.getTags());
         ruleTemplateCategoryDTO.setTags(null);
-        RuleTemplateCategoryDTO ruleTemplateCatg = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplateCategoryDTO, RuleTemplateCategoryDTO.class);
+        RuleTemplateCategoryDTO ruleTemplateCatg = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplateCategoryDTO, RuleTemplateCategoryDTO.class);
         ruleTemplateCatg.setTags(tagDTOS);
         wtaBaseRuleTemplateDTOS.forEach(wtaBaseRuleTemplateDTO -> wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplateCatg));
         return new RuleTemplateAndCategoryResponseDTO(ruleTemplateCategoryDTO, wtaBaseRuleTemplateDTOS);

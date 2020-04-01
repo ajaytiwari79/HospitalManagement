@@ -262,7 +262,7 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     private void updateChildTimeTypeDetailsBeforeResponse(BigInteger timeTypeId, List<TimeType> timeTypes, List<TimeTypeDTO> parentOfWorkingTimeType, List<TimeTypeDTO> parentOfNonWorkingTimeType, TimeType timeType) {
-        TimeTypeDTO timeTypeDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(timeType, TimeTypeDTO.class);
+        TimeTypeDTO timeTypeDTO = ObjectMapperUtils.copyPropertiesByMapper(timeType, TimeTypeDTO.class);
         timeTypeDTO.setSecondLevelType(timeType.getSecondLevelType());
         if ( timeType.getId().equals(timeTypeId)) {
             timeTypeDTO.setSelected(true);
@@ -325,7 +325,7 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeTypeDTO> lowerLevelTimeTypeDTOS = new ArrayList<>();
         timeTypes.forEach(timeType -> {
             if (timeType.getUpperLevelTimeTypeId().equals(upperlevelTimeTypeId)) {
-                TimeTypeDTO levelTwoTimeTypeDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(timeType, TimeTypeDTO.class);
+                TimeTypeDTO levelTwoTimeTypeDTO = ObjectMapperUtils.copyPropertiesByMapper(timeType, TimeTypeDTO.class);
                 if (timeTypeId != null && timeType.getId().equals(timeTypeId)) {
                     levelTwoTimeTypeDTO.setSelected(true);
                 }
@@ -440,7 +440,7 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public TimeCalculationActivityDTO updateTimeCalculationTabOfTimeType(TimeCalculationActivityDTO timeCalculationActivityDTO, BigInteger timeTypeId) {
-        TimeCalculationActivityTab timeCalculationActivityTab = ObjectMapperUtils.copyPropertiesOrCloneByMapper(timeCalculationActivityDTO, TimeCalculationActivityTab.class);
+        TimeCalculationActivityTab timeCalculationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(timeCalculationActivityDTO, TimeCalculationActivityTab.class);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
@@ -465,7 +465,7 @@ public class TimeTypeService extends MongoBaseService {
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO,BigInteger timeTypeId) {
         activityService.validateActivityTimeRules(rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
-        RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesOrCloneByMapper(rulesActivityDTO, RulesActivityTab.class);
+        RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
@@ -578,7 +578,7 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllByTimeTypeIds(timeTypeIds);
         for (TimeType timeType : timeTypes) {
             if(timeType.isLeafNode()){
-                leafTimeTypes.add(ObjectMapperUtils.copyPropertiesOrCloneByMapper(timeType, TimeTypeDTO.class));
+                leafTimeTypes.add(ObjectMapperUtils.copyPropertiesByMapper(timeType, TimeTypeDTO.class));
             }else{
                 getAllLeafTimeTypeByParentTimeTypeIds(timeType.getChildTimeTypeIds(), leafTimeTypes);
             }
