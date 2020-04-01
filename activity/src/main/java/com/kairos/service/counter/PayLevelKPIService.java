@@ -1,5 +1,6 @@
 package com.kairos.service.counter;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
@@ -16,7 +17,7 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Service
-public class PayLevelKPIService {
+public class PayLevelKPIService implements KPIService{
 
     public double getPayLevelGradeOfMainEmploymentOfStaff(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if(isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())){
@@ -86,4 +87,8 @@ public class PayLevelKPIService {
         return currentEmploymentLine;
     }
 
+    @Override
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+        return getPayLevelGradeOfMainEmploymentOfStaff(staffId, kpiCalculationRelatedInfo);
+    }
 }

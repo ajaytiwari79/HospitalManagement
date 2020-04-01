@@ -231,7 +231,7 @@ public class AbsenceShiftService {
         Phase phase = phaseMapByDate.get(shiftDTOS.get(0).getActivities().get(0).getStartDate());
         if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || !isRuleViolated(shiftWithViolatedInfoDTOS)) {
             shiftService.saveShiftWithActivity(phaseMapByDate, shifts, staffAdditionalInfoDTO);
-            shiftDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shifts, ShiftDTO.class);
+            shiftDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(shifts, ShiftDTO.class);
             shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
             shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS);
             shiftDTOS.forEach(shiftDTO -> shiftWithViolatedInfoDTOS.add(new ShiftWithViolatedInfoDTO(newArrayList(shiftDTO))));

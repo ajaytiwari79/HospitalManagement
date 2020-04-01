@@ -98,11 +98,11 @@ public class UnitPayrollSettingService extends MongoBaseService {
         if (isNull(unitPayrollSetting)) {
             exceptionService.actionNotPermittedException(MESSAGE_PAYROLL_PERIOD_NOT_FOUND);
         }
-        unitPayrollSetting.setAccessGroupsPriority(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(unitPayrollSettingDTO.getAccessGroupsPriority(), PayrollAccessGroups.class));
+        unitPayrollSetting.setAccessGroupsPriority(ObjectMapperUtils.copyCollectionPropertiesByMapper(unitPayrollSettingDTO.getAccessGroupsPriority(), PayrollAccessGroups.class));
         unitPayrollSetting.setPublished(unitPayrollSettingDTO.isPublished());
         if (!unitPayrollSettingDTO.isPublished()) {
-            unitPayrollSetting.setPayrollPeriods(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(unitPayrollSettingDTO.getPayrollPeriods(), PayrollPeriod.class));
-            unitPayrollSetting.setAccessGroupsPriority(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(unitPayrollSettingDTO.getAccessGroupsPriority(), PayrollAccessGroups.class));
+            unitPayrollSetting.setPayrollPeriods(ObjectMapperUtils.copyCollectionPropertiesByMapper(unitPayrollSettingDTO.getPayrollPeriods(), PayrollPeriod.class));
+            unitPayrollSetting.setAccessGroupsPriority(ObjectMapperUtils.copyCollectionPropertiesByMapper(unitPayrollSettingDTO.getAccessGroupsPriority(), PayrollAccessGroups.class));
         } else {
             unitPayrollSetting.setPayrollPeriods(validatePayrollPeriod(unitPayrollSettingDTO.getPayrollPeriods(), unitPayrollSetting.getPayrollPeriods()));
             UnitPayrollSetting availableDraftPayroll = unitPayrollSettingMongoRepository.findDraftPayrollPeriodByUnitIdAndPayrollParentIdNotExist(unitPayrollSetting.getId(), unitId, unitPayrollSetting.getPayrollFrequency());
@@ -200,7 +200,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
             newUnitPayrollSetting = getNewDraftStateOfPayroll(unitPayrollSettingDTO, unitPayrollSetting, startDateAndPayrollPeriodMap, unitId);
         }
         unitPayrollSettingMongoRepository.save(newUnitPayrollSetting);
-        List<UnitPayrollSettingDTO> unitPayrollSettingDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(Arrays.asList(newUnitPayrollSetting, unitPayrollSetting), unitPayrollSettingDTO.getClass());
+        List<UnitPayrollSettingDTO> unitPayrollSettingDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(Arrays.asList(newUnitPayrollSetting, unitPayrollSetting), unitPayrollSettingDTO.getClass());
         return getUnitPayrollSettingData(unitPayrollSettingDTOS);
     }
 
@@ -261,7 +261,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
                 startDateAndPayrollPeriodMap.get(payrollPeriodDTO.getStartDate()).setDeadlineDate(payrollPeriodDTO.getDeadlineDate());
                 int daysTillDeadlineDate = (int) ChronoUnit.DAYS.between(payrollPeriodDTO.getEndDate(), payrollPeriodDTO.getDeadlineDate());
                 if (verifyGracePeriodOfAccessGroup(payrollPeriodDTO.getPayrollAccessGroups(), daysTillDeadlineDate, payrollPeriodDTO.getStartDate(), payrollPeriodDTO.getEndDate())) {
-                    startDateAndPayrollPeriodMap.get(payrollPeriodDTO.getStartDate()).setPayrollAccessGroups(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(payrollPeriodDTO.getPayrollAccessGroups(), PayrollAccessGroups.class));
+                    startDateAndPayrollPeriodMap.get(payrollPeriodDTO.getStartDate()).setPayrollAccessGroups(ObjectMapperUtils.copyCollectionPropertiesByMapper(payrollPeriodDTO.getPayrollAccessGroups(), PayrollAccessGroups.class));
                 }
             }
         }

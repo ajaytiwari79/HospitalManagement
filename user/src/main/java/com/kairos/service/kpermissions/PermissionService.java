@@ -46,13 +46,14 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApplicationConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_ID;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_DATANOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_PERMISSION_FIELD;
+
 
 @Service
 public class PermissionService {
@@ -116,7 +117,7 @@ public class PermissionService {
             }
 
         });
-        kPermissionModels.addAll(copyPropertiesOfCollectionByMapper(newModelDTO, KPermissionModel.class));
+        kPermissionModels.addAll(copyCollectionPropertiesByMapper(newModelDTO, KPermissionModel.class));
         return kPermissionModels;
     }
 
@@ -596,18 +597,4 @@ public class PermissionService {
         return new FieldPermissionUserData(modelDTOS,currentUserStaffId);
     }
 
-
-    private <T> Set<String> getModelNames(List<T> objects) {
-        return objects.stream().map(model->{
-            if(model.getClass().isAnnotationPresent(com.kairos.annotations.KPermissionModel.class)) {
-                return model.getClass().getSimpleName();
-            }else if(model.getClass().isAnnotationPresent(PermissionClass.class)){
-                PermissionClass permissionClass = model.getClass().getAnnotation(PermissionClass.class);
-                return permissionClass.name();
-            }else if(model.getClass().isAnnotationPresent(KPermissionRelatedModel.class)){
-                //return getRelationShipModelPermissionModelName(model.getClass());
-            }
-            return "";
-        }).collect(Collectors.toSet());
-    }
 }

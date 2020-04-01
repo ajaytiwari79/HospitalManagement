@@ -20,7 +20,7 @@ import static com.kairos.enums.kpi.CalculationType.ESCALATED_SHIFTS;
 import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
 
 @Service
-public class ShiftEscalationService {
+public class ShiftEscalationService implements KPIService{
 
     @Inject
     private KPIBuilderCalculationService kpiBuilderCalculationService;
@@ -56,5 +56,10 @@ public class ShiftEscalationService {
                 shift.setEscalationResolved(false);
             }
         }
+    }
+
+    @Override
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+        return getEscalatedShiftsOrResolvedShifts(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
     }
 }

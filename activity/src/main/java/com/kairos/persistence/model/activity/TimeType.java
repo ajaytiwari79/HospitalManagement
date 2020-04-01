@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.enums.PriorityFor.PRESENCE;
@@ -54,6 +55,7 @@ public class TimeType extends MongoBaseEntity{
     private BigInteger activityPriorityId;
     private PriorityFor priorityFor = PRESENCE;
     private boolean sicknessSettingValid;
+    private Map<String,BigInteger> upperLevelTimeTypeDetails;
 
     public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.timeTypes = timeTypes;

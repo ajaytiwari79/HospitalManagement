@@ -46,7 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_QUESTIONNAIRE_FREQUENCY;
 
@@ -143,7 +143,7 @@ public class NightWorkerService {
             answerResponseDTO.setSubmitted(true);
             answerResponseDTO.setSubmittedOn(staffQuestionnaire.getSubmittedOn());
         }
-        staffQuestionnaire.setQuestionAnswerPair(copyPropertiesOfCollectionByMapper(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
+        staffQuestionnaire.setQuestionAnswerPair(copyCollectionPropertiesByMapper(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
         staffQuestionnaireMongoRepository.save(staffQuestionnaire);
         return answerResponseDTO;
     }
@@ -152,7 +152,7 @@ public class NightWorkerService {
         List<QuestionAnswerDTO> questionnaire = nightWorkerMongoRepository.getNightWorkerQuestions();
         StaffQuestionnaire staffQuestionnaire = new StaffQuestionnaire(
                 prepareNameOfQuestionnaireSet(),
-                copyPropertiesOfCollectionByMapper(questionnaire, QuestionAnswerPair.class));
+                copyCollectionPropertiesByMapper(questionnaire, QuestionAnswerPair.class));
         staffQuestionnaireMongoRepository.save(staffQuestionnaire);
         return staffQuestionnaire;
     }

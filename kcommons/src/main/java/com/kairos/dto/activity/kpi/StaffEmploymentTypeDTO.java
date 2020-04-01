@@ -1,11 +1,14 @@
 package com.kairos.dto.activity.kpi;
 
+import com.kairos.enums.FilterType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,6 +22,7 @@ public class StaffEmploymentTypeDTO {
     private String startDate;
     private String endDate;
     private List<Long> tagIds;
+    private Map<FilterType, List> filterBasedCriteria;
 
     public StaffEmploymentTypeDTO(List<Long> employmentTypeIds, Long organizationId, String startDate, String endDate) {
         this.employmentTypeIds = employmentTypeIds;

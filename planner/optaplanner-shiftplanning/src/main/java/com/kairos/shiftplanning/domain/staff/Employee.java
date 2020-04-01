@@ -51,7 +51,8 @@ public class Employee {
     private Long employmentId;
     private Set<Tag> tags;
     private Map<BigInteger,ShiftImp> actualShiftsMap;
-
+    private Set<Team> teams;
+    private boolean nightWorker;
 
     public Employee(Long id, String name, Set<Skill> skillSet, Long expertiseId, int totalWeeklyMinutes, int workingDaysInWeek, PaidOutFrequencyEnum paidOutFrequencyEnum, Long employmentTypeId) {
         super();

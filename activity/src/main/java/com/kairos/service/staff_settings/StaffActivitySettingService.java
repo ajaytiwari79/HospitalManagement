@@ -2,7 +2,6 @@ package com.kairos.service.staff_settings;
 
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.common.StaffFilterDataDTO;
 import com.kairos.dto.activity.shift.StaffActivityResponse;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
@@ -161,7 +160,7 @@ public class StaffActivitySettingService extends MongoBaseService {
             staffActivitySetting.setUnitId(unitId);
             staffActivitySetting.setStaffId(staffId);
         });
-        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffActivitySettings,StaffActivitySetting.class);
+        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyCollectionPropertiesByMapper(staffActivitySettings,StaffActivitySetting.class);
         save(staffActivitySettingsList);
         return staffActivitySettings;
    }

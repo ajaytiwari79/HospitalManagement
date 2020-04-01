@@ -10,6 +10,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+//Todo Team A
 public class SicknessSetting {
 
 

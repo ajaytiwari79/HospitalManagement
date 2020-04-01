@@ -226,7 +226,7 @@ public class ShiftCopyService extends MongoBaseService {
 
     private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffEmploymentDetails staffEmployment, Date startDate, Date endDate, List<Shift> newShifts,  Map<BigInteger, ActivityWrapper> activityMap, StaffEmploymentUnitDataWrapper dataWrapper, List<ActivityConfiguration> activityConfigurations, PlanningPeriodDTO planningPeriod) {
         if (responseMessages.isEmpty()) {
-            List<ShiftActivity> shiftActivities = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(sourceShift.getActivities(),ShiftActivity.class);
+            List<ShiftActivity> shiftActivities = ObjectMapperUtils.copyCollectionPropertiesByMapper(sourceShift.getActivities(),ShiftActivity.class);
             for (ShiftActivity shiftActivity : shiftActivities) {
                 shiftActivity.setStartDate(asDate(asLocalDate(startDate),asLocalTime(shiftActivity.getStartDate())));
                 shiftActivity.setEndDate(asDate(asLocalDate(endDate),asLocalTime(shiftActivity.getEndDate())));

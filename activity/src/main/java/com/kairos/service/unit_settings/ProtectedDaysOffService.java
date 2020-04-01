@@ -63,7 +63,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
 
     public List<ProtectedDaysOffSettingDTO> getAllProtectedDaysOffByUnitIds(List<Long> unitIds){
         List<ProtectedDaysOffSetting> protectedDaysOffSettings =protectedDaysOffRepository.getAllProtectedDaysOffByUnitIdsAndDeletedFalse(unitIds);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(protectedDaysOffSettings,ProtectedDaysOffSettingDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(protectedDaysOffSettings,ProtectedDaysOffSettingDTO.class);
     }
 
     public Boolean createAutoProtectedDaysOffOfAllUnits(Long countryId){

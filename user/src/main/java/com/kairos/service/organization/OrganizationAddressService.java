@@ -280,7 +280,7 @@ public class OrganizationAddressService {
     public ReasonCodeWrapper getAddressAndReasonCodeOfOrganization(Set<Long> absenceReasonCodeIds, Long unitId) {
         Map<String, Object> contactAddressData = unitGraphRepository.getContactAddressOfParentOrganization(unitId);
         List<ReasonCode> reasonCodes = reasonCodeGraphRepository.findByIds(absenceReasonCodeIds);
-        List<ReasonCodeDTO> reasonCodeDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(reasonCodes, ReasonCodeDTO.class);
+        List<ReasonCodeDTO> reasonCodeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodes, ReasonCodeDTO.class);
         return new ReasonCodeWrapper(reasonCodeDTOS, contactAddressData);
     }
 

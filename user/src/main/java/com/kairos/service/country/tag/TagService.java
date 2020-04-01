@@ -344,7 +344,7 @@ public class TagService {
             orgId = organizationBaseRepository.findParentOrgId(orgId);
         }
         List<TagQueryResult> tagQueryResults = tagGraphRepository.getListOfStaffOrganizationTags(orgId,false,"", masterDataType.toString());
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(tagQueryResults,TagDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(tagQueryResults,TagDTO.class);
     }
 }
 

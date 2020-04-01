@@ -655,7 +655,7 @@ public class EmploymentService {
         com.kairos.dto.activity.shift.StaffEmploymentDetails employmentDetails = null;
         if (employment != null) {
             List<ProtectedDaysOffSetting> protectedDaysOffSettings = expertiseGraphRepository.findProtectedDaysOffSettingByExpertiseId(employment.getExpertise().getId());
-            employment.getExpertise().setProtectedDaysOffSettings(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(protectedDaysOffSettings, com.kairos.dto.activity.shift.ProtectedDaysOffSetting.class));
+            employment.getExpertise().setProtectedDaysOffSettings(ObjectMapperUtils.copyCollectionPropertiesByMapper(protectedDaysOffSettings, com.kairos.dto.activity.shift.ProtectedDaysOffSetting.class));
             employmentDetails = convertEmploymentObject(employment);
             List<EmploymentLinesQueryResult> employmentLinesQueryResults = employmentGraphRepository.findFunctionalHourlyCost(Arrays.asList(employmentId));
             Map<Long, BigDecimal> hourlyCostMap = employmentLinesQueryResults.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
@@ -743,7 +743,7 @@ public class EmploymentService {
         Unit unit = unitGraphRepository.findOne(unitId);
         Long countryId = countryService.getCountryIdByUnitId(unitId);
         List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(unit.getId(), staffIds, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        List<com.kairos.dto.activity.shift.StaffEmploymentDetails> staffAdditionalInfoDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffAdditionalInfoQueryResult, com.kairos.dto.activity.shift.StaffEmploymentDetails.class);
+        List<com.kairos.dto.activity.shift.StaffEmploymentDetails> staffAdditionalInfoDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffAdditionalInfoQueryResult, com.kairos.dto.activity.shift.StaffEmploymentDetails.class);
         List<StaffEmploymentDetails> staffData = employmentGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffIds);
         Map<Long, StaffEmploymentDetails> staffEmploymentDetailsMap = staffData.stream().collect(Collectors.toMap(StaffEmploymentDetails::getStaffId, Function.identity()));
         List<String> invalidStaffs = staffAdditionalInfoQueryResult.stream().filter(staffAdditionalInfoQueryResult1 -> !staffEmploymentDetailsMap.containsKey(staffAdditionalInfoQueryResult1.getId())).map(StaffAdditionalInfoQueryResult::getName).collect(Collectors.toList());
@@ -776,7 +776,7 @@ public class EmploymentService {
             }
         } else {
             List<Map<Object, Object>> employments = (List<Map<Object, Object>>) object;
-            employmentDTOList = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employments, EmploymentDTO.class);
+            employmentDTOList = ObjectMapperUtils.copyCollectionPropertiesByMapper(employments, EmploymentDTO.class);
         }
         return employmentDTOList;
     }
@@ -803,7 +803,7 @@ public class EmploymentService {
     private List<EmploymentQueryResult> setHourlyCostInEmployments(List<EmploymentQueryResult> employments) {
         List<EmploymentLinesQueryResult> hourlyCostPerLine = employmentGraphRepository.findFunctionalHourlyCost(employments.stream().map(employmentQueryResult -> employmentQueryResult.getId()).collect(Collectors.toList()));
         Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
-        employments = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employments, EmploymentQueryResult.class);
+        employments = ObjectMapperUtils.copyCollectionPropertiesByMapper(employments, EmploymentQueryResult.class);
         for (EmploymentQueryResult employmentQueryResult : employments) {
             for (EmploymentLinesQueryResult employmentLine : employmentQueryResult.getEmploymentLines()) {
                 BigDecimal hourlyCost = employmentLine.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);

@@ -209,7 +209,7 @@ public class AssessmentService {
         } else if (assessmentDTO.getEndDate().isBefore(LocalDate.now()) || assessmentDTO.getEndDate().isBefore(assessmentDTO.getStartDate())) {
             exceptionService.invalidRequestException("message.assessment.enter.valid.enddate");
         }
-        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getStartDate(), assessmentDTO.getEndDate(), assessmentDTO.getComment(), ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessmentDTO.getAssigneeList(), com.kairos.persistence.model.embeddables.Staff.class), ObjectMapperUtils.copyPropertiesByMapper(assessmentDTO.getApprover(), com.kairos.persistence.model.embeddables.Staff.class), unitId);
+        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getStartDate(), assessmentDTO.getEndDate(), assessmentDTO.getComment(), ObjectMapperUtils.copyCollectionPropertiesByMapper(assessmentDTO.getAssigneeList(), com.kairos.persistence.model.embeddables.Staff.class), ObjectMapperUtils.copyPropertiesByMapper(assessmentDTO.getApprover(), com.kairos.persistence.model.embeddables.Staff.class), unitId);
         QuestionnaireTemplate questionnaireTemplate;
         switch (templateType) {
             case ASSET_TYPE:
@@ -399,7 +399,7 @@ public class AssessmentService {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "Assessment", assessmentId);
         }
         QuestionnaireTemplate assessmentQuestionnaireTemplate = assessment.getQuestionnaireTemplate();
-        List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessmentQuestionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class);
+        List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections = ObjectMapperUtils.copyCollectionPropertiesByMapper(assessmentQuestionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class);
         if (assessment.isRiskAssessment()) {
             getRiskAssessmentAnswer(assessment, assessmentQuestionnaireSections);
         } else {
@@ -449,19 +449,19 @@ public class AssessmentService {
 
         switch (assetAttributeName) {
             case HOSTING_PROVIDER:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(hostingProviderRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(hostingProviderRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case HOSTING_TYPE:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(hostingTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(hostingTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ASSET_TYPE:
                 return assetTypeService.getAllAssetTypeWithSubAssetTypeAndRisk(unitId);
             case STORAGE_FORMAT:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(storageFormatRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(storageFormatRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case DATA_DISPOSAL:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataDisposalRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(dataDisposalRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case TECHNICAL_SECURITY_MEASURES:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(technicalSecurityMeasureRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(technicalSecurityMeasureRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ORGANIZATION_SECURITY_MEASURES:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(organizationalSecurityMeasureRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationalSecurityMeasureRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             default:
                 return null;
         }
@@ -475,17 +475,17 @@ public class AssessmentService {
 
         switch (processingActivityAttributeName) {
             case RESPONSIBILITY_TYPE:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(responsibilityTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(responsibilityTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case PROCESSING_PURPOSES:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingPurposeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(processingPurposeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case DATA_SOURCES:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataSourceRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(dataSourceRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case TRANSFER_METHOD:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(transferMethodRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(transferMethodRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ACCESSOR_PARTY:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessorPartyRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(accessorPartyRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case PROCESSING_LEGAL_BASIS:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingLegalBasisRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(processingLegalBasisRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             default:
                 return null;
         }
@@ -637,13 +637,13 @@ public class AssessmentService {
         Long staffId = gDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         });
         List<Assessment> assessments = assessmentRepository.getAllAssessmentByUnitIdAndStaffId(unitId, staffId, assessmentStatusList);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessments, AssessmentBasicResponseDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(assessments, AssessmentBasicResponseDTO.class);
     }
 
 
     public List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId) {
         List<Assessment> assessments = assessmentRepository.getAllAssessmentByUnitId(unitId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessments, AssessmentResponseDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(assessments, AssessmentResponseDTO.class);
     }
 
     public AssessmentSchedulingFrequency[] getSchedulingFrequency() {
@@ -781,8 +781,8 @@ public class AssessmentService {
         assessments.forEach(assessment -> {
             AssessmentBasicResponseDTO assessmentBasicResponseDTO = new AssessmentBasicResponseDTO(assessment.getId(), assessment.getName(), assessment.getEndDate(), assessment.getCompletedDate(), assessment.getStartDate(), assessment.getComment(), assessment.getAssessmentStatus(), assessment.getAssessmentLaunchedDate(), assessment.getAssessmentSchedulingFrequency());
             assessmentBasicResponseDTO.setApprover(ObjectMapperUtils.copyPropertiesByMapper(assessment.getApprover(), Staff.class));
-            assessmentBasicResponseDTO.setAssigneeList(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessment.getAssigneeList(), Staff.class));
-            assessmentBasicResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessment.getRisks(), RiskBasicResponseDTO.class));
+            assessmentBasicResponseDTO.setAssigneeList(ObjectMapperUtils.copyCollectionPropertiesByMapper(assessment.getAssigneeList(), Staff.class));
+            assessmentBasicResponseDTO.setRisks(ObjectMapperUtils.copyCollectionPropertiesByMapper(assessment.getRisks(), RiskBasicResponseDTO.class));
             assessmentBasicResponseDTOList.add(assessmentBasicResponseDTO);
         });
         return assessmentBasicResponseDTOList;

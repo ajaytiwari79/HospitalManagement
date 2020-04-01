@@ -812,7 +812,7 @@ public class AccessGroupService {
 
     public ReasonCodeWrapper getAbsenceReasonCodesAndAccessRole(Long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = findUserAccessRole(unitId);
-        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
+        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
 
         return new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO);
     }
@@ -824,7 +824,7 @@ public class AccessGroupService {
 
 
     public List<StaffAccessGroupDTO> getStaffAndAccessGroupsByUnitId(Long unitId, List<Long> accessGroupId) {
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsByUnitId(unitId, accessGroupId), StaffAccessGroupDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsByUnitId(unitId, accessGroupId), StaffAccessGroupDTO.class);
     }
 
     public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId) {
@@ -854,7 +854,7 @@ public class AccessGroupService {
 
     public void linkParentOrganizationAccessGroup(Unit unit, Long parentOrganizationId) {
         List<AccessGroupQueryResult> accessGroupQueryResults = getOrganizationAccessGroups(parentOrganizationId);
-        List<AccessGroup> accessGroupList = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessGroupQueryResults, AccessGroup.class);
+        List<AccessGroup> accessGroupList = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupQueryResults, AccessGroup.class);
         unit.setAccessGroups(accessGroupList);
         accessGroupRepository.saveAll(accessGroupList);
 

@@ -3,6 +3,7 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
@@ -14,47 +15,40 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Service
-public class SkillKPIService {
+public class SkillKPIService implements KPIService{
 
     @Inject
     private KPIBuilderCalculationService kpiBuilderCalculationService;
-    @Inject
-    private UserIntegrationService userIntegrationService;
 
 
 
     public double getCountOfSkillOfStaffIdOnSelectedDate(Long staffId, LocalDate selectedFromDate, LocalDate selectedToDate, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
-        List<StaffPersonalDetail> staffPersonalDetails = userIntegrationService.getAllSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(),kpiCalculationRelatedInfo.getStaffIds());
+        StaffKpiFilterDTO staffKpiFilterDTO = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
         int count=0;
         if(selectedFromDate.equals(selectedToDate)) {
-            count = getCountOfSkillByDay(staffId, selectedFromDate, selectedToDate, count, staffPersonalDetails,kpiCalculationRelatedInfo);
+            count = getCountOfSkillByDay(staffKpiFilterDTO, selectedFromDate, selectedToDate, count, kpiCalculationRelatedInfo);
         }
         else if(!selectedFromDate.equals(selectedToDate)){
-            count =getCountOfSkillByMonth(staffId,staffPersonalDetails,selectedFromDate,selectedToDate);
+            count =getCountOfSkillByMonth(staffKpiFilterDTO,selectedFromDate,selectedToDate);
         }
 
         return count;
     }
 
-    private int getCountOfSkillByDay(Long staffId, LocalDate selectedFromDate, LocalDate selectedToDate, int count, List<StaffPersonalDetail> staffPersonalDetails, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+    private int getCountOfSkillByDay(StaffKpiFilterDTO staffKpiFilterDTO, LocalDate selectedFromDate, LocalDate selectedToDate, int count, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if(ObjectUtils.isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())) {
             selectedFromDate = kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
             selectedToDate = kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
         }
-
-        for(StaffPersonalDetail staffPersonalDetail :staffPersonalDetails){
-            if(staffPersonalDetail.getId().equals(staffId)){
-                count = getSkillCount(selectedFromDate, selectedToDate, count, staffPersonalDetail);
-            }
-        }
-        return count;
+        return getSkillCount(selectedFromDate, selectedToDate, count, staffKpiFilterDTO);
     }
 
-    private int getSkillCount(LocalDate selectedFromDate, LocalDate selectedToDate, int count, StaffPersonalDetail staffPersonalDetail) {
-        for(SkillLevelDTO skillLevelDTO :staffPersonalDetail.getSkills()){
+    private int getSkillCount(LocalDate selectedFromDate, LocalDate selectedToDate, int count, StaffKpiFilterDTO staffKpiFilterDTO) {
+        for(SkillLevelDTO skillLevelDTO :staffKpiFilterDTO.getSkills()){
             DateTimeInterval dateTimeInterval = new DateTimeInterval(skillLevelDTO.getStartDate(),skillLevelDTO.getEndDate());
             if(selectedFromDate.equals(selectedToDate)) {
                 if ((selectedFromDate.isAfter(skillLevelDTO.getStartDate()) || selectedFromDate.equals(skillLevelDTO.getStartDate())) && ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
@@ -78,15 +72,11 @@ public class SkillKPIService {
     }
 
 
-    public int getCountOfSkillByMonth(Long staffId, List<StaffPersonalDetail> staffPersonalDetails,LocalDate selectedFromDate, LocalDate selectedToDate){
+    public int getCountOfSkillByMonth(StaffKpiFilterDTO staffKpiFilterDTO,LocalDate selectedFromDate, LocalDate selectedToDate){
         DateTimeInterval dateTimeIntervalForMonth = new DateTimeInterval(selectedFromDate,selectedToDate);
         int count=0;
-        for(StaffPersonalDetail staffPersonalDetail :staffPersonalDetails) {
-            if (staffPersonalDetail.getId().equals(staffId)) {
-                for (SkillLevelDTO skillLevelDTO : staffPersonalDetail.getSkills()) {
-                    count = getCount(selectedFromDate, dateTimeIntervalForMonth, count, skillLevelDTO);
-                }
-            }
+        for (SkillLevelDTO skillLevelDTO : staffKpiFilterDTO.getSkills()) {
+            count = getCount(selectedFromDate, dateTimeIntervalForMonth, count, skillLevelDTO);
         }
         return count;
     }
@@ -107,4 +97,8 @@ public class SkillKPIService {
         return count;
     }
 
+    @Override
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+        return getCountOfSkillOfStaffIdOnSelectedDate(staffId, asLocalDate(kpiCalculationRelatedInfo.getStartDate()), asLocalDate(kpiCalculationRelatedInfo.getEndDate()), kpiCalculationRelatedInfo);
+    }
 }

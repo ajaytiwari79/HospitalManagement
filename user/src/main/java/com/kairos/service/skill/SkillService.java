@@ -329,7 +329,7 @@ public class SkillService {
 
         Map<String, Object> map = new HashMap<>();
         map.put("skills", skillsResponse);
-        map.put("staffList", ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffList, Map.class));
+        map.put("staffList", ObjectMapperUtils.copyCollectionPropertiesByMapper(staffList, Map.class));
         return map;
     }
 

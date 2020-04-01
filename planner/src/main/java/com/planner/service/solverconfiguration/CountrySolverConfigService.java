@@ -98,7 +98,7 @@ public class CountrySolverConfigService {
                 UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig, UnitSolverConfig.class);
                 unitSolverConfig.setId(null);//Unset Id
                 unitSolverConfig.setUnitId(unitId);
-                List<UnitConstraint> unitConstraints = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(solverConfigConstraints,UnitConstraint.class);
+                List<UnitConstraint> unitConstraints = ObjectMapperUtils.copyCollectionPropertiesByMapper(solverConfigConstraints,UnitConstraint.class);
                 if(isCollectionNotEmpty(unitConstraints)) {
                     constraintsRepository.saveList(unitConstraints);
                 }
@@ -195,7 +195,7 @@ public class CountrySolverConfigService {
     }
 
     public DefaultDataDTO getDefaultData(Long countryId) {
-        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
+        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
         return new DefaultDataDTO()
                 .setOrganizationServicesBuilder(getOrganizationServicesAndItsSubServices(countryId))
                 .setPhaseDTOSBuilder(getAllPhases(countryId)).setTimeTypeEnumSBuilder(newArrayList(PRESENCE,ABSENCE,PAID_BREAK,UNPAID_BREAK))
@@ -235,7 +235,7 @@ public class CountrySolverConfigService {
 
     private List<OrganizationServiceDTO> getOrganizationServicesAndItsSubServices(Long countryId) {
         List<OrganizationServiceQueryResult> organizationServiceQueryResults = userNeo4jRepo.getAllOrganizationServices(countryId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
     }
 
     private List<PhaseDTO> getAllPhases(Long countryId) {

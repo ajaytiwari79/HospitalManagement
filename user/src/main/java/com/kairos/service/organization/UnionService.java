@@ -474,10 +474,10 @@ public class UnionService {
         List<ZipCodeDTO> zipCodes = null;
         List<SectorDTO> sectors = null;
         if (CollectionUtils.isNotEmpty(zipCodesSectors.getZipCodes())) {
-            zipCodes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(zipCodesSectors.getZipCodes(), ZipCodeDTO.class);
+            zipCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(zipCodesSectors.getZipCodes(), ZipCodeDTO.class);
         }
         if (CollectionUtils.isNotEmpty(zipCodesSectors.getSectors())) {
-            sectors = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(zipCodesSectors.getSectors(), SectorDTO.class);
+            sectors = ObjectMapperUtils.copyCollectionPropertiesByMapper(zipCodesSectors.getSectors(), SectorDTO.class);
         }
         UnionGlobalDataDTO globalDataDTO = new UnionGlobalDataDTO(zipCodes, sectors);
 
@@ -495,7 +495,7 @@ public class UnionService {
             UnionDataDTO unionDataDTO = new UnionDataDTO();
             unionDataDTO.setId(unionDataQueryResult.getUnion().getId());
             unionDataDTO.setName(unionDataQueryResult.getUnion().getName());
-            unionDataDTO.setSectors(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(unionDataQueryResult.getSectors(), SectorDTO.class));
+            unionDataDTO.setSectors(ObjectMapperUtils.copyCollectionPropertiesByMapper(unionDataQueryResult.getSectors(), SectorDTO.class));
             List<LocationDTO> locationDTOS = new ArrayList<>();
             List<MunicipalityDTO> municipalitiesUnion;
             if (Optional.ofNullable(unionDataQueryResult.getAddress()).isPresent()) {
@@ -503,7 +503,7 @@ public class UnionService {
                 if (Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()) {
                     contactAddressDTOUnion.setZipCodeId(unionDataQueryResult.getZipCode().getId());
                     contactAddressDTOUnion.setZipCodeValue(unionDataQueryResult.getZipCode().getZipCode());
-                    municipalitiesUnion = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(unionDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
+                    municipalitiesUnion = ObjectMapperUtils.copyCollectionPropertiesByMapper(unionDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
                     updateMunicipalities(municipalitiesUnion, municipalityMap);
                     unionDataDTO.setMunicipalities(municipalitiesUnion);
                 }
@@ -545,7 +545,7 @@ public class UnionService {
                 if (Optional.ofNullable(locationDataQueryResult.getZipCode()).isPresent()) {
                     contactAddressDTO.setZipCodeId(locationDataQueryResult.getZipCode().getId());
                     contactAddressDTO.setZipCodeValue(locationDataQueryResult.getZipCode().getZipCode());
-                    municipalitiesLocation = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(locationDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
+                    municipalitiesLocation = ObjectMapperUtils.copyCollectionPropertiesByMapper(locationDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
                     updateMunicipalities(municipalitiesLocation, municipalityMap);
                 }
                 if (Optional.ofNullable(locationDataQueryResult.getMunicipality()).isPresent()) {

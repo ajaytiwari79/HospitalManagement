@@ -169,7 +169,7 @@ public class SchedulerPanelService extends MongoBaseService {
             dynamicCronScheduler.setCronScheduling(schedulerPanel, timezone);
         }
         //      System.out.println("log-----> "+logger.toString());
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(schedulerPanels, SchedulerPanelDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(schedulerPanels, SchedulerPanelDTO.class);
     }
 
 
@@ -322,7 +322,7 @@ public class SchedulerPanelService extends MongoBaseService {
     public List<SchedulerPanelDTO> getSchedulerPanelByUnitId(long unitId) {
         //List<Map<String, Object>> controlPanels = schedulerPanelRepository.findByUnitId(unitId);
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByUnitIdAndDeletedFalse(unitId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(schedulerPanels, SchedulerPanelDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(schedulerPanels, SchedulerPanelDTO.class);
 
     }
 

@@ -144,7 +144,7 @@ public class GroupService {
         List<GroupDTO> groupDTOS = new ArrayList<>();
         for(Group group : groups){
             GroupDTO groupDTO = getGroupDTOFromGroup(group);
-            List<FilterSelectionDTO> filterSelectionDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(groupDTO.getFiltersData(), FilterSelectionDTO.class);
+            List<FilterSelectionDTO> filterSelectionDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(groupDTO.getFiltersData(), FilterSelectionDTO.class);
             List<Map> staffs = staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value, filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false,null).getStaffList();
             staffIds.addAll(staffs.stream().map(map-> Long.valueOf(map.get("id").toString())).collect(Collectors.toSet()));
             excludedStaffs.addAll(groupDTO.getExcludedStaffs());

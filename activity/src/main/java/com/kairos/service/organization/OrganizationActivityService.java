@@ -420,7 +420,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long unitId) {
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypesAtUnit(unitId);
-        List<DayType> dayTypes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeEmploymentTypeWrapper.getDayTypes(), DayType.class);
+        List<DayType> dayTypes = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypeEmploymentTypeWrapper.getDayTypes(), DayType.class);
         Activity activity = activityMongoRepository.findOne(activityId);
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
         TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());

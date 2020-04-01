@@ -27,7 +27,6 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -36,6 +35,7 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.phase.PhaseService;
@@ -227,12 +227,12 @@ public class StaffingLevelService  {
         Date endDate = getEndOfDay(startDate);
 
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse( startDate, endDate, newArrayList(unitId));
-        List<ShiftDTO>  shiftDTOS = shiftService.updateDraftShiftToShift(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shifts, ShiftDTO.class),userAccessRoleDTO);
+        List<ShiftDTO>  shiftDTOS = shiftService.updateDraftShiftToShift(ObjectMapperUtils.copyCollectionPropertiesByMapper(shifts, ShiftDTO.class),userAccessRoleDTO);
         StaffingLevel staffingLevel=staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(UserContext.getUnitId(),startDate);
         if (isNull(staffingLevel)) {
             staffingLevel = createDefaultStaffingLevel(unitId, startDate);
         }
-        return updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftDTOS,Shift.class), null);
+        return updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftDTOS,Shift.class),null);
 
     }
 
@@ -701,15 +701,8 @@ public class StaffingLevelService  {
         }
     }
 
-    public StaffingLevel updatePresenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel, List<Shift> shifts, Map<Long, List<SkillLevelDTO>> staffSkillsMap) {
-        Map[] activityAndParentActivityMap = getActivityAndParentActivityMap(shifts);
-        Map<BigInteger,BigInteger> childAndParentActivityIdMap = activityAndParentActivityMap[0];
-        Map<BigInteger,Activity> activityMap = activityAndParentActivityMap[1];
-        if(isMapEmpty(staffSkillsMap)) {
-            List<Long> staffIds = shifts.stream().map(shift-> shift.getStaffId()).collect(Collectors.toList());
-            List<StaffPersonalDetail> staffDTOS = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, asLocalDate(staffingLevel.getCurrentDate()), asLocalDate(staffingLevel.getCurrentDate())).getOrDefault(asLocalDate(staffingLevel.getCurrentDate()).toString(),new ArrayList<>());
-            staffSkillsMap = isCollectionNotEmpty(staffDTOS) ? staffDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getSkills())) : new HashMap<>();
-        }
+    public StaffingLevel updatePresenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel, List<Shift> shifts, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        Map<BigInteger,Activity> activityMap = getActivityAndParentActivityMap(shifts);
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
                 Activity activity = activityMap.get(shiftActivity.getActivityId());
@@ -717,32 +710,21 @@ public class StaffingLevelService  {
                     updateAbsenceStaffingLevelAvailableStaffCount(staffingLevel, activity.getId());
                 }else {
                     int durationMinutes = staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes();
-                    updateStaffingLevelInterval(shift.getBreakActivities(),durationMinutes,staffingLevel, shiftActivity, childAndParentActivityIdMap, shift.getStaffId(), staffSkillsMap);
+                    updateStaffingLevelInterval(shift.getBreakActivities(),durationMinutes,staffingLevel, shiftActivity,  shift.getStaffId(), kpiCalculationRelatedInfo);
                 }
             }
         }
         return staffingLevel;
     }
 
-    private Map[] getActivityAndParentActivityMap(List<Shift> shifts){
+    private Map<BigInteger,Activity> getActivityAndParentActivityMap(List<Shift> shifts){
         List<BigInteger> activityIds = shifts.stream().flatMap(shift -> shift.getActivities().stream()).map(ShiftActivity::getActivityId).collect(Collectors.toList());
-        List<Activity> parentActivities = activityMongoRepository.findByChildActivityIds(activityIds);
         List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger,Activity> activityMap = activities.stream().collect(Collectors.toMap(Activity::getId,v->v));
-        Map<BigInteger,BigInteger> childAndParentActivityIdMap = new HashMap<>();
-        for (Shift shift : shifts) {
-            for (ShiftActivity shiftActivity : shift.getActivities()) {
-                for (Activity parentActivity : parentActivities) {
-                    if(parentActivity.getChildActivityIds().contains(shiftActivity.getActivityId())){
-                        childAndParentActivityIdMap.put(shiftActivity.getActivityId(),parentActivity.getId());
-                    }
-                }
-            }
-        }
-        return new Map[]{childAndParentActivityIdMap,activityMap};
+        return activityMap;
     }
 
-    private void updateStaffingLevelInterval(List<ShiftActivity> breakActivities,int durationMinutes,StaffingLevel staffingLevel, ShiftActivity shiftActivity,Map<BigInteger,BigInteger> childAndParentActivityIdMap, Long staffId, Map<Long, List<SkillLevelDTO>> staffSkillsMap) {
+    private void updateStaffingLevelInterval(List<ShiftActivity> breakActivities,int durationMinutes,StaffingLevel staffingLevel, ShiftActivity shiftActivity, Long staffId,KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         for (StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()) {
             Date startDate = getDateByLocalTime(staffingLevel.getCurrentDate(),staffingLevelInterval.getStaffingLevelDuration().getFrom());
             Date endDate = staffingLevelInterval.getStaffingLevelDuration().getFrom().isAfter(staffingLevelInterval.getStaffingLevelDuration().getTo()) ? asDate(asLocalDate(staffingLevel.getCurrentDate()).plusDays(1)) : getDateByLocalTime(staffingLevel.getCurrentDate(),staffingLevelInterval.getStaffingLevelDuration().getTo());
@@ -753,19 +735,18 @@ public class StaffingLevelService  {
                 updateShiftActivityStaffingLevel(durationMinutes, childActivity, staffingLevelInterval, interval,breakActivities);
             }
             staffingLevelInterval.setAvailableNoOfStaff(availableNoOfStaff);
-            if(isCollectionNotEmpty(staffingLevelInterval.getStaffingLevelSkills()) && isMapNotEmpty(staffSkillsMap)){
-                updateStaffingLevelSkills(staffingLevelInterval,staffId, staffSkillsMap,interval,shiftActivity);
+            if(isCollectionNotEmpty(staffingLevelInterval.getStaffingLevelSkills()) && isNotNull(kpiCalculationRelatedInfo) && kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().containsKey(staffId)){
+                List<SkillLevelDTO> skillLevelDTOS = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId).getSkillsByLocalDate(asLocalDate(shiftActivity.getStartDate()));
+                updateStaffingLevelSkills(staffingLevelInterval,staffId, skillLevelDTOS,interval,shiftActivity);
             }
         }
     }
 
-    private void updateStaffingLevelSkills(StaffingLevelInterval staffingLevelInterval, Long staffId, Map<Long, List<SkillLevelDTO>> staffSkillsMap,DateTimeInterval interval,ShiftActivity shiftActivity){
+    private void updateStaffingLevelSkills(StaffingLevelInterval staffingLevelInterval, Long staffId, List<SkillLevelDTO> skillLevelDTOS,DateTimeInterval interval,ShiftActivity shiftActivity){
         for (StaffingLevelSkill staffingLevelSkill : staffingLevelInterval.getStaffingLevelSkills()){
-            if(staffSkillsMap.containsKey(staffId)) {
-                for (SkillLevelDTO staffSkill : staffSkillsMap.get(staffId)) {
-                    if (staffingLevelSkill.getSkillId().equals(staffSkill.getSkillId()) && interval.overlaps(shiftActivity.getInterval())) {
-                        updateAvailableNoOfStaff(staffingLevelSkill, staffSkill);
-                    }
+            for (SkillLevelDTO staffSkill : skillLevelDTOS) {
+                if (staffingLevelSkill.getSkillId().equals(staffSkill.getSkillId()) && interval.overlaps(shiftActivity.getInterval())) {
+                    updateAvailableNoOfStaff(staffingLevelSkill, staffSkill);
                 }
             }
         }

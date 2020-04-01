@@ -92,7 +92,7 @@ public class UnitSettingService{
 
     public boolean createDefaultOpenShiftPhaseSettings(Long unitId, List<Phase> phases) {
         if (!Optional.ofNullable(phases).isPresent()) {
-            phases = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(phaseService.getPhasesByUnit(unitId), Phase.class);
+            phases = ObjectMapperUtils.copyCollectionPropertiesByMapper(phaseService.getPhasesByUnit(unitId), Phase.class);
         }
         List<UnitSettingDTO> openShiftPhaseSettings = unitSettingRepository.getOpenShiftPhaseSettings(unitId);
         if (ObjectUtils.isCollectionEmpty(openShiftPhaseSettings)) {

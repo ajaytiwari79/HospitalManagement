@@ -661,7 +661,7 @@ public class OrganizationService {
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
         OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         organizationMappingDTO.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(unitId, false));
-        organizationMappingDTO.setExpertise(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffRetrievalService.getExpertisesOfUnitByCountryId(countryId, unitId), Expertise.class));
+        organizationMappingDTO.setExpertise(ObjectMapperUtils.copyCollectionPropertiesByMapper(staffRetrievalService.getExpertisesOfUnitByCountryId(countryId, unitId), Expertise.class));
         return organizationMappingDTO;
     }
 
@@ -798,7 +798,7 @@ public class OrganizationService {
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(unitId);
         List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(organizationBaseEntity);
-        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypes,DayTypeDTO.class);
+        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
         return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS, timeSlotDTOS, countryId);
     }
 
@@ -825,7 +825,7 @@ public class OrganizationService {
 
     public List<UnitAndParentOrganizationAndCountryDTO> getParentOrganizationAndCountryIdsOfUnit() {
         List<Map<String, Object>> parentOrganizationAndCountryData = unitGraphRepository.getUnitAndParentOrganizationAndCountryIds();
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(parentOrganizationAndCountryData, UnitAndParentOrganizationAndCountryDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(parentOrganizationAndCountryData, UnitAndParentOrganizationAndCountryDTO.class);
     }
 
     public CTABasicDetailsDTO getCTABasicDetailInfo(Long expertiseId, Long organizationSubTypeId, Long countryId, List<Long> unitIds) {
@@ -921,8 +921,8 @@ public class OrganizationService {
     public SelfRosteringMetaData getPublicHolidaysReasonCodeAndDayTypeUnitId(long unitId) {
         Long countryId = UserContext.getUserDetails().getCountryId();
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
-        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(reasonCodeGraphRepository.findReasonCodeByUnitId(unitId), ReasonCodeDTO.class);
-        return new SelfRosteringMetaData(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeService.getAllDayTypeByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
+        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeGraphRepository.findReasonCodeByUnitId(unitId), ReasonCodeDTO.class);
+        return new SelfRosteringMetaData(ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypeService.getAllDayTypeByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
     }
 
     public boolean isUnit(Long unitId) {

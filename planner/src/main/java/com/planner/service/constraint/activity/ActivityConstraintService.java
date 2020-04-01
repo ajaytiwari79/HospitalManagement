@@ -41,7 +41,7 @@ public class ActivityConstraintService {
     public List<ActivityConstraintDTO> getAllActivityConstraintByActivityId(BigInteger activityId){
         List<ActivityConstraint> activityConstraintList = activityConstraintRepository.findAllByActivityIdAndDeletedFalse( activityId);
         if(isCollectionNotEmpty(activityConstraintList)){
-            return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(activityConstraintList, ActivityConstraintDTO.class);
+            return ObjectMapperUtils.copyCollectionPropertiesByMapper(activityConstraintList, ActivityConstraintDTO.class);
         }else{
            return getActivityConstraints();
         }
@@ -54,7 +54,7 @@ public class ActivityConstraintService {
         List<ActivityConstraintDTO> activityConstraintDTOS = new ArrayList<>();
 
         for(int i = 0; i < ConstraintSubType.values().length; i++) {
-            PlanningSetting planningSetting1 = new PlanningSetting(HARD,2);
+            PlanningSetting planningSetting1 = new PlanningSetting(HARD,2,false);
             ActivityConstraintDTO activityConstraintDTO1 = new ActivityConstraintDTO(planningSetting1,ConstraintSubType.values()[i]);
             activityConstraintDTOS.add(activityConstraintDTO1);
         }

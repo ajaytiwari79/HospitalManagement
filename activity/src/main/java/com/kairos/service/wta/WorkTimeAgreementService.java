@@ -75,7 +75,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.getDate;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
@@ -449,7 +449,7 @@ public class WorkTimeAgreementService{
 
     public CTAWTAAndAccumulatedTimebankWrapper getWTACTAByEmploymentIds(Set<Long> employmentIds) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByUpIds(employmentIds, getDate());
-        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementService.getCTAByEmploymentIds(employmentIds);
         return new CTAWTAAndAccumulatedTimebankWrapper(ctaResponseDTOS, wtaResponseDTOS);
     }
@@ -473,10 +473,10 @@ public class WorkTimeAgreementService{
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         List<WTAQueryResultDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(employmentIds);
         List<WTAQueryResultDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(employmentIds);
-        List<WTAResponseDTO> parentWTA = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(currentWTAList, WTAResponseDTO.class);
+        List<WTAResponseDTO> parentWTA = ObjectMapperUtils.copyCollectionPropertiesByMapper(currentWTAList, WTAResponseDTO.class);
         Map<Long, List<WTAQueryResultDTO>> verionWTAMap = versionsOfWTAs.stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
         parentWTA.forEach(currentWTA -> {
-            List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(verionWTAMap.get(currentWTA.getEmploymentId()), WTAResponseDTO.class);
+            List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyCollectionPropertiesByMapper(verionWTAMap.get(currentWTA.getEmploymentId()), WTAResponseDTO.class);
             ruleTemplateService.assignCategoryToRuleTemplate(countryId, currentWTA.getRuleTemplates());
             if (versionWTAs != null && !versionWTAs.isEmpty()) {
                 currentWTA.setVersions(versionWTAs);
@@ -503,8 +503,8 @@ public class WorkTimeAgreementService{
 
     public List<WTAResponseDTO> getWTAOfEmployment(Long employmentId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
-        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
-        wtaResponseDTOS.addAll(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)), WTAResponseDTO.class));
+        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+        wtaResponseDTOS.addAll(ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)), WTAResponseDTO.class));
         return wtaResponseDTOS;
     }
 
@@ -1089,7 +1089,7 @@ public class WorkTimeAgreementService{
         staffFilterDTO.setNightWorkerDetails(staffIdNightWorkerMap.entrySet().stream().filter(x->filteredStaffIds.contains(x.getKey())).collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue)));
         if(staffFilterDTO.isIncludeWorkTimeAgreement()) {
             List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getAllWTAByEmploymentIds(staffFilterDTO.getMapOfStaffAndEmploymentIds().values().stream().flatMap(employmentIds -> employmentIds.stream()).collect(Collectors.toList()));
-            List<WTAResponseDTO> wtaResponseDTOS = copyPropertiesOfCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+            List<WTAResponseDTO> wtaResponseDTOS = copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
             Map<Long, List<WTAResponseDTO>> employmentIdAndwtaQueryResultDTOSMap = wtaResponseDTOS.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId()));
             staffFilterDTO.setEmploymentIdAndWtaResponseMap(employmentIdAndwtaQueryResultDTOSMap);
         }

@@ -135,7 +135,7 @@ public class CountryCTAService extends MongoBaseService {
      */
     public void buildCTA(Map<PhaseDefaultName, BigInteger> unitPhaseIdsMap, CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, boolean doUpdate, boolean creatingFromCountry, CTABasicDetailsDTO ctaBasicDetailsDTO, Map<BigInteger, PhaseDefaultName> phaseDefaultNameMap) {
         // Get Rule Templates
-        List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(collectiveTimeAgreementDTO.getRuleTemplates(), CTARuleTemplate.class);
+        List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyCollectionPropertiesByMapper(collectiveTimeAgreementDTO.getRuleTemplates(), CTARuleTemplate.class);
         List<BigInteger> ruleTemplateIds = new ArrayList<>();
         if (!ruleTemplates.isEmpty()) {
             ruleTemplates.forEach(ctaRuleTemplate -> {

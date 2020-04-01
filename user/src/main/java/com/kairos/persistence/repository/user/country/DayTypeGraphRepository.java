@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Created by oodles on 9/1/17.
@@ -34,4 +34,7 @@ public interface DayTypeGraphRepository extends Neo4jBaseRepository<DayType,Long
             " WITH count(dayType) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
     Boolean dayTypeExistInCountryByNameOrCode(Long countryId, String name, int code, Long currentDayTypeId);
+
+    @Query("MATCH (organization) where id(organization)={0} with organization MATCH (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region MATCH (region)-[:"+BELONGS_TO+"]->(country:Country)-[:"+ BELONGS_TO +"]-(dt:DayType {isEnabled:true}) where id(c)={0} return dt")
+    List<DayType> getDayTypeByOrganizationById(Long organizationId);
 }

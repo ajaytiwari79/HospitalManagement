@@ -51,7 +51,7 @@ public class PayRollSystemService {
         }
         List<PayRollSystemDTO> payRollSystemDTOList=null;
         try {
-          payRollSystemDTOList = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(payRollSystemList, PayRollSystemDTO.class);
+          payRollSystemDTOList = ObjectMapperUtils.copyCollectionPropertiesByMapper(payRollSystemList, PayRollSystemDTO.class);
         } catch (Exception e) {
             logger.error("Exception occured in Default Payroll creation during bootstart");
         }
