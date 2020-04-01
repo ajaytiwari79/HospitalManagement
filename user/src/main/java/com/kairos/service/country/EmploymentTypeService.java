@@ -304,13 +304,15 @@ public class EmploymentTypeService {
     }
 
     public List<StaffKpiFilterDTO> getStaffByKpiFilter(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
-        Set<String> filterValues = (Set<String>)staffEmploymentTypeDTO.getFilterBasedCriteria().values().stream().flatMap(list -> list.stream()).map(value->value.toString()).collect(Collectors.toSet());
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
         List<StaffKpiFilterQueryResult> staffKpiFilterQueryResult=staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), organizationBaseEntity instanceof Organization,staffEmploymentTypeDTO.getTagIds());
-        updateTagsDetails(filterValues,staffKpiFilterQueryResult);
-        updateHourlyCostDetails(staffKpiFilterQueryResult,filterValues,staffEmploymentTypeDTO.getOrganizationId());
-        updateSkillsDetails(filterValues,staffKpiFilterQueryResult);
-        updateDayTypeDetails(filterValues,staffEmploymentTypeDTO.getOrganizationId(),staffKpiFilterQueryResult);
+        if(staffEmploymentTypeDTO.isIncludeDataForKPIs()){
+            Set<String> filterValues = (Set<String>)staffEmploymentTypeDTO.getFilterBasedCriteria().values().stream().flatMap(list -> list.stream()).map(value->value.toString()).collect(Collectors.toSet());
+            updateTagsDetails(filterValues,staffKpiFilterQueryResult);
+            updateHourlyCostDetails(staffKpiFilterQueryResult,filterValues,staffEmploymentTypeDTO.getOrganizationId());
+            updateSkillsDetails(filterValues,staffKpiFilterQueryResult);
+            updateDayTypeDetails(filterValues,staffEmploymentTypeDTO.getOrganizationId(),staffKpiFilterQueryResult);
+        }
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(staffKpiFilterQueryResult, StaffKpiFilterDTO.class);
     }
 
