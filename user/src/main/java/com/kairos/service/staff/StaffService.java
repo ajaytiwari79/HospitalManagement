@@ -67,15 +67,13 @@ import com.kairos.service.redis.RedisService;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FileUtil;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Lazy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -98,7 +96,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
@@ -167,7 +164,6 @@ public class StaffService {
     @Inject
     private StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
     @Inject
-    @Lazy
     private PasswordEncoder passwordEncoder;
     @Inject
     private RedisService redisService;

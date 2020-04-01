@@ -47,7 +47,6 @@ import java.util.stream.StreamSupport;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApplicationConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_ID;
