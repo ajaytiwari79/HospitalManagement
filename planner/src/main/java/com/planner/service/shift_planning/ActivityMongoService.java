@@ -138,7 +138,7 @@ public class ActivityMongoService {
             activity.setName(activityDTO.getName());
             activity.setOrder(++order);
             activity.setConstraints(getActivityContraints());
-            TimeType timeType=ObjectMapperUtils.copyPropertiesOrCloneByMapper(activityDTO.getTimeType(), TimeType.class);
+            TimeType timeType=ObjectMapperUtils.copyPropertiesByMapper(activityDTO.getTimeType(), TimeType.class);
             timeType.setName(activityDTO.getTimeType().getSecondLevelType().name().toLowerCase());
             activity.setTimeType(timeType);
             activity.setRank(++rank);

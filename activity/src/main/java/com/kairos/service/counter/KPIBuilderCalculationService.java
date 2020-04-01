@@ -82,8 +82,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneByMapper;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.dto.activity.counter.enums.XAxisConfig.*;
@@ -175,7 +175,7 @@ public class KPIBuilderCalculationService implements CounterService {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
-        CalculationType calculationType = ((List<CalculationType>) copyPropertiesOrCloneCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE), CalculationType.class)).get(0);
+        CalculationType calculationType = ((List<CalculationType>) copyCollectionPropertiesByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE), CalculationType.class)).get(0);
         if (!calculationType.equals(TOTAL_MINUTES)) {
             exceptionService.illegalArgumentException(CALCULATION_TYPE_NOT_VALID);
         }
@@ -185,7 +185,7 @@ public class KPIBuilderCalculationService implements CounterService {
         Set<BigInteger> plannedTimeIds = shiftActivityCriteria.getPlannedTimeIds();
         int valuesSumInMinutes = filterShiftActivity.getShiftActivityDTOS().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream()).filter(plannedTime -> plannedTimeIds.contains(plannedTime.getPlannedTimeId())).mapToInt(plannedTime -> (int) plannedTime.getInterval().getMinutes()).sum();
         double total = getHoursByMinutes(valuesSumInMinutes);
-        XAxisConfig calculationUnit = (XAxisConfig) ((List) copyPropertiesOrCloneCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
+        XAxisConfig calculationUnit = (XAxisConfig) ((List) copyCollectionPropertiesByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
         if (PERCENTAGE.equals(calculationUnit)) {
             int sumOfShifts = shiftWithActivityDTOS.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream())).mapToInt(plannedTime -> (int) plannedTime.getInterval().getMinutes()).sum();
             total = sumOfShifts > 0 ? getValueWithDecimalFormat((valuesSumInMinutes * 100.0) / sumOfShifts) : valuesSumInMinutes;
@@ -368,14 +368,14 @@ public class KPIBuilderCalculationService implements CounterService {
     @Override
     public KPIRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getTotalHoursKpiData(filterBasedCriteria, organizationId, kpi, null);
-        XAxisConfig xAxisConfig = (XAxisConfig) ((List) copyPropertiesOrCloneCollectionByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
+        XAxisConfig xAxisConfig = (XAxisConfig) ((List) copyCollectionPropertiesByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), xAxisConfig, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(xAxisConfig.getDisplayValue(), AppConstants.VALUE_FIELD));
     }
 
     @Override
     public KPIRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getTotalHoursKpiData(filterBasedCriteria, organizationId, kpi, applicableKPI);
-        XAxisConfig xAxisConfig = (XAxisConfig) ((List) copyPropertiesOrCloneCollectionByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
+        XAxisConfig xAxisConfig = (XAxisConfig) ((List) copyCollectionPropertiesByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), xAxisConfig, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(xAxisConfig.getDisplayValue(), AppConstants.VALUE_FIELD));
     }
 
@@ -463,7 +463,7 @@ public class KPIBuilderCalculationService implements CounterService {
                     subClusteredBarValue.addAll(clusteredBarChartKpiDataUnits);
                     break;
                 default:
-                    Double count = counterServiceMapping.getKpiServiceMap(copyPropertiesOrCloneByMapper(yAxisConfig, CalculationType.class)).get(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig);
+                    Double count = counterServiceMapping.getKpiServiceMap(copyPropertiesByMapper(yAxisConfig, CalculationType.class)).get(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig);
                     subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, count));
                     break;
             }
@@ -760,13 +760,13 @@ public class KPIBuilderCalculationService implements CounterService {
             this.unitId = unitId;
             this.applicableKPI = applicableKPI;
             this.kpi = kpi;
-            yAxisConfigs = ((List) copyPropertiesOrCloneCollectionByMapper(filterBasedCriteria.get(CALCULATION_BASED_ON), YAxisConfig.class));
+            yAxisConfigs = ((List) copyCollectionPropertiesByMapper(filterBasedCriteria.get(CALCULATION_BASED_ON), YAxisConfig.class));
             isNullOrEmptyThrowException(yAxisConfigs);
-            xAxisConfigs = ((List) copyPropertiesOrCloneCollectionByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class));
+            xAxisConfigs = ((List) copyCollectionPropertiesByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class));
             isNullOrEmptyThrowException(xAxisConfigs);
-            calculationTypes = ((List) copyPropertiesOrCloneCollectionByMapper(filterBasedCriteria.get(CALCULATION_TYPE), CalculationType.class));
-            calculationTypes = isCollectionNotEmpty(calculationTypes) ? calculationTypes : ((List) copyPropertiesOrCloneCollectionByMapper(yAxisConfigs, CalculationType.class));
-            employmentSubTypes = ((List) copyPropertiesOrCloneCollectionByMapper(filterBasedCriteria.get(EMPLOYMENT_SUB_TYPE), EmploymentSubType.class));
+            calculationTypes = ((List) copyCollectionPropertiesByMapper(filterBasedCriteria.get(CALCULATION_TYPE), CalculationType.class));
+            calculationTypes = isCollectionNotEmpty(calculationTypes) ? calculationTypes : ((List) copyCollectionPropertiesByMapper(yAxisConfigs, CalculationType.class));
+            employmentSubTypes = ((List) copyCollectionPropertiesByMapper(filterBasedCriteria.get(EMPLOYMENT_SUB_TYPE), EmploymentSubType.class));
             loadKpiCalculationRelatedInfo(filterBasedCriteria, unitId, applicableKPI);
             employmentIds = staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getEmployment().stream().map(EmploymentWithCtaDetailsDTO::getId)).collect(Collectors.toSet());
             getTodoDetails();
@@ -932,7 +932,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 tagIds = getLongValueSet(filterBasedCriteria.get(TAGS));
                 List<Long> validStaffIds = staffKpiFilterDTOS.stream().filter(staffKpiFilterDTO -> staffKpiFilterDTO.isTagValid(tagIds)).map(staffKpiFilterDTO -> staffKpiFilterDTO.getId()).collect(Collectors.toList());
                 List<Map> shiftsLog = auditLoggingService.getAuditLogOfStaff(validStaffIds, startDate, endDate);
-                List<AuditShiftDTO> auditShiftDTOS = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(shiftsLog, AuditShiftDTO.class);
+                List<AuditShiftDTO> auditShiftDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftsLog, AuditShiftDTO.class);
                 staffAuditLog = auditShiftDTOS.stream().collect(Collectors.groupingBy(auditShiftDTO -> auditShiftDTO.getStaffId()));
             }
         }
@@ -942,7 +942,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 List<String> validKPIS = newArrayList(PRESENCE_UNDER_STAFFING.toString(), PRESENCE_OVER_STAFFING.toString(), ABSENCE_UNDER_STAFFING.toString(), ABSENCE_OVER_STAFFING.toString());
                 if (filterBasedCriteria.containsKey(FilterType.CALCULATION_TYPE) && CollectionUtils.containsAny(validKPIS, filterBasedCriteria.get(FilterType.CALCULATION_TYPE))) {
                     List<Shift> shiftData = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), isCollectionNotEmpty(unitIds) ? unitIds : newArrayList(organizationId));
-                    shifts = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(shiftData, ShiftWithActivityDTO.class);
+                    shifts = ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftData, ShiftWithActivityDTO.class);
                 } else {
                     shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), false);
                     StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);

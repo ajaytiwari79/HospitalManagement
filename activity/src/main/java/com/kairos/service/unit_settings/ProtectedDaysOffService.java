@@ -50,7 +50,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
         }
         protectedDaysOffSetting.setProtectedDaysOffUnitSettings(protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings());
         protectedDaysOffRepository.save(protectedDaysOffSetting);
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(protectedDaysOffSetting,ProtectedDaysOffSettingDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOffSetting,ProtectedDaysOffSettingDTO.class);
     }
 
     public ProtectedDaysOffSettingDTO getProtectedDaysOffByUnitId(Long unitId){
@@ -63,7 +63,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
 
     public List<ProtectedDaysOffSettingDTO> getAllProtectedDaysOffByUnitIds(List<Long> unitIds){
         List<ProtectedDaysOffSetting> protectedDaysOffSettings =protectedDaysOffRepository.getAllProtectedDaysOffByUnitIdsAndDeletedFalse(unitIds);
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(protectedDaysOffSettings,ProtectedDaysOffSettingDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(protectedDaysOffSettings,ProtectedDaysOffSettingDTO.class);
     }
 
     public Boolean createAutoProtectedDaysOffOfAllUnits(Long countryId){

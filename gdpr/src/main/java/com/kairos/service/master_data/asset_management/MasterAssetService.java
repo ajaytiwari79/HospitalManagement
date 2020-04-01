@@ -93,7 +93,7 @@ public class MasterAssetService {
         List<Long> organizationSubServicesIds = masterAssetDto.getOrganizationSubServices().stream().map(SubServiceCategoryDTO::getId).collect(Collectors.toList());
         List<Long> unitIds = gdprToUserIntegrationService.getUnitIdsByOrgSubTypeId(countryId, organizationSubTypeIds, organizationSubServicesIds);
         if(isCollectionNotEmpty(unitIds)) {
-            unitIds.forEach(unitId -> assetService.saveAsset(unitId, ObjectMapperUtils.copyPropertiesOrCloneByMapper(masterAssetDto, AssetDTO.class),true));
+            unitIds.forEach(unitId -> assetService.saveAsset(unitId, ObjectMapperUtils.copyPropertiesByMapper(masterAssetDto, AssetDTO.class),true));
         }
     }
     /**
@@ -104,10 +104,10 @@ public class MasterAssetService {
      * @return
      */
     private void addMetadataOfMasterAsset(MasterAssetDTO masterAssetDto, MasterAsset masterAsset) {
-        masterAsset.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(new ArrayList<>(masterAssetDto.getOrganizationTypes()), OrganizationType.class));
-        masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubTypes()), OrganizationSubType.class));
-        masterAsset.setOrganizationServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(new ArrayList<>(masterAssetDto.getOrganizationServices()), ServiceCategory.class));
-        masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubServices()), SubServiceCategory.class));
+        masterAsset.setOrganizationTypes(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterAssetDto.getOrganizationTypes()), OrganizationType.class));
+        masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubTypes()), OrganizationSubType.class));
+        masterAsset.setOrganizationServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterAssetDto.getOrganizationServices()), ServiceCategory.class));
+        masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubServices()), SubServiceCategory.class));
     }
 
     /**
@@ -271,9 +271,9 @@ public class MasterAssetService {
         });
         MasterAsset masterAsset = new MasterAsset(assetDTO.getName(), assetDTO.getDescription(), countryId, LocalDate.now(), SuggestedDataStatus.PENDING);
         masterAsset.setOrganizationTypes(Arrays.asList(new OrganizationType(orgTypeSubTypeServicesAndSubServicesDTO.getId(), orgTypeSubTypeServicesAndSubServicesDTO.getName())));
-        masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypeDTOS(), OrganizationSubType.class));
-        masterAsset.setOrganizationServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationServices(), ServiceCategory.class));
-        masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubServices(), SubServiceCategory.class));
+        masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyCollectionPropertiesByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypeDTOS(), OrganizationSubType.class));
+        masterAsset.setOrganizationServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationServices(), ServiceCategory.class));
+        masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubServices(), SubServiceCategory.class));
         masterAssetRepository.save(masterAsset);
         assetDTO.setId(masterAsset.getId());
         return assetDTO;

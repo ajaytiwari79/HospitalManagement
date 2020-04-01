@@ -59,7 +59,7 @@ public class UnitSettingService{
         if (!Optional.ofNullable(unitAgeSetting).isPresent()) {
             unitAgeSetting = createDefaultNightWorkerSettings(unitId);
         }
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(unitAgeSetting, UnitAgeSettingDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(unitAgeSetting, UnitAgeSettingDTO.class);
     }
 
     public UnitAgeSettingDTO updateUnitAgeSettings(Long unitId, UnitAgeSettingDTO unitSettingsDTO) {
@@ -92,7 +92,7 @@ public class UnitSettingService{
 
     public boolean createDefaultOpenShiftPhaseSettings(Long unitId, List<Phase> phases) {
         if (!Optional.ofNullable(phases).isPresent()) {
-            phases = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(phaseService.getPhasesByUnit(unitId), Phase.class);
+            phases = ObjectMapperUtils.copyCollectionPropertiesByMapper(phaseService.getPhasesByUnit(unitId), Phase.class);
         }
         List<UnitSettingDTO> openShiftPhaseSettings = unitSettingRepository.getOpenShiftPhaseSettings(unitId);
         if (ObjectUtils.isCollectionEmpty(openShiftPhaseSettings)) {
@@ -128,7 +128,7 @@ public class UnitSettingService{
         if (unitSetting == null) {
             exceptionService.dataNotFoundException(MESSAGE_UNIT_SETTING_NOTFOUND);
         }
-        FlexibleTimeSettings flexibleTimeSettings = ObjectMapperUtils.copyPropertiesOrCloneByMapper(flexibleTimeSettingDTO, FlexibleTimeSettings.class);
+        FlexibleTimeSettings flexibleTimeSettings = ObjectMapperUtils.copyPropertiesByMapper(flexibleTimeSettingDTO, FlexibleTimeSettings.class);
         unitSetting.setUnitId(unitId);
         unitSetting.setFlexibleTimeSettings(flexibleTimeSettings);
         unitSettingRepository.save(unitSetting);
