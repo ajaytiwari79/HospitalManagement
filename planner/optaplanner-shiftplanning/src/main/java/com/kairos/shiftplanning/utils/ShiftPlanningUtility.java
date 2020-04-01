@@ -64,7 +64,7 @@ import java.util.stream.IntStream;
 
 import static com.kairos.commons.utils.CommonsExceptionUtil.throwException;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.constants.CommonConstants.CAMELCASE_DAYS;
+import static com.kairos.constants.CommonConstants.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ShiftPlanningUtility {
@@ -150,23 +150,23 @@ public class ShiftPlanningUtility {
         return updatedShifts;
     }
 
-    public static DateTimeInterval getIntervalByRuleTemplate(ShiftWithActivityDTO shift, String intervalUnit, long intervalValue) {
+    public static DateTimeInterval getIntervalByRuleTemplate(ShiftImp shift, String intervalUnit, long intervalValue) {
         DateTimeInterval interval = null;
         if (intervalValue == 0 || StringUtils.isEmpty(intervalUnit)) {
             throwException(MESSAGE_RULETEMPLATE_INTERVAL_NOTNULL);
         }
         switch (intervalUnit) {
-            case CAMELCASE_DAYS:
-                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
+            case DAYS:
+                interval = new DateTimeInterval(shift.getStart().minusDays((int) intervalValue).withTimeAtStartOfDay().plusDays(1).getMillis(), shift.getStart().plusDays((int) intervalValue).withTimeAtStartOfDay().minusDays(1).plusDays(1).getMillis());
                 break;
             case WEEKS:
-                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
+                interval = new DateTimeInterval(shift.getStart().minusWeeks((int) intervalValue).withTimeAtStartOfDay().plusDays(1).getMillis(), shift.getStart().plusWeeks((int) intervalValue).withTimeAtStartOfDay().minusDays(1).plusDays(1).getMillis());
                 break;
             case MONTHS:
-                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
+                interval = new DateTimeInterval(shift.getStart().minusMonths((int) intervalValue).withTimeAtStartOfDay().plusDays(1).getMillis(), shift.getStart().plusMonths((int) intervalValue).withTimeAtStartOfDay().minusDays(1).plusDays(1).getMillis());
                 break;
             case YEARS:
-                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
+                interval = new DateTimeInterval(shift.getStart().minusYears((int) intervalValue).withTimeAtStartOfDay().plusDays(1).getMillis(), shift.getStart().plusYears((int) intervalValue).withTimeAtStartOfDay().minusDays(1).plusDays(1).getMillis());
                 break;
             default:
                 break;

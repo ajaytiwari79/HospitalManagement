@@ -66,7 +66,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
                 throwException("message.ruleTemplate.interval.notNull");
             }
             if (isValidForPhase(unit.getPhase().getId(), this.phaseTemplateValues) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds()) && CollectionUtils.containsAny(plannedTimeIds,infoWrapper.getShift().getActivitiesPlannedTimeIds())) {
-                DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+                DateTimeInterval interval = getIntervalByRuleTemplate(shiftImp, intervalUnit, intervalLength);
                 shiftImps.add(shiftImp);
                 List<ShiftImp> shifts = getShiftsByInterval(interval, shiftImps, null);
                 shifts = filterShiftsByPlannedTypeAndTimeTypeIds(shiftImps, timeTypeIds, plannedTimeIds);
