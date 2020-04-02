@@ -1034,7 +1034,7 @@ public class ClientService {
     }
 
     public ClientContactPersonStructuredData saveContactPerson(Long clientId, ContactPersonDTO contactPersonDTO) {
-        ClientContactPersonStructuredData clientContactPersonStructuredData = ObjectMapperUtils.copyPropertiesOrCloneByMapper(contactPersonDTO,ClientContactPersonStructuredData.class);
+        ClientContactPersonStructuredData clientContactPersonStructuredData = ObjectMapperUtils.copyPropertiesByMapper(contactPersonDTO,ClientContactPersonStructuredData.class);
         try {
             if (Optional.ofNullable(contactPersonDTO.getPrimaryStaffId()).isPresent()) {
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getPrimaryStaffId(), ClientContactPersonRelationship.ContactPersonRelationType.PRIMARY, contactPersonDTO.getHouseHoldMembers());

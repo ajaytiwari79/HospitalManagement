@@ -54,7 +54,7 @@ public class ActivityIntegrationService {
     }
 
     public OrderAndActivityDTO getAllOrderAndActivitiesByUnit(long unitId) {
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/orders_and_activities", null), OrderAndActivityDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/orders_and_activities", null), OrderAndActivityDTO.class);
     }
 
     public void crateDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
@@ -63,17 +63,17 @@ public class ActivityIntegrationService {
     }
 
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypes(long countryId) {
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/activities_with_time_types", null), ActivityWithTimeTypeDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/activities_with_time_types", null), ActivityWithTimeTypeDTO.class);
     }
 
     public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/activities_categories", null), ActivityDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/activities_categories", null), ActivityDTO.class);
     }
 
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypesByUnit(Long unitId, Long countryId) {
         Map<String, Object> countryDetail = new HashMap<>();
         countryDetail.put("countryId", countryId);
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/activities_with_time_types", countryDetail), ActivityWithTimeTypeDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/activities_with_time_types", countryDetail), ActivityWithTimeTypeDTO.class);
     }
 
     public void createDefaultOpenShiftRuleTemplate(OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, long unitId) {
@@ -86,7 +86,7 @@ public class ActivityIntegrationService {
     }
 
     public TableConfiguration getTableSettings(Long unitId, BigInteger tableSettingsId) {
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/table_settings/" + tableSettingsId, null), TableConfiguration.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/table_settings/" + tableSettingsId, null), TableConfiguration.class);
     }
 
     public void createDefaultKPISetting(DefaultKPISettingDTO defaultKPISettingDTO, Long unitId) {

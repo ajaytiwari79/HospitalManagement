@@ -48,7 +48,7 @@ public class ActivityPriorityService {
         if (isNotNull(activityPriority)) {
             exceptionService.actionNotPermittedException("message.activity.priority.same.sequence");
         }
-        activityPriority = ObjectMapperUtils.copyPropertiesOrCloneByMapper(activityPriorityDTO, ActivityPriority.class);
+        activityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriorityDTO, ActivityPriority.class);
         activityPriority.setCountryId(countryId);
         activityPriorityMongoRepository.save(activityPriority);
         activityPriorityDTO.setId(activityPriority.getId());
@@ -59,7 +59,7 @@ public class ActivityPriorityService {
         List<ActivityPriorityDTO> activityPriorityDTOs = activityPriorityMongoRepository.findAllCountryId(countryId);
         List<ActivityPriority> activityPrioritiesOfOrganization = new ArrayList<>(activityPriorityDTOs.size());
         for (ActivityPriorityDTO activityPriorityDTO : activityPriorityDTOs) {
-            ActivityPriority organizationActivityPriority = copyActivityPriorityToOrganization(unitId, ObjectMapperUtils.copyPropertiesOrCloneByMapper(activityPriorityDTO, ActivityPriority.class));
+            ActivityPriority organizationActivityPriority = copyActivityPriorityToOrganization(unitId, ObjectMapperUtils.copyPropertiesByMapper(activityPriorityDTO, ActivityPriority.class));
             activityPrioritiesOfOrganization.add(organizationActivityPriority);
         }
         if (isCollectionNotEmpty(activityPrioritiesOfOrganization)) {
@@ -69,7 +69,7 @@ public class ActivityPriorityService {
     }
 
     private ActivityPriority copyActivityPriorityToOrganization(Long unitId, ActivityPriority activityPriority) {
-        ActivityPriority organizationActivityPriority = ObjectMapperUtils.copyPropertiesOrCloneByMapper(activityPriority, ActivityPriority.class);
+        ActivityPriority organizationActivityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriority, ActivityPriority.class);
         organizationActivityPriority.setId(null);
         organizationActivityPriority.setCountryId(null);
         organizationActivityPriority.setSequence(activityPriority.getSequence());
@@ -106,7 +106,7 @@ public class ActivityPriorityService {
         if (isNotNull(activityPriority)) {
             exceptionService.actionNotPermittedException("message.activity.priority.same.sequence");
         }
-        activityPriority = ObjectMapperUtils.copyPropertiesOrCloneByMapper(activityPriorityDTO, ActivityPriority.class);
+        activityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriorityDTO, ActivityPriority.class);
         activityPriority.setOrganizationId(organizationId);
         activityPriorityMongoRepository.save(activityPriority);
         activityPriorityDTO.setId(activityPriority.getId());
@@ -131,7 +131,7 @@ public class ActivityPriorityService {
         if (activityPriority.getSequence() < activityPriorityDTO.getSequence()) {
             activityPriorityMongoRepository.updateSequenceOfActivityPriorityOnCountry(activityPriorityDTO.getSequence(), activityPriority.getSequence(), countryId);
         }
-        activityPriority = ObjectMapperUtils.copyPropertiesOrCloneByMapper(activityPriorityDTO, ActivityPriority.class);
+        activityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriorityDTO, ActivityPriority.class);
         activityPriority.setCountryId(countryId);
         activityPriorityMongoRepository.save(activityPriority);
         return activityPriorityDTO;
@@ -150,7 +150,7 @@ public class ActivityPriorityService {
         if (activityPriority.getSequence() != activityPriorityDTO.getSequence()) {
             activityPriorityMongoRepository.updateSequenceOfActivityPriorityOnOrganization(activityPriorityDTO.getSequence(), activityPriority.getSequence(), unitId);
         }
-        activityPriority = ObjectMapperUtils.copyPropertiesOrCloneByMapper(activityPriorityDTO, ActivityPriority.class);
+        activityPriority = ObjectMapperUtils.copyPropertiesByMapper(activityPriorityDTO, ActivityPriority.class);
         activityPriority.setOrganizationId(unitId);
         activityPriorityMongoRepository.save(activityPriority);
         activityPriorityDTO.setId(activityPriority.getId());

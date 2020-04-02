@@ -63,14 +63,17 @@ public class AuditLogging {
                     }
                 }
             });
+            diffResult.put("loggingType", getLoggingType(oldEntity, newEntity));
             if(newEntity.getClass().getSimpleName().equals("Shift")){
                 diffResult.put("staffId", newEntity.getClass().getMethod("getStaffId").invoke(newEntity));
                 diffResult.put("management", UserContext.getUserDetails().isManagement());
                 if((Boolean) newEntity.getClass().getMethod("isDraft").invoke(newEntity)){
                     return null;
                 }
+                if((Boolean) oldEntity.getClass().getMethod("isDraft").invoke(oldEntity)){
+                    diffResult.put("loggingType", LoggingType.CREATED);
+                }
             }
-            diffResult.put("loggingType", getLoggingType(oldEntity, newEntity));
             result = diffResult;
             mongoTemplate.save(result, newEntity.getClass().getSimpleName());
             LOGGER.info("test {}", oldEntity);
@@ -140,6 +143,7 @@ public class AuditLogging {
         try {
             id = (T)oldEntity.getClass().getMethod("getId").invoke(oldEntity);
             deleted = (boolean)newEntity.getClass().getMethod("isDeleted").invoke(newEntity);
+
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }

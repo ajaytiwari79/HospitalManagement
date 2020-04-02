@@ -29,7 +29,7 @@ public class ActivityConstraintService {
                 activityConstraint.setPlanningSetting(activityConstraintDTO.getPlanningSetting());
             }
         }else {
-            activityConstraint = ObjectMapperUtils.copyPropertiesOrCloneByMapper(activityConstraintDTO, ActivityConstraint.class);
+            activityConstraint = ObjectMapperUtils.copyPropertiesByMapper(activityConstraintDTO, ActivityConstraint.class);
 
         }
         activityConstraintRepository.saveEntity(activityConstraint);
@@ -41,7 +41,7 @@ public class ActivityConstraintService {
     public List<ActivityConstraintDTO> getAllActivityConstraintByActivityId(BigInteger activityId){
         List<ActivityConstraint> activityConstraintList = activityConstraintRepository.findAllByActivityIdAndDeletedFalse( activityId);
         if(isCollectionNotEmpty(activityConstraintList)){
-            return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(activityConstraintList, ActivityConstraintDTO.class);
+            return ObjectMapperUtils.copyCollectionPropertiesByMapper(activityConstraintList, ActivityConstraintDTO.class);
         }else{
            return getActivityConstraints();
         }
