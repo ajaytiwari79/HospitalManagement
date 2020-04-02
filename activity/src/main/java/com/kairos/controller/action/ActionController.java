@@ -34,6 +34,13 @@ public class ActionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.saveAction(unitId, actionDTO));
     }
 
+    @ApiOperation("Create Default Action")
+    @PostMapping("/action/default")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createDefaultAction(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.createDefaultAction(unitId));
+    }
+
     @ApiOperation("Update Action")
     @PutMapping("/action/{actionId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")

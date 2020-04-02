@@ -17,4 +17,9 @@ public class Action extends MongoBaseEntity {
     private ActionType name;
     private String description;
     private Long unitId;
+
+    public Action(ActionType name, Long unitId){
+        this.name = name;
+        this.unitId = unitId;
+    }
 }

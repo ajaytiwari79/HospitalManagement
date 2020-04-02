@@ -2,6 +2,7 @@ package com.kairos.service.action;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.enums.ActionType;
 import com.kairos.persistence.model.action.Action;
 import com.kairos.persistence.repository.action.ActionRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.constants.ActivityMessagesConstants.ACTION;
@@ -50,5 +52,13 @@ public class ActionService {
         actionRepository.save(action);
         actionDTO.setId(actionId);
         return actionDTO;
+    }
+
+    public List<Action> createDefaultAction(Long unitId) {
+        List<Action> actions = new ArrayList<>();
+        for (ActionType value : ActionType.values()) {
+            actions.add(new Action(value, unitId));
+        }
+        return actionRepository.saveAll(actions);
     }
 }
