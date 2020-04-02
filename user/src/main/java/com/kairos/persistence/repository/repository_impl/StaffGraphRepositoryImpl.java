@@ -218,7 +218,8 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class, query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map>toList());
     }
 
-    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType,Set<T>> filters,final Long unitId,final String today){
+    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType,Set<T>> filters,final Long unitId,final LocalDate localDateToday){
+        String today = DateUtils.formatLocalDate(localDateToday,"dd-MM-yyyy");
 
         Map<String,Object> queryParameters = new HashMap<>();
         queryParameters.put("unitId",unitId);
@@ -234,6 +235,47 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ")
                     .append(" id(user) as userId, ")
                    .append(" collect( distinct employments) as employments ");
+
+
+        if(Optional.ofNullable(filters.get(FilterType.AGE)).isPresent() && filters.get(FilterType.AGE).size()!=0) {
+           Set <Map<String,Number>> customQuerySet = (Set<Map<String, Number>>) filters.get(FilterType.AGE);
+            addComparisonValuesToQuery(query," staff.age ",customQuerySet);
+            /*for(Map<String,Number> c:customQuerySet){
+                for(Map.Entry entry : c.entrySet()){
+                    query.append(" AND ");
+                    query.append("staff.age ");
+                    query.append(entry.getKey()).append(" ").append(entry.getValue());
+                }
+            }*/
+
+        }
+
+        if(Optional.ofNullable(filters.get(FilterType.EMPLOYED_SINCE)).isPresent() && filters.get(FilterType.EMPLOYED_SINCE).size()!=0) {
+            Set <Map<String,String>> customQuerySet = (Set<Map<String, String>>) filters.get(FilterType.EMPLOYED_SINCE);
+            addComparisonValuesToQuery(query," employments.startDate ",customQuerySet);
+           /* for(Map<String,String> c:customQuerySet){
+                for(Map.Entry entry : c.entrySet()){
+                    query.append(" AND ");
+                    query.append("employments.startDate ");
+                    query.append(entry.getKey()).append(" ").append(entry.getValue());
+                }
+            }*/
+
+        }
+
+        /*if(Optional.ofNullable(filters.get(FilterType.ORGANIZATION_EXPERIENCE)).isPresent() && filters.get(FilterType.ORGANIZATION_EXPERIENCE).size()!=0) {
+            Set <Map<String,String>> customQuerySet = (Set<Map<String, String>>) filters.get(FilterType.ORGANIZATION_EXPERIENCE);
+
+            for(Map<String,String> c:customQuerySet){
+                for(Map.Entry entry : c.entrySet()){
+                    query.append(" AND ");
+                    query.append("employments.startDate ");
+                    query.append(entry.getKey()).append(" ").append(localDateToday.p);
+                }
+            }
+
+        }*/
+
 
         if (Optional.ofNullable(filters.get(FilterType.STAFF_STATUS)).isPresent() && filters.get(FilterType.STAFF_STATUS).size()!=0) {
             queryParameters.put("statusNames",filters.get(FilterType.STAFF_STATUS));
@@ -287,7 +329,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         query.append(" WITH staff,employments,user MATCH (staff)-[:BELONGS_TO_TAGS]-(selectedTags:Tag) ");
         returnData.append(" , collect( distinct selectedTags) as tags ");
-        returnData.append(" ORDER BY staff.firstName");
+            returnData.append(" ORDER BY staff.firstName");
         query.append(returnData);
 
         Result staffEmployments =  session.query(query.toString(),queryParameters);
@@ -295,11 +337,22 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
        List<StaffEmploymentWithTag> staffEmploymentWithTags = new ArrayList<>();
         Iterator si = staffEmployments.iterator();
         while (si.hasNext()){
-            staffEmploymentWithTags.add(ObjectMapperUtils.copyPropertiesByMapper(si.next(),StaffEmploymentWithTag.class));
+            staffEmploymentWithTags.add(ObjectMapperUtils.copyPropertiesOrCloneByMapper(si.next(),StaffEmploymentWithTag.class));
         }
         return staffEmploymentWithTags;
     }
 
+    private <T> StringBuilder addComparisonValuesToQuery(StringBuilder query,String propertyToCompare,Set <Map<String,T>> customQuerySet){
+
+        for(Map<String,T> c:customQuerySet){
+            for(Map.Entry entry : c.entrySet()){
+                query.append(" AND ");
+                query.append(propertyToCompare);
+                query.append(entry.getKey()).append(" ").append(entry.getValue());
+            }
+        }
+        return query;
+    }
 
     public <T> List<Long> convertListOfStringIntoLong(Set<T> listOfString) {
         return listOfString.stream().map(list->Long.valueOf(list.toString())).collect(Collectors.toList());

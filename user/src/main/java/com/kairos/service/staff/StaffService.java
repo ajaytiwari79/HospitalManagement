@@ -73,7 +73,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -1005,8 +1004,8 @@ public class StaffService {
     public <T> List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId,StaffFilterDTO staffFilterDetails){
 
         LOGGER.info("filters received are {} ",staffFilterDetails.getFiltersData());
-        LocalDate localDate = LocalDate.now();
-       String dateToday = DateUtils.formatLocalDate(localDate,"dd-MM-yyyy");
+        LocalDate dateToday = LocalDate.now();
+
 
         final Map<FilterType,Set<T>> filterTypeSetMap = staffFilterService.getMapOfFiltersToBeAppliedWithValue(staffFilterDetails.getModuleId(),staffFilterDetails.getFiltersData());
 
@@ -1017,43 +1016,65 @@ public class StaffService {
         return staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap,unitId,dateToday);
     }
 
-   private <T>  Map<FilterType,Set<T>> updateFilterTypeCriteriaListByGroups(final Long unitId,final  Map<FilterType,Set<T>> filterTypeSetMap){
+   private <T>  Map<FilterType,T> updateFilterTypeCriteriaListByGroups(final Long unitId,final  Map<FilterType,T> filterTypeSetMap){
         Set<Long> groupIds = (Set<Long>) filterTypeSetMap.get(FilterType.GROUPS);
         Set<FilterSelection> filterSelections = groupService.getSelectedFilterGroupsOfUnit(unitId,groupIds,false);
         Set<Map<String,Number>> age =null ,organizationExperience=null,timeBankBalance=null,seniorityLevel=null,payGradeLevel=null ;
        Set<Map<String,String>> employedSince=null,birthday=null;
 
         for(FilterSelection filterSelection:filterSelections){
-            if(Optional.ofNullable(filterTypeSetMap.get(filterSelection.getName())).isPresent() ){
-                filterTypeSetMap.get(filterSelection.getName()).add((T) filterSelection.getId());
-            }
-            else if(filterSelection.getName().equals(FilterType.AGE)){
-                age.add(compareBuilder(filterSelection.getValue().get(0)));
-                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) age);
+            if(filterSelection.getName().equals(FilterType.AGE)){
+                if(age==null){
+                    age = new HashSet<>();
+                }
+                age.add(compareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(),(T) age);
             }
             else if(filterSelection.getName().equals(FilterType.EMPLOYED_SINCE)){
-                employedSince.add(compareBuilder(filterSelection.getValue().get(0)));
-                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) employedSince);
+                if(employedSince==null){
+                    employedSince = new HashSet<>();
+                }
+                employedSince.add(dateCompareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(),(T) employedSince);
             }
             else if(filterSelection.getName().equals(FilterType.ORGANIZATION_EXPERIENCE)){
-                organizationExperience.add(compareBuilder(filterSelection.getValue().get(0)));
-                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) organizationExperience);
+                if(organizationExperience==null){
+                    organizationExperience = new HashSet<>();
+                }
+                organizationExperience.add(dateCompareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(),(T) organizationExperience);
             }
             else if(filterSelection.getName().equals(FilterType.TIME_BANK_BALANCE)){
-                timeBankBalance.add(compareBuilder(filterSelection.getValue().get(0)));
-                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) timeBankBalance);
+                if(timeBankBalance==null){
+                    timeBankBalance = new HashSet<>();
+                }
+                timeBankBalance.add(compareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(), (T) timeBankBalance);
             }
             else if(filterSelection.getName().equals(FilterType.SENIORITY)){
-                seniorityLevel.add(compareBuilder(filterSelection.getValue().get(0)));
-                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) seniorityLevel);
+                if(seniorityLevel==null){
+                    seniorityLevel = new HashSet<>();
+                }
+                seniorityLevel.add(compareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(), (T) seniorityLevel);
             }
             else if(filterSelection.getName().equals(FilterType.PAY_GRADE_LEVEL)){
-                payGradeLevel.add(compareBuilder(filterSelection.getValue().get(0)));
-                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) payGradeLevel);
+
+                if(payGradeLevel==null){
+                    payGradeLevel = new HashSet<>();
+                }
+                payGradeLevel.add(compareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(), (T) payGradeLevel);
             }
             else if(filterSelection.getName().equals(FilterType.BIRTHDAY)){
-                birthday.add(compareBuilder(filterSelection.getValue().get(0)));
-                filterTypeSetMap.put(filterSelection.getName(), (Set<T>) birthday);
+                if(birthday==null){
+                    birthday = new HashSet<>();
+                }
+                birthday.add(dateCompareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(), (T) birthday);
+            }
+            else if(Optional.ofNullable(filterTypeSetMap.get(filterSelection.getName())).isPresent() ){
+                ((Set<T>) filterTypeSetMap.get(filterSelection.getName())).add((T) filterSelection.getId());
             }
         }
 
@@ -1061,23 +1082,52 @@ public class StaffService {
     }
 
 
-    private  <T> Map<String,T> compareBuilder(final String comparableData){
+    private  <T> Map<String,T> compareBuilder(final FilterSelection filterSelection){
 
         Map<String,T> customQueryMap= new HashMap<>();
-        JSONObject jsonObject = new JSONObject(comparableData);
 
-        if(jsonObject.get("from")!=null){
-            customQueryMap.put(">", (T) jsonObject.get("from"));
-            customQueryMap.put("<", (T) (jsonObject.get("to") == null ? jsonObject.get("from") :jsonObject.get("to")));
-        }else if(jsonObject.get("moreThan")!=null){
-            customQueryMap.put(">", (T) jsonObject.get("moreThan"));
-        }else if (jsonObject.get("lessThan")!=null){
-            customQueryMap.put("<", (T) jsonObject.get("lessThan"));
+        if(filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.BETWEEN)){
+            customQueryMap.put(">", (T) filterSelection.getGreaterThan());
+            customQueryMap.put("<", (T) filterSelection.getLessThan());
+        }else if(filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.GREATER_THAN)){
+            customQueryMap.put(">", (T)  filterSelection.getGreaterThan());
+        }else if (filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.LESS_THAN)){
+            customQueryMap.put("<", (T) filterSelection.getLessThan());
         }
-
-        LOGGER.debug(" custom query maop prepared is {}",customQueryMap);
+//        customQueryMap.put("durationType",(T) filterSelection.getFilterComparisonDurationType());
+        LOGGER.info(" custom query map prepared is {}",customQueryMap);
         return  customQueryMap;
+    }
 
+    private  <T> Map<String,T> dateCompareBuilder(final FilterSelection filterSelection){
+
+        Map<String,T> customQueryMap = new HashMap<>();
+        LocalDate localDateToday = LocalDate.now();
+        long moreThanDays = staffFilterService.getDataInDays((long)filterSelection.getGreaterThan(),filterSelection.getDurationType());
+        long lessThanDays = staffFilterService.getDataInDays((long)filterSelection.getGreaterThan(),filterSelection.getDurationType());
+
+        LocalDate dateGreaterThan = localDateToday.minusDays(moreThanDays);
+        LocalDate dateLessThan = localDateToday.plusDays(lessThanDays);
+
+        if(filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.BETWEEN)){
+            customQueryMap.put(">", (T) ("DATE("+dateGreaterThan+")"));
+            customQueryMap.put("<", (T)("DATE("+ dateLessThan+")"));
+        }else if(filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.GREATER_THAN)){
+            customQueryMap.put(">", (T) ("DATE("+ dateGreaterThan+")"));
+        }else if (filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.LESS_THAN)){
+            customQueryMap.put("<", (T)  ("DATE("+dateLessThan+")"));
+        }
+//        customQueryMap.put("durationType",(T) filterSelection.getFilterComparisonDurationType());
+        LOGGER.info(" custom query map prepared is {}",customQueryMap);
+        return  customQueryMap;
+    }
+
+
+    private <T> void addDuration(final FilterSelection filterSelection,final T filterCompareValue){
+
+        if(filterCompareValue instanceof Number && filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.DUE_IN)){
+            filterSelection.setGreaterThan((Long)filterSelection.getGreaterThan() + ((Number) filterCompareValue).longValue());
+        }
 
     }
 

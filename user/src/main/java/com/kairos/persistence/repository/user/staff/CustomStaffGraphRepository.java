@@ -20,6 +20,6 @@ public interface CustomStaffGraphRepository {
 
 
                                   Map<FilterType, Set<T>> filters, String searchText, String imagePath,Long loggedInStaffId,LocalDate selectedDate);
-   <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(Map<FilterType,Set<T>> filters, Long unitId, String today);
+   <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(Map<FilterType,Set<T>> filters, Long unitId, LocalDate today);
 
 }

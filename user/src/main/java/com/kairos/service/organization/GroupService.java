@@ -107,8 +107,8 @@ public class GroupService {
         return filterSelectionGraphRepository.findAllByUnitAndDeleted(unitId,isDeleted);
     }
 
-    public Set<FilterSelection> getSelectedFilterGroupsOfUnit(Long unitId,Set<Long> filterGroupIds,boolean isGroupDeleted){
-        Set<FilterSelection> filterSelectionSet = filterSelectionGraphRepository.findAllByUnitAndSelectedGroupsAndDeleted(unitId,filterGroupIds,isGroupDeleted);
+    public Set<FilterSelection> getSelectedFilterGroupsOfUnit(final Long unitId,final Set<Long> filterGroupIds,final boolean isGroupDeleted){
+        Set<FilterSelection> filterSelectionSet = filterSelectionGraphRepository.findAllByUnitIdAndSelectedGroupIdsAndGroupDeleted(unitId,filterGroupIds,isGroupDeleted);
         return filterSelectionSet;
     }
 
@@ -117,7 +117,7 @@ public class GroupService {
         List<FilterSelectionDTO> filterSelectionDTOS = new ArrayList<>();
         for(FilterSelection filterSelection : group.getFiltersData()){
             Set<Object> values = new HashSet<>();
-            filterSelection.getValue().forEach(val-> values.add(ObjectMapperUtils.jsonStringToObject(val,Object.class)));
+//            filterSelection.getValue().forEach(val-> values.add(ObjectMapperUtils.jsonStringToObject(val,Object.class)));
             filterSelectionDTOS.add(new FilterSelectionDTO(filterSelection.getName(), values));
         }
         groupDTO.setFiltersData(filterSelectionDTOS);

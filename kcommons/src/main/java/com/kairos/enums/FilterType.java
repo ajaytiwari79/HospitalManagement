@@ -26,7 +26,6 @@ public enum FilterType {
 
 
     public enum FilterComparisonType{
-        CONTAINS,LESS_THAN,GREATER_THAN,BETWEEN
+        CONTAINS,LESS_THAN,GREATER_THAN,BETWEEN,DUE_IN
     }
-
 }

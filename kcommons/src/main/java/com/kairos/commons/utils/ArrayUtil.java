@@ -56,4 +56,18 @@ public class ArrayUtil {
         }
         return matchedDates;
     }
+
+    // Generic function to convert set to list
+    public static <T> List<T> convertSetToList(Set<T> set)
+    {
+        // create an empty list
+        List<T> list = new ArrayList<>();
+
+        // push each element in the set into the list
+        for (T t : set)
+            list.add(t);
+
+        // return the list
+        return list;
+    }
 }

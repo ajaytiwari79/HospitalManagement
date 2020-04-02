@@ -29,7 +29,6 @@ import com.kairos.persistence.model.organization.services.OrganizationServicesAn
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.filter.*;
-import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -414,17 +413,17 @@ public class StaffFilterService {
         return employmentTypeGraphRepository.getEmploymentTypeByCountryIdForFilters(countryId);
     }
 
-    public <T> Map<FilterType, Set<T>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelectionDTO> filters) {
-        Map<FilterType, Set<T>> mapOfFilters = new HashMap<>();
+    public <T> Map<FilterType, T> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelectionDTO> filters) {
+        Map<FilterType, T> mapOfFilters = new HashMap<>();
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
         LOGGER.info("filter group searched is {}",filterGroup);
         filters.forEach(filterSelection -> {
             if (filterGroup!=null && !filterSelection.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
                     filterSelection.getName())) {
-                mapOfFilters.put(filterSelection.getName(), filterSelection.getValue());
+                mapOfFilters.put(filterSelection.getName(),(T) filterSelection.getValue());
             }else{
-                mapOfFilters.put(filterSelection.getName(), filterSelection.getValue());
+                mapOfFilters.put(filterSelection.getName(), (T) filterSelection.getValue());
             }
         });
         return mapOfFilters;
@@ -610,7 +609,7 @@ public class StaffFilterService {
         return from <= inDays && to >= inDays;
     }
 
-    private long getDataInDays(long value, DurationType durationType){
+    public long getDataInDays(long value, DurationType durationType){
         switch (durationType){
             case YEAR :
                 return Math.round(value *  DAYS_IN_ONE_YEAR);
