@@ -3,9 +3,9 @@ package com.kairos.enums;
 public enum ActionType {
         DELETE_SHIFT,
         COPY_SHIFT,
-        AVAILABILITY,
-        UNAVAILABILITY,
-        Delete_Event,
+        AVAILABILITY_SHIFT,
+        UNAVAILABILITY_SHIFT,
+        DELETE_EVENT,
         DELETE_ACTIVITY,
         COPY_ACTIVITY,
         FIX_ACTIVITY,
