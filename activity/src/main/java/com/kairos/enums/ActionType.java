@@ -1,5 +1,5 @@
 package com.kairos.enums;
 
 public enum ActionType {
-        SHIFT,ACTIVITY,SHIFT_ACTIVITY
+        DELETE_SHIFT,COPY_SHIFT,DELETE_ACTIVITY,COPY_ACTIVITY,I_AM_SICK,I_AM_FINE
 }

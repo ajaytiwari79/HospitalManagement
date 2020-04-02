@@ -37,8 +37,8 @@ public class ActionController {
     @ApiOperation("Update Action")
     @PutMapping("/action/{actionId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateAction(@PathVariable Long unitId, @PathVariable BigInteger actionId, @Validated @RequestBody ActionDTO actionDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.updateAction(unitId, actionId, actionDTO));
+    public ResponseEntity<Map<String, Object>> updateAction(@PathVariable BigInteger actionId, @Validated @RequestBody ActionDTO actionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.updateAction(actionId, actionDTO));
     }
 
     @ApiOperation("Get Action")

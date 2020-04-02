@@ -1,5 +1,6 @@
 package com.kairos.service.action;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.action.Action;
 import com.kairos.persistence.repository.action.ActionRepository;
@@ -11,7 +12,9 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.constants.ActivityMessagesConstants.ACTION;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_DATANOTFOUND;
+import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 
 /**
  * Created By G.P.Ranjan on 2/4/20
@@ -32,10 +35,7 @@ public class ActionService {
     }
 
     public ActionDTO getAction(BigInteger actionId){
-        Action action = actionRepository.findOne(actionId);
-        if(isNull(action)){
-            exceptionService.dataNotFoundByIdException("Action Not Found");
-        }
+        Action action = actionRepository.findById(actionId).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_DATANOTFOUND,ACTION,actionId)));
         return ObjectMapperUtils.copyPropertiesByMapper(action, ActionDTO.class);
     }
 
@@ -43,11 +43,8 @@ public class ActionService {
         return actionRepository.getAllByUnitId(unitId);
     }
 
-    public ActionDTO updateAction(Long unitId, BigInteger actionId, ActionDTO actionDTO) {
-        Action action = actionRepository.findOne(actionId);
-        if(isNull(action) || unitId != action.getUnitId()){
-            exceptionService.actionNotPermittedException("Invalid Action Id");
-        }
+    public ActionDTO updateAction(BigInteger actionId, ActionDTO actionDTO) {
+        Action action = actionRepository.findById(actionId).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_DATANOTFOUND,ACTION,actionId)));
         action.setName(actionDTO.getName());
         action.setDescription(actionDTO.getDescription());
         actionRepository.save(action);
