@@ -135,7 +135,6 @@ public class TimeBankOffKPIService implements KPIService{
         return statusPercentage;
     }
 
-
     @Override
     public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
         return getCountAndHoursAndPercentageOfTODOS(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
