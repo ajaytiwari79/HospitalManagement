@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<changelog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:noNamespaceSchemaLocation="http://www.liquigraph.org/schema/1.0/liquigraph.xsd">
-  <!--  <import resource="scripts/DateWiseSampleChangeLog.xml" />-->
+<changelog >
+<!--  <import resource="scripts/DateWiseSampleChangeLog.xml" />-->
 </changelog>
+
+
+        <!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<changelog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
+           <!--xsi:noNamespaceSchemaLocation="http://www.liquigraph.org/schema/1.0/liquigraph.xsd">-->
+<!--&lt;!&ndash;  <import resource="scripts/DateWiseSampleChangeLog.xml" />&ndash;&gt;-->
+<!--</changelog>-->
