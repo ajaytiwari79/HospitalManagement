@@ -937,8 +937,8 @@ public class UserIntegrationService {
 //        return genericRestClient.publishRequest(employmentIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_total_sum_of_paylevel", queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
 //    }
 
-    public <T> FieldPermissionUserData getModels(List<T> objects){
-       return genericRestClient.publishRequest(objects, null, RestClientUrlType.UNIT, HttpMethod.POST, "fetch_permissions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<FieldPermissionUserData>>() {
+    public <T> FieldPermissionUserData getModels(Set<String> objects){
+       return genericRestClient.publishRequest(objects, null, RestClientUrlType.UNIT, HttpMethod.POST, "/fetch_permissions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<FieldPermissionUserData>>() {
         });
     }
 }

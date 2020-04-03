@@ -44,7 +44,8 @@ public class PermissionService {
             if(UserContext.getUserDetails().isHubMember()){
                 return;
             }
-            FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getModels(objects);
+            Set<String> modelNames=getModelNames(objects);
+            FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getModels(modelNames);
             FieldPermissionHelperDTO fieldPermissionHelperDTO=new FieldPermissionHelperDTO(objects,fieldLevelPermissions,fieldPermissionUserData);
             updateObjectsPropertiesBeforeSave(fieldPermissionHelperDTO,fieldLevelPermissions);
         }catch (Exception e){
@@ -135,6 +136,20 @@ public class PermissionService {
         public PermissionMapperUtils.PermissionHelper getPermissionHelper(String className,Set<FieldLevelPermission> fieldLevelPermissions){
             return new PermissionMapperUtils.PermissionHelper(modelMap.get(className),currentUserStaffId,otherPermissionDTOMap,hubMember,fieldLevelPermissions);
         }
+    }
+
+    private <T> Set<String> getModelNames(List<T> objects) {
+        return objects.stream().map(model->{
+            if(model.getClass().isAnnotationPresent(com.kairos.annotations.KPermissionModel.class)) {
+                return model.getClass().getSimpleName();
+            }else if(model.getClass().isAnnotationPresent(PermissionClass.class)){
+                PermissionClass permissionClass = model.getClass().getAnnotation(PermissionClass.class);
+                return permissionClass.name();
+            }else if(model.getClass().isAnnotationPresent(KPermissionRelatedModel.class)){
+                //return getRelationShipModelPermissionModelName(model.getClass());
+            }
+            return "";
+        }).collect(Collectors.toSet());
     }
 
 }
