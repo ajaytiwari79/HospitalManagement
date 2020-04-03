@@ -937,12 +937,10 @@ public class KPIBuilderCalculationService implements CounterService {
                 }
                 staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
                 activityIdAndTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
-                Map<BigInteger,List<TodoDTO>> bigIntegerListMap = new HashMap<>();
                 for (Map.Entry<Long, List<TodoDTO>> entry : staffIdAndTodoMap.entrySet()) {
+                    Map<BigInteger,List<TodoDTO>> bigIntegerListMap = new HashMap<>();
                     if(isCollectionNotEmpty(entry.getValue())) {
                         bigIntegerListMap = entry.getValue().stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
-                    }else {
-                        bigIntegerListMap =new HashMap<>();
                     }
                   staffIdAndActivityTodoListMap.put(entry.getKey(),bigIntegerListMap);
                 }
