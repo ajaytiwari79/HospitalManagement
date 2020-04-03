@@ -116,7 +116,10 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     }
 
     public void setEndDate(Date endDate) {
-        this.endDate = roundDateByMinutes(endDate,15);
+        if(isNotNull(endDate)) {
+            this.endDate = roundDateByMinutes(endDate, 15);
+        }
+        this.endDate =endDate;
     }
 
     public boolean isShiftActivityChanged(ShiftActivity shiftActivity){
