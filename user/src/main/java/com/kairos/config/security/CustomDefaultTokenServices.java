@@ -42,7 +42,7 @@ public class CustomDefaultTokenServices extends DefaultTokenServices {
         log.info("adding user details information into oauth2 token");
         UserPrincipal user = (UserPrincipal) authentication.getUserAuthentication().getPrincipal();
         final Map<String, Object> userDetails = new HashMap<>();
-        Map<String, Object> userDetailsMap = ObjectMapperUtils.copyPropertiesByMapper(user.getDetails(), Map.class);
+        Map<String, Object> userDetailsMap = ObjectMapperUtils.copyPropertiesOrCloneByMapper(user.getDetails(), Map.class);
         userDetailsMap.put("languageId", userService.getUserSelectedLanguageId(user.getUser().getId()));
         userDetails.put("details", userDetailsMap);
         authentication.setDetails(userDetails);

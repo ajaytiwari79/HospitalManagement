@@ -28,7 +28,7 @@ public class UnitConstraintService {
                 unitConstraint.setPlanningSetting(unitConstraintDTO.getPlanningSetting());
             }
         }else{
-            unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
+            unitConstraint = ObjectMapperUtils.copyPropertiesOrCloneByMapper(unitConstraintDTO, UnitConstraint.class);
 
         }
         unitConstraintRepository.save(unitConstraint);
@@ -39,7 +39,7 @@ public class UnitConstraintService {
     public List<UnitConstraintDTO> getAllUnitConstraintByUnitId(Long unitId){
         List<UnitConstraint> unitConstraints = unitConstraintRepository.findAllByUnitIdAndDeletedFalse(unitId);
         if(ObjectUtils.isCollectionNotEmpty(unitConstraints)) {
-            return ObjectMapperUtils.copyCollectionPropertiesByMapper(unitConstraints, UnitConstraintDTO.class);
+            return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(unitConstraints, UnitConstraintDTO.class);
         }else{
           return getunitconstraints();
         }

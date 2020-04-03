@@ -60,7 +60,7 @@ public class ProcessingPurposeService {
             }
             processingPurposeRepository.saveAll(processingPurposes);
         }
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(processingPurposes, ProcessingPurposeDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(processingPurposes, ProcessingPurposeDTO.class);
 
     }
 

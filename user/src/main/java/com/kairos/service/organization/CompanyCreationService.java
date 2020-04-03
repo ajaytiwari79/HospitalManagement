@@ -5,8 +5,8 @@ import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
-import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -298,7 +298,7 @@ public class CompanyCreationService {
     public Map<String, Object> getAddressOfCompany(Long unitId) {
         HashMap<String, Object> orgBasicData = new HashMap<>();
         ContactAddress address = contactAddressGraphRepository.getContactAddressOfOrganization(unitId);
-        AddressDTO addressDTO=ObjectMapperUtils.copyPropertiesByMapper(address,AddressDTO.class);
+        AddressDTO addressDTO=ObjectMapperUtils.copyPropertiesOrCloneByMapper(address,AddressDTO.class);
         orgBasicData.put("address", addressDTO);
         orgBasicData.put("municipalities", (address==null || address.getZipCode() == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(address.getZipCode().getId())));
         return orgBasicData;
@@ -602,10 +602,10 @@ public class CompanyCreationService {
     }
 
     private QueryResult generateOrgHierarchyQueryResult(OrganizationBaseEntity organization, Organization parent) {
-        QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
+        QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesOrCloneByMapper(organization, QueryResult.class);
         List<QueryResult> childQueryResults = new ArrayList<>();
         for (Unit childUnits : parent.getUnits()) {
-            QueryResult childUnit = ObjectMapperUtils.copyPropertiesByMapper(childUnits, QueryResult.class);
+            QueryResult childUnit = ObjectMapperUtils.copyPropertiesOrCloneByMapper(childUnits, QueryResult.class);
             childQueryResults.add(childUnit);
         }
         organizationQueryResult.setChildren(childQueryResults);

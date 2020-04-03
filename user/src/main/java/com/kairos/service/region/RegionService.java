@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_ZIPCODE_NOTFOUND;
 
 /**
  * Created by prabjot on 12/12/16.

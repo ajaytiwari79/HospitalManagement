@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper;
 import static com.kairos.enums.FilterType.CALCULATION_UNIT;
 
 @Service
@@ -54,7 +54,7 @@ public class UnavailabilityCalculationKPIService implements KPIService{
     }
 
     private double getTotalByCalculationUnitOfUnavailibilityShift(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity, List<ShiftActivityDTO> shiftActivityDTOS, double total) {
-        XAxisConfig calculationUnit = (XAxisConfig) ((List) copyCollectionPropertiesByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
+        XAxisConfig calculationUnit = (XAxisConfig) ((List) copyPropertiesOrCloneCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
         switch (calculationUnit) {
             case COUNT:
                 total = shiftActivityDTOS.size();

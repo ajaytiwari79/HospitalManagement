@@ -61,7 +61,7 @@ public class OrganizationalSecurityMeasureService{
                 }
               organizationalSecurityMeasureRepository.saveAll(orgSecurityMeasures);
             }
-            return ObjectMapperUtils.copyCollectionPropertiesByMapper(orgSecurityMeasures, OrganizationalSecurityMeasureDTO.class);
+            return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(orgSecurityMeasures, OrganizationalSecurityMeasureDTO.class);
     }
 
     /**

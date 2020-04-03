@@ -23,6 +23,11 @@ public class PermissionSchemaProcessor implements BeanPostProcessor {
     }
 
     private void publishPermissionSchemaToUserService(UserRestClient userRestClient, List<Map<String, Object>> data){
-        userRestClient.publishRequest(data, userServiceUrl, IntegrationOperation.CREATE, "/create_permission_schema", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {});
+        try {
+            userRestClient.publishRequest(data, userServiceUrl, IntegrationOperation.CREATE, "/create_permission_schema", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {});
+        }catch (Exception e){
+           //ignored
+        }
+
     }
 }

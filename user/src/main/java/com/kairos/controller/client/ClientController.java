@@ -9,7 +9,6 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.client.relationships.ClientRelativeRelation;
-import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.StaffClientData;
 import com.kairos.service.client.ClientAddressService;
 import com.kairos.service.client.ClientBatchService;

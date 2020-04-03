@@ -23,7 +23,6 @@ import javax.validation.Valid;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;

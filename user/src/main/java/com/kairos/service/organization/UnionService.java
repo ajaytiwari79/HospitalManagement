@@ -474,10 +474,10 @@ public class UnionService {
         List<ZipCodeDTO> zipCodes = null;
         List<SectorDTO> sectors = null;
         if (CollectionUtils.isNotEmpty(zipCodesSectors.getZipCodes())) {
-            zipCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(zipCodesSectors.getZipCodes(), ZipCodeDTO.class);
+            zipCodes = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(zipCodesSectors.getZipCodes(), ZipCodeDTO.class);
         }
         if (CollectionUtils.isNotEmpty(zipCodesSectors.getSectors())) {
-            sectors = ObjectMapperUtils.copyCollectionPropertiesByMapper(zipCodesSectors.getSectors(), SectorDTO.class);
+            sectors = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(zipCodesSectors.getSectors(), SectorDTO.class);
         }
         UnionGlobalDataDTO globalDataDTO = new UnionGlobalDataDTO(zipCodes, sectors);
 
@@ -495,15 +495,15 @@ public class UnionService {
             UnionDataDTO unionDataDTO = new UnionDataDTO();
             unionDataDTO.setId(unionDataQueryResult.getUnion().getId());
             unionDataDTO.setName(unionDataQueryResult.getUnion().getName());
-            unionDataDTO.setSectors(ObjectMapperUtils.copyCollectionPropertiesByMapper(unionDataQueryResult.getSectors(), SectorDTO.class));
+            unionDataDTO.setSectors(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(unionDataQueryResult.getSectors(), SectorDTO.class));
             List<LocationDTO> locationDTOS = new ArrayList<>();
             List<MunicipalityDTO> municipalitiesUnion;
             if (Optional.ofNullable(unionDataQueryResult.getAddress()).isPresent()) {
-                ContactAddressDTO contactAddressDTOUnion = ObjectMapperUtils.copyPropertiesByMapper(unionDataQueryResult.getAddress(), ContactAddressDTO.class);
+                ContactAddressDTO contactAddressDTOUnion = ObjectMapperUtils.copyPropertiesOrCloneByMapper(unionDataQueryResult.getAddress(), ContactAddressDTO.class);
                 if (Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()) {
                     contactAddressDTOUnion.setZipCodeId(unionDataQueryResult.getZipCode().getId());
                     contactAddressDTOUnion.setZipCodeValue(unionDataQueryResult.getZipCode().getZipCode());
-                    municipalitiesUnion = ObjectMapperUtils.copyCollectionPropertiesByMapper(unionDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
+                    municipalitiesUnion = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(unionDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
                     updateMunicipalities(municipalitiesUnion, municipalityMap);
                     unionDataDTO.setMunicipalities(municipalitiesUnion);
                 }
@@ -541,11 +541,11 @@ public class UnionService {
             ContactAddressDTO contactAddressDTO = null;
             List<MunicipalityDTO> municipalitiesLocation = null;
             if (Optional.ofNullable(locationDataQueryResult.getAddress()).isPresent()) {
-                contactAddressDTO = ObjectMapperUtils.copyPropertiesByMapper(locationDataQueryResult.getAddress(), ContactAddressDTO.class);
+                contactAddressDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(locationDataQueryResult.getAddress(), ContactAddressDTO.class);
                 if (Optional.ofNullable(locationDataQueryResult.getZipCode()).isPresent()) {
                     contactAddressDTO.setZipCodeId(locationDataQueryResult.getZipCode().getId());
                     contactAddressDTO.setZipCodeValue(locationDataQueryResult.getZipCode().getZipCode());
-                    municipalitiesLocation = ObjectMapperUtils.copyCollectionPropertiesByMapper(locationDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
+                    municipalitiesLocation = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(locationDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
                     updateMunicipalities(municipalitiesLocation, municipalityMap);
                 }
                 if (Optional.ofNullable(locationDataQueryResult.getMunicipality()).isPresent()) {

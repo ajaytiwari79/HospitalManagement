@@ -103,7 +103,7 @@ public class DynamicTabService extends MongoBaseService {
         if (ConfLevel.UNIT.equals(level)) {
             createTabsForStaff(unitId, kpiDashboards, staffDTOS.stream().map(StaffPersonalDetail::getId).collect(Collectors.toList()));
         }
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(kpiDashboards, KPIDashboardDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(kpiDashboards, KPIDashboardDTO.class);
     }
 
     public List<KPIDashboardDTO> addDashboardDefaultTabToRef(KPIDashboardDTO kpiDashboardDTO, ConfLevel level) {
@@ -122,7 +122,7 @@ public class DynamicTabService extends MongoBaseService {
             kpiDashboards.stream().forEach(kpiDashboard -> kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(), kpiDashboard.getParentModuleId())));
             counterRepository.saveEntities(kpiDashboards);
         }
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(kpiDashboards, KPIDashboardDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(kpiDashboards, KPIDashboardDTO.class);
     }
 
     private String createModuleId(BigInteger id, String parentModuleId) {
@@ -174,7 +174,7 @@ public class DynamicTabService extends MongoBaseService {
         List<KPIDashboard> kpiDashboards = modifyCategories(dashboardTabs.getUpdateDashboardTab(), existingDashboardTab, level, refId);
         List<String> deletableCategoryIds = deletableDashboardTab.stream().filter(k -> !k.isDefaultTab()).map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
         counterRepository.removeAll("moduleId", deletableCategoryIds, KPIDashboard.class, level);
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(kpiDashboards, KPIDashboardDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(kpiDashboards, KPIDashboardDTO.class);
     }
 
     private List<KPIDashboardDTO> getExistingDashboardTab(List<KPIDashboardDTO> dashboardTabs, ConfLevel level, Long refId) {

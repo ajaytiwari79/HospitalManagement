@@ -9,7 +9,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.Email;
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_BASE_PAY_GRADE;

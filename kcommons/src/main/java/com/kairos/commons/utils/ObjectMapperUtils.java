@@ -67,7 +67,7 @@ public class ObjectMapperUtils {
     }
 */
 
-    public static <T,E,F extends Collection> F copyCollectionPropertiesByMapper(Collection<T> objects, Class<E> elementClass, Class... type) {
+    public static <T,E,F extends Collection> F copyPropertiesOrCloneCollectionByMapper(Collection<T> objects, Class<E> elementClass, Class... type) {
         Class className = getClassByIntance(objects);
         try {
             return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
@@ -92,7 +92,7 @@ public class ObjectMapperUtils {
 
 
 
-    public static <E extends Object,T extends Object> T copyPropertiesByMapper(E object, Class<T> valueType){
+    public static <E extends Object,T extends Object> T copyPropertiesOrCloneByMapper(E object, Class<T> valueType){
         try {
             String json = mapper.writeValueAsString(object);
             return mapper.readValue(json, valueType);

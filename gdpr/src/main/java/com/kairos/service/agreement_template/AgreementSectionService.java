@@ -91,7 +91,7 @@ public class AgreementSectionService {
         policyAgreementTemplate.setSignatureComponentRightAlign(agreementTemplateSectionDTO.isSignatureComponentRightAlign());
         policyAgreementTemplate.setSignatureHtml(agreementTemplateSectionDTO.getSignatureHtml());
         policyAgreementTemplate.setCoverPageAdded(agreementTemplateSectionDTO.isCoverPageAdded());
-        policyAgreementTemplate.setCoverPageData(ObjectMapperUtils.copyPropertiesByMapper(agreementTemplateSectionDTO.getCoverPageData(), CoverPage.class));
+        policyAgreementTemplate.setCoverPageData(ObjectMapperUtils.copyPropertiesOrCloneByMapper(agreementTemplateSectionDTO.getCoverPageData(), CoverPage.class));
         policyAgreementTemplate.setIncludeContentPage(agreementTemplateSectionDTO.isIncludeContentPage());
 
     }
@@ -130,18 +130,18 @@ public class AgreementSectionService {
                 clause = new OrganizationClause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), Arrays.asList(defaultTag), Arrays.asList(policyAgreementTemplate.getTemplateType()), referenceId, clauseBasicDTO.getTempClauseId());
             else
                 clause = new MasterClause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), Arrays.asList(defaultTag), Arrays.asList(policyAgreementTemplate.getTemplateType()), referenceId, clauseBasicDTO.getTempClauseId(),
-                        ObjectMapperUtils.copyCollectionPropertiesByMapper(policyAgreementTemplate.getAccountTypes(), AccountType.class),
-                        ObjectMapperUtils.copyCollectionPropertiesByMapper(policyAgreementTemplate.getOrganizationTypes(), OrganizationType.class),
-                        ObjectMapperUtils.copyCollectionPropertiesByMapper(policyAgreementTemplate.getOrganizationSubTypes(), OrganizationSubType.class),
-                        ObjectMapperUtils.copyCollectionPropertiesByMapper(policyAgreementTemplate.getOrganizationServices(), ServiceCategory.class),
-                        ObjectMapperUtils.copyCollectionPropertiesByMapper(policyAgreementTemplate.getOrganizationSubServices(), SubServiceCategory.class));
+                        ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(policyAgreementTemplate.getAccountTypes(), AccountType.class),
+                        ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(policyAgreementTemplate.getOrganizationTypes(), OrganizationType.class),
+                        ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(policyAgreementTemplate.getOrganizationSubTypes(), OrganizationSubType.class),
+                        ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(policyAgreementTemplate.getOrganizationServices(), ServiceCategory.class),
+                        ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(policyAgreementTemplate.getOrganizationSubServices(), SubServiceCategory.class));
             clauses.add(clause);
         }
         clauses = clauseRepository.saveAll(clauses);
         Map<UUID, Long> clauseData = new HashMap<>();
         clauses.forEach(clause -> clauseData.put(clause.getTempClauseId(), clause.getId()));
         mapClauseIdToEmbeddedClausesOfSectionDTO(sectionDTOList, clauseData);
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(sectionDTOList, AgreementSection.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(sectionDTOList, AgreementSection.class);
     }
 
     /**

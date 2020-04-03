@@ -1,6 +1,5 @@
 package com.kairos.utils.validator.company;
 
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;

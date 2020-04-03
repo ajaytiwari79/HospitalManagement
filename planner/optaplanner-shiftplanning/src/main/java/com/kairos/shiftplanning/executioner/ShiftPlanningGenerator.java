@@ -49,7 +49,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.enums.MasterDataTypeEnum.*;
 

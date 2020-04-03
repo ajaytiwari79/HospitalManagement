@@ -77,7 +77,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
             endDate = payrollPeriods.get(payrollPeriods.size() - 1).getEndDate().plusDays(1);
         }
         unitPayrollSettingMongoRepository.saveEntities(unitPayrollSettings);
-        return ObjectMapperUtils.copyPropertiesByMapper(unitPayrollSettings.get(0), UnitPayrollSettingDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(unitPayrollSettings.get(0), UnitPayrollSettingDTO.class);
     }
 
 
@@ -89,7 +89,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
         // use when draft table deleted and return previous data of parent table
         UnitPayrollSetting parentUnitPayrollSetting = unitPayrollSettingMongoRepository.findPayrollPeriodByUnitIdPayrollPeriodId(unitId, unitPayrollSetting.getParentPayrollId());
         unitPayrollSettingMongoRepository.removeDraftPayrollPeriodByUnitAndPayrollPeriodId(unitId, unitPayrollSetting.getId());
-        return ObjectMapperUtils.copyPropertiesByMapper(parentUnitPayrollSetting, UnitPayrollSettingDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(parentUnitPayrollSetting, UnitPayrollSettingDTO.class);
     }
 
     public UnitPayrollSettingDTO updatePayrollPeriod(UnitPayrollSettingDTO unitPayrollSettingDTO, Long unitId) {
@@ -98,11 +98,11 @@ public class UnitPayrollSettingService extends MongoBaseService {
         if (isNull(unitPayrollSetting)) {
             exceptionService.actionNotPermittedException(MESSAGE_PAYROLL_PERIOD_NOT_FOUND);
         }
-        unitPayrollSetting.setAccessGroupsPriority(ObjectMapperUtils.copyCollectionPropertiesByMapper(unitPayrollSettingDTO.getAccessGroupsPriority(), PayrollAccessGroups.class));
+        unitPayrollSetting.setAccessGroupsPriority(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(unitPayrollSettingDTO.getAccessGroupsPriority(), PayrollAccessGroups.class));
         unitPayrollSetting.setPublished(unitPayrollSettingDTO.isPublished());
         if (!unitPayrollSettingDTO.isPublished()) {
-            unitPayrollSetting.setPayrollPeriods(ObjectMapperUtils.copyCollectionPropertiesByMapper(unitPayrollSettingDTO.getPayrollPeriods(), PayrollPeriod.class));
-            unitPayrollSetting.setAccessGroupsPriority(ObjectMapperUtils.copyCollectionPropertiesByMapper(unitPayrollSettingDTO.getAccessGroupsPriority(), PayrollAccessGroups.class));
+            unitPayrollSetting.setPayrollPeriods(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(unitPayrollSettingDTO.getPayrollPeriods(), PayrollPeriod.class));
+            unitPayrollSetting.setAccessGroupsPriority(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(unitPayrollSettingDTO.getAccessGroupsPriority(), PayrollAccessGroups.class));
         } else {
             unitPayrollSetting.setPayrollPeriods(validatePayrollPeriod(unitPayrollSettingDTO.getPayrollPeriods(), unitPayrollSetting.getPayrollPeriods()));
             UnitPayrollSetting availableDraftPayroll = unitPayrollSettingMongoRepository.findDraftPayrollPeriodByUnitIdAndPayrollParentIdNotExist(unitPayrollSetting.getId(), unitId, unitPayrollSetting.getPayrollFrequency());
@@ -115,7 +115,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
         }
         unitPayrollSettings.add(unitPayrollSetting);
         unitPayrollSettingMongoRepository.saveEntities(unitPayrollSettings);
-        return ObjectMapperUtils.copyPropertiesByMapper(unitPayrollSetting, UnitPayrollSettingDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(unitPayrollSetting, UnitPayrollSettingDTO.class);
     }
 
     // when first payroll period create and table is break between two year then if one payroll table is published than second table also publish
@@ -162,7 +162,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
                         unitPayrollSetting.getPayrollPeriods().add(payrollPeriod);
                     } else {
                         if (isNull(newUnitPayrollSetting)) {
-                            newUnitPayrollSetting = ObjectMapperUtils.copyPropertiesByMapper(unitPayrollSetting, UnitPayrollSetting.class);
+                            newUnitPayrollSetting = ObjectMapperUtils.copyPropertiesOrCloneByMapper(unitPayrollSetting, UnitPayrollSetting.class);
                             newUnitPayrollSetting.setId(null);
                             newUnitPayrollSetting.setPayrollPeriods(new ArrayList<>());
                         }
@@ -200,7 +200,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
             newUnitPayrollSetting = getNewDraftStateOfPayroll(unitPayrollSettingDTO, unitPayrollSetting, startDateAndPayrollPeriodMap, unitId);
         }
         unitPayrollSettingMongoRepository.save(newUnitPayrollSetting);
-        List<UnitPayrollSettingDTO> unitPayrollSettingDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(Arrays.asList(newUnitPayrollSetting, unitPayrollSetting), unitPayrollSettingDTO.getClass());
+        List<UnitPayrollSettingDTO> unitPayrollSettingDTOS = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(Arrays.asList(newUnitPayrollSetting, unitPayrollSetting), unitPayrollSettingDTO.getClass());
         return getUnitPayrollSettingData(unitPayrollSettingDTOS);
     }
 
@@ -261,7 +261,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
                 startDateAndPayrollPeriodMap.get(payrollPeriodDTO.getStartDate()).setDeadlineDate(payrollPeriodDTO.getDeadlineDate());
                 int daysTillDeadlineDate = (int) ChronoUnit.DAYS.between(payrollPeriodDTO.getEndDate(), payrollPeriodDTO.getDeadlineDate());
                 if (verifyGracePeriodOfAccessGroup(payrollPeriodDTO.getPayrollAccessGroups(), daysTillDeadlineDate, payrollPeriodDTO.getStartDate(), payrollPeriodDTO.getEndDate())) {
-                    startDateAndPayrollPeriodMap.get(payrollPeriodDTO.getStartDate()).setPayrollAccessGroups(ObjectMapperUtils.copyCollectionPropertiesByMapper(payrollPeriodDTO.getPayrollAccessGroups(), PayrollAccessGroups.class));
+                    startDateAndPayrollPeriodMap.get(payrollPeriodDTO.getStartDate()).setPayrollAccessGroups(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(payrollPeriodDTO.getPayrollAccessGroups(), PayrollAccessGroups.class));
                 }
             }
         }

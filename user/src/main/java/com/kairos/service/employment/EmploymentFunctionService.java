@@ -81,7 +81,7 @@ public class EmploymentFunctionService {
     public Map<LocalDate, Long> removeFunctions(Long employmentId, Set<LocalDate> appliedDates) {
         Map<LocalDate, Long> localDateAndFunctionIdMap = new HashMap<>();
         List<EmploymentFunctionRelationship> employmentFunctionRelationships = new ArrayList<>();
-        Set<String> localDatesAsString = (Set<String>) ObjectMapperUtils.copyCollectionPropertiesByMapper(appliedDates, String.class);
+        Set<String> localDatesAsString = (Set<String>) ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(appliedDates, String.class);
         List<EmploymentFunctionRelationshipQueryResult> employmentFunctionRelationshipQueryResults = employmentFunctionRelationshipRepository.findAllByAppliedDatesIn(employmentId, localDatesAsString);
         for (EmploymentFunctionRelationshipQueryResult employmentFunctionRelationshipQueryResult : employmentFunctionRelationshipQueryResults) {
             Set<LocalDate> dateToRemove = ArrayUtil.getIntersectedDates(employmentFunctionRelationshipQueryResult.getAppliedDates(), appliedDates);
@@ -134,7 +134,7 @@ public class EmploymentFunctionService {
         List<EmploymentLineFunctionQueryResult> hourlyCostByEmploymentLines = employmentGraphRepository.getFunctionalHourlyCostByEmploymentId(unitId, employmentId);
         BigDecimal leapYearConst = PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(LEAP_YEAR));
         BigDecimal nonLeapYearConst = PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE.multiply(new BigDecimal(NON_LEAP_YEAR));
-        hourlyCostByEmploymentLines = ObjectMapperUtils.copyCollectionPropertiesByMapper(hourlyCostByEmploymentLines, EmploymentLineFunctionQueryResult.class);
+        hourlyCostByEmploymentLines = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(hourlyCostByEmploymentLines, EmploymentLineFunctionQueryResult.class);
         for (EmploymentLineFunctionQueryResult employmentLineFunctionQueryResult : hourlyCostByEmploymentLines) {
             BigDecimal hourlyCostCalculationFactor = employmentLineFunctionQueryResult.getStartDate().isLeapYear() ? leapYearConst : nonLeapYearConst;
             employmentLineFunctionQueryResult.setBasePayGradeAmount(employmentLineFunctionQueryResult.getBasePayGradeAmount().divide(hourlyCostCalculationFactor, 2, RoundingMode.CEILING));

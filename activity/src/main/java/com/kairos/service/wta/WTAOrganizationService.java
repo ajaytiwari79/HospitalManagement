@@ -77,7 +77,7 @@ public class WTAOrganizationService extends MongoBaseService {
         List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWtaByOrganization(unitId);
         List<WTAResponseDTO> wtaResponseDTOs = new ArrayList<>();
         workingTimeAgreements.forEach(wta -> {
-            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
+            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(wta, WTAResponseDTO.class);
             ruleTemplateService.assignCategoryToRuleTemplate(organization.getCountryId(), wtaResponseDTO.getRuleTemplates());
             wtaResponseDTOs.add(wtaResponseDTO);
         });
@@ -137,7 +137,7 @@ public class WTAOrganizationService extends MongoBaseService {
             tags = tagMongoRepository.findAllTagsByIdIn(oldWta.getTags());
             oldWta.setTags(null);
         }
-        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(oldWta, WTAResponseDTO.class);
         wtaResponseDTO.setStartDate(oldWta.getStartDate());
         wtaResponseDTO.setEndDate(oldWta.getEndDate());
         wtaResponseDTO.setTags(tags);
@@ -177,7 +177,7 @@ public class WTAOrganizationService extends MongoBaseService {
             });
             wtaQueryResultDTOS=wtaQueryResultMap.values().stream().collect(Collectors.toList());
         }
-        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getDefaultCTAOfExpertiseAndDate(unitId, expertiseId, selectedDate);
         return new CTAWTAAndAccumulatedTimebankWrapper(ctaResponseDTOS, wtaResponseDTOS);
     }

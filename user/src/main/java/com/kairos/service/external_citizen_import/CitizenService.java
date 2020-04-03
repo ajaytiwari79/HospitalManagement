@@ -3,7 +3,6 @@ package com.kairos.service.external_citizen_import;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.constants.AppConstants;
-import com.kairos.dto.activity.task.order.OrderGrant;
 import com.kairos.dto.user.patient.PatientRelative;
 import com.kairos.dto.user.patient.PatientWrapper;
 import com.kairos.dto.user.staff.AvailableContacts;

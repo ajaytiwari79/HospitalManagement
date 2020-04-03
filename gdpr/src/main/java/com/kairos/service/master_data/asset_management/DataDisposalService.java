@@ -60,7 +60,7 @@ public class DataDisposalService {
             }
             dataDisposalRepository.saveAll(dataDisposals);
         }
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(dataDisposals, DataDisposalDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(dataDisposals, DataDisposalDTO.class);
 
     }
 

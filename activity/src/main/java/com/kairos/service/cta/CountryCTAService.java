@@ -81,7 +81,7 @@ public class CountryCTAService extends MongoBaseService {
         CTABasicDetailsDTO ctaBasicDetailsDTO = userIntegrationService.getCtaBasicDetailsDTO(countryId, requestParam);
         List<TagDTO> tagDTOS = collectiveTimeAgreementDTO.getTags();
         collectiveTimeAgreementDTO.setTags(null);
-        CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
+        CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesOrCloneByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
         costTimeAgreement.setId(null);
         buildCTA(null, costTimeAgreement, collectiveTimeAgreementDTO, false, true, ctaBasicDetailsDTO, null);
         costTimeAgreement.setCountryId(countryId);
@@ -94,7 +94,7 @@ public class CountryCTAService extends MongoBaseService {
 
     private CollectiveTimeAgreementDTO addTagsInResponse(CostTimeAgreement costTimeAgreement, List<TagDTO> tagDTOS) {
         costTimeAgreement.setTags(null);
-        CollectiveTimeAgreementDTO  collectiveTimeAgreementDTO = ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement, CollectiveTimeAgreementDTO.class);
+        CollectiveTimeAgreementDTO  collectiveTimeAgreementDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(costTimeAgreement, CollectiveTimeAgreementDTO.class);
         collectiveTimeAgreementDTO.setTags(tagDTOS);
         return collectiveTimeAgreementDTO;
     }
@@ -116,7 +116,7 @@ public class CountryCTAService extends MongoBaseService {
         CTABasicDetailsDTO ctaBasicDetailsDTO = userIntegrationService.getCtaBasicDetailsDTO(0L, requestParam);
         List<TagDTO> tagDTOS = collectiveTimeAgreementDTO.getTags();
         collectiveTimeAgreementDTO.setTags(null);
-        CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
+        CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesOrCloneByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
         costTimeAgreement.setId(null);
         buildCTA(null, costTimeAgreement, collectiveTimeAgreementDTO, false, false, ctaBasicDetailsDTO, null);
         costTimeAgreement.setTags(tagDTOS.stream().map(TagDTO::getId).collect(Collectors.toList()));
@@ -135,7 +135,7 @@ public class CountryCTAService extends MongoBaseService {
      */
     public void buildCTA(Map<PhaseDefaultName, BigInteger> unitPhaseIdsMap, CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, boolean doUpdate, boolean creatingFromCountry, CTABasicDetailsDTO ctaBasicDetailsDTO, Map<BigInteger, PhaseDefaultName> phaseDefaultNameMap) {
         // Get Rule Templates
-        List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyCollectionPropertiesByMapper(collectiveTimeAgreementDTO.getRuleTemplates(), CTARuleTemplate.class);
+        List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(collectiveTimeAgreementDTO.getRuleTemplates(), CTARuleTemplate.class);
         List<BigInteger> ruleTemplateIds = new ArrayList<>();
         if (!ruleTemplates.isEmpty()) {
             ruleTemplates.forEach(ctaRuleTemplate -> {
@@ -232,7 +232,7 @@ public class CountryCTAService extends MongoBaseService {
      * @return
      */
     public CostTimeAgreement createCostTimeAgreementForOrganization(Map<PhaseDefaultName, BigInteger> unitPhaseIdsMap, CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, Map<Long, BigInteger> parentUnitActivityMap, CTABasicDetailsDTO ctaBasicDetailsDTO, OrganizationBasicDTO organization, Map<BigInteger, PhaseDefaultName> phaseDefaultNameMap) {
-        CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement, CostTimeAgreement.class);
+        CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesOrCloneByMapper(costTimeAgreement, CostTimeAgreement.class);
         organisationCTA.setId(null);
         costTimeAgreementService.assignOrganisationActivitiesToRuleTemplate(collectiveTimeAgreementDTO.getRuleTemplates(), parentUnitActivityMap);
         organisationCTA.setOrganization(new WTAOrganization(organization.getId(), organization.getName(), organization.getDescription()));
@@ -262,7 +262,7 @@ public class CountryCTAService extends MongoBaseService {
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
         List<TagDTO> tagDTOS = collectiveTimeAgreementDTO.getTags();
         collectiveTimeAgreementDTO.setTags(null);
-        CostTimeAgreement updateCostTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
+        CostTimeAgreement updateCostTimeAgreement = ObjectMapperUtils.copyPropertiesOrCloneByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
         updateCostTimeAgreement.setId(costTimeAgreement.getId());
         costTimeAgreement.setId(null);
         costTimeAgreement.setDisabled(true);
@@ -298,7 +298,7 @@ public class CountryCTAService extends MongoBaseService {
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
         List<TagDTO> tagDTOS = collectiveTimeAgreementDTO.getTags();
         collectiveTimeAgreementDTO.setTags(null);
-        CostTimeAgreement updateCostTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement, CostTimeAgreement.class);
+        CostTimeAgreement updateCostTimeAgreement = ObjectMapperUtils.copyPropertiesOrCloneByMapper(costTimeAgreement, CostTimeAgreement.class);
         updateCostTimeAgreement.setId(costTimeAgreement.getId());
         costTimeAgreement.setDisabled(true);
         costTimeAgreement.setEndDate(collectiveTimeAgreementDTO.getStartDate().minusDays(1));

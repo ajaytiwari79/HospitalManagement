@@ -63,7 +63,7 @@ public class OrganizationTransferMethodService {
 
             transferMethodRepository.saveAll(transferMethods);
         }
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(transferMethods, TransferMethodDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(transferMethods, TransferMethodDTO.class);
     }
 
     /**

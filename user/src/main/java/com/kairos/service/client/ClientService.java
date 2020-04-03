@@ -33,7 +33,6 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
@@ -847,7 +846,7 @@ public class ClientService {
     }
 
     public ClientContactPersonStructuredData saveContactPerson(Long clientId, ContactPersonDTO contactPersonDTO) {
-        ClientContactPersonStructuredData clientContactPersonStructuredData = ObjectMapperUtils.copyPropertiesByMapper(contactPersonDTO,ClientContactPersonStructuredData.class);
+        ClientContactPersonStructuredData clientContactPersonStructuredData = ObjectMapperUtils.copyPropertiesOrCloneByMapper(contactPersonDTO,ClientContactPersonStructuredData.class);
         try {
             if (Optional.ofNullable(contactPersonDTO.getPrimaryStaffId()).isPresent()) {
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getPrimaryStaffId(), ClientContactPersonRelationship.ContactPersonRelationType.PRIMARY, contactPersonDTO.getHouseHoldMembers());

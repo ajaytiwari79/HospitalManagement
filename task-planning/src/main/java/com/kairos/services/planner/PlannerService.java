@@ -83,7 +83,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.concurrent.TimeUnit;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_UNIT_ID;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.MERGED_TASK_NAME;
 import static com.kairos.persistence.model.constants.ClientExceptionConstant.SICK;

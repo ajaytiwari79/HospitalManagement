@@ -160,7 +160,7 @@ public class StaffActivitySettingService extends MongoBaseService {
             staffActivitySetting.setUnitId(unitId);
             staffActivitySetting.setStaffId(staffId);
         });
-        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyCollectionPropertiesByMapper(staffActivitySettings,StaffActivitySetting.class);
+        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(staffActivitySettings,StaffActivitySetting.class);
         save(staffActivitySettingsList);
         return staffActivitySettings;
    }
@@ -202,7 +202,7 @@ public class StaffActivitySettingService extends MongoBaseService {
                staffActivitySettingDTO.setStaffId(currentStaffActivitySettings.getStaffId());
                staffActivitySettingDTO.setId(currentStaffActivitySettings.getId());
                staffActivitySettingDTO.setUnitId(currentStaffActivitySettings.getUnitId());
-               currentStaffActivitySettings = ObjectMapperUtils.copyPropertiesByMapper(staffActivitySettingDTO,StaffActivitySetting.class);
+               currentStaffActivitySettings = ObjectMapperUtils.copyPropertiesOrCloneByMapper(staffActivitySettingDTO,StaffActivitySetting.class);
                staffActivitySettingSet.add(currentStaffActivitySettings);
                staffWiseActivityMap.remove(currentStaffActivitySettings.getStaffId()).get(currentStaffActivitySettings.getActivityId());
            }

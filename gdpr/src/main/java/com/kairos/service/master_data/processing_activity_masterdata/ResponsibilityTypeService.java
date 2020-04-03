@@ -61,7 +61,7 @@ public class ResponsibilityTypeService {
             responsibilityTypeRepository.saveAll(responsibilityTypes);
 
         }
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(responsibilityTypes, ResponsibilityTypeDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(responsibilityTypes, ResponsibilityTypeDTO.class);
 
     }
 

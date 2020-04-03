@@ -24,7 +24,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.FilterType.TEAM_TYPE;
 import static com.kairos.enums.kpi.CalculationType.*;
 import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
-import static java.util.stream.Collectors.toMap;
 
 
 /**
@@ -71,7 +70,7 @@ public class StaffingLevelCalculationKPIService implements KPIService{
             DateTimeInterval staffingLevelInterval = new DateTimeInterval(asLocalDate(staffingLevel.getCurrentDate()), asLocalDate(staffingLevel.getCurrentDate()).plusDays(1));
             List<ShiftWithActivityDTO> currentDateShifts = filterShiftActivity.getShifts().stream().filter(shift -> staffingLevelInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());
             if (isCollectionNotEmpty(currentDateShifts)) {
-                staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyCollectionPropertiesByMapper(currentDateShifts, Shift.class),kpiCalculationRelatedInfo);
+                staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(currentDateShifts, Shift.class),kpiCalculationRelatedInfo);
             }
         }
         long staffingLevelData;
@@ -139,7 +138,7 @@ public class StaffingLevelCalculationKPIService implements KPIService{
             DateTimeInterval staffingLevelInterval = new DateTimeInterval(asLocalDate(staffingLevel.getCurrentDate()), asLocalDate(staffingLevel.getCurrentDate()).plusDays(1));
             List<ShiftWithActivityDTO> currentDateShifts = filterShiftActivity.getShifts().stream().filter(shift -> staffingLevelInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());
             if (isCollectionNotEmpty(currentDateShifts)) {
-                staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyCollectionPropertiesByMapper(currentDateShifts, Shift.class),kpiCalculationRelatedInfo);
+                staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(currentDateShifts, Shift.class),kpiCalculationRelatedInfo);
             }
         }
         if (isCollectionNotEmpty(staffingLevel.getPresenceStaffingLevelInterval())) {

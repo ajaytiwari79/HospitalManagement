@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
-import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

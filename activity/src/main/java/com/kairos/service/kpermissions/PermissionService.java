@@ -8,6 +8,7 @@ import com.kairos.dto.kpermissions.OtherPermissionDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.repository.activity.CommonRepository;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
@@ -34,7 +35,7 @@ public class PermissionService {
     @Inject
     private ExceptionService exceptionService;
 
-    @Inject private MongoBaseRepository commonRepository;
+    @Inject private CommonRepository commonRepository;
     @Inject private UserIntegrationService userIntegrationService;
 
 
@@ -113,7 +114,7 @@ public class PermissionService {
             Map<ID,E> mapOfDataBaseObject = new HashMap<>();
             if(fieldLevelPermissions.contains(FieldLevelPermission.WRITE)){
                 for (Map.Entry<Class, Set<ID>> classIdSetEntry : objectIdsMap.entrySet()) {
-                    Collection<E> databaseObject = commonRepository.findAllById(classIdSetEntry.getValue());
+                    Collection<E> databaseObject = commonRepository.findAllByIds(classIdSetEntry.getKey(),classIdSetEntry.getValue());
                     for (E object : databaseObject) {
                         try {
                             ID id = (ID) object.getClass().getMethod("getId").invoke(object);

@@ -81,6 +81,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.ACTIVITY_END_DATE_LESS_THAN_START_DATE;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ORGANIZATION_PHASES;
@@ -88,9 +89,9 @@ import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
 import static com.kairos.enums.cta.AccountType.PAID_OUT;
 import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
+import static com.kairos.enums.phase.PhaseDefaultName.*;
 import static com.kairos.enums.phase.PhaseDefaultName.PAYROLL;
 import static com.kairos.enums.phase.PhaseDefaultName.REALTIME;
-import static com.kairos.enums.phase.PhaseDefaultName.*;
 import static com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService.getCutoffInterval;
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.util.stream.Collectors.*;
@@ -1309,7 +1310,7 @@ public class TimeBankCalculationService {
             for (PlannedTime plannedTime : shiftActivity.getPlannedTimes()) {
                 if (breakActivity.getInterval().overlaps(plannedTime.getInterval())) {
                     DateTimeInterval breakDateTimeInterval = breakActivity.getInterval().overlap(plannedTime.getInterval());
-                    PlannedTime breakPlannedTime = ObjectMapperUtils.copyPropertiesByMapper(plannedTime, PlannedTime.class);
+                    PlannedTime breakPlannedTime = ObjectMapperUtils.copyPropertiesOrCloneByMapper(plannedTime, PlannedTime.class);
                     breakPlannedTime.setStartDate(breakDateTimeInterval.getStartDate());
                     breakPlannedTime.setEndDate(breakDateTimeInterval.getEndDate());
                     plannedTimes.add(breakPlannedTime);
@@ -1324,7 +1325,7 @@ public class TimeBankCalculationService {
 
         private boolean updateShiftActivityByBreakInterval(List<ShiftActivityDTO> updatedShiftActivities, ShiftActivityDTO shiftActivity, List<DateTimeInterval> dateTimeIntervals,boolean scheduledHourAdded) {
             for (DateTimeInterval timeInterval : dateTimeIntervals) {
-                ShiftActivityDTO updatedShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivity, ShiftActivityDTO.class);
+                ShiftActivityDTO updatedShiftActivity = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftActivity, ShiftActivityDTO.class);
                 updatedShiftActivity.setStartDate(timeInterval.getStartDate());
                 updatedShiftActivity.setEndDate(timeInterval.getEndDate());
                 List<PlannedTime> plannedTimes = new ArrayList<>();

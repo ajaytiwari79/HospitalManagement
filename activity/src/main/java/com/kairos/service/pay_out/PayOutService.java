@@ -153,22 +153,22 @@ public class PayOutService extends MongoBaseService {
             shiftActivity.setPayoutCtaBonusMinutes(shiftActivity.getPayoutCtaBonusMinutes() + shiftActivityDTO.getPayoutCtaBonusMinutes());
             shiftActivity.setPlannedMinutesOfPayout(shiftActivity.getPlannedMinutesOfPayout() + shiftActivityDTO.getScheduledMinutesOfPayout() + shiftActivityDTO.getPayoutCtaBonusMinutes());
             shiftActivity.setScheduledMinutesOfPayout(shiftActivity.getScheduledMinutesOfPayout() + shiftActivityDTO.getScheduledMinutesOfPayout());
-            shiftActivity.setPayoutPerShiftCTADistributions(ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftActivityDTO.getPayoutPerShiftCTADistributions(), PayOutPerShiftCTADistribution.class));
+            shiftActivity.setPayoutPerShiftCTADistributions(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(shiftActivityDTO.getPayoutPerShiftCTADistributions(), PayOutPerShiftCTADistribution.class));
             totalPlannerMinutesOfPayout = shiftActivity.getPlannedMinutesOfPayout();
         }
         return totalPlannerMinutesOfPayout;
     }
 
     public ShiftWithActivityDTO buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
-        ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftWithActivityDTO.class);
+        ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shift, ShiftWithActivityDTO.class);
         shift.getActivities().forEach(shiftActivityDTO ->
                 shiftActivityDTO.setActivityName(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getName())
         );
         shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
-            shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
+            shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesOrCloneByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
             shiftActivityDTO.setTimeType(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getTimeType());
             shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> {
-                childActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
+                childActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesOrCloneByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
                 childActivityDTO.setTimeType(activityWrapperMap.get(childActivityDTO.getActivityId()).getTimeType());
             });
         });

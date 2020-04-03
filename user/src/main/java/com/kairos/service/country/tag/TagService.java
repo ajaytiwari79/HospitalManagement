@@ -188,7 +188,7 @@ public class TagService {
         if (tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType("(?i)" + tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false)) {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME_ALREADYEXIST, tagDTO.getName());
         }
-        Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, ObjectMapperUtils.copyPropertiesByMapper(tagDTO.getPenaltyScore(), PenaltyScore.class), tagDTO.getColor(),tagDTO.getShortName(),tagDTO.getUltraShortName());
+        Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, ObjectMapperUtils.copyPropertiesOrCloneByMapper(tagDTO.getPenaltyScore(), PenaltyScore.class), tagDTO.getColor(),tagDTO.getShortName(),tagDTO.getUltraShortName());
         if (CollectionUtils.isNotEmpty(org.getTags())) {
             org.getTags().add(tag);
         } else {
@@ -344,7 +344,7 @@ public class TagService {
             orgId = organizationBaseRepository.findParentOrgId(orgId);
         }
         List<TagQueryResult> tagQueryResults = tagGraphRepository.getListOfStaffOrganizationTags(orgId,false,"", masterDataType.toString());
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(tagQueryResults,TagDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(tagQueryResults,TagDTO.class);
     }
 }
 

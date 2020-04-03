@@ -63,7 +63,8 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
@@ -196,7 +197,7 @@ public class PositionService {
         } else {
             staffAccessGroupQueryResult = removeUnitPermisssion(unitId, staffId, accessGroupId, parentUnit);
         }
-        accessGroupPermissionCounterDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult, AccessGroupPermissionCounterDTO.class);
+        accessGroupPermissionCounterDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(staffAccessGroupQueryResult, AccessGroupPermissionCounterDTO.class);
         accessGroupPermissionCounterDTO.setStaffId(staffId);
         List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("created", created + ""));
         genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {

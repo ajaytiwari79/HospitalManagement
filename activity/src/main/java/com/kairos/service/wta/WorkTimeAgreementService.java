@@ -75,7 +75,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.getDate;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
@@ -204,7 +204,7 @@ public class WorkTimeAgreementService{
             wta.setRuleTemplateIds(ruleTemplatesIds);
 
         }
-        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(wta, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
         return wtaResponseDTO;
     }
@@ -241,7 +241,7 @@ public class WorkTimeAgreementService{
                 workingTimeAgreement.setOrganization(new WTAOrganization(organization.getId(), organization.getName(), organization.getDescription()));
                 workingTimeAgreement.setOrganizationType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationType().getName(), wtaBasicDetailsDTO.getOrganizationType().getDescription()));
                 workingTimeAgreement.setOrganizationSubType(new OrganizationType(wtaBasicDetailsDTO.getOrganizationSubType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getName(), wtaBasicDetailsDTO.getOrganizationSubType().getDescription()));
-                WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement, WTAResponseDTO.class);
+                WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(workingTimeAgreement, WTAResponseDTO.class);
                 wtaResponseDTOMap.put(organization.getId(), wtaResponseDTO);
                 workingTimeAgreements.add(workingTimeAgreement);
             }
@@ -338,7 +338,7 @@ public class WorkTimeAgreementService{
             tags = tagMongoRepository.findAllTagsByIdIn(oldWta.getTags());
             oldWta.setTags(null);
         }
-        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(oldWta, WTAResponseDTO.class);
         wtaResponseDTO.setTags(tags);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
         return wtaResponseDTO;
@@ -346,7 +346,7 @@ public class WorkTimeAgreementService{
 
     public WTAResponseDTO getWta(BigInteger wtaId) {
         WTAQueryResultDTO wtaQueryResult = wtaRepository.getOne(wtaId);
-        return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResult, WTAResponseDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(wtaQueryResult, WTAResponseDTO.class);
     }
 
 
@@ -355,7 +355,7 @@ public class WorkTimeAgreementService{
         if (wtaQueryResult == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_WTA_NOTFOUND);
         }
-        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResult, WTAResponseDTO.class);
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(wtaQueryResult, WTAResponseDTO.class);
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         ruleTemplateService.assignCategoryToRuleTemplate(countryId, wtaResponseDTO.getRuleTemplates());
         return wtaResponseDTO.getRuleTemplates();
@@ -375,7 +375,7 @@ public class WorkTimeAgreementService{
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByCountryId(countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
-            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
+            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(wta, WTAResponseDTO.class);
             wtaResponseDTOS.add(wtaResponseDTO);
         });
 
@@ -385,21 +385,21 @@ public class WorkTimeAgreementService{
     public List<WTAResponseDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId, long countryId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByOrganizationSubTypeIdAndCountryId(organizationSubTypeId, countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
-        wtaQueryResultDTOS.forEach(wta -> wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class)));
+        wtaQueryResultDTOS.forEach(wta -> wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesOrCloneByMapper(wta, WTAResponseDTO.class)));
         return wtaResponseDTOS;
     }
 
     public List<WTAResponseDTO> getAllWTAWithOrganizationByCountryId(long countryId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAWithOrganization(countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
-        wtaQueryResultDTOS.forEach(wta -> wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class)));
+        wtaQueryResultDTOS.forEach(wta -> wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesOrCloneByMapper(wta, WTAResponseDTO.class)));
         return wtaResponseDTOS;
     }
 
     public List<WTAResponseDTO> getAllWTAWithWTAIdAndCountryId(long countryId, BigInteger wtaId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAWithWTAId(countryId, wtaId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
-        wtaQueryResultDTOS.forEach(wta -> wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class)));
+        wtaQueryResultDTOS.forEach(wta -> wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesOrCloneByMapper(wta, WTAResponseDTO.class)));
         return wtaResponseDTOS;
     }
 
@@ -449,7 +449,7 @@ public class WorkTimeAgreementService{
 
     public CTAWTAAndAccumulatedTimebankWrapper getWTACTAByEmploymentIds(Set<Long> employmentIds) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByUpIds(employmentIds, getDate());
-        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementService.getCTAByEmploymentIds(employmentIds);
         return new CTAWTAAndAccumulatedTimebankWrapper(ctaResponseDTOS, wtaResponseDTOS);
     }
@@ -473,10 +473,10 @@ public class WorkTimeAgreementService{
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         List<WTAQueryResultDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(employmentIds);
         List<WTAQueryResultDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(employmentIds);
-        List<WTAResponseDTO> parentWTA = ObjectMapperUtils.copyCollectionPropertiesByMapper(currentWTAList, WTAResponseDTO.class);
+        List<WTAResponseDTO> parentWTA = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(currentWTAList, WTAResponseDTO.class);
         Map<Long, List<WTAQueryResultDTO>> verionWTAMap = versionsOfWTAs.stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
         parentWTA.forEach(currentWTA -> {
-            List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyCollectionPropertiesByMapper(verionWTAMap.get(currentWTA.getEmploymentId()), WTAResponseDTO.class);
+            List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(verionWTAMap.get(currentWTA.getEmploymentId()), WTAResponseDTO.class);
             ruleTemplateService.assignCategoryToRuleTemplate(countryId, currentWTA.getRuleTemplates());
             if (versionWTAs != null && !versionWTAs.isEmpty()) {
                 currentWTA.setVersions(versionWTAs);
@@ -503,8 +503,8 @@ public class WorkTimeAgreementService{
 
     public List<WTAResponseDTO> getWTAOfEmployment(Long employmentId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
-        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
-        wtaResponseDTOS.addAll(ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)), WTAResponseDTO.class));
+        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+        wtaResponseDTOS.addAll(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)), WTAResponseDTO.class));
         return wtaResponseDTOS;
     }
 
@@ -515,8 +515,8 @@ public class WorkTimeAgreementService{
             exceptionService.duplicateDataException(MESSAGE_WTA_ID, wtaId);
         }
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
-        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
-        WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
+        WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesOrCloneByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         Map<String, BigInteger> activitiesIdsAndUnitIdsMap = getActivityMapWithUnitId(wtaResponseDTO.getRuleTemplates(), newArrayList(unitId));
         if (CollectionUtils.isNotEmpty(wtaResponseDTO.getRuleTemplates())) {
@@ -539,7 +539,7 @@ public class WorkTimeAgreementService{
         workingTimeAgreement.setParentId(wtaResponseDTO.getId());
 
         wtaRepository.save(workingTimeAgreement);
-        wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement, WTAResponseDTO.class);
+        wtaResponseDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(workingTimeAgreement, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
         return wtaResponseDTO;
     }
@@ -550,8 +550,8 @@ public class WorkTimeAgreementService{
         wtaQueryResultDTOS.forEach(w -> {
             //TODO Refactor Tag assignment in WTA
             w.setTags(null);
-            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(w, WTAResponseDTO.class);
-            WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
+            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(w, WTAResponseDTO.class);
+            WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesOrCloneByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
             List<WTABaseRuleTemplate> ruleTemplates;
             if (wtaResponseDTO.getRuleTemplates() != null && !wtaResponseDTO.getRuleTemplates().isEmpty()) {
                 ruleTemplates = wtaBuilderService.copyRuleTemplates(wtaResponseDTO.getRuleTemplates(), true);
@@ -620,7 +620,7 @@ public class WorkTimeAgreementService{
             oldWta.setRuleTemplateIds(ruleTemplatesIds);
         }
         oldWta.setEndDate(isNotNull(updateDTO.getEndDate()) ? updateDTO.getEndDate() : null);
-        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(oldWta, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
 
         return wtaResponseDTO;
@@ -643,7 +643,7 @@ public class WorkTimeAgreementService{
             }
             List<BigInteger> ruleTemplateIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
 
-            WorkingTimeAgreement wtaDB = ObjectMapperUtils.copyPropertiesByMapper(wta, WorkingTimeAgreement.class);
+            WorkingTimeAgreement wtaDB = ObjectMapperUtils.copyPropertiesOrCloneByMapper(wta, WorkingTimeAgreement.class);
             wtaDB.setEmploymentId(newOldemploymentIdMap.get(wta.getEmploymentId()));
             wtaDB.setRuleTemplateIds(ruleTemplateIds);
             wtaDB.setId(null);
@@ -689,24 +689,24 @@ public class WorkTimeAgreementService{
         for (WTABaseRuleTemplateDTO ruleTemplate : wtaBaseRuleTemplateDTOS) {
             switch (ruleTemplate.getWtaTemplateType()) {
                 case VETO_AND_STOP_BRICKS:
-                    VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, VetoAndStopBricksWTATemplate.class);
+                    VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, VetoAndStopBricksWTATemplate.class);
                     CollectionUtils.addIgnoreNull(activityIds, vetoAndStopBricksWTATemplate.getStopBrickActivityId());
                     CollectionUtils.addIgnoreNull(activityIds, vetoAndStopBricksWTATemplate.getVetoActivityId());
                     break;
                 case SENIOR_DAYS_PER_YEAR:
-                    SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, SeniorDaysPerYearWTATemplate.class);
+                    SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, SeniorDaysPerYearWTATemplate.class);
                     activityIds.addAll(seniorDaysPerYearWTATemplate.getActivityIds());
                     break;
                 case CHILD_CARE_DAYS_CHECK:
-                    ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ChildCareDaysCheckWTATemplate.class);
+                    ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, ChildCareDaysCheckWTATemplate.class);
                     activityIds.addAll(childCareDaysCheckWTATemplate.getActivityIds());
                     break;
                 case WTA_FOR_CARE_DAYS:
-                    WTAForCareDays wtaForCareDays = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, WTAForCareDays.class);
+                    WTAForCareDays wtaForCareDays = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, WTAForCareDays.class);
                     activityIds.addAll(wtaForCareDays.getCareDayCounts().stream().map(activityCareDayCount -> activityCareDayCount.getActivityId()).collect(Collectors.toSet()));
                     break;
                 case PROTECTED_DAYS_OFF:
-                    ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ProtectedDaysOffWTATemplate.class);
+                    ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = ObjectMapperUtils.copyPropertiesOrCloneByMapper(ruleTemplate, ProtectedDaysOffWTATemplate.class);
                     CollectionUtils.addIgnoreNull(activityIds,protectedDaysOffWTATemplate.getActivityId());
                     break;
                 default:
@@ -749,7 +749,7 @@ public class WorkTimeAgreementService{
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
         }
-        WorkingTimeAgreement newWta = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
+        WorkingTimeAgreement newWta = ObjectMapperUtils.copyPropertiesOrCloneByMapper(oldWta, WorkingTimeAgreement.class);
         newWta.setDescription(wtadto.getDescription());
         newWta.setName(wtadto.getName());
         newWta.setOrganizationParentId(oldWta.getOrganizationParentId());
@@ -774,8 +774,8 @@ public class WorkTimeAgreementService{
         wtaRepository.save(oldWta);
         newWta.setParentId(oldWta.getId());
         wtaRepository.save(newWta);
-        wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(newWta, WTAResponseDTO.class);
-        WTAResponseDTO version = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
+        wtaResponseDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(newWta, WTAResponseDTO.class);
+        WTAResponseDTO version = ObjectMapperUtils.copyPropertiesOrCloneByMapper(oldWta, WTAResponseDTO.class);
         wtaResponseDTO.setParentId(oldWta.getId());
         List<WTABaseRuleTemplate> existingWtaBaseRuleTemplates = wtaBaseRuleTemplateRepository.findAllByIdInAndDeletedFalse(oldWta.getRuleTemplateIds());
         version.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(existingWtaBaseRuleTemplates));
@@ -1089,7 +1089,7 @@ public class WorkTimeAgreementService{
         staffFilterDTO.setNightWorkerDetails(staffIdNightWorkerMap.entrySet().stream().filter(x->filteredStaffIds.contains(x.getKey())).collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue)));
         if(staffFilterDTO.isIncludeWorkTimeAgreement()) {
             List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getAllWTAByEmploymentIds(staffFilterDTO.getMapOfStaffAndEmploymentIds().values().stream().flatMap(employmentIds -> employmentIds.stream()).collect(Collectors.toList()));
-            List<WTAResponseDTO> wtaResponseDTOS = copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+            List<WTAResponseDTO> wtaResponseDTOS = copyPropertiesOrCloneCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
             Map<Long, List<WTAResponseDTO>> employmentIdAndwtaQueryResultDTOSMap = wtaResponseDTOS.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId()));
             staffFilterDTO.setEmploymentIdAndWtaResponseMap(employmentIdAndwtaQueryResultDTOSMap);
         }

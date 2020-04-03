@@ -505,7 +505,7 @@ public class UserService {
 
         for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
             unitPermission.put(userPermissionQueryResult.getUnitId(),
-                    prepareUnitPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), userPermissionQueryResult.isParentOrganization()));
+                    prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), userPermissionQueryResult.isParentOrganization()));
         }
         permissionData.setOrganizationPermissions(unitPermission);
     }

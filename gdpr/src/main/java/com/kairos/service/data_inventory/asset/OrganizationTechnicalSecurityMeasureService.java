@@ -66,7 +66,7 @@ public class OrganizationTechnicalSecurityMeasureService {
             }
             technicalSecurityMeasureRepository.saveAll(technicalSecurityMeasures);
         }
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(technicalSecurityMeasures, TechnicalSecurityMeasureDTO.class);
+        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(technicalSecurityMeasures, TechnicalSecurityMeasureDTO.class);
 
     }
 
