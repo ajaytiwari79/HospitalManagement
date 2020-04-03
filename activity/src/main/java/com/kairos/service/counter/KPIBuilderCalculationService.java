@@ -756,14 +756,15 @@ public class KPIBuilderCalculationService implements CounterService {
                 }
                 getTimeTypeIdTodoMap();
                 staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
+                Map<BigInteger,List<TodoDTO>> bigIntegerListMap = new HashMap<>();
                 for (Map.Entry<Long, List<TodoDTO>> entry : staffIdAndTodoMap.entrySet()) {
                     if(isCollectionNotEmpty(entry.getValue())) {
-                        timeTypeTodoListMap = entry.getValue().stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
+                        bigIntegerListMap = entry.getValue().stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
                     }
                     else {
-                        timeTypeTodoListMap =new HashMap<>();
+                        bigIntegerListMap =new HashMap<>();
                     }
-                    staffIdAndTimeTypeTodoListMap.put(entry.getKey(),activityIdAndTodoListMap);
+                    staffIdAndTimeTypeTodoListMap.put(entry.getKey(),bigIntegerListMap);
                 }
 
             }
@@ -936,13 +937,14 @@ public class KPIBuilderCalculationService implements CounterService {
                 }
                 staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
                 activityIdAndTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
+                Map<BigInteger,List<TodoDTO>> bigIntegerListMap = new HashMap<>();
                 for (Map.Entry<Long, List<TodoDTO>> entry : staffIdAndTodoMap.entrySet()) {
                     if(isCollectionNotEmpty(entry.getValue())) {
-                        activityIdAndTodoListMap = entry.getValue().stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
+                        bigIntegerListMap = entry.getValue().stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
                     }else {
-                        activityIdAndTodoListMap =new HashMap<>();
+                        bigIntegerListMap =new HashMap<>();
                     }
-                  staffIdAndActivityTodoListMap.put(entry.getKey(),activityIdAndTodoListMap);
+                  staffIdAndActivityTodoListMap.put(entry.getKey(),bigIntegerListMap);
                 }
             }
         }

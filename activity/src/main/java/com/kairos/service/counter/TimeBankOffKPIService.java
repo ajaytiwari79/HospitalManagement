@@ -47,7 +47,7 @@ public class TimeBankOffKPIService implements KPIService{
     }
     public Map<BigInteger,List<TodoDTO>> getBigIntegerTodoListMap(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
         boolean isActivityExist =kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ACTIVITY_IDS);
-        Map<BigInteger,List<TodoDTO>> bigIntegerTodoListMap = new HashMap<>() ;
+        Map<BigInteger,List<TodoDTO>> bigIntegerTodoListMap;
        if(isNotNull(staffId)){
            if(isActivityExist){
                bigIntegerTodoListMap=kpiCalculationRelatedInfo.getStaffIdAndActivityTodoListMap().get(staffId);
@@ -61,8 +61,11 @@ public class TimeBankOffKPIService implements KPIService{
                bigIntegerTodoListMap=kpiCalculationRelatedInfo.getTimeTypeTodoListMap();
            }
 
-       }
-       return bigIntegerTodoListMap;
+       }if(isNotNull(bigIntegerTodoListMap)) {
+            return bigIntegerTodoListMap;
+        }else {
+           return new HashMap<>();
+        }
     }
 
     private double getTodoStatusCountByTimeTypeAndByActivity(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval) {
@@ -70,9 +73,13 @@ public class TimeBankOffKPIService implements KPIService{
         double todoStatusCount=0;
         Map<BigInteger,List<TodoDTO>> idTodoListMap  = getBigIntegerTodoListMap(staffId,kpiCalculationRelatedInfo);
         for(Map.Entry<BigInteger, List<TodoDTO>> entry : idTodoListMap.entrySet()){
-                List<TodoDTO> todoDTOList = getTodoDTOListIfStaffIsNotExist(staffId, kpiCalculationRelatedInfo, dateTimeInterval, entry);
+            List<TodoDTO> todoDTOList = new ArrayList<>();
+            if(isNull(staffId)) {
+                todoDTOList = getTodoDTOListIfStaffIsNotExist(staffId, kpiCalculationRelatedInfo, dateTimeInterval, entry);
+                }
+                List<TodoDTO> todoDTOS =isNotNull(staffId)?entry.getValue():todoDTOList;
                 totalTodos +=entry.getValue().size();
-                todoStatusCount += getActivityStatusCount(todoDTOList,kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getXAxisConfigs().get(0));
+                todoStatusCount += getActivityStatusCount(todoDTOS,kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getXAxisConfigs().get(0));
             }
         if(PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))&&totalTodos>0){
             return getValueWithDecimalFormat((double)(todoStatusCount * 100) / totalTodos);
@@ -82,7 +89,10 @@ public class TimeBankOffKPIService implements KPIService{
     }
 
     private List<TodoDTO> getTodoDTOListIfStaffIsNotExist(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, Map.Entry<BigInteger, List<TodoDTO>> entry) {
-        return isNotNull(staffId)?kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getActivityIdAndTodoListMap().get(entry.getKey())):kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getTimeTypeTodoListMap().get(entry.getKey()));
+        boolean isActivityExist =kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ACTIVITY_IDS);
+        List<TodoDTO> activityTodoList =kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getActivityIdAndTodoListMap().getOrDefault(entry.getKey(),new ArrayList<>()));
+        List<TodoDTO> timeTypeTodoList =kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getTimeTypeTodoListMap().getOrDefault(entry.getKey(),new ArrayList<>()));
+        return isActivityExist?activityTodoList:timeTypeTodoList;
     }
 
 
@@ -111,12 +121,13 @@ public class TimeBankOffKPIService implements KPIService{
     }
 
     public double getStatusCountByPercentage(List<TodoDTO> todoDTOS, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
-        double statusPercentage;
-        if(ShiftStatus.APPROVE.name().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).get(0))&&kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).size()<2) {
-             statusPercentage = todoDTOS.stream().filter(todoDTO -> TodoStatus.APPROVE.equals(todoDTO.getStatus())).collect(Collectors.toList()).size();
-        }
-        else if(ShiftStatus.DISAPPROVE.name().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).get(0))&&kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).size()<2) {
-             statusPercentage = todoDTOS.stream().filter(todoDTO -> TodoStatus.DISAPPROVE.equals(todoDTO.getStatus())).collect(Collectors.toList()).size();
+        double statusPercentage = 0;
+        if(isCollectionNotEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS))) {
+            if (ShiftStatus.APPROVE.name().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).get(0)) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).size() < 2) {
+                statusPercentage = todoDTOS.stream().filter(todoDTO -> TodoStatus.APPROVE.equals(todoDTO.getStatus())).collect(Collectors.toList()).size();
+            } else if (ShiftStatus.DISAPPROVE.name().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).get(0)) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).size() < 2) {
+                statusPercentage = todoDTOS.stream().filter(todoDTO -> TodoStatus.DISAPPROVE.equals(todoDTO.getStatus())).collect(Collectors.toList()).size();
+            }
         }else{
             statusPercentage =todoDTOS.stream().filter(todoDTO -> TodoStatus.APPROVE.equals(todoDTO.getStatus())||TodoStatus.DISAPPROVE.equals(todoDTO.getStatus())).collect(Collectors.toList()).size();
         }
