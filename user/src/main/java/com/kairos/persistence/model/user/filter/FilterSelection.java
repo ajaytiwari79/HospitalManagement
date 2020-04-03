@@ -23,8 +23,6 @@ public class FilterSelection<T> extends UserBaseEntity {
     private FilterType name;
     private List<T> value;
     private int sequence;
-    private T lessThan;
-    private T greaterThan;
 
     private FilterType.FilterComparisonType filterComparisonType = FilterType.FilterComparisonType.CONTAINS;
     private DurationType durationType = DurationType.MONTHS;

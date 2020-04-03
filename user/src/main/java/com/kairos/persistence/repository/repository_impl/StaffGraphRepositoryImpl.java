@@ -239,28 +239,12 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
         if(Optional.ofNullable(filters.get(FilterType.AGE)).isPresent() && filters.get(FilterType.AGE).size()!=0) {
            Set <Map<String,Number>> customQuerySet = (Set<Map<String, Number>>) filters.get(FilterType.AGE);
-            addComparisonValuesToQuery(query," staff.age ",customQuerySet);
-            /*for(Map<String,Number> c:customQuerySet){
-                for(Map.Entry entry : c.entrySet()){
-                    query.append(" AND ");
-                    query.append("staff.age ");
-                    query.append(entry.getKey()).append(" ").append(entry.getValue());
-                }
-            }*/
-
+            addComparisonValuesToQuery(query," DATE(user.dateOfBirth) ",customQuerySet);
         }
 
         if(Optional.ofNullable(filters.get(FilterType.EMPLOYED_SINCE)).isPresent() && filters.get(FilterType.EMPLOYED_SINCE).size()!=0) {
             Set <Map<String,String>> customQuerySet = (Set<Map<String, String>>) filters.get(FilterType.EMPLOYED_SINCE);
             addComparisonValuesToQuery(query," employments.startDate ",customQuerySet);
-           /* for(Map<String,String> c:customQuerySet){
-                for(Map.Entry entry : c.entrySet()){
-                    query.append(" AND ");
-                    query.append("employments.startDate ");
-                    query.append(entry.getKey()).append(" ").append(entry.getValue());
-                }
-            }*/
-
         }
 
         /*if(Optional.ofNullable(filters.get(FilterType.ORGANIZATION_EXPERIENCE)).isPresent() && filters.get(FilterType.ORGANIZATION_EXPERIENCE).size()!=0) {
@@ -337,7 +321,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
        List<StaffEmploymentWithTag> staffEmploymentWithTags = new ArrayList<>();
         Iterator si = staffEmployments.iterator();
         while (si.hasNext()){
-            staffEmploymentWithTags.add(ObjectMapperUtils.copyPropertiesOrCloneByMapper(si.next(),StaffEmploymentWithTag.class));
+            staffEmploymentWithTags.add(ObjectMapperUtils.copyPropertiesByMapper(si.next(),StaffEmploymentWithTag.class));
         }
         return staffEmploymentWithTags;
     }

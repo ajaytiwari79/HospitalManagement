@@ -413,17 +413,17 @@ public class StaffFilterService {
         return employmentTypeGraphRepository.getEmploymentTypeByCountryIdForFilters(countryId);
     }
 
-    public <T> Map<FilterType, T> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelectionDTO> filters) {
-        Map<FilterType, T> mapOfFilters = new HashMap<>();
+    public <T> Map<FilterType, Set<T>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelectionDTO> filters) {
+        Map<FilterType, Set<T>> mapOfFilters = new HashMap<>();
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
         LOGGER.info("filter group searched is {}",filterGroup);
         filters.forEach(filterSelection -> {
-            if (filterGroup!=null && !filterSelection.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
+            if (filterGroup!=null && !isNull(filterSelection.getValue()) && filterGroup.getFilterTypes().contains(
                     filterSelection.getName())) {
-                mapOfFilters.put(filterSelection.getName(),(T) filterSelection.getValue());
+                mapOfFilters.put(filterSelection.getName(),filterSelection.getValue());
             }else{
-                mapOfFilters.put(filterSelection.getName(), (T) filterSelection.getValue());
+                mapOfFilters.put(filterSelection.getName(),filterSelection.getValue());
             }
         });
         return mapOfFilters;
@@ -471,7 +471,7 @@ public class StaffFilterService {
         for (Map staffAndModifiable : staffs) {
             if(staffFilterDTO.getNightWorkerDetails().containsKey(staffAndModifiable.get(ID))) {
                 Map<String, Object> staff = ObjectMapperUtils.copyPropertiesByMapper(staffAndModifiable, HashedMap.class);
-                staff.put(NIGHT_WORKER, staffFilterDTO.getNightWorkerDetails().get(((Integer) ((Map) staff).get(ID)).longValue()));
+                staff.put(NIGHT_WORKER, staffFilterDTO.getNightWorkerDetails().get(((Integer) (staff).get(ID)).longValue()));
                 staffList.add(staff);
                 if(staffFilterDTO.isIncludeWorkTimeAgreement()){
                     for (Map employment : ((Collection<Map>) staff.get(EMPLOYMENTS))) {

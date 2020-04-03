@@ -73,6 +73,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -89,7 +91,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.CharBuffer;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
@@ -238,7 +239,7 @@ public class StaffService {
         return true;
     }
 
-    public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) throws ParseException {
+    public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
 
@@ -249,7 +250,7 @@ public class StaffService {
         if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
         }
-        if (isNotNull(staffToUpdate.getContactDetail()) && isNotNull(staffToUpdate.getContactDetail().getPrivateEmail()) && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
+        if (isNotNull(staffToUpdate) && isNotNull(staffToUpdate.getContactDetail()) && isNotNull(staffToUpdate.getContactDetail().getPrivateEmail()) && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
             if (staffGraphRepository.findStaffByEmailIdInOrganization(staffPersonalDetail.getContactDetail().getPrivateEmail(), parentUnit.getId()) != null) {
                 exceptionService.duplicateDataException(MESSAGE_EMAIL_ALREADYEXIST, "Staff", staffPersonalDetail.getContactDetail().getPrivateEmail());
             }
@@ -1027,7 +1028,7 @@ public class StaffService {
                 if(age==null){
                     age = new HashSet<>();
                 }
-                age.add(compareBuilder(filterSelection));
+                age.add(dateCompareBuilder(filterSelection));
                 filterTypeSetMap.put(filterSelection.getName(),(T) age);
             }
             else if(filterSelection.getName().equals(FilterType.EMPLOYED_SINCE)){
@@ -1084,17 +1085,30 @@ public class StaffService {
 
     private  <T> Map<String,T> compareBuilder(final FilterSelection filterSelection){
 
-        Map<String,T> customQueryMap= new HashMap<>();
+        Map<String,T> customQueryMap = new HashMap<>();
+        String valueWithoutNextLine = String.valueOf(filterSelection.getValue()).replace("\n"," ");
+        JSONArray jsonArray = new JSONArray(valueWithoutNextLine);
 
-        if(filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.BETWEEN)){
-            customQueryMap.put(">", (T) filterSelection.getGreaterThan());
-            customQueryMap.put("<", (T) filterSelection.getLessThan());
-        }else if(filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.GREATER_THAN)){
-            customQueryMap.put(">", (T)  filterSelection.getGreaterThan());
-        }else if (filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.LESS_THAN)){
-            customQueryMap.put("<", (T) filterSelection.getLessThan());
+        JSONObject comparisonData =jsonArray.getJSONObject(0);
+
+        Long moreThan = 0L;
+        if(!comparisonData.isNull("from")) {
+            moreThan = Long.parseLong(comparisonData.getString("from"));
         }
-//        customQueryMap.put("durationType",(T) filterSelection.getFilterComparisonDurationType());
+        Long lessThan = 0L;
+        LOGGER.info(" to data {}",comparisonData.isNull("to"));
+        if(!comparisonData.isNull("to")){
+            lessThan = Long.parseLong(comparisonData.getString("to"));
+        }
+        if(lessThan!=0 && moreThan!=0){
+            customQueryMap.put(">", (T) lessThan);
+            customQueryMap.put("<", (T) moreThan);
+        }else if( moreThan!=0){
+            customQueryMap.put(">", (T)  comparisonData.get("from"));
+        }else if (lessThan!=0){
+            customQueryMap.put("<", (T) comparisonData.get("to"));
+        }
+
         LOGGER.info(" custom query map prepared is {}",customQueryMap);
         return  customQueryMap;
     }
@@ -1103,32 +1117,27 @@ public class StaffService {
 
         Map<String,T> customQueryMap = new HashMap<>();
         LocalDate localDateToday = LocalDate.now();
-        long moreThanDays = staffFilterService.getDataInDays((long)filterSelection.getGreaterThan(),filterSelection.getDurationType());
-        long lessThanDays = staffFilterService.getDataInDays((long)filterSelection.getGreaterThan(),filterSelection.getDurationType());
+        String valueWithoutNextLine = String.valueOf(filterSelection.getValue()).replace("\n"," ");
+        JSONArray jsonArray = new JSONArray(valueWithoutNextLine);
+
+        JSONObject jsonObject =jsonArray.getJSONObject(0);
+
+        Long moreThanDays = 0L;
+        if(!jsonObject.isNull("from")) {
+            moreThanDays = staffFilterService.getDataInDays(Long.parseLong(jsonObject.getString("from")), filterSelection.getDurationType());
+        }
+        Long lessThanDays = 0L;
+        LOGGER.info(" to data {}",jsonObject.isNull("to"));
+        if(!jsonObject.isNull("to")){
+            lessThanDays = staffFilterService.getDataInDays(Long.parseLong(jsonObject.getString("to")),filterSelection.getDurationType());
+        }
 
         LocalDate dateGreaterThan = localDateToday.minusDays(moreThanDays);
         LocalDate dateLessThan = localDateToday.plusDays(lessThanDays);
-
-        if(filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.BETWEEN)){
-            customQueryMap.put(">", (T) ("DATE("+dateGreaterThan+")"));
-            customQueryMap.put("<", (T)("DATE("+ dateLessThan+")"));
-        }else if(filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.GREATER_THAN)){
-            customQueryMap.put(">", (T) ("DATE("+ dateGreaterThan+")"));
-        }else if (filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.LESS_THAN)){
-            customQueryMap.put("<", (T)  ("DATE("+dateLessThan+")"));
-        }
-//        customQueryMap.put("durationType",(T) filterSelection.getFilterComparisonDurationType());
+        customQueryMap.put(">", (T) ("DATE('"+dateGreaterThan+"')"));
+        customQueryMap.put("<", (T)("DATE('"+ dateLessThan+"')"));
         LOGGER.info(" custom query map prepared is {}",customQueryMap);
         return  customQueryMap;
-    }
-
-
-    private <T> void addDuration(final FilterSelection filterSelection,final T filterCompareValue){
-
-        if(filterCompareValue instanceof Number && filterSelection.getFilterComparisonType().equals(FilterType.FilterComparisonType.DUE_IN)){
-            filterSelection.setGreaterThan((Long)filterSelection.getGreaterThan() + ((Number) filterCompareValue).longValue());
-        }
-
     }
 
 }

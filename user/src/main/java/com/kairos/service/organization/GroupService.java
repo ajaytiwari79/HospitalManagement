@@ -117,7 +117,7 @@ public class GroupService {
         List<FilterSelectionDTO> filterSelectionDTOS = new ArrayList<>();
         for(FilterSelection filterSelection : group.getFiltersData()){
             Set<Object> values = new HashSet<>();
-//            filterSelection.getValue().forEach(val-> values.add(ObjectMapperUtils.jsonStringToObject(val,Object.class)));
+            filterSelection.getValue().forEach(val-> values.add(ObjectMapperUtils.jsonStringToObject((String) val,Object.class)));
             filterSelectionDTOS.add(new FilterSelectionDTO(filterSelection.getName(), values));
         }
         groupDTO.setFiltersData(filterSelectionDTOS);
