@@ -42,46 +42,47 @@ public class TimeBankOffKPIService implements KPIService{
     private TimeTypeService timeTypeService;
 
     public double getCountAndHoursAndPercentageOfTODOS(Long staffId,DateTimeInterval dateTimeInterval,KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
-        double todoStatusCount =0.0d;
-           if (isNotNull(staffId)&&YAxisConfig.ACTIVITY.equals(kpiCalculationRelatedInfo.getYAxisConfigs().get(0))) {
-               kpiCalculationRelatedInfo.updateTodoDtosByStaffId(staffId);
-           }
-            if (isNotNull(staffId)&&YAxisConfig.TIME_TYPE.equals(kpiCalculationRelatedInfo.getYAxisConfigs().get(0))) {
-                kpiCalculationRelatedInfo.getUpdateTimeTypeTodoDTOSMapByStaffId(staffId);
-            }
-           todoStatusCount =todoStatusCount + getTodoStatus(staffId,kpiCalculationRelatedInfo,dateTimeInterval);
-
+           double todoStatusCount = getTodoStatusCountByTimeTypeAndByActivity(staffId,kpiCalculationRelatedInfo,dateTimeInterval);
            return todoStatusCount;
     }
-
-    public double getTodoStatus (Long staffId,KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo,DateTimeInterval dateTimeInterval){
-        double todoStatusCount =0.0d;
-        todoStatusCount = getTodoStatusCount(staffId, kpiCalculationRelatedInfo, dateTimeInterval, todoStatusCount);
-
-        return todoStatusCount;
-    }
-
-    private double getTodoStatusCount(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, double todoStatusCount) {
-        todoStatusCount = getTodoStatusCountByTimeTypeAndByActivity(staffId, kpiCalculationRelatedInfo, dateTimeInterval, todoStatusCount);
-        return todoStatusCount;
-    }
-
-    private double getTodoStatusCountByTimeTypeAndByActivity(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, double todoStatusCount) {
-        int totalTodos=0;
+    public Map<BigInteger,List<TodoDTO>> getBigIntegerTodoListMap(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
         boolean isActivityExist =kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ACTIVITY_IDS);
+        Map<BigInteger,List<TodoDTO>> bigIntegerTodoListMap = new HashMap<>() ;
+       if(isNotNull(staffId)){
+           if(isActivityExist){
+               bigIntegerTodoListMap=kpiCalculationRelatedInfo.getStaffIdAndActivityTodoListMap().get(staffId);
+           }else {
+               bigIntegerTodoListMap=kpiCalculationRelatedInfo.getStaffIdAndTimeTypeTodoListMap().get(staffId);
+           }
+       }else {
+           if(isActivityExist){
+               bigIntegerTodoListMap=kpiCalculationRelatedInfo.getActivityIdAndTodoListMap();
+           }else {
+               bigIntegerTodoListMap=kpiCalculationRelatedInfo.getTimeTypeTodoListMap();
+           }
 
-        Map<BigInteger,List<TodoDTO>> idTodoListMap  = isActivityExist ? kpiCalculationRelatedInfo.getActivityIdAndTodoListMap() : kpiCalculationRelatedInfo.getTimeTypeTodoListMap();
+       }
+       return bigIntegerTodoListMap;
+    }
+
+    private double getTodoStatusCountByTimeTypeAndByActivity(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval) {
+        int totalTodos=0;
+        double todoStatusCount=0;
+        Map<BigInteger,List<TodoDTO>> idTodoListMap  = getBigIntegerTodoListMap(staffId,kpiCalculationRelatedInfo);
         for(Map.Entry<BigInteger, List<TodoDTO>> entry : idTodoListMap.entrySet()){
-                List<TodoDTO> todoDTOList =isActivityExist?kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getActivityIdAndTodoListMap().get(entry.getKey())):kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getTimeTypeTodoListMap().get(entry.getKey()));
-                List<TodoDTO> todoDTOS =isNotNull(staffId)?entry.getValue():todoDTOList;
+                List<TodoDTO> todoDTOList = getTodoDTOListIfStaffIsNotExist(staffId, kpiCalculationRelatedInfo, dateTimeInterval, entry);
                 totalTodos +=entry.getValue().size();
-                todoStatusCount += getActivityStatusCount(todoDTOS,kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getXAxisConfigs().get(0));
+                todoStatusCount += getActivityStatusCount(todoDTOList,kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getXAxisConfigs().get(0));
             }
         if(PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))&&totalTodos>0){
             return getValueWithDecimalFormat((double)(todoStatusCount * 100) / totalTodos);
         }else {
             return todoStatusCount;
         }
+    }
+
+    private List<TodoDTO> getTodoDTOListIfStaffIsNotExist(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, Map.Entry<BigInteger, List<TodoDTO>> entry) {
+        return isNotNull(staffId)?kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getActivityIdAndTodoListMap().get(entry.getKey())):kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getTimeTypeTodoListMap().get(entry.getKey()));
     }
 
 
@@ -110,7 +111,7 @@ public class TimeBankOffKPIService implements KPIService{
     }
 
     public double getStatusCountByPercentage(List<TodoDTO> todoDTOS, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
-        double statusPercentage=0.0d;
+        double statusPercentage;
         if(ShiftStatus.APPROVE.name().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).get(0))&&kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).size()<2) {
              statusPercentage = todoDTOS.stream().filter(todoDTO -> TodoStatus.APPROVE.equals(todoDTO.getStatus())).collect(Collectors.toList()).size();
         }

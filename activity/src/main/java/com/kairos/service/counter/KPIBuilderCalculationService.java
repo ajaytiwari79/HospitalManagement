@@ -713,6 +713,8 @@ public class KPIBuilderCalculationService implements CounterService {
         private List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>();
         private Map<Long, List<AuditShiftDTO>> staffAuditLog = new HashMap<>();
         private Set<Long> tagIds = new HashSet<>();
+        private Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdAndActivityTodoListMap = new HashMap<>();
+        private Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdAndTimeTypeTodoListMap = new HashMap<>();
 
         public KPICalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long unitId, ApplicableKPI applicableKPI, KPI kpi) {
             this.filterBasedCriteria = filterBasedCriteria;
@@ -754,6 +756,16 @@ public class KPIBuilderCalculationService implements CounterService {
                 }
                 getTimeTypeIdTodoMap();
                 staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
+                for (Map.Entry<Long, List<TodoDTO>> entry : staffIdAndTodoMap.entrySet()) {
+                    if(isCollectionNotEmpty(entry.getValue())) {
+                        timeTypeTodoListMap = entry.getValue().stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
+                    }
+                    else {
+                        timeTypeTodoListMap =new HashMap<>();
+                    }
+                    staffIdAndTimeTypeTodoListMap.put(entry.getKey(),activityIdAndTodoListMap);
+                }
+
             }
 
         }
@@ -774,17 +786,6 @@ public class KPIBuilderCalculationService implements CounterService {
             }
         }
 
-
-        public void getUpdateTimeTypeTodoDTOSMapByStaffId(Long staffId) {
-            if(isNotNull(staffId)){
-                todoDTOS=staffIdAndTodoMap.get(staffId);
-            }
-            if(isCollectionNotEmpty(todoDTOS)) {
-                timeTypeTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
-            }else {
-                timeTypeTodoListMap = new HashMap<>();
-            }
-        }
 
 
         public CalculationType getCalculationType() {
@@ -926,8 +927,8 @@ public class KPIBuilderCalculationService implements CounterService {
         public void getTodoDetails() {
             if (CollectionUtils.containsAny(yAxisConfigs,newHashSet(YAxisConfig.PLANNING_QUALITY_LEVEL,ABSENCE_REQUEST,YAxisConfig.ACTIVITY))) {
                 getUpdateTodoStatus();
-                if(filterBasedCriteria.containsKey(DAYS_OF_WEEK)){
-                    todoDTOS=todoDTOS.stream().filter(todoDTO -> daysOfWeeks.contains(asLocalDate(todoDTO.getRequestedOn()).getDayOfWeek())).collect(Collectors.toList());
+                if (filterBasedCriteria.containsKey(DAYS_OF_WEEK)) {
+                    todoDTOS = todoDTOS.stream().filter(todoDTO -> daysOfWeeks.contains(asLocalDate(todoDTO.getRequestedOn()).getDayOfWeek())).collect(Collectors.toList());
                 }
                 activityIds = filterBasedCriteria.containsKey(ACTIVITY_IDS) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(ACTIVITY_IDS)) : new HashSet<>();
                 if (isCollectionNotEmpty(activityIds)) {
@@ -935,6 +936,14 @@ public class KPIBuilderCalculationService implements CounterService {
                 }
                 staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
                 activityIdAndTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
+                for (Map.Entry<Long, List<TodoDTO>> entry : staffIdAndTodoMap.entrySet()) {
+                    if(isCollectionNotEmpty(entry.getValue())) {
+                        activityIdAndTodoListMap = entry.getValue().stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
+                    }else {
+                        activityIdAndTodoListMap =new HashMap<>();
+                    }
+                  staffIdAndActivityTodoListMap.put(entry.getKey(),activityIdAndTodoListMap);
+                }
             }
         }
 
