@@ -563,14 +563,8 @@ public class ShiftValidatorService {
             if (activityIdAndShiftActivityDTOMap.containsKey(key) && (!shiftActivity.getStartDate().equals(activityIdAndShiftActivityDTOMap.get(key).getStartDate()) || !shiftActivity.getEndDate().equals(activityIdAndShiftActivityDTOMap.get(key).getEndDate()))) {
                 if (shiftActivity.getStatus().contains(ShiftStatus.FIX)) {
                     valid = true;
-                } else if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)|| (!oldStateOfShift.isDraft()&&isCollectionEmpty(shiftActivity.getStatus()))||shiftActivity.getStatus().contains(ShiftStatus.APPROVE)) {
+                } else if (shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)||shiftActivity.getStatus().contains(ShiftStatus.APPROVE)) {
                     ShiftActivityDTO shiftActivityDTO = activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId() + "" + shiftActivity.getStartDate());
-                    shiftActivityDTO.getStatus().add(ShiftStatus.MOVED);
-                }
-            }if(isApprovalRequired && !activityIdAndShiftActivityDTOMap.containsKey(key)&&(shiftActivity.getStatus().contains(ShiftStatus.APPROVE)&& shiftActivity.getStatus().contains(ShiftStatus.APPROVE))){
-                for(ShiftActivityDTO shiftActivityDTO :shiftDTO.getActivities()){
-                    shiftActivity.getStatus().remove(ShiftStatus.APPROVE);
-                    shiftActivityDTO.setStatus(shiftActivity.getStatus());
                     shiftActivityDTO.getStatus().add(ShiftStatus.MOVED);
                 }
             }
