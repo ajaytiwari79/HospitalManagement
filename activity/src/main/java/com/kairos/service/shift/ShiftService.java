@@ -264,6 +264,8 @@ public class ShiftService extends MongoBaseService {
         if ((PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             mainShift = saveShiftWithActivity(activityWrapperMap, mainShift, staffAdditionalInfoDTO, false, functionId, phase, shiftActionType);
             shiftDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(isNotNull(mainShift.getDraftShift()) ? mainShift.getDraftShift() : mainShift, ShiftDTO.class);
+            todoService.createOrUpdateTodo(mainShift, TodoType.APPROVAL_REQUIRED);
+            payOutService.updatePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
             shiftDTO.setId(mainShift.getId());
             shiftValidatorService.validateShiftViolatedRules(mainShift, shiftOverlappedWithNonWorkingType, shiftWithViolatedInfoDTO, PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) ? ShiftActionType.SAVE_AS_DRAFT : null);
             shiftDTO = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(Arrays.asList(shiftDTO)).get(0);
