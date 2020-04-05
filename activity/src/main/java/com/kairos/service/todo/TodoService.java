@@ -302,11 +302,12 @@ public class TodoService {
         return todoRepository.findAllByEntityIdsAndTodoStatus(startDate,endDate,newArrayList(APPROVE,DISAPPROVE, REQUESTED,PENDING,VIEWED));
     }
 
-    public List<TodoDTO> getAllTodoByDateTimeIntervalAndStatus(Date startDate, Date endDate){
-        return todoRepository.findAllByDateTimeIntervalAndTodoStatus(startDate,endDate,newArrayList(APPROVE,DISAPPROVE));
+    public List<TodoDTO> getAllTodoByDateTimeIntervalAndTodoStatus(Date startDate, Date endDate,Collection<ShiftStatus> statuses) {
+        return todoRepository.findAllByEntityIdsAndApproveStatus(startDate,endDate, statuses);
     }
-    public List<TodoDTO> getAllTodoByDateTimeIntervalAndApproveStatus(Date startDate, Date endDate,Object todoStatus){
-        return todoRepository.findAllByEntityIdsAndApproveStatus(startDate,endDate, todoStatus);
+
+    public List<TodoDTO> getAllTodoByShiftDateAndTodoStatus(Date startDate, Date endDate) {
+        return todoRepository.findAllByShiftDateAndTodoStatus(startDate,endDate, newArrayList(APPROVE,DISAPPROVE, REQUESTED,PENDING,VIEWED));
     }
 
 

@@ -58,14 +58,16 @@ public interface TodoRepository extends MongoBaseRepository<Todo, BigInteger>,Cu
     @Query(value = "{deleted:false,requestedOn:{$gte:?0,$lte:?1},status:{$in:?2}}")
     List<TodoDTO> findAllByEntityIdsAndTodoStatus(Date startDate, Date endDate, Collection<TodoStatus> statuses);
 
-    @Query(value = "{deleted:false,requestedOn:{$gte:?0,$lte:?1},status:?2}")
-    List<TodoDTO> findAllByEntityIdsAndApproveStatus(Date startDate, Date endDate,Object todoStatus);
+    @Query(value = "{deleted:false,shiftDate:{$gte:?0,$lte:?1},status:{$in:?2}}")
+    List<TodoDTO> findAllByEntityIdsAndApproveStatus(Date startDate, Date endDate,Collection<ShiftStatus> statuses);
 
     @Query(value ="{subEntityId:?0,deleted:false,entityId:?1,status:{$in:?2}}")
     Todo findTodoBySubEntityId(BigInteger shiftActivityId,BigInteger shiftId,Collection<TodoStatus> statuses);
 
-    @Query(value = "{deleted:false,requestedOn:{$gte:?0,$lte:?1},status:{$in:?2}}")
-    List<TodoDTO> findAllByDateTimeIntervalAndTodoStatus(Date startDate, Date endDate, Collection<TodoStatus> statuses);
+    @Query(value = "{deleted:false,shiftDate:{$gte:?0,$lte:?1},status:{$in:?2}}")
+    List<TodoDTO> findAllByShiftDateAndTodoStatus(Date startDate, Date endDate, Collection<TodoStatus> statuses);
+
+
 
 
 }
