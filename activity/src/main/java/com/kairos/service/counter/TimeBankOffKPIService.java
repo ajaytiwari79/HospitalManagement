@@ -8,10 +8,7 @@ import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.service.activity.TimeTypeService;
 import org.springframework.stereotype.Service;
-import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,13 +20,6 @@ import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
 
 @Service
 public class TimeBankOffKPIService implements KPIService{
-    @Inject
-    private KPIBuilderCalculationService kpiBuilderCalculationService;
-    @Inject
-    private TimeTypeService timeTypeService;
-    @Inject
-    private ShiftMongoRepository shiftMongoRepository;
-
     public double getCountAndHoursAndPercentageOfTODOSByActivityAndTimeType(Long staffId,DateTimeInterval dateTimeInterval,KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
         int totalTodos=0;
         double todoStatusCount=0;
