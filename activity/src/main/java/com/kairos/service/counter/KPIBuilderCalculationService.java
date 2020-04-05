@@ -30,7 +30,6 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
-import com.kairos.enums.cta.CalculationUnit;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.YAxisConfig;
@@ -779,22 +778,22 @@ public class KPIBuilderCalculationService implements CounterService {
         }
 
         private Map<Long, Map<BigInteger, List<Shift>>> updateStaffIdAndBigIntegerIdAndShiftMap(Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdBigIntegerTodoListMap,Map<BigInteger,List<Shift>> bigIntegerShiftListMap) {
-            Map<Long,Map<BigInteger,List<Shift>>> staffIdAndActivityIdAndShiftMap = new HashMap<>();
+            Map<Long,Map<BigInteger,List<Shift>>> staffIdAndActivityAndShiftMap = new HashMap<>();
             for(Map.Entry<Long,Map<BigInteger,List<TodoDTO>>> entry :staffIdBigIntegerTodoListMap.entrySet()){
                 for(Map.Entry<BigInteger,List<TodoDTO>> bigIntegerListEntry :entry.getValue().entrySet()){
-                    List<BigInteger> staffIds =bigIntegerListEntry.getValue().stream().map(TodoDTO::getEntityId).collect(Collectors.toList());
-                    List<Shift> shifts =shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(staffIds);
-                    bigIntegerShiftListMap.put(bigIntegerListEntry.getKey(),shifts);
+                    List<BigInteger> staffIdList =bigIntegerListEntry.getValue().stream().map(TodoDTO::getEntityId).collect(Collectors.toList());
+                    List<Shift> shiftList =shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(staffIdList);
+                    bigIntegerShiftListMap.put(bigIntegerListEntry.getKey(),shiftList);
                 }
-                staffIdAndActivityIdAndShiftMap.put(entry.getKey(),bigIntegerShiftListMap);
+                staffIdAndActivityAndShiftMap.put(entry.getKey(),bigIntegerShiftListMap);
             }
-            return staffIdAndActivityIdAndShiftMap;
+            return staffIdAndActivityAndShiftMap;
         }
 
         private void getTimeTypeIdTodoMap() {
-            Set<BigInteger> activityIds =activityMap.keySet();
+            Set<BigInteger> activityIdList =activityMap.keySet();
             if(isCollectionNotEmpty(todoDTOS)) {
-                todoDTOS = todoDTOS.stream().filter(todoDTO -> activityIds.contains(todoDTO.getSubEntityId())).collect(Collectors.toList());
+                todoDTOS = todoDTOS.stream().filter(todoDTO -> activityIdList.contains(todoDTO.getSubEntityId())).collect(Collectors.toList());
                 timeTypeTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
             }
         }
