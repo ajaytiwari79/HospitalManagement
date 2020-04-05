@@ -15,7 +15,6 @@ import java.math.BigInteger;
 @NoArgsConstructor
 public class BalanceSettingsActivityTab{
 
-
     private Integer addTimeTo;
     private BigInteger timeTypeId;
     private TimeTypeEnum timeType; // This is used to verify the activity is of  paid break or unpaid break
