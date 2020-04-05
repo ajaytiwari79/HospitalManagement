@@ -20,11 +20,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.enums.kpermissions.FieldLevelPermission.READ;
 
 
 @Service
@@ -47,7 +49,11 @@ public class PermissionService {
             Set<String> modelNames=getModelNames(objects);
             FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getModels(modelNames);
             FieldPermissionHelperDTO fieldPermissionHelperDTO=new FieldPermissionHelperDTO(objects,fieldLevelPermissions,fieldPermissionUserData);
-            updateObjectsPropertiesBeforeSave(fieldPermissionHelperDTO,fieldLevelPermissions);
+            if(fieldLevelPermissions.contains(READ)){
+                updateObjectsPropertiesBeforeSend(fieldPermissionHelperDTO,fieldLevelPermissions);
+            }else {
+                updateObjectsPropertiesBeforeSave(fieldPermissionHelperDTO,fieldLevelPermissions);
+            }
         }catch (Exception e){
             LOGGER.error(e.getMessage());
         }
@@ -150,6 +156,26 @@ public class PermissionService {
             }
             return "";
         }).collect(Collectors.toSet());
+    }
+
+    public <T ,E> void updateObjectsPropertiesBeforeSend(FieldPermissionHelperDTO fieldPermissionHelper,Set<FieldLevelPermission> fieldLevelPermissions) throws NoSuchFieldException, IllegalAccessException {
+        for (T object : (List<T>)fieldPermissionHelper.getObjects()) {
+            if(object.getClass().isAnnotationPresent(com.kairos.annotations.KPermissionModel.class) || object.getClass().isAnnotationPresent(PermissionClass.class)){
+                Field field=object.getClass().getDeclaredField("id");
+                field.setAccessible(true);
+                Long objectId=Long.valueOf(field.get(object).toString());
+                String className=!object.getClass().isAnnotationPresent(PermissionClass.class)?object.getClass().getSimpleName():object.getClass().getAnnotation(PermissionClass.class).name();
+                E databaseObject = (E)fieldPermissionHelper.getMapOfDataBaseObject().get(objectId);
+                PermissionMapperUtils.PermissionHelper permissionHelper = fieldPermissionHelper.getPermissionHelper(className,fieldLevelPermissions);
+                if(PermissionMapperUtils.personalisedModel.contains(className)){
+                    permissionHelper.setSameStaff(permissionHelper.getCurrentUserStaffId().equals(objectId));
+                    permissionHelper.setOtherPermissions(permissionHelper.getOtherPermissionDTOMap().getOrDefault(objectId,new OtherPermissionDTO()));
+                }
+                PermissionMapperUtils.copySpecificPropertiesByMapper(object,databaseObject,permissionHelper);
+            }/*else if(object.getClass().isAnnotationPresent(KPermissionRelatedModel.class)){
+
+            }*/
+        }
     }
 
 }

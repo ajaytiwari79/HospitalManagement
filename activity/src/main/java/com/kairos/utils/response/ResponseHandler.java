@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.aspects.ReadPermissionAspect.validateResponseAsPerPermission;
+
 /**
  * Created by prabjot on 9/20/16.
  */
@@ -23,6 +25,7 @@ public final class ResponseHandler {
         Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("status", status.value());
         map.put("isSuccess", isSuccess);
+        validateResponseAsPerPermission(responseObj);
         map.put("data", responseObj);
         map.put("time_stamp", dateTime);
         return new ResponseEntity<Map<String, Object>>(map, status);
@@ -45,9 +48,5 @@ public final class ResponseHandler {
         map.put("time_stamp", dateTime);
         return new ResponseEntity<Map<String, Object>>(map, status);
 
-    }
-
-    public static ResponseEntity<String> generateResponse(JSONObject jsonObject){
-        return new ResponseEntity<String>(jsonObject.toString(), HttpStatus.UNAUTHORIZED);
     }
 }
