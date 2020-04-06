@@ -67,11 +67,13 @@ public class DynamicCronScheduler{
         } else {
             future = threadPoolTaskScheduler.schedule(runnable, DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate().atZone(ZoneId.of(timezone))));
         }
-
-        logger.info("Name of cron job is --> {} scheduler {}",schedulerPanel.getId(),TimeZone.getDefault());
-        BeanFactoryUtil.registerSingleton(SCHEDULER + schedulerPanel.getId(), future);
-        logger.info("Name of cron job is --> " + SCHEDULER + schedulerPanel.getId());
-
+        try {
+            logger.info("Name of cron job is --> {} scheduler {}", schedulerPanel.getId(), TimeZone.getDefault());
+            BeanFactoryUtil.registerSingleton(SCHEDULER + schedulerPanel.getId(), future);
+            logger.info("Name of cron job is --> " + SCHEDULER + schedulerPanel.getId());
+        }catch (Exception ex){
+            logger.info("Exception --> ", ex.getMessage());
+        }
         return SCHEDULER + schedulerPanel.getId();
 
 

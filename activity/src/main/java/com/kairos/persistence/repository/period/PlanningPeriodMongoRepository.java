@@ -22,8 +22,8 @@ public interface PlanningPeriodMongoRepository extends MongoBaseRepository<Plann
     @Query("{deleted:false,unitId:?0,id:{$in:?1}}")
     List<PlanningPeriod> findAllByUnitIdAndIds(Long unitId, List<BigInteger> planningPeriodIds);
 
-    @Query("{deleted:false,unitId:{$in:?0},startDate: {$lt: ?2},endDate:{$gt:?1}}")
-    List<PlanningPeriod> findAllByUnitIdsAndBetweenDates(List<Long> unitIds, Date startDate, Date endDate);
+    @Query("{deleted:false,endDate:{$gte:?0}}")
+    List<PlanningPeriod> getAllPlanningPeriodWhichNotEnd(Date endDate);
 
     @Query("{deleted:false,unitId:?0,startDate: {$lte: ?1},endDate:{$gte:?1}}")
     PlanningPeriod findOneByUnitIdAndDate(Long unitId, Date startDate);

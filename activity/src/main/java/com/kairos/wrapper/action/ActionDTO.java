@@ -18,7 +18,7 @@ import java.math.BigInteger;
 @AllArgsConstructor
 public class ActionDTO {
     private BigInteger id;
-    @NotNull
+    @NotNull(message = "name can't be null")
     private ActionType name;
     private String description;
     private Long unitId;
