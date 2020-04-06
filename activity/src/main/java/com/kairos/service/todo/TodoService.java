@@ -306,8 +306,8 @@ public class TodoService {
         return todoRepository.findAllByEntityIdsAndApproveStatus(startDate,endDate, statuses);
     }
 
-    public List<TodoDTO> getAllTodoByShiftDateAndTodoStatus(Date startDate, Date endDate) {
-        return todoRepository.findAllByShiftDateAndTodoStatus(startDate,endDate, newArrayList(APPROVE,DISAPPROVE, REQUESTED,PENDING,VIEWED));
+    public List<TodoDTO> getAllTodoByShiftDate(Date startDate, Date endDate) {
+        return todoRepository.findAllTodosByShiftDate(startDate,endDate, newArrayList(APPROVE,DISAPPROVE, REQUESTED,PENDING,VIEWED));
     }
 
 

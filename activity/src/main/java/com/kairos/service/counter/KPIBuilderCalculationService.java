@@ -737,7 +737,7 @@ public class KPIBuilderCalculationService implements CounterService {
             getTodoDetails();
             getDailyTimeBankEntryByDate();
             getActivityTodoList();
-            updateActivityIdMap();
+            getActivityIdMap();
             getTimeTypeTodoList();
             updateActivityAndTimeTypeAndPlannedTimeMap();
             planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
@@ -755,9 +755,7 @@ public class KPIBuilderCalculationService implements CounterService {
         public void getTimeTypeTodoList(){
             if (CollectionUtils.containsAny(yAxisConfigs,newHashSet(YAxisConfig.TIME_TYPE))) {
                 getUpdateTodoStatus();
-                if(filterBasedCriteria.containsKey(DAYS_OF_WEEK)){
-                    todoDTOS=todoDTOS.stream().filter(todoDTO -> daysOfWeeks.contains(todoDTO.getShiftDate().getDayOfWeek())).collect(Collectors.toList());
-                }
+                getUpdateTodoDTOSByDayOfWeek(todoDTOS);
                 getTimeTypeIdTodoMap();
                 staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
                 staffIdAndTimeTypeTodoListMap = getStaffIdBigIntegerIdTodoListMap(staffIdAndTimeTypeTodoListMap,staffIdAndTodoMap);
@@ -767,6 +765,12 @@ public class KPIBuilderCalculationService implements CounterService {
 
             }
 
+        }
+
+        private void getUpdateTodoDTOSByDayOfWeek(List<TodoDTO> todoDTOS) {
+            if (filterBasedCriteria.containsKey(DAYS_OF_WEEK)) {
+                todoDTOS.stream().filter(todoDTO -> daysOfWeeks.contains(todoDTO.getShiftDate().getDayOfWeek())).collect(Collectors.toList());
+            }
         }
 
         private Map<Long,Map<BigInteger,List<TodoDTO>>> getStaffIdBigIntegerIdTodoListMap(Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdAndBigIntegerTodoListMap,Map<Long,List<TodoDTO>> longTodoListMap) {
@@ -791,14 +795,16 @@ public class KPIBuilderCalculationService implements CounterService {
         }
 
         private void getTimeTypeIdTodoMap() {
-            Set<BigInteger> activityIdList =activityMap.keySet();
-            if(isCollectionNotEmpty(todoDTOS)) {
-                todoDTOS = todoDTOS.stream().filter(todoDTO -> activityIdList.contains(todoDTO.getSubEntityId())).collect(Collectors.toList());
-                timeTypeTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
+            if(TODO_STATUS.equals(calculationTypes.get(0))) {
+                Set<BigInteger> activityIdList = activityMap.keySet();
+                if (isCollectionNotEmpty(todoDTOS)) {
+                    todoDTOS = todoDTOS.stream().filter(todoDTO -> activityIdList.contains(todoDTO.getSubEntityId())).collect(Collectors.toList());
+                    timeTypeTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
+                }
             }
         }
-        private void updateActivityIdMap(){
-            if(CollectionUtils.containsAny(yAxisConfigs,newHashSet(YAxisConfig.TIME_TYPE))) {
+        private void getActivityIdMap(){
+            if(CalculationType.TODO_STATUS.equals(calculationTypes.get(0)) && CollectionUtils.containsAny(yAxisConfigs,newHashSet(YAxisConfig.TIME_TYPE))) {
                 Set<BigInteger> timeTypeIds = isCollectionNotEmpty(filterBasedCriteria.get(TIME_TYPE)) ? getBigIntegerSet(filterBasedCriteria.get(TIME_TYPE)) : new HashSet<>();
                 Set<BigInteger> lowerLevelTimeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), timeTypeIds).keySet();
                 List<Activity> activities = activityMongoRepository.findAllByUnitIdAndTimeTypeIds(unitId, lowerLevelTimeTypeIds);
@@ -947,9 +953,7 @@ public class KPIBuilderCalculationService implements CounterService {
         public void getTodoDetails() {
             if (CollectionUtils.containsAny(yAxisConfigs,newHashSet(YAxisConfig.PLANNING_QUALITY_LEVEL,ABSENCE_REQUEST,YAxisConfig.ACTIVITY))) {
                 getUpdateTodoStatus();
-                if (filterBasedCriteria.containsKey(DAYS_OF_WEEK)) {
-                    todoDTOS = todoDTOS.stream().filter(todoDTO -> daysOfWeeks.contains(todoDTO.getShiftDate().getDayOfWeek())).collect(Collectors.toList());
-                }
+                getUpdateTodoDTOSByDayOfWeek(todoDTOS);
                 activityIds = filterBasedCriteria.containsKey(ACTIVITY_IDS) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(ACTIVITY_IDS)) : new HashSet<>();
                 if (isCollectionNotEmpty(activityIds)) {
                     todoDTOS = todoDTOS.stream().filter(todoDTO -> activityIds.contains(todoDTO.getSubEntityId())).collect(Collectors.toList());
@@ -966,7 +970,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 todoDTOS = todoService.getAllTodoByDateTimeIntervalAndTodoStatus(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),filterBasedCriteria.get(ACTIVITY_STATUS));
             }
             else if(XAxisConfig.PERCENTAGE.equals(xAxisConfigs.get(0))&& TODO_STATUS.equals(calculationTypes.get(0))){
-                todoDTOS =todoService.getAllTodoByShiftDateAndTodoStatus(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+                todoDTOS =todoService.getAllTodoByShiftDate(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
             }
             else{
                 todoDTOS=todoService.getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
