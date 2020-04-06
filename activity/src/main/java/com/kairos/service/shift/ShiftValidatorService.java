@@ -567,6 +567,12 @@ public class ShiftValidatorService {
                     ShiftActivityDTO shiftActivityDTO = activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId() + "" + shiftActivity.getStartDate());
                     shiftActivityDTO.getStatus().add(ShiftStatus.MOVED);
                 }
+            }if(isApprovalRequired && !activityIdAndShiftActivityDTOMap.containsKey(key)&&(shiftActivity.getStatus().contains(ShiftStatus.APPROVE)&&shiftActivity.getStatus().contains(ShiftStatus.PUBLISH))){
+                for(ShiftActivityDTO shiftActivityDTO :shiftDTO.getActivities()){
+                    shiftActivity.getStatus().remove(ShiftStatus.APPROVE);
+                    shiftActivityDTO.setStatus(shiftActivity.getStatus());
+                    shiftActivityDTO.getStatus().add(ShiftStatus.MOVED);
+                }
             }
             if (valid) {
                 exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
