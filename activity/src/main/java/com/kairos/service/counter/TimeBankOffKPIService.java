@@ -118,7 +118,7 @@ public class TimeBankOffKPIService implements KPIService{
                 statusPercentage = todoDTOS.stream().filter(todoDTO -> TodoStatus.APPROVE.equals(todoDTO.getStatus())).collect(Collectors.toList()).size();
             } else if (ShiftStatus.DISAPPROVE.name().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).get(0)) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).size() < 2) {
                 statusPercentage = todoDTOS.stream().filter(todoDTO -> TodoStatus.DISAPPROVE.equals(todoDTO.getStatus())).collect(Collectors.toList()).size();
-            }else if(ShiftStatus.DISAPPROVE.name().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).get(0)) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).size() >1){
+            }else if(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).size() >1){
                 statusPercentage =todoDTOS.stream().filter(todoDTO -> TodoStatus.APPROVE.equals(todoDTO.getStatus())||TodoStatus.DISAPPROVE.equals(todoDTO.getStatus())).collect(Collectors.toList()).size();
             }
         }else{

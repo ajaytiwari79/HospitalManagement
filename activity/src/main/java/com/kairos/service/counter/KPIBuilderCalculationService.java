@@ -130,23 +130,9 @@ public class KPIBuilderCalculationService implements CounterService {
     @Inject
     private TodoService todoService;
     @Inject
-    private WorkTimeAgreementService workTimeAgreementService;
-    @Inject
-    private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
-    @Inject
-    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
-    @Inject
-    private ShiftValidatorService shiftValidatorService;
-    @Inject
-    private TimeBankService timeBankService;
-    @Inject
     private AbsencePlanningKPIService absencePlanningKPIService;
     @Inject
     private StaffingLevelCalculationKPIService staffingLevelCalculationKPIService;
-    @Inject
-    private SkillKPIService skillKPIService;
-    @Inject
-    private ActivityService activityService;
     @Inject
     private AuditLoggingService auditLoggingService;
     @Inject
@@ -756,7 +742,7 @@ public class KPIBuilderCalculationService implements CounterService {
             if (CollectionUtils.containsAny(yAxisConfigs,newHashSet(YAxisConfig.TIME_TYPE))) {
                 getUpdateTodoStatus();
                 getUpdateTodoDTOSByDayOfWeek(todoDTOS);
-                getTimeTypeIdTodoMap();
+                getTimeTodoListMap();
                 staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
                 staffIdAndTimeTypeTodoListMap = getStaffIdBigIntegerIdTodoListMap(staffIdAndTimeTypeTodoListMap,staffIdAndTodoMap);
                 if(HOURS.equals(xAxisConfigs.get(0))){
@@ -794,7 +780,7 @@ public class KPIBuilderCalculationService implements CounterService {
             return staffIdAndActivityAndShiftMap;
         }
 
-        private void getTimeTypeIdTodoMap() {
+        private void getTimeTodoListMap() {
             if(TODO_STATUS.equals(calculationTypes.get(0))) {
                 Set<BigInteger> activityIdList = activityMap.keySet();
                 if (isCollectionNotEmpty(todoDTOS)) {
