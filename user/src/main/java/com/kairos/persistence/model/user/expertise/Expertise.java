@@ -49,11 +49,17 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = HAS_SENIOR_DAYS)
     private List<CareDays> seniorDays;
 
+    @Relationship(type = HAS_SENIOR_DAYS)
+    private List<SeniorDays> seniorDaysList;
+
     @Relationship(type = HAS_PROTECTED_DAYS_OFF_SETTINGS)
     private List<ProtectedDaysOffSetting> protectedDaysOffSettings = new ArrayList<>();
 
     @Relationship(type = HAS_CHILD_CARE_DAYS)
     private List<CareDays> childCareDays;
+
+    @Relationship(type = HAS_CHILD_CARE_DAYS)
+    private List<ChildCareDays> childCareDaysList;
 
     @Relationship(type = HAS_EXPERTISE_LINES)
     private List<ExpertiseLine> expertiseLines = new ArrayList<>();
