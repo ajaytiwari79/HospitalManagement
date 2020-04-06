@@ -110,5 +110,11 @@ public class PlanningPeriodController {
     }
 
 
+    @ApiOperation(value = "Register Job For Existing Planning Period")
+    @PostMapping(value="/register_job_for_existing_planning_period")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> registerJobForExistingPlanningPeriod() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.registerJobForExistingPlanningPeriod());
+    }
 
 }

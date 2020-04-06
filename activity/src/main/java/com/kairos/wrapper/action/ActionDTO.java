@@ -9,6 +9,8 @@ import lombok.Setter;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_NAME_NOTNULL;
+
 /**
  * Created By G.P.Ranjan on 2/4/20
  **/
@@ -18,7 +20,7 @@ import java.math.BigInteger;
 @AllArgsConstructor
 public class ActionDTO {
     private BigInteger id;
-    @NotNull
+    @NotNull(message = ERROR_NAME_NOTNULL)
     private ActionType name;
     private String description;
     private Long unitId;
