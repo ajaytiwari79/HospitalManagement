@@ -8,7 +8,6 @@ import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
-import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
 import com.kairos.shiftplanning.executioner.ShiftPlanningGenerator;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
@@ -65,7 +64,7 @@ public class Activity {
     }
 
     public boolean isBlankActivity(){
-        return this.name== ShiftPlanningGenerator.BLANK_ACTIVITY;
+        return this.name.equals(ShiftPlanningGenerator.BLANK_ACTIVITY);
     }
     public boolean isTypePresence(){
         return TimeTypeEnum.PRESENCE.equals(timeType.getTimeTypeEnum());

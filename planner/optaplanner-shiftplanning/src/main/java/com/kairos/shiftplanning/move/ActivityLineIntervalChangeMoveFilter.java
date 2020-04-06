@@ -20,26 +20,12 @@ public class ActivityLineIntervalChangeMoveFilter implements SelectionFilter<Shi
         ActivityLineInterval activityLineInterval = (ActivityLineInterval) selection.getEntity();
         DateTime dt=null;
         ShiftImp shiftImp = (ShiftImp) selection.getToPlanningValue();
-        /*if((dt=activityLineInterval.getStart()).getDayOfMonth()==12 && dt.getMinuteOfHour()==15 && dt.getHourOfDay()==15 && activityLineInterval.getShift()!=null &&  shiftImp==null){
-            log.info("MAKING MOVE :"+selection);
-        }*/
-
-        //check if shift already contains that activity
-        //TODO we're limiting moves here BIGFIXME
-        /*if(shiftImp!=null && shiftImp.getActivityLineIntervalsList()!=null) {
-            for (ActivityLineInterval activityLineInterval1 : shiftImp.getActivityLineIntervalsList()) {
-                if (activityLineInterval.compareTo(activityLineInterval1) == 0) {
-                    return false;
-                }
-            }
-        }*/
         if(Objects.equals(activityLineInterval.getShift(), shiftImp)){
             return false;
         }
         if(shiftImp !=null && !shiftImp.getDate().equals(activityLineInterval.getStart().toLocalDate())){
             return false;
         }
-        //log.info("Acceptable change move activity:"+selection);
         return true;
     }
 }

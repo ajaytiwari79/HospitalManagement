@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 /*
@@ -18,10 +19,10 @@ import java.util.Date;
 @NoArgsConstructor
 public class PlannedTime {
     private BigInteger plannedTimeId;
-    private Date startDate;
-    private Date endDate;
+    private ZonedDateTime startDate;
+    private ZonedDateTime endDate;
 
-    public PlannedTime(BigInteger plannedTimeId, Date startDate, Date endDate) {
+    public PlannedTime(BigInteger plannedTimeId, ZonedDateTime startDate, ZonedDateTime endDate) {
         this.plannedTimeId = plannedTimeId;
         this.startDate = startDate;
         this.endDate = endDate;

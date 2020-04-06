@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain.activity;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLineInterval;
@@ -8,14 +9,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /*
@@ -31,7 +32,7 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     private String id;
     private ActivityLineInterval previous;
     private ActivityLineInterval next;
-    private DateTime start;
+    private ZonedDateTime start;
     private boolean required;
     private Activity activity;
     @PlanningVariable(valueRangeProviderRefs = "shifts", nullable = true)
@@ -47,7 +48,7 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     private int duration;
     private int staffNo;
 
-    public ActivityLineInterval(String id, DateTime start, int duration, boolean required, Activity activity, int staffNo) {
+    public ActivityLineInterval(String id, ZonedDateTime start, int duration, boolean required, Activity activity, int staffNo) {
         this.id = id;
         this.start = start;
         this.duration = duration;
@@ -56,8 +57,8 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
         this.staffNo = staffNo;
     }
 
-    public Interval getInterval() {
-        return start == null ? null : new Interval(start, start.plusMinutes(duration));
+    public DateTimeInterval getInterval() {
+        return start == null ? null : new DateTimeInterval(start, start.plusMinutes(duration));
     }
 
     public String getIntervalAsString() {
@@ -79,11 +80,11 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
         return id + "---" + getIntervalAsString();
     }
 
-    public boolean similarInterval(Interval interval) {
+    public boolean similarInterval(DateTimeInterval interval) {
         return this.getInterval().equals(interval);
     }
 
-    public DateTime getEnd() {
+    public ZonedDateTime getEnd() {
         return start == null ? null : start.plusMinutes(duration);
     }
 
@@ -98,7 +99,7 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     }
 
     public ShiftActivity getShiftActivity(){
-        return new ShiftActivity(this.start,this.activity,this.getEnd());
+        return new ShiftActivity(this.start,this.activity,this.getEnd(),new ArrayList<>());
     }
 
     @Override

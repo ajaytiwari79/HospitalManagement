@@ -4,9 +4,9 @@ import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.Day;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.constraint.ConstraintSubType;
+import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.constraints.Constraint;
-import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.constraints.activityconstraint.*;
 import com.kairos.shiftplanning.constraints.unitconstraint.DislikeNightShiftsForNonNightWorkers;
 import com.kairos.shiftplanning.constraints.unitconstraint.MaxLengthOfShiftInNightTimeSlot;
@@ -24,21 +24,15 @@ import com.kairos.shiftplanning.domain.staffing_level.*;
 import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.domain.unit.Unit;
-import com.kairos.shiftplanning.domain.wta.*;
 import com.kairos.shiftplanning.enums.SkillType;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
-import com.kairos.shiftplanning.utils.JodaLocalDateConverter;
-import com.kairos.shiftplanning.utils.JodaLocalTimeConverter;
-import com.kairos.shiftplanning.utils.JodaTimeConverter;
+import com.kairos.shiftplanning.utils.LocalDateConverter;
+import com.kairos.shiftplanning.utils.LocalTimeConverter;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import com.kairos.shiftplanning.utils.ZonedDateTimeConverter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,13 +40,17 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
 import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.enums.MasterDataTypeEnum.*;
+import static com.kairos.enums.constraint.ScoreLevel.HARD;
+import static com.kairos.enums.constraint.ScoreLevel.SOFT;
 
 public class ShiftPlanningGenerator {
 
@@ -97,7 +95,7 @@ public class ShiftPlanningGenerator {
         Map<String,List<ActivityLineInterval>> groupedAlis= new HashMap<>();
 
         for(ActivityLineInterval ali:activityLineIntervals){
-            String key=ali.getStart().toLocalDate().toString("MM/dd/yyyy")+"_"+ali.getActivity().getId()+"_"+ali.getStaffNo();
+            String key=ali.getStart().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))+"_"+ali.getActivity().getId()+"_"+ali.getStaffNo();
             if(groupedAlis.containsKey(key)){
                 groupedAlis.get(key).add(ali);
             }else{
@@ -117,7 +115,7 @@ public class ShiftPlanningGenerator {
         secondarySolution.setIndirectActivities(generateIndirectActivities(solution.getEmployees()));
         secondarySolution.setShiftBreaks(generateBreaksForShifts(secondarySolution.getShifts()));
         secondarySolution.setPossibleStartDateTimes(solution.getWeekDates().stream()
-                .flatMap(d->IntStream.rangeClosed(0,1440/INTERVAL_MINS-1).mapToObj(i->d.toDateTimeAtStartOfDay().plusMinutes(i*INTERVAL_MINS))).collect(Collectors.toList()));
+                .flatMap(d->IntStream.rangeClosed(0,1440/INTERVAL_MINS-1).mapToObj(i->asZonedDateTime(d).plusMinutes(i*INTERVAL_MINS))).collect(Collectors.toList()));
         secondarySolution.setSkillLineIntervals(solution.getSkillLineIntervals());
         secondarySolution.setWeekDates(solution.getWeekDates());
         secondarySolution.setActivities(solution.getActivities());
@@ -130,13 +128,12 @@ public class ShiftPlanningGenerator {
         xstream.processAnnotations(StaffingLevelPlannerEntity.class);
         xstream.processAnnotations(StaffingLevelInterval.class);
         xstream.setMode(XStream.ID_REFERENCES);
-        xstream.registerConverter(new JodaTimeConverter());
-        xstream.registerConverter(new JodaLocalTimeConverter());
-        xstream.registerConverter(new JodaLocalDateConverter());
+        xstream.registerConverter(new ZonedDateTimeConverter());
+        xstream.registerConverter(new LocalTimeConverter());
+        xstream.registerConverter(new LocalDateConverter());
         BreaksIndirectAndActivityPlanningSolution unresolvedSolution = null;
         try {
             unresolvedSolution = (BreaksIndirectAndActivityPlanningSolution) xstream.fromXML(new File(filePath));
-            unresolvedSolution.getEmployees().forEach(emp->emp.setWorkingTimeConstraints(getWTA()));
         } catch (Exception e) {
             LOGGER.error(ERROR,e.getMessage());
         }
@@ -170,14 +167,13 @@ public class ShiftPlanningGenerator {
         xstream.processAnnotations(StaffingLevelPlannerEntity.class);
         xstream.processAnnotations(StaffingLevelInterval.class);
         xstream.setMode(XStream.ID_REFERENCES);
-        xstream.registerConverter(new JodaTimeConverter());
-        xstream.registerConverter(new JodaLocalTimeConverter());
-        xstream.registerConverter(new JodaLocalDateConverter());
+        xstream.registerConverter(new ZonedDateTimeConverter());
+        xstream.registerConverter(new LocalTimeConverter());
+        xstream.registerConverter(new LocalDateConverter());
         ShiftRequestPhasePlanningSolution unresolvedSolution = null;
         try {
             unresolvedSolution = (ShiftRequestPhasePlanningSolution) xstream.fromXML(new File(problemXml));
-            unresolvedSolution.getEmployees().forEach(emp->emp.setWorkingTimeConstraints(getWTA()));
-        } catch (Exception e) {
+         } catch (Exception e) {
             LOGGER.error(ERROR,e.getMessage());
         }
         return unresolvedSolution;
@@ -203,14 +199,14 @@ public class ShiftPlanningGenerator {
 
 
     public Map<ConstraintSubType, Constraint> getActivityContraints(){
-        LongestDuration longestDuration = new LongestDuration(80, ScoreLevel.SOFT,-5);
-        ShortestDuration shortestDuration = new ShortestDuration(60,ScoreLevel.HARD,-2);
-        MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(3,ScoreLevel.SOFT,-1);//3
-        MaxDiffrentActivity maxDiffrentActivity = new MaxDiffrentActivity(3,ScoreLevel.SOFT,-1);//4
-        MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(60,ScoreLevel.SOFT,-1);//5
+        LongestDuration longestDuration = new LongestDuration(80, SOFT,-5);
+        ShortestDuration shortestDuration = new ShortestDuration(60, HARD,-2);
+        MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(3, SOFT,-1);//3
+        MaxDiffrentActivity maxDiffrentActivity = new MaxDiffrentActivity(3, SOFT,-1);//4
+        MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(60, SOFT,-1);//5
         List<DayType> dayTypes = getDayTypes();
-        ActivityDayType activityDayType = new ActivityDayType(dayTypes,ScoreLevel.SOFT,5);
-        ActivityRequiredTag activityRequiredTag = new ActivityRequiredTag(requiredTagId(),ScoreLevel.HARD,1);
+        ActivityDayType activityDayType = new ActivityDayType(dayTypes, SOFT,5);
+        ActivityRequiredTag activityRequiredTag = new ActivityRequiredTag(requiredTagId(), HARD,1);
         Map<ConstraintSubType, Constraint> constraintMap = new HashMap<>();
         TimeSlot timeSlot = new TimeSlot(23,7);
         constraintMap.put(ConstraintSubType.ACTIVITY_LONGEST_DURATION_RELATIVE_TO_SHIFT_LENGTH,longestDuration);
@@ -220,12 +216,12 @@ public class ShiftPlanningGenerator {
         constraintMap.put(ConstraintSubType.MINIMUM_LENGTH_OF_ACTIVITY,minimumLengthofActivity);
         constraintMap.put(ConstraintSubType.ACTIVITY_VALID_DAYTYPE,activityDayType);
         constraintMap.put(ConstraintSubType.ACTIVITY_REQUIRED_TAG,activityRequiredTag);
-        constraintMap.put(ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME,new PresenceAndAbsenceAtSameTime(ScoreLevel.SOFT,-6));
-        constraintMap.put(ConstraintSubType.MAX_SHIFT_OF_STAFF,new MaxShiftOfStaff(1,ScoreLevel.SOFT,-6));
-        constraintMap.put(ConstraintSubType.PREFER_PERMANENT_EMPLOYEE,new PreferedEmployementType(newHashSet(123l),ScoreLevel.SOFT,-4));
-        constraintMap.put(ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS,new ShiftOnWeekend(ScoreLevel.SOFT,-4,newHashSet(DayOfWeek.SATURDAY,DayOfWeek.SUNDAY)));
-        constraintMap.put(ConstraintSubType.MAX_LENGTH_OF_SHIFT_IN_NIGHT_TIMESLOT,new MaxLengthOfShiftInNightTimeSlot(ScoreLevel.SOFT,-4,timeSlot,5));
-        constraintMap.put(ConstraintSubType.DISLIKE_NIGHT_SHIFS_FOR_NON_NIGHT_WORKERS,new DislikeNightShiftsForNonNightWorkers(ScoreLevel.SOFT,-4,timeSlot));
+        constraintMap.put(ConstraintSubType.PRESENCE_AND_ABSENCE_SAME_TIME,new PresenceAndAbsenceAtSameTime(SOFT,-6));
+        constraintMap.put(ConstraintSubType.MAX_SHIFT_OF_STAFF,new MaxShiftOfStaff(1, SOFT,-6));
+        constraintMap.put(ConstraintSubType.PREFER_PERMANENT_EMPLOYEE,new PreferedEmployementType(newHashSet(123l), SOFT,-4));
+        constraintMap.put(ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS,new ShiftOnWeekend(SOFT,-4,newHashSet(DayOfWeek.SATURDAY,DayOfWeek.SUNDAY)));
+        constraintMap.put(ConstraintSubType.MAX_LENGTH_OF_SHIFT_IN_NIGHT_TIMESLOT,new MaxLengthOfShiftInNightTimeSlot(SOFT,-4,timeSlot,5));
+        constraintMap.put(ConstraintSubType.DISLIKE_NIGHT_SHIFS_FOR_NON_NIGHT_WORKERS,new DislikeNightShiftsForNonNightWorkers(SOFT,-4,timeSlot));
         return constraintMap;
     }
     public  Tag requiredTagId(){
@@ -281,11 +277,7 @@ public class ShiftPlanningGenerator {
     private Employee getEmployee(String s, String s2, long l, Set<Tag> tags2) {
         Employee employee3 = new Employee(Long.valueOf(s), s2, createSkillSet(), null, 0, 0, PaidOutFrequencyEnum.HOURLY, null);
         employee3.setBaseCost(BigDecimal.valueOf(1.5));
-        employee3.setWorkingTimeConstraints(getWTA());
-        employee3.setPrevShiftsInfo(getPreShiftsInfo());
         employee3.setEmploymentTypeId(l);
-        employee3.setPrevShiftStart(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(20));
-        employee3.setPrevShiftEnd(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(10));
         employee3.setTags(tags2);
         return employee3;
     }
@@ -302,55 +294,8 @@ public class ShiftPlanningGenerator {
         return prevShiftsInfo;
     }
 
-    public WorkingTimeConstraints getWTA(){
-        WorkingTimeConstraints workingTimeConstraints = new WorkingTimeConstraints();
-        Interval interval = new Interval(getPlanningWeekStart().toDateTimeAtStartOfDay(),getPlanningWeekStart().plusDays(7).toDateTimeAtStartOfDay());
-        long nightStarts = new DateTime().withTimeAtStartOfDay().plusHours(20).getMinuteOfDay();
-        long nightEnds = new DateTime().plusDays(1).withTimeAtStartOfDay().plusHours(3).getMinuteOfDay();
-        MaximumAverageScheduledTimeWTATemplate maximumAverageScheduledTime = new MaximumAverageScheduledTimeWTATemplate(300,4,-10,ScoreLevel.SOFT,getPlanningWeekStart());
-        maximumAverageScheduledTime.setInterval(interval);
-        workingTimeConstraints.setMaximumAverageScheduledTime(maximumAverageScheduledTime);
-        MaximumConsecutiveWorkingDaysWTATemplate maximumConsecutiveWorkingDays = new MaximumConsecutiveWorkingDaysWTATemplate(3,-5,ScoreLevel.SOFT);
-        workingTimeConstraints.setMaximumConsecutiveWorkingDays(maximumConsecutiveWorkingDays);
-        MaximumConsecutiveWorkingNightsWTATemplate maximumConsecutiveWorkingNights = new MaximumConsecutiveWorkingNightsWTATemplate(2,-6,ScoreLevel.SOFT,nightStarts,nightEnds);
-        workingTimeConstraints.setMaximumConsecutiveWorkingNights(maximumConsecutiveWorkingNights);
-        MaximumNightShiftLengthWTATemplate maximumNightShiftLength = new MaximumNightShiftLengthWTATemplate(600,-8,ScoreLevel.SOFT,nightStarts,nightEnds);
-        workingTimeConstraints.setMaximumNightShiftLength(maximumNightShiftLength);
-        MaximumNumberOfNightsWTATemplate maximumNumberOfNights = new MaximumNumberOfNightsWTATemplate(4,-6,ScoreLevel.SOFT,nightStarts,nightEnds);
-        workingTimeConstraints.setMaximumNumberOfNights(maximumNumberOfNights);
-        MaximumShiftLengthWTATemplate maximumShiftLength = new MaximumShiftLengthWTATemplate(600,-4,ScoreLevel.SOFT);
-        workingTimeConstraints.setMaximumShiftLength(maximumShiftLength);
-        MaximumShiftsInIntervalWTATemplate maximumShiftsInInterval = new MaximumShiftsInIntervalWTATemplate(6,-5,ScoreLevel.SOFT);
-        maximumShiftsInInterval.setInterval(interval);
-        workingTimeConstraints.setMaximumShiftsInInterval(maximumShiftsInInterval);
-        updateWTAConstrainsts(workingTimeConstraints, interval, nightStarts, nightEnds);
-        return workingTimeConstraints;
-    }
-
-    private void updateWTAConstrainsts(WorkingTimeConstraints workingTimeConstraints, Interval interval, long nightStarts, long nightEnds) {
-        MinimumConsecutiveNightsWTATemplate minimumConsecutiveNights = new MinimumConsecutiveNightsWTATemplate(2,-1, ScoreLevel.SOFT,nightStarts,nightEnds);
-        workingTimeConstraints.setMinimumConsecutiveNights(minimumConsecutiveNights);
-        MinimumDailyRestingTimeWTATemplateTemplate minimumDailyRestingTime = new MinimumDailyRestingTimeWTATemplateTemplate(660,-1,ScoreLevel.SOFT);
-        workingTimeConstraints.setMinimumDailyRestingTime(minimumDailyRestingTime);
-        MinimumDurationBetweenShiftWTATemplate minimumDurationBetweenShift = new MinimumDurationBetweenShiftWTATemplate(60,-1,ScoreLevel.SOFT);
-        workingTimeConstraints.setMinimumDurationBetweenShift(minimumDurationBetweenShift);
-        MinimumRestConsecutiveNightsWTATemplate minimumRestConsecutiveNights = new MinimumRestConsecutiveNightsWTATemplate(400,3,-1,ScoreLevel.SOFT,nightStarts,nightEnds);
-        workingTimeConstraints.setMinimumRestConsecutiveNights(minimumRestConsecutiveNights);
-        MinimumRestInConsecutiveDaysWTATemplate minimumRestInConsecutiveDays = new MinimumRestInConsecutiveDaysWTATemplate(200,4,-1,ScoreLevel.SOFT);
-        workingTimeConstraints.setMinimumRestInConsecutiveDays(minimumRestInConsecutiveDays);
-        MinimumShiftLengthWTATemplate minimumShiftLength = new MinimumShiftLengthWTATemplate(120,-1,ScoreLevel.SOFT);
-        workingTimeConstraints.setMinimumShiftLength(minimumShiftLength);
-        MinimumWeeklyRestPeriodWTATemplate minimumWeeklyRestPeriod = new MinimumWeeklyRestPeriodWTATemplate(1200,-1,ScoreLevel.SOFT);
-        minimumWeeklyRestPeriod.setInterval(interval);
-        workingTimeConstraints.setMinimumWeeklyRestPeriod(minimumWeeklyRestPeriod);
-        NumberOfWeekendShiftInPeriodWTATemplate numberOfWeekendShiftInPeriod = new NumberOfWeekendShiftInPeriodWTATemplate(2, 4,new LocalTime(14,0),0,new LocalTime(7,15),false,-5,ScoreLevel.SOFT,getPlanningWeekStart());
-        workingTimeConstraints.setNumberOfWeekendShiftInPeriod(numberOfWeekendShiftInPeriod);
-        ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRest = new ShortestAndAverageDailyRestWTATemplate(320,-5,ScoreLevel.SOFT);
-        workingTimeConstraints.setShortestAndAverageDailyRest(shortestAndAverageDailyRest);
-    }
-
     public LocalDate getPlanningWeekStart(){
-        return DateTimeFormat.forPattern("dd/MM/yyyy").parseLocalDate("18/12/2019");
+        return LocalDate.parse("18/12/2019", DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 
     public List<LocalDate> getPlanningDays(){
@@ -409,7 +354,7 @@ public class ShiftPlanningGenerator {
 
     private void getAbsenceActivityLine(LocalDate date, DailyActivityLine dailyActivityLine, Activity activity) {
         for(int staffNum=0;staffNum<2;staffNum++){
-            ActivityLineInterval activityLineInterval= new ActivityLineInterval(getAbsenceId(),date.toDateTimeAtStartOfDay(),24*60,staffNum==0, activity,staffNum);
+            ActivityLineInterval activityLineInterval= new ActivityLineInterval(getAbsenceId(),asZonedDateTime(date),24*60,staffNum==0, activity,staffNum);
             dailyActivityLine.getActivityLineIntervals().add(activityLineInterval);
         }
     }
@@ -417,7 +362,7 @@ public class ShiftPlanningGenerator {
     private void getPresenceActivityLine(int intervalMins, LocalDate date, DailyActivityLine dailyActivityLine, Activity activity) {
         for(int staffNum=0;staffNum<5;staffNum++){//first staff is required
             for(int j=46;j<52;j++){//32..80
-                ActivityLineInterval activityLineInterval= new ActivityLineInterval(getId(),date.toDateTimeAtStartOfDay().plusMinutes(j*intervalMins),intervalMins,staffNum<3, activity,staffNum);
+                ActivityLineInterval activityLineInterval= new ActivityLineInterval(getId(),asZonedDateTime(date).plusMinutes(j*intervalMins),intervalMins,staffNum<3, activity,staffNum);
                 dailyActivityLine.getActivityLineIntervals().add(activityLineInterval);
             }
         }
@@ -426,7 +371,7 @@ public class ShiftPlanningGenerator {
     private void getDailyActivityLine(int intervalMins, LocalDate date, DailyActivityLine dailyActivityLine, Activity activity) {
         for(int staffNum=0;staffNum<3;staffNum++){//first staff is required
             for(int j=0;j<96;j++){
-                ActivityLineInterval activityLineInterval= new ActivityLineInterval(getId(),date.toDateTimeAtStartOfDay().plusMinutes(j*intervalMins),intervalMins,false, activity,staffNum);
+                ActivityLineInterval activityLineInterval= new ActivityLineInterval(getId(),asZonedDateTime(date).plusMinutes(j*intervalMins),intervalMins,false, activity,staffNum);
                 dailyActivityLine.getActivityLineIntervals().add(activityLineInterval);
             }
         }
@@ -518,12 +463,12 @@ public class ShiftPlanningGenerator {
 
     public Unit getUnit(){
         ShiftOnWeekend shiftOnWeekend = new ShiftOnWeekend();
-        shiftOnWeekend.setLevel(ScoreLevel.HARD);
+        shiftOnWeekend.setLevel(HARD);
         shiftOnWeekend.setWeight(3);
         Map<ConstraintSubType,Constraint> unitConstraints = new HashMap<>();
         PreferedEmployementType preferedEmployementType = new PreferedEmployementType();
         preferedEmployementType.setPreferedEmploymentTypeIds(newHashSet(123l,145l));
-        preferedEmployementType.setLevel(ScoreLevel.SOFT);
+        preferedEmployementType.setLevel(SOFT);
         preferedEmployementType.setWeight(3);
         unitConstraints.put(ConstraintSubType.PREFER_PERMANENT_EMPLOYEE,preferedEmployementType);
         unitConstraints.put(ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS,shiftOnWeekend);

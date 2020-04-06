@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain.activity;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Setter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Getter
@@ -16,13 +18,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ShiftActivity {
-    private DateTime startTime;
+    private ZonedDateTime startTime;
     private Activity activity;
-    private DateTime endTime;
+    private ZonedDateTime endTime;
     private List<PlannedTime> plannedTimes;
 
-    public Interval getInterval() {
-        return new Interval(this.startTime,this.endTime);
+    public DateTimeInterval getInterval() {
+        return new DateTimeInterval(this.startTime,this.endTime);
     }
 
     @Override

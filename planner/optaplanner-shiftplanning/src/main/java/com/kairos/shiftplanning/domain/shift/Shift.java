@@ -2,8 +2,6 @@ package com.kairos.shiftplanning.domain.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.shiftplanning.domain.staff.Employee;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
 
 import java.time.ZonedDateTime;
 import java.util.List;

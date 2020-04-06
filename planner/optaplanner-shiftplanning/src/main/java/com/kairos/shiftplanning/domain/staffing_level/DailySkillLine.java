@@ -3,8 +3,8 @@ package com.kairos.shiftplanning.domain.staffing_level;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.joda.time.LocalDate;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter

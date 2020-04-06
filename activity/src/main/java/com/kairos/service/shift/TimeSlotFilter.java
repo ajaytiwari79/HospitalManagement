@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.shift.ShiftDTO;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
+import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.TIME_SLOT;
 
@@ -43,7 +44,7 @@ public class TimeSlotFilter <G> implements ShiftFilter {
             });
             for (ShiftDTO shiftDTO : shiftDTOS) {
                 for (TimeInterval timeInterval : timeIntervals) {
-                    if (timeInterval.contains(asZoneDateTime(shiftDTO.getStartDate()).get(ChronoField.MINUTE_OF_DAY))) {
+                    if (timeInterval.contains(DateUtils.asZonedDateTime(shiftDTO.getStartDate()).get(ChronoField.MINUTE_OF_DAY))) {
                         filteredShifts.add((T) shiftDTO);
                         break;
                     }

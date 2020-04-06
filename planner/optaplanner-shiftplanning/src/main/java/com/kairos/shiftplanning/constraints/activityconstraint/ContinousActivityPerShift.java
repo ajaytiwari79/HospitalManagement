@@ -1,6 +1,6 @@
 package com.kairos.shiftplanning.constraints.activityconstraint;
 
-import com.kairos.shiftplanning.constraints.ScoreLevel;
+import com.kairos.enums.constraint.ScoreLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

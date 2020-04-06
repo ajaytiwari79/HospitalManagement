@@ -1,8 +1,8 @@
 package com.kairos.shiftplanning.constraints.unitconstraint;
 
+import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.team.TeamType;
 import com.kairos.shiftplanning.constraints.Constraint;
-import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;

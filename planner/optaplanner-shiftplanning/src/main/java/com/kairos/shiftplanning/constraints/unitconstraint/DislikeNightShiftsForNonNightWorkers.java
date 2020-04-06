@@ -1,18 +1,20 @@
 package com.kairos.shiftplanning.constraints.unitconstraint;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
+import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanning.constraints.Constraint;
-import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+
+import static com.kairos.commons.utils.DateUtils.getStartOfDay;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -22,7 +24,7 @@ public class DislikeNightShiftsForNonNightWorkers implements Constraint {
     private TimeSlot nightTimeSlot;
 
     private boolean shiftTimeContainsInNightInterval(ZonedDateTime shiftTime){
-        return new Interval(shiftTime.withTimeAtStartOfDay().plusHours(nightTimeSlot.getStartHour()).plusMinutes(nightTimeSlot.getStartMinute()),shiftTime.withTimeAtStartOfDay().plusDays(1).plusHours(nightTimeSlot.getStartHour()).plusMinutes(nightTimeSlot.getStartMinute())).contains(shiftTime);
+        return new DateTimeInterval(getStartOfDay(shiftTime).plusHours(nightTimeSlot.getStartHour()).plusMinutes(nightTimeSlot.getStartMinute()),getStartOfDay(shiftTime.plusDays(1).plusHours(nightTimeSlot.getStartHour()).plusMinutes(nightTimeSlot.getStartMinute()))).contains(shiftTime);
     }
 
 

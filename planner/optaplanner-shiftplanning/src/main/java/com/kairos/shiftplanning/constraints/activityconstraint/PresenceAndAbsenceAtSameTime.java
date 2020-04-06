@@ -2,8 +2,8 @@ package com.kairos.shiftplanning.constraints.activityconstraint;
 
 
 import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanning.constraints.Constraint;
-import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;

@@ -5,11 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
 import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.enums.wta.MinMaxSetting;
@@ -28,7 +29,6 @@ import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelActivityType;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelPlannerEntity;
 import com.kairos.shiftplanning.domain.unit.Unit;
-import com.kairos.shiftplanning.domain.wta.WTABaseRuleTemplate;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.move.helper.ActivityLineIntervalWrapper;
 import lombok.AccessLevel;
@@ -44,9 +44,6 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +53,10 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -64,7 +64,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.kairos.commons.utils.CommonsExceptionUtil.throwException;
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.shiftplanning.constants.ShiftPlanningMessageConstants.MESSAGE_RULETEMPLATE_INTERVAL_NOTNULL;
 
@@ -102,62 +104,68 @@ public class ShiftPlanningUtility {
         return new HashSet<>(dayOfWeeks);
     }
 
-    public static void brakeRuleTemplateAndUpdateViolationDetails(RuleTemplateSpecificInfo infoWrapper,
-                                                                  Integer counterCount, boolean isValid,
-                                                                  WTABaseRuleTemplate wtaBaseRuleTemplate,
-                                                                  Integer totalCounter, String unitType,
-                                                                  String unitValue) {
-        if (!isValid) {
-        }
-    }
 
-    public static Integer[] getValueByPhaseAndCounter(Unit unit, List<PhaseTemplateValue> phaseTemplateValues, WTABaseRuleTemplate ruleTemplate) {
-        Integer[] limitAndCounter = new Integer[3];
+    public static int getValueByPhaseAndCounter(Unit unit, List<PhaseTemplateValue> phaseTemplateValues) {
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (unit.getPhase().getId().equals(phaseTemplateValue.getPhaseId())) {
-                limitAndCounter[0] = (int) (UserContext.getUserDetails().isStaff() ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
-                Integer[] counterValue = getCounterValue(unit, phaseTemplateValue, ruleTemplate);
-                limitAndCounter[1] = counterValue[0];
-                limitAndCounter[2] = counterValue[1];
-                break;
+                return (int)phaseTemplateValue.getManagementValue();
             }
         }
-        return limitAndCounter;
-    }
-
-    public static Integer[] getCounterValue(Unit unit, PhaseTemplateValue phaseTemplateValue, WTABaseRuleTemplate ruleTemplate) {
-        Integer totalCounterValue = null;
-        if (UserContext.getUserDetails().isStaff() && phaseTemplateValue.isStaffCanIgnore()) {
-            totalCounterValue = ruleTemplate.getStaffCanIgnoreCounter();
-            if (totalCounterValue == null) {
-                throwException(MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL, ruleTemplate.getName());
-            }
-        } else if (UserContext.getUserDetails().isManagement() && phaseTemplateValue.isManagementCanIgnore()) {
-            totalCounterValue = ruleTemplate.getManagementCanIgnoreCounter();
-            if (totalCounterValue == null) {
-                throwException(MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL, ruleTemplate.getName());
-            }
-        }
-        Integer availableCounter = 0;
-        return new Integer[]{availableCounter,totalCounterValue};
+        return 0;
     }
 
     public static DateTimeInterval getIntervalByActivity(ShiftImp shiftImp, List<BigInteger> activityIds) {
         LocalDate shiftDate = shiftImp.getStart().toLocalDate();
-        DateTimeInterval dateTimeInterval = new DateTimeInterval(shiftDate, DateUtils.asDate(shiftDate.plusDays(1)));
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(asDate(shiftDate), DateUtils.asDate(shiftDate.plusDays(1)));
         for (BigInteger activityId : activityIds) {
-            if (activityWrapperMap.containsKey(activityId)) {
-                Activity activity = activityWrapperMap.get(activityId).getActivity();
-                dateTimeInterval = getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(), activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue(),shiftStartDate);
+            Activity activity = shiftImp.getActivityById(activityId);
+            if (isNotNull(activity)) {
+                dateTimeInterval = getCutoffInterval(activity.getCutOffStartFrom(), activity.getCutOffIntervalUnit(), activity.getCutOffdayValue(),shiftImp.getStart());
             }
         }
         return dateTimeInterval;
     }
 
+    public static DateTimeInterval getCutoffInterval(LocalDate dateFrom, CutOffIntervalUnit cutOffIntervalUnit, Integer dayValue,ZonedDateTime shiftDate) {
+        LocalDate startDate = dateFrom;
+        LocalDate endDate = startDate.plusYears(3);
+        while (startDate.isBefore(endDate)) {
+            LocalDate nextEndDate = startDate;
+            switch (cutOffIntervalUnit) {
+                case DAYS:
+                    nextEndDate = startDate.plusDays(dayValue - 1);
+                    break;
+                case HALF_YEARLY:
+                    nextEndDate = startDate.plusMonths(6).minusDays(1);
+                    break;
+                case WEEKS:
+                    nextEndDate = startDate.plusWeeks(1).minusDays(1);
+                    break;
+                case MONTHS:
+                    nextEndDate = startDate.plusMonths(1).minusDays(1);
+                    break;
+                case QUARTERS:
+                    nextEndDate = startDate.plusMonths(3).minusDays(1);
+                    break;
+                case YEARS:
+                    nextEndDate = startDate.plusYears(1).minusDays(1);
+                    break;
+                default:
+                    break;
+            }
+            DateTimeInterval dateTimeInterval = new DateTimeInterval(startDate,nextEndDate);
+            if(dateTimeInterval.containsAndEqualsEndDate(shiftDate)){
+                return dateTimeInterval;
+            }
+            startDate = nextEndDate.plusDays(1);
+        }
+        return null;
+    }
+
     public static List<ShiftImp> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftImp> shifts, TimeInterval timeInterval) {
         List<ShiftImp> updatedShifts = new ArrayList<>();
         shifts.forEach(s -> {
-            if (dateTimeInterval.containsAndEqualsEndDate(s.getStart().toDate()) && (timeInterval == null || timeInterval.contains(s.getStart().getMinuteOfDay()))) {
+            if (dateTimeInterval.containsAndEqualsEndDate(s.getStart()) && (timeInterval == null || timeInterval.contains(s.getStart().get(ChronoField.MINUTE_OF_DAY)))) {
                 updatedShifts.add(s);
             }
         });
@@ -171,16 +179,16 @@ public class ShiftPlanningUtility {
         }
         switch (intervalUnit) {
             case DAYS:
-                interval = new DateTimeInterval(shift.getStart().minusDays((int) intervalValue).withTimeAtStartOfDay().plusDays(1).getMillis(), shift.getStart().plusDays((int) intervalValue).withTimeAtStartOfDay().minusDays(1).plusDays(1).getMillis());
+                interval = new DateTimeInterval(getStartOfDay(shift.getStart().minusDays((int) intervalValue)).plusDays(1), getStartOfDay(shift.getStart().plusDays((int) intervalValue)).minusDays(1).plusDays(1));
                 break;
             case WEEKS:
-                interval = new DateTimeInterval(shift.getStart().minusWeeks((int) intervalValue).withTimeAtStartOfDay().plusDays(1).getMillis(), shift.getStart().plusWeeks((int) intervalValue).withTimeAtStartOfDay().minusDays(1).plusDays(1).getMillis());
+                interval = new DateTimeInterval(getStartOfDay(shift.getStart().minusWeeks((int) intervalValue)).plusDays(1), getStartOfDay(shift.getStart().plusWeeks((int) intervalValue)).minusDays(1).plusDays(1));
                 break;
             case MONTHS:
-                interval = new DateTimeInterval(shift.getStart().minusMonths((int) intervalValue).withTimeAtStartOfDay().plusDays(1).getMillis(), shift.getStart().plusMonths((int) intervalValue).withTimeAtStartOfDay().minusDays(1).plusDays(1).getMillis());
+                interval = new DateTimeInterval(getStartOfDay(shift.getStart().minusMonths((int) intervalValue)).plusDays(1), getStartOfDay(shift.getStart().plusMonths((int) intervalValue)).minusDays(1).plusDays(1));
                 break;
             case YEARS:
-                interval = new DateTimeInterval(shift.getStart().minusYears((int) intervalValue).withTimeAtStartOfDay().plusDays(1).getMillis(), shift.getStart().plusYears((int) intervalValue).withTimeAtStartOfDay().minusDays(1).plusDays(1).getMillis());
+                interval = new DateTimeInterval(getStartOfDay(shift.getStart().minusYears((int) intervalValue)).plusDays(1), getStartOfDay(shift.getStart().plusYears((int) intervalValue)).minusDays(1).plusDays(1));
                 break;
             default:
                 break;
@@ -200,9 +208,55 @@ public class ShiftPlanningUtility {
         return shiftImps;
     }
 
-    public static boolean isValidForDay(List<Long> dayTypeIds, Unit unit,DateTime shiftDate) {
-        DayOfWeek shiftDay = asLocalDate(shiftDate).getDayOfWeek();
+    public static boolean isValidForDay(List<Long> dayTypeIds, Unit unit,ZonedDateTime shiftDate) {
+        DayOfWeek shiftDay = shiftDate.getDayOfWeek();
         return getValidDays(unit.getDayTypeMap(), dayTypeIds).stream().anyMatch(day -> day.equals(shiftDay));
+    }
+
+    public static boolean isValidShift(BigInteger phaseId,ShiftImp shift, List<PhaseTemplateValue> phaseTemplateValues, Set<BigInteger> timeTypeIds, Set<BigInteger> plannedTimeIds) {
+        boolean valid = false;
+        for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
+            if (phaseId.equals(phaseTemplateValue.getPhaseId()) && !phaseTemplateValue.isDisabled()) {
+                valid = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds())) && (isCollectionNotEmpty(plannedTimeIds) && CollectionUtils.containsAny(plannedTimeIds, shift.getActivitiesPlannedTimeIds()));
+                break;
+            }
+        }
+        return valid;
+    }
+
+    public static Set<BigInteger> getShiftIdsByInterval(DateTimeInterval dateTimeInterval, List<ShiftImp> shifts, TimeInterval[] timeIntervals) {
+        Set<BigInteger> updatedShifts = new HashSet<>();
+        shifts.forEach(s -> {
+            for (TimeInterval timeInterval : timeIntervals) {
+                if ((dateTimeInterval.contains(s.getStart()) || dateTimeInterval.getEndDate().equals(s.getStart())) && (timeInterval == null || timeInterval.contains(s.getStart().get(ChronoField.MINUTE_OF_DAY)))) {
+                    updatedShifts.add(s.getId());
+                }
+            }
+        });
+        return updatedShifts;
+    }
+
+    public static TimeInterval[] getTimeSlotsByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftImp shift) {
+        TimeInterval[] timeIntervals = new TimeInterval[partOfDays.size()];
+        int i=0;
+        boolean valid = false;
+        for (PartOfDay partOfDay : partOfDays) {
+            if (timeSlotWrapperMap.containsKey(partOfDay.getValue())) {
+                TimeSlotWrapper timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
+                if (partOfDay.getValue().equals(timeSlotWrapper.getName())) {
+                    int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
+                    int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
+                    TimeInterval interval = new TimeInterval(startMinutesOfInterval, endMinutesOfInterval);
+                    int minuteOfTheDay = DateUtils.asZonedDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
+                    timeIntervals[i] = interval;
+                    i++;
+                    if (!valid && (minuteOfTheDay == (int) interval.getStartFrom() || interval.contains(minuteOfTheDay))) {
+                        valid = true;
+                    }
+                }
+            }
+        }
+        return valid ? timeIntervals : new TimeInterval[0];
     }
 
     public static int isValid(MinMaxSetting minMaxSetting, int limitValue, int calculatedValue) {
@@ -232,7 +286,7 @@ public class ShiftPlanningUtility {
                     int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
                     int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
                     TimeInterval interval = new TimeInterval(startMinutesOfInterval, endMinutesOfInterval);
-                    int minuteOfTheDay = shift.getStart().getMinuteOfDay();
+                    int minuteOfTheDay = shift.getStart().get(ChronoField.MINUTE_OF_DAY);
                     if (minuteOfTheDay == (int) interval.getStartFrom() || interval.contains(minuteOfTheDay)) {
                         timeInterval = interval;
                         break;
@@ -300,8 +354,8 @@ public class ShiftPlanningUtility {
         return new ArrayList<>();
     }
 
-    public static String getIntervalAsString(Interval interval) {
-        return interval.getStart().toString("dd[HH:mm") + "-" + interval.getEnd().toString("HH:mm]");
+    public static String getIntervalAsString(DateTimeInterval interval) {
+        return interval.getStart().format(DateTimeFormatter.ofPattern("dd[HH:mm")) + "-" + interval.getEnd().format(DateTimeFormatter.ofPattern("HH:mm]"));
     }
 
     public static List<LocalDate> getSortedAndUniqueDates(List<Shift> shifts) {
@@ -310,23 +364,98 @@ public class ShiftPlanningUtility {
         return dates;
     }
 
-    public static List<Shift> sortShifts(List<Shift> shifts) {
-        shifts.sort(Comparator.comparing(Shift::getStart));
+    public static DateTimeInterval[] getIntervalsByRuleTemplate(ShiftImp shift, String intervalUnit, long intervalValue) {
+        DateTimeInterval[] interval = new DateTimeInterval[2];
+        if (intervalValue == 0 || StringUtils.isEmpty(intervalUnit)) {
+            throwException("message.ruleTemplate.interval.notNull");
+        }
+        switch (intervalUnit) {
+            case DAYS:
+                interval[0] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZonedDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZonedDateTime(shift.getStartDate()).plusDays(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            case WEEKS:
+                interval[0] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZonedDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZonedDateTime(shift.getStartDate()).plusWeeks(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            case MONTHS:
+                interval[0] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZonedDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZonedDateTime(shift.getStartDate()).plusMonths(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            case YEARS:
+                interval[0] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZonedDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZonedDateTime(shift.getStartDate()).plusYears(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            default:
+                break;
+        }
+        return interval;
+    }
+
+    public static List<LocalDate> getSortedAndUniqueLocalDates(List<ShiftImp> shifts) {
+        List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> s.getStart().toLocalDate()).collect(Collectors.toSet()));
+        Collections.sort(dates);
+        return dates;
+    }
+
+    public static DateTimeInterval getNightInterval(ZonedDateTime startDate, TimeSlot timeSlot) {
+        LocalDate startLocalDate = startDate.toLocalDate();
+        LocalDate endLocalDate = LocalTime.of(timeSlot.getStartHour(), timeSlot.getStartMinute()).isAfter(LocalTime.of(timeSlot.getEndHour(), timeSlot.getEndMinute())) ? startLocalDate.plusDays(1) : startLocalDate;
+        return new DateTimeInterval(asDate(startLocalDate, LocalTime.of(timeSlot.getStartHour(), timeSlot.getStartMinute())), asDate(endLocalDate, LocalTime.of(timeSlot.getEndHour(), timeSlot.getEndMinute())));
+    }
+
+    public static int getConsecutiveDaysInDate(List<LocalDate> localDates) {
+        if (localDates.size() < 2) return 0;
+        int count = 0;
+        int max = 0;
+        int l = 1;
+        while (l < localDates.size()) {
+            if (localDates.get(l - 1).equals(localDates.get(l).minusDays(1))) {
+                count++;
+            } else {
+                count = 0;
+            }
+            if (count > max) {
+                max = count;
+            }
+            l++;
+        }
+        return max;
+    }
+
+    public static List<ShiftImp> sortShifts(List<ShiftImp> shifts) {
+        shifts.sort(Comparator.comparing(ShiftImp::getStart));
         return shifts;
     }
 
-    public static List<Interval> getSortedIntervals(List<Shift> shifts) {
-        List<Interval> intervals = new ArrayList<>();
+    public static List<DateTimeInterval> getSortedIntervals(List<ShiftImp> shifts) {
+        List<DateTimeInterval> intervals = new ArrayList<>();
         for (Shift s : sortShifts(shifts)) {
             intervals.add(s.getInterval());
         }
         return intervals;
     }
 
-    public static Interval createInterval(LocalDate weekStart, int intervalLength, IntervalUnit intervalUnit) {
-        Interval interval = null;
+    public static List<DateTimeInterval> getDaysIntervals(DateTimeInterval dateTimeInterval) {
+        List<DateTimeInterval> intervals = new ArrayList<>();
+        ZonedDateTime endDate;
+        ZonedDateTime startDate = dateTimeInterval.getStart();
+        while (true) {
+            if (startDate.isBefore(dateTimeInterval.getEnd())) {
+                endDate = startDate.plusDays(1);
+                intervals.add(new DateTimeInterval(startDate, endDate));
+                startDate = endDate;
+            } else {
+                break;
+            }
+        }
+        return intervals;
+    }
+
+    public static DateTimeInterval createInterval(LocalDate weekStart, int intervalLength, IntervalUnit intervalUnit) {
+        DateTimeInterval interval = null;
         if (IntervalUnit.WEEKS == intervalUnit) {
-            interval = new Interval(weekStart.minusWeeks(intervalLength - 1).toDateTimeAtStartOfDay(), weekStart.plusWeeks(1).toDateTimeAtStartOfDay());
+            interval = new DateTimeInterval(asZonedDateTime(weekStart.minusWeeks(intervalLength - 1)), asZonedDateTime(weekStart.plusWeeks(1)));
         }
         return interval;
     }
@@ -352,7 +481,7 @@ public class ShiftPlanningUtility {
         return overlappingAlis;
     }
 
-    public static List<ActivityLineInterval> getOverlappingActivityLineIntervalsWithInterval(ShiftImp shift, Interval interval) {
+    public static List<ActivityLineInterval> getOverlappingActivityLineIntervalsWithInterval(ShiftImp shift, DateTimeInterval interval) {
         List<ActivityLineInterval> alis = shift.getActivityLineIntervals();
         List<ActivityLineInterval> overlappingAlis = new ArrayList<>();
         for (ActivityLineInterval ali : alis) {
@@ -362,7 +491,7 @@ public class ShiftPlanningUtility {
         }
         return overlappingAlis;
     }
-    public static boolean intervalOverlapsBreak(List<ShiftBreak> shiftBreaks, Interval interval) {
+    public static boolean intervalOverlapsBreak(List<ShiftBreak> shiftBreaks, DateTimeInterval interval) {
         boolean overlaps = false;
         if (shiftBreaks == null) return overlaps;
         for (ShiftBreak shiftBreak : shiftBreaks) {
@@ -484,17 +613,17 @@ public class ShiftPlanningUtility {
         return overlappingAlisWrappers;
     }
 
-    public static List<Interval> getMergedIntervals(List<ActivityLineInterval> intervals, boolean ignoreActivities) {
+    public static List<DateTimeInterval> getMergedIntervals(List<ActivityLineInterval> intervals, boolean ignoreActivities) {
         if (intervals.isEmpty()) {
             return new ArrayList<>();
         }
         intervals.sort(Comparator.comparing(ActivityLineInterval::getStart));
-        Interval mergedInterval = intervals.get(0).getInterval();
+        DateTimeInterval mergedInterval = intervals.get(0).getInterval();
         BigInteger id = intervals.get(0).getActivity().getId();
-        List<Interval> mergedIntervals = new ArrayList<>();
+        List<DateTimeInterval> mergedIntervals = new ArrayList<>();
         for (ActivityLineInterval ali : intervals) {
             if (mergedInterval.getEnd().equals(ali.getStart()) && (ignoreActivities || id.equals(ali.getActivity().getId()))) {
-                mergedInterval = mergedInterval.withEnd(ali.getEnd());
+                mergedInterval.setEnd(ali.getEnd());
             } else if ((mergedInterval.getEnd().equals(ali.getStart()) && (ignoreActivities || !id.equals(ali.getActivity().getId()))) || mergedInterval.getEnd().isBefore(ali.getStart())) {
                 mergedIntervals.add(mergedInterval);
                 mergedInterval = ali.getInterval();
@@ -538,8 +667,8 @@ public class ShiftPlanningUtility {
         return new Object[]{shiftActivities,activityIds,plannedTimeTypeIds,timeTypeIds};
     }
 
-    public static int getMinutes(DateTime start, DateTime end) {
-        return new Interval(start, end).toDuration().toStandardMinutes().getMinutes();
+    public static int getMinutes(ZonedDateTime start, ZonedDateTime end) {
+        return (int) new DateTimeInterval(start, end).getMinutes();
 
     }
 
@@ -588,7 +717,7 @@ public class ShiftPlanningUtility {
         slMatrix.forEach((k, v) -> {
             log.info("date: {}", k);
             int[] idx = {0};
-            Arrays.stream(v).forEach(i -> log.info("{} {} {}",k.toDateTimeAtStartOfDay().plusMinutes((idx[0]++) * 15).toString("HH:mm")
+            Arrays.stream(v).forEach(i -> log.info("{} {} {}",asZonedDateTime(k).plusMinutes((idx[0]++) * 15).format(DateTimeFormatter.ofPattern("HH:mm"))
                     , (originalMatrix != null ? Arrays.toString((int[]) originalMatrix.get(k)[idx[0] - 1]) : "")
                     , Arrays.toString((int[]) i)));
         });
@@ -662,7 +791,7 @@ public class ShiftPlanningUtility {
         }
     }
 
-    private static boolean intervalOverlapsIndirectActivities(List<IndirectActivity> indirectActivities, Interval interval, Employee employee) {
+    private static boolean intervalOverlapsIndirectActivities(List<IndirectActivity> indirectActivities, DateTimeInterval interval, Employee employee) {
         for (IndirectActivity ic : indirectActivities) {
             if (ic.getInterval() != null && ic.getInterval().overlaps(interval) && ic.getEmployees().contains(employee))
                 return true;
@@ -730,8 +859,8 @@ public class ShiftPlanningUtility {
         return missingMinAndMax;
     }
 
-    public static int getTimeIndex(DateTime dateTime, int granularity) {
-        return dateTime.getMinuteOfDay() / granularity;
+    public static int getTimeIndex(ZonedDateTime dateTime, int granularity) {
+        return dateTime.get(ChronoField.MINUTE_OF_DAY) / granularity;
     }
 
     //activity with order 1 can return 0 if min and 1 if max
@@ -753,7 +882,7 @@ public class ShiftPlanningUtility {
 
     public static boolean isValidForDayType(Shift shift,List<DayType> dayTypes){
         boolean valid = false;
-        DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStart().getMillis(),shift.getEnd().getMillis());
+        DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStart(),shift.getEnd());
         for (DayType dayType : dayTypes) {
             if (dayType.isHolidayType()) {
                 valid = isHolidayTypeValid(valid, shiftInterval, dayType);

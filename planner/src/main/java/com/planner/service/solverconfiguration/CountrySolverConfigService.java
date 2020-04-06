@@ -133,7 +133,7 @@ public class CountrySolverConfigService {
             List<CountryConstraint> solverConfigConstraints = constraintsRepository.findAllCountryConstraintByIds(solverConfig.getConstraintIds());
             List<CountryConstraint> countryConstraints = new ArrayList<>();
             for (CountryConstraint solverConfigConstraint : solverConfigConstraints) {
-                countryConstraints.add(new CountryConstraint(solverConfigConstraint.getConstraintLevel(),solverConfigConstraint.getPenalty(),solverConfigConstraint.getName()));
+                countryConstraints.add(new CountryConstraint(solverConfigConstraint.getScoreLevel(),solverConfigConstraint.getPenalty(),solverConfigConstraint.getName()));
             }
             constraintsRepository.saveList(countryConstraints);
             List<BigInteger> countraintids = countryConstraints.stream().map(countryConstraint -> countryConstraint.getId()).collect(Collectors.toList());
@@ -175,12 +175,12 @@ public class CountrySolverConfigService {
         for (ConstraintDTO constraintDTO : countrySolverConfigDTO.getConstraints()) {
             if(countryConstraintDTOMap.containsKey(constraintDTO.getId())) {
                 CountryConstraint countryConstraint = countryConstraintDTOMap.get(constraintDTO.getId());
-                countryConstraint.setConstraintLevel(constraintDTO.getConstraintLevel());
+                countryConstraint.setScoreLevel(constraintDTO.getScoreLevel());
                 countryConstraint.setPenalty(constraintDTO.getPenalty());
                 countryConstraints.add(countryConstraint);
             }
             else {
-                countryConstraints.add(new CountryConstraint(constraintDTO.getConstraintLevel(),constraintDTO.getPenalty(),constraintDTO.getName()));
+                countryConstraints.add(new CountryConstraint(constraintDTO.getScoreLevel(),constraintDTO.getPenalty(),constraintDTO.getName()));
             }
         }
         if(isCollectionNotEmpty(countryConstraints)) {

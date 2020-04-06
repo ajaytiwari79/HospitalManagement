@@ -12,9 +12,9 @@ import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
-import com.kairos.shiftplanning.utils.JodaLocalDateConverter;
-import com.kairos.shiftplanning.utils.JodaLocalTimeConverter;
-import com.kairos.shiftplanning.utils.JodaTimeConverter;
+import com.kairos.shiftplanning.utils.LocalDateConverter;
+import com.kairos.shiftplanning.utils.LocalTimeConverter;
+import com.kairos.shiftplanning.utils.ZonedDateTimeConverter;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
@@ -35,9 +35,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.math.BigInteger;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.kairos.commons.utils.DateUtils.asDate;
 
 public class ShiftPlanningSolver {
     public static final String BASE_SRC = "src/main/resources/data/";
@@ -280,7 +283,7 @@ public class ShiftPlanningSolver {
     }
 
     private String getShiftPlanInfo(Shift shift){
-        return ""+shift.getStart().toString("dd/MM-HH:mm")+"--"+shift.getEnd().toString("dd/MM-HH:mm");
+        return ""+shift.getStart().format(DateTimeFormatter.ofPattern("dd/MM-HH:mm"))+"--"+shift.getEnd().format(DateTimeFormatter.ofPattern("dd/MM-HH:mm"));
     }
 
     private void printSolvedSolution(Object[] output) {
@@ -329,7 +332,7 @@ public class ShiftPlanningSolver {
     private List<ShiftDTO> getShift(List<ShiftImp> shiftImp){
         List<ShiftDTO> shiftDTOS = new ArrayList<>(shiftImp.size());
         shiftImp.forEach(s->{
-            ShiftDTO shiftDTO = new ShiftDTO(s.getStart().toDate(),s.getEnd().toDate(),BigInteger.valueOf(320l),95l,1005l);
+            ShiftDTO shiftDTO = new ShiftDTO(asDate(s.getStart()),asDate(s.getEnd()),BigInteger.valueOf(320l),95l,1005l);
             shiftDTO.setUnitEmploymentPositionId(12431l);
             if(s.getActivityLineIntervals().size()>1) {
                 shiftDTO.setSubShifts(getSubShift(s));
@@ -345,7 +348,7 @@ public class ShiftPlanningSolver {
         List<ActivityLineInterval> alis = getMergedALIs(shift.getActivityLineIntervals());
         if(alis.size()==1) return new ArrayList<>();
         alis.forEach(a->{
-            ShiftDTO shiftDTO = new ShiftDTO(a.getStart().minusHours(5).minusMinutes(30).toDate(),a.getEnd().minusHours(5).minusMinutes(30).toDate(),BigInteger.valueOf(375),95l,1005l);
+            ShiftDTO shiftDTO = new ShiftDTO(asDate(a.getStart().minusHours(5).minusMinutes(30)),asDate(a.getEnd().minusHours(5).minusMinutes(30)),BigInteger.valueOf(375),95l,1005l);
             shiftDTOS.add(shiftDTO);
         });
         return shiftDTOS;
@@ -370,9 +373,9 @@ public class ShiftPlanningSolver {
         try {
             XStream xstream = new XStream(new PureJavaReflectionProvider());
             xstream.setMode(XStream.ID_REFERENCES);
-            xstream.registerConverter(new JodaTimeConverter());
-            xstream.registerConverter(new JodaLocalTimeConverter());
-            xstream.registerConverter(new JodaLocalDateConverter());
+            xstream.registerConverter(new ZonedDateTimeConverter());
+            xstream.registerConverter(new LocalTimeConverter());
+            xstream.registerConverter(new LocalDateConverter());
             xstream.registerConverter(new HardMediumSoftLongScoreXStreamConverter());
             String xmlString = xstream.toXML(solution);
             writeXml(xmlString, fileName);

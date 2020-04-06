@@ -4,11 +4,11 @@ import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
-import org.joda.time.DateTime;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
 import java.math.BigInteger;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -63,15 +63,15 @@ public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
         shiftImp.setActivityIds((Set<BigInteger>)objects[1]);
         shiftImp.setActivitiesPlannedTimeIds((Set<BigInteger>)objects[2]);
         shiftImp.setActivitiesTimeTypeIds((Set<BigInteger>)objects[3]);
-        DateTime[] startAndEnd=getEarliestStartAndLatestEnd(shiftImp.getActivityLineIntervals());
+        ZonedDateTime[] startAndEnd=getEarliestStartAndLatestEnd(shiftImp.getActivityLineIntervals());
         scoreDirector.beforeVariableChanged(shiftImp, START_TIME);
         shiftImp.setStartTime(startAndEnd[0].toLocalTime());
         scoreDirector.afterVariableChanged(shiftImp, START_TIME);
         shiftImp.setEndTime(startAndEnd[1].toLocalTime());
 
     }
-    private DateTime[] getEarliestStartAndLatestEnd(List<ActivityLineInterval> activityLineIntervals){
-        DateTime[] startAndEnd= new DateTime[2];
+    private ZonedDateTime[] getEarliestStartAndLatestEnd(List<ActivityLineInterval> activityLineIntervals){
+        ZonedDateTime[] startAndEnd= new ZonedDateTime[2];
         for (ActivityLineInterval activityLineInterval:activityLineIntervals) {
             if(startAndEnd[0]==null && startAndEnd[1]==null){
                 startAndEnd[0]=activityLineInterval.getStart();

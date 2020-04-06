@@ -80,6 +80,10 @@ public  class DateUtils {
         return localDateTimeToDate(startOfDay);
     }
 
+    public static ZonedDateTime getStartOfDay(ZonedDateTime date) {
+        return date.truncatedTo(ChronoUnit.DAYS);
+    }
+
     public static Date getMidNightOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date).plusDays(1);
         LocalDateTime startOfDay = localDateTime.with(LocalTime.MIDNIGHT);
@@ -266,7 +270,7 @@ public  class DateUtils {
     }
 
     public static Date onlyDate(Date date) {
-        return getDateByZoneDateTime(asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS));
+        return getDateByZoneDateTime(asZonedDateTime(date).truncatedTo(ChronoUnit.DAYS));
     }
 
     public static Date addMinutes(final Date date, final int amount) {
@@ -367,12 +371,16 @@ public  class DateUtils {
         return dateTime.toString(formatter);
     }
 
-    public static ZonedDateTime asZoneDateTime(Date date) {
+    public static ZonedDateTime asZonedDateTime(Date date) {
         return ZonedDateTime.ofInstant(date.toInstant(),
                 ZoneId.systemDefault());
     }
 
-    public static ZonedDateTime asZoneDateTime(LocalDate localDate,LocalTime localTime) {
+    public static ZonedDateTime asZonedDateTime(LocalDate localDate) {
+        return asZonedDateTime(localDate,LocalTime.MIN);
+    }
+
+    public static ZonedDateTime asZonedDateTime(LocalDate localDate, LocalTime localTime) {
         return ZonedDateTime.of(localDate,localTime,
                 ZoneId.systemDefault());
     }
@@ -565,7 +573,7 @@ public  class DateUtils {
     }
 
     public static Date getStartOfTheDay(Date date){
-        return asDate(asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS));
+        return asDate(asZonedDateTime(date).truncatedTo(ChronoUnit.DAYS));
     }
 
     public static int getWeekNumberByLocalDate(LocalDate localDate) {
@@ -608,11 +616,11 @@ public  class DateUtils {
     }
 
     public static int getHourFromDate(Date date) {
-        return asZoneDateTime(date).getHour();
+        return asZonedDateTime(date).getHour();
     }
 
     public static int getMinutesFromDate(Date date) {
-        return asZoneDateTime(date).getMinute();
+        return asZonedDateTime(date).getMinute();
     }
 
     public static LocalDate getStartDateOfWeek(){
@@ -652,23 +660,23 @@ public  class DateUtils {
     }
 
     public static Date plusDays(Date date,int plusDays){
-        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusDays(plusDays));
+        return DateUtils.asDate(DateUtils.asZonedDateTime(date).plusDays(plusDays));
     }
 
     public static Date plusMonths(Date date,int plusMonths){
-        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusMonths(plusMonths));
+        return DateUtils.asDate(DateUtils.asZonedDateTime(date).plusMonths(plusMonths));
     }
 
     public static Date plusWeeks(Date date,int plusWeeks){
-        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusWeeks(plusWeeks));
+        return DateUtils.asDate(DateUtils.asZonedDateTime(date).plusWeeks(plusWeeks));
     }
 
     public static Date plusHours(Date date,int plusHours){
-        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusHours(plusHours));
+        return DateUtils.asDate(DateUtils.asZonedDateTime(date).plusHours(plusHours));
     }
 
     public static Date plusMinutes(Date date,int plusMinutes){
-        return DateUtils.asDate(DateUtils.asZoneDateTime(date).plusMinutes(plusMinutes));
+        return DateUtils.asDate(DateUtils.asZonedDateTime(date).plusMinutes(plusMinutes));
     }
 
     public static LocalDateTime getLocalDateTimeFromLocalDate(LocalDate localDate){
@@ -684,7 +692,7 @@ public  class DateUtils {
     }
 
     public static Date minusDays(Date date,int minusDays) {
-        return DateUtils.asDate(DateUtils.asZoneDateTime(date).minusDays(minusDays));
+        return DateUtils.asDate(DateUtils.asZonedDateTime(date).minusDays(minusDays));
     }
 
     public static Long getIsoDateInLong(String dateReceived) {
@@ -739,7 +747,7 @@ public  class DateUtils {
         return localDate.with(TemporalAdjusters.firstDayOfNextYear());
     }
     public static Date minusMonths(Date date,int minusMonths) {
-        return DateUtils.asDate(DateUtils.asZoneDateTime(date).minusMonths(minusMonths));
+        return DateUtils.asDate(DateUtils.asZonedDateTime(date).minusMonths(minusMonths));
     }
     public static Date parseDate(String date){
         DateTime dateTime = new DateTime(date);
@@ -888,7 +896,7 @@ public  class DateUtils {
     }
 
     public static Date roundDateByMinutes(Date date,int minutes){
-        ZonedDateTime zonedDateTime = asZoneDateTime(date);
+        ZonedDateTime zonedDateTime = asZonedDateTime(date);
         return asDate(zonedDateTime.truncatedTo(ChronoUnit.HOURS).plusMinutes((int)Math.round((double)zonedDateTime.get(ChronoField.MINUTE_OF_HOUR)/minutes)*(long)minutes));
     }
     public static Set<DayOfWeek> getAllDaysBetweenDays(DayOfWeek startDayOfWeek, DayOfWeek endDayOfWeek) {

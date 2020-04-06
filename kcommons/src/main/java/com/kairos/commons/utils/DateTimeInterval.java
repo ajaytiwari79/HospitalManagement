@@ -226,6 +226,13 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
         return (date.getTime() >= thisStart && date.getTime() <= thisEnd);
     }
 
+    public final boolean containsAndEqualsEndDate(ZonedDateTime zonedDateTime) {
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        Date date = asDate(zonedDateTime);
+        return (date.getTime() >= thisStart && date.getTime() <= thisEnd);
+    }
+
     public boolean contains(DateTimeInterval interval) {
         if (interval == null) {
             return containsNow();

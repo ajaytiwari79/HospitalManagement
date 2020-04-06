@@ -1,7 +1,7 @@
 package com.planner.domain.constraint.common;
 
 import com.kairos.dto.planner.constarints.ConstraintDTO;
-import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.planner.domain.common.MongoBaseEntity;
@@ -15,7 +15,7 @@ public class Constraint extends MongoBaseEntity{
     protected String description;
     protected ConstraintType constraintType;
     protected ConstraintSubType constraintSubType;
-    protected ConstraintLevel constraintLevel;
+    protected ScoreLevel scoreLevel;
     protected int penalty;
     protected BigInteger planningProblemId;
     protected BigInteger parentConstraintId;//copiedFrom
@@ -25,13 +25,13 @@ public class Constraint extends MongoBaseEntity{
         //Default Constructor
     }
 
-    public Constraint(BigInteger id, String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ConstraintLevel constraintLevel, int penalty, BigInteger planningProblemId, BigInteger parentConstraintId) {
+    public Constraint(BigInteger id, String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ScoreLevel scoreLevel, int penalty, BigInteger planningProblemId, BigInteger parentConstraintId) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.constraintType = constraintType;
         this.constraintSubType = constraintSubType;
-        this.constraintLevel = constraintLevel;
+        this.scoreLevel = scoreLevel;
         this.penalty = penalty;
         this.planningProblemId = planningProblemId;
         this.parentConstraintId = parentConstraintId;
@@ -70,12 +70,12 @@ public class Constraint extends MongoBaseEntity{
         this.constraintSubType = constraintSubType;
     }
 
-    public ConstraintLevel getConstraintLevel() {
-        return constraintLevel;
+    public ScoreLevel getScoreLevel() {
+        return scoreLevel;
     }
 
-    public void setConstraintLevel(ConstraintLevel constraintLevel) {
-        this.constraintLevel = constraintLevel;
+    public void setScoreLevel(ScoreLevel scoreLevel) {
+        this.scoreLevel = scoreLevel;
     }
 
     public int getPenalty() {
@@ -103,7 +103,7 @@ public class Constraint extends MongoBaseEntity{
     }
 
     public boolean isEqualsWithSpecificField(ConstraintDTO constraintDTO) {
-        return constraintType.equals(constraintDTO.getConstraintType()) && constraintSubType.equals(constraintDTO.getConstraintSubType()) && constraintLevel.equals(constraintDTO.getConstraintLevel()) && penalty == constraintDTO.getPenalty();
+        return constraintType.equals(constraintDTO.getConstraintType()) && constraintSubType.equals(constraintDTO.getConstraintSubType()) && scoreLevel.equals(constraintDTO.getScoreLevel()) && penalty == constraintDTO.getPenalty();
     }
 
 
