@@ -244,7 +244,12 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
         if(Optional.ofNullable(filters.get(FilterType.EMPLOYED_SINCE)).isPresent() && filters.get(FilterType.EMPLOYED_SINCE).size()!=0) {
             Set <Map<String,String>> customQuerySet = (Set<Map<String, String>>) filters.get(FilterType.EMPLOYED_SINCE);
-            addComparisonValuesToQuery(query," employments.startDate ",customQuerySet);
+            addComparisonValuesToQuery(query," DATE(employments.startDate) ",customQuerySet);
+        }
+
+        if(Optional.ofNullable(filters.get(FilterType.BIRTHDAY)).isPresent() && filters.get(FilterType.BIRTHDAY).size()!=0) {
+            Set <Map<String,String>> customQuerySet = (Set<Map<String, String>>) filters.get(FilterType.BIRTHDAY);
+            addComparisonValuesToQuery(query," DATE(staff.dateOfBirth) ",customQuerySet);
         }
 
         /*if(Optional.ofNullable(filters.get(FilterType.ORGANIZATION_EXPERIENCE)).isPresent() && filters.get(FilterType.ORGANIZATION_EXPERIENCE).size()!=0) {
@@ -279,8 +284,22 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent() && filters.get(FilterType.EXPERTISE).size()!=0) {
             queryParameters.put("expertiseIds", convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
-            query.append(" WITH staff,employments,user MATCH (staff)-[:STAFF_HAS_EXPERTISE]->(expertise:Expertise) where id(expertise) in {expertiseIds}");
+            query.append(" WITH staff,employments,user MATCH (staff)-[:STAFF_HAS_EXPERTISE]->(expertise:Expertise)<-[:HAS_EXPERTISE_IN]-(employments) where id(expertise) in {expertiseIds}");
         }
+
+        if(Optional.ofNullable(filters.get(FilterType.SENIORITY)).isPresent() || Optional.ofNullable(filters.get(FilterType.PAY_GRADE_LEVEL)).isPresent() ) {
+            Set <Map<String,String>> customQuerySet = (Set<Map<String, String>>) filters.get(FilterType.SENIORITY);
+            query.append(" WITH staff,employments,user ");
+            query.append(" MATCH (employments)-[:HAS_EMPLOYMENT_LINES]->(el:EmploymentLine)-[:HAS_SENIORITY_LEVEL]->(sl:SeniorityLevel)-[:HAS_BASE_PAY_GRADE]->(pg:PayGrade) ");
+            if( filters.get(FilterType.SENIORITY).size()!=0) {
+                query.append(" WHERE DATE(el.endDate) <= DATE(employments.endDate) ");
+                addComparisonValuesToQuery(query, " sl.to ", customQuerySet);
+            }if(filters.get(FilterType.PAY_GRADE_LEVEL).size()!=0) {
+                addComparisonValuesToQuery(query, " pg.payGradeLevel ", customQuerySet);
+            }
+        }
+
+
         if (Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent() && filters.get(FilterType.SKILLS).size()!=0) {
             queryParameters.put("skillIds", convertListOfStringIntoLong(filters.get(FilterType.SKILLS)));
             query.append(" WITH staff,employments,user MATCH (staff)-[:STAFF_HAS_SKILLS]->(skills:Skill) where id(skills) in {skillIds}");

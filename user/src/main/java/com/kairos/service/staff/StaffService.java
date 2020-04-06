@@ -1045,13 +1045,14 @@ public class StaffService {
                 organizationExperience.add(dateCompareBuilder(filterSelection));
                 filterTypeSetMap.put(filterSelection.getName(),(T) organizationExperience);
             }
-            else if(filterSelection.getName().equals(FilterType.TIME_BANK_BALANCE)){
+            //fixme should be filtered in activity microservice
+            /*else if(filterSelection.getName().equals(FilterType.TIME_BANK_BALANCE)){
                 if(timeBankBalance==null){
                     timeBankBalance = new HashSet<>();
                 }
                 timeBankBalance.add(compareBuilder(filterSelection));
                 filterTypeSetMap.put(filterSelection.getName(), (T) timeBankBalance);
-            }
+            }*/
             else if(filterSelection.getName().equals(FilterType.SENIORITY)){
                 if(seniorityLevel==null){
                     seniorityLevel = new HashSet<>();
