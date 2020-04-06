@@ -767,9 +767,9 @@ public class KPIBuilderCalculationService implements CounterService {
 
         }
 
-        private void getUpdateTodoDTOSByDayOfWeek(List<TodoDTO> todoDTOS) {
+        private void getUpdateTodoDTOSByDayOfWeek(List<TodoDTO> todoDTOList) {
             if (filterBasedCriteria.containsKey(DAYS_OF_WEEK)) {
-                todoDTOS.stream().filter(todoDTO -> daysOfWeeks.contains(todoDTO.getShiftDate().getDayOfWeek())).collect(Collectors.toList());
+               todoDTOS = todoDTOList.stream().filter(todoDTO -> daysOfWeeks.contains(todoDTO.getShiftDate().getDayOfWeek())).collect(Collectors.toList());
             }
         }
 
