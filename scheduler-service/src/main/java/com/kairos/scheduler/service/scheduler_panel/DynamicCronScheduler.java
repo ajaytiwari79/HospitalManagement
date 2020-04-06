@@ -72,7 +72,7 @@ public class DynamicCronScheduler{
             BeanFactoryUtil.registerSingleton(SCHEDULER + schedulerPanel.getId(), future);
             logger.info("Name of cron job is --> " + SCHEDULER + schedulerPanel.getId());
         }catch (Exception ex){
-            logger.info("Exception --> ", ex.getMessage());
+            logger.info("Exception --> {}", ex.getMessage());
         }
         return SCHEDULER + schedulerPanel.getId();
 

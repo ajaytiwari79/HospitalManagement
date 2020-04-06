@@ -940,7 +940,7 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     public boolean registerJobForExistingPlanningPeriod() {
-        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.getAllPlanningPeriodWhichNotEnd(getDate());
+        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllAfterEndDateAndDeletedFalse(getLocalDate());
         List<BigInteger> schedulerPanelIds = new ArrayList<>();
         for (PlanningPeriod planningPeriod : planningPeriods) {
             planningPeriod.getPhaseFlippingDate().forEach(periodPhaseFlippingDate -> {

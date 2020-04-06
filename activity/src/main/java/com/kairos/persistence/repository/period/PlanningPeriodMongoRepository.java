@@ -5,6 +5,7 @@ import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public interface PlanningPeriodMongoRepository extends MongoBaseRepository<Plann
     List<PlanningPeriod> findAllByUnitIdAndIds(Long unitId, List<BigInteger> planningPeriodIds);
 
     @Query("{deleted:false,endDate:{$gte:?0}}")
-    List<PlanningPeriod> getAllPlanningPeriodWhichNotEnd(Date endDate);
+    List<PlanningPeriod> findAllAfterEndDateAndDeletedFalse(LocalDate date);
 
     @Query("{deleted:false,unitId:?0,startDate: {$lte: ?1},endDate:{$gte:?1}}")
     PlanningPeriod findOneByUnitIdAndDate(Long unitId, Date startDate);
