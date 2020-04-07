@@ -48,7 +48,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps) {
         int penality = 0;
         if(!isDisabled() && isValidShift(unit.getPhase().getId(),shiftImp,this.phaseTemplateValues,timeTypeIds,plannedTimeIds)){
-            TimeInterval[] timeIntervals = getTimeSlotsByPartOfDay(partOfDays,unit.getTimeSlotWrapperMap(),shiftImp);
+            TimeInterval[] timeIntervals = getTimeSlotsByPartOfDay(partOfDays,unit.getTimeSlotMap(),shiftImp);
             if(timeIntervals.length>0) {
                 DateTimeInterval[] dateTimeIntervals = getIntervalsByRuleTemplate(shiftImp, intervalUnit, intervalLength);
                 List<ShiftImp> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(shiftImps, timeTypeIds, plannedTimeIds);

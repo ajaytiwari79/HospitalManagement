@@ -7,6 +7,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.unit.TimeSlot;
 import com.kairos.shiftplanning.domain.unit.Unit;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,7 +55,7 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps) {
         int penality = 0;
         if(!isDisabled() && CollectionUtils.containsAny(timeTypeIds,shiftImp.getActivitiesTimeTypeIds())){
-            TimeSlotWrapper timeSlotWrapper = getTimeSlotWrapper(unit, shiftImp);
+            TimeSlot timeSlotWrapper = getTimeSlotWrapper(unit, shiftImp);
             if(isNotNull(timeSlotWrapper)) {
                 int totalOccurrencesSequenceShift = getOccurrencesSequenceShift(shiftImps,shiftImp,unit);
                 int limit = getValueByPhaseAndCounter(unit, getPhaseTemplateValues());
@@ -69,8 +70,8 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
         shiftImps.add(shiftImp);
         shiftImps = shiftImps.stream().sorted(Comparator.comparing(k->k.getStart())).collect(Collectors.toList());
         for(int i=0; i<shiftImps.size()-1; i++){
-            TimeSlotWrapper timeSlot = getTimeSlotWrapper(unit, shiftImps.get(i));
-            TimeSlotWrapper nextTimeSlot = getTimeSlotWrapper(unit, shiftImps.get(i+1));
+            TimeSlot timeSlot = getTimeSlotWrapper(unit, shiftImps.get(i));
+            TimeSlot nextTimeSlot = getTimeSlotWrapper(unit, shiftImps.get(i+1));
             List<PartOfDay> partOfDays = newArrayList(sequenceShiftFrom,sequenceShiftTo);
             if(partOfDays.contains(PartOfDay.valueOf(timeSlot.getName().toUpperCase())) && partOfDays.contains(PartOfDay.valueOf(nextTimeSlot.getName().toUpperCase())) && !timeSlot.getName().equals(nextTimeSlot.getName())){
                 Period period = Period.between(shiftImps.get(i).getStartDate(), shiftImps.get(i+1).getStartDate());
@@ -82,21 +83,21 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
         return totalOccurrencesSequenceShift;
     }
 
-    private TimeSlotWrapper getTimeSlotWrapper(Unit unit, ShiftImp shift){
-        TimeSlotWrapper timeSlotWrapper = null;
-        for (Map.Entry<String, TimeSlotWrapper> stringTimeSlotWrapperEntry : unit.getTimeSlotWrapperMap().entrySet()) {
-            timeSlotWrapper = stringTimeSlotWrapperEntry.getValue();
-            int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
-            int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
+    private TimeSlot getTimeSlotWrapper(Unit unit, ShiftImp shift){
+        TimeSlot timeSlot = null;
+        for (Map.Entry<String, TimeSlot> stringTimeSlotWrapperEntry : unit.getTimeSlotMap().entrySet()) {
+            timeSlot = stringTimeSlotWrapperEntry.getValue();
+            int endMinutesOfInterval = (timeSlot.getEndHour() * 60) + timeSlot.getEndMinute();
+            int startMinutesOfInterval = (timeSlot.getStartHour() * 60) + timeSlot.getStartMinute();
             TimeInterval interval = new TimeInterval(startMinutesOfInterval, endMinutesOfInterval);
             int minuteOfTheDay = shift.getStart().get(ChronoField.MINUTE_OF_DAY);
             if (minuteOfTheDay == (int) interval.getStartFrom() || interval.contains(minuteOfTheDay)) {
                 break;
             }else{
-                timeSlotWrapper = null;
+                timeSlot = null;
             }
         }
-        return timeSlotWrapper;
+        return timeSlot;
     }
 
 

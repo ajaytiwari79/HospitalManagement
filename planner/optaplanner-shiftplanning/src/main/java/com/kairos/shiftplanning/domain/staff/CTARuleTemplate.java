@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.cta;
+package com.kairos.shiftplanning.domain.staff;
 
 import com.kairos.dto.activity.cta.CTARuleTemplatePhaseInfo;
 import com.kairos.dto.activity.cta.CompensationTable;
@@ -6,7 +6,6 @@ import com.kairos.dto.activity.cta.PlannedTimeWithFactor;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.enums.cta.*;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -18,7 +17,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
  * @date - 30/7/18
  */
 
-public class CTARuleTemplate extends MongoBaseEntity {
+public class CTARuleTemplate {
 
     protected String name;
     protected String description;

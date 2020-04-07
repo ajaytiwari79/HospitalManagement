@@ -254,6 +254,14 @@ public class ShiftImp implements Shift{
         return true;
     }
 
+    public LocalDate getStartDate() {
+        return getDate();
+    }
+
+    public LocalDate getEndDate() {
+        return getEnd().toLocalDate();
+    }
+
     public ShiftActivity firstShiftActivity(){
         return shiftActivities.get(0);
     }

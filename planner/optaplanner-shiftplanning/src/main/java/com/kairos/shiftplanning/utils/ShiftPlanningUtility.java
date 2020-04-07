@@ -6,11 +6,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlot;
-import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.enums.Day;
 import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.enums.wta.MinMaxSetting;
@@ -28,6 +24,7 @@ import com.kairos.shiftplanning.domain.staff.Employee;
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelActivityType;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelPlannerEntity;
+import com.kairos.shiftplanning.domain.unit.TimeSlot;
 import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.move.helper.ActivityLineIntervalWrapper;
@@ -90,7 +87,7 @@ public class ShiftPlanningUtility {
         return invalidShiftIntervals[0];
     }
 
-    public static Set<DayOfWeek> getValidDays(Map<Long, DayTypeDTO> dayTypeMap, List<Long> dayTypeIds) {
+    public static Set<DayOfWeek> getValidDays(Map<Long, DayType> dayTypeMap, List<Long> dayTypeIds) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         List<Day> days = dayTypeIds.stream().filter(s -> dayTypeMap.containsKey(s)).flatMap(dayTypeId -> dayTypeMap.get(dayTypeId).getValidDays().stream()).collect(Collectors.toList());
         days.forEach(day -> {
@@ -236,13 +233,13 @@ public class ShiftPlanningUtility {
         return updatedShifts;
     }
 
-    public static TimeInterval[] getTimeSlotsByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftImp shift) {
+    public static TimeInterval[] getTimeSlotsByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlot> timeSlotMap, ShiftImp shift) {
         TimeInterval[] timeIntervals = new TimeInterval[partOfDays.size()];
         int i=0;
         boolean valid = false;
         for (PartOfDay partOfDay : partOfDays) {
-            if (timeSlotWrapperMap.containsKey(partOfDay.getValue())) {
-                TimeSlotWrapper timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
+            if (timeSlotMap.containsKey(partOfDay.getValue())) {
+                TimeSlot timeSlotWrapper = timeSlotMap.get(partOfDay.getValue());
                 if (partOfDay.getValue().equals(timeSlotWrapper.getName())) {
                     int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
                     int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
@@ -277,11 +274,11 @@ public class ShiftPlanningUtility {
         return returnValue;
     }
 
-    public static TimeInterval getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftImp shift) {
+    public static TimeInterval getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlot> timeSlotWrapperMap, ShiftImp shift) {
         TimeInterval timeInterval = null;
         for (PartOfDay partOfDay : partOfDays) {
             if (timeSlotWrapperMap.containsKey(partOfDay.getValue())) {
-                TimeSlotWrapper timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
+                TimeSlot timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
                 if (partOfDay.getValue().equals(timeSlotWrapper.getName())) {
                     int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
                     int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
@@ -355,7 +352,7 @@ public class ShiftPlanningUtility {
     }
 
     public static String getIntervalAsString(DateTimeInterval interval) {
-        return interval.getStart().format(DateTimeFormatter.ofPattern("dd[HH:mm")) + "-" + interval.getEnd().format(DateTimeFormatter.ofPattern("HH:mm]"));
+        return interval.getStart().format(DateTimeFormatter.ofPattern("dd(HH:mm")) + "-" + interval.getEnd().format(DateTimeFormatter.ofPattern("HH:mm)"));
     }
 
     public static List<LocalDate> getSortedAndUniqueDates(List<Shift> shifts) {
@@ -648,8 +645,8 @@ public class ShiftPlanningUtility {
         BigInteger id = intervals.get(0).getActivity().getId();
         for (ActivityLineInterval ali : intervals) {
             if (shiftActivity.getInterval().getEnd().equals(ali.getStart()) && id.equals(ali.getActivity().getId())) {
-                shiftActivity.setEndTime(ali.getEnd());
-            } else if (shiftActivity.getEndTime().equals(ali.getStart()) && !id.equals(ali.getActivity().getId()) || shiftActivity.getEndTime().isBefore(ali.getStart())) {
+                shiftActivity.setEndDate(ali.getEnd());
+            } else if (shiftActivity.getEndDate().equals(ali.getStart()) && !id.equals(ali.getActivity().getId()) || shiftActivity.getEndDate().isBefore(ali.getStart())) {
                 activityIds.add(shiftActivity.getActivity().getId());
                 timeTypeIds.add(shiftActivity.getActivity().getTimeType().getId());
                 plannedTimeTypeIds.addAll(shiftActivity.getPlannedTimes().stream().map(plannedTime -> plannedTime.getPlannedTimeId()).collect(Collectors.toSet()));
@@ -663,7 +660,7 @@ public class ShiftPlanningUtility {
         timeTypeIds.add(shiftActivity.getActivity().getTimeType().getId());
         plannedTimeTypeIds.addAll(shiftActivity.getPlannedTimes().stream().map(plannedTime -> plannedTime.getPlannedTimeId()).collect(Collectors.toSet()));
         shiftActivities.add(shiftActivity);
-        shiftActivities.sort(Comparator.comparing(ShiftActivity::getStartTime));
+        shiftActivities.sort(Comparator.comparing(ShiftActivity::getStartDate));
         return new Object[]{shiftActivities,activityIds,plannedTimeTypeIds,timeTypeIds};
     }
 

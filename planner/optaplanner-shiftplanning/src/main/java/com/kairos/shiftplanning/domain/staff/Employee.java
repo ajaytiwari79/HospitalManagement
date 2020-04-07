@@ -1,9 +1,6 @@
 package com.kairos.shiftplanning.domain.staff;
 
-import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
-import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.skill.Skill;
@@ -15,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.kie.api.runtime.rule.RuleContext;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +33,7 @@ public class Employee {
     private static final Logger LOGGER = LoggerFactory.getLogger(Employee.class);
     private Long id;
     private BigDecimal baseCost;
-    private Map<java.time.LocalDate,CTAResponseDTO> localDateCTAResponseDTOMap;// added 10-9-2018
-   // private Map<java.time.LocalDate,Map<ConstraintType, WTABaseRuleTemplate>> localDateWTAMap;
+    private Map<java.time.LocalDate,List<CTARuleTemplate>> localDateCTARuletemplateMap;
     private Location location;
     private String name;
     private Set<Skill> skillSet;
@@ -83,6 +81,10 @@ public class Employee {
         return this.wtaRuleTemplateMap.get(shiftImp.getStartDate()).get(constraintSubType).checkConstraints(unit,shiftImp,shiftImps);
     }
 
+    public void breakContraints(ShiftImp shiftImp,HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, ConstraintSubType constraintSubType) {
+        this.wtaRuleTemplateMap.get(shiftImp.getStartDate()).get(constraintSubType).breakLevelConstraints(scoreHolder,kContext,constraintPenality);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -98,8 +100,7 @@ public class Employee {
 
     @Override
     public int hashCode() {
-        int hashcode=id.hashCode();
-        return hashcode;
+        return id.hashCode();
     }
 
     public Long getEmploymentTypeId() {

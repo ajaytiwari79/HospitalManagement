@@ -17,5 +17,5 @@ salience 20
         $shifts:List(size>0) from collect(ShiftImp($employee.equals(employee)))
         $constraintsPenality: Integer(intValue>0) from ($employee.checkConstraints($unit,$shift,$shifts,ConstraintSubType.AVERAGE_SHEDULED_TIME))
     then
-        $employee.breakContraints(scoreHolder,kcontext,$constraintsPenality,ConstraintSubType.AVERAGE_SHEDULED_TIME);
+        $employee.breakContraints($shift,scoreHolder,kcontext,$constraintsPenality,ConstraintSubType.AVERAGE_SHEDULED_TIME);
 end

@@ -20,4 +20,10 @@ public class PlanningPeriod {
     private BigInteger currentPhaseId;
     private BigInteger nextPhaseId;
     private Set<Long> publishEmploymentIds=new HashSet<>();
+
+    public PlanningPeriod(BigInteger id, LocalDate startDate, LocalDate endDate) {
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 }

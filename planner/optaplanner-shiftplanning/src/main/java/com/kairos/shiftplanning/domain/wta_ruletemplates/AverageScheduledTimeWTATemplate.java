@@ -10,9 +10,8 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.Unit;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,6 +36,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
 
@@ -44,11 +44,16 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     private long intervalLength;
     @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
+    @Builder.Default
     private Set<BigInteger> plannedTimeIds = new HashSet<>();
+    @Builder.Default
     private Set<BigInteger> timeTypeIds = new HashSet<>();
+    @Builder.Default
     private Set<PartOfDay> partOfDays = new HashSet<>();
     private float recommendedValue;
+    @Builder.Default
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
+    @Builder.Default
     private ShiftLengthAndAverageSetting shiftLengthAndAverageSetting = ShiftLengthAndAverageSetting.DIFFERENCE_BETWEEN_START_END_TIME;
 
 

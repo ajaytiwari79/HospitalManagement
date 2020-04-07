@@ -1,11 +1,11 @@
 package com.kairos.shiftplanning.constraints.unitconstraint;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.unit.TimeSlot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

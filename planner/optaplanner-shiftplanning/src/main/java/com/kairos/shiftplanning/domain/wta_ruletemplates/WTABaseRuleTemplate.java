@@ -5,9 +5,8 @@ import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.constraints.Constraint;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
@@ -19,6 +18,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@SuperBuilder
 @Document(collection = "wtaBaseRuleTemplate")
 @NoArgsConstructor
 public class WTABaseRuleTemplate implements Constraint {

@@ -19,10 +19,10 @@ import java.util.Date;
 @NoArgsConstructor
 public class PlannedTime {
     private BigInteger plannedTimeId;
-    private ZonedDateTime startDate;
-    private ZonedDateTime endDate;
+    private Date startDate;
+    private Date endDate;2
 
-    public PlannedTime(BigInteger plannedTimeId, ZonedDateTime startDate, ZonedDateTime endDate) {
+    public PlannedTime(BigInteger plannedTimeId, Date startDate, Date endDate) {
         this.plannedTimeId = plannedTimeId;
         this.startDate = startDate;
         this.endDate = endDate;

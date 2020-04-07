@@ -42,7 +42,7 @@ public class PresenceAndAbsenceAtSameTime implements Constraint {
     @Override
     public int checkConstraints(List<ShiftImp> shifts) {
         shifts.sort(Comparator.comparing(ShiftImp::getStartDate));
-        List<ShiftActivity> shiftActivities = shifts.stream().flatMap(shiftImp -> shiftImp.getShiftActivities().stream()).sorted(Comparator.comparing(ShiftActivity::getStartTime)).collect(Collectors.toList());
+        List<ShiftActivity> shiftActivities = shifts.stream().flatMap(shiftImp -> shiftImp.getShiftActivities().stream()).sorted(Comparator.comparing(ShiftActivity::getStartDate)).collect(Collectors.toList());
         int contraintPenality = 0;
         for (int i = 1; i < shiftActivities.size(); i++) {
             ShiftActivity shiftActivity = shiftActivities.get(i - 1);

@@ -49,6 +49,9 @@ public class CommonConstants {
     public static final String WEEKS = "WEEKS";
     public static final String DAYS = "DAYS";
     public static final String YEARS = "YEARS";
+    public static final String NIGHT = "Night";
+    public static final String DAY = "Day";
+    public static final String EVENING = "Evening";
 
     public static final int ONE_MINUTE_MILLIS = 60000;
 }

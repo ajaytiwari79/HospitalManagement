@@ -92,16 +92,16 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
     private int getDurationByAbsenceOrPresenceType(List<ShiftImp> shifts, ShiftActivity shiftActivity, boolean checkBefore, Set<TimeTypeEnum> timeTypeEnums) {
-        ZonedDateTime date = checkBefore ? shiftActivity.getStartTime() : shiftActivity.getEndTime();
+        ZonedDateTime date = checkBefore ? shiftActivity.getStartDate() : shiftActivity.getEndDate();
         int restingHours = NOT_VALID_VALUE;
         for (ShiftImp shiftImp : shifts) {
             for (ShiftActivity activity : shiftImp.getShiftActivities()) {
-                if(checkBefore && !activity.getEndTime().isAfter(date) && timeTypeEnums.contains(activity.getActivity().getTimeType().getTimeTypeEnum())){
-                    int duration = (int)new DateTimeInterval(activity.getEndTime(),date).getMinutes();
+                if(checkBefore && !activity.getEndDate().isAfter(date) && timeTypeEnums.contains(activity.getActivity().getTimeType().getTimeTypeEnum())){
+                    int duration = (int)new DateTimeInterval(activity.getEndDate(),date).getMinutes();
                     restingHours = restingHours > duration || restingHours==NOT_VALID_VALUE ? duration : restingHours;
                 }
-                if(!checkBefore && !activity.getStartTime().isBefore(date) && timeTypeEnums.contains(activity.getActivity().getTimeType().getTimeTypeEnum())){
-                    int duration = (int)new DateTimeInterval(date,activity.getStartTime()).getMinutes();
+                if(!checkBefore && !activity.getStartDate().isBefore(date) && timeTypeEnums.contains(activity.getActivity().getTimeType().getTimeTypeEnum())){
+                    int duration = (int)new DateTimeInterval(date,activity.getStartDate()).getMinutes();
                     restingHours = restingHours > duration || restingHours==NOT_VALID_VALUE ? duration : restingHours;
                 }
             }

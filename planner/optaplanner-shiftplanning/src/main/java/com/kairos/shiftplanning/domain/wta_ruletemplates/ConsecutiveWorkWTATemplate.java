@@ -54,7 +54,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         int penality = 0;
         if(!isDisabled() && isValidForPhase(unit.getPhase().getId(),this.phaseTemplateValues)) {
             if (CollectionUtils.containsAny(timeTypeIds,shiftImp.getActivitiesTimeTypeIds())) {
-                TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, unit.getTimeSlotWrapperMap(), shiftImp);
+                TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, unit.getTimeSlotMap(), shiftImp);
                 if (timeInterval != null) {
                     shiftImps = filterShiftsByPlannedTypeAndTimeTypeIds(shiftImps, timeTypeIds, plannedTimeIds);
                     DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(shiftImp, intervalUnit, intervalLength);
