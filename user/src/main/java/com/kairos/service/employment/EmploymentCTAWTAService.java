@@ -67,8 +67,6 @@ public class EmploymentCTAWTAService {
     @Inject
     private OrganizationBaseRepository organizationBaseRepository;
     @Inject
-    private CountryService countryService;
-    @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     private UnitGraphRepository unitGraphRepository;

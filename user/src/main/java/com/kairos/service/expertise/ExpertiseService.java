@@ -10,10 +10,8 @@ import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.country.experties.AgeRangeDTO;
+import com.kairos.dto.user.country.experties.*;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
-import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
-import com.kairos.dto.user.country.experties.SeniorityLevelDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
@@ -39,16 +37,14 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.response.*;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseBasicDetails;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
-import com.kairos.persistence.repository.user.expertise.ExpertiseEmploymentTypeRelationshipGraphRepository;
-import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
-import com.kairos.persistence.repository.user.expertise.FunctionalPaymentGraphRepository;
-import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
+import com.kairos.persistence.repository.user.expertise.*;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.rest_client.SchedulerServiceRestClient;
@@ -128,6 +124,10 @@ public class ExpertiseService {
     private SectorGraphRepository sectorGraphRepository;
     @Inject
     private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
+    @Inject
+    private SeniorDaysGraphRepository seniorDaysGraphRepository;
+    @Inject
+    private ChildCareDaysGraphRepository childCareDaysGraphRepository;
 
 
     public ExpertiseQueryResult saveExpertise(Long countryId, ExpertiseDTO expertiseDTO) {
@@ -356,7 +356,7 @@ public class ExpertiseService {
     }
 
 
-    public List<com.kairos.persistence.model.user.expertise.response.ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
+    public List<ExpertiseBasicDetails> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
         return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId);
     }
 
@@ -506,7 +506,7 @@ public class ExpertiseService {
         return getPlannedTimeAndEmploymentType(countryId);
     }
 
-    //register a job for unassign expertise from activity and this method call when set enddate of publish expertise
+    //register a job for unassign expertise from activity and this method call when set enddate of published expertise
     public void registerJobForUnassingExpertiesFromActivity(List<SchedulerPanelDTO> schedulerPanelDTOS) {
         if (isCollectionNotEmpty(schedulerPanelDTOS)) {
             LOGGER.info("create job for add planning period");
@@ -648,11 +648,11 @@ public class ExpertiseService {
 
     public Map<Long,SeniorAndChildCareDaysDTO> getSeniorAndChildCareDaysMapByExpertiseIds(List<Long> expertiseIds) {
         Map<Long,SeniorAndChildCareDaysDTO> seniorAndChildCareDaysDTOMap=new HashMap<>();
-        List<Expertise> expertises = expertiseGraphRepository.findAllById(expertiseIds);
-        for (Expertise expertise : expertises) {
-            List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
-            List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
-            seniorAndChildCareDaysDTOMap.put(expertise.getId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
+        List<CareDaysQueryResult>  careDaysQueryResults=seniorDaysGraphRepository.getSeniorAbdChildCareDaysByExpertiseIds(expertiseIds);
+        for (CareDaysQueryResult expertise : careDaysQueryResults) {
+            List<CareDaysDetails> childCareDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getChildCareDays(), CareDaysDetails.class);
+            List<CareDaysDetails> seniorDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getSeniorDays(), CareDaysDetails.class);
+            seniorAndChildCareDaysDTOMap.put(expertise.getExpertiseId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
         }
         return seniorAndChildCareDaysDTOMap;
     }
@@ -696,6 +696,17 @@ public class ExpertiseService {
         if (CollectionUtils.isNotEmpty(staffExpertiseRelationShips)) {
             staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
         }
+    }
+
+    public Map<Long,SeniorAndChildCareDaysDTO> findSeniorAndChildCareDaysMapByExpertiseIds(List<Long> expertiseIds) {
+        Map<Long,SeniorAndChildCareDaysDTO> seniorAndChildCareDaysDTOMap=new HashMap<>();
+        List<CareDaysQueryResult>  careDaysQueryResults=seniorDaysGraphRepository.getSeniorAbdChildCareDaysByExpertiseIds(expertiseIds);
+        for (CareDaysQueryResult expertise : careDaysQueryResults) {
+            List<CareDaysDetails> childCareDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getChildCareDays(), CareDaysDetails.class);
+            List<CareDaysDetails> seniorDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getSeniorDays(), CareDaysDetails.class);
+            seniorAndChildCareDaysDTOMap.put(expertise.getExpertiseId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
+        }
+        return seniorAndChildCareDaysDTOMap;
     }
 
 }

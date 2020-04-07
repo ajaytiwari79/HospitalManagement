@@ -390,11 +390,6 @@ public class UserIntegrationService {
         }, countryAdminsOfUnitId);
     }
 
-    //On user micro-service query Param is not applicable
-    public StaffEmploymentDetails verifyUnitEmploymentOfStaff(Long staffId, Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentDetails>>() {
-        }, staffId);
-    }
     public StaffEmploymentDetails mainUnitEmploymentOfStaff(Long staffId, Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, MAIN_UNIT_EMPLOYEMNT_BY_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentDetails>>() {
         }, staffId);

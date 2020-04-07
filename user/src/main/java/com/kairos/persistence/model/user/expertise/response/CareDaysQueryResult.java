@@ -2,10 +2,15 @@ package com.kairos.persistence.model.user.expertise.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.expertise.ChildCareDays;
+import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.SeniorDays;
 import lombok.Getter;
 import lombok.Setter;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.util.List;
 
 /**
  * @author pradeep
@@ -18,8 +23,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @Getter
 @Setter
 public class CareDaysQueryResult {
-    private Long id;
-    private Integer from;
-    private Integer to;
-    private Integer leavesAllowed;
+    private List<SeniorDays> seniorDays;
+    private List<ChildCareDays> childCareDays;
+    private Long expertiseId;
 }
