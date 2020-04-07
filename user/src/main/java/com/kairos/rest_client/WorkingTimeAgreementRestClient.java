@@ -90,29 +90,29 @@ public class WorkingTimeAgreementRestClient {
         }
     }
 
-    public WTAResponseDTO updateWTAOfEmployment(WTADTO wtadto, boolean employmentPublished) {
-        String baseUrl = getBaseUrl(true);
-        try {
-            HttpEntity<WTADTO> request = new HttpEntity<>(wtadto);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<WTAResponseDTO>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/wta?employmentPublished=" + employmentPublished,
-                            HttpMethod.PUT, request, typeReference);
-
-            RestTemplateResponseEnvelope<WTAResponseDTO> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
-            } else {
-                exceptionService.exceptionWithoutConvertInRestClient(response.getMessage());
-            }
-        } catch (HttpClientErrorException e) {
-
-            logger.info(STATUS, e.getStatusCode());
-            logger.info(RESPONSE, e.getResponseBodyAsString());
-            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
-        }
-        return null;
-    }
+//    public WTAResponseDTO updateWTAOfEmployment(WTADTO wtadto, boolean employmentPublished) {
+//        String baseUrl = getBaseUrl(true);
+//        try {
+//            HttpEntity<WTADTO> request = new HttpEntity<>(wtadto);
+//            ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>>() {
+//            };
+//            ResponseEntity<RestTemplateResponseEnvelope<WTAResponseDTO>> restExchange =
+//                    restTemplate.exchange(
+//                            baseUrl + "/wta?employmentPublished=" + employmentPublished,
+//                            HttpMethod.PUT, request, typeReference);
+//
+//            RestTemplateResponseEnvelope<WTAResponseDTO> response = restExchange.getBody();
+//            if (restExchange.getStatusCode().is2xxSuccessful()) {
+//                return response.getData();
+//            } else {
+//                exceptionService.exceptionWithoutConvertInRestClient(response.getMessage());
+//            }
+//        } catch (HttpClientErrorException e) {
+//
+//            logger.info(STATUS, e.getStatusCode());
+//            logger.info(RESPONSE, e.getResponseBodyAsString());
+//            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
+//        }
+//        return null;
+//    }
 }
