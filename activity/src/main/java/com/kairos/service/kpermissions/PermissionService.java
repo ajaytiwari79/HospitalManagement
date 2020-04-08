@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -163,12 +164,11 @@ public class PermissionService {
             if(object.getClass().isAnnotationPresent(com.kairos.annotations.KPermissionModel.class) || object.getClass().isAnnotationPresent(PermissionClass.class)){
                 Field field=object.getClass().getDeclaredField("id");
                 field.setAccessible(true);
-                Long objectId=Long.valueOf(field.get(object).toString());
+                BigInteger objectId=new BigInteger(field.get(object).toString());
                 String className=!object.getClass().isAnnotationPresent(PermissionClass.class)?object.getClass().getSimpleName():object.getClass().getAnnotation(PermissionClass.class).name();
                 E databaseObject = (E)fieldPermissionHelper.getMapOfDataBaseObject().get(objectId);
                 PermissionMapperUtils.PermissionHelper permissionHelper = fieldPermissionHelper.getPermissionHelper(className,fieldLevelPermissions);
                 if(PermissionMapperUtils.personalisedModel.contains(className)){
-                    permissionHelper.setSameStaff(permissionHelper.getCurrentUserStaffId().equals(objectId));
                     permissionHelper.setOtherPermissions(permissionHelper.getOtherPermissionDTOMap().getOrDefault(objectId,new OtherPermissionDTO()));
                 }
                 PermissionMapperUtils.copySpecificPropertiesByMapper(object,databaseObject,permissionHelper);
