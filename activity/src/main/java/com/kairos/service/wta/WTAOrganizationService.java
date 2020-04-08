@@ -86,7 +86,7 @@ public class WTAOrganizationService extends MongoBaseService {
 
 
     public WTAResponseDTO updateWtaOfOrganization(Long unitId, BigInteger wtaId, WTADTO updateDTO) {
-        if (updateDTO.getStartDate().isBefore(LocalDate.now())) {
+        if (isNotNull(updateDTO.getEndDate())&&updateDTO.getStartDate().isAfter(updateDTO.getEndDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_WTA_START_ENDDATE);
         }
         WorkingTimeAgreement agreement = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
