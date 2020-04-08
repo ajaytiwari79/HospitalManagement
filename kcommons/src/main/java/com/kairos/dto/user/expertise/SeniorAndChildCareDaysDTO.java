@@ -1,6 +1,5 @@
 package com.kairos.dto.user.expertise;
 
-import com.kairos.dto.user.country.experties.CareDaysDetails;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,8 +15,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class SeniorAndChildCareDaysDTO {
-    private List<CareDaysDetails> seniorDays;
-    private List<CareDaysDetails> childCareDays;
+    private List<CareDaysDTO> seniorDays;
+    private List<CareDaysDTO> childCareDays;
 
     public SeniorAndChildCareDaysDTO() {
         this.seniorDays = new ArrayList<>();
