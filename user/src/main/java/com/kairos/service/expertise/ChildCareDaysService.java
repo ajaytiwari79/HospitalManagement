@@ -10,6 +10,7 @@ import com.kairos.persistence.model.user.expertise.ChildCareDays;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.repository.user.expertise.ChildCareDaysGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.*;
 
+@Service
 public class ChildCareDaysService {
 
     @Inject
@@ -101,8 +103,8 @@ public class ChildCareDaysService {
         } else {
             // update in current copy
 
-            validateAgeRange(careDaysDetails.getCareDaysDetails());
-            List<CareDays> careDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(careDaysDetails.getCareDaysDetails(), CareDays.class);
+            validateAgeRange(careDaysDetails.getCareDays());
+            List<CareDays> careDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(careDaysDetails.getCareDays(), CareDays.class);
             childCareDays.setCareDays(careDays);
             childCareDaysGraphRepository.save(childCareDays);
         }

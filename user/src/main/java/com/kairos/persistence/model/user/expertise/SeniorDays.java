@@ -21,6 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.VERSI
 @AllArgsConstructor
 @NoArgsConstructor
 public class SeniorDays extends UserBaseEntity{
+
     @Relationship(type = BELONGS_TO_EXPERTISE)
     private Expertise expertise;
     private LocalDate startDate;

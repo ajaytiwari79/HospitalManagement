@@ -16,7 +16,7 @@ public class CareDaysDetails {
     private LocalDate endDate;
     private boolean published;
     private Long expertiseId;
-    private List<AgeRangeDTO> careDaysDetails;
+    private List<AgeRangeDTO> careDays;
 
     @AssertTrue(message = "message.start_date.less_than.end_date")
     public boolean isValid() {

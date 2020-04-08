@@ -461,43 +461,6 @@ public class ExpertiseService {
         return new SeniorAndChildCareDaysDTO(seniorDays, childCareDays);
     }
 
-    public List<AgeRangeDTO> updateAgeRangeInExpertise(Long expertiseId, List<AgeRangeDTO> ageRangeDTO, String wtaType) {
-        if(SENIOR_DAYS.equalsIgnoreCase(wtaType)){
-            expertiseGraphRepository.removeSeniorDays(expertiseId);
-        }else if(CHILD_CARE.equalsIgnoreCase(wtaType)){
-            expertiseGraphRepository.removeChildCareDays(expertiseId);
-        }
-        Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
-        if (isNull(expertise) || expertise.isDeleted()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
-
-        }
-        validateAgeRange(ageRangeDTO);
-
-        List<CareDays> careDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(ageRangeDTO, CareDays.class);
-        if (SENIOR_DAYS.equalsIgnoreCase(wtaType)) {
-            expertise.setSeniorDays(careDays);
-        } else if (CHILD_CARE.equalsIgnoreCase(wtaType)) {
-            expertise.setChildCareDays(careDays);
-        }
-        expertiseGraphRepository.save(expertise);
-        ageRangeDTO = ObjectMapperUtils.copyCollectionPropertiesByMapper((wtaType.equals(CHILD_CARE) ? expertise.getChildCareDays() : expertise.getSeniorDays()), AgeRangeDTO.class);
-        return ageRangeDTO;
-    }
-
-    //Validating age range
-    private void validateAgeRange(List<AgeRangeDTO> ageRangeDTO) {
-        Collections.sort(ageRangeDTO);
-        for (int i = 0; i < ageRangeDTO.size(); i++) {
-            if (ageRangeDTO.get(i).getTo() != null && (ageRangeDTO.get(i).getFrom() > ageRangeDTO.get(i).getTo()))
-                exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_AGE_RANGEINVALID, ageRangeDTO.get(i).getFrom(), ageRangeDTO.get(i).getTo());
-            if (ageRangeDTO.size() > 1 && i < ageRangeDTO.size() - 1 && ageRangeDTO.get(i).getTo() > ageRangeDTO.get(i + 1).getFrom())
-                exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_AGE_OVERLAP);
-
-        }
-
-    }
-
 
     public Map<String, Object> getPlannedTimeAndEmploymentTypeForUnit(Long unitId) {
         Unit unit = unitGraphRepository.findOne(unitId);
@@ -648,16 +611,6 @@ public class ExpertiseService {
        return expertiseGraphRepository.findById(id,depth).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, id)));
     }
 
-    public Map<Long,SeniorAndChildCareDaysDTO> getSeniorAndChildCareDaysMapByExpertiseIds(List<Long> expertiseIds) {
-        Map<Long,SeniorAndChildCareDaysDTO> seniorAndChildCareDaysDTOMap=new HashMap<>();
-        List<Expertise> expertises = expertiseGraphRepository.findAllById(expertiseIds);
-        for (Expertise expertise : expertises) {
-            List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
-            List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
-            seniorAndChildCareDaysDTOMap.put(expertise.getId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
-        }
-        return seniorAndChildCareDaysDTOMap;
-    }
 
     public Expertise getExpertise(Long expertiseId, Long countryId) {
         Expertise expertise;

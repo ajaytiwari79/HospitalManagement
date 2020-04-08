@@ -4,6 +4,7 @@ import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.experties.CareDaysDetails;
 import com.kairos.service.expertise.SeniorDaysService;
 import com.kairos.utils.response.ResponseHandler;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,12 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 @RestController
+@RequestMapping(API_V1)
+@Api(value = API_V1)
 public class SeniorDaysController {
     @Inject
     private SeniorDaysService seniorDaysService;
@@ -53,8 +57,8 @@ public class SeniorDaysController {
 
     @ApiOperation(value = "Add a senior days settings for senior_days")
     @PutMapping(value =  COUNTRY_URL + "/senior_days/{seniorDayId}")
-    public ResponseEntity<Map<String, Object>> updateMatrixInSeniorDays(@RequestBody @Valid CareDaysDetails careDaysDetails) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, seniorDaysService.updateMatrixInSeniorDays(careDaysDetails));
+    public ResponseEntity<Map<String, Object>> updateMatrixInSeniorDays(@PathVariable Long seniorDayId, @RequestBody @Valid List<AgeRangeDTO> careDaysDetails) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, seniorDaysService.updateMatrixInSeniorDays(seniorDayId,careDaysDetails));
     }
 
     @ApiOperation(value = "published a senior days settings for expertise")

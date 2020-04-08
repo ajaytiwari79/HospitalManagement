@@ -14,8 +14,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_C
 @Repository
 public interface ChildCareDaysGraphRepository extends Neo4jBaseRepository<ChildCareDays, Long> {
 
-    @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]->(childCareDays:ChildCareDays{deleted:false})-[careDayRel:"+HAS_CARE_DAYS+"]-(careDays:CareDays) WHERE id(expertise)={0}" +
-            " RETURN childCareDays, COLLECT(careDayRel) , COLLECT(careDays) ORDER BY startDate ASC")
+    @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]->(childCareDays:ChildCareDays{deleted:false}) WHERE id(expertise)={0} " +
+            "OPTIONAL MATCH(childCareDays)-[careDayRel:"+HAS_CARE_DAYS+"]-(careDays:CareDays) " +
+            " RETURN childCareDays, COLLECT(careDayRel) , COLLECT(careDays) ORDER BY childCareDays.startDate ASC")
     List<ChildCareDays> getChildCareDaysOfExpertise(Long expertiseId);
 
     @Query("MATCH(childCareDays:ChildCareDays{deleted:false,published:true})-[:" + BELONGS_TO_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0} RETURN childCareDays ORDER BY childCareDays.startDate DESC LIMIT 1 ")
@@ -23,7 +24,7 @@ public interface ChildCareDaysGraphRepository extends Neo4jBaseRepository<ChildC
 
     @Query("MATCH(child:ChildCareDays{deleted:false})-[relation:VERSION_OF]->(childCareDays:ChildCareDays{deleted:false}) " +
             "WHERE id(child)={0} AND id(childCareDays)={1} " +
-            "set childCareDays.hasDraftCopy=false  detach delete relation")
+            " detach delete relation")
     void detachChildCareDays(Long id, Long parentChildCareDaysId);
 
     @Query("MATCH(child:ChildCareDays{deleted:false})-[relation:VERSION_OF]->(childCareDays:ChildCareDays{deleted:false}) \n" +

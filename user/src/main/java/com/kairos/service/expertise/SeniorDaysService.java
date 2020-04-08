@@ -10,6 +10,7 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.SeniorDays;
 import com.kairos.persistence.repository.user.expertise.SeniorDaysGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.*;
 
+@Service
 public class SeniorDaysService {
 
     @Inject
@@ -81,32 +83,33 @@ public class SeniorDaysService {
         return seniorDaysGraphRepository.findOne(seniorDayId);
     }
 
-    public CareDaysDetails updateMatrixInSeniorDays(CareDaysDetails careDaysDetails) {
-        SeniorDays seniorDays = seniorDaysGraphRepository.findById(careDaysDetails.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, FUNCTIONALPAYMENT, careDaysDetails.getId())));
+    public CareDaysDetails updateMatrixInSeniorDays(Long seniorDayId,List<AgeRangeDTO> ageRangeDTOS) {
+        SeniorDays seniorDays = seniorDaysGraphRepository.findById(seniorDayId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, FUNCTIONALPAYMENT, seniorDayId)));
 
         if (seniorDays.isOneTimeUpdatedAfterPublish()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DRAFT_COPY_CREATED);
         }
-
+        validateAgeRange(ageRangeDTOS);
         if (seniorDays.isPublished()) {
             // functional payment is published so we need to create a  new copy and update in same
-            SeniorDays seniorDayCopy = ObjectMapperUtils.copyPropertiesByMapper(careDaysDetails,SeniorDays.class);
+            SeniorDays seniorDayCopy = ObjectMapperUtils.copyPropertiesByMapper(seniorDays,SeniorDays.class);
             seniorDayCopy.setPublished(false);
             seniorDayCopy.setOneTimeUpdatedAfterPublish(false);
             seniorDays.setOneTimeUpdatedAfterPublish(true);
             seniorDayCopy.setParentSeniorDays(seniorDays);
+            seniorDayCopy.setId(null);
+            List<CareDays> careDays=ObjectMapperUtils.copyCollectionPropertiesByMapper(ageRangeDTOS,CareDays.class);
+            seniorDayCopy.setCareDays(careDays);
             seniorDaysGraphRepository.save(seniorDayCopy);
-            careDaysDetails.setId(seniorDayCopy.getId());
 
         } else {
             // update in current copy
 
-            validateAgeRange(careDaysDetails.getCareDaysDetails());
-            List<CareDays> careDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(careDaysDetails.getCareDaysDetails(), CareDays.class);
+            List<CareDays> careDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(ageRangeDTOS, CareDays.class);
             seniorDays.setCareDays(careDays);
             seniorDaysGraphRepository.save(seniorDays);
         }
-        return careDaysDetails;
+        return ObjectMapperUtils.copyPropertiesByMapper(seniorDays,CareDaysDetails.class);
     }
 
     public CareDaysDetails publishSeniorDays(Long seniorDaysId, CareDaysDetails careDaysDetails) {
