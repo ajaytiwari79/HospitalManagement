@@ -7,6 +7,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,9 +35,8 @@ public interface SeniorDaysGraphRepository  extends Neo4jBaseRepository<SeniorDa
             "set functionalPayment.endDate={2} detach delete relation")
     void setEndDateToSeniorDays(Long id, Long parentFunctionalPaymentId, String endDate);
 
-    @Query("OPTIONAL MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]-(seniorDays:SeniorDays{deleted:false})-[careDayRel:"+HAS_CARE_DAYS+"]-(careDays:CareDays) WHERE id(expertise) IN {0} " +
-            "WITH DISTINCT expertise,COLLECT(seniorDays) as seniorDays,COLLECT(careDayRel) as careDayRel,COLLECT(careDays) as careDays" +
-            "OPTIONAL MATCH(expertise)<-[expChildCareDayRel:" + BELONGS_TO_EXPERTISE + "]-(childCareDays:ChildCareDays{deleted:false})-[childCareDayRel:"+HAS_CARE_DAYS+"]-(ccd:CareDays) " +
-            " RETURN DISTINCT id(expertise) as expertiseId,seniorDays, careDayRel, COLLECT(childCareDayRel), COLLECT(ccd) ORDER BY startDate ASC")
-    List<CareDaysQueryResult> getSeniorAbdChildCareDaysByExpertiseIds(Collection<Long> expertiseIds);
+    @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]->(seniorDays:SeniorDays{deleted:false})-[careDayRel:"+HAS_CARE_DAYS+"]-(careDays:CareDays) " +
+            "WHERE id(expertise)={0} AND seniorDays.startDate <= DATE({1}) AND (seniorDays.endDate IS NULL  OR DATE({1})<=seniorDays.endDate) \" +\n" +
+            " RETURN seniorDays,COLLECT(careDayRel),COLLECT(careDays)")
+    SeniorDays findSeniorDaysBySelectedDate(Long expertiseId, String selectedDate);
 }

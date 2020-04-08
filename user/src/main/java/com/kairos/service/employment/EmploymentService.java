@@ -439,7 +439,7 @@ public class EmploymentService {
         positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnPositionEnd());
         // Deleting All shifts after position end date
         if (employmentDTO.getEndDate() != null) {
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentId(employmentDTO.getEndDate(), employmentId, employmentDTO.getUnitId(), null);
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentId(employmentDTO.getEndDate(), employmentId, employmentDTO.getUnitId(), null,null);
             activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId, employmentDTO.getEndDate(), employmentDTO.getStaffId(), staffAdditionalInfoDTO);
         }
         setHourlyCost(employmentQueryResult);
@@ -834,7 +834,7 @@ public class EmploymentService {
     public void setEndDateInEmploymentOfExpertise(ExpertiseDTO expertiseDTO) {
         List<Employment> employments = employmentGraphRepository.findAllEmploymentByExpertiseId(expertiseDTO.getId());
         employments.forEach(employment -> {
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentId(employment.getEndDate(), employment.getId(), employment.getUnit().getId(), null);
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentId(employment.getEndDate(), employment.getId(), employment.getUnit().getId(), null,null);
             employment.getEmploymentLines().forEach(employmentLine -> {
                 if (employmentLine.getEndDate() != null && startDateIsEqualsOrBeforeEndDate(employmentLine.getEndDate(), expertiseDTO.getEndDate())) {
                     return;

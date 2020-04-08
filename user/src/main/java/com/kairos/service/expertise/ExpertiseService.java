@@ -452,10 +452,12 @@ public class ExpertiseService {
 
     }
 
-    public SeniorAndChildCareDaysDTO getSeniorAndChildCareDays(Long expertiseId) {
-        Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
-        List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
-        List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
+    public SeniorAndChildCareDaysDTO getSeniorAndChildCareDays(Long expertiseId,LocalDate selectedDate) {
+        String date=selectedDate==null?getLocalDate().toString():selectedDate.toString();
+        SeniorDays seniorDay=seniorDaysGraphRepository.findSeniorDaysBySelectedDate(expertiseId,date);
+        ChildCareDays childCareDay=childCareDaysGraphRepository.findChildCareDaysBySelectedDate(expertiseId,date);
+        List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(seniorDay.getCareDays(), CareDaysDTO.class);
+        List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(childCareDay.getCareDays(), CareDaysDTO.class);
         return new SeniorAndChildCareDaysDTO(seniorDays, childCareDays);
     }
 
@@ -648,11 +650,11 @@ public class ExpertiseService {
 
     public Map<Long,SeniorAndChildCareDaysDTO> getSeniorAndChildCareDaysMapByExpertiseIds(List<Long> expertiseIds) {
         Map<Long,SeniorAndChildCareDaysDTO> seniorAndChildCareDaysDTOMap=new HashMap<>();
-        List<CareDaysQueryResult>  careDaysQueryResults=seniorDaysGraphRepository.getSeniorAbdChildCareDaysByExpertiseIds(expertiseIds);
-        for (CareDaysQueryResult expertise : careDaysQueryResults) {
-            List<CareDaysDetails> childCareDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getChildCareDays(), CareDaysDetails.class);
-            List<CareDaysDetails> seniorDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getSeniorDays(), CareDaysDetails.class);
-            seniorAndChildCareDaysDTOMap.put(expertise.getExpertiseId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
+        List<Expertise> expertises = expertiseGraphRepository.findAllById(expertiseIds);
+        for (Expertise expertise : expertises) {
+            List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
+            List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
+            seniorAndChildCareDaysDTOMap.put(expertise.getId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
         }
         return seniorAndChildCareDaysDTOMap;
     }
@@ -698,15 +700,5 @@ public class ExpertiseService {
         }
     }
 
-    public Map<Long,SeniorAndChildCareDaysDTO> findSeniorAndChildCareDaysMapByExpertiseIds(List<Long> expertiseIds) {
-        Map<Long,SeniorAndChildCareDaysDTO> seniorAndChildCareDaysDTOMap=new HashMap<>();
-        List<CareDaysQueryResult>  careDaysQueryResults=seniorDaysGraphRepository.getSeniorAbdChildCareDaysByExpertiseIds(expertiseIds);
-        for (CareDaysQueryResult expertise : careDaysQueryResults) {
-            List<CareDaysDetails> childCareDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getChildCareDays(), CareDaysDetails.class);
-            List<CareDaysDetails> seniorDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getSeniorDays(), CareDaysDetails.class);
-            seniorAndChildCareDaysDTOMap.put(expertise.getExpertiseId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
-        }
-        return seniorAndChildCareDaysDTOMap;
-    }
 
 }

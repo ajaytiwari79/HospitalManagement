@@ -192,7 +192,7 @@ public class ExpertiseController {
     @ApiOperation(value = "Get senior Days and child Care days at country")
     @GetMapping(value = "/expertise/{expertiseId}/senior_and_child_care_days")
     public ResponseEntity<Map<String, Object>> getSeniorAndChildCareDaysAtCountry(@PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getSeniorAndChildCareDays(expertiseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getSeniorAndChildCareDays(expertiseId,null));
     }
     //-------------------UNIT LEVEL ----------------------\\
 

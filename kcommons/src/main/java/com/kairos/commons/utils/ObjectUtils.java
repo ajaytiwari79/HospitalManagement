@@ -133,4 +133,8 @@ public class ObjectUtils {
         return new ArrayList<>();
     }
 
+    public static <T>  String getToString(T str){
+        return str==null?null:str.toString();
+    }
+
 }

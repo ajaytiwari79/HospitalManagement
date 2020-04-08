@@ -242,7 +242,7 @@ public class CostTimeAgreementService {
 
 
     public StaffEmploymentDetails updateCostTimeAgreementForEmployment(Long unitId, Long employmentId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO) {
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>(),null);
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", employmentId);
         }
