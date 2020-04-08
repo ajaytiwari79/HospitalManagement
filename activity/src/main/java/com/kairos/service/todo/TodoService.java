@@ -127,6 +127,12 @@ public class TodoService {
                 }
             }
         }
+        }else{
+            for(ShiftActivity shiftActivity :shift.getActivities()){
+            if(isCollectionEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionNotEmpty(shiftActivity.getStatus())) {
+                shiftActivity.setStatus(new HashSet<>());
+            }
+            }
         }
     }
 
@@ -301,6 +307,15 @@ public class TodoService {
     public List<TodoDTO> getAllTodoByEntityIds( Date startDate, Date endDate){
         return todoRepository.findAllByEntityIdsAndTodoStatus(startDate,endDate,newArrayList(APPROVE,DISAPPROVE, REQUESTED,PENDING,VIEWED));
     }
+
+    public List<TodoDTO> getAllTodoByDateTimeIntervalAndTodoStatus(Date startDate, Date endDate,Collection<TodoStatus> statuses) {
+        return todoRepository.findAllTodosByShiftDate(startDate,endDate, statuses);
+    }
+
+    public List<TodoDTO> getAllTodoByShiftDate(Date startDate, Date endDate) {
+        return todoRepository.findAllTodosByShiftDate(startDate,endDate, newArrayList(APPROVE,DISAPPROVE, REQUESTED,PENDING,VIEWED));
+    }
+
 
 
 

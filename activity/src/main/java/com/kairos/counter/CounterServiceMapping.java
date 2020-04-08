@@ -173,6 +173,11 @@ public class CounterServiceMapping {
 
     }
 
+    @Inject
+    public void setTimeBankOffKPI(TimeBankOffKPIService timeBankOffKPIService){
+        this.kpiServiceMap.put(TODO_STATUS,timeBankOffKPIService);
+    }
+
     public KPIService getKpiServiceMap(CalculationType calculationType) {
         return kpiServiceMap.get(calculationType);
     }

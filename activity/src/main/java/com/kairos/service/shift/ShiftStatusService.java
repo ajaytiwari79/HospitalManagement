@@ -351,7 +351,7 @@ public class ShiftStatusService {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
                     shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? ShiftStatus.APPROVE : REQUEST);
                 }
-            }else if(shiftActivity.getStatus().contains(REQUEST)){
+            }else if(shiftActivity.getStatus().contains(REQUEST)&&UserContext.getUserDetails().isManagement()){
                 shiftActivity.setStatus(newHashSet(APPROVE));
             } else if(shiftActivity.getStatus().contains(APPROVE)){
                 ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
