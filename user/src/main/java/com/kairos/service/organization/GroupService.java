@@ -18,6 +18,8 @@ import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.filter_group.FilterSelectionGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffFilterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -34,6 +36,8 @@ import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_NOT_FOUND
  **/
 @Service
 public class GroupService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupService.class);
+
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -109,6 +113,7 @@ public class GroupService {
 
     public Set<FilterSelection> getSelectedFilterGroupsOfUnit(final Long unitId,final Set<Long> filterGroupIds,final boolean isGroupDeleted){
         Set<FilterSelection> filterSelectionSet = filterSelectionGraphRepository.findAllByUnitIdAndSelectedGroupIdsAndGroupDeleted(unitId,filterGroupIds,isGroupDeleted);
+        LOGGER.debug(" filter selection set found are {}",filterSelectionSet);
         return filterSelectionSet;
     }
 

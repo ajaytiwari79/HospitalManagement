@@ -16,9 +16,8 @@ public interface FilterSelectionGraphRepository extends Neo4jBaseRepository<Filt
             "RETURN fs order by fs.name")
     List<FilterSelection> findAllByUnitAndDeleted(Long unitId, boolean deleted);
 
-    @Query("MATCH (unit:Unit)-[:HAS_GROUPS]->(g:Group) \n" +
-            "WHERE id(unit)={0}  AND g.deleted={2} WITH g \n" +//AND id(g) IN {1}
-            "MATCH (g)-[:HAS_FILTERS]->(fs:FilterSelection) " +
+    @Query("MATCH (unit:Unit)-[:HAS_GROUPS]->(g:Group)-[:HAS_FILTERS]->(fs:FilterSelection) \n" +
+            "WHERE id(unit)={0}  AND g.deleted={2} AND id(g) IN {1}  \n" +
             "RETURN fs ORDER BY fs.name")
     Set<FilterSelection> findAllByUnitIdAndSelectedGroupIdsAndGroupDeleted(Long unitId, Set<Long> groupIds, boolean groupDeleted);
 }

@@ -1101,15 +1101,23 @@ public class StaffService {
         if(!comparisonData.isNull("to")){
             lessThan = Long.parseLong(comparisonData.getString("to"));
         }
-        if(lessThan!=0 && moreThan!=0){
-            customQueryMap.put(">", (T) lessThan);
-            customQueryMap.put("<", (T) moreThan);
-        }else if( moreThan!=0){
-            customQueryMap.put(">", (T)  comparisonData.get("from"));
-        }else if (lessThan!=0){
-            customQueryMap.put("<", (T) comparisonData.get("to"));
-        }
 
+        /*
+            Prepare query, more than and less than match equals as well
+         */
+
+        if(comparisonData.getString("type").equals("BETWEEN")){
+            customQueryMap.put(">", (T) moreThan);
+            if(lessThan!=0) {
+                customQueryMap.put("<", (T) lessThan);
+            }
+        }else if( comparisonData.getString("type").equals("MORE_THAN")){
+            customQueryMap.put(">", (T)  comparisonData.get("from"));
+        }else if (comparisonData.getString("type").equals("LESS_THAN")){
+            customQueryMap.put("<", (T) comparisonData.get("to"));
+        }else if (comparisonData.getString("type").equals("EQUALS")){
+            customQueryMap.put("=", (T) comparisonData.get("from"));
+        }
         LOGGER.info(" custom query map prepared is {}",customQueryMap);
         return  customQueryMap;
     }
@@ -1120,23 +1128,36 @@ public class StaffService {
         LocalDate localDateToday = LocalDate.now();
         String valueWithoutNextLine = String.valueOf(filterSelection.getValue()).replace("\n"," ");
         JSONArray jsonArray = new JSONArray(valueWithoutNextLine);
-
-        JSONObject jsonObject =jsonArray.getJSONObject(0);
+        JSONObject comparisonData =jsonArray.getJSONObject(0);
 
         Long moreThanDays = 0L;
-        if(!jsonObject.isNull("from")) {
-            moreThanDays = staffFilterService.getDataInDays(Long.parseLong(jsonObject.getString("from")), filterSelection.getDurationType());
+        if(!comparisonData.isNull("from")) {
+            moreThanDays = staffFilterService.getDataInDays(Long.parseLong(comparisonData.getString("from")), filterSelection.getDurationType());
         }
         Long lessThanDays = 0L;
-        LOGGER.info(" to data {}",jsonObject.isNull("to"));
-        if(!jsonObject.isNull("to")){
-            lessThanDays = staffFilterService.getDataInDays(Long.parseLong(jsonObject.getString("to")),filterSelection.getDurationType());
+        LOGGER.info(" to data {}",comparisonData.isNull("to"));
+        if(!comparisonData.isNull("to")){
+            lessThanDays = staffFilterService.getDataInDays(Long.parseLong(comparisonData.getString("to")),filterSelection.getDurationType());
         }
 
         LocalDate dateGreaterThan = localDateToday.minusDays(moreThanDays);
         LocalDate dateLessThan = localDateToday.plusDays(lessThanDays);
-        customQueryMap.put(">", (T) ("DATE('"+dateGreaterThan+"')"));
-        customQueryMap.put("<", (T)("DATE('"+ dateLessThan+"')"));
+       /* customQueryMap.put(">", (T) ("DATE('"+dateGreaterThan+"')"));
+        customQueryMap.put("<", (T)("DATE('"+ dateLessThan+"')"));*/
+
+        if(comparisonData.getString("type").equals("BETWEEN")){
+            customQueryMap.put(">",(T) ("DATE('"+dateGreaterThan+"')"));
+            if(lessThanDays!=0) {
+                customQueryMap.put("<",(T) comparisonData.get("from"));
+            }
+        }else if( comparisonData.getString("type").equals("MORE_THAN")){
+            customQueryMap.put(">", (T) ("DATE('"+dateGreaterThan+"')"));
+        }else if (comparisonData.getString("type").equals("LESS_THAN")){
+            customQueryMap.put("<", (T)("DATE('"+ dateLessThan+"')"));
+        }else if (comparisonData.getString("type").equals("EQUALS")){
+            customQueryMap.put("=", (T) comparisonData.get("from"));
+        }
+
         LOGGER.info(" custom query map prepared is {}",customQueryMap);
         return  customQueryMap;
     }
