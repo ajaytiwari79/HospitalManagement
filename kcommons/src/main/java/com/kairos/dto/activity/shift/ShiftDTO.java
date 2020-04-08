@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftEscalationReason;
@@ -152,7 +153,7 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     public void setActivities(List<ShiftActivityDTO> activities) {
         if (Optional.ofNullable(activities).isPresent() && activities.size()>1) {
             activities = activities.stream().filter(shiftActivityDTO -> Optional.ofNullable(shiftActivityDTO.getStartDate()).isPresent()).sorted(Comparator.comparing(ShiftActivityDTO::getStartDate)).collect(Collectors.toList());
-            mergeShiftActivity();
+            activities = ObjectUtils.mergeShiftActivity(activities);
         }
         this.activities = activities;
     }
