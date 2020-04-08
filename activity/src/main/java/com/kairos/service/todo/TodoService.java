@@ -109,12 +109,12 @@ public class TodoService {
             todo.setApprovedOn(getDate());
             todoRepository.save(todo);
         }else{
-            updateShiftStatusIfShiftUpdate(activityWrapperMap, shift, shiftUpdate, shiftActionType, phase);
+            updateShiftStatusIfShiftUpdate(activityWrapperMap, shift, shiftUpdate, shiftActionType, phase,planningPeriod,staffAdditionalInfoDTO);
 
         }
     }
 
-    private void updateShiftStatusIfShiftUpdate(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, boolean shiftUpdate, ShiftActionType shiftActionType, Phase phase) {
+    private void updateShiftStatusIfShiftUpdate(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, boolean shiftUpdate, ShiftActionType shiftActionType, Phase phase,PlanningPeriod planningPeriod,StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         if(UserContext.getUserDetails().isManagement()){
         shift=isNotNull(shift.getDraftShift())?shift.getDraftShift():shift;
         for(ShiftActivity shiftActivity :shift.getActivities()) {
@@ -123,6 +123,13 @@ public class TodoService {
                     shiftActivity.setStatus(newHashSet(ShiftStatus.REQUEST));
                 }
                 else {
+                    shiftActivity.setStatus(new HashSet<>());
+                }
+            }else{
+                boolean isPlanningPeriodPublished =planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId());
+                if(shiftUpdate&&activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())&&!isPlanningPeriodPublished){
+                    shiftActivity.setStatus(newHashSet(ShiftStatus.APPROVE));
+                }else if(isNull(shiftActionType)&&!isPlanningPeriodPublished){
                     shiftActivity.setStatus(new HashSet<>());
                 }
             }
@@ -159,7 +166,7 @@ public class TodoService {
             Activity activity = activityMap.get(shiftActivity.getActivityId()).getActivity();
             if(isCollectionNotEmpty(activity.getRulesActivityTab().getApprovalAllowedPhaseIds()) && activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(shift.getPhaseId())){
                 if(shift.isDraft()) {
-                    shiftActivity.getStatus().add(ShiftStatus.REQUEST);
+                    shiftActivity.setStatus(newHashSet(ShiftStatus.REQUEST));
                 }else if(planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())&&UserContext.getUserDetails().isManagement()){
                     shiftActivity.getStatus().addAll(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH));
                 }
