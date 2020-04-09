@@ -65,4 +65,12 @@ public class SchedulerJobController {
         userSchedulerJobService.createJobForPositionEnd();
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
+
+    @ApiOperation(value = "Register job for add weather info of units")
+    @PostMapping(value = "/register_job_for_add_weather_info_of_units")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createJobForAddTodayWeatherInfoOfUnits() {
+        userSchedulerJobService.createJobForAddTodayWeatherInfoOfUnits();
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+    }
 }

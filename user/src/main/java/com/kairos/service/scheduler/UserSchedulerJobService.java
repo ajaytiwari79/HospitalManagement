@@ -56,8 +56,8 @@ public class UserSchedulerJobService  {
     }
 
     public void createJobForPositionEnd() {
-        SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(newArrayList(DayOfWeek.values()), LocalTime.of(0, 1), JobType.SYSTEM, JobSubType.POSITION_END, ZoneId.systemDefault().toString());
-        schedulerRestClient.publishRequest(newArrayList(schedulerPanelDTO), null, false, IntegrationOperation.CREATE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
+
+
     }
 
     public void updateJobForTimecareShift(KairosSchedulerExecutorDTO job, LocalDateTime started, LocalDateTime stopped, Transstatus transstatus, String unzipped) {
@@ -68,6 +68,10 @@ public class UserSchedulerJobService  {
         schedulerRestClient.publishRequest(logs,null,false,IntegrationOperation.CREATE,JOB_DETAILS,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
     }
 
+    public void createJobForAddTodayWeatherInfoOfUnits() {
+        SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(newArrayList(DayOfWeek.values()), LocalTime.of(0, 1), JobType.SYSTEM, JobSubType.ADD_WEATHER_INFO, ZoneId.systemDefault().toString());
+        schedulerRestClient.publishRequest(newArrayList(schedulerPanelDTO), null, false, IntegrationOperation.CREATE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
+    }
 }
 
 
