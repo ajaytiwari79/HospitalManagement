@@ -9,7 +9,6 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.repository.activity.CommonRepository;
-import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.PermissionMapperUtils;
@@ -48,7 +47,7 @@ public class PermissionService {
                 return;
             }
             Set<String> modelNames=getModelNames(objects);
-            FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getModels(modelNames);
+            FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(modelNames);
             FieldPermissionHelperDTO fieldPermissionHelperDTO=new FieldPermissionHelperDTO(objects,fieldLevelPermissions,fieldPermissionUserData);
             if(fieldLevelPermissions.contains(READ)){
                 updateObjectsPropertiesBeforeSend(fieldPermissionHelperDTO,fieldLevelPermissions);
@@ -67,7 +66,6 @@ public class PermissionService {
                 E databaseObject = (E)fieldPermissionHelper.getMapOfDataBaseObject().get(object.getId());
                 PermissionMapperUtils.PermissionHelper permissionHelper = fieldPermissionHelper.getPermissionHelper(object.getClass().getSimpleName(),fieldLevelPermissions);
                 if(PermissionMapperUtils.personalisedModel.contains(object.getClass().getSimpleName())){
-                    permissionHelper.setSameStaff(permissionHelper.getCurrentUserStaffId().equals(object.getId()));
                     permissionHelper.setOtherPermissions(permissionHelper.getOtherPermissionDTOMap().getOrDefault(object.getId(),new OtherPermissionDTO()));
                 }
                 PermissionMapperUtils.copySpecificPropertiesByMapper(object,databaseObject,permissionHelper);
@@ -80,7 +78,7 @@ public class PermissionService {
 
     @Getter
     @Setter
-    private class FieldPermissionHelperDTO<T extends MongoBaseEntity, E extends MongoBaseEntity> {
+    public class FieldPermissionHelperDTO<T extends MongoBaseEntity, E extends MongoBaseEntity> {
         private List<T> objects;
         private Map<String, ModelDTO> modelMap;
         private Map<Long, E> mapOfDataBaseObject;
@@ -90,7 +88,7 @@ public class PermissionService {
         private Long staffId;
         private FieldPermissionUserData fieldPermissionUserData;
 
-        public FieldPermissionHelperDTO(List<T> objects,Set<FieldLevelPermission> fieldLevelPermissions,FieldPermissionUserData fieldPermissionUserData) {
+        private FieldPermissionHelperDTO(List<T> objects,Set<FieldLevelPermission> fieldLevelPermissions,FieldPermissionUserData fieldPermissionUserData) {
             this.objects = objects;
             hubMember = UserContext.getUserDetails().isHubMember();
             List<ModelDTO> modelDTOS = fieldPermissionUserData.getModelDTOS();
@@ -106,7 +104,6 @@ public class PermissionService {
         private <ID,E,T> Map[] getObjectByIds(List<T> objects,Set<FieldLevelPermission> fieldLevelPermissions){
             Map<Class,Set<ID>> objectIdsMap = new HashMap<>();
             for (T object : objects) {
-                if(!object.getClass().isAnnotationPresent(KPermissionRelatedModel.class)){
                     try {
                         ID id = (ID) object.getClass().getMethod("getId").invoke(object);
                         if (isNotNull(id)) {
@@ -117,7 +114,6 @@ public class PermissionService {
                     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
-                }
             }
             Map<ID,E> mapOfDataBaseObject = new HashMap<>();
             if(fieldLevelPermissions.contains(FieldLevelPermission.WRITE)){

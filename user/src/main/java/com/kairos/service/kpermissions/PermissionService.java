@@ -573,19 +573,7 @@ public class PermissionService {
         }
     }
 
-    public <T,E> void updateModelBasisOfPermissionOfActivity(List<T> objects,Set<FieldLevelPermission> fieldLevelPermissions){
-        try {
-            if(UserContext.getUserDetails().isHubMember()){
-                return;
-            }
-            FieldPermissionHelper fieldPermissionHelper = new FieldPermissionHelper(objects,fieldLevelPermissions);
-            updateObjectsPropertiesBeforeSave(fieldPermissionHelper,fieldLevelPermissions);
-        }catch (Exception e){
-            LOGGER.error(e.getMessage());
-        }
-    }
-
-    public <T> FieldPermissionUserData fetchPermission(Set<String> modelNames,Long unitId){
+    public <T> FieldPermissionUserData fetchPermissions(Set<String> modelNames, Long unitId){
         List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
         boolean hubMember = UserContext.getUserDetails().isHubMember();
         List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember);
