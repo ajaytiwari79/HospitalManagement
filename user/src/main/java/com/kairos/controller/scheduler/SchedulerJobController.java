@@ -70,7 +70,7 @@ public class SchedulerJobController {
     @PostMapping(value = "/register_job_for_add_weather_info_of_units")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createJobForAddTodayWeatherInfoOfUnits() {
-        userSchedulerJobService.createJobForAddTodayWeatherInfoOfUnits();
+        userSchedulerJobService.createJobForAddWeatherInfo();
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 }
