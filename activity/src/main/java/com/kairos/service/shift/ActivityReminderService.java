@@ -1,6 +1,6 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.service.mail.SendGridMailService;
+import com.kairos.commons.service.mail.KMailService;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.wta.IntervalBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
@@ -35,13 +35,12 @@ import static com.kairos.enums.wta.WTATemplateType.WTA_FOR_CARE_DAYS;
 /**
  * Created By G.P.Ranjan on 7/2/20
  **/
+
 @Service
 public class ActivityReminderService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShiftReminderService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityReminderService.class);
 
-    @Inject
-    private SendGridMailService sendGridMailService;
     @Inject
     private EnvConfig envConfig;
     @Inject
@@ -52,6 +51,8 @@ public class ActivityReminderService {
     private StaffActivitySettingRepository staffActivitySettingRepository;
     @Inject
     private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
+    @Inject
+    private KMailService kMailService;
 
     public void sendActivityReminderViaEmail(Long unitId, BigInteger entityId) {
         Activity activity = activityMongoRepository.findOne(entityId);
@@ -72,7 +73,7 @@ public class ActivityReminderService {
                         }
                     }
                 }catch (Exception ex){
-                    ex.printStackTrace();
+                    LOGGER.info("Exception {}", ex.getMessage());
                 }
             }
         }
@@ -82,10 +83,12 @@ public class ActivityReminderService {
         String description = String.format(ABSENCE_ACTIVITY_REMINDER_EMAIL_BODY, activity.getName(), intervalBalance.getEndDate(), intervalBalance.getAvailable());
         Map<String,Object> templateParam = new HashMap<>();
         templateParam.put("receiverName",staffPersonalDetail.getFullName());
-        templateParam.put("description", description);
+        templateParam.put(DESCRIPTION, description);
         if(isNotNull(staffPersonalDetail.getProfilePic())) {
             templateParam.put("receiverImage",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+staffPersonalDetail.getProfilePic());
         }
-        sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, ACTIVITY_REMINDER,staffPersonalDetail.getPrivateEmail());
+        //sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, ACTIVITY_REMINDER,staffPersonalDetail.getPrivateEmail());
+        kMailService.sendMail(null, ACTIVITY_REMINDER,templateParam.get(DESCRIPTION).toString(),templateParam.get(DESCRIPTION).toString(),templateParam,DEFAULT_EMAIL_TEMPLATE,staffPersonalDetail.getPrivateEmail());
+        LOGGER.info("Mail Send {}", staffPersonalDetail.getPrivateEmail());
     }
 }
