@@ -115,8 +115,6 @@ dependencies {
     compile group: 'org.liquigraph', name: 'liquigraph-spring-boot-starter', version: '3.1.0'
 // https://mvnrepository.com/artifact/org.neo4j.driver/neo4j-java-driver
     compile group: 'org.neo4j.driver', name: 'neo4j-java-driver', version: '1.7.5'
-// https://mvnrepository.com/artifact/org.neo4j/neo4j
-    compile group: 'org.neo4j', name: 'neo4j', version: '3.4.8'
 
 }
 

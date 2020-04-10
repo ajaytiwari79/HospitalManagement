@@ -7,7 +7,6 @@ import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.enums.FilterType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
@@ -114,7 +113,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<StaffShiftDetails> findAllShiftsByEmploymentsAndBetweenDuration(Set<Long> employmentIds, Date startDate, Date endDate){
         Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false)
                 .and(START_DATE).lte(endDate).and(END_DATE).gte(startDate);
-        return getShiftWithActivityByCriteria(criteria,false,Shift.class,false);
+        return getShiftsByCriteria(criteria,false,Shift.class);
     }
 
     public StaffShiftDetails getAllShiftsForOneStaffWithEmploymentsAndBetweenDuration(Set<Long> employmentIds, Date startDate, Date endDate){
@@ -569,12 +568,11 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     //fixme this method is a  duplicate of above method
-   private  List<StaffShiftDetails>  getShiftWithActivityByCriteria(Criteria criteria, boolean replaceDraftShift, Class classType, boolean addActivityDetails){
-
+   private  List<StaffShiftDetails>  getShiftsByCriteria(Criteria criteria, boolean replaceDraftShift, Class classType){
         List<AggregationOperation> aggregationOperations = getShiftWithActivityAggregationOperations(criteria, replaceDraftShift, new String[]{});
             GroupOperation groupOperation = group("staffId").addToSet("$$ROOT").as("shifts");
             aggregationOperations.add(groupOperation);
-        List<StaffShiftDetails> shiftWithActivityDTOS = mongoTemplate.aggregate(Aggregation.newAggregation(aggregationOperations),Shift.class ,StaffShiftDetails.class).getMappedResults();
+        List<StaffShiftDetails> shiftWithActivityDTOS = mongoTemplate.aggregate(Aggregation.newAggregation(aggregationOperations),classType ,StaffShiftDetails.class).getMappedResults();
         return shiftWithActivityDTOS;
     }
 
