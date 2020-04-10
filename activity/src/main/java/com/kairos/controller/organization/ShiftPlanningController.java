@@ -35,7 +35,7 @@ public class ShiftPlanningController {
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         Long loggedInUserId = currentUserDetails.getId();
         searchDTO.setLoggedInUserId(loggedInUserId);
-        if(searchDTO.getShiftFilterDurationType()== ShiftFilterDurationType.INDIVIDUAL){
+        if(searchDTO.getShiftFilterDurationType().equals(ShiftFilterDurationType.INDIVIDUAL)){
             return shiftPlanningService.getUnitPlanningAndShiftForSelectedStaff(unitId,searchDTO);
         }else {
             return shiftPlanningService.getShiftPlanningDetailsForUnit(unitId, searchDTO);

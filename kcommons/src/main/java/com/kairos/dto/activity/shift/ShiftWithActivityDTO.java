@@ -88,8 +88,8 @@ public class ShiftWithActivityDTO extends ShiftDTO{
     }
 
     public int getMinutes() {
-        return 0;
-//        return ((int) (this.activities.get(activities.size() - 1).getEndDate().getTime() - this.activities.get(0).getStartDate().getTime()) / 60000);
+//        return 0;
+        return ((int) (this.activities.get(activities.size() - 1).getEndDate().getTime() - this.activities.get(0).getStartDate().getTime()) / 60000);
     }
 
     public boolean isPresence(){

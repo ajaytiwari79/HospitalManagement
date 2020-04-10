@@ -1,6 +1,8 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftSearchDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.shift.ShiftFilterDurationType;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,8 +56,7 @@ public class ShiftPlanningService {
 
         staffListWithPersonalDetails.remove(i);
         staffListWithPersonalDetails.add(0,matchedStaff);
-        final Set<Long> employmentIds = new HashSet<>();
-        employmentIds.addAll(matchedStaff.getEmployments().stream().map(employment -> employment.getId()).collect(Collectors.toSet()));
+        final Set<Long> employmentIds = matchedStaff.getEmployments().stream().map(employment -> employment.getId()).collect(Collectors.toSet());
         StaffShiftDetails shiftDetails = findShiftsForSelectedEmploymentsAndDuration(employmentIds,shiftSearchDTO.getShiftFilterDurationType());
         matchedStaff.setShifts(shiftDetails.getShifts());
         return matchedStaff;
@@ -81,8 +81,7 @@ public class ShiftPlanningService {
             staffListWithPersonalDetails.add(0,matchedStaff);
         }
 
-        final Set<Long> employmentIds = new HashSet<>();
-        employmentIds.addAll(matchedStaff.getEmployments().stream().map(employment -> employment.getId()).collect(Collectors.toSet()));
+        final Set<Long> employmentIds = matchedStaff.getEmployments().stream().map(employment -> employment.getId()).collect(Collectors.toSet());
         StaffShiftDetails shiftDetails = findShiftsForSelectedEmploymentsAndDuration(employmentIds,shiftSearchDTO.getShiftFilterDurationType());
         matchedStaff.setShifts(shiftDetails.getShifts());
         return staffListWithPersonalDetails;
@@ -91,8 +90,6 @@ public class ShiftPlanningService {
     private StaffShiftDetails findShiftsForSelectedEmploymentsAndDuration(Set<Long> employmentIds, ShiftFilterDurationType shiftFilterDurationType){
 
         LOGGER.debug("employment ids are {}",employmentIds);
-        Date dateToday = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
-
         List<Date> startAndEndDates  = getStartAndEndDates(shiftFilterDurationType);
         Date fromDate = startAndEndDates.get(0);
         Date toDate = startAndEndDates.get(1);
@@ -110,17 +107,9 @@ public class ShiftPlanningService {
 
         switch (shiftFilterDurationType){
 
-            case INDIVIDUAL:
-                startDate = LocalDate.now().minusWeeks(shiftFilterDurationType.getDuration());
-                endDate = LocalDate.now().plusWeeks(shiftFilterDurationType.getDuration());
-                break;
             case DAILY:
                 startDate = LocalDate.now().minusDays(shiftFilterDurationType.getDuration());
                 endDate = LocalDate.now().plusDays(shiftFilterDurationType.getDuration());
-                break;
-            case WEEKLY:
-                startDate = LocalDate.now().minusWeeks(shiftFilterDurationType.getDuration());
-                endDate = LocalDate.now().plusWeeks(shiftFilterDurationType.getDuration());
                 break;
             case MONTHLY:
                 startDate = LocalDate.now().minusMonths(shiftFilterDurationType.getDuration());
@@ -131,39 +120,23 @@ public class ShiftPlanningService {
                 endDate = LocalDate.now().plusWeeks(shiftFilterDurationType.getDuration());
         }
 
-        Date fromDate = Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant())  ;
-        Date toDate = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date fromDate = DateUtils.asDate(startDate);
+        Date toDate = DateUtils.asDate(endDate);
         LOGGER.debug(" searching between dates start {} and end {} for filter type {}",startDate,endDate,shiftFilterDurationType.getValue());
         startAndEndDates.add(fromDate);
         startAndEndDates.add(toDate);
         return startAndEndDates;
     }
 
-
-
     public List<StaffShiftDetails> getAllStaffEligibleForPlanning(Long unitId, ShiftSearchDTO shiftSearchDTO){
       return  userIntegrationService.getAllPlanningStaffForUnit(unitId,shiftSearchDTO);
     }
 
-
-    private  List<StaffShiftDetails> assignShiftsToStaff(List<StaffShiftDetails> staffShiftPersonalDetailsList,List<StaffShiftDetails> shiftData){
-
+   private  List<StaffShiftDetails> assignShiftsToStaff(List<StaffShiftDetails> staffShiftPersonalDetailsList,List<StaffShiftDetails> shiftData){
+        Map<Long,List<ShiftWithActivityDTO>> shiftsMap = shiftData.stream().collect(Collectors.toMap(s->s.getId(), v->v.getShifts()));
         for(StaffShiftDetails staffShiftDetails:staffShiftPersonalDetailsList){
-            for(StaffShiftDetails shiftDetails:shiftData){
-                if(shiftDetails.getId().equals(staffShiftDetails.getId())){
-                    staffShiftDetails.setShifts(shiftDetails.getShifts());
-                }
-            }
+            staffShiftDetails.setShifts(shiftsMap.getOrDefault(staffShiftDetails.getId(),new ArrayList()));
         }
         return staffShiftPersonalDetailsList;
-
     }
-
-    private  StaffShiftDetails assignShiftsToStaff(StaffShiftDetails staffShiftPersonalDetails,StaffShiftDetails shiftData){
-        staffShiftPersonalDetails.setShifts(shiftData.getShifts());
-        return staffShiftPersonalDetails;
-    }
-
-
-
 }

@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Getter
@@ -18,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class StaffShiftDetails implements Serializable {
+public class StaffShiftDetails {
 
     private Long id;
     private String firstName;

@@ -112,9 +112,7 @@ public class GroupService {
     }
 
     public Set<FilterSelection> getSelectedFilterGroupsOfUnit(final Long unitId,final Set<Long> filterGroupIds,final boolean isGroupDeleted){
-        Set<FilterSelection> filterSelectionSet = filterSelectionGraphRepository.findAllByUnitIdAndSelectedGroupIdsAndGroupDeleted(unitId,filterGroupIds,isGroupDeleted);
-        LOGGER.debug(" filter selection set found are {}",filterSelectionSet);
-        return filterSelectionSet;
+        return filterSelectionGraphRepository.findAllByUnitIdAndSelectedGroupIdsAndGroupDeleted(unitId,filterGroupIds,isGroupDeleted);
     }
 
     private GroupDTO getGroupDTOFromGroup(Group group) {
