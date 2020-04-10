@@ -4,6 +4,7 @@ import com.kairos.service.weather.WeatherService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,14 +38,14 @@ public class WeatherController {
     @GetMapping("/weathers")
     @ApiOperation("get all weather info of unit in dates")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllWeatherInfoInDate(@PathVariable Long unitId, @RequestParam LocalDate startDate, @RequestParam(required = false) LocalDate endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, weatherService.getAllWeatherInfoInDate(unitId, startDate, isNull(endDate)?startDate:endDate));
+    public ResponseEntity<Map<String, Object>> getAllWeatherInfoBetweenDate(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, weatherService.getAllWeatherInfoBetweenDate(unitId, startDate, isNull(endDate)?startDate:endDate));
     }
 
     @GetMapping(value = "/save_today_weather_info")
     @ApiOperation("save today weather info if not exist")
-    public ResponseEntity<Map<String, Object>> saveTodayWeatherInfoOfAllUnitInDB() {
-        weatherService.saveTodayWeatherInfoOfAllUnitInDB();
+    public ResponseEntity<Map<String, Object>> saveTodayWeatherInfoOfAllUnit() {
+        weatherService.saveTodayWeatherInfoOfAllUnit();
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 }

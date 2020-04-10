@@ -16,7 +16,6 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WeatherInfoDTO {
-    private Long id;
     private Long unitId;
     private LocalDate date;
     private Map weatherInfo;
