@@ -73,7 +73,7 @@ public class ActivityReminderService {
                         }
                     }
                 }catch (Exception ex){
-                    ex.printStackTrace();
+                    LOGGER.info("Exception {}", ex.getMessage());
                 }
             }
         }
@@ -89,5 +89,6 @@ public class ActivityReminderService {
         }
         //sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, ACTIVITY_REMINDER,staffPersonalDetail.getPrivateEmail());
         kMailService.sendMail(null, ACTIVITY_REMINDER,templateParam.get(DESCRIPTION).toString(),templateParam.get(DESCRIPTION).toString(),templateParam,DEFAULT_EMAIL_TEMPLATE,staffPersonalDetail.getPrivateEmail());
+        LOGGER.info("Mail Send {}", staffPersonalDetail.getPrivateEmail());
     }
 }
