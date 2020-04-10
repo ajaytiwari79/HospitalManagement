@@ -2,15 +2,12 @@ package com.kairos.counter;
 
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.enums.kpi.CalculationType;
-import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.service.counter.*;
 import com.kairos.service.shift.ShiftBreakService;
-import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -174,6 +171,11 @@ public class CounterServiceMapping {
         this.kpiServiceMap.put(TOTAL_ABSENCE_DAYS,workTimeAgreementBalancesCalculationService);
         this.kpiServiceMap.put(CHILD_CARE_DAYS,workTimeAgreementBalancesCalculationService);
 
+    }
+
+    @Inject
+    public void setTimeBankOffKPI(TimeBankOffKPIService timeBankOffKPIService){
+        this.kpiServiceMap.put(TODO_STATUS,timeBankOffKPIService);
     }
 
     public KPIService getKpiServiceMap(CalculationType calculationType) {
