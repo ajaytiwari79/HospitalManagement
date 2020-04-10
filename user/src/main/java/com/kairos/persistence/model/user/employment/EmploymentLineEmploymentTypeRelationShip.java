@@ -27,8 +27,10 @@ public class EmploymentLineEmploymentTypeRelationShip extends UserBaseEntity {
 
     @StartNode
     private EmploymentLine employmentLine;
+
     @EndNode
     private EmploymentType employmentType;
+
     @Property
     private EmploymentCategory employmentTypeCategory;
 }

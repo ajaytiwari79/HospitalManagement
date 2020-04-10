@@ -2,6 +2,7 @@ package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.enums.TimeTypeEnum;
@@ -26,6 +27,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
  *
  * */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 public class ShiftWithActivityDTO extends ShiftDTO{
@@ -86,6 +88,7 @@ public class ShiftWithActivityDTO extends ShiftDTO{
     }
 
     public int getMinutes() {
+//        return 0;
         return ((int) (this.activities.get(activities.size() - 1).getEndDate().getTime() - this.activities.get(0).getStartDate().getTime()) / 60000);
     }
 

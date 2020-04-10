@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.filter;
 
+import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import lombok.AllArgsConstructor;
@@ -18,12 +19,15 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FilterSelection extends UserBaseEntity {
+public class FilterSelection<T> extends UserBaseEntity {
     private FilterType name;
-    private List<String> value;
+    private List<T> value;
     private int sequence;
 
-    public FilterSelection(FilterType name, List<String> value) {
+    private FilterType.FilterComparisonType filterComparisonType = FilterType.FilterComparisonType.CONTAINS;
+    private DurationType durationType = DurationType.MONTHS;
+
+    public FilterSelection(FilterType name, List<T> value) {
         this.name = name;
         this.value = value;
     }

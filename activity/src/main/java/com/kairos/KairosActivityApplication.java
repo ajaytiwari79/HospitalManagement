@@ -110,8 +110,15 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 	}
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(new ExtractOrganizationAndUnitInfoInterceptor());
+		registry.addInterceptor(extractOrganizationAndUnitInfoInterceptor());
 	}
+
+	@Bean
+	ExtractOrganizationAndUnitInfoInterceptor extractOrganizationAndUnitInfoInterceptor(){
+		return new ExtractOrganizationAndUnitInfoInterceptor();
+	}
+
+
 
 	@Profile({"development","qa","production"})
 	@LoadBalanced
