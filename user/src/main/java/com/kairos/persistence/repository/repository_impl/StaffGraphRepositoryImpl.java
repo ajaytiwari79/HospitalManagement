@@ -1,31 +1,36 @@
  package com.kairos.persistence.repository.repository_impl;
 
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
-import com.kairos.enums.Employment;
-import com.kairos.enums.FilterType;
-import com.kairos.enums.ModuleId;
-import com.kairos.persistence.model.staff.StaffEmploymentQueryResult;
-import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
-import com.kairos.persistence.repository.user.staff.CustomStaffGraphRepository;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.neo4j.ogm.model.Result;
-import org.neo4j.ogm.session.Session;
-import org.springframework.stereotype.Repository;
+ import com.kairos.commons.utils.DateUtils;
+ import com.kairos.commons.utils.ObjectMapperUtils;
+ import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+ import com.kairos.enums.Employment;
+ import com.kairos.enums.FilterType;
+ import com.kairos.enums.ModuleId;
+ import com.kairos.persistence.model.staff.StaffEmploymentQueryResult;
+ import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
+ import com.kairos.persistence.model.staff.personal_details.StaffEmploymentWithTag;
+ import com.kairos.persistence.repository.user.staff.CustomStaffGraphRepository;
+ import org.apache.commons.collections.CollectionUtils;
+ import org.apache.commons.lang3.StringUtils;
+ import org.neo4j.ogm.model.Result;
+ import org.neo4j.ogm.session.Session;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ import org.springframework.stereotype.Repository;
 
-import javax.inject.Inject;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+ import javax.inject.Inject;
+ import java.time.LocalDate;
+ import java.util.*;
+ import java.util.stream.Collectors;
+ import java.util.stream.StreamSupport;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StaffGraphRepositoryImpl.class);
     @Inject
     private Session session;
 
@@ -170,9 +175,10 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         if (loggedInStaffId!=null) {
             queryParameters.put("loggedInStaffId", loggedInStaffId);
         }
-        if (selectedDate!=null) {
-            queryParameters.put("selectedDate", selectedDate.toString());
+        if (selectedDate==null) {
+            selectedDate = LocalDate.now();
         }
+        queryParameters.put("selectedDate", selectedDate.toString());
         queryParameters.put("imagePath", imagePath);
         return searchText;
     }
@@ -210,6 +216,184 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         if (Optional.ofNullable(filters.get(FilterType.MAIN_TEAM)).isPresent()) {
             queryParameters.put("mainTeamIds", convertListOfStringIntoLong(filters.get(FilterType.MAIN_TEAM)));
+        }
+    }
+
+    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType,Set<T>> filters,final Long unitId,final LocalDate localDateToday){
+        String today = DateUtils.formatLocalDate(localDateToday,"dd-MM-yyyy");
+        Map<String,Object> queryParameters = new HashMap<>();
+        queryParameters.put("unitId",unitId);
+        queryParameters.put("today",today);
+        StringBuilder query = new StringBuilder();
+        StringBuilder returnData = new StringBuilder();
+
+        query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment)-[:IN_UNIT]-(unit:Unit)\n" +
+                "WHERE id(unit)={unitId} AND ( employments.endDate > '{today}' OR employments.endDate is null ) \n");
+
+        returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ")
+                    .append(" id(user) as userId, ")
+                   .append(" collect( distinct employments) as employments ");
+
+        ageMatcher(query,filters);
+        employedSinceMatcher(query,filters);
+        birthdayMatcher(query,filters);
+//        organizationalExperienceMatcher(query,filters);
+        staffStatusMatcher(query,filters,queryParameters);
+        genderMatcher(query,filters,queryParameters);
+        teamMatcher(query,filters,queryParameters);
+        expertiseMatcher(query,filters,queryParameters);
+        seniorityAndPaygradeMatcher(query,filters,queryParameters);
+        skillMatcher(query,filters,queryParameters);
+        tagsMatcher(query,filters,queryParameters);
+        employmentTypeMatcher(query,filters,queryParameters);
+        accessGroupMatcher(query,filters,queryParameters);
+        functionsMatcher(query,filters,queryParameters);
+
+        query.append(" WITH staff,employments,user MATCH (staff)-[:BELONGS_TO_TAGS]-(selectedTags:Tag) ");
+        returnData.append(" , collect( distinct selectedTags) as tags ");
+            returnData.append(" ORDER BY staff.firstName");
+            query.append(returnData);
+
+        Result staffEmployments =  session.query(query.toString(),queryParameters);
+        LOGGER.info("staff with employments found are {}",staffEmployments.queryResults());
+        List<StaffEmploymentWithTag> staffEmploymentWithTags = new ArrayList<>();
+        Iterator si = staffEmployments.iterator();
+        while (si.hasNext()){
+            staffEmploymentWithTags.add(ObjectMapperUtils.copyPropertiesByMapper(si.next(),StaffEmploymentWithTag.class));
+        }
+        return staffEmploymentWithTags;
+    }
+
+    private <T> StringBuilder addComparisonValuesToQuery(StringBuilder query,String propertyToCompare,Set <Map<String,T>> customQuerySet){
+        for(Map<String,T> c:customQuerySet){
+            for(Map.Entry entry : c.entrySet()){
+                query.append(" AND ");
+                query.append(propertyToCompare);
+                query.append(entry.getKey()).append(" ").append(entry.getValue());
+            }
+        }
+        return query;
+    }
+
+    private <T> void ageMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters){
+        if(Optional.ofNullable(filters.get(FilterType.AGE)).isPresent() && filters.get(FilterType.AGE).size()!=0) {
+            Set <Map<String,Number>> customQuerySet = (Set<Map<String, Number>>) filters.get(FilterType.AGE);
+            addComparisonValuesToQuery(query," DATE(user.dateOfBirth) ",customQuerySet);
+        }
+    }
+
+    private <T> void employedSinceMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters){
+        if(Optional.ofNullable(filters.get(FilterType.EMPLOYED_SINCE)).isPresent() && filters.get(FilterType.EMPLOYED_SINCE).size()!=0) {
+            Set <Map<String,String>> customQuerySet = (Set<Map<String, String>>) filters.get(FilterType.EMPLOYED_SINCE);
+            addComparisonValuesToQuery(query," DATE(employments.startDate) ",customQuerySet);
+        }
+    }
+
+    private <T> void birthdayMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters){
+        if(Optional.ofNullable(filters.get(FilterType.BIRTHDAY)).isPresent() && filters.get(FilterType.BIRTHDAY).size()!=0) {
+            Set <Map<String,String>> customQuerySet = (Set<Map<String, String>>) filters.get(FilterType.BIRTHDAY);
+            addComparisonValuesToQuery(query," DATE(staff.dateOfBirth) ",customQuerySet);
+        }
+    }
+
+    private <T> void staffStatusMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
+        if (Optional.ofNullable(filters.get(FilterType.STAFF_STATUS)).isPresent() && filters.get(FilterType.STAFF_STATUS).size()!=0) {
+            queryParameters.put("statusNames",filters.get(FilterType.STAFF_STATUS));
+            query.append(" AND staff.currentStatus in {statusNames} ");
+        }
+    }
+
+    private <T> void genderMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
+        if (Optional.ofNullable(filters.get(FilterType.GENDER)).isPresent() && filters.get(FilterType.GENDER).size()!=0) {
+            queryParameters.put("genderList", filters.get(FilterType.GENDER));
+            query.append(" AND user.gender in {genderList} ");
+        }
+    }
+
+    private <T> void teamMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
+        if (Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent() && filters.get(FilterType.TEAM).size()!=0) {
+            queryParameters.put("teamIds", convertListOfStringIntoLong(filters.get(FilterType.TEAM)));
+            query.append(" WITH staff,employments,user MATCH (staff)<-[teamRel:TEAM_HAS_MEMBER]-(team:Team) where id(team) in {teamIds} ");
+            if(Optional.ofNullable(filters.get(FilterType.MAIN_TEAM)).isPresent()){
+                query.append(" AND teamRel.teamType='MAIN')");
+            }
+        }
+    }
+
+    private <T> void expertiseMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
+        if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent() && filters.get(FilterType.EXPERTISE).size()!=0) {
+            queryParameters.put("expertiseIds", convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
+            query.append(" WITH staff,employments,user MATCH (staff)-[:STAFF_HAS_EXPERTISE]->(expertise:Expertise)<-[:HAS_EXPERTISE_IN]-(employments) where id(expertise) in {expertiseIds}");
+        }
+    }
+
+    private <T> void seniorityAndPaygradeMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
+        if(Optional.ofNullable(filters.get(FilterType.SENIORITY)).isPresent() || Optional.ofNullable(filters.get(FilterType.PAY_GRADE_LEVEL)).isPresent() ) {
+            Set <Map<String,String>> customQuerySet = (Set<Map<String, String>>) filters.get(FilterType.SENIORITY);
+            query.append(" WITH staff,employments,user ");
+            query.append(" MATCH (employments)-[:HAS_EMPLOYMENT_LINES]->(el:EmploymentLine)-[:HAS_SENIORITY_LEVEL]->(sl:SeniorityLevel)-[:HAS_BASE_PAY_GRADE]->(pg:PayGrade) ");
+            if( filters.get(FilterType.SENIORITY).size()!=0) {
+                query.append(" WHERE DATE(el.endDate) <= DATE(employments.endDate) ");
+                addComparisonValuesToQuery(query, " sl.to ", customQuerySet);
+            }if(filters.get(FilterType.PAY_GRADE_LEVEL).size()!=0) {
+                addComparisonValuesToQuery(query, " pg.payGradeLevel ", customQuerySet);
+            }
+        }
+    }
+
+    private <T> void skillMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
+        if (Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent() && filters.get(FilterType.SKILLS).size()!=0) {
+            queryParameters.put("skillIds", convertListOfStringIntoLong(filters.get(FilterType.SKILLS)));
+            query.append(" WITH staff,employments,user MATCH (staff)-[:STAFF_HAS_SKILLS]->(skills:Skill) where id(skills) in {skillIds}");
+        }
+        /*  if (Optional.ofNullable(filters.get(FilterType.SKILL_LEVEL)).isPresent()) {
+            queryParameters.put("skillLevels",
+                    filters.get(FilterType.SKILL_LEVEL));
+        }*/
+    }
+
+    private <T> void tagsMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
+        if (Optional.ofNullable(filters.get(FilterType.TAGS)).isPresent() && filters.get(FilterType.TAGS).size()!=0) {
+            queryParameters.put("tagIds", convertListOfStringIntoLong(filters.get(FilterType.TAGS)));
+            query.append(" WITH staff,employments,user MATCH (staff)-[:BELONGS_TO_TAGS]->(tags:Tag) where id(tags) in {tagIds}");
+        }
+    }
+
+    private <T> void employmentTypeMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
+        if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()  && filters.get(FilterType.EMPLOYMENT_TYPE).size()!=0) {
+            queryParameters.put("employmentTypeIds", convertListOfStringIntoLong(filters.get(FilterType.EMPLOYMENT_TYPE)));
+            query.append(" WITH staff,employments,user MATCH (employmentType:EmploymentType)<-[:HAS_EMPLOYMENT_TYPE]-(el:EmploymentLine)<-[:HAS_EMPLOYMENT_LINES]-(employments) WHERE id(employmentType) in {employmentTypeIds}");
+        }
+    }
+
+    private <T> void accessGroupMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
+        if (Optional.ofNullable(filters.get(FilterType.ACCESS_GROUPS)).isPresent() && filters.get(FilterType.ACCESS_GROUPS).size()!=0) {
+            queryParameters.put("accessGroupIds", convertListOfStringIntoLong(filters.get(FilterType.ACCESS_GROUPS)));
+            query.append("WITH staff,employments,user MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroups:AccessGroup)\n" +
+                    " where id(accessGroups) IN {accessGroupIds} ") ;
+        }
+    }
+
+    private <T> void functionsMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
+        if(Optional.ofNullable(filters.get(FilterType.FUNCTIONS)).isPresent() && filters.get(FilterType.FUNCTIONS).size()!=0) {
+            queryParameters.put("functionIds",filters.get(FilterType.FUNCTIONS));
+            query.append("WITH staff,employments,user MATCH (staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false})-[:HAS_EMPLOYMENT_LINES]->(employmentLine:EmploymentLine)-[:APPLICABLE_FUNCTION]->(function:Function)\n" +
+                    " where id(function) IN {functionIds}");
+        }
+    }
+
+    private <T> void organizationalExperienceMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters){
+        Date localDateToday = DateUtils.asDate(LocalDate.now());
+        if(Optional.ofNullable(filters.get(FilterType.ORGANIZATION_EXPERIENCE)).isPresent() && filters.get(FilterType.ORGANIZATION_EXPERIENCE).size()!=0) {
+            Set<Map<String, String>> customQuerySet = (Set<Map<String, String>>) filters.get(FilterType.ORGANIZATION_EXPERIENCE);
+
+            for (Map<String, String> c : customQuerySet) {
+                for (Map.Entry entry : c.entrySet()) {
+                    query.append(" AND ");
+                    query.append("employments.startDate ");
+                    query.append(entry.getKey()).append(" ").append(localDateToday.toString());
+                }
+            }
         }
     }
 

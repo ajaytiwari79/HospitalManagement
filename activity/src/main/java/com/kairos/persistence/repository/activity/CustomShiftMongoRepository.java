@@ -10,6 +10,7 @@ import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
+import com.kairos.wrapper.shift.StaffShiftDetails;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -25,6 +26,10 @@ public interface CustomShiftMongoRepository {
     List<ShiftDTO> findAllShiftsBetweenDuration(Long employmentId, Long staffId, Date startDate, Date endDate, Long unitId);
 
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(Set<Long> employmentIds, Date startDate, Date endDate ,Set<BigInteger> activityIds);
+
+    List<StaffShiftDetails> findAllShiftsByEmploymentsAndBetweenDuration(Set<Long> employmentIds, Date startDate, Date endDate );
+
+    StaffShiftDetails getAllShiftsForOneStaffWithEmploymentsAndBetweenDuration(Set<Long> employmentIds, Date startDate, Date endDate);
 
     List<ShiftDTO> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate);
 

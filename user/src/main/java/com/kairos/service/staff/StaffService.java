@@ -18,10 +18,7 @@ import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.EmploymentSubType;
-import com.kairos.enums.Gender;
-import com.kairos.enums.SkillLevel;
-import com.kairos.enums.StaffStatusEnum;
+import com.kairos.enums.*;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -43,9 +40,11 @@ import com.kairos.persistence.model.user.employment.query_result.EmploymentQuery
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
+import com.kairos.persistence.model.user.filter.FilterSelection;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.repository_impl.StaffGraphRepositoryImpl;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -61,6 +60,7 @@ import com.kairos.service.auth.UserService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.organization.GroupService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.redis.RedisService;
@@ -73,6 +73,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -171,6 +173,16 @@ public class StaffService {
     private TagGraphRepository tagGraphRepository;
     @Inject
     private ExpertiseService expertiseService;
+
+    @Inject
+    private StaffGraphRepositoryImpl staffGraphRepositoryImpl;
+
+    @Inject
+    private StaffFilterService staffFilterService;
+
+    @Inject
+    private GroupService groupService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffService.class);
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
@@ -236,7 +248,7 @@ public class StaffService {
         if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
         }
-        if (isNotNull(staffToUpdate.getContactDetail()) && isNotNull(staffToUpdate.getContactDetail().getPrivateEmail()) && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
+        if (isNotNull(staffToUpdate) && isNotNull(staffToUpdate.getContactDetail()) && isNotNull(staffToUpdate.getContactDetail().getPrivateEmail()) && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
             if (staffGraphRepository.findStaffByEmailIdInOrganization(staffPersonalDetail.getContactDetail().getPrivateEmail(), parentUnit.getId()) != null) {
                 exceptionService.duplicateDataException(MESSAGE_EMAIL_ALREADYEXIST, "Staff", staffPersonalDetail.getContactDetail().getPrivateEmail());
             }
@@ -994,4 +1006,165 @@ public class StaffService {
     public Long getStaffIdByUserId(Long userId, Long parentOrganizationId) {
         return staffGraphRepository.getStaffIdByUserId(userId, parentOrganizationId);
     }
+
+    public <T> List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId,StaffFilterDTO staffFilterDetails){
+
+        LOGGER.info("filters received are {} ",staffFilterDetails.getFiltersData());
+        LocalDate dateToday = LocalDate.now();
+
+
+        final Map<FilterType,Set<T>> filterTypeSetMap = staffFilterService.getMapOfFiltersToBeAppliedWithValue(staffFilterDetails.getModuleId(),staffFilterDetails.getFiltersData());
+
+        if(Optional.ofNullable(filterTypeSetMap.get(FilterType.GROUPS)).isPresent() && filterTypeSetMap.get(FilterType.GROUPS).size()!=0){
+            updateFilterTypeCriteriaListByGroups(unitId,filterTypeSetMap);
+        }
+
+        return staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap,unitId,dateToday);
+    }
+
+   private <T>  Map<FilterType,T> updateFilterTypeCriteriaListByGroups(final Long unitId,final  Map<FilterType,T> filterTypeSetMap){
+        Set<Long> groupIds = (Set<Long>) filterTypeSetMap.get(FilterType.GROUPS);
+        Set<FilterSelection> filterSelections = groupService.getSelectedFilterGroupsOfUnit(unitId,groupIds,false);
+        Set<Map<String,Number>> age =null ,organizationExperience=null,timeBankBalance=null,seniorityLevel=null,payGradeLevel=null ;
+       Set<Map<String,String>> employedSince=null,birthday=null;
+
+        for(FilterSelection filterSelection:filterSelections){
+            if(filterSelection.getName().equals(FilterType.AGE)){
+                if(age==null){
+                    age = new HashSet<>();
+                }
+                age.add(dateCompareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(),(T) age);
+            }
+            else if(filterSelection.getName().equals(FilterType.EMPLOYED_SINCE)){
+                if(employedSince==null){
+                    employedSince = new HashSet<>();
+                }
+                employedSince.add(dateCompareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(),(T) employedSince);
+            }
+            else if(filterSelection.getName().equals(FilterType.ORGANIZATION_EXPERIENCE)){
+                if(organizationExperience==null){
+                    organizationExperience = new HashSet<>();
+                }
+                organizationExperience.add(dateCompareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(),(T) organizationExperience);
+            }
+            //fixme should be filtered in activity microservice
+            /*else if(filterSelection.getName().equals(FilterType.TIME_BANK_BALANCE)){
+                if(timeBankBalance==null){
+                    timeBankBalance = new HashSet<>();
+                }
+                timeBankBalance.add(compareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(), (T) timeBankBalance);
+            }*/
+            else if(filterSelection.getName().equals(FilterType.SENIORITY)){
+                if(seniorityLevel==null){
+                    seniorityLevel = new HashSet<>();
+                }
+                seniorityLevel.add(compareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(), (T) seniorityLevel);
+            }
+            else if(filterSelection.getName().equals(FilterType.PAY_GRADE_LEVEL)){
+
+                if(payGradeLevel==null){
+                    payGradeLevel = new HashSet<>();
+                }
+                payGradeLevel.add(compareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(), (T) payGradeLevel);
+            }
+            else if(filterSelection.getName().equals(FilterType.BIRTHDAY)){
+                if(birthday==null){
+                    birthday = new HashSet<>();
+                }
+                birthday.add(dateCompareBuilder(filterSelection));
+                filterTypeSetMap.put(filterSelection.getName(), (T) birthday);
+            }
+            else if(Optional.ofNullable(filterTypeSetMap.get(filterSelection.getName())).isPresent() ){
+                ((Set<T>) filterTypeSetMap.get(filterSelection.getName())).add((T) filterSelection.getId());
+            }
+        }
+
+     return filterTypeSetMap;
+    }
+
+
+    private  <T> Map<String,T> compareBuilder(final FilterSelection filterSelection){
+
+        Map<String,T> customQueryMap = new HashMap<>();
+        String valueWithoutNextLine = String.valueOf(filterSelection.getValue()).replace("\n"," ");
+        JSONArray jsonArray = new JSONArray(valueWithoutNextLine);
+
+        JSONObject comparisonData =jsonArray.getJSONObject(0);
+
+        Long moreThan = 0L;
+        if(!comparisonData.isNull("from")) {
+            moreThan = Long.parseLong(comparisonData.getString("from"));
+        }
+        Long lessThan = 0L;
+        LOGGER.info(" to data {}",comparisonData.isNull("to"));
+        if(!comparisonData.isNull("to")){
+            lessThan = Long.parseLong(comparisonData.getString("to"));
+        }
+
+        /*
+            Prepare query, more than and less than match equals as well
+         */
+
+        if(comparisonData.getString("type").equals("BETWEEN")){
+            customQueryMap.put(">", (T) moreThan);
+            if(lessThan!=0) {
+                customQueryMap.put("<", (T) lessThan);
+            }
+        }else if( comparisonData.getString("type").equals("MORE_THAN")){
+            customQueryMap.put(">", (T)  comparisonData.get("from"));
+        }else if (comparisonData.getString("type").equals("LESS_THAN")){
+            customQueryMap.put("<", (T) comparisonData.get("to"));
+        }else if (comparisonData.getString("type").equals("EQUALS")){
+            customQueryMap.put("=", (T) comparisonData.get("from"));
+        }
+        LOGGER.info(" custom query map prepared is {}",customQueryMap);
+        return  customQueryMap;
+    }
+
+    private  <T> Map<String,T> dateCompareBuilder(final FilterSelection filterSelection){
+
+        Map<String,T> customQueryMap = new HashMap<>();
+        LocalDate localDateToday = LocalDate.now();
+        String valueWithoutNextLine = String.valueOf(filterSelection.getValue()).replace("\n"," ");
+        JSONArray jsonArray = new JSONArray(valueWithoutNextLine);
+        JSONObject comparisonData =jsonArray.getJSONObject(0);
+
+        Long moreThanDays = 0L;
+        if(!comparisonData.isNull("from")) {
+            moreThanDays = staffFilterService.getDataInDays(Long.parseLong(comparisonData.getString("from")), filterSelection.getDurationType());
+        }
+        Long lessThanDays = 0L;
+        LOGGER.info(" to data {}",comparisonData.isNull("to"));
+        if(!comparisonData.isNull("to")){
+            lessThanDays = staffFilterService.getDataInDays(Long.parseLong(comparisonData.getString("to")),filterSelection.getDurationType());
+        }
+
+        LocalDate dateGreaterThan = localDateToday.minusDays(moreThanDays);
+        LocalDate dateLessThan = localDateToday.plusDays(lessThanDays);
+       /* customQueryMap.put(">", (T) ("DATE('"+dateGreaterThan+"')"));
+        customQueryMap.put("<", (T)("DATE('"+ dateLessThan+"')"));*/
+
+        if(comparisonData.getString("type").equals("BETWEEN")){
+            customQueryMap.put(">",(T) ("DATE('"+dateGreaterThan+"')"));
+            if(lessThanDays!=0) {
+                customQueryMap.put("<",(T) comparisonData.get("from"));
+            }
+        }else if( comparisonData.getString("type").equals("MORE_THAN")){
+            customQueryMap.put(">", (T) ("DATE('"+dateGreaterThan+"')"));
+        }else if (comparisonData.getString("type").equals("LESS_THAN")){
+            customQueryMap.put("<", (T)("DATE('"+ dateLessThan+"')"));
+        }else if (comparisonData.getString("type").equals("EQUALS")){
+            customQueryMap.put("=", (T) comparisonData.get("from"));
+        }
+
+        LOGGER.info(" custom query map prepared is {}",customQueryMap);
+        return  customQueryMap;
+    }
+
 }

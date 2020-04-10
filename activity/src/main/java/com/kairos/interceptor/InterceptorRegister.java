@@ -1,5 +1,6 @@
 package com.kairos.interceptor;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -8,9 +9,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 public class InterceptorRegister implements WebMvcConfigurer {
 
+
+    @Bean
+    ExtractOrganizationAndUnitInfoInterceptor extractOrganizationAndUnitInfoInterceptor(){
+        return new ExtractOrganizationAndUnitInfoInterceptor();
+    }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new ExtractOrganizationAndUnitInfoInterceptor());
+        registry.addInterceptor(extractOrganizationAndUnitInfoInterceptor());
     }
 
 }

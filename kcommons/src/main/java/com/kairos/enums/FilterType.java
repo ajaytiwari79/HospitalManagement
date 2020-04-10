@@ -24,4 +24,8 @@ public enum FilterType {
         this.value = value;
     }
 
+
+    public enum FilterComparisonType{
+        CONTAINS,LESS_THAN,GREATER_THAN,BETWEEN,DUE_IN
+    }
 }

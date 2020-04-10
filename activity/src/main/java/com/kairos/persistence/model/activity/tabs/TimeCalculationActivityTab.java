@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.activity.tabs;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.constants.ApiConstants;
 import com.kairos.enums.TimeCalaculationType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ public class TimeCalculationActivityTab  {
     private String methodForCalculatingTimeInMonths;
     private List<String> balanceType;
     private Boolean multiplyWith;
-    private Double multiplyWithValue;
+    private Double multiplyWithValue = ApiConstants.DEFAULT_VALUE;
     private Boolean multiplyByVacationFactor;
     private Boolean multiplyByFinalSchedule;
     private DayOfWeek fullWeekStart;
