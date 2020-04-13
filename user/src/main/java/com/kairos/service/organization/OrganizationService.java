@@ -531,6 +531,10 @@ public class OrganizationService {
         return true;
     }
 
+    public List<Long> getAllUnitIds() {
+        return unitGraphRepository.findAllUnitIds();
+    }
+
     public List<Long> getAllOrganizationIds() {
         return unitGraphRepository.findAllOrganizationIds();
     }
@@ -908,7 +912,7 @@ public class OrganizationService {
         public List<Long> getOrganizationIds(Long unitId) {
         List<Long> organizationIds = null;
         if (isNull(unitId)) {
-            organizationIds = unitGraphRepository.findAllOrganizationIds();
+            organizationIds = unitGraphRepository.findAllUnitIds();
         } else {
             Optional<Organization> optionalOrganization = organizationGraphRepository.findById(unitId);
             if (optionalOrganization.isPresent()) {

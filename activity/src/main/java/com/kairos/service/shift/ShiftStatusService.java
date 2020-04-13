@@ -340,7 +340,7 @@ public class ShiftStatusService {
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
 
             if (planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) {
-                if(!activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
+                if(!activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())||(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())&&UserContext.getUserDetails().isStaff())) {
                     shiftActivity.getStatus().add(PUBLISH);
                 }else {
                     if(shiftActivity.getStatus().contains(REQUEST)) {
