@@ -299,6 +299,7 @@ public class StaffCreationService {
         final String password = payload.getFirstName().replaceAll("\\s+", "") + DEFAULT_PASSPHRASE_ENDS_WITH;
         user.setPassword(new BCryptPasswordEncoder().encode(password));
         user.setCountryId(organization.getCountry().getId());
+        user.setUserType(UserType.USER_ACCOUNT);
         staff = updateStaffDetailsOnCreationOfStaff(organization, payload);
         staff.setUser(user);
         staffGraphRepository.save(staff);

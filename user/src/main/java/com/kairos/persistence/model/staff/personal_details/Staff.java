@@ -85,9 +85,6 @@ public class Staff extends UserBaseEntity {
     @KPermissionField
     private Long externalId;
 
-    //monaco id
-    private String manacoId;
-
     //personal info
     @KPermissionField
     private String firstName;

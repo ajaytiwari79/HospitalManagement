@@ -51,6 +51,8 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,6 +80,9 @@ import static com.kairos.enums.shift.ShiftStatus.*;
 @Transactional
 @Service
 public class StaffFilterService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StaffFilterService.class);
+
 
     @Inject
     private StaffGraphRepository staffGraphRepository;
@@ -412,10 +417,13 @@ public class StaffFilterService {
         Map<FilterType, Set<T>> mapOfFilters = new HashMap<>();
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
+        LOGGER.info("filter group searched is {}",filterGroup);
         filters.forEach(filterSelection -> {
-            if (!filterSelection.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
+            if (filterGroup!=null && !isNull(filterSelection.getValue()) && filterGroup.getFilterTypes().contains(
                     filterSelection.getName())) {
-                mapOfFilters.put(filterSelection.getName(), filterSelection.getValue());
+                mapOfFilters.put(filterSelection.getName(),filterSelection.getValue());
+            }else{
+                mapOfFilters.put(filterSelection.getName(),filterSelection.getValue());
             }
         });
         return mapOfFilters;
@@ -463,7 +471,7 @@ public class StaffFilterService {
         for (Map staffAndModifiable : staffs) {
             if(staffFilterDTO.getNightWorkerDetails().containsKey(staffAndModifiable.get(ID))) {
                 Map<String, Object> staff = ObjectMapperUtils.copyPropertiesByMapper(staffAndModifiable, HashedMap.class);
-                staff.put(NIGHT_WORKER, staffFilterDTO.getNightWorkerDetails().get(((Integer) ((Map) staff).get(ID)).longValue()));
+                staff.put(NIGHT_WORKER, staffFilterDTO.getNightWorkerDetails().get(((Integer) (staff).get(ID)).longValue()));
                 staffList.add(staff);
                 if(staffFilterDTO.isIncludeWorkTimeAgreement()){
                     for (Map employment : ((Collection<Map>) staff.get(EMPLOYMENTS))) {
@@ -601,7 +609,7 @@ public class StaffFilterService {
         return from <= inDays && to >= inDays;
     }
 
-    private long getDataInDays(long value, DurationType durationType){
+    public long getDataInDays(long value, DurationType durationType){
         switch (durationType){
             case YEAR :
                 return Math.round(value *  DAYS_IN_ONE_YEAR);

@@ -15,8 +15,11 @@ import com.kairos.persistence.model.organization.group.GroupDTO;
 import com.kairos.persistence.model.user.filter.FilterSelection;
 import com.kairos.persistence.repository.organization.GroupGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.organization.filter_group.FilterSelectionGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffFilterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -33,6 +36,8 @@ import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_NOT_FOUND
  **/
 @Service
 public class GroupService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupService.class);
+
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -46,17 +51,21 @@ public class GroupService {
     @Inject
     private StaffFilterService staffFilterService;
 
+    @Inject
+    private FilterSelectionGraphRepository filterSelectionGraphRepository;
+
     public GroupDTO createGroup(Long unitId, GroupDTO groupDTO) {
         Unit unit = unitGraphRepository.findOne(unitId);
-        if (groupGraphRepository.existsByName(unitId,-1L, groupDTO.getName())){
+        if (groupGraphRepository.existsByName(unitId, -1L, groupDTO.getName())) {
             exceptionService.duplicateDataException(MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT, groupDTO.getName(), unitId);
         }
-        Group group = new Group(groupDTO.getName(),groupDTO.getDescription());
+        Group group = new Group(groupDTO.getName(), groupDTO.getDescription());
         unit.getGroups().add(group);
         unitGraphRepository.save(unit);
         groupDTO.setId(group.getId());
         return groupDTO;
     }
+
 
     public GroupDTO updateGroup(Long unitId, Long groupId, GroupDTO groupDTO) {
         if (isNotNull(groupDTO.getName()) && groupGraphRepository.existsByName(unitId,groupId, groupDTO.getName())){
@@ -97,12 +106,21 @@ public class GroupService {
         return groupDTOS;
     }
 
+
+    public List<FilterSelection> getFilterGroupsOfUnit(Long unitId,boolean isDeleted){
+        return filterSelectionGraphRepository.findAllByUnitAndDeleted(unitId,isDeleted);
+    }
+
+    public Set<FilterSelection> getSelectedFilterGroupsOfUnit(final Long unitId,final Set<Long> filterGroupIds,final boolean isGroupDeleted){
+        return filterSelectionGraphRepository.findAllByUnitIdAndSelectedGroupIdsAndGroupDeleted(unitId,filterGroupIds,isGroupDeleted);
+    }
+
     private GroupDTO getGroupDTOFromGroup(Group group) {
         GroupDTO groupDTO = new GroupDTO(group.getId(), group.getName(), group.getDescription(), group.getExcludedStaffIds(), group.getRoomId());
         List<FilterSelectionDTO> filterSelectionDTOS = new ArrayList<>();
         for(FilterSelection filterSelection : group.getFiltersData()){
             Set<Object> values = new HashSet<>();
-            filterSelection.getValue().forEach(val-> values.add(ObjectMapperUtils.jsonStringToObject(val,Object.class)));
+            filterSelection.getValue().forEach(val-> values.add(ObjectMapperUtils.jsonStringToObject((String) val,Object.class)));
             filterSelectionDTOS.add(new FilterSelectionDTO(filterSelection.getName(), values));
         }
         groupDTO.setFiltersData(filterSelectionDTOS);
@@ -142,6 +160,7 @@ public class GroupService {
         Set<Long> excludedStaffs = new HashSet<>();
         List<Group> groups = groupGraphRepository.findAllGroupsByIdSAndDeletedFalse(groupIds);
         List<GroupDTO> groupDTOS = new ArrayList<>();
+
         for(Group group : groups){
             GroupDTO groupDTO = getGroupDTOFromGroup(group);
             List<FilterSelectionDTO> filterSelectionDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(groupDTO.getFiltersData(), FilterSelectionDTO.class);
@@ -150,6 +169,7 @@ public class GroupService {
             excludedStaffs.addAll(groupDTO.getExcludedStaffs());
             groupDTOS.add(groupDTO);
         }
+
         staffIds.removeAll(excludedStaffs);
         return staffIds;
     }
