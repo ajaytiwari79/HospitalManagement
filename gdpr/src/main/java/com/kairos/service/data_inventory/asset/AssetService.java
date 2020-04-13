@@ -120,6 +120,11 @@ public class AssetService {
         asset.setOrganizationId(unitId);
         asset.setName(assetDTO.getName());
         asset.setDescription(assetDTO.getDescription());
+        setAllOptionalData(unitId, assetDTO, asset);
+        return asset;
+    }
+
+    private void setAllOptionalData(Long unitId, AssetDTO assetDTO, Asset asset) {
         if (assetDTO.getHostingProvider() != null) {
             asset.setHostingProvider(hostingProviderRepository.findByIdAndOrganizationIdAndDeletedFalse(assetDTO.getHostingProvider(), unitId));
         }
@@ -156,7 +161,6 @@ public class AssetService {
         if (isNotNull(assetDTO.getAssetAssessor())) {
             asset.setAssetAssessor(assetDTO.getAssetAssessor());
         }
-        return asset;
     }
 
 
@@ -170,31 +174,14 @@ public class AssetService {
             }
             if (assetDTO.getSubAssetType() != null) {
                 if (assetDTO.getSubAssetType().getId() == null) {
-                    subAssetType = new AssetType(assetDTO.getSubAssetType().getName(), unitId, true);
-                    if (isCollectionNotEmpty(assetDTO.getSubAssetType().getRisks())) {
-                        linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getSubAssetType().getRisks());
-                    }
-                    subAssetType.setAssetType(assetType);
-                    assetTypeRepository.save(subAssetType);
+                    subAssetType = saveAssetType(unitId, assetDTO, assetType);
                     assetType.getSubAssetTypes().add(subAssetType);
                 } else {
-                    for (AssetType assetSubType : assetType.getSubAssetTypes()) {
-                        if (assetDTO.getSubAssetType().getId().equals(assetSubType.getId())) {
-                            subAssetType = assetSubType;
-                            if (isCollectionNotEmpty(assetDTO.getSubAssetType().getRisks())) {
-                                linkRiskWithAssetTypeAndSubType(assetSubType, assetDTO.getSubAssetType().getRisks());
-                            }
-                            break;
-                        }
-                    }
+                    subAssetType = linkedRiskWithAllAssetTypeAndSubType(assetDTO, assetType, subAssetType);
                 }
             }
         } else {
-            AssetType previousAssetType = assetTypeRepository.findByNameAndOrganizationIdAndSubAssetType(assetDTO.getAssetType().getName(), unitId, false);
-            if (Optional.ofNullable(previousAssetType).isPresent()) {
-                exceptionService.duplicateDataException(MESSAGE_DATANOTFOUND, MESSAGE_ASSETTYPE, assetDTO.getAssetType().getName());
-            }
-            assetType = new AssetType(assetDTO.getAssetType().getName(), unitId, false);
+            assetType = getAssetType(unitId, assetDTO);
             if (assetDTO.getSubAssetType() != null) {
                 subAssetType = new AssetType(assetDTO.getSubAssetType().getName(), unitId, true);
                 subAssetType.setAssetType(assetType);
@@ -207,6 +194,37 @@ public class AssetService {
         assetTypeRepository.save(assetType);
         asset.setAssetType(assetType);
         asset.setSubAssetType(subAssetType);
+    }
+
+    private AssetType getAssetType(Long unitId, AssetDTO assetDTO) {
+        AssetType previousAssetType = assetTypeRepository.findByNameAndOrganizationIdAndSubAssetType(assetDTO.getAssetType().getName(), unitId, false);
+        if (Optional.ofNullable(previousAssetType).isPresent()) {
+            exceptionService.duplicateDataException(MESSAGE_DATANOTFOUND, MESSAGE_ASSETTYPE, assetDTO.getAssetType().getName());
+        }
+        return new AssetType(assetDTO.getAssetType().getName(), unitId, false);
+    }
+
+    private AssetType saveAssetType(Long unitId, AssetDTO assetDTO, AssetType assetType) {
+        AssetType subAssetType = new AssetType(assetDTO.getSubAssetType().getName(), unitId, true);
+        if (isCollectionNotEmpty(assetDTO.getSubAssetType().getRisks())) {
+            linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getSubAssetType().getRisks());
+        }
+        subAssetType.setAssetType(assetType);
+        assetTypeRepository.save(subAssetType);
+        return subAssetType;
+    }
+
+    private AssetType linkedRiskWithAllAssetTypeAndSubType(AssetDTO assetDTO, AssetType assetType, AssetType subAssetType) {
+        for (AssetType assetSubType : assetType.getSubAssetTypes()) {
+            if (assetDTO.getSubAssetType().getId().equals(assetSubType.getId())) {
+                subAssetType = assetSubType;
+                if (isCollectionNotEmpty(assetDTO.getSubAssetType().getRisks())) {
+                    linkRiskWithAssetTypeAndSubType(assetSubType, assetDTO.getSubAssetType().getRisks());
+                }
+                break;
+            }
+        }
+        return subAssetType;
     }
 
     private AssetType linkRiskWithAssetTypeAndSubType(AssetType assetType, Set<OrganizationLevelRiskDTO> risks) {
@@ -303,27 +321,29 @@ public class AssetService {
             assetResponseDTO.setProcessingActivities(assetIdAndProcessingActivityListMap.get(asset.getId()));
         }
         if (!isBasicDataOnly) {
-            assetResponseDTO.setDataRetentionPeriod(asset.getDataRetentionPeriod());
-            assetResponseDTO.setSuggested(asset.isSuggested());
-            assetResponseDTO.setAssetOwner(asset.getAssetOwner());
-            assetResponseDTO.setAssetAssessor(asset.getAssetAssessor());
-            assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyCollectionPropertiesByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
-            assetResponseDTO.setOrgSecurityMeasures(ObjectMapperUtils.copyCollectionPropertiesByMapper(asset.getOrgSecurityMeasures(), OrganizationalSecurityMeasureResponseDTO.class));
-            assetResponseDTO.setTechnicalSecurityMeasures(ObjectMapperUtils.copyCollectionPropertiesByMapper(asset.getTechnicalSecurityMeasures(), TechnicalSecurityMeasureResponseDTO.class));
-            assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyCollectionPropertiesByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
-            assetResponseDTO.setHostingProvider(ObjectMapperUtils.copyPropertiesByMapper(asset.getHostingProvider(), HostingProviderResponseDTO.class));
-            assetResponseDTO.setHostingType(ObjectMapperUtils.copyPropertiesByMapper(asset.getHostingType(), HostingTypeResponseDTO.class));
-            assetResponseDTO.setDataDisposal(ObjectMapperUtils.copyPropertiesByMapper(asset.getDataDisposal(), DataDisposalResponseDTO.class));
-            if (Optional.ofNullable(asset.getAssetType()).isPresent()) {
-                assetResponseDTO.setAssetType(new AssetTypeBasicResponseDTO(asset.getAssetType().getId(), asset.getAssetType().getName(), asset.getAssetType().isSubAssetType(), isCollectionNotEmpty(asset.getAssetType().getRisks()) ? organizationAssetTypeService.buildAssetTypeRisksResponse(asset.getAssetType().getRisks()) : new ArrayList<>()));
-            }
-            if (Optional.ofNullable(asset.getSubAssetType()).isPresent()) {
-                assetResponseDTO.setSubAssetType(new AssetTypeBasicResponseDTO(asset.getSubAssetType().getId(), asset.getSubAssetType().getName(), asset.getSubAssetType().isSubAssetType(), organizationAssetTypeService.buildAssetTypeRisksResponse(asset.getSubAssetType().getRisks())));
-            }
+            setAllData(asset, assetResponseDTO);
         }
         return assetResponseDTO;
+    }
 
-
+    private void setAllData(Asset asset, AssetResponseDTO assetResponseDTO) {
+        assetResponseDTO.setDataRetentionPeriod(asset.getDataRetentionPeriod());
+        assetResponseDTO.setSuggested(asset.isSuggested());
+        assetResponseDTO.setAssetOwner(asset.getAssetOwner());
+        assetResponseDTO.setAssetAssessor(asset.getAssetAssessor());
+        assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyCollectionPropertiesByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
+        assetResponseDTO.setOrgSecurityMeasures(ObjectMapperUtils.copyCollectionPropertiesByMapper(asset.getOrgSecurityMeasures(), OrganizationalSecurityMeasureResponseDTO.class));
+        assetResponseDTO.setTechnicalSecurityMeasures(ObjectMapperUtils.copyCollectionPropertiesByMapper(asset.getTechnicalSecurityMeasures(), TechnicalSecurityMeasureResponseDTO.class));
+        assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyCollectionPropertiesByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
+        assetResponseDTO.setHostingProvider(ObjectMapperUtils.copyPropertiesByMapper(asset.getHostingProvider(), HostingProviderResponseDTO.class));
+        assetResponseDTO.setHostingType(ObjectMapperUtils.copyPropertiesByMapper(asset.getHostingType(), HostingTypeResponseDTO.class));
+        assetResponseDTO.setDataDisposal(ObjectMapperUtils.copyPropertiesByMapper(asset.getDataDisposal(), DataDisposalResponseDTO.class));
+        if (Optional.ofNullable(asset.getAssetType()).isPresent()) {
+            assetResponseDTO.setAssetType(new AssetTypeBasicResponseDTO(asset.getAssetType().getId(), asset.getAssetType().getName(), asset.getAssetType().isSubAssetType(), isCollectionNotEmpty(asset.getAssetType().getRisks()) ? organizationAssetTypeService.buildAssetTypeRisksResponse(asset.getAssetType().getRisks()) : new ArrayList<>()));
+        }
+        if (Optional.ofNullable(asset.getSubAssetType()).isPresent()) {
+            assetResponseDTO.setSubAssetType(new AssetTypeBasicResponseDTO(asset.getSubAssetType().getId(), asset.getSubAssetType().getName(), asset.getSubAssetType().isSubAssetType(), organizationAssetTypeService.buildAssetTypeRisksResponse(asset.getSubAssetType().getRisks())));
+        }
     }
 
     /**
@@ -357,13 +377,10 @@ public class AssetService {
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
     public List<Map<String, Object>> getAssetActivitiesHistory(Long assetId) throws ClassNotFoundException {
-
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
         return javersCommonService.getHistoryMap(changes, assetId, Asset.class);
-
-
     }
 
     public List<AssetResponseDTO> getAllActiveAsset(Long unitId) {
