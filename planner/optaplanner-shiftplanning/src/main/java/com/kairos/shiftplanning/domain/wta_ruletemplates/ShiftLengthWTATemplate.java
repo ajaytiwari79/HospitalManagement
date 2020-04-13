@@ -9,6 +9,7 @@ import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.Unit;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
@@ -32,6 +33,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@EqualsAndHashCode
 public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     private long timeLimit;

@@ -665,14 +665,16 @@ public class ShiftService extends MongoBaseService {
         List<ShiftViolatedRules> saveShiftViolatedRules = new ArrayList<>();
         List<ShiftViolatedRules> deleteShiftViolatedRules = new ArrayList<>();
         for (Shift draftShift : draftShifts) {
-            Shift shift = draftShift.getDraftShift();
-            shift.setDraftShift(null);
-            shift.setId(draftShift.getId());
-            shift.setDraft(false);
-            for (ShiftActivity shiftActivity : shift.getActivities()) {
-                shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+            if(isNotNull(draftShift.getDraftShift())){
+                Shift shift = draftShift.getDraftShift();
+                shift.setDraftShift(null);
+                shift.setId(draftShift.getId());
+                shift.setDraft(false);
+                for (ShiftActivity shiftActivity : shift.getActivities()) {
+                    shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+                }
+                saveShifts.add(shift);
             }
-            saveShifts.add(shift);
         }
         shiftStateService.updateShiftDailyTimeBankAndPaidOut(saveShifts, saveShifts, unitId);
         List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(draftShifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()), true);

@@ -130,7 +130,7 @@ public class ShiftPlanningUtility {
             LocalDate nextEndDate = startDate;
             switch (cutOffIntervalUnit) {
                 case DAYS:
-                    nextEndDate = startDate.plusDays(dayValue - 1);
+                    nextEndDate = startDate.plusDays(dayValue - (long)1);
                     break;
                 case HALF_YEARLY:
                     nextEndDate = startDate.plusMonths(6).minusDays(1);
@@ -225,7 +225,7 @@ public class ShiftPlanningUtility {
         Set<BigInteger> updatedShifts = new HashSet<>();
         shifts.forEach(s -> {
             for (TimeInterval timeInterval : timeIntervals) {
-                if ((dateTimeInterval.contains(s.getStart()) || dateTimeInterval.getEndDate().equals(s.getStart())) && (timeInterval == null || timeInterval.contains(s.getStart().get(ChronoField.MINUTE_OF_DAY)))) {
+                if ((dateTimeInterval.contains(s.getStart()) || dateTimeInterval.getEnd().equals(s.getStart())) && (timeInterval == null || timeInterval.contains(s.getStart().get(ChronoField.MINUTE_OF_DAY)))) {
                     updatedShifts.add(s.getId());
                 }
             }
@@ -452,7 +452,7 @@ public class ShiftPlanningUtility {
     public static DateTimeInterval createInterval(LocalDate weekStart, int intervalLength, IntervalUnit intervalUnit) {
         DateTimeInterval interval = null;
         if (IntervalUnit.WEEKS == intervalUnit) {
-            interval = new DateTimeInterval(asZonedDateTime(weekStart.minusWeeks(intervalLength - 1)), asZonedDateTime(weekStart.plusWeeks(1)));
+            interval = new DateTimeInterval(asZonedDateTime(weekStart.minusWeeks(intervalLength - (long)1)), asZonedDateTime(weekStart.plusWeeks(1)));
         }
         return interval;
     }
@@ -592,7 +592,6 @@ public class ShiftPlanningUtility {
         return request;
     }
 
-    //TODO n2 complex need to improve
     public static List<ActivityLineIntervalWrapper> buildNullAssignWrappersForExIntervals(List<ActivityLineIntervalWrapper> activityLineIntervalWrappers) {
         List<ActivityLineIntervalWrapper> overlappingAlisWrappers = new ArrayList<>();
         if (activityLineIntervalWrappers.get(0).getShiftImp() == null) return overlappingAlisWrappers;
@@ -714,7 +713,7 @@ public class ShiftPlanningUtility {
         slMatrix.forEach((k, v) -> {
             log.info("date: {}", k);
             int[] idx = {0};
-            Arrays.stream(v).forEach(i -> log.info("{} {} {}",asZonedDateTime(k).plusMinutes((idx[0]++) * 15).format(DateTimeFormatter.ofPattern("HH:mm"))
+            Arrays.stream(v).forEach(i -> log.info("{} {} {}",asZonedDateTime(k).plusMinutes((idx[0]++) * (long)15).format(DateTimeFormatter.ofPattern("HH:mm"))
                     , (originalMatrix != null ? Arrays.toString((int[]) originalMatrix.get(k)[idx[0] - 1]) : "")
                     , Arrays.toString((int[]) i)));
         });

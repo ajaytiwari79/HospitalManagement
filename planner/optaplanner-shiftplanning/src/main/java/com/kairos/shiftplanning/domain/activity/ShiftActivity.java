@@ -7,8 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -20,6 +22,7 @@ public class ShiftActivity {
     private Activity activity;
     private ZonedDateTime endDate;
     private List<PlannedTime> plannedTimes;
+    private boolean breakNotHeld;
 
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.startDate,this.endDate);
@@ -27,7 +30,7 @@ public class ShiftActivity {
 
     @Override
     public String toString() {
-        return activity.getName() + "-" + getIntervalAsString();
+        return activity.getName() + "-" + getIntervalAsString()+" - "+ plannedTimes.toString();
     }
 
     public String getIntervalAsString() {

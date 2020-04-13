@@ -38,6 +38,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@EqualsAndHashCode
 public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
 
     @Positive(message = "message.ruleTemplate.interval.notNull")

@@ -899,6 +899,7 @@ public  class DateUtils {
         ZonedDateTime zonedDateTime = asZonedDateTime(date);
         return asDate(zonedDateTime.truncatedTo(ChronoUnit.HOURS).plusMinutes((int)Math.round((double)zonedDateTime.get(ChronoField.MINUTE_OF_HOUR)/minutes)*(long)minutes));
     }
+
     public static Set<DayOfWeek> getAllDaysBetweenDays(DayOfWeek startDayOfWeek, DayOfWeek endDayOfWeek) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         while (true){

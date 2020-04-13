@@ -7,6 +7,7 @@ import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 * */
 @Getter
 @Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 public class PresenceAndAbsenceAtSameTime implements Constraint {
 

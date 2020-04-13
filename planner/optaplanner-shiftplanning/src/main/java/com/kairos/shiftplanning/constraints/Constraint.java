@@ -25,18 +25,18 @@ public interface Constraint{
     ScoreLevel getLevel();
     int getWeight();
     default void breakLevelConstraints(HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int contraintPenality){
-        switch (getLevel()){
-            case HARD:scoreHolder.addHardConstraintMatch(kContext,getWeight()*contraintPenality);
-                log.debug("breaking constraint Hard: {}",getWeight()*contraintPenality);
-                break;
-            case MEDIUM:scoreHolder.addMediumConstraintMatch(kContext,getWeight()*contraintPenality);
-                log.debug("breaking constraint Medium: {}",getWeight()*contraintPenality);
-                break;
-            case SOFT:scoreHolder.addSoftConstraintMatch(kContext,getWeight()*contraintPenality);
-                log.debug("breaking constraint Soft: {}",getWeight()*contraintPenality);
-                break;
-            default:
-                break;
-        }
+            switch (getLevel()){
+                case HARD:scoreHolder.addHardConstraintMatch(kContext,getWeight()*contraintPenality);
+                    log.debug("breaking constraint Hard: {}",getWeight()*contraintPenality);
+                    break;
+                case MEDIUM:scoreHolder.addMediumConstraintMatch(kContext,getWeight()*contraintPenality);
+                    log.debug("breaking constraint Medium: {}",getWeight()*contraintPenality);
+                    break;
+                case SOFT:scoreHolder.addSoftConstraintMatch(kContext,getWeight()*contraintPenality);
+                    log.debug("breaking constraint Soft: {}",getWeight()*contraintPenality);
+                    break;
+                default:
+                    break;
+            }
     }
 }

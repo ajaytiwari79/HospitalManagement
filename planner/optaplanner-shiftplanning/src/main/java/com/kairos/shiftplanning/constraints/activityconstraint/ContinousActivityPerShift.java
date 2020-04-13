@@ -1,6 +1,7 @@
 package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import com.kairos.enums.constraint.ScoreLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 public class ContinousActivityPerShift {
 
     private int contActivityPerShift;

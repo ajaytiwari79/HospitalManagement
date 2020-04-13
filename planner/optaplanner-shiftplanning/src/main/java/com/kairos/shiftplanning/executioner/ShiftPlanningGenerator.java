@@ -25,10 +25,7 @@ import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.domain.staffing_level.*;
 import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
-import com.kairos.shiftplanning.domain.unit.Phase;
-import com.kairos.shiftplanning.domain.unit.PlanningPeriod;
-import com.kairos.shiftplanning.domain.unit.TimeSlot;
-import com.kairos.shiftplanning.domain.unit.Unit;
+import com.kairos.shiftplanning.domain.unit.*;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.AverageScheduledTimeWTATemplate;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.WTABaseRuleTemplate;
 import com.kairos.shiftplanning.enums.SkillType;
@@ -93,8 +90,9 @@ public class ShiftPlanningGenerator {
         unresolvedSolution.setActivitiesIntervalsGroupedPerDay(groupActivityLineIntervals(unresolvedSolution.getActivityLineIntervals()));
         List<LocalDate> planningDays = getPlanningDays();
         unresolvedSolution.setWeekDates(planningDays);
-        unresolvedSolution.setUnit(getUnit(planningDays));
-        List<Employee> employees= generateEmployeeList(planningDays);
+        Unit unit = getUnit(planningDays);
+        unresolvedSolution.setUnit(unit);
+        List<Employee> employees= generateEmployeeList(planningDays,unit);
         unresolvedSolution.setEmployees(employees);
         unresolvedSolution.setShifts(generateShiftForAssignments( employees));
         int[] activitiesRank=activities.stream().mapToInt(a->a.getRank()).toArray();
@@ -259,27 +257,27 @@ public class ShiftPlanningGenerator {
 
     }
 
-    public List<Employee> generateEmployeeList(List<LocalDate> planningDays) {
+    public List<Employee> generateEmployeeList(List<LocalDate> planningDays, Unit unit) {
         List<Employee> employees = new ArrayList<>();
-        Employee employee = getEmployee("145","Sachin Verma",123l,createTags1());
+        Employee employee = getEmployee("145","Sachin Verma",123l,createTags1(),unit);
         Map<LocalDate,Map<ConstraintSubType, WTABaseRuleTemplate>> wtaTemplateMap = getWTAMap(planningDays);
         employee.setWtaRuleTemplateMap(wtaTemplateMap);
         employees.add(employee);
-        Employee employee2 = getEmployee("160","Pradeep Singh",126l,createTags2());
+        Employee employee2 = getEmployee("160","Pradeep Singh",126l,createTags2(), unit);
         employee2.setWtaRuleTemplateMap(wtaTemplateMap);
         employee2.setNightWorker(true);
         employees.add(employee2);
-        Employee employee3 = getEmployee("170", "Arvind Das", 123l, createTags2());
+        Employee employee3 = getEmployee("170", "Arvind Das", 123l, createTags2(), unit);
         employee3.setWtaRuleTemplateMap(wtaTemplateMap);
         employee3.setNightWorker(true);
         employees.add(employee3);
-        Employee employee4 = getEmployee("180","Ulrik",126l,createTags3());
+        Employee employee4 = getEmployee("180","Ulrik",126l,createTags3(), unit);
         employee4.setWtaRuleTemplateMap(wtaTemplateMap);
         employees.add(employee4);
-        Employee employee5 = getEmployee("190", "Ramanuj", 123l, createTags4());
+        Employee employee5 = getEmployee("190", "Ramanuj", 123l, createTags4(), unit);
         employee5.setWtaRuleTemplateMap(wtaTemplateMap);
         employees.add(employee5);
-        Employee employee6 = getEmployee("195", "Dravid", 145l, createTags4());
+        Employee employee6 = getEmployee("195", "Dravid", 145l, createTags4(), unit);
         employee6.setWtaRuleTemplateMap(wtaTemplateMap);
         employees.add(employee6);
         return employees;
@@ -297,12 +295,13 @@ public class ShiftPlanningGenerator {
         return wtaTemplateMap;
     }
 
-    private Employee getEmployee(String s, String s2, long l, Set<Tag> tags2) {
-        Employee employee3 = new Employee(Long.valueOf(s), s2, createSkillSet(), null, 0, 0, PaidOutFrequencyEnum.HOURLY, null);
-        employee3.setBaseCost(BigDecimal.valueOf(1.5));
-        employee3.setEmploymentTypeId(l);
-        employee3.setTags(tags2);
-        return employee3;
+    private Employee getEmployee(String s, String s2, long l, Set<Tag> tags2, Unit unit) {
+        Employee employee = new Employee(Long.valueOf(s), s2, createSkillSet(), null, 0, 0, PaidOutFrequencyEnum.HOURLY, null);
+        employee.setBaseCost(BigDecimal.valueOf(1.5));
+        employee.setEmploymentTypeId(l);
+        employee.setTags(tags2);
+        employee.setUnit(unit);
+        return employee;
     }
 
     public LocalDate getPlanningWeekStart(){
@@ -403,8 +402,8 @@ public class ShiftPlanningGenerator {
 
     public TimeType[] createTimeTypes(){
         TimeType[] timeTypes= new TimeType[4];
-        timeTypes[0]= new TimeType(BigInteger.valueOf(new Date().getTime()),"presence", TimeTypeEnum.PRESENCE );
-        timeTypes[1]= new TimeType(BigInteger.valueOf(new Date().getTime()),"absence",TimeTypeEnum.ABSENCE);
+        timeTypes[0]= new TimeType(BigInteger.valueOf(new Date().getTime()),"presence", TimeTypeEnum.PRESENCE ,true);
+        timeTypes[1]= new TimeType(BigInteger.valueOf(new Date().getTime()),"absence",TimeTypeEnum.ABSENCE,true);
         return timeTypes;
     }
     private List<Activity> getActivities(){
@@ -490,6 +489,9 @@ public class ShiftPlanningGenerator {
         timeSlotMap.put(EVENING,TimeSlot.builder().startHour(15).endHour(23).build());
         Unit unit = Unit.builder().phase(new Phase(BigInteger.valueOf(13l), PhaseDefaultName.CONSTRUCTION, PhaseType.PLANNING)).planningPeriod(new PlanningPeriod(BigInteger.valueOf(12l),planningDays.get(0),planningDays.get(planningDays.size()-1))).dayTypeMap(dayTypeMap).timeSlotMap(timeSlotMap).id(1l).constraints(unitConstraints).build();
         unit.setConstraints(unitConstraints);
+        unit.setAbsencePlannedTime(new AbsencePlannedTime(unit.getPhase().getId(),newArrayList(BigInteger.valueOf(3l)),false));
+        unit.setPresencePlannedTime(new PresencePlannedTime(unit.getPhase().getId(),newArrayList(BigInteger.valueOf(5l))));
+        unit.setNonWorkingPlannedTime(new NonWorkingPlannedTime(unit.getPhase().getId(),newArrayList(BigInteger.valueOf(3l)),false));
         unit.setId(1l);
         return unit;
     }

@@ -6,6 +6,7 @@ import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.Unit;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,6 +25,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @Getter
 @Setter
+@EqualsAndHashCode
 public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;

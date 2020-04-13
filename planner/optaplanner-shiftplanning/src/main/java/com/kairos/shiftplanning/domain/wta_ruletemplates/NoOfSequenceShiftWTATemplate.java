@@ -9,6 +9,7 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.TimeSlot;
 import com.kairos.shiftplanning.domain.unit.Unit;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
@@ -34,6 +35,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.isValid;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@EqualsAndHashCode
 public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
 
     //private int sequence;

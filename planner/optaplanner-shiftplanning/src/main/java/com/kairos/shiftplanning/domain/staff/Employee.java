@@ -50,7 +50,9 @@ public class Employee {
     private Set<Team> teams;
     private boolean nightWorker;
     private ExpertiseNightWorkerSetting expertiseNightWorkerSetting;
+    private Unit unit;
     private Map<LocalDate,Map<ConstraintSubType, WTABaseRuleTemplate>> wtaRuleTemplateMap;
+    private BreakSettings breakSettings;
 
     public Employee(Long id, String name, Set<Skill> skillSet, Long expertiseId, int totalWeeklyMinutes, int workingDaysInWeek, PaidOutFrequencyEnum paidOutFrequencyEnum, Long employmentTypeId) {
         super();

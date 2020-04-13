@@ -1,11 +1,6 @@
 package com.kairos.shiftplanning.domain.unit;
 
-import com.kairos.dto.activity.unit_settings.activity_configuration.AbsencePlannedTime;
-import com.kairos.dto.activity.unit_settings.activity_configuration.NonWorkingPlannedTime;
-import com.kairos.dto.activity.unit_settings.activity_configuration.PresencePlannedTime;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.shiftplanning.constraints.Constraint;

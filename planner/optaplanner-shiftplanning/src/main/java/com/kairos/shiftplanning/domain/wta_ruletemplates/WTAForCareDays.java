@@ -2,6 +2,7 @@ package com.kairos.shiftplanning.domain.wta_ruletemplates;
 
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +18,7 @@ import static com.kairos.enums.wta.WTATemplateType.WTA_FOR_CARE_DAYS;
  */
 @Getter
 @Setter
+@EqualsAndHashCode
 public class WTAForCareDays extends WTABaseRuleTemplate{
 
     private List<ActivityCareDayCount> careDayCounts = new ArrayList<>();

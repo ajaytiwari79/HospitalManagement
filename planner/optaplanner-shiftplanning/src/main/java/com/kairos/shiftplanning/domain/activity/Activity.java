@@ -48,6 +48,7 @@ public class Activity {
     private LocalDate cutOffStartFrom;
     private CutOffIntervalUnit cutOffIntervalUnit;
     private Integer cutOffdayValue;
+    private boolean breakAllowed;
 
 
 

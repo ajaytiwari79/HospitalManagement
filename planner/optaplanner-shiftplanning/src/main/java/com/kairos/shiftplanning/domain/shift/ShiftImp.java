@@ -33,6 +33,7 @@ import java.time.temporal.ChronoField;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 
@@ -65,7 +66,8 @@ public class ShiftImp implements Shift{
     private int plannedMinutesOfTimebank;
     private boolean isLocked;
     private boolean isCreatedByStaff;
-    private List<ShiftActivity> shiftActivities;
+    private List<ShiftActivity> actualShiftActivities = new ArrayList<>();
+    private List<ShiftActivity> shiftActivities = new ArrayList<>();
     private Set<BigInteger> activitiesTimeTypeIds = new HashSet<>();
     private Set<BigInteger> activityIds = new HashSet<>();
     private Set<BigInteger> activitiesPlannedTimeIds = new HashSet<>();
@@ -108,6 +110,10 @@ public class ShiftImp implements Shift{
             }
         }
         return null;
+    }
+
+    public boolean isShiftTypeChanged() {
+        return isCollectionNotEmpty(actualShiftActivities) && isCollectionNotEmpty(shiftActivities) && !actualShiftActivities.get(0).getActivity().getTimeType().equals(shiftActivities.get(0).getActivity().getTimeType().getTimeTypeEnum());
     }
 
     @Override

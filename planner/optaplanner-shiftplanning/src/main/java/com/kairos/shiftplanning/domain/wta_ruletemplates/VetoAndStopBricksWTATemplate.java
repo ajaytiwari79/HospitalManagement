@@ -3,6 +3,7 @@ package com.kairos.shiftplanning.domain.wta_ruletemplates;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.wta.WTATemplateType;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@EqualsAndHashCode
 public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
 
     @Positive(message = "message.ruleTemplate.weeks.notNull")

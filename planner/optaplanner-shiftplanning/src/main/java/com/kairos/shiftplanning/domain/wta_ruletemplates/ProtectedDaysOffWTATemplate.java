@@ -2,6 +2,7 @@ package com.kairos.shiftplanning.domain.wta_ruletemplates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +19,7 @@ import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@EqualsAndHashCode
 public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
     private BigInteger activityId;
 

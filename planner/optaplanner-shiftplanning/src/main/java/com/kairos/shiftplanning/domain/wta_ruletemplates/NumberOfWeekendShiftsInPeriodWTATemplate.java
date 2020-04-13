@@ -7,6 +7,7 @@ import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.Unit;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,6 +33,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@EqualsAndHashCode
 public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplate {
 
 
@@ -101,7 +103,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         }
         return dayIntervals.size() - overLapsIntervals.size();
     }
-
+    //
     private List<DateTimeInterval> getOverLapsInterval(List<DateTimeInterval> intervals, DateTimeInterval dateTimeInterval) {
         List<DateTimeInterval> overLapIntervals = new ArrayList<>();
         intervals.forEach(interval -> {

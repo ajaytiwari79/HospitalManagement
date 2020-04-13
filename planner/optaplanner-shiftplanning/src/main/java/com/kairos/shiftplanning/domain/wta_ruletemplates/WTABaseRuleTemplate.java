@@ -21,6 +21,7 @@ import java.util.List;
 @SuperBuilder
 @Document(collection = "wtaBaseRuleTemplate")
 @NoArgsConstructor
+@EqualsAndHashCode
 public class WTABaseRuleTemplate implements Constraint {
 
     protected BigInteger id;

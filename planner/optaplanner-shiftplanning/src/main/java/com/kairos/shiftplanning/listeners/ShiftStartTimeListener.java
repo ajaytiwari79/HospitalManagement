@@ -3,6 +3,7 @@ package com.kairos.shiftplanning.listeners;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.utils.PlannedTimeTypeUtils;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
@@ -59,6 +60,7 @@ public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
             return;
         }
         Object[] objects = ShiftPlanningUtility.getMergedShiftActivitys(shiftImp.getActivityLineIntervals());
+        PlannedTimeTypeUtils.addPlannedTimeInShift(shiftImp);
         shiftImp.setShiftActivities((List<ShiftActivity>)objects[0]);
         shiftImp.setActivityIds((Set<BigInteger>)objects[1]);
         shiftImp.setActivitiesPlannedTimeIds((Set<BigInteger>)objects[2]);

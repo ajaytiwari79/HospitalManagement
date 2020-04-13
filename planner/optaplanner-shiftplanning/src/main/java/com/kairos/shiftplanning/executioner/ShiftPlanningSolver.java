@@ -119,15 +119,10 @@ public class ShiftPlanningSolver {
 
 
     public ShiftRequestPhasePlanningSolution runSolver() {
-        try {
             Object[] solvedSolution = getSolution(null);
             printSolvedSolution(solvedSolution);
             printIndictment((Map<Object,Indictment>)solvedSolution[1]);
             return (ShiftRequestPhasePlanningSolution)solvedSolution[0];
-        } catch (Exception e) {
-            log.error(ERROR,e.getMessage());
-            return null;
-        }
     }
     public Object[] getSolution(ShiftRequestPhasePlanningSolution unsolvedSolution){
         if(unsolvedSolution==null) {
@@ -177,6 +172,7 @@ public class ShiftPlanningSolver {
             return new ShiftPlanningGenerator().loadUnsolvedBreakAndIndirectActivityPlanningSolution(BASE_SRC+"shift_solution_secondary.xml");
         return new ShiftPlanningGenerator().loadUnsolvedBreakAndIndirectActivityPlanningSolution(solution);
     }
+
     public ShiftRequestPhasePlanningSolution runSolverOnRequest(ShiftRequestPhasePlanningSolution unSolvedsolution) {
         try {
             Object[] solvedSolution = getSolution(unSolvedsolution);

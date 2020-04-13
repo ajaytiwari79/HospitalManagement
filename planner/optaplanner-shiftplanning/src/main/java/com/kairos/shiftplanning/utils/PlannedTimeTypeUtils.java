@@ -8,9 +8,8 @@ import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.Unit;
 
 import java.math.BigInteger;
+import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static java.util.Comparator.comparing;
@@ -18,18 +17,20 @@ import static java.util.stream.Collectors.toMap;
 
 public class PlannedTimeTypeUtils {
 
-    public void addPlannedTimeInShift(ShiftImp shift, Unit unit, boolean shiftTypeChanged) {
-        List<PlannedTime> plannedTimeList = shift.getShiftActivities().stream().flatMap(k -> k.getPlannedTimes().stream()).collect(Collectors.toList());
-        Map<DateTimeInterval, PlannedTime> plannedTimeMap = plannedTimeList.stream().filter(distinctByKey(plannedTime -> new DateTimeInterval(plannedTime.getStartDate(), plannedTime.getEndDate()))).collect(toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()), Function.identity()));
+    public static void addPlannedTimeInShift(ShiftImp shift) {
         for (ShiftActivity shiftActivity : shift.getShiftActivities()) {
-            List<BigInteger> plannedTimeIds = addPlannedTimeInShift(unit, shiftActivity.getActivity());
-            BigInteger plannedTimeId = plannedTimeIds.get(0);
-            List<PlannedTime> plannedTimes = isNull(shift.getId()) || shiftTypeChanged ? newArrayList(new PlannedTime(plannedTimeId, shiftActivity.getStartDate(), shiftActivity.getEndDate())) : filterPlannedTimes(shiftActivity.getStartDate(), shiftActivity.getEndDate(), plannedTimeMap, plannedTimeId);
+            BigInteger plannedTimeId = getPlannedTimeIdByTimeType(shift.getEmployee().getUnit(), shiftActivity.getActivity());
+            List<PlannedTime> plannedTimes;
+            if(shift.isShiftTypeChanged()){
+                plannedTimes = newArrayList(new PlannedTime(plannedTimeId, shiftActivity.getStartDate(), shiftActivity.getEndDate()));
+            }else {
+                plannedTimes = filterPlannedTimes(shiftActivity.getStartDate(), shiftActivity.getEndDate(), shift, plannedTimeId);
+            }
             shiftActivity.setPlannedTimes(plannedTimes);
         }
     }
 
-    public List<BigInteger> addPlannedTimeInShift(Unit unit, Activity activity) {
+    private static BigInteger getPlannedTimeIdByTimeType(Unit unit, Activity activity) {
         List<BigInteger> plannedTimes;
         switch (activity.getTimeType().getTimeTypeEnum()){
             case ABSENCE :
@@ -42,10 +43,10 @@ public class PlannedTimeTypeUtils {
                 plannedTimes = unit.getNonWorkingPlannedTime().getPlannedTimeIds();
 
         }
-        return plannedTimes;
+        return plannedTimes.get(0);
     }
 
-    private List<BigInteger> getAbsencePlannedTime(Unit unit, Activity activity) {
+    private static List<BigInteger> getAbsencePlannedTime(Unit unit, Activity activity) {
         List<BigInteger> plannedTimeIds = unit.getAbsencePlannedTime().getPlannedTimeIds();
         if (unit.getAbsencePlannedTime().isException() && activity.getTimeType().getId().equals(unit.getAbsencePlannedTime().getTimeTypeId())) {
             plannedTimeIds = unit.getAbsencePlannedTime().getPlannedTimeIds();
@@ -53,42 +54,39 @@ public class PlannedTimeTypeUtils {
         return plannedTimeIds;
     }
 
-    private List<com.kairos.dto.activity.shift.PlannedTime> filterPlannedTimes(Date startDate, Date endDate, Map<DateTimeInterval, com.kairos.dto.activity.shift.PlannedTime> plannedTimeMap, BigInteger plannedTimeId) {
+    private static List<PlannedTime> filterPlannedTimes(ZonedDateTime startDate, ZonedDateTime endDate, ShiftImp shiftImp, BigInteger plannedTimeId) {
         DateTimeInterval activityInterval = new DateTimeInterval(startDate, endDate);
-        plannedTimeMap = plannedTimeMap.entrySet().stream().filter(map -> map.getKey().overlaps(activityInterval)).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-        plannedTimeMap = plannedTimeMap.entrySet().stream().sorted(comparing(k -> k.getKey().getStartDate())).collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
-        List<com.kairos.dto.activity.shift.PlannedTime> plannedTimes = new ArrayList<>();
-        final boolean endDateInside = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().containsStartOrEnd(endDate));
+        Map<DateTimeInterval,PlannedTime> plannedTimeMap = shiftImp.getActualShiftActivities().stream().flatMap(shiftActivity -> shiftActivity.getPlannedTimes().stream()).filter(plannedTime -> plannedTime.getInterval().overlaps(activityInterval)).sorted(comparing(plannedTime -> plannedTime.getStartDate())).collect(toMap(plannedTime->plannedTime.getInterval(), plannedTime->plannedTime, (e1, e2) -> e2, LinkedHashMap::new));
+        List<PlannedTime> plannedTimes = new ArrayList<>();
+        final boolean endDateInside = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().containsAndEqualsEndDate(endDate));
         final boolean activityIntervalOverLapped = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().overlaps(activityInterval));
-
         if (!activityIntervalOverLapped) {
-            plannedTimes.add(new com.kairos.dto.activity.shift.PlannedTime(plannedTimeId, startDate, endDate));
+            plannedTimes.add(new PlannedTime(plannedTimeId, startDate, endDate));
         } else {
-
-            if (plannedTimeMap.size() != 0) {
+            if (isMapNotEmpty(plannedTimeMap)) {
                 DateTimeInterval lastInterval = plannedTimeMap.keySet().stream().skip(plannedTimeMap.keySet().size() - 1).findFirst().get();
                 boolean addedAtLeading = false;
-                for (Map.Entry<DateTimeInterval, com.kairos.dto.activity.shift.PlannedTime> plannedTimeInterval : plannedTimeMap.entrySet()) {
+                for (Map.Entry<DateTimeInterval, PlannedTime> plannedTimeInterval : plannedTimeMap.entrySet()) {
                     DateTimeInterval shiftActivityInterVal = new DateTimeInterval(startDate, endDate);
                     if (plannedTimeInterval.getKey().containsInterval(shiftActivityInterVal)) {
-                        plannedTimes.add(new com.kairos.dto.activity.shift.PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(), startDate, endDate));
+                        plannedTimes.add(new PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(), startDate, endDate));
                         break;
-                    } else if (startDate.before(plannedTimeInterval.getKey().getStartDate())) {
+                    } else if (startDate.isBefore(plannedTimeInterval.getKey().getStart())) {
                         if (!addedAtLeading) {
-                            plannedTimes.add(new com.kairos.dto.activity.shift.PlannedTime(plannedTimeId, startDate, plannedTimeInterval.getKey().getStartDate()));
+                            plannedTimes.add(new PlannedTime(plannedTimeId, startDate, plannedTimeInterval.getKey().getStart()));
                             addedAtLeading = true;
                         }
-                        plannedTimes.add(new com.kairos.dto.activity.shift.PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(), plannedTimeInterval.getKey().getStartDate(), plannedTimeInterval.getKey().getEndDate()));
-                        startDate = plannedTimeInterval.getKey().getEndDate();
-                    } else if (startDate.equals(plannedTimeInterval.getKey().getStartDate()) || startDate.after(plannedTimeInterval.getKey().getStartDate())) {
-                        plannedTimes.add(new com.kairos.dto.activity.shift.PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(), startDate, plannedTimeInterval.getKey().getEndDate()));
-                        startDate = plannedTimeInterval.getKey().getEndDate();
+                        plannedTimes.add(new PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(), plannedTimeInterval.getKey().getStart(), plannedTimeInterval.getKey().getEnd()));
+                        startDate = plannedTimeInterval.getKey().getEnd();
+                    } else if (startDate.equals(plannedTimeInterval.getKey().getStartDate()) || startDate.isAfter(plannedTimeInterval.getKey().getStart())) {
+                        plannedTimes.add(new PlannedTime(plannedTimeInterval.getValue().getPlannedTimeId(), startDate, plannedTimeInterval.getKey().getEnd()));
+                        startDate = plannedTimeInterval.getKey().getEnd();
                     }  else if (!plannedTimeInterval.getKey().overlaps(shiftActivityInterVal)) {
-                        plannedTimes.add(new com.kairos.dto.activity.shift.PlannedTime(plannedTimeId, startDate, endDate));
+                        plannedTimes.add(new PlannedTime(plannedTimeId, startDate, endDate));
                     }
                 }
                 if (!endDateInside) {
-                    plannedTimes.add(new com.kairos.dto.activity.shift.PlannedTime(plannedTimeId, lastInterval.getEndDate(), endDate));
+                    plannedTimes.add(new PlannedTime(plannedTimeId, lastInterval.getEnd(), endDate));
                 }
 
             }

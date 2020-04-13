@@ -20,5 +20,6 @@ public class TimeType {
     private BigInteger id;
     private String name;
     private TimeTypeEnum timeTypeEnum;
+    private boolean breakNotHeldValid;
 
 }
