@@ -71,7 +71,7 @@ public class TimeBankOffKPIService implements KPIService{
 
 
     private List<TodoDTO> getTodoDTOListIfStaffIsNotExist(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, Map.Entry<BigInteger, List<TodoDTO>> entry) {
-        boolean isActivityExist =kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ACTIVITY_IDS)&&kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ACTIVITY_STATUS);
+        boolean isActivityExist =kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ACTIVITY_IDS);
         List<TodoDTO> activityTodoList =kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getActivityIdAndTodoListMap().getOrDefault(entry.getKey(),new ArrayList<>()));
         List<TodoDTO> timeTypeTodoList =kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getTimeTypeTodoListMap().getOrDefault(entry.getKey(),new ArrayList<>()));
         return isActivityExist?activityTodoList:timeTypeTodoList;
