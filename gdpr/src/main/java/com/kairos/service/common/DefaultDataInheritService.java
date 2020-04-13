@@ -136,137 +136,175 @@ public class DefaultDataInheritService {
 
 
     public boolean copyMasterDataFromCountry(Long unitId, OrgTypeSubTypeServiceCategoryVO orgTypeSubTypeServiceCategoryVO) throws Exception {
-
         Long countryId = orgTypeSubTypeServiceCategoryVO.getCountryId();
-        OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(Collections.singletonList(orgTypeSubTypeServiceCategoryVO.getId()),
-                orgTypeSubTypeServiceCategoryVO.getOrganizationSubTypes().stream().map(OrganizationSubTypeDTO::getId).collect(Collectors.toList()),
-                orgTypeSubTypeServiceCategoryVO.getOrganizationServices().stream().map(ServiceCategoryDTO::getId).collect(Collectors.toList()),
-                orgTypeSubTypeServiceCategoryVO.getOrganizationSubServices().stream().map(SubServiceCategoryDTO::getId).collect(Collectors.toList()));
-
+        OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO = new OrganizationTypeAndSubTypeIdDTO(Collections.singletonList(orgTypeSubTypeServiceCategoryVO.getId()), orgTypeSubTypeServiceCategoryVO.getOrganizationSubTypes().stream().map(OrganizationSubTypeDTO::getId).collect(Collectors.toList()), orgTypeSubTypeServiceCategoryVO.getOrganizationServices().stream().map(ServiceCategoryDTO::getId).collect(Collectors.toList()), orgTypeSubTypeServiceCategoryVO.getOrganizationSubServices().stream().map(SubServiceCategoryDTO::getId).collect(Collectors.toList()));
         Map<Long, AssetType> longAssetTypeMap = copyAssetTypeFromCountry(unitId, assetTypeRepository.getAllAssetTypeByCountryId(countryId));
         copyQuestionnaireTemplateFromCountry(unitId, questionnaireTemplateService.getAllQuestionnaireTemplateWithSectionOfCountryOrOrganization(countryId, false), longAssetTypeMap);
-
-
         List<Callable<Boolean>> callables = new ArrayList<>();
-        Callable<Boolean> dataDisposalCreationlTask = () -> {
-            List<DataDisposalResponseDTO> dataDisposalResponseDTOS = dataDisposalRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
-            List dataDisposalMDS = prepareMetadataObjectList(unitId, dataDisposalResponseDTOS, DataDisposal.class);
-            dataDisposalRepository.saveAll(dataDisposalMDS);
-            return true;
-        };
-        Callable<Boolean> hostingProviderCreationTask = () -> {
-            List<HostingProviderResponseDTO> hostingProviderDTOS = hostingProviderRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
-            List hostingProviders = prepareMetadataObjectList(unitId, hostingProviderDTOS, HostingProvider.class);
-            hostingProviderRepository.saveAll(hostingProviders);
-            return true;
-        };
-        Callable<Boolean> hostingTypeCreationTask = () -> {
-            List<HostingTypeResponseDTO> hostingTypeDTOS = hostingTypeRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
-            List hostingTypes = prepareMetadataObjectList(unitId, hostingTypeDTOS, HostingType.class);
-            hostingTypeRepository.saveAll(hostingTypes);
-            return true;
-
-        };
-        Callable<Boolean> storageFormatCreationTask = () -> {
-            List<StorageFormatResponseDTO> storageFormatDTOS = storageFormatRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
-            List storageFormats = prepareMetadataObjectList(unitId, storageFormatDTOS, StorageFormat.class);
-            storageFormatRepository.saveAll(storageFormats);
-            return true;
-
-        };
-        Callable<Boolean> technicalSecurityMeasureTask = () -> {
-
-            List<TechnicalSecurityMeasureResponseDTO> techSecurityMeasureDTOS = technicalSecurityMeasureRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
-            List techSecurityMeasures = prepareMetadataObjectList(unitId, techSecurityMeasureDTOS, TechnicalSecurityMeasure.class);
-            technicalSecurityMeasureRepository.saveAll(techSecurityMeasures);
-            return true;
-
-        };
-        Callable<Boolean> orgSecurityMeasureTask = () -> {
-            List<OrganizationalSecurityMeasureResponseDTO> orgSecurityMeasureDTOS = organizationalSecurityMeasureRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
-            List orgSecurityMeasures = prepareMetadataObjectList(unitId, orgSecurityMeasureDTOS, OrganizationalSecurityMeasure.class);
-            organizationalSecurityMeasureRepository.saveAll(orgSecurityMeasures);
-            return true;
-        };
-
-        Callable<Boolean> accessorPartyTask = () -> {
-            List<AccessorPartyResponseDTO> accessorPartyDTOS = accessorPartyRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
-            List accessorParties = prepareMetadataObjectList(unitId, accessorPartyDTOS, AccessorParty.class);
-            accessorPartyRepository.saveAll(accessorParties);
-            return true;
-        };
-
-        Callable<Boolean> dataSourceTask = () -> {
-            List<DataSourceResponseDTO> dataSourceDTOS = dataSourceRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
-            List dataSources = prepareMetadataObjectList(unitId, dataSourceDTOS, DataSource.class);
-            dataSourceRepository.saveAll(dataSources);
-            return true;
-        };
-        Callable<Boolean> legalBasisTask = () -> {
-            List<ProcessingLegalBasisResponseDTO> legalBasisDTOS = processingLegalBasisRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
-            List legalBasisList = prepareMetadataObjectList(unitId, legalBasisDTOS, ProcessingLegalBasis.class);
-            processingLegalBasisRepository.saveAll(legalBasisList);
-            return true;
-        };
-        Callable<Boolean> processingPurposeTask = () -> {
-            List<ProcessingPurposeResponseDTO> processingPurposeDTOS = processingPurposeRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
-            List processingPurposes = prepareMetadataObjectList(unitId, processingPurposeDTOS, ProcessingPurpose.class);
-            processingPurposeRepository.saveAll(processingPurposes);
-            return true;
-        };
-        Callable<Boolean> responsibilityTypeTask = () -> {
-            List<ResponsibilityTypeResponseDTO> responsibilityTypeDTOS = responsibilityTypeRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
-            List responsibilityTypes = prepareMetadataObjectList(unitId, responsibilityTypeDTOS, ResponsibilityType.class);
-            responsibilityTypeRepository.saveAll(responsibilityTypes);
-            return true;
-        };
-        Callable<Boolean> transferMethodTask = () -> {
-            List<TransferMethodResponseDTO> transferMethodDTOS = transferMethodRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
-            List transferMethods = prepareMetadataObjectList(unitId, transferMethodDTOS, TransferMethod.class);
-            transferMethodRepository.saveAll(transferMethods);
-            return true;
-        };
-        Callable<Boolean> processingActivityTask = () -> {
-            List<MasterProcessingActivity> masterProcessingActivities = masterProcessingActivityRepository.findAllByCountryIdAndOrganizationalMetadata(countryId, organizationMetaDataDTO.getOrganizationTypeId(), organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
-            copyProcessingActivityAndSubProcessingActivitiesFromCountryToUnit(unitId, masterProcessingActivities);
-            return true;
-        };
-        Callable<Boolean> assetTask = () -> {
-            List<MasterAsset> masterAssets = masterAssetRepository.findAllByCountryIdAndOrganizationalMetadata(countryId, organizationMetaDataDTO.getOrganizationTypeId(), organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
-            copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssets, longAssetTypeMap);
-            LOGGER.info(" asset creation on inheriting data ");
-            return true;
-        };
-        Callable<Boolean> dataSubjectTask = () -> {
-            List<DataCategory> masterDataCategories = dataCategoryRepository.getAllDataCategoriesByCountryId(countryId);
-            List<DataSubject> masterDataSubjects = dataSubjectRepository.getAllDataSubjectByCountryId(countryId);
-            copyDataSubjectAndDataCategoryFromCountry(unitId, masterDataCategories, masterDataSubjects);
-            return true;
-        };
-        Callable<Boolean> clauseTask = () -> {
-            List<Clause> clauses = clauseRepository.getClauseByCountryIdAndOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaDataDTO.getOrganizationTypeId(), organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
-            copyClauseFromCountry(unitId, clauses);
-            return true;
-        };
-
-        callables.add(technicalSecurityMeasureTask);
-        callables.add(storageFormatCreationTask);
-        callables.add(orgSecurityMeasureTask);
-        callables.add(accessorPartyTask);
-        callables.add(dataSourceTask);
-        callables.add(legalBasisTask);
-        callables.add(processingPurposeTask);
-        callables.add(responsibilityTypeTask);
-        callables.add(transferMethodTask);
-        callables.add(processingActivityTask);
-        callables.add(assetTask);
-        callables.add(dataSubjectTask);
-        callables.add(clauseTask);
-        callables.add(dataDisposalCreationlTask);
-        callables.add(hostingProviderCreationTask);
-        callables.add(hostingTypeCreationTask);
+        callables.add(getDataDisposalCreationlTask(unitId, countryId));
+        callables.add(getHostingProviderCreationTask(unitId, countryId));
+        callables.add(getHostingTypeCreationTask(unitId, countryId));
+        callables.add(getStorageFormatCreationTask(unitId, countryId));
+        callables.add(getTechnicalSecurityMeasureTask(unitId, countryId));
+        callables.add(getOrgSecurityMeasureTask(unitId, countryId));
+        callables.add(getAccessorPartyTask(unitId, countryId));
+        callables.add(getDataSourceTask(unitId, countryId));
+        callables.add(getLegalBasisTask(unitId, countryId));
+        callables.add(getProcessingPurposeTask(unitId, countryId));
+        callables.add(getResponsibilityTypeTask(unitId, countryId));
+        callables.add(getTransferMethodTask(unitId, countryId));
+        callables.add(getProcessingActivityTask(unitId, countryId, organizationMetaDataDTO));
+        callables.add(getAssetTask(unitId, countryId, organizationMetaDataDTO, longAssetTypeMap));
+        callables.add(getDataSubjectTask(unitId, countryId));
+        callables.add(getClauseTask(unitId, countryId, organizationMetaDataDTO));
         asynchronousService.executeAsynchronously(callables);
         return true;
+    }
+
+    private Callable<Boolean> getClauseTask(Long unitId, Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO) {
+        return () -> {
+                List<Clause> clauses = clauseRepository.getClauseByCountryIdAndOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaDataDTO.getOrganizationTypeId(), organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
+                copyClauseFromCountry(unitId, clauses);
+                return true;
+            };
+    }
+
+    private Callable<Boolean> getDataSubjectTask(Long unitId, Long countryId) {
+        return () -> {
+                List<DataCategory> masterDataCategories = dataCategoryRepository.getAllDataCategoriesByCountryId(countryId);
+                List<DataSubject> masterDataSubjects = dataSubjectRepository.getAllDataSubjectByCountryId(countryId);
+                copyDataSubjectAndDataCategoryFromCountry(unitId, masterDataCategories, masterDataSubjects);
+                return true;
+            };
+    }
+
+    private Callable<Boolean> getAssetTask(Long unitId, Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO, Map<Long, AssetType> longAssetTypeMap) {
+        return () -> {
+                List<MasterAsset> masterAssets = masterAssetRepository.findAllByCountryIdAndOrganizationalMetadata(countryId, organizationMetaDataDTO.getOrganizationTypeId(), organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
+                copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssets, longAssetTypeMap);
+                LOGGER.info(" asset creation on inheriting data ");
+                return true;
+            };
+    }
+
+    private Callable<Boolean> getProcessingActivityTask(Long unitId, Long countryId, OrganizationTypeAndSubTypeIdDTO organizationMetaDataDTO) {
+        return () -> {
+                List<MasterProcessingActivity> masterProcessingActivities = masterProcessingActivityRepository.findAllByCountryIdAndOrganizationalMetadata(countryId, organizationMetaDataDTO.getOrganizationTypeId(), organizationMetaDataDTO.getOrganizationSubTypeIds(), organizationMetaDataDTO.getServiceCategoryIds(), organizationMetaDataDTO.getSubServiceCategoryIds());
+                copyProcessingActivityAndSubProcessingActivitiesFromCountryToUnit(unitId, masterProcessingActivities);
+                return true;
+            };
+    }
+
+    private Callable<Boolean> getTransferMethodTask(Long unitId, Long countryId) {
+        return () -> {
+                List<TransferMethodResponseDTO> transferMethodDTOS = transferMethodRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+                List transferMethods = prepareMetadataObjectList(unitId, transferMethodDTOS, TransferMethod.class);
+                transferMethodRepository.saveAll(transferMethods);
+                return true;
+            };
+    }
+
+    private Callable<Boolean> getResponsibilityTypeTask(Long unitId, Long countryId) {
+        return () -> {
+                List<ResponsibilityTypeResponseDTO> responsibilityTypeDTOS = responsibilityTypeRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+                List responsibilityTypes = prepareMetadataObjectList(unitId, responsibilityTypeDTOS, ResponsibilityType.class);
+                responsibilityTypeRepository.saveAll(responsibilityTypes);
+                return true;
+            };
+    }
+
+    private Callable<Boolean> getProcessingPurposeTask(Long unitId, Long countryId) {
+        return () -> {
+                List<ProcessingPurposeResponseDTO> processingPurposeDTOS = processingPurposeRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+                List processingPurposes = prepareMetadataObjectList(unitId, processingPurposeDTOS, ProcessingPurpose.class);
+                processingPurposeRepository.saveAll(processingPurposes);
+                return true;
+            };
+    }
+
+    private Callable<Boolean> getLegalBasisTask(Long unitId, Long countryId) {
+        return () -> {
+                List<ProcessingLegalBasisResponseDTO> legalBasisDTOS = processingLegalBasisRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+                List legalBasisList = prepareMetadataObjectList(unitId, legalBasisDTOS, ProcessingLegalBasis.class);
+                processingLegalBasisRepository.saveAll(legalBasisList);
+                return true;
+            };
+    }
+
+    private Callable<Boolean> getDataSourceTask(Long unitId, Long countryId) {
+        return () -> {
+                List<DataSourceResponseDTO> dataSourceDTOS = dataSourceRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+                List dataSources = prepareMetadataObjectList(unitId, dataSourceDTOS, DataSource.class);
+                dataSourceRepository.saveAll(dataSources);
+                return true;
+            };
+    }
+
+    private Callable<Boolean> getAccessorPartyTask(Long unitId, Long countryId) {
+        return () -> {
+                List<AccessorPartyResponseDTO> accessorPartyDTOS = accessorPartyRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+                List accessorParties = prepareMetadataObjectList(unitId, accessorPartyDTOS, AccessorParty.class);
+                accessorPartyRepository.saveAll(accessorParties);
+                return true;
+            };
+    }
+
+    private Callable<Boolean> getOrgSecurityMeasureTask(Long unitId, Long countryId) {
+        return () -> {
+                List<OrganizationalSecurityMeasureResponseDTO> orgSecurityMeasureDTOS = organizationalSecurityMeasureRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+                List orgSecurityMeasures = prepareMetadataObjectList(unitId, orgSecurityMeasureDTOS, OrganizationalSecurityMeasure.class);
+                organizationalSecurityMeasureRepository.saveAll(orgSecurityMeasures);
+                return true;
+            };
+    }
+
+    private Callable<Boolean> getTechnicalSecurityMeasureTask(Long unitId, Long countryId) {
+        return () -> {
+
+                List<TechnicalSecurityMeasureResponseDTO> techSecurityMeasureDTOS = technicalSecurityMeasureRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+                List techSecurityMeasures = prepareMetadataObjectList(unitId, techSecurityMeasureDTOS, TechnicalSecurityMeasure.class);
+                technicalSecurityMeasureRepository.saveAll(techSecurityMeasures);
+                return true;
+
+            };
+    }
+
+    private Callable<Boolean> getStorageFormatCreationTask(Long unitId, Long countryId) {
+        return () -> {
+                List<StorageFormatResponseDTO> storageFormatDTOS = storageFormatRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+                List storageFormats = prepareMetadataObjectList(unitId, storageFormatDTOS, StorageFormat.class);
+                storageFormatRepository.saveAll(storageFormats);
+                return true;
+
+            };
+    }
+
+    private Callable<Boolean> getHostingTypeCreationTask(Long unitId, Long countryId) {
+        return () -> {
+                List<HostingTypeResponseDTO> hostingTypeDTOS = hostingTypeRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+                List hostingTypes = prepareMetadataObjectList(unitId, hostingTypeDTOS, HostingType.class);
+                hostingTypeRepository.saveAll(hostingTypes);
+                return true;
+
+            };
+    }
+
+    private Callable<Boolean> getHostingProviderCreationTask(Long unitId, Long countryId) {
+        return () -> {
+                List<HostingProviderResponseDTO> hostingProviderDTOS = hostingProviderRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+                List hostingProviders = prepareMetadataObjectList(unitId, hostingProviderDTOS, HostingProvider.class);
+                hostingProviderRepository.saveAll(hostingProviders);
+                return true;
+            };
+    }
+
+    private Callable<Boolean> getDataDisposalCreationlTask(Long unitId, Long countryId) {
+        return () -> {
+                List<DataDisposalResponseDTO> dataDisposalResponseDTOS = dataDisposalRepository.findAllByCountryIdAndSortByCreatedDate(countryId);
+                List dataDisposalMDS = prepareMetadataObjectList(unitId, dataDisposalResponseDTOS, DataDisposal.class);
+                dataDisposalRepository.saveAll(dataDisposalMDS);
+                return true;
+            };
     }
 
 
@@ -291,20 +329,24 @@ public class DefaultDataInheritService {
                 questionnaireTemplate.setRiskAssociatedEntity(masterQuestionnaireTemplate.getRiskAssociatedEntity());
 
             }
-            if (CollectionUtils.isNotEmpty(masterQuestionnaireTemplate.getSections())) {
-                questionnaireTemplate.setSections(
-                        masterQuestionnaireTemplate.getSections().stream().map(questionnaireSectionResponseDTO -> {
-                            QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionResponseDTO.getTitle(), null, unitId);
-                            questionnaireSection.setQuestions(questionnaireSectionResponseDTO.getQuestions().stream().map(questionBasicResponseDTO ->
-                                    new Question(questionBasicResponseDTO.getQuestion(), questionBasicResponseDTO.getDescription(), questionBasicResponseDTO.isRequired(), questionBasicResponseDTO.getQuestionType(), questionBasicResponseDTO.isNotSureAllowed(), null, unitId)
-                            ).collect(Collectors.toList()));
-                            return questionnaireSection;
-                        }).collect(Collectors.toList())
-                );
-            }
+            setSections(unitId, masterQuestionnaireTemplate, questionnaireTemplate);
             unitQuestionnaireTemplates.add(questionnaireTemplate);
         });
         questionnaireTemplateRepository.saveAll(unitQuestionnaireTemplates);
+    }
+
+    private void setSections(Long unitId, QuestionnaireTemplateResponseDTO masterQuestionnaireTemplate, QuestionnaireTemplate questionnaireTemplate) {
+        if (CollectionUtils.isNotEmpty(masterQuestionnaireTemplate.getSections())) {
+            questionnaireTemplate.setSections(
+                    masterQuestionnaireTemplate.getSections().stream().map(questionnaireSectionResponseDTO -> {
+                        QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionResponseDTO.getTitle(), null, unitId);
+                        questionnaireSection.setQuestions(questionnaireSectionResponseDTO.getQuestions().stream().map(questionBasicResponseDTO ->
+                                new Question(questionBasicResponseDTO.getQuestion(), questionBasicResponseDTO.getDescription(), questionBasicResponseDTO.isRequired(), questionBasicResponseDTO.getQuestionType(), questionBasicResponseDTO.isNotSureAllowed(), null, unitId)
+                        ).collect(Collectors.toList()));
+                        return questionnaireSection;
+                    }).collect(Collectors.toList())
+            );
+        }
     }
 
 
@@ -346,7 +388,7 @@ public class DefaultDataInheritService {
 
     private void copyMasterAssetAndAssetTypeFromCountryToUnit(Long unitId, List<MasterAsset> masterAssets, Map<Long, AssetType> longAssetTypeMap) {
 
-        LOGGER.info("Data inheriting Master Asset Size : " + masterAssets.size());
+        LOGGER.info("Data inheriting Master Asset Size : {}", masterAssets.size());
         try {
             List<Asset> unitLevelAssets = new ArrayList<>();
             masterAssets.forEach(masterAsset -> {
@@ -361,9 +403,9 @@ public class DefaultDataInheritService {
                 unitLevelAssets.add(asset);
             });
             assetRepository.saveAll(unitLevelAssets);
-            LOGGER.info("Data inheriting Unit Asset Size : {0}" , unitLevelAssets.size());
+            LOGGER.info("Data inheriting Unit Asset Size : {}" , unitLevelAssets.size());
         } catch (Exception ex) {
-            LOGGER.error("Error in asset processing==" + ex.getMessage());
+            LOGGER.error("Error in asset processing== {}", ex.getMessage());
         }
     }
 
@@ -468,7 +510,6 @@ public class DefaultDataInheritService {
     }
 
     public boolean copyMasterAssetToUnitAsset(Long countryId, Long unitId, List<Long> orgSubTypeId, Long orgSubServiceId){
-        //Long countryId = UserContext.getUserDetails().getCountryId();
         List<MasterAsset> masterAssets = masterAssetRepository.findAllByCountryIdAndOrgSubTypeAndOrgSubService(countryId, orgSubTypeId, orgSubServiceId);
         if(isCollectionNotEmpty(masterAssets)) {
             Map<Long, AssetType> longAssetTypeMap = copyAssetTypeFromCountry(unitId, assetTypeRepository.getAllAssetTypeByCountryId(countryId));
