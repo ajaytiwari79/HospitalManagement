@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.persistence.model.auth.UserAuthentication.getCurrentUser;
 
 /**
  * Created by anil on 10/8/17.

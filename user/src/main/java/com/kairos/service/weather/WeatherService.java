@@ -2,20 +2,17 @@ package com.kairos.service.weather;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.weather.WeatherInfoDTO;
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.weather.WeatherInfo;
 import com.kairos.persistence.repository.weather.WeatherRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.service.organization.UnitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

@@ -10,9 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
-import static com.kairos.commons.utils.ObjectUtils.removeNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.utils.PermissionMapperUtils.checkAndReturnValidModel;
 
 
@@ -34,7 +32,7 @@ public class ReadPermissionAspect {
         Object[] objectArray = removeNull(objectCollection);
         List<T> objects = checkAndReturnValidModel(objectArray);
         if(isCollectionNotEmpty(objects)) {
-            permissionService.updateModelBasisOfPermission(objects, newHashSet(FieldLevelPermission.READ));
+            //permissionService.updateModelBasisOfPermission(objects, newHashSet(FieldLevelPermission.READ));
         }
     }
 }

@@ -2,7 +2,6 @@ package com.kairos.utils.response;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.response.ResponseDTO;
-import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
