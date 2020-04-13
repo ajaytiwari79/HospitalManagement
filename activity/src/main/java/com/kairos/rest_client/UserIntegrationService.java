@@ -53,9 +53,12 @@ import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.wrapper.shift.StaffShiftDetails;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -80,16 +83,13 @@ import static com.kairos.constants.ApiConstants.*;
 @Transactional
 public class UserIntegrationService {
 
-    private static GenericRestClient genericRestClient;
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserIntegrationService.class);
+    @Inject
+    private GenericRestClient genericRestClient;
     @Inject
     private ExceptionService exceptionService;
     @Inject
     private UserRestClientForScheduler userRestClientForScheduler;
-
-    @Inject
-    public void setGenericRestClient(GenericRestClient genericRestClient) {
-        this.genericRestClient = genericRestClient;
-    }
 
     public Long getEmploymentId(Long unitId, Long staffId, Long expertiseId) {
         Long value = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_EXPERTISE_ID_UNIT_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
@@ -906,7 +906,7 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(groupIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Long>>>() {});
     }
 
-    public static CurrentUserDetails getCurrentUser(){
+    public CurrentUserDetails getCurrentUser(){
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, "/get_current_user", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CurrentUserDetails>>() {});
     }
 
@@ -925,6 +925,13 @@ public class UserIntegrationService {
 //        queryParamList.add(new BasicNameValuePair("selectedDate", selectedDate.toString()));
 //        return genericRestClient.publishRequest(employmentIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_total_sum_of_paylevel", queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
 //    }
+    public List<StaffShiftDetails> getAllPlanningStaffForUnit(Long unitId, ShiftSearchDTO shiftSearchDTO){
+        LOGGER.debug("filter selections being sent {}",shiftSearchDTO);
+        return genericRestClient.publishRequest(shiftSearchDTO, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/staff/get_all_planning_staff", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffShiftDetails>>>() {
+        });
+    }
+
+
 }
 
 

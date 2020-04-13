@@ -484,6 +484,15 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={0} RETURN id(staff)")
     Long getStaffIdByUserId(Long userId, Long parentOrganizationId);
 
+    @Query("MATCH (employments:Employment)-[:IN_UNIT]-(unit:Unit) WHERE id(unit)={0} AND ( employments.endDate > {1} OR employments.endDate is null) " +
+            "WITH employments MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments)" +
+            "WITH user,staff,employments OPTIONAL MATCH (staff)-[:BELONGS_TO_TAGS]-(tags:Tag)"+
+            "RETURN distinct id(staff) as id, id(user) as userId, staff.firstName as firstName,staff.lastName as lastName," +
+            "collect(employments) as employments," +
+            "collect(tags) as tags " +
+            "ORDER BY staff.firstName")
+    List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId, String dateToCompare);
+
     @Query("MATCH(user:User)-[rel:BELONGS_TO]-(staff:Staff)-[rela:BELONGS_TO]-(position:Position)-[relb:HAS_POSITIONS]-(o:Organization)\n" +
             "WHERE id(o)={0} AND id(user)={1} RETURN staff")
     Staff getStaffByUnitIdAndUserId(Long unitId,Long userId);

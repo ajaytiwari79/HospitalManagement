@@ -1,14 +1,5 @@
 package com.kairos.enums;
 
-import org.springframework.data.mongodb.core.query.Criteria;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import static com.kairos.commons.utils.ObjectUtils.*;
-
 /**
  * Created by prerna on 30/4/18.
  * Modified By: mohit.shakya@oodlestechnologies.com on Jun 26th, 2018
@@ -33,4 +24,8 @@ public enum FilterType {
         this.value = value;
     }
 
+
+    public enum FilterComparisonType{
+        CONTAINS,LESS_THAN,GREATER_THAN,BETWEEN,DUE_IN
+    }
 }

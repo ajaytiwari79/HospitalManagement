@@ -939,4 +939,20 @@ public class PlanningPeriodService extends MongoBaseService {
         return planningPeriod;
     }
 
+    public boolean registerJobForExistingPlanningPeriod() {
+        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllAfterEndDateAndDeletedFalse(getLocalDate());
+        List<BigInteger> schedulerPanelIds = new ArrayList<>();
+        for (PlanningPeriod planningPeriod : planningPeriods) {
+            planningPeriod.getPhaseFlippingDate().forEach(periodPhaseFlippingDate -> {
+                if(isNotNull(periodPhaseFlippingDate.getSchedulerPanelId())){
+                    schedulerPanelIds.add(periodPhaseFlippingDate.getSchedulerPanelId());
+                }
+            });
+        }
+        if(isCollectionNotEmpty(schedulerPanelIds)) {
+            schedulerRestClient.publishRequest(schedulerPanelIds, -1l, true, IntegrationOperation.DELETE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
+        }
+        createScheduleJobOfPanningPeriod(planningPeriods);
+        return true;
+    }
 }

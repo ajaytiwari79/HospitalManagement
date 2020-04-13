@@ -42,7 +42,7 @@ public class PhaseTemplateValue {
         if (this == o) return true;
         if (!(o instanceof PhaseTemplateValue)) return false;
         PhaseTemplateValue that = (PhaseTemplateValue) o;
-        return phaseId == that.phaseId &&
+        return phaseId.equals(that.phaseId) &&
                 staffValue == that.staffValue &&
                 managementValue == that.managementValue &&
                 disabled == that.disabled &&
