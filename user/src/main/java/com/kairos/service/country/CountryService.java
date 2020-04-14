@@ -530,7 +530,7 @@ public class CountryService {
     }
 
     public List<Long> getAllUnits() {
-        return organizationService.getAllOrganizationIds();
+        return organizationService.getAllUnitIds();
     }
 
     public Country findById(Long countryId){

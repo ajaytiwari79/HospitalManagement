@@ -637,7 +637,7 @@ public class OrganizationController {
     @GetMapping("/ids")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllOrganizationIds() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllOrganizationIds());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllUnitIds());
     }
 
     @GetMapping("/country_admins_ids/{countryAdminsOfUnitId}")

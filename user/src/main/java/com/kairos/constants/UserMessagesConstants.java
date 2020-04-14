@@ -71,6 +71,7 @@ public class UserMessagesConstants {
     public static final String ERROR_STAFF_EXISTS_SAME_CPRNUMBER = "error.staff.exists.same.cprNumber";
     public static final String ERROR_CITIZENSTATUS_NAME_NOTEMPTY = "error.CitizenStatus.name.notEmpty";
     public static final String ERROR_CITIZENSTATUS_NOTFOUND  = "error.CitizenStatus.notfound ";
+    public static final String ERROR_WEATHER_NOTFOUND  = "error.weather.notfound";
     public static final String ERROR_CITIZENSTATUS_NAME_EXIST  = "error.CitizenStatus.name.exist ";
     public static final String ERROR_LANGUAGELEVEL_NAME_NOTEMPTY  = "error.LanguageLevel.name.notEmpty ";
     public static final String ERROR_LANGUAGELEVEL_NAME_EXIST  = "error.LanguageLevel.name.exist ";

@@ -408,8 +408,10 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
 
 
     @Query("MATCH (o:Unit{deleted:false,boardingCompleted:true}) RETURN id(o)")
-    List<Long> findAllOrganizationIds();
+    List<Long> findAllUnitIds();
 
+    @Query("MATCH (o:OrganizationBaseEntity{deleted:false}) RETURN id(o)")
+    List<Long> findAllOrganizationIds();
 
     @Query("MATCH (organization:Organization) - [:" + BELONGS_TO + "] -> (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(organization)={0} AND et.deleted={1}\n" +
