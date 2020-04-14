@@ -1,32 +1,48 @@
 package com.kairos.persistence.repository.shift;
 
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.wrapper.shift.StaffShiftDetails;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 
 public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
 
-    public static final String ACTIVITY_STATUS = "activities.status";
-    public static final String ACTIVITY_IDS = "activities.activityId";
-    public static final String PLANNED_TIME_IDS = "activities.plannedTimeId";
-    public static final String VALIDATED_BY_ROLES = "accessGroupRole";
+    private static final String ACTIVITY_STATUS = "activities.status";
+    private static final String ACTIVITY_IDS = "activities.activityId";
+    private static final String PLANNED_TIME_IDS = "activities.plannedTimeId";
+    private static final String VALIDATED_BY_ROLES = "accessGroupRole";
+    private static final String UNIT_ID = "unitId";
+    private static final String EMPLOYMENT_ID = "employmentId";
+    private static final String START_DATE = "startDate";
+    private static final String END_DATE = "endDate";
+    private static final String STAFF_ID = "staffId";
+    private static final String SHIFTS = "shifts";
+
     @Inject
     private MongoTemplate mongoTemplate;
+    @Inject
+    private UserIntegrationService userIntegrationService;
 
     @Override
-    public <T> List<StaffShiftDetails> getFilteredShiftsGroupedByStaff(Map<FilterType, Set<T>> filterTypes) {
+    public <T> List<StaffShiftDetails> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate) {
+
         Criteria criteria = new Criteria();
+        criteria.and(UNIT_ID).is(unitId);
+        criteria.and(EMPLOYMENT_ID).in(employmentIds);
+        criteria.and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
+
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         for (Map.Entry<FilterType, Set<T>> entry : filterTypes.entrySet()) {
             if (entry.getKey().equals(FilterType.ACTIVITY_STATUS)) {
@@ -37,10 +53,13 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
                 criteria.and(PLANNED_TIME_IDS).in(entry.getValue());
             } else if (entry.getKey().equals(FilterType.VALIDATED_BY)) {
                 criteria.and(VALIDATED_BY_ROLES).in(entry.getValue());
-            }
-           /* else if (entry.getKey().equals(FilterType.TIME_SLOT)) {
+            } else if (entry.getKey().equals(FilterType.TIME_SLOT)) {
+                List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlotByIds(unitId, (Set<Long>) entry.getValue());
+                for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
+//                    criteria.and(START_DATE).gte()
+                }
 
-            } else if (entry.getKey().equals(FilterType.ESCALATION_CAUSED_BY)) {
+            }/* else if (entry.getKey().equals(FilterType.ESCALATION_CAUSED_BY)) {
                 AggregationOperation violationOperation = LookupOperation.newLookup().from("shiftViolatedRules").
                         localField("_id").foreignField("shiftId").as("violations");
                 aggregationOperations.add(violationOperation);
@@ -49,6 +68,8 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
 
         AggregationOperation matchOperation = new MatchOperation(criteria);
         aggregationOperations.add(matchOperation);
+        GroupOperation groupOperation = group(STAFF_ID).addToSet("$$ROOT").as(SHIFTS);
+        aggregationOperations.add(groupOperation);
         Aggregation aggregations = Aggregation.newAggregation(aggregationOperations);
 
         return mongoTemplate.aggregate(aggregations, Shift.class, StaffShiftDetails.class).getMappedResults();

@@ -965,6 +965,12 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Get time slots of organization")
+    @GetMapping(UNIT_URL + "/get_time_slots_by_id")
+    public ResponseEntity<Map<String, Object>> getTimeSlotOfUnitById(@PathVariable Long unitId, @RequestParam Set<Long> timeSlotIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getUnitTimeSlotById(unitId, timeSlotIds));
+    }
+
+    @ApiOperation(value = "Get time slots of organization")
     @PostMapping(UNIT_URL + "/get_filter_data")
     public ResponseEntity<Map<String, Object>> getFilterDataBySelfRoasteringFilter(@RequestBody SelfRosteringFilterDTO selfRosteringFilterDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getFilterDataBySelfRosteringFilter(selfRosteringFilterDTO));

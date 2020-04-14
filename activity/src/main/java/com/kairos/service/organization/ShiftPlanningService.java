@@ -39,7 +39,7 @@ public class ShiftPlanningService {
                 employmentIds.addAll(staffShiftDetails.getEmployments().stream().map(EmploymentDTO::getId).collect(Collectors.toList()))
         );
         List<Date> startAndEndDates = getStartAndEndDates(shiftSearchDTO.getShiftFilterDurationType());
-        List<StaffShiftDetails> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsByEmploymentsAndBetweenDuration(employmentIds, startAndEndDates.get(0), startAndEndDates.get(1));
+        List<StaffShiftDetails> shiftWithActivityDTOS = shiftMongoRepository.getFilteredShiftsGroupedByStaff(employmentIds, validMatches, unitId, startAndEndDates.get(0), startAndEndDates.get(1));
         return assignShiftsToStaff(staffListWithPersonalDetails, shiftWithActivityDTOS);
     }
 
