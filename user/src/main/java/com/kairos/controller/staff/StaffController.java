@@ -370,8 +370,7 @@ public class StaffController {
     @ApiOperation("Get All  Staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllStaff() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffService.getAllStaff());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaff());
     }
 
     @RequestMapping(value = "/{staffId}/deleteStaff/{positionId}", method = RequestMethod.DELETE)
