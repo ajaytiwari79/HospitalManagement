@@ -138,7 +138,7 @@ public class DayTypeService {
             return dayTypes;
         } else {
             List<DayType> dayTypes = getDayTypes(date);
-            return dayTypes.isEmpty() ? Collections.EMPTY_LIST : dayTypes;
+            return dayTypes;
         }
 
     }
