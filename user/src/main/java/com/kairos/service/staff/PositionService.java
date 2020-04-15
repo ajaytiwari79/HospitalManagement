@@ -598,6 +598,7 @@ public class PositionService {
             UnitPermission permissionForUnit = new UnitPermission();
             permissionForUnit.setUnit(unit);
             permissionForUnit.setAccessGroup(accessGroup);
+            position.getUnitPermissions().add(permissionForUnit);
         }
         position.getUnitPermissions().add(unitPermission);
     }
