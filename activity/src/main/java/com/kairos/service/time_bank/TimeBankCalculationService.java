@@ -1278,8 +1278,13 @@ public class TimeBankCalculationService {
             if(isCollectionNotEmpty(breakActivities)){
                 for (ShiftActivityDTO shiftActivity : shiftActivities) {
                     boolean scheduledHourAdded = false;
-                    for (ShiftActivityDTO breakActivity : breakActivities) {
-                        scheduledHourAdded = isScheduledHourAdded(updatedShiftActivities, shiftActivity, scheduledHourAdded, breakActivity);
+                    boolean anybreakFallOnShiftActivity = breakActivities.stream().anyMatch(breakActivity -> shiftActivity.getInterval().overlaps(breakActivity.getInterval()) && shiftActivity.getInterval().overlap(breakActivity.getInterval()).getMinutes() == breakActivity.getInterval().getMinutes() && !breakActivity.isBreakNotHeld());
+                    if(anybreakFallOnShiftActivity){
+                        for (ShiftActivityDTO breakActivity : breakActivities) {
+                            scheduledHourAdded = getShiftActivityByBreakInterval(updatedShiftActivities, shiftActivity, scheduledHourAdded, breakActivity);
+                        }
+                    }else {
+                        updatedShiftActivities.add(shiftActivity);
                     }
                 }
 
@@ -1288,17 +1293,6 @@ public class TimeBankCalculationService {
             }
             Collections.sort(updatedShiftActivities);
             return updatedShiftActivities;
-        }
-
-        private boolean isScheduledHourAdded(List<ShiftActivityDTO> updatedShiftActivities, ShiftActivityDTO shiftActivity, boolean scheduledHourAdded, ShiftActivityDTO breakActivity) {
-            if (shiftActivity.getInterval().overlaps(breakActivity.getInterval()) && shiftActivity.getInterval().overlap(breakActivity.getInterval()).getMinutes() == breakActivity.getInterval().getMinutes()) {
-                if (!breakActivity.isBreakNotHeld()) {
-                    scheduledHourAdded = getShiftActivityByBreakInterval(updatedShiftActivities, shiftActivity, scheduledHourAdded, breakActivity);
-                }else {
-                    updatedShiftActivities.add(shiftActivity);
-                }
-            }
-            return scheduledHourAdded;
         }
 
         private boolean getShiftActivityByBreakInterval(List<ShiftActivityDTO> updatedShiftActivities, ShiftActivityDTO shiftActivity, boolean scheduledHourAdded, ShiftActivityDTO breakActivity) {
