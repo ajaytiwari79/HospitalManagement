@@ -110,7 +110,7 @@ public class EmploymentCTAWTAService {
     }
 
     //TODO this must be moved to activity
-    public EmploymentQueryResult updateEmploymentWTA(Long unitId, Long employmentId, BigInteger wtaId, WTADTO updateDTO) {
+    public EmploymentQueryResult updateEmploymentWTA(Long unitId, Long employmentId, BigInteger wtaId, WTADTO updateDTO,Boolean saveAsDraft){
         Employment employment = employmentGraphRepository.findOne(employmentId);
         if (!Optional.ofNullable(employment).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_INVALIDEMPLOYMENTID, employmentId);
@@ -130,7 +130,7 @@ public class EmploymentCTAWTAService {
         }
         updateDTO.setId(wtaId);
         updateDTO.setEmploymentEndDate(employment.getEndDate());
-        WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfEmployment(updateDTO, employment.isPublished());
+        WTAResponseDTO wtaResponseDTO = activityIntegrationService.updateWTAOfEmployment(unitId,updateDTO, employment.isPublished(),saveAsDraft);
         return employmentService.getBasicDetails(employment, wtaResponseDTO, employment.getEmploymentLines().get(0));
     }
 
