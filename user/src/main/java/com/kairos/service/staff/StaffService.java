@@ -557,7 +557,7 @@ public class StaffService {
         staffDTO.setAge(Period.between(CPRUtil.getDateOfBirthFromCPR(user.getCprNumber()), LocalDate.now()).getYears());
         staffList.add(staffDTO);
         if (!staffGraphRepository.staffAlreadyInUnit(externalId, organization.getId())) {
-            positionService.createPosition(organization, staff, accessGroupId, DateUtils.getCurrentDateMillis());
+            positionService.createPosition(organization, staff, accessGroupId, DateUtils.getCurrentDateMillis(),organization.getId());
         }
     }
 
