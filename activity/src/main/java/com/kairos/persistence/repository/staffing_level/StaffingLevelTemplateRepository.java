@@ -15,6 +15,9 @@ public interface StaffingLevelTemplateRepository extends MongoBaseRepository<Sta
     @Query("{ 'unitId' : ?0 ,disabled:false,deleted:false, 'validity.startDate' : { '$lte' : ?1},'validity.endDate' : { '$gte' : ?2}, 'dayType' :{ '$in' : ?3 }, 'validDays' : { '$in' : ?4} }")
     List<StaffingLevelTemplateDTO> findByUnitIdDayTypeAndDate(Long unitID, Date selectedDateParam1, Date selectedDateParam2, List<Long> dayTypeId, List<String> days);
 
+    @Query("{ 'unitId' : ?0 ,disabled:false,deleted:false, 'validity.startDate' : { '$lte' : ?1},'validity.endDate' : { '$gte' : ?2}, 'dayType' :{ '$in' : ?3 } }")
+    List<StaffingLevelTemplateDTO> findByUnitIdHolidayDayTypeAndDate(Long unitID, Date selectedDateParam1, Date selectedDateParam2, List<Long> dayTypeId);
+
     List<StaffingLevelTemplateDTO> findAllByUnitIdAndDeletedFalse(Long unitId);
 
     StaffingLevelTemplate findByIdAndUnitIdAndDeletedFalse(BigInteger staffingLevelTemplateId,Long unitId);
