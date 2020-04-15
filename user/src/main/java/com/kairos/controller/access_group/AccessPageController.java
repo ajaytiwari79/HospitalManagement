@@ -1,5 +1,6 @@
 package com.kairos.controller.access_group;
 
+import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.dto.user.access_permission.AccessPageStatusDTO;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
@@ -8,6 +9,7 @@ import com.kairos.persistence.model.access_permission.Tab;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -103,5 +105,17 @@ public class AccessPageController {
     @GetMapping(value = "/module/{moduleId}/language/{languageId}")
     public ResponseEntity<Map<String, Object>> getLanguageSpecificData(@PathVariable String moduleId, @PathVariable Long languageId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getLanguageDataByModuleId(moduleId,languageId));
+    }
+
+    @ApiOperation(value = "add translated data")
+    @PostMapping(COUNTRY_URL + "/access_page/{accessPageId}/update_translation")
+    public ResponseEntity<Map<String, Object>> updateTranslation(@PathVariable Long accessPageId, @RequestBody TranslationDTO translationData) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.updateTranslation(accessPageId, translationData));
+    }
+
+    @ApiOperation(value = "get translated data")
+    @GetMapping(COUNTRY_URL + "/access_page/{accessPageId}/translation")
+    public ResponseEntity<Map<String, Object>> getTranslatedData(@PathVariable Long accessPageId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getTranslatedData(accessPageId));
     }
 }

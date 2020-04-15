@@ -1,0 +1,26 @@
+//For Dashboard Tab
+MATCH (n:AccessPage) where n.moduleId="module_1"
+SET n.editable=true
+RETURN n
+
+//Self Rostering Sub Tab
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Combined Shifts",isModule:false,moduleId:"tab_410",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Graph",isModule:false,moduleId:"tab_411",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Presence Staffing Levels",isModule:false,moduleId:"tab_412",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Absence Staffing Levels",isModule:false,moduleId:"tab_413",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Presence Staffing Levels Templates",isModule:false,moduleId:"tab_414",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Solver Configuration",isModule:false,moduleId:"tab_415",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Individual",isModule:false,moduleId:"tab_417",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Daily",isModule:false,moduleId:"tab_418",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Weekly",isModule:false,moduleId:"tab_419",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Activities",isModule:false,moduleId:"tab_416",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Leave Balance",isModule:false,moduleId:"tab_420",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Shift Details",isModule:false,moduleId:"tab_421",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Monthly",isModule:false,moduleId:"tab_440",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Filter Setting",isModule:false,moduleId:"tab_441",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Day Details",isModule:false,moduleId:"tab_442",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"To do List",isModule:false,moduleId:"tab_443",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Chat",isModule:false,moduleId:"tab_444",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Time Balance",isModule:false,moduleId:"tab_445",active:true});
+
+
