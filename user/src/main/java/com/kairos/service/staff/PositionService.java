@@ -570,23 +570,22 @@ public class PositionService {
         return true;
     }
 
-    public void createPosition(Organization organization, Staff staff, Long accessGroupId, Long employedSince) {
+    public void createPosition(Organization organization, Staff staff, Long accessGroupId, Long employedSince,Long unitId) {
         Position position = new Position();
         position.setName("Working as staff");
         position.setStaff(staff);
         position.setStartDateMillis(employedSince);
-        createStaffPermission(organization, accessGroupId, position);
+        createStaffPermission(organization, accessGroupId, position,unitId);
         positionGraphRepository.save(position);
         organization.getPositions().add(position);
         organizationGraphRepository.save(organization);
 
     }
 
-    private void createStaffPermission(Organization organization, Long accessGroupId, Position position) {
+    private void createStaffPermission(Organization organization, Long accessGroupId, Position position,Long unitId) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             exceptionService.dataNotFoundByIdException(ERROR_STAFF_ACCESSGROUP_NOTFOUND, accessGroupId);
-
         }
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
@@ -594,6 +593,13 @@ public class PositionService {
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         unitPermission.setAccessGroup(accessGroup);
+        Unit unit=organization.getUnits().stream().filter(k->k.getId().equals(unitId)).findAny().orElse(null);
+        if(unit!=null){
+            UnitPermission permissionForUnit = new UnitPermission();
+            permissionForUnit.setUnit(unit);
+            permissionForUnit.setAccessGroup(accessGroup);
+            position.getUnitPermissions().add(permissionForUnit);
+        }
         position.getUnitPermissions().add(unitPermission);
     }
 
