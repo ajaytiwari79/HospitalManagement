@@ -263,7 +263,7 @@ public class CostTimeAgreementService {
         } else if(save&&!updateSameCTA){
             responseCTA = updateEmploymentCTA(oldCTA, ctaDTO);
         }
-        else if(!save&&!updateSameCTA){
+        else if(!save&&updateSameCTA){
             responseCTA = updateEmploymentCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
         }
         staffAdditionalInfoDTO.getEmployment().setCostTimeAgreement(responseCTA);
