@@ -127,6 +127,8 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitService.getManageHierarchyData(unitId));
     }
 
+
+
     @ApiOperation(value = "Get skills of organization")
     @GetMapping(UNIT_URL + "/skill")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -995,6 +997,13 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllUnitIdsByCountryId(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllUnitIdsByCountryId(countryId));
+    }
+
+    @ApiOperation(value = "Get organization herirchy data")
+    @GetMapping(value = UNIT_URL + "/delete_unpublished_unit")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteUnpublishedUnit(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitService.deleteUnpublishedUnit(unitId));
     }
 
 }
