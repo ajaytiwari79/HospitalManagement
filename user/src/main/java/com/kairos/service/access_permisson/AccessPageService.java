@@ -30,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.constants.AppConstants.MODULE_11;
+import static com.kairos.constants.AppConstants.TAB_119;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 
@@ -107,10 +109,12 @@ public class AccessPageService {
         if( !Optional.ofNullable(tabId).isPresent() ){
             return false;
         }
-
+        AccessPage accessPage = accessPageRepository.findById(tabId).orElse(new AccessPage());
         Boolean isKairosHub = OrganizationCategory.HUB.equals(orgCategoryTabAccessDTO.getOrganizationCategory());
         Boolean isUnion = OrganizationCategory.UNION.equals(orgCategoryTabAccessDTO.getOrganizationCategory());
-
+        if(isKairosHub && !orgCategoryTabAccessDTO.isAccessStatus() && (MODULE_11.equals(accessPage.getModuleId()) || TAB_119.equals(accessPage.getModuleId()))){
+            exceptionService.actionNotPermittedException(ERROR_TAB_CAN_NOT_BE_HIDE_FOR_HUB);
+        }
         if(orgCategoryTabAccessDTO.isAccessStatus()){
             accessGroupRepository.addAccessPageRelationshipForCountryAccessGroups(tabId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
             accessGroupRepository.addAccessPageRelationshipForOrganizationAccessGroups(tabId, isKairosHub, isUnion);

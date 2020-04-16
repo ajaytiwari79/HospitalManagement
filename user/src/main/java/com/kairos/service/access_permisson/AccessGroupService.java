@@ -929,4 +929,8 @@ public class AccessGroupService {
 
 
     }
+    public List<AccessGroupQueryResult> getCountryAccessGroupByOrgCategory(Long countryId, String orgCategory){
+        return accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, orgCategory);
+    }
+
 }
