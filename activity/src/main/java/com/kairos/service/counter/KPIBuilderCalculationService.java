@@ -745,12 +745,22 @@ public class KPIBuilderCalculationService implements CounterService {
                 getTimeTodoListMap();
                 staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
                 staffIdAndTimeTypeTodoListMap = getStaffIdBigIntegerIdTodoListMap(staffIdAndTimeTypeTodoListMap,staffIdAndTodoMap);
+                getidShiftListMap(timeTypeTodoListMap,timeTypeIdAndShiftListMap);
                 if(HOURS.equals(xAxisConfigs.get(0))){
-                    staffIdAndTimeTypeIdAndShiftMap = updateStaffIdAndBigIntegerIdAndShiftMap(staffIdAndTimeTypeTodoListMap,timeTypeIdAndShiftListMap);
+                    staffIdAndTimeTypeIdAndShiftMap = updateStaffIdAndBigIntegerIdAndShiftMap(staffIdAndTimeTypeTodoListMap);
                 }
 
             }
 
+        }
+
+        public void getidShiftListMap(Map<BigInteger,List<TodoDTO>> idTodoListMap, Map<BigInteger,List<Shift>> idShiftListMap ){
+            for(Map.Entry<BigInteger,List<TodoDTO>> entry :idTodoListMap.entrySet()){
+                List<BigInteger> shiftIds =entry.getValue().stream().map(TodoDTO::getEntityId).collect(Collectors.toList());
+                List<Shift> shiftList =shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftIds);
+                idShiftListMap.put(entry.getKey(),shiftList);
+
+            }
         }
 
         private void getUpdateTodoDTOSByDayOfWeek(List<TodoDTO> todoDTOList) {
@@ -767,15 +777,17 @@ public class KPIBuilderCalculationService implements CounterService {
             return staffIdAndBigIntegerTodoListMap;
         }
 
-        private Map<Long, Map<BigInteger, List<Shift>>> updateStaffIdAndBigIntegerIdAndShiftMap(Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdBigIntegerTodoListMap,Map<BigInteger,List<Shift>> bigIntegerShiftListMap) {
+        private Map<Long, Map<BigInteger, List<Shift>>> updateStaffIdAndBigIntegerIdAndShiftMap(Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdBigIntegerTodoListMap) {
             Map<Long,Map<BigInteger,List<Shift>>> staffIdAndActivityAndShiftMap = new HashMap<>();
+            Map<BigInteger,List<Shift>> idShiftListMap = new HashMap<>();
             for(Map.Entry<Long,Map<BigInteger,List<TodoDTO>>> entry :staffIdBigIntegerTodoListMap.entrySet()){
                 for(Map.Entry<BigInteger,List<TodoDTO>> bigIntegerListEntry :entry.getValue().entrySet()){
-                    List<BigInteger> staffIdList =bigIntegerListEntry.getValue().stream().map(TodoDTO::getEntityId).collect(Collectors.toList());
-                    List<Shift> shiftList =shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(staffIdList);
-                    bigIntegerShiftListMap.put(bigIntegerListEntry.getKey(),shiftList);
+                    List<BigInteger> shiftIds =bigIntegerListEntry.getValue().stream().map(TodoDTO::getEntityId).collect(Collectors.toList());
+                    List<Shift> shiftList =shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftIds);
+                    idShiftListMap.put(bigIntegerListEntry.getKey(),shiftList);
                 }
-                staffIdAndActivityAndShiftMap.put(entry.getKey(),bigIntegerShiftListMap);
+                staffIdAndActivityAndShiftMap.put(entry.getKey(),idShiftListMap);
+                idShiftListMap =new HashMap<>();
             }
             return staffIdAndActivityAndShiftMap;
         }
@@ -947,7 +959,8 @@ public class KPIBuilderCalculationService implements CounterService {
                 staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
                 activityIdAndTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
                 staffIdAndActivityTodoListMap = getStaffIdBigIntegerIdTodoListMap(staffIdAndActivityTodoListMap,staffIdAndTodoMap);
-                staffIdAndActivityIdAndShiftMap= updateStaffIdAndBigIntegerIdAndShiftMap(staffIdAndActivityTodoListMap,activityIdAndShiftListMap);
+                getidShiftListMap(activityIdAndTodoListMap,activityIdAndShiftListMap);
+                staffIdAndActivityIdAndShiftMap= updateStaffIdAndBigIntegerIdAndShiftMap(staffIdAndActivityTodoListMap);
             }
         }
 

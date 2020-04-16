@@ -1,13 +1,16 @@
 package com.kairos.service.shift;
 
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.shift.ShiftStatus;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.enums.FilterType.ACTIVITY_STATUS;
 
 /**
@@ -30,10 +33,7 @@ public class ActivityStatusFilter <G> implements ShiftFilter {
         if(validFilter){
             for (ShiftDTO shiftDTO : shiftDTOS) {
                 Set<String> activityStatus = new HashSet<>();
-                shiftDTO.getActivities().forEach(shiftActivityDTO -> {
-                    activityStatus.addAll(shiftActivityDTO.getStatus().stream().map(shiftStatus -> shiftStatus.toString()).collect(Collectors.toSet()));
-                    shiftActivityDTO.getChildActivities().forEach(childActivityDTO ->  activityStatus.addAll(childActivityDTO.getStatus().stream().map(shiftStatus -> shiftStatus.toString()).collect(Collectors.toSet())));
-                });
+                getShiftActivityStatus(shiftDTO, activityStatus);
                 if(CollectionUtils.containsAny(filterCriteriaMap.get(ACTIVITY_STATUS),activityStatus)){
                     filteredShifts.add((T)shiftDTO);
                 }
@@ -41,6 +41,13 @@ public class ActivityStatusFilter <G> implements ShiftFilter {
 
         }
         return filteredShifts;
+    }
+
+    private void getShiftActivityStatus(ShiftDTO shiftDTO, Set<String> activityStatus) {
+        shiftDTO.getActivities().forEach(shiftActivityDTO -> {
+                activityStatus.addAll(shiftActivityDTO.getStatus().stream().filter(shiftStatus -> isNotNull(shiftStatus)).map(shiftStatus -> shiftStatus.toString()).collect(Collectors.toSet()));
+                shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> activityStatus.addAll(childActivityDTO.getStatus().stream().filter(shiftStatus -> isNotNull(shiftStatus)).map(shiftStatus -> shiftStatus.toString()).collect(Collectors.toSet())));
+            });
     }
 
 }
