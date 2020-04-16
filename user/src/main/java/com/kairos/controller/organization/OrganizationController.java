@@ -966,8 +966,8 @@ public class OrganizationController {
 
     @ApiOperation(value = "Get time slots of organization")
     @GetMapping(UNIT_URL + "/get_time_slots_by_id")
-    public ResponseEntity<Map<String, Object>> getTimeSlotOfUnitById(@PathVariable Long unitId, @RequestParam Set<Long> timeSlotIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getUnitTimeSlotById(unitId, timeSlotIds));
+    public ResponseEntity<Map<String, Object>> getTimeSlotOfUnitById(@PathVariable Long unitId, @RequestParam Set<String> timeSlotIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getUnitTimeSlotByNames(unitId, timeSlotIds));
     }
 
     @ApiOperation(value = "Get time slots of organization")

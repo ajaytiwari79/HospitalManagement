@@ -836,10 +836,10 @@ public class UserIntegrationService {
         });
     }
 
-    public List<TimeSlotDTO> getUnitTimeSlotByIds(Long unitId, Set<Long> timeSlotIds) {
+    public List<TimeSlotDTO> getUnitTimeSlotByNames(Long unitId, Set<String> timeSlotNames) {
         List<NameValuePair> queryParam = new ArrayList<>();
-        queryParam.add(new BasicNameValuePair("timeSlotIds", timeSlotIds.toString()));
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/get_time_slots", queryParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotDTO>>>() {
+        queryParam.add(new BasicNameValuePair("timeSlotIds", timeSlotNames.toString()));
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/get_time_slots_by_id", queryParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotDTO>>>() {
         });
     }
 

@@ -27,6 +27,8 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     private static final String EMPLOYMENT_ID = "employmentId";
     private static final String START_DATE = "startDate";
     private static final String END_DATE = "endDate";
+    private static final String START_TIME = "shiftStartTime";
+    private static final String END_TIME = "shiftEndTime";
     private static final String STAFF_ID = "staffId";
     private static final String SHIFTS = "shifts";
 
@@ -54,11 +56,20 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
             } else if (entry.getKey().equals(FilterType.VALIDATED_BY)) {
                 criteria.and(VALIDATED_BY_ROLES).in(entry.getValue());
             } else if (entry.getKey().equals(FilterType.TIME_SLOT)) {
-                List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlotByIds(unitId, (Set<Long>) entry.getValue());
-                for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
-//                    criteria.and(START_DATE).gte()
-                }
+                List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlotByNames(unitId, (Set<String>) entry.getValue());
+                Criteria timeslotCriteria;
 
+                List<Criteria> orCriteria = new ArrayList<>();
+                for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
+                    timeslotCriteria = new Criteria();
+                    Integer startTime = (timeSlotDTO.getStartHour() * 60 * 60) + (timeSlotDTO.getStartMinute() * 60);
+                    Integer endTime = (timeSlotDTO.getEndHour() * 60 * 60) + (timeSlotDTO.getEndMinute() * 60);
+                    timeslotCriteria.and(START_TIME).gte(startTime);
+//                            timeslotCriteria.and(END_TIME).lte(endTime);
+                    orCriteria.add(timeslotCriteria);
+                }
+                Criteria[] criteriaArray = orCriteria.stream().toArray(Criteria[]::new);
+                criteria.orOperator(criteriaArray);
             }/* else if (entry.getKey().equals(FilterType.ESCALATION_CAUSED_BY)) {
                 AggregationOperation violationOperation = LookupOperation.newLookup().from("shiftViolatedRules").
                         localField("_id").foreignField("shiftId").as("violations");
@@ -71,7 +82,8 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         GroupOperation groupOperation = group(STAFF_ID).addToSet("$$ROOT").as(SHIFTS);
         aggregationOperations.add(groupOperation);
         Aggregation aggregations = Aggregation.newAggregation(aggregationOperations);
-
         return mongoTemplate.aggregate(aggregations, Shift.class, StaffShiftDetails.class).getMappedResults();
     }
+
+
 }

@@ -358,12 +358,12 @@ public class TimeSlotService {
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(timeSlotWrappers, TimeSlotDTO.class);
     }
 
-    public List<TimeSlotDTO> getUnitTimeSlotById(Long unitId, Set<Long> timeslotIds) {
+    public List<TimeSlotDTO> getUnitTimeSlotByNames(Long unitId, Set<String> timeslotNames) {
         OrganizationBaseEntity unit = organizationBaseRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
         }
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getUnitTimeSlotsByIds(unit.getId(), timeslotIds, STANDARD, TimeSlotType.SHIFT_PLANNING);
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getUnitTimeSlotsByIds(unit.getId(), timeslotNames, STANDARD, TimeSlotType.SHIFT_PLANNING);
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(timeSlotWrappers, TimeSlotDTO.class);
     }
 
