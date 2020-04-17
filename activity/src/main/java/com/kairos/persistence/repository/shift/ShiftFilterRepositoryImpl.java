@@ -46,11 +46,22 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         criteria.and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
 
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
+        Set<String> activityIds = new HashSet<>();
+        List<String> selectedActivityIds = (List<String>) filterTypes.get(FilterType.ACTIVITY_IDS);
+        if (selectedActivityIds.size() > 0) {
+            activityIds.addAll(selectedActivityIds);
+        }
+        List<String> selectedAbsenceActivityIds = (List<String>) filterTypes.get(FilterType.ACTIVITY_IDS);
+        if (selectedAbsenceActivityIds.size() > 0) {
+            activityIds.addAll(selectedActivityIds);
+        }
+        if (activityIds.size() > 0) {
+            criteria.and(ACTIVITY_IDS).in(activityIds);
+        }
+
         for (Map.Entry<FilterType, Set<T>> entry : filterTypes.entrySet()) {
             if (entry.getKey().equals(FilterType.ACTIVITY_STATUS)) {
                 criteria.and(ACTIVITY_STATUS).in(entry.getValue());
-            } else if (entry.getKey().equals(FilterType.ACTIVITY_IDS)) {
-                criteria.and(ACTIVITY_IDS).in(entry.getValue());
             } else if (entry.getKey().equals(FilterType.PLANNED_TIME_TYPE)) {
                 criteria.and(PLANNED_TIME_IDS).in(entry.getValue());
             } else if (entry.getKey().equals(FilterType.VALIDATED_BY)) {
@@ -67,7 +78,12 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
                 }
                 Criteria[] criteriaArray = orCriteria.stream().toArray(Criteria[]::new);
                 criteria.orOperator(criteriaArray);
-            }/* else if (entry.getKey().equals(FilterType.ESCALATION_CAUSED_BY)) {
+            } else if (entry.getKey().equals(FilterType.TIME_TYPE)) {
+//                criteria.in(loop)
+            }
+
+
+            /* else if (entry.getKey().equals(FilterType.ESCALATION_CAUSED_BY)) {
                 AggregationOperation violationOperation = LookupOperation.newLookup().from("shiftViolatedRules").
                         localField("_id").foreignField("shiftId").as("violations");
                 aggregationOperations.add(violationOperation);
