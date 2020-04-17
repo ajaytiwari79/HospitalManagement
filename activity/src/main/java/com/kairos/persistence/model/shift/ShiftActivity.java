@@ -23,7 +23,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ShiftActivity implements Comparable<ShiftActivity>{
+public class ShiftActivity implements Comparable<ShiftActivity> {
 
 
     private BigInteger activityId;
@@ -31,6 +31,8 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     private Date endDate;
     private int scheduledMinutes;
     private int durationMinutes;
+    private Integer startTime;
+    private Integer endTime;
     private String activityName;
     //used in T&A view
     private Long reasonCodeId;

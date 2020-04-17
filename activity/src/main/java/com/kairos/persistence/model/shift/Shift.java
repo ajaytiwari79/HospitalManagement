@@ -36,6 +36,8 @@ public class Shift extends MongoBaseEntity {
 
     protected Date startDate;
     protected Date endDate;
+    protected Integer shiftStartTime;
+    protected Integer shiftEndTime;
     protected boolean disabled = false;
     @NotNull(message = "error.ShiftDTO.staffId.notnull")
     protected Long staffId;
@@ -81,6 +83,7 @@ public class Shift extends MongoBaseEntity {
         this.endDate = endDate;
         this.employmentId = employmentId;
         this.activities = shiftActivities;
+        updateShiftTimeValues();
     }
 
     // This is used in absance shift
@@ -93,6 +96,7 @@ public class Shift extends MongoBaseEntity {
         this.unitId = unitId;
         this.phaseId = phaseId;
         this.planningPeriodId = planningPeriodId;
+        updateShiftTimeValues();
 
     }
 
@@ -113,6 +117,7 @@ public class Shift extends MongoBaseEntity {
         this.planningPeriodId = planningPeriodId;
         this.staffUserId = staffUserId;
         this.shiftType = shiftType;
+        updateShiftTimeValues();
     }
 
     public void setBreakActivities(List<ShiftActivity> breakActivities) {
@@ -232,10 +237,12 @@ public class Shift extends MongoBaseEntity {
 
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
+        updateShiftTimeValues();
     }
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+        updateShiftTimeValues();
     }
 
 
@@ -250,15 +257,25 @@ public class Shift extends MongoBaseEntity {
     @JsonIgnore
     public boolean isActivityMatch(BigInteger activityId,boolean includeDraftShift){
         boolean activityMatch;
-        if(!includeDraftShift && this.draft){
+        if (!includeDraftShift && this.draft) {
             activityMatch = false;
-        }else {
+        } else {
             activityMatch = this.getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getActivityId().equals(activityId));
             if (!activityMatch && includeDraftShift) {
                 activityMatch = isNotNull(this.getDraftShift()) ? this.getDraftShift().getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getActivityId().equals(activityId)) : false;
             }
         }
         return activityMatch;
+    }
+
+    public void updateShiftTimeValues() {
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
+        ;
+    }
+
+    private Integer timeInSeconds(Date date) {
+        return ((date.getHours() * 60 * 60) + (date.getMinutes() * 60));
     }
 
     @Override

@@ -58,14 +58,11 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
             } else if (entry.getKey().equals(FilterType.TIME_SLOT)) {
                 List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlotByNames(unitId, (Set<String>) entry.getValue());
                 Criteria timeslotCriteria;
-
                 List<Criteria> orCriteria = new ArrayList<>();
                 for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
                     timeslotCriteria = new Criteria();
                     Integer startTime = (timeSlotDTO.getStartHour() * 60 * 60) + (timeSlotDTO.getStartMinute() * 60);
-                    Integer endTime = (timeSlotDTO.getEndHour() * 60 * 60) + (timeSlotDTO.getEndMinute() * 60);
                     timeslotCriteria.and(START_TIME).gte(startTime);
-//                            timeslotCriteria.and(END_TIME).lte(endTime);
                     orCriteria.add(timeslotCriteria);
                 }
                 Criteria[] criteriaArray = orCriteria.stream().toArray(Criteria[]::new);
