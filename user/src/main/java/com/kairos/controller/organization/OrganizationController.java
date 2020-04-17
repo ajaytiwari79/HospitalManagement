@@ -447,8 +447,8 @@ public class OrganizationController {
     @DeleteMapping(UNIT_URL + "/deleteChildOrganization")
     @ApiOperation("Permanent Delete organization node, don't invoke this method")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteOrganizationById(@PathVariable Long organizationId, @PathVariable Long unitId) {
-        Boolean status = organizationService.deleteOrganizationById(organizationId, unitId);
+    public ResponseEntity<Map<String, Object>> deleteOrganizationById(@PathVariable Long unitId) {
+        Boolean status = organizationService.deleteOrganizationById(unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, status);
     }
 
@@ -999,12 +999,6 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllUnitIdsByCountryId(countryId));
     }
 
-    @ApiOperation(value = "Get organization herirchy data")
-    @GetMapping(value = UNIT_URL + "/delete_unpublished_unit")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteUnpublishedUnit(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitService.deleteUnpublishedUnit(unitId));
-    }
 
 }
 

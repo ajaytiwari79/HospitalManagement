@@ -379,10 +379,15 @@ public class OrganizationService {
         return organizationStaffWrapper;
     }
 
-    public boolean deleteOrganizationById(long parentOrganizationId, long childOrganizationId) {
-        unitGraphRepository.deleteChildRelationOrganizationById(parentOrganizationId, childOrganizationId);
-        unitGraphRepository.deleteOrganizationById(childOrganizationId);
-        return unitGraphRepository.findOne(childOrganizationId) == null;
+    public boolean deleteOrganizationById(long childOrganizationId) {
+        OrganizationBaseEntity organizationBaseEntity =organizationBaseRepository.findOne(childOrganizationId);
+        if(organizationBaseEntity instanceof Organization) {
+            unitGraphRepository.deleteUnpublishedOrganizationById(childOrganizationId);
+            return organizationGraphRepository.findOne(childOrganizationId)==null;
+        }else {
+            unitGraphRepository.deleteUnpublishedUnitById(childOrganizationId);
+            return unitGraphRepository.findOne(childOrganizationId)==null;
+        }
     }
 
     public Unit updateExternalId(long unitId, long externalId) {

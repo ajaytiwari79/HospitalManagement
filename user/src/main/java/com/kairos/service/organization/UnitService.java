@@ -187,12 +187,5 @@ public class UnitService {
         return unitGraphRepository.findById(unitId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANISATION_NOTFOUND)));
     }
 
-    public boolean deleteUnpublishedUnit(Long unitId){
-        Unit unit =unitGraphRepository.findOne(unitId);
-        if(unit.isBoardingCompleted()){
-            exceptionService.dataNotFoundByIdException(UserMessagesConstants.MESSAGE_UNIT_IS_PUBLISHED, unitId);
-        }
-        return true;
-    }
 
 }
