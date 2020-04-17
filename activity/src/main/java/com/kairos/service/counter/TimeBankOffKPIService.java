@@ -37,8 +37,8 @@ public class TimeBankOffKPIService implements KPIService{
         if(PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))&&totalTodos>0){
             return getValueWithDecimalFormat((todoStatusCount * 100) / totalTodos);
         }else if(HOURS.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))){
-            double totalHours = getHoursOfTheTodos(staffId,kpiCalculationRelatedInfo,dateTimeInterval);
-            return totalHours;
+          return getHoursOfTheTodos(staffId,kpiCalculationRelatedInfo,dateTimeInterval);
+
         }
         else {
             return todoStatusCount;

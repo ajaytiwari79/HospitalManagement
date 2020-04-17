@@ -45,11 +45,9 @@ import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
@@ -57,12 +55,8 @@ import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftBreakService;
 import com.kairos.service.shift.ShiftFilterService;
-import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
-import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.todo.TodoService;
-import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
-import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Builder;
 import lombok.Getter;
@@ -745,21 +739,23 @@ public class KPIBuilderCalculationService implements CounterService {
                 getTimeTodoListMap();
                 staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
                 staffIdAndTimeTypeTodoListMap = getStaffIdBigIntegerIdTodoListMap(staffIdAndTimeTypeTodoListMap,staffIdAndTodoMap);
-                getidShiftListMap(timeTypeTodoListMap,timeTypeIdAndShiftListMap);
+                updateActivityIdShiftListMap(timeTypeTodoListMap,timeTypeIdAndShiftListMap);
                 if(HOURS.equals(xAxisConfigs.get(0))){
-                    staffIdAndTimeTypeIdAndShiftMap = updateStaffIdAndBigIntegerIdAndShiftMap(staffIdAndTimeTypeTodoListMap);
+                    staffIdAndTimeTypeIdAndShiftMap = getStaffIdAndActivityIdAndShiftMap(staffIdAndTimeTypeTodoListMap);
                 }
 
             }
 
         }
 
-        public void getidShiftListMap(Map<BigInteger,List<TodoDTO>> idTodoListMap, Map<BigInteger,List<Shift>> idShiftListMap ){
-            for(Map.Entry<BigInteger,List<TodoDTO>> entry :idTodoListMap.entrySet()){
-                List<BigInteger> shiftIds =entry.getValue().stream().map(TodoDTO::getEntityId).collect(Collectors.toList());
-                List<Shift> shiftList =shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftIds);
-                idShiftListMap.put(entry.getKey(),shiftList);
+        public void updateActivityIdShiftListMap(Map<BigInteger,List<TodoDTO>> activityIdTodoListMap, Map<BigInteger,List<Shift>> ActivityIdShiftListMap ){
+            if(TODO_STATUS.equals(calculationTypes.get(0))) {
+                for (Map.Entry<BigInteger, List<TodoDTO>> entry : activityIdTodoListMap.entrySet()) {
+                    List<BigInteger> shiftIds = entry.getValue().stream().map(TodoDTO::getEntityId).collect(Collectors.toList());
+                    List<Shift> shiftList = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftIds);
+                    ActivityIdShiftListMap.put(entry.getKey(), shiftList);
 
+                }
             }
         }
 
@@ -777,7 +773,7 @@ public class KPIBuilderCalculationService implements CounterService {
             return staffIdAndBigIntegerTodoListMap;
         }
 
-        private Map<Long, Map<BigInteger, List<Shift>>> updateStaffIdAndBigIntegerIdAndShiftMap(Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdBigIntegerTodoListMap) {
+        private Map<Long, Map<BigInteger, List<Shift>>> getStaffIdAndActivityIdAndShiftMap(Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdBigIntegerTodoListMap) {
             Map<Long,Map<BigInteger,List<Shift>>> staffIdAndActivityAndShiftMap = new HashMap<>();
             Map<BigInteger,List<Shift>> idShiftListMap = new HashMap<>();
             for(Map.Entry<Long,Map<BigInteger,List<TodoDTO>>> entry :staffIdBigIntegerTodoListMap.entrySet()){
@@ -959,8 +955,8 @@ public class KPIBuilderCalculationService implements CounterService {
                 staffIdAndTodoMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
                 activityIdAndTodoListMap = todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
                 staffIdAndActivityTodoListMap = getStaffIdBigIntegerIdTodoListMap(staffIdAndActivityTodoListMap,staffIdAndTodoMap);
-                getidShiftListMap(activityIdAndTodoListMap,activityIdAndShiftListMap);
-                staffIdAndActivityIdAndShiftMap= updateStaffIdAndBigIntegerIdAndShiftMap(staffIdAndActivityTodoListMap);
+                updateActivityIdShiftListMap(activityIdAndTodoListMap,activityIdAndShiftListMap);
+                staffIdAndActivityIdAndShiftMap= getStaffIdAndActivityIdAndShiftMap(staffIdAndActivityTodoListMap);
             }
         }
 
