@@ -773,17 +773,17 @@ public class KPIBuilderCalculationService implements CounterService {
             return staffIdAndBigIntegerTodoListMap;
         }
 
-        private Map<Long, Map<BigInteger, List<Shift>>> getStaffIdAndActivityIdAndShiftMap(Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdBigIntegerTodoListMap) {
+        private Map<Long, Map<BigInteger, List<Shift>>> getStaffIdAndActivityIdAndShiftMap(Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdActivityIdTodoListMap) {
             Map<Long,Map<BigInteger,List<Shift>>> staffIdAndActivityAndShiftMap = new HashMap<>();
-            Map<BigInteger,List<Shift>> idShiftListMap = new HashMap<>();
-            for(Map.Entry<Long,Map<BigInteger,List<TodoDTO>>> entry :staffIdBigIntegerTodoListMap.entrySet()){
+            Map<BigInteger,List<Shift>> activityIdShiftListMap = new HashMap<>();
+            for(Map.Entry<Long,Map<BigInteger,List<TodoDTO>>> entry :staffIdActivityIdTodoListMap.entrySet()){
                 for(Map.Entry<BigInteger,List<TodoDTO>> bigIntegerListEntry :entry.getValue().entrySet()){
                     List<BigInteger> shiftIds =bigIntegerListEntry.getValue().stream().map(TodoDTO::getEntityId).collect(Collectors.toList());
                     List<Shift> shiftList =shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftIds);
-                    idShiftListMap.put(bigIntegerListEntry.getKey(),shiftList);
+                    activityIdShiftListMap.put(bigIntegerListEntry.getKey(),shiftList);
                 }
-                staffIdAndActivityAndShiftMap.put(entry.getKey(),idShiftListMap);
-                idShiftListMap =new HashMap<>();
+                staffIdAndActivityAndShiftMap.put(entry.getKey(),activityIdShiftListMap);
+                activityIdShiftListMap =new HashMap<>();
             }
             return staffIdAndActivityAndShiftMap;
         }
