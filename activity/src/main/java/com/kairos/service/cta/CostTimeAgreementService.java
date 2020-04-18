@@ -258,14 +258,8 @@ public class CostTimeAgreementService {
         if (!updateSameCTA) {
             updateSameCTA = !isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
         }
-        if (updateSameCTA&&save) {
+        if (save) {
             responseCTA = updateEmploymentCTA(oldCTA, ctaDTO);
-        }
-        else if(save&&!updateSameCTA){
-            responseCTA = updateEmploymentCTA(oldCTA, ctaDTO);
-        }
-        else if(!save&&updateSameCTA){
-            responseCTA = updateEmploymentCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
         }
         else if(!save&&!updateSameCTA){
             responseCTA = updateEmploymentCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
