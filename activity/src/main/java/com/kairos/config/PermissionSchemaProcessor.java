@@ -24,6 +24,7 @@ public class PermissionSchemaProcessor implements BeanPostProcessor {
             publishPermissionSchemaToUserService(userRestClient, data);
         }catch (Exception e){
             LOGGER.info("something went wrong while creating permission model");
+            LOGGER.error(e.getLocalizedMessage());
         }
 
     }
