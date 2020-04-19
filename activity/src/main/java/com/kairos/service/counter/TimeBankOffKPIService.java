@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.dto.activity.counter.enums.XAxisConfig.HOURS;
 import static com.kairos.dto.activity.counter.enums.XAxisConfig.PERCENTAGE;
 import static com.kairos.enums.FilterType.*;
 import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
@@ -30,12 +31,16 @@ public class TimeBankOffKPIService implements KPIService{
                 todoDTOList = getTodoDTOListIfStaffIsNotExist(kpiCalculationRelatedInfo, dateTimeInterval, entry);
             }
             List<TodoDTO> todoDTOS =isNotNull(staffId)?entry.getValue():todoDTOList;
-            totalTodos +=entry.getValue().size();
+            totalTodos +=todoDTOS.size();
             todoStatusCount += getActivityStatusCount(staffId,todoDTOS,kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getXAxisConfigs().get(0),dateTimeInterval);
         }
         if(PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))&&totalTodos>0){
             return getValueWithDecimalFormat((todoStatusCount * 100) / totalTodos);
-        }else {
+        }else if(HOURS.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))){
+          return getHoursOfTheTodos(staffId,kpiCalculationRelatedInfo,dateTimeInterval);
+
+        }
+        else {
             return todoStatusCount;
         }
 
@@ -86,9 +91,7 @@ public class TimeBankOffKPIService implements KPIService{
 
 
     public double getActivityStatusCount(Long staffId,List<TodoDTO> todoDTOS, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo,XAxisConfig xAxisConfig,DateTimeInterval dateTimeInterval) {
-        if(XAxisConfig.HOURS.equals(xAxisConfig)){
-            return getHoursOfTheTodos(staffId,kpiCalculationRelatedInfo,dateTimeInterval);
-        }else if(PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))){
+        if(PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))){
             return getStatusCountByPercentage(todoDTOS,kpiCalculationRelatedInfo);
         }
         else{
@@ -102,12 +105,16 @@ public class TimeBankOffKPIService implements KPIService{
         Map<BigInteger,List<Shift>> bigIntegerAndShiftListMap =isActivityExist?kpiCalculationRelatedInfo.getActivityIdAndShiftListMap():kpiCalculationRelatedInfo.getTimeTypeIdAndShiftListMap();
         Map<BigInteger,List<Shift>> filterIdAndShiftListMap =isNotNull(staffId)?bigIntegerAndShiftMap:bigIntegerAndShiftListMap;
         double shiftHours =0.0d;
-        for(Map.Entry<BigInteger, List<Shift>> entry : filterIdAndShiftListMap.entrySet()){
-            List<Shift> shiftList =isNotNull(staffId)?entry.getValue():getShiftListIfStaffIsNotExist(kpiCalculationRelatedInfo,dateTimeInterval,entry);
-            for(Shift shift :shiftList) {
-                shiftHours += DateUtils.getMinutesBetweenDate(shift.getStartDate(), shift.getEndDate());
+        if(isNotNull(filterIdAndShiftListMap)) {
+            for (Map.Entry<BigInteger, List<Shift>> entry : filterIdAndShiftListMap.entrySet()) {
+
+                List<Shift> shiftList = isNotNull(staffId) ? entry.getValue() : getShiftListIfStaffIsNotExist(kpiCalculationRelatedInfo, dateTimeInterval, entry);
+                for (Shift shift : shiftList) {
+                    shiftHours += DateUtils.getMinutesBetweenDate(shift.getStartDate(), shift.getEndDate());
+                }
             }
         }
+
         return shiftHours;
     }
 
