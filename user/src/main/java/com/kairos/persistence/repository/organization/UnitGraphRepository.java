@@ -595,12 +595,12 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     List<OrganizationBasicResponse> getAllOrganizationOfOrganization(Long orgId);
 
     @Query("MATCH(org:Organization{isEnable:true,boardingCompleted: false}) where id(org)={0}\n" +
-       "Optional MATCH(org)-[:HAS_UNIT]-(unit:Unit)\n" +
-      " Optional MATCH(org)-[:HAS_POSITIONS]-(pos:Position)\n" +
-      "Optional MATCH(pos)-[:HAS_PERMISSION]-(per:UnitPermission)\n" + "Optional MATCH(pos)-[:BELONGS_TO]-(staff:Staff)\n" +
-      "Optional MATCH(staff)-[:HAS_CONTACT_ADDRESS]-(ca:ContactAddress)\n" +
-      "Optional MATCH(staff)-[:SECONDARY_CONTACT_ADDRESS]-(sca:ContactAddress)\n" +
-      "detach delete org,unit,pos,per,staff,ca,sca return true")
+       "OPTIONAL MATCH(org)-[:HAS_UNIT]-(unit:Unit)\n" +
+      " OPTIONAL MATCH(org)-[:HAS_POSITIONS]-(pos:Position)\n" +
+      "OPTIONAL MATCH(pos)-[:HAS_PERMISSION]-(per:UnitPermission)\n" + "Optional MATCH(pos)-[:BELONGS_TO]-(staff:Staff)\n" +
+      "OPTIONAL MATCH(staff)-[:HAS_CONTACT_ADDRESS]-(ca:ContactAddress)\n" +
+      "OPTIONAL MATCH(staff)-[:SECONDARY_CONTACT_ADDRESS]-(sca:ContactAddress)\n" +
+      "DETACH DELETE org,unit,pos,per,staff,ca,sca return true")
     Boolean deleteUnpublishedOrganizationById(Long orgId);
 
     @Query("MATCH(up:UnitPermission)-[:APPLICABLE_IN_UNIT]-(unit:Unit{isEnable:true,boardingCompleted:false}) where id(unit)={0}\n" +
@@ -608,7 +608,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     "OPTIONAL MATCH(pos)-[:BELONGS_TO]-(staff:Staff)\n"+
     "OPTIONAL MATCH(staff)-[:HAS_CONTACT_ADDRESS]-(ca:ContactAddress)\n" +
     "OPTIONAL MATCH(staff)-[:SECONDARY_CONTACT_ADDRESS]-(sca:ContactDetail)\n" +
-    "detach delete up,unit,pos,staff,ca,sca return true")
+    "DETACH DELETE up,unit,pos,staff,ca,sca return true")
     Boolean deleteUnpublishedUnitById(Long unitId);
 
 
