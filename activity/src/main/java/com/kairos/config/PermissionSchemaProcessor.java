@@ -3,6 +3,8 @@ package com.kairos.config;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.rest_client.UserRestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PermissionSchemaProcessor implements BeanPostProcessor {
+    private static final Logger LOGGER= LoggerFactory.getLogger(PermissionSchemaProcessor.class);
     private UserRestClient userRestClient;
 
     private String userServiceUrl;
@@ -20,7 +23,7 @@ public class PermissionSchemaProcessor implements BeanPostProcessor {
         try{
             publishPermissionSchemaToUserService(userRestClient, data);
         }catch (Exception e){
-            //ignored
+            LOGGER.info("something went wrong while creating permission model");
         }
 
     }
