@@ -6,10 +6,7 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.wrapper.shift.StaffShiftDetails;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.GroupOperation;
-import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.inject.Inject;
@@ -46,18 +43,22 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         criteria.and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
 
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
+        //fixme below code has to be modified with front api, if activities are  selected, send them in one array
         Set<String> activityIds = new HashSet<>();
-        List<String> selectedActivityIds = (List<String>) filterTypes.get(FilterType.ACTIVITY_IDS);
+        List<String> selectedActivityIds = filterTypes.get(FilterType.ACTIVITY_IDS) != null ? (List<String>) filterTypes.get(FilterType.ACTIVITY_IDS) : Collections.emptyList();
         if (selectedActivityIds.size() > 0) {
             activityIds.addAll(selectedActivityIds);
         }
-        List<String> selectedAbsenceActivityIds = (List<String>) filterTypes.get(FilterType.ACTIVITY_IDS);
+        List<String> selectedAbsenceActivityIds = filterTypes.get(FilterType.ABSENCE_ACTIVITY) != null ? (List<String>) filterTypes.get(FilterType.ABSENCE_ACTIVITY) : Collections.emptyList();
+        ;
         if (selectedAbsenceActivityIds.size() > 0) {
             activityIds.addAll(selectedActivityIds);
         }
         if (activityIds.size() > 0) {
             criteria.and(ACTIVITY_IDS).in(activityIds);
         }
+        LookupOperation timeTypeLookupOperation = null;
+        Criteria timeTypeMatchOperation = null;
 
         for (Map.Entry<FilterType, Set<T>> entry : filterTypes.entrySet()) {
             if (entry.getKey().equals(FilterType.ACTIVITY_STATUS)) {
@@ -79,7 +80,16 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
                 Criteria[] criteriaArray = orCriteria.stream().toArray(Criteria[]::new);
                 criteria.orOperator(criteriaArray);
             } else if (entry.getKey().equals(FilterType.TIME_TYPE)) {
-//                criteria.in(loop)
+                timeTypeLookupOperation = LookupOperation.newLookup()
+                        .from("activities")
+                        .localField("activities.activityId")
+                        .foreignField("_id")
+                        .as("matchedActivities");
+                List<Criteria> andTimeTypeIdCriterias = new ArrayList<>();
+                timeTypeMatchOperation = new Criteria();
+                List<Criteria> cc = prepareMaterializedPath((Set<String>) entry.getValue());
+                Criteria[] criteriaArray = cc.stream().toArray(Criteria[]::new);
+                timeTypeMatchOperation.orOperator(criteriaArray);
             }
 
 
@@ -92,11 +102,25 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
 
         AggregationOperation matchOperation = new MatchOperation(criteria);
         aggregationOperations.add(matchOperation);
+        if (timeTypeLookupOperation != null) {
+            aggregationOperations.add(timeTypeLookupOperation);
+            aggregationOperations.add(new MatchOperation(timeTypeMatchOperation));
+        }
         GroupOperation groupOperation = group(STAFF_ID).addToSet("$$ROOT").as(SHIFTS);
         aggregationOperations.add(groupOperation);
         Aggregation aggregations = Aggregation.newAggregation(aggregationOperations);
         return mongoTemplate.aggregate(aggregations, Shift.class, StaffShiftDetails.class).getMappedResults();
     }
 
+    private List<Criteria> prepareMaterializedPath(final Set<String> filterValues) {
+        Criteria tt;
+        List<Criteria> criteriaList = new ArrayList<>();
+        for (String filterValue : filterValues) {
+            tt = new Criteria();
+            tt.and("matchedActivities.path").regex(filterValue, "g");
+            criteriaList.add(tt);
+        }
+        return criteriaList;
+    }
 
 }
