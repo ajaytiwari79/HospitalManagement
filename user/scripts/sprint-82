@@ -24,6 +24,6 @@ Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(acces
 Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Time Balance",isModule:false,moduleId:"tab_445",active:true});
 
 //create access group relationship for country admin
-MATCH(up:UnitPermission) WHERE id(up)=18746 WITH up
-MATCH(ag:AccessGroup) WHERE id(ag)=23211 WITH up,ag
+MATCH(p:Position)-[:HAS_UNIT_PERMISSIONS]->(up:UnitPermission) WHERE p.name="working as country admin" WITH up
+MATCH(ag:AccessGroup) WHERE ag.name="Hub Manager" WITH up,ag
 CREATE(up)-[:HAS_ACCESS_GROUP]->(ag)
