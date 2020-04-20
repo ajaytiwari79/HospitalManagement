@@ -356,7 +356,6 @@ public class PermissionService {
         if(updateOrganisationCategories){
             kPermissionModel.setOrganizationCategories(modelDTO.getOrganizationCategories());
         }else {
-
             permissionModelRepository.createAccessGroupPermissionModelRelationship(kPermissionModel.getId(), accessGroupIds, modelDTO.getPermissions(),modelDTO.getForOtherPermissions().getExpertiseIds(),modelDTO.getForOtherPermissions().getUnionIds(),modelDTO.getForOtherPermissions().getTeamIds(),modelDTO.getForOtherPermissions().getEmploymentTypeIds(),modelDTO.getForOtherPermissions().getTagIds(),modelDTO.getForOtherPermissions().getStaffStatuses(),modelDTO.getForOtherPermissions().getPermissions());
         }
     }
