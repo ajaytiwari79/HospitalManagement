@@ -127,6 +127,8 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitService.getManageHierarchyData(unitId));
     }
 
+
+
     @ApiOperation(value = "Get skills of organization")
     @GetMapping(UNIT_URL + "/skill")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -445,8 +447,8 @@ public class OrganizationController {
     @DeleteMapping(UNIT_URL + "/deleteChildOrganization")
     @ApiOperation("Permanent Delete organization node, don't invoke this method")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteOrganizationById(@PathVariable Long organizationId, @PathVariable Long unitId) {
-        Boolean status = organizationService.deleteOrganizationById(organizationId, unitId);
+    public ResponseEntity<Map<String, Object>> deleteOrganizationById(@PathVariable Long unitId) {
+        Boolean status = organizationService.deleteOrganizationById(unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, status);
     }
 
@@ -996,6 +998,7 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getAllUnitIdsByCountryId(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllUnitIdsByCountryId(countryId));
     }
+
 
 }
 
