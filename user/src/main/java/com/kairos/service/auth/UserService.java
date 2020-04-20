@@ -20,10 +20,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.user.ChatStatus;
 import com.kairos.enums.user.UserType;
-import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessPage;
-import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
+import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.default_data.DayType;
@@ -457,11 +454,12 @@ public class UserService {
         permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
         if (permissionData.isHub()) {
             Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
-            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId());
+            List<AccessGroupQueryResult> accessGroupQueryResults = accessGroupService.getCountryAccessGroupByOrgCategory(UserContext.getUserDetails().getCountryId(), OrganizationCategory.HUB.toString());
+            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId(), accessGroupQueryResults.get(0).getId());
+            Map<String, AccessPageQueryResult> permissionMap = prepareUnitPermissions(permissions,true);
             HashMap<String, Object> unitPermissionMap = new HashMap<>();
             for (AccessPageQueryResult permission : permissions) {
-                permission.setActive(permission.isRead() || permission.isWrite());
-                unitPermissionMap.put(permission.getModuleId(), permission);
+                unitPermissionMap.put(permission.getModuleId(), permissionMap.get(permission.getModuleId()));
             }
             permissionData.setHubPermissions(unitPermissionMap);
 

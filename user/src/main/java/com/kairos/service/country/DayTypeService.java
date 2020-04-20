@@ -134,17 +134,22 @@ public class DayTypeService {
         if (Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()) {
             List<DayType> dayTypes = new ArrayList<>();
             dayTypes.add(countryHolidayCalendarQueryResult.getDayType());
+            dayTypes.addAll(getDayTypes(date));
             return dayTypes;
         } else {
-            Instant instant = Instant.ofEpochMilli(date.getTime());
-            LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-            LocalDate localDate = localDateTime.toLocalDate();
-            String day = localDate.getDayOfWeek().name();
-            Day dayEnum = Day.valueOf(day);
-            List<DayType> dayTypes = dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
-            return dayTypes.isEmpty() ? Collections.EMPTY_LIST : dayTypes;
+            List<DayType> dayTypes = getDayTypes(date);
+            return dayTypes;
         }
 
+    }
+
+    private List<DayType> getDayTypes(Date date) {
+        Instant instant = Instant.ofEpochMilli(date.getTime());
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        LocalDate localDate = localDateTime.toLocalDate();
+        String day = localDate.getDayOfWeek().name();
+        Day dayEnum = Day.valueOf(day);
+        return dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
     }
 
     public List<DayType> getDayTypes(List<Long> dayTypeIds) {

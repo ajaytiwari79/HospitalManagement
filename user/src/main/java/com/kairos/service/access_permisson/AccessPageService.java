@@ -3,11 +3,14 @@ package com.kairos.service.access_permisson;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.*;
+import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.position.AccessPermissionAccessPageRelation;
@@ -27,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.constants.AppConstants.MODULE_11;
+import static com.kairos.constants.AppConstants.TAB_119;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 
@@ -104,10 +109,12 @@ public class AccessPageService {
         if( !Optional.ofNullable(tabId).isPresent() ){
             return false;
         }
-
+        AccessPage accessPage = accessPageRepository.findById(tabId).orElse(new AccessPage());
         Boolean isKairosHub = OrganizationCategory.HUB.equals(orgCategoryTabAccessDTO.getOrganizationCategory());
         Boolean isUnion = OrganizationCategory.UNION.equals(orgCategoryTabAccessDTO.getOrganizationCategory());
-
+        if(isKairosHub && !orgCategoryTabAccessDTO.isAccessStatus() && (MODULE_11.equals(accessPage.getModuleId()) || TAB_119.equals(accessPage.getModuleId()))){
+            exceptionService.actionNotPermittedException(ERROR_TAB_CAN_NOT_BE_HIDE_FOR_HUB);
+        }
         if(orgCategoryTabAccessDTO.isAccessStatus()){
             accessGroupRepository.addAccessPageRelationshipForCountryAccessGroups(tabId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
             accessGroupRepository.addAccessPageRelationshipForOrganizationAccessGroups(tabId, isKairosHub, isUnion);
@@ -247,5 +254,18 @@ public class AccessPageService {
 
     public List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, Set<Long> organizationIds){
        return accessPageRepository.getAccessPermission(userId,  organizationIds);
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long accessPageId, TranslationDTO translationData) {
+        AccessPage accessPage = accessPageRepository.findOne(accessPageId);
+        accessPage.setTranslatedNames(translationData.getTranslatedNames());
+        accessPage.setTranslatedDescriptions(translationData.getTranslatedDescriptions());
+        accessPageRepository.save(accessPage);
+        return accessPage.getTranslatedData();
+    }
+
+    public Map<String, TranslationInfo> getTranslatedData(Long accessPageId) {
+        AccessPage accessPage = accessPageRepository.findOne(accessPageId);
+        return accessPage.getTranslatedData();
     }
 }

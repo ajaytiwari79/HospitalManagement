@@ -34,17 +34,18 @@ public class WeatherController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, weatherService.getTodayWeatherInfo(unitId));
     }
 
-    @GetMapping("/weathers")
-    @ApiOperation("get all weather info of unit in dates")
+    @GetMapping("/weather")
+    @ApiOperation("get weather info of unit at date")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllWeatherInfoBetweenDate(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, weatherService.getAllWeatherInfoBetweenDate(unitId, startDate, isNull(endDate)?startDate:endDate));
+    public ResponseEntity<Map<String, Object>> getWeatherInfoAtDate(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, weatherService.getWeatherInfoAtDate(unitId, date));
     }
 
+    //For weather job
     @GetMapping(value = "/save_today_weather_info")
     @ApiOperation("save today weather info if not exist")
-    public ResponseEntity<Map<String, Object>> saveTodayWeatherInfoOfAllUnit() {
-        weatherService.saveTodayWeatherInfoOfAllUnit();
+    public ResponseEntity<Map<String, Object>> saveWeatherInfoOfAllUnit() {
+        weatherService.saveWeatherInfoOfAllUnit();
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 }

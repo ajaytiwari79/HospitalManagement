@@ -51,6 +51,7 @@ public class UserMessagesConstants {
     public static final String ERROR_ORGANIZATION_KAIROSID_NOTNULL = "error.Organization.kairosId.notnull";
     public static final String ERROR_ORGANIZATION_UNITMANAGER_ACCESSGROUPID_NOTNULL = "error.Organization.unitmanager.accessgroupid.notnull";
     public static final String ERROR_ORGANIZATION_UNITMANAGER_ACCESSGROUP_NOTNULL = "error.Organization.unitmanager.accessgroup.notnull";
+    public static final String MESSAGE_UNIT_IS_PUBLISHED="published.unit.can.not.be.deleted";
     public static final String MESSAGE_DAY_TYPE_ABSENT = "message.day_type.absent";
     public static final String ERROR_ORGANIZATION_DESIREDURL_NOTNULL = "error.Organization.desiredUrl.notNull";
     public static final String ERROR_ORGANIZATION_ACCOUNTTYPE_NOTNULL = "error.Organization.accountType.notNull";
@@ -462,4 +463,5 @@ public class UserMessagesConstants {
     public static final String  ERROR_EMAIL_VALID="error.email.valid";
     public static  final String ERROR_STAFF_USERNAME_NOTNULL="error.Staff.userName.notnull";
     public static  final String ERROR_STAFF_ACCESSGROUP_NOTNULL="error.staff.accessGroup.id.notnull";
+    public static  final String ERROR_TAB_CAN_NOT_BE_HIDE_FOR_HUB="Tab can not be hide for HUB";
 }

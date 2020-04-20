@@ -86,7 +86,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 activityService.unassighExpertiseFromActivities(job.getEntityId());
                 break;
             case ACTIVITY_REMINDER:
-                LOGGER.info("Job to Reminders to be sent to the staff for not planning the absences within the cutoff period. ");
+                LOGGER.info("Job to Reminders to be sent to the staff for not planning the absences with in the cutoff period. ");
                 activityReminderService.sendActivityReminderViaEmail(job.getUnitId(), job.getEntityId());
                 break;
             default:

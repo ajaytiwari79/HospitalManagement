@@ -83,8 +83,8 @@ public class EmploymentController {
 
     @ApiOperation(value = "Update employment's WTA")
     @PutMapping(value = "/employment/{employmentId}/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> updateEmploymentWTA(@PathVariable Long employmentId, @PathVariable Long unitId, @PathVariable BigInteger wtaId, @RequestBody @Valid WTADTO wtadto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.updateEmploymentWTA(unitId, employmentId, wtaId, wtadto));
+    public ResponseEntity<Map<String, Object>> updateEmploymentWTA(@PathVariable Long employmentId, @PathVariable Long unitId, @PathVariable BigInteger wtaId, @RequestBody @Valid WTADTO wtadto, @RequestParam("save") Boolean save) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.updateEmploymentWTA(unitId, employmentId, wtaId, wtadto,save));
     }
 
     @ApiOperation(value = "apply function to employment")

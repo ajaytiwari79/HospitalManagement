@@ -94,6 +94,7 @@ public class PermissionService {
     }
 
     public List<ModelDTO> createPermissionSchema(List<ModelDTO> modelDTOS){
+        LOGGER.info("creating model permission");
         Map<String,KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll(2).spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k->k.getModelName().toLowerCase(),v->v));
         List<KPermissionModel> kPermissionModels = buildPermissionModelData(modelDTOS, modelNameAndModelMap, false);
         permissionModelRepository.save(kPermissionModels,2);
@@ -346,7 +347,7 @@ public class PermissionService {
                 KPermissionField kPermissionField = kPermissionFieldQueryResult.getKPermissionField();
                 updatePermissionOrOrganisationCategory(accessGroupIds, updateOrganisationCategories, fieldDTO, kPermissionField);
             }
-            if(kPermissionModel!=null){
+            if(isNotNull(kPermissionModel)){
                 updateModelPermissionOrOrganisationCategory(accessGroupIds, updateOrganisationCategories, modelPermissionDTO, kPermissionModel);
             }
             if(!modelPermissionDTO.getSubModelPermissions().isEmpty()){
@@ -371,7 +372,6 @@ public class PermissionService {
         if(updateOrganisationCategories){
             kPermissionModel.setOrganizationCategories(modelDTO.getOrganizationCategories());
         }else {
-
             permissionModelRepository.createAccessGroupPermissionModelRelationship(kPermissionModel.getId(), accessGroupIds, modelDTO.getPermissions(),modelDTO.getForOtherPermissions().getExpertiseIds(),modelDTO.getForOtherPermissions().getUnionIds(),modelDTO.getForOtherPermissions().getTeamIds(),modelDTO.getForOtherPermissions().getEmploymentTypeIds(),modelDTO.getForOtherPermissions().getTagIds(),modelDTO.getForOtherPermissions().getStaffStatuses(),modelDTO.getForOtherPermissions().getPermissions());
         }
     }
