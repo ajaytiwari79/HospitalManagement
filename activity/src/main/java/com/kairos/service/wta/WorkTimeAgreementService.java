@@ -590,7 +590,7 @@ public class WorkTimeAgreementService{
             wtaRepository.save(oldWta.get());
         }
         wtaResponseDTO.setStartDate(wtadto.getStartDate());
-        if (isNotNull(wtadto.getEndDate())) {
+        if (isNotNull(wtadto.getEndDate())&&wtadto.getStartDate().isBefore(wtadto.getEndDate())) {
             wtaResponseDTO.setEndDate(wtadto.getEndDate());
         }
         return wtaResponseDTO;
@@ -754,7 +754,7 @@ public class WorkTimeAgreementService{
             newWta.setName(wtadto.getName());
             newWta.setOrganizationParentId(oldWta.getOrganizationParentId());
             newWta.setStartDate(wtadto.getStartDate());
-            newWta.setEndDate(wtadto.getEndDate() != null ? wtadto.getEndDate() : null);
+            newWta.setEndDate((wtadto.getEndDate() != null && wtadto.getStartDate().isBefore(wtadto.getEndDate())) ? wtadto.getEndDate() : null);
             newWta.setRuleTemplateIds(null);
 
         oldWta.setDisabled(true);

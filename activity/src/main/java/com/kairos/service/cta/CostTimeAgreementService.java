@@ -258,12 +258,10 @@ public class CostTimeAgreementService {
         if (!updateSameCTA) {
             updateSameCTA = !isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
         }
-        if (updateSameCTA&&save) {
-            responseCTA = updateEmploymentCTA(oldCTA, ctaDTO);
-        } else if(save&&!updateSameCTA){
+        if (save) {
             responseCTA = updateEmploymentCTA(oldCTA, ctaDTO);
         }
-        else if(!save&&updateSameCTA){
+        else if(!save&&!updateSameCTA){
             responseCTA = updateEmploymentCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
         }
         staffAdditionalInfoDTO.getEmployment().setCostTimeAgreement(responseCTA);
@@ -319,6 +317,7 @@ public class CostTimeAgreementService {
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
         ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
         CTAResponseDTO responseCTA = new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false, oldCTA.getEmploymentId(), costTimeAgreement.getDescription());
+        responseCTA.setEndDate((isNotNull(responseCTA.getEndDate())&&responseCTA.getStartDate().isBefore(responseCTA.getEndDate()))?responseCTA.getEndDate():null);
         responseCTA.setParentId(oldCTA.getId());
         responseCTA.setOrganizationParentId(oldCTA.getOrganizationParentId());
         CTAResponseDTO versionCTA = ObjectMapperUtils.copyPropertiesByMapper(oldCTA, CTAResponseDTO.class);
