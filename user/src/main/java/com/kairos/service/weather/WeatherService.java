@@ -74,6 +74,7 @@ public class WeatherService {
             }
             if(!mapOfCityAndWeatherInfo.containsKey(city)) {
                 String weatherApiUrl = weatherApi + "?q=" + city + "&appid=" + weatherApiKey;
+                LOGGER.info("Weather URL is ======> {}",weatherApiUrl);
                 Map responseData=restTemplate.getForObject(weatherApiUrl, Map.class);
                 //remove this call if api is call for 16 day
                 removeDuplicateDataFromResponse(responseData);
