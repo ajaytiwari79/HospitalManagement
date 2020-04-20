@@ -333,7 +333,9 @@ public class PermissionService {
                 KPermissionField kPermissionField = kPermissionFieldQueryResult.getKPermissionField();
                 updatePermissionOrOrganisationCategory(accessGroupIds, updateOrganisationCategories, fieldDTO, kPermissionField);
             }
-            updateModelPermissionOrOrganisationCategory(accessGroupIds, updateOrganisationCategories, modelPermissionDTO, kPermissionModel);
+            if(kPermissionModel!=null){
+                updateModelPermissionOrOrganisationCategory(accessGroupIds, updateOrganisationCategories, modelPermissionDTO, kPermissionModel);
+            }
             if(!modelPermissionDTO.getSubModelPermissions().isEmpty()){
                 updateOrganisationCategoryOrPermissions(modelPermissionDTO.getSubModelPermissions(), accessGroupIds,updateOrganisationCategories);
             }
