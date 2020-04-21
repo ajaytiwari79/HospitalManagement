@@ -72,6 +72,7 @@ public class Shift extends MongoBaseEntity {
     protected List<ShiftActivity> breakActivities;
     protected AccessGroupRole accessGroupRole;
     protected LocalDate validated;
+    private ShiftViolatedRules shiftViolatedRules;
 
     public Shift() {
         //Default Constructor
