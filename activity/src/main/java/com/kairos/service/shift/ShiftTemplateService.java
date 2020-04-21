@@ -191,8 +191,6 @@ public class ShiftTemplateService{
             List<ShiftActivityDTO> childActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().get(0).getChildActivities().size());
             individualShiftTemplateDTO.getActivities().forEach(shiftTemplateActivity -> {
                 shiftTemplateActivity.getChildActivities().forEach(shiftTemplateActivity1 -> {
-                    shiftTemplateActivity1.setStartTime(DateUtils.asLocalTime(shiftTemplateActivity1.getStartDate()));
-                    shiftTemplateActivity1.setEndTime(DateUtils.asLocalTime(shiftTemplateActivity1.getEndDate()));
                     ShiftActivityDTO  shiftChildActivity =getShiftActivityDTO(shiftDTO,shiftTemplateActivity1);
                     childActivities.add(shiftChildActivity);
                 });
