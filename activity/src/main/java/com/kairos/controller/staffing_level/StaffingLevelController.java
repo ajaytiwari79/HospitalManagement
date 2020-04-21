@@ -38,7 +38,7 @@ import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 @Api(value = API_UNIT_URL + "/staffing_level")
 public class StaffingLevelController {
 
-    private Logger logger= LoggerFactory.getLogger(StaffingLevelController.class);
+    private static  final Logger LOGGER= LoggerFactory.getLogger(StaffingLevelController.class);
     @Autowired private StaffingLevelService staffingLevelService;
 
 
@@ -60,8 +60,7 @@ public class StaffingLevelController {
     @ApiOperation("getting  staffing_level between date unit wise ")
     public ResponseEntity<Map<String, Object>> getPresenceStaffingLevels(@PathVariable Long unitId
     , @RequestParam("startDate")@DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam("endDate")@DateTimeFormat(pattern="yyyy-MM-dd")Date endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.getPresenceStaffingLevel(unitId,startDate,endDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,staffingLevelService.getPresenceStaffingLevel(unitId,startDate,endDate));
     }
 
 
@@ -73,10 +72,8 @@ public class StaffingLevelController {
      */
     @RequestMapping(value = "/currentDay", method = RequestMethod.GET)
     @ApiOperation("getting  staffing_level for selected day ")
-    public ResponseEntity<Map<String, Object>> getStaffingLevel(@PathVariable Long unitId
-            ,@RequestParam("currentDate")Date currentDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.getPresenceStaffingLevel(unitId,currentDate));
+    public ResponseEntity<Map<String, Object>> getStaffingLevel(@PathVariable Long unitId,@RequestParam("currentDate")Date currentDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.getPresenceStaffingLevel(unitId,currentDate));
     }
 
     /**

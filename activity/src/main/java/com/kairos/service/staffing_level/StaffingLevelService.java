@@ -137,7 +137,6 @@ public class StaffingLevelService  {
         LOGGER.debug("saving staffing level organizationId {}", unitId);
         StaffingLevel staffingLevel = null;
         staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalseCustom(unitId, DateUtils.onlyDate(presenceStaffingLevelDTO.getCurrentDate()));
-        StaffingLevelUtil.sortStaffingLevelActivities(presenceStaffingLevelDTO, presenceStaffingLevelDTO.getStaffingLevelSetting().getActivitiesRank());
         if (Optional.ofNullable(staffingLevel).isPresent()) {
             if (staffingLevel.getPresenceStaffingLevelInterval().isEmpty()) {
                 List<StaffingLevelInterval> presenceStaffingLevelIntervals = new ArrayList<StaffingLevelInterval>();
@@ -204,7 +203,6 @@ public class StaffingLevelService  {
      */
     public PresenceStaffingLevelDto updatePresenceStaffingLevel(BigInteger staffingLevelId, Long unitId
             , PresenceStaffingLevelDto presenceStaffingLevelDTO) {
-        StaffingLevelUtil.sortStaffingLevelActivities(presenceStaffingLevelDTO, presenceStaffingLevelDTO.getStaffingLevelSetting().getActivitiesRank());
         LOGGER.info("updating staffing level organizationId and staffingLevelId is {} ,{}", unitId, staffingLevelId);
         StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).orElseThrow(()->new DataNotFoundException(convertMessage("Staffing Level Not Found")));
         if (!staffingLevel.getCurrentDate().equals(presenceStaffingLevelDTO.getCurrentDate())) {
@@ -389,7 +387,6 @@ public class StaffingLevelService  {
             staffingLevelTimeSlList.add(staffingLevelTimeSlot);
         }
         staffingDTO.setPresenceStaffingLevelInterval(staffingLevelTimeSlList);
-        staffingDTO.getStaffingLevelSetting().setActivitiesRank(activityRankMap);
         staffingDtoList.add(staffingDTO);
 
         staffingDtoList.forEach(staffingLevelDto -> {
