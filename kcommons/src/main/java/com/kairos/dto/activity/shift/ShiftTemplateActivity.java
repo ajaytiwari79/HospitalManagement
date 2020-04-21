@@ -22,6 +22,8 @@ public class ShiftTemplateActivity {
     private LocalTime startTime;
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
+    private Date startDate;
+    private Date endDate;
     private int scheduledMinutes;
     private int durationMinutes;
     private String activityName;
