@@ -59,15 +59,12 @@ public class Activity extends MongoBaseEntity {
     private boolean isParentActivity = true;
     @KPermissionSubModel
     private GeneralActivityTab generalActivityTab;
-    @KPermissionSubModel
     private BalanceSettingsActivityTab balanceSettingsActivityTab;
     @KPermissionSubModel
     private IndividualPointsActivityTab individualPointsActivityTab;
-
     private Set<BigInteger> childActivityIds=new HashSet<>();
     @KPermissionSubModel
     private NotesActivityTab notesActivityTab;
-    @KPermissionSubModel
     private CommunicationActivityTab communicationActivityTab;
     @KPermissionSubModel
     private BonusActivityTab bonusActivityTab;
@@ -77,13 +74,9 @@ public class Activity extends MongoBaseEntity {
     private TimeCalculationActivityTab timeCalculationActivityTab;
     @KPermissionSubModel
     private SkillActivityTab skillActivityTab;
-    @KPermissionSubModel
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
-    @KPermissionSubModel
     private OptaPlannerSettingActivityTab optaPlannerSettingActivityTab;
-    @KPermissionSubModel
     private CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab;
-    @KPermissionSubModel
     private LocationActivityTab locationActivityTab;
     private BigInteger countryParentId;
     @JsonIgnore
