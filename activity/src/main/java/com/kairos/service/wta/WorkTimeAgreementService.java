@@ -732,7 +732,7 @@ public class WorkTimeAgreementService{
             wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), false);
         }
         boolean isCalculatedValueChanged = isCalCulatedValueChangedForWTA(oldWta, wtaBaseRuleTemplates);
-        if (save||wtadto.getStartDate().isBefore(oldWta.getStartDate()) || wtadto.getStartDate().equals(oldWta.getStartDate()) || !isCalculatedValueChanged) {
+        if (save&&(wtadto.getStartDate().isBefore(oldWta.getStartDate()) || wtadto.getStartDate().equals(oldWta.getStartDate()) || !isCalculatedValueChanged)) {
             wtaResponseDTO = updateWTAOfUnpublishedEmployment(oldWta, wtadto, unitId);
             oldWta.setStartDate(wtadto.getStartDate());
             wtaResponseDTO.setStartDate(wtadto.getStartDate());
