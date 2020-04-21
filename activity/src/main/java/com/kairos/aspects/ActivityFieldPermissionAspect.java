@@ -27,7 +27,7 @@ public class ActivityFieldPermissionAspect {
     public <T extends MongoBaseEntity> void validateStaffPermission(JoinPoint joinPoint) {
         List<T> objects = checkAndReturnValidModel(joinPoint.getArgs());
         if(isCollectionNotEmpty(objects)) {
-            //permissionService.updateModelBasisOfPermission(objects,newHashSet(FieldLevelPermission.WRITE));
+            permissionService.updateModelBasisOfPermission(objects,newHashSet(FieldLevelPermission.WRITE));
         }
     }
 
@@ -37,7 +37,7 @@ public class ActivityFieldPermissionAspect {
             Collection collection = (Collection) joinPoint.getArgs()[0];
             List<T> objects = checkAndReturnValidModel(collection.toArray());
             if (isCollectionNotEmpty(objects)) {
-                //permissionService.updateModelBasisOfPermission(objects, newHashSet(FieldLevelPermission.WRITE));
+                permissionService.updateModelBasisOfPermission(objects, newHashSet(FieldLevelPermission.WRITE));
             }
         }
     }

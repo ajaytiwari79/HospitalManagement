@@ -32,7 +32,7 @@ public class ReadPermissionAspect {
         Object[] objectArray = removeNull(objectCollection);
         List<T> objects = checkAndReturnValidModel(objectArray);
         if(isCollectionNotEmpty(objects)) {
-            //permissionService.updateModelBasisOfPermission(objects, newHashSet(FieldLevelPermission.READ));
+            permissionService.updateModelBasisOfPermission(objects, newHashSet(FieldLevelPermission.READ));
         }
     }
 }
