@@ -737,10 +737,13 @@ public class WorkTimeAgreementService{
             oldWta.setStartDate(wtadto.getStartDate());
             wtaResponseDTO.setStartDate(wtadto.getStartDate());
             wtaRepository.save(oldWta);
-        } else if(!save){
+        }else if(!save && !isCalculatedValueChanged) {
+            exceptionService.actionNotPermittedException(MESSAGE_WTA_VALUE);
+        }
+        else if(!save && isCalculatedValueChanged){
             wtaResponseDTO = getcreateVersionOfPersionalisedWTA(oldWta, wtadto, unitId, wtaBaseRuleTemplates);
         }
-        return wtaResponseDTO;
+        return  wtaResponseDTO;
     }
 
     private WTAResponseDTO getcreateVersionOfPersionalisedWTA(WorkingTimeAgreement oldWta, WTADTO wtadto, Long unitId, List<WTABaseRuleTemplate> wtaBaseRuleTemplates){
