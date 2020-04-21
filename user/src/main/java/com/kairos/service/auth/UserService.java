@@ -468,7 +468,7 @@ public class UserService {
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
         permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
-        permissionData.setModelPermissions(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isHubMember()), ModelDTO.class));
+        permissionData.setModelPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isHubMember()), ModelDTO.class));
         Organization parent = organizationService.fetchParentOrganization(organizationId);
         permissionData.setStaffId(staffGraphRepository.getStaffIdByUserId(currentUserId,parent.getId()));
         updateChatStatus(ChatStatus.ONLINE);
@@ -497,7 +497,7 @@ public class UserService {
 
         for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
             unitPermission.put(userPermissionQueryResult.getUnitId(),
-                    prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), userPermissionQueryResult.isParentOrganization()));
+                    prepareUnitPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), userPermissionQueryResult.isParentOrganization()));
         }
         permissionData.setOrganizationPermissions(unitPermission);
     }

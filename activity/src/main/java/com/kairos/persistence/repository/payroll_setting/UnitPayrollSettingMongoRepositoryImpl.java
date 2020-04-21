@@ -48,7 +48,7 @@ public class UnitPayrollSettingMongoRepositoryImpl implements CustomUnitPayrollS
 
         );
         AggregationResults<UnitPayrollSetting> results = mongoTemplate.aggregate(aggregation, UnitPayrollSetting.class, UnitPayrollSetting.class);
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(results.getMappedResults(), UnitPayrollSettingDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(results.getMappedResults(), UnitPayrollSettingDTO.class);
 
     }
 

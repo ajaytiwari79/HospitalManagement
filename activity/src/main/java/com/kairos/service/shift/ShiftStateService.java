@@ -124,7 +124,7 @@ public class ShiftStateService {
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=oldTimeAndAttendanceShiftStates.stream().filter(shiftState -> shiftState.getShiftStatePhaseId().equals(phase.getId())).collect(Collectors.toMap(ShiftState::getShiftId, v->v));
         List<ShiftState> timeAndAttendanceShiftStates = getShiftStateLists( shifts, phase.getId(), timeAndAttendanceShiftStateMap);
         for (ShiftState timeAndAttendanceShiftState : timeAndAttendanceShiftStates) {
-            if(shiftValidatorService.validateGracePeriod(ObjectMapperUtils.copyPropertiesOrCloneByMapper(timeAndAttendanceShiftState, ShiftDTO.class),true,timeAndAttendanceShiftState.getUnitId(),phase)){
+            if(shiftValidatorService.validateGracePeriod(ObjectMapperUtils.copyPropertiesByMapper(timeAndAttendanceShiftState, ShiftDTO.class),true,timeAndAttendanceShiftState.getUnitId(),phase)){
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.STAFF);
             }else {
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
@@ -143,8 +143,8 @@ public class ShiftStateService {
         ShiftState newshiftState;
         List<ShiftState> shiftState = new CopyOnWriteArrayList<>(timeAndAttendanceShiftStates);
         for (ShiftState timeAndAttendanceShiftState : shiftState) {
-            if(!shiftValidatorService.validateGracePeriod(ObjectMapperUtils.copyPropertiesOrCloneByMapper(timeAndAttendanceShiftState, ShiftDTO.class),true,timeAndAttendanceShiftState.getUnitId(),phase) && !AccessGroupRole.MANAGEMENT.equals(timeAndAttendanceShiftState.getAccessGroupRole())){
-                newshiftState=ObjectMapperUtils.copyPropertiesOrCloneByMapper(timeAndAttendanceShiftState,ShiftState.class);
+            if(!shiftValidatorService.validateGracePeriod(ObjectMapperUtils.copyPropertiesByMapper(timeAndAttendanceShiftState, ShiftDTO.class),true,timeAndAttendanceShiftState.getUnitId(),phase) && !AccessGroupRole.MANAGEMENT.equals(timeAndAttendanceShiftState.getAccessGroupRole())){
+                newshiftState=ObjectMapperUtils.copyPropertiesByMapper(timeAndAttendanceShiftState,ShiftState.class);
                 newshiftState.setId(null);
                 newshiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
                 newshiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
@@ -165,10 +165,10 @@ public class ShiftStateService {
             if (!DateUtils.asLocalDate(shift.getStartDate()).isAfter(DateUtils.getCurrentLocalDate())) {
                 ShiftState oldshiftState=shiftStateMap.get(shift.getId());
                 if(isNotNull(oldshiftState)){
-                    shiftUpdated = shift.isShiftUpdated(ObjectMapperUtils.copyPropertiesOrCloneByMapper(oldshiftState, Shift.class));
+                    shiftUpdated = shift.isShiftUpdated(ObjectMapperUtils.copyPropertiesByMapper(oldshiftState, Shift.class));
                 }
                 if(isNull(oldshiftState) || shiftUpdated) {
-                    shiftState = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shift, ShiftState.class);
+                    shiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
                     shiftState.setId((shiftStateMap.containsKey(shift.getId())) ? shiftStateMap.get(shift.getId()).getId() : null);
                     shiftState.setStartDate(shiftState.getActivities().get(0).getStartDate());
                     shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
@@ -204,7 +204,7 @@ public class ShiftStateService {
             shiftDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());
             shiftDTO.setEndDate(shiftDTO.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
         }
-        shiftState = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftDTO, ShiftState.class);
+        shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
         shiftMongoRepository.save(shiftState);
         return shiftDTO;
     }

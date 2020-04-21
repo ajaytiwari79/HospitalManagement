@@ -59,7 +59,7 @@ public class WeatherService {
                 exceptionService.dataNotFoundByIdException(ERROR_WEATHER_NOTFOUND);
             }
         }
-        WeatherInfoDTO weatherInfoDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(weatherInfo, WeatherInfoDTO.class);
+        WeatherInfoDTO weatherInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(weatherInfo, WeatherInfoDTO.class);
         weatherInfoDTO.setWeatherInfo(ObjectMapperUtils.jsonStringToObject(weatherInfo.getWeatherInfoInJson(), Map.class));
         return weatherInfoDTO;
     }
@@ -106,7 +106,7 @@ public class WeatherService {
         if(isNull(weatherInfo)){
             exceptionService.dataNotFoundByIdException(ERROR_WEATHER_NOTFOUND);
         }
-        WeatherInfoDTO weatherInfoDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(weatherInfo, WeatherInfoDTO.class);
+        WeatherInfoDTO weatherInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(weatherInfo, WeatherInfoDTO.class);
         weatherInfoDTO.setWeatherInfo(ObjectMapperUtils.jsonStringToObject(weatherInfo.getWeatherInfoInJson(), Map.class));
         return weatherInfoDTO;
     }

@@ -181,7 +181,7 @@ public class TimeBankService implements KPIService {
         if(isCollectionNotEmpty(draftShifts)){
             DailyTimeBankEntry draftDailyTimeBankEntry = updateDailyTimeBankEntry(staffAdditionalInfoDTO, shift, validatedByPlanner, null, planningPeriodInterval, draftShifts, interval);
             if(isNull(dailyTimeBankEntry)){
-                dailyTimeBankEntry = ObjectMapperUtils.copyPropertiesOrCloneByMapper(draftDailyTimeBankEntry,DailyTimeBankEntry.class);
+                dailyTimeBankEntry = ObjectMapperUtils.copyPropertiesByMapper(draftDailyTimeBankEntry,DailyTimeBankEntry.class);
             }
             dailyTimeBankEntry.setDraftDailyTimeBankEntry(draftDailyTimeBankEntry);
         }
@@ -468,7 +468,7 @@ public class TimeBankService implements KPIService {
         if(shiftActivityDTOMap.containsKey(shiftActivity.getActivityId()+"_"+shiftActivity.getStartDate())) {
             ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getActivityId() + "_" + shiftActivity.getStartDate());
             shiftActivity.setTimeBankCtaBonusMinutes((int)shiftActivityDTO.getTimeBankCtaBonusMinutes());
-            shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
+            shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
             shiftActivity.setPlannedMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank() + (int)shiftActivityDTO.getTimeBankCtaBonusMinutes());
             shiftActivity.setScheduledMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank());
         }

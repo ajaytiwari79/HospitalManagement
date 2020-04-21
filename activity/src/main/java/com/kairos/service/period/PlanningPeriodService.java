@@ -647,7 +647,7 @@ public class PlanningPeriodService extends MongoBaseService {
         if (!shifts.isEmpty()) {
             List<ShiftState> shiftStates = new ArrayList<>();
             shifts.stream().forEach(shift -> {
-                ShiftState shiftState = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shift, ShiftState.class);
+                ShiftState shiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
                 shiftState.setShiftId(shift.getId());
                 shiftState.setShiftStatePhaseId(currentPhaseId);
                 shiftState.setId(null);
@@ -672,7 +672,7 @@ public class PlanningPeriodService extends MongoBaseService {
         if (!staffingLevels.isEmpty()) {
             List<StaffingLevelState> staffingLevelStates = new ArrayList<>();
             staffingLevels.stream().forEach(staffingLevel -> {
-                StaffingLevelState staffingLevelState = ObjectMapperUtils.copyPropertiesOrCloneByMapper(staffingLevel, StaffingLevelState.class);
+                StaffingLevelState staffingLevelState = ObjectMapperUtils.copyPropertiesByMapper(staffingLevel, StaffingLevelState.class);
                 staffingLevelState.setStaffingLevelId(staffingLevel.getId());
                 staffingLevelState.setStaffingLevelStatePhaseId(currentPhaseId);
                 staffingLevelState.setPlanningPeriodId(planningPeriodId);
@@ -728,7 +728,7 @@ public class PlanningPeriodService extends MongoBaseService {
         if (!shiftStates.isEmpty()) {
             List<Shift> shifts = new ArrayList<>();
             shiftStates.forEach(shiftState -> {
-                Shift shift = ObjectMapperUtils.copyPropertiesOrCloneByMapper(shiftState, Shift.class);
+                Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftState, Shift.class);
                 shift.setId(shiftState.getShiftId());
                 shifts.add(shift);
             });

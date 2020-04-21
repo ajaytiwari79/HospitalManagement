@@ -30,7 +30,7 @@ public class ActionService {
 
     public ActionDTO saveAction(Long unitId, ActionDTO actionDTO) {
         actionDTO.setUnitId(unitId);
-        Action action = ObjectMapperUtils.copyPropertiesOrCloneByMapper(actionDTO, Action.class);
+        Action action = ObjectMapperUtils.copyPropertiesByMapper(actionDTO, Action.class);
         actionRepository.save(action);
         actionDTO.setId(action.getId());
         return actionDTO;
@@ -38,7 +38,7 @@ public class ActionService {
 
     public ActionDTO getAction(BigInteger actionId){
         Action action = actionRepository.findById(actionId).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_DATANOTFOUND,ACTION,actionId)));
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(action, ActionDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(action, ActionDTO.class);
     }
 
     public List<ActionDTO> getAllActionByUnitId(Long unitId){

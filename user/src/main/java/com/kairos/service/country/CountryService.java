@@ -501,7 +501,7 @@ public class CountryService {
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId) {
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(dayTypes,DayTypeDTO.class);
+        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
         return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS, getDefaultTimeSlot(), countryId);
     }
 

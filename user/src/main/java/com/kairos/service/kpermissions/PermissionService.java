@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApplicationConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_ID;
@@ -117,7 +117,7 @@ public class PermissionService {
             }
 
         });
-        kPermissionModels.addAll(copyPropertiesOrCloneCollectionByMapper(newModelDTO, KPermissionModel.class));
+        kPermissionModels.addAll(copyCollectionPropertiesByMapper(newModelDTO, KPermissionModel.class));
         return kPermissionModels;
     }
 
@@ -163,15 +163,15 @@ public class PermissionService {
         List<KPermissionModel> kPermissionModels = new ArrayList();
         permissionModelRepository.findAll().iterator().forEachRemaining(kPermissionModels::add);
         kPermissionModels = kPermissionModels.stream().filter(it -> !it.isPermissionSubModel()).collect(Collectors.toList());
-        return copyPropertiesOrCloneCollectionByMapper(kPermissionModels, ModelDTO.class);
+        return copyCollectionPropertiesByMapper(kPermissionModels, ModelDTO.class);
     }
 
     public Map<String, Object> getPermissionSchema(List<Long> accessGroupIds){
         Map<String, Object> permissionSchemaMap = new HashMap<>();
         List<KPermissionModel> kPermissionModels = getkPermissionModels();
-        permissionSchemaMap.put(PERMISSIONS_SCHEMA, copyPropertiesOrCloneCollectionByMapper(kPermissionModels, ModelDTO.class));
+        permissionSchemaMap.put(PERMISSIONS_SCHEMA, copyCollectionPropertiesByMapper(kPermissionModels, ModelDTO.class));
         permissionSchemaMap.put(PERMISSIONS, FieldLevelPermission.values());
-        permissionSchemaMap.put(PERMISSION_DATA, copyPropertiesOrCloneCollectionByMapper(getModelPermission(newArrayList(),accessGroupIds,false),ModelDTO.class));
+        permissionSchemaMap.put(PERMISSION_DATA, copyCollectionPropertiesByMapper(getModelPermission(newArrayList(),accessGroupIds,false),ModelDTO.class));
             return permissionSchemaMap;
     }
 
@@ -423,10 +423,10 @@ public class PermissionService {
             unions = organizationService.getAllUnionsByOrganizationOrCountryId(DEFAULT_ID, refrenceId);
         }
         Long countryId = ConfLevel.COUNTRY.equals(confLevel) ? refrenceId : organizationDTO.getCountryId();
-        List<ExpertiseDTO> expertises = copyPropertiesOrCloneCollectionByMapper(expertiseGraphRepository.getExpertiesOfCountry(countryId),ExpertiseDTO.class);
-        List<EmploymentTypeDTO> employmentTypeDTOS = copyPropertiesOrCloneCollectionByMapper(employmentTypeGraphRepository.getEmploymentTypeByCountry(countryId,false), EmploymentTypeDTO.class);
-        List<UnionDTO> unionDTOS = copyPropertiesOrCloneCollectionByMapper(unions,UnionDTO.class);
-        List<TeamDTO> teamDTOS = copyPropertiesOrCloneCollectionByMapper(teamGraphRepository.findAllTeamsInOrganization(refrenceId), TeamDTO.class);
+        List<ExpertiseDTO> expertises = copyCollectionPropertiesByMapper(expertiseGraphRepository.getExpertiesOfCountry(countryId),ExpertiseDTO.class);
+        List<EmploymentTypeDTO> employmentTypeDTOS = copyCollectionPropertiesByMapper(employmentTypeGraphRepository.getEmploymentTypeByCountry(countryId,false), EmploymentTypeDTO.class);
+        List<UnionDTO> unionDTOS = copyCollectionPropertiesByMapper(unions,UnionDTO.class);
+        List<TeamDTO> teamDTOS = copyCollectionPropertiesByMapper(teamGraphRepository.findAllTeamsInOrganization(refrenceId), TeamDTO.class);
         return new PermissionDefaultDataDTO(expertises,unionDTOS,employmentTypeDTOS,teamDTOS,isNull(organizationDTO) ? newArrayList() : organizationDTO.getTagDTOS(),newArrayList(StaffStatusEnum.values()));
     }
 
@@ -504,7 +504,7 @@ public class PermissionService {
             List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
             hubMember = UserContext.getUserDetails().isHubMember();
             List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember);
-            List<ModelDTO> modelDTOS = copyPropertiesOrCloneCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
+            List<ModelDTO> modelDTOS = copyCollectionPropertiesByMapper(modelPermissionQueryResults,ModelDTO.class);
             modelMap = modelDTOS.stream().collect(Collectors.toMap(k -> k.getModelName(), v -> v));
             Map[] mapArray = getObjectByIds(objects,fieldLevelPermissions);
             mapOfDataBaseObject = mapArray[0];
@@ -577,7 +577,7 @@ public class PermissionService {
         List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
         boolean hubMember = UserContext.getUserDetails().isHubMember();
         List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember);
-        List<ModelDTO> modelDTOS = copyPropertiesOrCloneCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
+        List<ModelDTO> modelDTOS = copyCollectionPropertiesByMapper(modelPermissionQueryResults,ModelDTO.class);
         Organization parentOrganisation=organizationService.fetchParentOrganization(unitId);
         Long currentUserStaffId = staffService.getStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganisation.getId());
         return new FieldPermissionUserData(modelDTOS,currentUserStaffId);

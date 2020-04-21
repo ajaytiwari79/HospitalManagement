@@ -149,7 +149,7 @@ public class StaffCreationService {
         ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
         staff.setContactDetail(contactDetail);
         staff.setCurrentStatus(payload.getCurrentStatus());
-        staff.setTags(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(payload.getTags(), Tag.class));
+        staff.setTags(ObjectMapperUtils.copyCollectionPropertiesByMapper(payload.getTags(), Tag.class));
         if (Optional.ofNullable(staffQueryResult).isPresent()) {
             contactAddress.setId(staffQueryResult.getContactAddressId());
             contactDetail.setId(staffQueryResult.getContactDetailId());
@@ -305,7 +305,7 @@ public class StaffCreationService {
             defaultKPISettingDTO.setParentUnitId(organization.getId());
             activityIntegrationService.createDefaultKPISettingForStaff(defaultKPISettingDTO, unitId);
         }
-        StaffPersonalDetail staffPersonalDetail = ObjectMapperUtils.copyPropertiesOrCloneByMapper(staff,StaffPersonalDetail.class);
+        StaffPersonalDetail staffPersonalDetail = ObjectMapperUtils.copyPropertiesByMapper(staff,StaffPersonalDetail.class);
         staffPersonalDetail.setGender(user.getGender());
         staffPersonalDetail.setAge(user.getAge());
         return staffPersonalDetail;

@@ -119,7 +119,7 @@ public class DataCategoryService {
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_DATACATEGORY, dataCategoryId);
         }
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(dataCategory, DataCategoryResponseDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(dataCategory, DataCategoryResponseDTO.class);
 
     }
 
@@ -133,7 +133,7 @@ public class DataCategoryService {
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_DATACATEGORY, dataCategoryId);
         }
-        return ObjectMapperUtils.copyPropertiesOrCloneByMapper(dataCategory, DataCategoryResponseDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(dataCategory, DataCategoryResponseDTO.class);
 
     }
 
@@ -144,7 +144,7 @@ public class DataCategoryService {
      */
     public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByCountryId(Long countryId) {
         List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByCountryId(countryId);
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(dataCategories, DataCategoryResponseDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(dataCategories, DataCategoryResponseDTO.class);
     }
 
 
@@ -154,7 +154,7 @@ public class DataCategoryService {
      */
     public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByUnitId(Long unitId) {
         List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByUnitId(unitId);
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(dataCategories, DataCategoryResponseDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(dataCategories, DataCategoryResponseDTO.class);
     }
 
 

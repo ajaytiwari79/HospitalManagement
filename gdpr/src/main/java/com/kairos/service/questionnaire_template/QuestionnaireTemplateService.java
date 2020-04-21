@@ -70,7 +70,7 @@ public class QuestionnaireTemplateService {
         questionnaireTemplateRepository.save(questionnaireTemplate);
         List<Long> unitIds = gdprToUserIntegrationService.getAllUnitIdsByCountryId(countryId);
         if(isCollectionNotEmpty(unitIds)) {
-            unitIds.forEach(unitId ->  saveQuestionnaireTemplate(unitId, ObjectMapperUtils.copyPropertiesOrCloneByMapper(templateDto, QuestionnaireTemplateDTO.class)));
+            unitIds.forEach(unitId ->  saveQuestionnaireTemplate(unitId, ObjectMapperUtils.copyPropertiesByMapper(templateDto, QuestionnaireTemplateDTO.class)));
         }
         templateDto.setId(questionnaireTemplate.getId());
         return templateDto;
@@ -258,7 +258,7 @@ public class QuestionnaireTemplateService {
         if (Optional.ofNullable(questionnaireTemplate.getSubAssetType()).isPresent()) {
             questionnaireTemplateResponseDTO.setSubAssetType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getSubAssetType().getId(), questionnaireTemplate.getSubAssetType().getName(), questionnaireTemplate.getSubAssetType().isSubAssetType()));
         }
-        questionnaireTemplateResponseDTO.setSections(ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(questionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class));
+        questionnaireTemplateResponseDTO.setSections(ObjectMapperUtils.copyCollectionPropertiesByMapper(questionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class));
 
         return questionnaireTemplateResponseDTO;
     }

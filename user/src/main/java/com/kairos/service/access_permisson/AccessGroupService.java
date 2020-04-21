@@ -127,7 +127,7 @@ public class AccessGroupService {
         if (CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())) {
             dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
         }
-        AccessGroup accessGroup = ObjectMapperUtils.copyPropertiesOrCloneByMapper(accessGroupDTO, AccessGroup.class);
+        AccessGroup accessGroup = ObjectMapperUtils.copyPropertiesByMapper(accessGroupDTO, AccessGroup.class);
         accessGroup.setDayTypes(dayTypes);
 
         organization.getAccessGroups().add(accessGroup);
@@ -788,7 +788,7 @@ public class AccessGroupService {
             if (isNull(accessGroupQueryResult)) {
                 exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
             }
-            accessGroupQueryResult = ObjectMapperUtils.copyPropertiesOrCloneByMapper(accessGroupQueryResult, AccessGroupStaffQueryResult.class);
+            accessGroupQueryResult = ObjectMapperUtils.copyPropertiesByMapper(accessGroupQueryResult, AccessGroupStaffQueryResult.class);
             String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
             boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
             boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
@@ -812,7 +812,7 @@ public class AccessGroupService {
 
     public ReasonCodeWrapper getAbsenceReasonCodesAndAccessRole(Long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = findUserAccessRole(unitId);
-        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
+        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
 
         return new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO);
     }
@@ -824,7 +824,7 @@ public class AccessGroupService {
 
 
     public List<StaffAccessGroupDTO> getStaffAndAccessGroupsByUnitId(Long unitId, List<Long> accessGroupId) {
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsByUnitId(unitId, accessGroupId), StaffAccessGroupDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsByUnitId(unitId, accessGroupId), StaffAccessGroupDTO.class);
     }
 
     public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId) {
@@ -854,7 +854,7 @@ public class AccessGroupService {
 
     public void linkParentOrganizationAccessGroup(Unit unit, Long parentOrganizationId) {
         List<AccessGroupQueryResult> accessGroupQueryResults = getOrganizationAccessGroups(parentOrganizationId);
-        List<AccessGroup> accessGroupList = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(accessGroupQueryResults, AccessGroup.class);
+        List<AccessGroup> accessGroupList = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupQueryResults, AccessGroup.class);
         unit.setAccessGroups(accessGroupList);
         accessGroupRepository.saveAll(accessGroupList);
 
@@ -882,7 +882,7 @@ public class AccessGroupService {
     public List<AccessGroup> validAccessGroupByDate(Long unitId,Date date){
         AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
         List<AccessGroup> accessGroups = new ArrayList<>();
-        List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
+        List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
         for (AccessGroupDayTypesQueryResult accessGroupDayTypesQueryResult : accessGroupDayTypesQueryResults) {
             if(isNotNull(accessGroupDayTypesQueryResult.getAccessGroup())){
                 if(!accessGroupDayTypesQueryResult.getAccessGroup().isAllowedDayTypes() && isDayTypeValid(date,accessGroupDayTypesQueryResult.getDayTypes()));{

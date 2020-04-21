@@ -78,7 +78,7 @@ public class OrganizationHierarchyService {
         for (String filterType : filterTypeDataMap.keySet()) {
             FilterResponseDTO filterResponseDTO = new FilterResponseDTO();
             setDetails(filterType, filterResponseDTO);
-            List<FilterAttributes> filterAttributes = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper((List<Map>) filterTypeDataMap.get(filterType), FilterAttributes.class);
+            List<FilterAttributes> filterAttributes = ObjectMapperUtils.copyCollectionPropertiesByMapper((List<Map>) filterTypeDataMap.get(filterType), FilterAttributes.class);
             filterResponseDTO.setFilterData(filterAttributes);
             filterResponseDTOList.add(filterResponseDTO);
         }
@@ -116,7 +116,7 @@ public class OrganizationHierarchyService {
         Set<Long> organizationIds = new HashSet<>();
         List<StaffAccessGroupQueryResult> staffAccessGroupQueryResults = accessPageService.getAccessPermission(UserContext.getUserDetails().getId(), getAllUnitIds(organizationHierarchy, organizationIds));
         Map<Long, Boolean> unitPermissionMap = staffAccessGroupQueryResults.stream().collect(Collectors.toMap(StaffAccessGroupQueryResult::getUnitId, StaffAccessGroupQueryResult::isHasPermission));
-        QueryResult data = ObjectMapperUtils.copyPropertiesOrCloneByMapper(organizationHierarchy, QueryResult.class);
+        QueryResult data = ObjectMapperUtils.copyPropertiesByMapper(organizationHierarchy, QueryResult.class);
         boolean hub = ((organizationHierarchy instanceof Organization) && ((Organization) organizationHierarchy).isKairosHub());
         Long hubId=unitGraphRepository.getHubIdByOrganizationId(organizationHierarchy.getId());
         setPermission(data, unitPermissionMap, countryAdmin, hub ? 0 : 1,hubId,(organizationHierarchy instanceof Unit));

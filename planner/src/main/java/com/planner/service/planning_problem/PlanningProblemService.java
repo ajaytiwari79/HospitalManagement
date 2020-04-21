@@ -23,7 +23,7 @@ public class PlanningProblemService {
     private PlanningProblemRepository planningProblemRepository;
 
     public void createPlanningProblem(PlanningProblemDTO planningProblemDTO) {
-        PlanningProblem planningProblem = ObjectMapperUtils.copyPropertiesOrCloneByMapper(planningProblemDTO, PlanningProblem.class);
+        PlanningProblem planningProblem = ObjectMapperUtils.copyPropertiesByMapper(planningProblemDTO, PlanningProblem.class);
         planningProblemRepository.saveEntity(planningProblem);
     }
 
@@ -31,14 +31,14 @@ public class PlanningProblemService {
         Optional<PlanningProblem> planningProblemOptional = planningProblemRepository.findById(planningProblemDTOId);
         PlanningProblemDTO planningProblemDTO = null;
         if (planningProblemOptional.isPresent()) {
-            planningProblemDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(planningProblemOptional.get(), PlanningProblemDTO.class);
+            planningProblemDTO = ObjectMapperUtils.copyPropertiesByMapper(planningProblemOptional.get(), PlanningProblemDTO.class);
         }
         return planningProblemDTO;
     }
 
     public List<PlanningProblemDTO> getAllPlanningProblem() {
         List<PlanningProblem> planningProblems = planningProblemRepository.findAll();
-        return ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(planningProblems, PlanningProblemDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(planningProblems, PlanningProblemDTO.class);
     }
 
     public void updatePlanningProblem(PlanningProblemDTO planningProblemDTO) {
@@ -67,7 +67,7 @@ public class PlanningProblemService {
         defaultPlanningProblem.setDescription("This is for ShiftPlanning");
         defaultPlanningProblem.setType(PlanningProblemType.SHIFT_PLANNING);
         planningProblemRepository.saveEntity(defaultPlanningProblem);
-        PlanningProblemDTO planningProblemDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(defaultPlanningProblem, PlanningProblemDTO.class);
+        PlanningProblemDTO planningProblemDTO = ObjectMapperUtils.copyPropertiesByMapper(defaultPlanningProblem, PlanningProblemDTO.class);
         return planningProblemDTO;
     }
 

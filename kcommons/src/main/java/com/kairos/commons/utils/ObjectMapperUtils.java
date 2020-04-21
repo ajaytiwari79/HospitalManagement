@@ -50,21 +50,8 @@ public class ObjectMapperUtils {
         mapper.registerModule(javaTimeModule);
     }
 
-    /*public static <T,E extends Object> List<E> copyProperties(List<T> objects1, Class className) {
-        List<E> objects = new ArrayList<>();
-        for (int i = 0; i < objects1.size(); i++) {
-            try {
-                E e = (E) className.newInstance();
-                PropertyUtils.copyProperties(e,objects1.get(i));
-                objects.add(e);
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |InstantiationException e) {
-            }
-        }
-        return objects;
-    }
-*/
 
-    public static <T,E,F extends Collection> F copyPropertiesOrCloneCollectionByMapper(Collection<T> objects, Class<E> elementClass, Class... type) {
+    public static <T,E,F extends Collection> F copyCollectionPropertiesByMapper(Collection<T> objects, Class<E> elementClass, Class... type) {
         Class className = getClassByIntance(objects);
         try {
             return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
@@ -89,7 +76,7 @@ public class ObjectMapperUtils {
 
 
 
-    public static <E extends Object,T extends Object> T copyPropertiesOrCloneByMapper(E object, Class<T> valueType){
+    public static <E extends Object,T extends Object> T copyPropertiesByMapper(E object, Class<T> valueType){
         try {
             String json = mapper.writeValueAsString(object);
             return mapper.readValue(json, valueType);

@@ -170,7 +170,7 @@ public class ShiftCopyService extends MongoBaseService {
                 Date endDate = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getEndDate()));
                 if ((shiftCreationStartDate.equals(staffEmployment.getStartDate()) || shiftCreationStartDate.isAfter(staffEmployment.getStartDate())) &&
                         (staffEmployment.getEndDate() == null || shiftCreationStartDate.equals(staffEmployment.getEndDate()) || shiftCreationStartDate.isBefore(staffEmployment.getEndDate()))) {
-                    ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(sourceShift,ShiftDTO.class);
+                    ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift,ShiftDTO.class);
                     shiftDTO.getActivities().forEach(act->{
                         act.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(act.getStartDate())));
                         act.setEndDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(act.getEndDate())));
@@ -214,11 +214,11 @@ public class ShiftCopyService extends MongoBaseService {
     }
 
     public ShiftWithActivityDTO convertIntoShiftWithActivity(Shift sourceShift, Map<BigInteger, ActivityWrapper> activityMap,LocalDate shiftCreationStartDate) {
-        ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(sourceShift, ShiftWithActivityDTO.class);
+        ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift, ShiftWithActivityDTO.class);
         shiftWithActivityDTO.getActivities().forEach(s -> {
             s.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(s.getStartDate())));
             s.setEndDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(s.getEndDate())));
-            ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesOrCloneByMapper(activityMap.get(s.getActivityId()).getActivity(), ActivityDTO.class);
+            ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activityMap.get(s.getActivityId()).getActivity(), ActivityDTO.class);
             s.setActivity(activityDTO);
         });
         return shiftWithActivityDTO;
@@ -226,7 +226,7 @@ public class ShiftCopyService extends MongoBaseService {
 
     private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffEmploymentDetails staffEmployment, Date startDate, Date endDate, List<Shift> newShifts,  Map<BigInteger, ActivityWrapper> activityMap, StaffEmploymentUnitDataWrapper dataWrapper, List<ActivityConfiguration> activityConfigurations, PlanningPeriodDTO planningPeriod) {
         if (responseMessages.isEmpty()) {
-            List<ShiftActivity> shiftActivities = ObjectMapperUtils.copyPropertiesOrCloneCollectionByMapper(sourceShift.getActivities(),ShiftActivity.class);
+            List<ShiftActivity> shiftActivities = ObjectMapperUtils.copyCollectionPropertiesByMapper(sourceShift.getActivities(),ShiftActivity.class);
             for (ShiftActivity shiftActivity : shiftActivities) {
                 shiftActivity.setStartDate(asDate(asLocalDate(startDate),asLocalTime(shiftActivity.getStartDate())));
                 shiftActivity.setEndDate(asDate(asLocalDate(endDate),asLocalTime(shiftActivity.getEndDate())));
