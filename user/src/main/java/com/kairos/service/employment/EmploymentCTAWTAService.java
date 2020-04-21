@@ -95,6 +95,9 @@ public class EmploymentCTAWTAService {
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = activityIntegrationService.getCTAWTAByExpertiseAndDate(expertiseId,unitId,selectedDate,employmentId);
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId,2);
         ExpertiseLine expertiseLine=currentExpertise.get().getCurrentlyActiveLine(selectedDate);
+        if(selectedDate.isBefore(currentExpertise.get().getStartDate())){
+            exceptionService.actionNotPermittedException(EMPLOYMENT_START_DATE_CANNOT_BE_BEFORE_EXPERTISE_START_DATE);
+        }
         SeniorityLevel appliedSeniorityLevel = seniorityLevelService.getSeniorityLevelByStaffAndExpertise(staffId, expertiseLine,currentExpertise.get().getId());
         SeniorityLevelQueryResult seniorityLevel = null;
         if (appliedSeniorityLevel != null) {
