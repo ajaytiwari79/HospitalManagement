@@ -430,6 +430,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_ZIPCODEID_NULL  = "message.zipCodeId.null ";
     public static final String MESSAGE_MUNICIPALITY_NULL  = "message.municipality.null ";
     public static final String END_DATE_FROM_END_DATE = "end_date.from.end_date";
+    public static final String EMPLOYMENT_START_DATE_CANNOT_BE_BEFORE_EXPERTISE_START_DATE = "employment.startdate.cannot.before.expertise.startdate";
     public static final String START_DATE_FROM_END_DATE = "start_date.from.end_date";
     public static final String MESSAGE_PUBLISH_EXPERTISE_UNION = "message.publish.expertise.union";
     public static final String MESSAGE_LOCATION_NAME_BLANK = "message.location.name.blank";
