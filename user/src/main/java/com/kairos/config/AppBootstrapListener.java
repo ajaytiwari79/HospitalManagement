@@ -106,94 +106,10 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     }
 
     public void createAccessPages() {
-
         if (accessPageRepository.count() == 0) {
-
-            String taskTypeArray[] = new String[]{
-                    "taskType.agreements",
-                    "taskType.balanceSettings",
-                    "taskType.general",
-                    "taskType.communication",
-                    "taskType.costIncome",
-                    "taskType.creationRules",
-                    "taskType.dependencies",
-                    "taskType.logging",
-                    "taskType.mainTask",
-                    "taskType.notification",
-                    "taskType.planningRules",
-                    "taskType.points",
-                    "taskType.resources",
-                    "taskType.restingTime",
-                    "taskType.skill",
-                    "taskType.staffType",
-                    "taskType.taskTypeSkill",
-                    "taskType.timeFrame",
-                    "taskType.timeRules",
-                    "taskType.visitation",
-                    "taskType.definations"
-            };
-            List<AccessPage> taskTypePages = new ArrayList<>();
-            for (String taskTypePage : taskTypeArray) {
-                AccessPage accessPage = new AccessPage(taskTypePage, environment.getProperty(taskTypePage));
-                taskTypePages.add(accessPage);
-            }
-            AccessPage taskType = new AccessPage("task-type", environment.getProperty("taskType"));
-            taskType.setModule(true);
-            taskType.setSubPages(taskTypePages);
-
-            String organizationArray[] = new String[]{
-                    "unit.general",
-                    "unit.location",
-                    "unit.services",
-                    "unit.skills",
-                    "unit.staff",
-                    "unit.manageHerichy",
-                    "unit.citizens",
-                    "unit.sms",
-                    "unit.integration",
-                    "unit.socialInfo",
-                    "unit.resources",
-                    "unit.management",
-                    "unit.openingHours",
-                    "unit.teams"
-            };
-
-            List<AccessPage> organizationPages = new ArrayList<>();
-            for (String organizationPage : organizationArray) {
-                AccessPage accessPage = new AccessPage(organizationPage, environment.getProperty(organizationPage));
-                organizationPages.add(accessPage);
-            }
-            AccessPage organization = new AccessPage("unit", environment.getProperty("unit"));
-            organization.setModule(true);
-            organization.setSubPages(organizationPages);
-
-            String countryArray[] = new String[]{
-                    "countrySettings.service",
-                    "countrySettings.organizationTypes",
-                    "countrySettings.calander",
-                    "countrySettings.skill",
-                    "countrySettings.mapSymbol",
-                    "countrySettings.taskType",
-                    "countrySettings.unitTypes"
-            };
-            List<AccessPage> countryPages = new ArrayList<>();
-            for (String countryPage : countryArray) {
-                AccessPage accessPage = new AccessPage(countryPage, environment.getProperty(countryPage));
-                countryPages.add(accessPage);
-            }
-            AccessPage country = new AccessPage("country-settings", environment.getProperty("countrySettings"));
-            country.setModule(true);
-            country.setSubPages(countryPages);
-
-            String visitatorArray[] = new String[]{"visitatorWorkflow.manageTask"};
-            List<AccessPage> visitatorPages = new ArrayList<>();
-            for (String visitatorPage : visitatorArray) {
-                AccessPage accessPage = new AccessPage(visitatorPage, environment.getProperty(visitatorPage));
-                visitatorPages.add(accessPage);
-            }
-            AccessPage visitator = new AccessPage("visitator-workflow", environment.getProperty("visitatorWorkflow"));
-            visitator.setModule(true);
-            visitator.setSubPages(visitatorPages);
+            List<AccessPage> taskTypePages = addTaskTypeAccessPage();
+            List<AccessPage> countryPages = getCountryAccessPages();
+            AccessPage visitator = addVisitorsAccessPage();
 
             //modules having without tab ids
             AccessPage dashBoard = new AccessPage("dashboard", environment.getProperty("dashboard"));
@@ -205,8 +121,71 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
             AccessPage planning = new AccessPage("planning",environment.getProperty("planning"));
             planning.setModule(true);
 
+            AccessPage taskType = new AccessPage("task-type", environment.getProperty("taskType"));
+            taskType.setModule(true);
+            taskType.setSubPages(taskTypePages);
+            AccessPage organization = getOrgAccessPage();
+            AccessPage country = new AccessPage("country-settings", environment.getProperty("countrySettings"));
+            country.setModule(true);
+            country.setSubPages(countryPages);
             accessPageRepository.saveAll(Arrays.asList(dashBoard, citizen, taskType, country, organization, visitator,planning));
         }
+    }
+
+    private AccessPage getOrgAccessPage() {
+        List<AccessPage> organizationPages = getOrganizationAccessPages();
+        AccessPage organization = new AccessPage("unit", environment.getProperty("unit"));
+        organization.setModule(true);
+        organization.setSubPages(organizationPages);
+        return organization;
+    }
+
+    private AccessPage addVisitorsAccessPage() {
+        List<AccessPage> visitatorPages = getVisitorAccessPages();
+        AccessPage visitator = new AccessPage("visitator-workflow", environment.getProperty("visitatorWorkflow"));
+        visitator.setModule(true);
+        visitator.setSubPages(visitatorPages);
+        return visitator;
+    }
+
+    private List<AccessPage> getVisitorAccessPages() {
+        String[] visitatorArray = new String[]{"visitatorWorkflow.manageTask"};
+        List<AccessPage> visitatorPages = new ArrayList<>();
+        for (String visitatorPage : visitatorArray) {
+            AccessPage accessPage = new AccessPage(visitatorPage, environment.getProperty(visitatorPage));
+            visitatorPages.add(accessPage);
+        }
+        return visitatorPages;
+    }
+
+    private List<AccessPage> getCountryAccessPages() {
+        String[] countryArray = new String[]{"countrySettings.service", "countrySettings.organizationTypes", "countrySettings.calander", "countrySettings.skill", "countrySettings.mapSymbol", "countrySettings.taskType", "countrySettings.unitTypes"};
+        List<AccessPage> countryPages = new ArrayList<>();
+        for (String countryPage : countryArray) {
+            AccessPage accessPage = new AccessPage(countryPage, environment.getProperty(countryPage));
+            countryPages.add(accessPage);
+        }
+        return countryPages;
+    }
+
+    private List<AccessPage> getOrganizationAccessPages() {
+        String[] organizationArray = new String[]{"unit.general", "unit.location", "unit.services", "unit.skills", "unit.staff", "unit.manageHerichy", "unit.citizens", "unit.sms", "unit.integration", "unit.socialInfo", "unit.resources", "unit.management", "unit.openingHours", "unit.teams"};
+        List<AccessPage> organizationPages = new ArrayList<>();
+        for (String organizationPage : organizationArray) {
+            AccessPage accessPage = new AccessPage(organizationPage, environment.getProperty(organizationPage));
+            organizationPages.add(accessPage);
+        }
+        return organizationPages;
+    }
+
+    private List<AccessPage> addTaskTypeAccessPage() {
+        String[] taskTypeArray = new String[]{"taskType.agreements", "taskType.balanceSettings", "taskType.general", "taskType.communication", "taskType.costIncome", "taskType.creationRules", "taskType.dependencies", "taskType.logging", "taskType.mainTask", "taskType.notification", "taskType.planningRules", "taskType.points", "taskType.resources", "taskType.restingTime", "taskType.skill", "taskType.staffType", "taskType.taskTypeSkill", "taskType.timeFrame", "taskType.timeRules", "taskType.visitation", "taskType.definations"};
+        List<AccessPage> taskTypePages = new ArrayList<>();
+        for (String taskTypePage : taskTypeArray) {
+            AccessPage accessPage = new AccessPage(taskTypePage, environment.getProperty(taskTypePage));
+            taskTypePages.add(accessPage);
+        }
+        return taskTypePages;
     }
 
     public void generateSequence(){

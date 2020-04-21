@@ -4,8 +4,6 @@ import com.kairos.annotations.KPermissionField;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 /**
  * Created by vipul on 24/8/17.
  */

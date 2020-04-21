@@ -752,14 +752,13 @@ public class WorkTimeAgreementService{
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
         }
-            WorkingTimeAgreement newWta = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
-            newWta.setDescription(wtadto.getDescription());
-            newWta.setName(wtadto.getName());
-            newWta.setOrganizationParentId(oldWta.getOrganizationParentId());
-            newWta.setStartDate(wtadto.getStartDate());
-            newWta.setEndDate((wtadto.getEndDate() != null && wtadto.getStartDate().isBefore(wtadto.getEndDate())) ? wtadto.getEndDate() : null);
-            newWta.setRuleTemplateIds(null);
-
+        WorkingTimeAgreement newWta = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
+        newWta.setDescription(wtadto.getDescription());
+        newWta.setName(wtadto.getName());
+        newWta.setOrganizationParentId(oldWta.getOrganizationParentId());
+        newWta.setStartDate(wtadto.getStartDate());
+        newWta.setEndDate(wtadto.getEndDate() != null ? wtadto.getEndDate() : null);
+        newWta.setRuleTemplateIds(null);
         oldWta.setDisabled(true);
             if (oldWta.getStartDate().isBefore(wtadto.getStartDate()) || (isNotNull(oldWta.getEndDate()) && oldWta.getEndDate().equals(wtadto.getEndDate()))) {
                 oldWta.setEndDate(wtadto.getStartDate().minusDays(1));

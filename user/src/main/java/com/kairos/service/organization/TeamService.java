@@ -18,7 +18,6 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -81,33 +80,19 @@ public class TeamService {
     private AccessGroupService accessGroupService;
 
     public TeamDTO createTeam(Long unitId, TeamDTO teamDTO) {
-
         OrganizationContactAddress organizationContactAddress = unitGraphRepository.getOrganizationByOrganizationId(unitId);
-        if (organizationContactAddress.getUnit() == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_UNIT_ID_NOTFOUND_BY_GROUP);
-        }
-        boolean teamExistInOrganizationByName = teamGraphRepository.teamExistInOrganizationByName(unitId, -1L, "(?i)" + teamDTO.getName());
-        if (teamExistInOrganizationByName) {
-            exceptionService.duplicateDataException(MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT, teamDTO.getName());
-        }
-
+        validateDetails(unitId, teamDTO, organizationContactAddress);
         Unit unit = organizationContactAddress.getUnit();
-
-        ContactAddress contactAddress;
-        ZipCode zipCode;
-        Municipality municipality;
-
-        zipCode = organizationContactAddress.getZipCode();
-        LOGGER.debug("zip code found is {}" , zipCode);
+        ZipCode zipCode = organizationContactAddress.getZipCode();
         if (zipCode == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
         }
-        municipality = organizationContactAddress.getMunicipality();
+        Municipality municipality = organizationContactAddress.getMunicipality();
         if (municipality == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
         }
-        contactAddress = new ContactAddress(municipality, organizationContactAddress.getContactAddress().getLongitude(), organizationContactAddress.getContactAddress().getLatitude(),
+        ContactAddress contactAddress = new ContactAddress(municipality, organizationContactAddress.getContactAddress().getLongitude(), organizationContactAddress.getContactAddress().getLatitude(),
                 organizationContactAddress.getContactAddress().getProvince(), organizationContactAddress.getContactAddress().getRegionName(), organizationContactAddress.getContactAddress().getCity(),
                 organizationContactAddress.getContactAddress().getCountry(), zipCode, organizationContactAddress.getContactAddress().getHouseNumber(),
                 organizationContactAddress.getContactAddress().getStreet(), organizationContactAddress.getContactAddress().getStreetUrl(), organizationContactAddress.getContactAddress().getFloorNumber()
@@ -116,12 +101,21 @@ public class TeamService {
         Team team = new Team(teamDTO.getName(), teamDTO.getDescription(), contactAddress);
         teamGraphRepository.save(team);
         teamDTO.setId(team.getId());
-
         unit.getTeams().add(team);
         unitGraphRepository.save(unit, 2);
         teamDTO.setId(team.getId());
         assignTeamLeadersToTeam(teamDTO, team);
         return teamDTO;
+    }
+
+    private void validateDetails(Long unitId, TeamDTO teamDTO, OrganizationContactAddress organizationContactAddress) {
+        if (organizationContactAddress.getUnit() == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_UNIT_ID_NOTFOUND_BY_GROUP);
+        }
+        boolean teamExistInOrganizationByName = teamGraphRepository.teamExistInOrganizationByName(unitId, -1L, "(?i)" + teamDTO.getName());
+        if (teamExistInOrganizationByName) {
+            exceptionService.duplicateDataException(MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT, teamDTO.getName());
+        }
     }
 
     public TeamDTO updateTeam(Long unitId, Long teamId, TeamDTO teamDTO) {

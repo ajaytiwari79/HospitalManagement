@@ -14,7 +14,6 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
-import org.joda.time.*;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
 import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;

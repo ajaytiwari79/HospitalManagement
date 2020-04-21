@@ -18,7 +18,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -92,6 +91,8 @@ public class Activity extends MongoBaseEntity {
         this.tags = tags;
 
     }
+
+
 
 
     public Activity(BalanceSettingsActivityTab balanceSettingsActivityTab) {

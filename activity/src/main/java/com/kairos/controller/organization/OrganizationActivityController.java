@@ -395,5 +395,4 @@ public class OrganizationActivityController {
     public ResponseEntity<Map<String, Object>> getAllAbsenceActivities(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getAllAbsenceActivity(unitId));
     }
-
 }

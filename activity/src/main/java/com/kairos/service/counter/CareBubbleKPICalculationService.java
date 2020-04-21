@@ -2,20 +2,14 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.AuditShiftDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.DateUtils.getHourByMinutes;
 import static com.kairos.dto.activity.counter.enums.XAxisConfig.HOURS;
-import static com.kairos.enums.shift.ShiftType.PRESENCE;
 
 @Service
 public class CareBubbleKPICalculationService implements KPIService{

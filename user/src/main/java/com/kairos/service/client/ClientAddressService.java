@@ -46,6 +46,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_T
 @Service
 @Transactional
 public class ClientAddressService{
+    public static final String MUNICIPALITIES = "municipalities";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
@@ -115,7 +116,7 @@ public class ClientAddressService{
             if (tempAddressQueryResult.getTemporaryAddress().isEnabled()) {
                 Map<String, Object> temporaryAddressInfo = filterAddressResponse(tempAddressQueryResult.getTemporaryAddress(),
                         tempAddressQueryResult.getTemporaryZipCode(), tempAddressQueryResult.getTemporaryAddressMunicipality(), tempAddressQueryResult.getTemporaryAddressHousingType());
-                temporaryAddressInfo.put("municipalities", (tempAddressQueryResult.getTemporaryZipCode() != null) ?
+                temporaryAddressInfo.put(MUNICIPALITIES, (tempAddressQueryResult.getTemporaryZipCode() != null) ?
                         FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(tempAddressQueryResult.getTemporaryZipCode().getId())) : Collections.emptyList());
                 temporaryAddressList.add(temporaryAddressInfo);
             }
@@ -128,7 +129,7 @@ public class ClientAddressService{
         if (clientAddressQueryResult.getSecondaryAddress() != null) {
             secondaryAddressInfo = filterAddressResponse(clientAddressQueryResult.getSecondaryAddress(),
                     clientAddressQueryResult.getSecondaryZipCode(), clientAddressQueryResult.getSecondaryAddressMunicipality(), clientAddressQueryResult.getSecondaryAddressHousingType());
-            secondaryAddressInfo.put("municipalities", (clientAddressQueryResult.getSecondaryAddress() != null && clientAddressQueryResult.getSecondaryZipCode() != null) ?
+            secondaryAddressInfo.put(MUNICIPALITIES, (clientAddressQueryResult.getSecondaryAddress() != null && clientAddressQueryResult.getSecondaryZipCode() != null) ?
                     FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(clientAddressQueryResult.getSecondaryZipCode().getId())) : Collections.emptyList());
         }
         return secondaryAddressInfo;
@@ -139,7 +140,7 @@ public class ClientAddressService{
         if (homeAddress != null) {
             homeAddressInfo = filterAddressResponse(homeAddress,
                     homeZipCode, homeAddressMunicipality, homeAddressHousingType);
-            homeAddressInfo.put("municipalities", (homeZipCode != null) ?
+            homeAddressInfo.put(MUNICIPALITIES, (homeZipCode != null) ?
                     FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(homeZipCode.getId())) : Collections.emptyList());
         }
         return homeAddressInfo;

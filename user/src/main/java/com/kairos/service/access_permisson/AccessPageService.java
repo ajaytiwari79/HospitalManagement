@@ -10,7 +10,6 @@ import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.*;
-import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.position.AccessPermissionAccessPageRelation;

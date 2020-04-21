@@ -2,8 +2,6 @@ package com.kairos.dto.activity.open_shift;
 
 import com.kairos.enums.DurationType;
 
-import java.io.Serializable;
-
 public class DurationField  {
     private Integer value;
     private DurationType type;

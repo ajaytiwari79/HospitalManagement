@@ -7,14 +7,13 @@ import com.kairos.persistence.model.weather.WeatherInfo;
 import com.kairos.persistence.repository.weather.WeatherRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
-import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +25,7 @@ import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.ERROR_RESOURCE_DATE_INCORRECT;
 import static com.kairos.constants.UserMessagesConstants.ERROR_WEATHER_NOTFOUND;
+
 
 /**
  * Created By G.P.Ranjan on 8/4/20

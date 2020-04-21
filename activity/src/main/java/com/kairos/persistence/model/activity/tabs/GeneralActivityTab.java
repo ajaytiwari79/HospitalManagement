@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,7 +27,9 @@ public class GeneralActivityTab  {
     private String code;
     @KPermissionField
     private String printoutSymbol;
+    @KPermissionField
     private BigInteger categoryId;
+    @KPermissionField
     private Boolean colorPresent;
     private String backgroundColor;
     @KPermissionField
