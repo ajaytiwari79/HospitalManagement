@@ -261,6 +261,9 @@ public class CostTimeAgreementService {
         if (save) {
             responseCTA = updateEmploymentCTA(oldCTA, ctaDTO);
         }
+        else if(!save&&updateSameCTA){
+            exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
+        }
         else if(!save&&!updateSameCTA){
             responseCTA = updateEmploymentCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
         }
