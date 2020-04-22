@@ -95,6 +95,7 @@ public class WeatherService {
             date = date.substring(0,10);
             newList.put(date,map);
         }
+        responseData.put("cnt",newList.values().size());
         responseData.put("list",newList.values());
     }
 
