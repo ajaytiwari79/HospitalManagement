@@ -40,7 +40,7 @@ public class WeatherService {
     @Inject
     private ExceptionService exceptionService;
     @Inject
-    @Qualifier("restTemplateWithoutAuth")
+    @Qualifier("restTemplateForThirdPartyAPI")
     private RestTemplate restTemplate;
     @Inject private EnvConfig envConfig;
 
