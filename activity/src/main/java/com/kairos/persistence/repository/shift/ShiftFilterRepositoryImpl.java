@@ -14,7 +14,9 @@ import javax.inject.Inject;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
 
 public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
 
@@ -46,10 +48,8 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         //fixme below code has to be modified with front end api, if activities are  selected, send them in one array
         Set<String> activityIds = new HashSet<>();
-
-
-        LookupOperation activityTimeTypeLookupOperation = null;
-        Criteria activityDetailsMatchCriteria = null;
+        LookupOperation activityTimeTypeLookupOperation = null, ctaLookupOperation = null, ctaTemplateLookupOperation = null;
+        Criteria activityDetailsMatchCriteria = null, ctaDetailsMatchCriteria = null;
 
         for (Map.Entry<FilterType, Set<T>> entry : filterTypes.entrySet()) {
             if (entry.getKey().equals(FilterType.ACTIVITY_STATUS)) {
@@ -81,19 +81,32 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
                 prepareRealtimeStatusMatchQueries(criteriaArrayList, (Set<String>) entry.getValue());
             } else if (entry.getKey().equals(FilterType.ESCALATION_CAUSED_BY)) {
                 criteria.and("shiftViolatedRules.escalationCausedBy").in(entry.getValue());
+            } else if (entry.getKey().equals(FilterType.CTA_ACCOUNT_TYPE)) {
+                ctaLookupOperation = lookup("costTimeAgreement", "employmentId", "employmentId", "ctaList");
+                ctaTemplateLookupOperation = lookup("cTARuleTemplate", "ctaList.ruleTemplateIds", "_id", "ruleTemplates");
+                ctaDetailsMatchCriteria = new Criteria("ruleTemplates.plannedTimeWithFactor.accountType");
+                ctaDetailsMatchCriteria.in(entry.getValue());
             }
         }
         if (!activityIds.isEmpty()) {
             criteria.and(ACTIVITY_IDS).in(activityIds);
         }
         Criteria[] orCriteriaArray = criteriaArrayList.stream().toArray(Criteria[]::new);
-        criteria.orOperator(orCriteriaArray);
+        if (isNotEmpty(criteriaArrayList)) {
+            criteria.orOperator(orCriteriaArray);
+        }
         AggregationOperation matchOperation = new MatchOperation(criteria);
         aggregationOperations.add(matchOperation);
         if (activityTimeTypeLookupOperation != null) {
             aggregationOperations.add(activityTimeTypeLookupOperation);
             aggregationOperations.add(new MatchOperation(activityDetailsMatchCriteria));
         }
+        if (ctaDetailsMatchCriteria != null) {
+            aggregationOperations.add(ctaLookupOperation);
+            aggregationOperations.add(ctaTemplateLookupOperation);
+            aggregationOperations.add(new MatchOperation(ctaDetailsMatchCriteria));
+        }
+
         GroupOperation groupOperation = group(STAFF_ID).addToSet("$$ROOT").as(SHIFTS);
         aggregationOperations.add(groupOperation);
         Aggregation aggregations = Aggregation.newAggregation(aggregationOperations);
