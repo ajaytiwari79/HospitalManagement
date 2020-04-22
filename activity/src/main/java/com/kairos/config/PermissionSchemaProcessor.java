@@ -20,20 +20,15 @@ public class PermissionSchemaProcessor implements BeanPostProcessor {
     public PermissionSchemaProcessor(List<Map<String, Object>> data, UserRestClient userRestClient, String userServiceUrl, String kpermissionDataPublish) {
         this.userRestClient =userRestClient;
         this.userServiceUrl= userServiceUrl;
-        try{
-            publishPermissionSchemaToUserService(userRestClient, data);
-        }catch (Exception e){
-            LOGGER.info("something went wrong while creating permission model");
-            LOGGER.error(e.getLocalizedMessage());
-        }
-
+        publishPermissionSchemaToUserService(userRestClient, data);
     }
 
     private void publishPermissionSchemaToUserService(UserRestClient userRestClient, List<Map<String, Object>> data){
         try {
             userRestClient.publishRequest(data, userServiceUrl, IntegrationOperation.CREATE, "/create_permission_schema", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {});
         }catch (Exception e){
-           //ignored
+            LOGGER.error("something went wrong while creating permission model");
+            LOGGER.error(e.getLocalizedMessage());
         }
 
     }
