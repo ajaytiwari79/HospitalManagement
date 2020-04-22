@@ -1,0 +1,6 @@
+MATCH(staff:Staff)-[r:STAFF_HAS_SKILLS]->(skill:Skill) WHERE id (staff)=21871 AND id(skill) IN [2034,2036,2037]
+DETACH delete r
+
+
+#Set user type of a user
+MATCH(user:User) WHERE user.userType IS NULL Set user.userType="USER_ACCOUNT"
