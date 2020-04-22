@@ -170,5 +170,11 @@ public class UserServiceApplication implements WebMvcConfigurer {
 				.build();
 	}
 
+	@Bean(name ="restTemplateForThirdPartyAPI")
+	public RestTemplate getRestTemplateForThirdPartyAPI(RestTemplateBuilder restTemplateBuilder) {
+		return restTemplateBuilder
+				.messageConverters(mappingJackson2HttpMessageConverter())
+				.build();
+	}
 }
 
