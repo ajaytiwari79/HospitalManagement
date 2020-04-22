@@ -31,6 +31,11 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     private static final String START_TIME = "shiftStartTime";
     private static final String STAFF_ID = "staffId";
     private static final String SHIFTS = "shifts";
+    private static final String CTA_TEMPLATES_COLLECTION = "cTARuleTemplate";
+    private static final String CTA_COLLECTION = "costTimeAgreement";
+    private static final String ID = "_id";
+    private static final String ACTIVITIES_COLLECTION = "activities";
+
 
     @Inject
     private MongoTemplate mongoTemplate;
@@ -40,12 +45,14 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     @Override
     public <T> List<StaffShiftDetails> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate) {
 
+        List<AggregationOperation> aggregationOperations = new ArrayList<>();
         List<Criteria> criteriaArrayList = new ArrayList<>();
+
         Criteria criteria = new Criteria();
         criteria.and(UNIT_ID).is(unitId);
         criteria.and(EMPLOYMENT_ID).in(employmentIds);
         criteria.and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
-        List<AggregationOperation> aggregationOperations = new ArrayList<>();
+
         //fixme below code has to be modified with front end api, if activities are  selected, send them in one array
         Set<String> activityIds = new HashSet<>();
         LookupOperation activityTimeTypeLookupOperation = null, ctaLookupOperation = null, ctaTemplateLookupOperation = null;
@@ -63,14 +70,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
             } else if (entry.getKey().equals(FilterType.VALIDATED_BY)) {
                 criteria.and(VALIDATED_BY_ROLES).in(entry.getValue());
             } else if (entry.getKey().equals(FilterType.TIME_SLOT)) {
-                List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlotByNames(unitId, (Set<String>) entry.getValue());
-                Criteria timeslotCriteria;
-                for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
-                    timeslotCriteria = new Criteria();
-                    Integer startTime = (timeSlotDTO.getStartHour() * 60 * 60) + (timeSlotDTO.getStartMinute() * 60);
-                    timeslotCriteria.and(START_TIME).gte(startTime);
-                    criteriaArrayList.add(timeslotCriteria);
-                }
+                prepareTimeSlotCriteria(criteria, (Set<String>) entry.getValue(), criteriaArrayList, unitId);
             } else if (entry.getKey().equals(FilterType.TIME_TYPE)) {
                 activityTimeTypeLookupOperation = getActivityLookupOperation(activityTimeTypeLookupOperation);
                 activityDetailsMatchCriteria = getActivityLookupTimeTypeMatchCriteria(activityDetailsMatchCriteria, (Set<String>) entry.getValue());
@@ -82,8 +82,8 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
             } else if (entry.getKey().equals(FilterType.ESCALATION_CAUSED_BY)) {
                 criteria.and("shiftViolatedRules.escalationCausedBy").in(entry.getValue());
             } else if (entry.getKey().equals(FilterType.CTA_ACCOUNT_TYPE)) {
-                ctaLookupOperation = lookup("costTimeAgreement", "employmentId", "employmentId", "ctaList");
-                ctaTemplateLookupOperation = lookup("cTARuleTemplate", "ctaList.ruleTemplateIds", "_id", "ruleTemplates");
+                ctaLookupOperation = lookup(CTA_COLLECTION, EMPLOYMENT_ID, EMPLOYMENT_ID, "ctaList");
+                ctaTemplateLookupOperation = lookup(CTA_TEMPLATES_COLLECTION, "ctaList.ruleTemplateIds", ID, "ruleTemplates");
                 ctaDetailsMatchCriteria = new Criteria("ruleTemplates.plannedTimeWithFactor.accountType");
                 ctaDetailsMatchCriteria.in(entry.getValue());
             }
@@ -91,10 +91,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         if (!activityIds.isEmpty()) {
             criteria.and(ACTIVITY_IDS).in(activityIds);
         }
-        Criteria[] orCriteriaArray = criteriaArrayList.stream().toArray(Criteria[]::new);
-        if (isNotEmpty(criteriaArrayList)) {
-            criteria.orOperator(orCriteriaArray);
-        }
+
         AggregationOperation matchOperation = new MatchOperation(criteria);
         aggregationOperations.add(matchOperation);
         if (activityTimeTypeLookupOperation != null) {
@@ -127,9 +124,9 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     private LookupOperation getActivityLookupOperation(LookupOperation lookupOperation) {
         if (lookupOperation == null) {
             lookupOperation = LookupOperation.newLookup()
-                    .from("activities")
+                    .from(ACTIVITIES_COLLECTION)
                     .localField(ACTIVITY_IDS)
-                    .foreignField("_id")
+                    .foreignField(ID)
                     .as("matchedActivities");
         }
         return lookupOperation;
@@ -175,9 +172,21 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
             }
             criteriaArrayList.add(statusMatch);
         }
-
-
     }
 
+    private void prepareTimeSlotCriteria(final Criteria criteria, final Set<String> values, final List<Criteria> criteriaArrayList, final Long unitId) {
+        List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlotByNames(unitId, values);
+        Criteria timeslotCriteria;
+        for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
+            timeslotCriteria = new Criteria();
+            Integer startTime = (timeSlotDTO.getStartHour() * 60 * 60) + (timeSlotDTO.getStartMinute() * 60);
+            timeslotCriteria.and(START_TIME).gte(startTime);
+            criteriaArrayList.add(timeslotCriteria);
+        }
+        Criteria[] orCriteriaArray = criteriaArrayList.stream().toArray(Criteria[]::new);
+        if (isNotEmpty(criteriaArrayList)) {
+            criteria.orOperator(orCriteriaArray);
+        }
+    }
 
 }
