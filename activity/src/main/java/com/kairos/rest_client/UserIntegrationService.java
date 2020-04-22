@@ -47,6 +47,7 @@ import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.rest_client.MicroService;
@@ -945,6 +946,10 @@ public class UserIntegrationService {
         LOGGER.debug("filter selections being sent {}",shiftSearchDTO);
         return genericRestClient.publishRequest(shiftSearchDTO, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/staff/get_all_planning_staff", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffShiftDetails>>>() {
         });
+    }
+
+    public void createPermissionModels(List<Map<String, Object>> permissionSchema){
+        genericRestClient.publishRequest(permissionSchema, null, RestClientUrlType.ORGANIZATION,HttpMethod.POST, "/create_permission_schema", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
     }
 
 
