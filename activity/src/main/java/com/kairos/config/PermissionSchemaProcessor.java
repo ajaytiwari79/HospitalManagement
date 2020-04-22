@@ -20,7 +20,7 @@ public class PermissionSchemaProcessor implements BeanPostProcessor {
     public PermissionSchemaProcessor(List<Map<String, Object>> data, UserRestClient userRestClient, String userServiceUrl, String kpermissionDataPublish) {
         this.userRestClient =userRestClient;
         this.userServiceUrl= userServiceUrl;
-        publishPermissionSchemaToUserService(userRestClient, data);
+        //publishPermissionSchemaToUserService(userRestClient, data);
     }
 
     private void publishPermissionSchemaToUserService(UserRestClient userRestClient, List<Map<String, Object>> data){
