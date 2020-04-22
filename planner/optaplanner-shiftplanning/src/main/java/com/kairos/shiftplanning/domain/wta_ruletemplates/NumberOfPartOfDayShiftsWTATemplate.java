@@ -30,7 +30,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
 
     @Positive(message = "message.ruleTemplate.interval.notNull")

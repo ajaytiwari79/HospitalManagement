@@ -5,9 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.Day;
+import com.kairos.enums.TimeCalaculationType;
+import com.kairos.enums.TimeTypes;
 import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
@@ -21,6 +25,8 @@ import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staff.Employee;
+import com.kairos.shiftplanning.domain.staff.Employment;
+import com.kairos.shiftplanning.domain.staff.EmploymentLine;
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelActivityType;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelPlannerEntity;
@@ -41,6 +47,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +84,10 @@ public class ShiftPlanningUtility {
     public static final int THIRD_BREAK_END_MINUTES = 615;
     private static Logger log = LoggerFactory.getLogger(ShiftPlanningUtility.class);
     public static final String ERROR = "Error {}";
+    public static final String ENTERED_TIMES = "ENTERED_TIMES";
+    public static final String WEEKLY_HOURS = "WEEKLY_HOURS";
+    public static final String FIXED_TIME = "FIXED_TIME";
+    public static final String ENTERED_MANUALLY = "ENTERED_MANUALLY";
 
     public static Integer getStaffingLevelSatisfaction(StaffingLevelPlannerEntity staffingLevel) {
         int[] invalidShiftIntervals = new int[1];
@@ -631,18 +642,18 @@ public class ShiftPlanningUtility {
         return mergedIntervals;
     }
 
-    public static Object[] getMergedShiftActivitys(List<ActivityLineInterval> intervals) {
+    public static Object[] getMergedShiftActivitys(ShiftImp shiftImp) {
         Set<BigInteger> activityIds = new HashSet<>();
         Set<BigInteger> timeTypeIds = new HashSet<>();
         Set<BigInteger> plannedTimeTypeIds = new HashSet<>();
-        if (intervals.isEmpty()) {
+        if (shiftImp.getActivityLineIntervals().isEmpty()) {
             return new Object[]{new ArrayList<>(),activityIds,plannedTimeTypeIds,timeTypeIds};
         }
         List<ShiftActivity> shiftActivities = new ArrayList<>();
-        intervals.sort(Comparator.comparing(ActivityLineInterval::getStart));
-        ShiftActivity shiftActivity = intervals.get(0).getShiftActivity();
-        BigInteger id = intervals.get(0).getActivity().getId();
-        for (ActivityLineInterval ali : intervals) {
+        shiftImp.getActivityLineIntervals().sort(Comparator.comparing(ActivityLineInterval::getStart));
+        ShiftActivity shiftActivity = shiftImp.getActivityLineIntervals().get(0).getShiftActivity();
+        BigInteger id = shiftImp.getActivityLineIntervals().get(0).getActivity().getId();
+        for (ActivityLineInterval ali : shiftImp.getActivityLineIntervals()) {
             if (shiftActivity.getInterval().getEnd().equals(ali.getStart()) && id.equals(ali.getActivity().getId())) {
                 shiftActivity.setEndDate(ali.getEnd());
             } else if (shiftActivity.getEndDate().equals(ali.getStart()) && !id.equals(ali.getActivity().getId()) || shiftActivity.getEndDate().isBefore(ali.getStart())) {
@@ -653,6 +664,7 @@ public class ShiftPlanningUtility {
                 shiftActivity = ali.getShiftActivity();
                 id = ali.getActivity().getId();
             }
+            calculateScheduledAndDurationInMinutes(shiftActivity,shiftImp.getEmployee().getEmployment().getEmploymentLinesByDate(shiftActivity.getStartDate().toLocalDate()));
         }
         //to add last one
         activityIds.add(shiftActivity.getActivity().getId());
@@ -662,6 +674,47 @@ public class ShiftPlanningUtility {
         shiftActivities.sort(Comparator.comparing(ShiftActivity::getStartDate));
         return new Object[]{shiftActivities,activityIds,plannedTimeTypeIds,timeTypeIds};
     }
+
+    public static void calculateScheduledAndDurationInMinutes(ShiftActivity shiftActivity, EmploymentLine employmentLine) {
+        int scheduledMinutes = 0;
+        int duration = 0;
+        int weeklyMinutes;
+        switch (shiftActivity.getActivity().getMethodForCalculatingTime()) {
+            case ENTERED_MANUALLY:
+                duration = shiftActivity.getDurationMinutes();
+                scheduledMinutes = Double.valueOf(duration * shiftActivity.getActivity().getMultiplyWithValue()).intValue();
+                break;
+            case FIXED_TIME:
+                duration = shiftActivity.getActivity().getFixedTimeValue().intValue();
+                scheduledMinutes = Double.valueOf(duration * shiftActivity.getActivity().getMultiplyWithValue()).intValue();
+                break;
+            case ENTERED_TIMES:
+                duration = (int) new DateTimeInterval(shiftActivity.getStartDate(), shiftActivity.getEndDate()).getMinutes();
+                scheduledMinutes = Double.valueOf(duration * shiftActivity.getActivity().getMultiplyWithValue()).intValue();
+                break;
+            case CommonConstants.FULL_DAY_CALCULATION:
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(shiftActivity.getActivity().getFullDayCalculationType())) ? employmentLine.getFullTimeWeeklyMinutes() : employmentLine.getTotalWeeklyMinutes();
+                duration = Double.valueOf(weeklyMinutes * shiftActivity.getActivity().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+                break;
+            case WEEKLY_HOURS:
+                duration = Double.valueOf(employmentLine.getTotalWeeklyMinutes() * shiftActivity.getActivity().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+                break;
+            case CommonConstants.FULL_WEEK:
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(shiftActivity.getActivity().getFullWeekCalculationType())) ? employmentLine.getFullTimeWeeklyMinutes() : employmentLine.getTotalWeeklyMinutes();
+                duration = Double.valueOf(weeklyMinutes * shiftActivity.getActivity().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+                break;
+            default:
+                break;
+        }
+        if (TimeTypes.WORKING_TYPE.equals(shiftActivity.getActivity().getTimeType().getTimeTypes())) {
+            shiftActivity.setDurationMinutes(duration);
+            shiftActivity.setScheduledMinutes(scheduledMinutes);
+        }
+    }
+
 
     public static int getMinutes(ZonedDateTime start, ZonedDateTime end) {
         return (int) new DateTimeInterval(start, end).getMinutes();

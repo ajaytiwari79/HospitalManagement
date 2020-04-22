@@ -7,6 +7,7 @@ import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.TimeSlot;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.DateTime;
@@ -20,6 +21,7 @@ import static com.kairos.commons.utils.DateUtils.getStartOfDay;
 @Getter
 @Setter
 @AllArgsConstructor
+@EqualsAndHashCode
 public class MaxLengthOfShiftInNightTimeSlot implements Constraint {
 
     private ScoreLevel level;

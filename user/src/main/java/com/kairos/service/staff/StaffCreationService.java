@@ -299,10 +299,11 @@ public class StaffCreationService {
         final String password = payload.getFirstName().replaceAll("\\s+", "") + DEFAULT_PASSPHRASE_ENDS_WITH;
         user.setPassword(new BCryptPasswordEncoder().encode(password));
         user.setCountryId(organization.getCountry().getId());
+        user.setUserType(UserType.USER_ACCOUNT);
         staff = updateStaffDetailsOnCreationOfStaff(organization, payload);
         staff.setUser(user);
         staffGraphRepository.save(staff);
-        positionService.createPosition(organization, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis());
+        positionService.createPosition(organization, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis(),unitId);
         if(StaffStatusEnum.ACTIVE.equals(payload.getCurrentStatus())) {
             staffService.addStaffInChatServer(staff);
             DefaultKPISettingDTO defaultKPISettingDTO = new DefaultKPISettingDTO(Arrays.asList(staff.getId()));
@@ -398,7 +399,7 @@ public class StaffCreationService {
             Staff staff = updateStaffDetailsOnImportingFromTimeCare(timeCareStaffDTO, organization, email);
             staff.setUser(user);
             staffGraphRepository.save(staff);
-            positionService.createPosition(organization, staff, payload.getAccessGroupId(), null);
+            positionService.createPosition(organization, staff, payload.getAccessGroupId(), null,null);
         }
         return true;
     }

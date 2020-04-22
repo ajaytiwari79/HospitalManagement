@@ -68,6 +68,7 @@ public class ShiftImp implements Shift{
     private boolean isCreatedByStaff;
     private List<ShiftActivity> actualShiftActivities = new ArrayList<>();
     private List<ShiftActivity> shiftActivities = new ArrayList<>();
+    private List<ShiftActivity> breakActivities = new ArrayList<>();
     private Set<BigInteger> activitiesTimeTypeIds = new HashSet<>();
     private Set<BigInteger> activityIds = new HashSet<>();
     private Set<BigInteger> activitiesPlannedTimeIds = new HashSet<>();
@@ -204,7 +205,7 @@ public class ShiftImp implements Shift{
 
     @Override
     public String toString() {
-        return "Shift{"+id.toString().substring(0,6)+":"+
+        return "Shift{"+id.toString()+":"+
                 date.format(DateTimeFormatter.ofPattern("[MM/dd]"))+"" + (Optional.ofNullable(startTime).isPresent()?startTime.format(DateTimeFormatter.ofPattern("HH:mm")):"") +
                 "," +  (Optional.ofNullable(endTime).isPresent()?endTime.format(DateTimeFormatter.ofPattern("HH:mm")):"") +
                 "}";
@@ -218,9 +219,7 @@ public class ShiftImp implements Shift{
         }
         return false;
     }
-    public String getPrettyId(){
-        return id.toString().substring(0,6);
-    }
+
     public boolean isAbsenceActivityApplied(){
         return CollectionUtils.isNotEmpty(activityLineIntervals) && new ArrayList<>(activityLineIntervals).get(0).getActivity().isTypeAbsence();
     }

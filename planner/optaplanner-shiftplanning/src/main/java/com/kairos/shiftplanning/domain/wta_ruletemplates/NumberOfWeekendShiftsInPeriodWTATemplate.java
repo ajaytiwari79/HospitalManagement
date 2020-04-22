@@ -33,7 +33,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplate {
 
 

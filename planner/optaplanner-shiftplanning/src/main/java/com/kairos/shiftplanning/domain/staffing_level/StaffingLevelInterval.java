@@ -2,6 +2,7 @@ package com.kairos.shiftplanning.domain.staffing_level;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode
 @XStreamAlias("StaffingLevelInterval")
 public class StaffingLevelInterval {
     private ZonedDateTime start;

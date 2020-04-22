@@ -8,6 +8,7 @@ import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.WTABaseRuleTemplate;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,33 +39,27 @@ public class Employee {
     private Location location;
     private String name;
     private Set<Skill> skillSet;
-    private Long expertiseId;
-    private int totalWeeklyMinutes;
-    private int workingDaysInWeek;
     private PaidOutFrequencyEnum paidOutFrequencyEnum;
-    private Long employmentTypeId;
-    private Long employmentId;
     private SeniorAndChildCareDays seniorAndChildCareDays;
     private List<StaffChildDetail> staffChildDetails;
     private Set<Tag> tags;
     private Map<BigInteger,ShiftImp> actualShiftsMap;
     private Set<Team> teams;
     private boolean nightWorker;
+    private Employment employment;
     private ExpertiseNightWorkerSetting expertiseNightWorkerSetting;
     private Unit unit;
     private Map<LocalDate,Map<ConstraintSubType, WTABaseRuleTemplate>> wtaRuleTemplateMap;
     private BreakSettings breakSettings;
+    private Map<LocalDate,BigDecimal> functionalBonus = new HashMap<>();
 
-    public Employee(Long id, String name, Set<Skill> skillSet, Long expertiseId, int totalWeeklyMinutes, int workingDaysInWeek, PaidOutFrequencyEnum paidOutFrequencyEnum, Long employmentTypeId) {
+    public Employee(Long id, String name, Set<Skill> skillSet, PaidOutFrequencyEnum paidOutFrequencyEnum) {
         super();
         this.id = id;
         this.name = name;
         this.skillSet = skillSet;
-        this.expertiseId = expertiseId;
-        this.totalWeeklyMinutes=totalWeeklyMinutes;
-        this.workingDaysInWeek=workingDaysInWeek;
         this.paidOutFrequencyEnum=paidOutFrequencyEnum;
-        this.employmentTypeId = employmentTypeId;
+
     }
 
 
@@ -71,13 +67,6 @@ public class Employee {
         return "E:" + id;
     }
 
-    public Long getEmploymentId() {
-        return employmentId;
-    }
-
-    public void setEmploymentId(Long employmentId) {
-        this.employmentId = employmentId;
-    }
 
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps,ConstraintSubType constraintSubType) {
         return this.wtaRuleTemplateMap.get(shiftImp.getStartDate()).get(constraintSubType).checkConstraints(unit,shiftImp,shiftImps);
@@ -105,11 +94,4 @@ public class Employee {
         return id.hashCode();
     }
 
-    public Long getEmploymentTypeId() {
-        return employmentTypeId;
-    }
-
-    public void setEmploymentTypeId(Long employmentTypeId) {
-        this.employmentTypeId = employmentTypeId;
-    }
 }

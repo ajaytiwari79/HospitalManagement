@@ -25,7 +25,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;

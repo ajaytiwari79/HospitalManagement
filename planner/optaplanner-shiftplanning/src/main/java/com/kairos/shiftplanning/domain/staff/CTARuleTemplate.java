@@ -6,23 +6,34 @@ import com.kairos.dto.activity.cta.PlannedTimeWithFactor;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.enums.cta.*;
+import com.kairos.shiftplanning.domain.shift.PlannedTime;
+import lombok.*;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
 
 /**
  * @author pradeep
  * @date - 30/7/18
  */
 
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CTARuleTemplate {
 
-    protected String name;
-    protected String description;
-    protected boolean disabled;
-    protected BigInteger ruleTemplateCategoryId;
+    private BigInteger id;
+    private String name;
+    private String description;
+    private boolean disabled;
+    private BigInteger ruleTemplateCategoryId;
     private String ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
@@ -30,269 +41,68 @@ public class CTARuleTemplate {
     private CompensationTable compensationTable;
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
-    private List<CTARuleTemplatePhaseInfo> phaseInfo = new ArrayList<>(); //Query beforeStart
+    @Builder.Default
+    private List<CTARuleTemplatePhaseInfo> phaseInfo = new ArrayList<>();
     private BudgetType budgetType;
-
+    @Builder.Default
     private List<CalculateValueIfPlanned> calculateValueIfPlanned = new ArrayList<>();
-    private List<Long> employmentTypes = new ArrayList<>();
+    @Builder.Default
+    private Set<Long> employmentTypes = new HashSet<>();
     private PlanningCategory planningCategory;
-    private List<Long> staffFunctions = new ArrayList<>();
+    @Builder.Default
+    private Set<Long> staffFunctions = new HashSet<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
 
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
-    private List<Long> activityIds;
-    private Set<Long> timeTypeIds;
-    private Set<Long> plannedTimeIds;
-    private List<Long> dayTypeIds;
+    private Set<BigInteger> activityIds;
+    private Set<BigInteger> timeTypeIds;
+    private Set<BigInteger> plannedTimeIds;
+    private Set<Long> dayTypeIds;
     //it describe that this template is scheduledHoursTemplate or not
     private boolean calculateScheduledHours;
     private CalculationFor calculationFor;
     private Long countryId;
 
-
-
-
-    public CTARuleTemplate() {
-    //Default Constructor
+    public Set<BigInteger> getActivityIds(Set<BigInteger> activityIds) {
+        this.activityIds = isNotNull(activityIds) ? activityIds : new HashSet<>();
+        return this.activityIds;
     }
 
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
-    }
-
-    public BigInteger getRuleTemplateCategoryId() {
-        return ruleTemplateCategoryId;
-    }
-
-    public void setRuleTemplateCategoryId(BigInteger ruleTemplateCategoryId) {
-        this.ruleTemplateCategoryId = ruleTemplateCategoryId;
-    }
-
-    public void setEmploymentTypes(List<Long> employmentTypes) {
-        this.employmentTypes = employmentTypes;
-    }
-
-    public List<Long> getEmploymentTypes() {
-        return employmentTypes;
-    }
-
-
-
-    public boolean isCalculateScheduledHours() {
-        return calculateScheduledHours;
-    }
-
-    public void setCalculateScheduledHours(boolean calculateScheduledHours) {
-        this.calculateScheduledHours = calculateScheduledHours;
-    }
-
-    public CalculationFor getCalculationFor() {
-        return calculationFor;
-    }
-
-    public void setCalculationFor(CalculationFor calculationFor) {
-        this.calculationFor = calculationFor;
-    }
-
-    public ActivityTypeForCostCalculation getActivityTypeForCostCalculation() {
-        return activityTypeForCostCalculation;
-    }
-
-    public void setActivityTypeForCostCalculation(ActivityTypeForCostCalculation activityTypeForCostCalculation) {
-        this.activityTypeForCostCalculation = activityTypeForCostCalculation;
-    }
-
-    public List<Long> getActivityIds() {
-        return activityIds;
-    }
-
-    public void setActivityIds(List<Long> activityIds) {
-        this.activityIds = isNotNull(activityIds) ? activityIds : new ArrayList<>();
-    }
-
-    public Set<Long> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(Set<Long> timeTypeIds) {
+    public Set<BigInteger> getTimeTypeIds(Set<BigInteger> timeTypeIds) {
         this.timeTypeIds = isNotNull(timeTypeIds) ? timeTypeIds : new HashSet<>();
+        return this.timeTypeIds;
     }
 
-    public Set<Long> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(Set<Long> plannedTimeIds) {
+    public Set<BigInteger> getPlannedTimeIds(Set<BigInteger> plannedTimeIds) {
         this.plannedTimeIds = isNotNull(plannedTimeIds) ? plannedTimeIds : new HashSet<>();
+        return this.plannedTimeIds;
     }
 
-    public String getPayrollType() {
-        return payrollType;
-    }
-
-    public void setPayrollType(String payrollType) {
-        this.payrollType = payrollType;
-    }
-
-    public String getPayrollSystem() {
-        return payrollSystem;
-    }
-
-    public void setPayrollSystem(String payrollSystem) {
-        this.payrollSystem = payrollSystem;
-    }
-
-    public CalculationUnit getCalculationUnit() {
-        return calculationUnit;
-    }
-
-    public void setCalculationUnit(CalculationUnit calculationUnit) {
-        this.calculationUnit = calculationUnit;
-    }
-
-    public CompensationTable getCompensationTable() {
-        return compensationTable;
-    }
-
-    public void setCompensationTable(CompensationTable compensationTable) {
-        this.compensationTable = compensationTable;
-    }
-
-    public CalculateValueAgainst getCalculateValueAgainst() {
-        return calculateValueAgainst;
-    }
-
-    public void setCalculateValueAgainst(CalculateValueAgainst calculateValueAgainst) {
-        this.calculateValueAgainst = calculateValueAgainst;
-    }
-
-    public ApprovalWorkFlow getApprovalWorkFlow() {
-        return approvalWorkFlow;
-    }
-
-    public void setApprovalWorkFlow(ApprovalWorkFlow approvalWorkFlow) {
-        this.approvalWorkFlow = approvalWorkFlow;
-    }
-
-    public List<CTARuleTemplatePhaseInfo> getPhaseInfo() {
-        return phaseInfo;
-    }
-
-    public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
+    public List<CTARuleTemplatePhaseInfo> getPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
         this.phaseInfo = isNotNull(phaseInfo) ? phaseInfo : new ArrayList<>();
+        return this.phaseInfo;
     }
 
-    public BudgetType getBudgetType() {
-        return budgetType;
+    public Set<Long> getDayTypeIds(Set<Long> dayTypeIds) {
+        this.dayTypeIds = isNotNull(dayTypeIds) ? dayTypeIds : new HashSet<>();
+        return this.dayTypeIds;
     }
 
-    public void setBudgetType(BudgetType budgetType) {
-        this.budgetType = budgetType;
+    public boolean isRuleTemplateValid(Long employmentTypeId,BigInteger shiftPhaseId,BigInteger activityId,BigInteger timeTypeId,List<PlannedTime> plannedTimes){
+        return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentTypeId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityId,timeTypeId,plannedTimes) || this.getCalculationFor().equals(FUNCTIONS));
     }
 
-    public List<CalculateValueIfPlanned> getCalculateValueIfPlanned() {
-        return calculateValueIfPlanned;
+    private boolean isPhaseValid(BigInteger shiftPhaseId){
+        return this.getPhaseInfo().stream().filter(p -> shiftPhaseId.equals(p.getPhaseId())).findFirst().isPresent();
     }
 
-    public void setCalculateValueIfPlanned(List<CalculateValueIfPlanned> calculateValueIfPlanned) {
-        this.calculateValueIfPlanned = calculateValueIfPlanned;
+    private boolean isActivityAndTimeTypeAndPlannedTimeValid(BigInteger activityId,BigInteger timeTypeId,List<PlannedTime> plannedTimes){
+        return (this.getActivityIds().contains(activityId) || this.getTimeTypeIds().contains(timeTypeId)) && CollectionUtils.containsAny(this.getPlannedTimeIds(),plannedTimes.stream().map(plannedTime -> plannedTime.getPlannedTimeId()).collect(Collectors.toSet()));
     }
 
-
-    public PlanningCategory getPlanningCategory() {
-        return planningCategory;
+    private boolean isEmployementTypeValid(Long employmentId){
+        return this.getEmploymentTypes().contains(employmentId);
     }
 
-    public void setPlanningCategory(PlanningCategory planningCategory) {
-        this.planningCategory = planningCategory;
-    }
-
-    public List<Long> getStaffFunctions() {
-        return staffFunctions;
-    }
-
-    public void setStaffFunctions(List<Long> staffFunctions) {
-        this.staffFunctions = staffFunctions;
-    }
-
-    public PlannedTimeWithFactor getPlannedTimeWithFactor() {
-        return plannedTimeWithFactor;
-    }
-
-    public void setPlannedTimeWithFactor(PlannedTimeWithFactor plannedTimeWithFactor) {
-        this.plannedTimeWithFactor = plannedTimeWithFactor;
-    }
-
-
-    public List<Long> getDayTypeIds() {
-        return dayTypeIds;
-    }
-
-    public void setDayTypeIds(List<Long> dayTypeIds) {
-        this.dayTypeIds = isNotNull(dayTypeIds) ? dayTypeIds : new ArrayList<>();
-    }
-
-
-    public String getRuleTemplateType() {
-        return ruleTemplateType;
-    }
-
-    public void setRuleTemplateType(String ruleTemplateType) {
-        this.ruleTemplateType = ruleTemplateType;
-    }
-
-
-
-    public boolean isCalculatedValueChanged(CTARuleTemplate ctaRuleTemplate){
-        return (this!=ctaRuleTemplate) && !(disabled == ctaRuleTemplate.disabled &&
-                calculateScheduledHours == ctaRuleTemplate.calculateScheduledHours &&
-                Objects.equals(payrollType, ctaRuleTemplate.payrollType) &&
-                Objects.equals(payrollSystem, ctaRuleTemplate.payrollSystem) &&
-                calculationUnit == ctaRuleTemplate.calculationUnit &&
-                Objects.equals(compensationTable, ctaRuleTemplate.compensationTable) &&
-                Objects.equals(calculateValueAgainst, ctaRuleTemplate.calculateValueAgainst) &&
-                approvalWorkFlow == ctaRuleTemplate.approvalWorkFlow &&
-                Objects.equals(phaseInfo, ctaRuleTemplate.phaseInfo) &&
-                budgetType == ctaRuleTemplate.budgetType &&
-                Objects.equals(calculateValueIfPlanned, ctaRuleTemplate.calculateValueIfPlanned) &&
-                Objects.equals(employmentTypes, ctaRuleTemplate.employmentTypes) &&
-                planningCategory == ctaRuleTemplate.planningCategory &&
-                Objects.equals(staffFunctions, ctaRuleTemplate.staffFunctions) &&
-                Objects.equals(plannedTimeWithFactor, ctaRuleTemplate.plannedTimeWithFactor) &&
-                activityTypeForCostCalculation == ctaRuleTemplate.activityTypeForCostCalculation &&
-                Objects.equals(activityIds, ctaRuleTemplate.activityIds) &&
-                Objects.equals(timeTypeIds, ctaRuleTemplate.timeTypeIds) &&
-                Objects.equals(plannedTimeIds, ctaRuleTemplate.plannedTimeIds) &&
-                Objects.equals(dayTypeIds, ctaRuleTemplate.dayTypeIds) &&
-                calculationFor == ctaRuleTemplate.calculationFor);
-    }
 }
 

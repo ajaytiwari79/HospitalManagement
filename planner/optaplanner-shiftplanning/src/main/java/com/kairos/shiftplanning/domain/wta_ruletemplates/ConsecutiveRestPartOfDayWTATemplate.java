@@ -24,7 +24,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
 
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);

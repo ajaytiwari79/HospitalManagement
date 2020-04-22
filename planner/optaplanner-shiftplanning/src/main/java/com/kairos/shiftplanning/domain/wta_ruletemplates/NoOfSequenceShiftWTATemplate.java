@@ -35,7 +35,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.isValid;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
 
     //private int sequence;

@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds = new ArrayList<>();

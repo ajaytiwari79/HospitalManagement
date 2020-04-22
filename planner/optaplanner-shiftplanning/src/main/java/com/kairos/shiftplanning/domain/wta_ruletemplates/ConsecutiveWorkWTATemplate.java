@@ -35,7 +35,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);

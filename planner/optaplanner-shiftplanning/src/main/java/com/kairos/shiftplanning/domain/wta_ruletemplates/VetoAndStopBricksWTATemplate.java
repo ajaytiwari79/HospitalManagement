@@ -22,7 +22,7 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
 
     @Positive(message = "message.ruleTemplate.weeks.notNull")

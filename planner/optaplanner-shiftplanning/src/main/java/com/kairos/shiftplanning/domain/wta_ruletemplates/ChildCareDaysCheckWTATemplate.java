@@ -20,7 +20,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private List<BigInteger> activityIds = new ArrayList<>();
     private float recommendedValue;

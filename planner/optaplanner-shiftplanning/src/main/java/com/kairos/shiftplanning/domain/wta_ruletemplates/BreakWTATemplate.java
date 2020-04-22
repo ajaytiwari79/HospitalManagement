@@ -11,6 +11,7 @@ import com.kairos.enums.wta.WTATemplateType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
 
@@ -18,7 +19,8 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-@EqualsAndHashCode
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
 public class BreakWTATemplate extends WTABaseRuleTemplate {
 
     private short breakGapMinutes;

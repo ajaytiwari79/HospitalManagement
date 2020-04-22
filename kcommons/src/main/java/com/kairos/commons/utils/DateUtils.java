@@ -84,6 +84,10 @@ public  class DateUtils {
         return date.truncatedTo(ChronoUnit.DAYS);
     }
 
+    public static ZonedDateTime getEndOfDay(ZonedDateTime date) {
+        return date.with(LocalTime.MAX);
+    }
+
     public static Date getMidNightOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date).plusDays(1);
         LocalDateTime startOfDay = localDateTime.with(LocalTime.MIDNIGHT);

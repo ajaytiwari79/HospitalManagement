@@ -99,7 +99,7 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     }
 
     public ShiftActivity getShiftActivity(){
-        return new ShiftActivity(this.start,this.activity,this.getEnd(),new ArrayList<>());
+        return ShiftActivity.builder().startDate(this.start).activity(this.activity).endDate(this.getEnd()).plannedTimes(new ArrayList<>()).breakNotHeld(false).build();
     }
 
     @Override

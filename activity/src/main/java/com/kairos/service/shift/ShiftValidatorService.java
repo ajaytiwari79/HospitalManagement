@@ -567,6 +567,12 @@ public class ShiftValidatorService {
                     ShiftActivityDTO shiftActivityDTO = activityIdAndShiftActivityDTOMap.get(shiftActivity.getActivityId() + "" + shiftActivity.getStartDate());
                     shiftActivityDTO.getStatus().add(ShiftStatus.MOVED);
                 }
+            }if(isApprovalRequired && !activityIdAndShiftActivityDTOMap.containsKey(key)&&(shiftActivity.getStatus().contains(ShiftStatus.APPROVE)&&shiftActivity.getStatus().contains(ShiftStatus.PUBLISH))){
+                for(ShiftActivityDTO shiftActivityDTO :shiftDTO.getActivities()){
+                    shiftActivity.getStatus().remove(ShiftStatus.APPROVE);
+                    shiftActivityDTO.setStatus(shiftActivity.getStatus());
+                    shiftActivityDTO.getStatus().add(ShiftStatus.MOVED);
+                }
             }
             if (valid) {
                 exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
@@ -905,19 +911,15 @@ public class ShiftValidatorService {
             shiftInterval = new DateTimeInterval(shiftDTO.getStartDate(), shiftDTO.getEndDate());
             startDate = getStartOfDay(shiftDTO.getStartDate());
             endDate = getEndOfDay(shiftDTO.getEndDate());
-
-
         }
         //As discussed with Arvind we remove the Check of cross organization overlapping functionality
-        List<ShiftWithActivityDTO> overlappedShifts = shiftMongoRepository.findOverlappedShiftsByEmploymentId(byTandAPhase ?
-                        shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getId(), startDate,
-                endDate);
+        List<ShiftWithActivityDTO> overlappedShifts = shiftMongoRepository.findOverlappedShiftsByEmploymentId(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getId(), startDate, endDate);
         if(isCollectionNotEmpty(overlappedShifts)) {
             if (ShiftType.ABSENCE.equals(overlappedShifts.get(0).getShiftType())) {
                 overlappedShifts.get(0).setEndDate(asDateEndOfDay(asLocalDate(overlappedShifts.get(0).getStartDate())));
             }
         }
-        if (!CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) && isNull(activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting()) && isShiftOverlap(overlappedShifts, shiftInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
+        if (isShiftOverlap(overlappedShifts, shiftInterval) && !CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) && isNull(activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting()) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
             shiftOverlappedWithNonWorkingType = true;
         }
         return shiftOverlappedWithNonWorkingType;

@@ -18,7 +18,7 @@ import static com.kairos.enums.wta.WTATemplateType.WTA_FOR_CARE_DAYS;
  */
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class WTAForCareDays extends WTABaseRuleTemplate{
 
     private List<ActivityCareDayCount> careDayCounts = new ArrayList<>();

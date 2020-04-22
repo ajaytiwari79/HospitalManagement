@@ -1,13 +1,22 @@
 package com.kairos.shiftplanning.executioner;
 
+import com.kairos.dto.activity.cta.*;
+import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
-import com.kairos.enums.Day;
-import com.kairos.enums.TimeTypeEnum;
+import com.kairos.dto.user.country.agreement.cta.CalculationFor;
+import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
+import com.kairos.enums.*;
 import com.kairos.enums.constraint.ConstraintSubType;
+import com.kairos.enums.cta.AccountType;
+import com.kairos.enums.cta.CalculateValueAgainst;
+import com.kairos.enums.cta.CalculateValueType;
+import com.kairos.enums.cta.CalculationUnit;
+import com.kairos.enums.employment_type.EmploymentCategory;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.enums.wta.MinMaxSetting;
+import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.constraints.activityconstraint.*;
@@ -20,13 +29,14 @@ import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.skill.Skill;
-import com.kairos.shiftplanning.domain.staff.Employee;
-import com.kairos.shiftplanning.domain.staff.IndirectActivity;
+import com.kairos.shiftplanning.domain.staff.*;
+import com.kairos.shiftplanning.domain.staff.Employment;
 import com.kairos.shiftplanning.domain.staffing_level.*;
 import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.domain.unit.*;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.AverageScheduledTimeWTATemplate;
+import com.kairos.shiftplanning.domain.wta_ruletemplates.BreakWTATemplate;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.WTABaseRuleTemplate;
 import com.kairos.shiftplanning.enums.SkillType;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
@@ -45,6 +55,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,6 +68,8 @@ import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.enums.MasterDataTypeEnum.*;
 import static com.kairos.enums.constraint.ScoreLevel.HARD;
 import static com.kairos.enums.constraint.ScoreLevel.SOFT;
+import static com.kairos.enums.cta.ActivityTypeForCostCalculation.COST_CALCULATION_ACTIVITY;
+import static com.kairos.enums.wta.WTATemplateType.WTA_FOR_BREAKS_IN_SHIFT;
 
 public class ShiftPlanningGenerator {
 
@@ -74,9 +87,18 @@ public class ShiftPlanningGenerator {
     public static final Logger LOGGER = LoggerFactory.getLogger(ShiftPlanningGenerator.class);
     public static final String ERROR = "error {}";
 
+    private BigInteger id = BigInteger.valueOf(100l);
+    private Set<BigInteger> activityIds = new HashSet<>();
+    private Set<BigInteger> timeTypeIds = new HashSet<>();
+    private Set<Long> dayTypeIds = new HashSet<>();
+    private Set<Long> employmentIds = newHashSet(126l,123l,145l);
+    private Set<BigInteger> plannedTimeIds = new HashSet<>();
+    private Set<BigInteger> phaseIds = new HashSet<>();
+
     public ShiftRequestPhasePlanningSolution loadUnsolvedSolution() {
         ShiftRequestPhasePlanningSolution unresolvedSolution = new ShiftRequestPhasePlanningSolution();
-        Object[] objects = dailyStaffingLines();
+        TimeType[] timeTypes = createTimeTypes();
+        Object[] objects = dailyStaffingLines(timeTypes);
         List<DailyStaffingLine> staffingLines = (List<DailyStaffingLine>)objects[1];
         List<Activity> activities = (List<Activity>)objects[0];
 
@@ -92,7 +114,7 @@ public class ShiftPlanningGenerator {
         unresolvedSolution.setWeekDates(planningDays);
         Unit unit = getUnit(planningDays);
         unresolvedSolution.setUnit(unit);
-        List<Employee> employees= generateEmployeeList(planningDays,unit);
+        List<Employee> employees= generateEmployeeList(planningDays,unit,timeTypes);
         unresolvedSolution.setEmployees(employees);
         unresolvedSolution.setShifts(generateShiftForAssignments( employees));
         int[] activitiesRank=activities.stream().mapToInt(a->a.getRank()).toArray();
@@ -198,7 +220,12 @@ public class ShiftPlanningGenerator {
             for(LocalDate date:getPlanningDays()) {
                 ShiftImp sa = new ShiftImp();
                 sa.setEmployee(emp);
-                sa.setId(BigInteger.valueOf(new Date().getTime()));
+                sa.setId(idGenerator());
+                sa.setDate(date);
+                shiftList.add(sa);
+                sa = new ShiftImp();
+                sa.setEmployee(emp);
+                sa.setId(idGenerator());
                 sa.setDate(date);
                 shiftList.add(sa);
             }
@@ -241,7 +268,7 @@ public class ShiftPlanningGenerator {
     private List<DayType> getDayTypes(){
         List<DayType> dayTypes = new ArrayList<>();
         dayTypes.add(new DayType(5l,"Monday",Arrays.asList(Day.MONDAY),new ArrayList<>(),false,false));
-        dayTypes.add(new DayType(6l,"Tuesday",Arrays.asList(Day.TUESDAY),new ArrayList<>(),false,false));
+        dayTypes.add(new DayType(6l,"Wednesday",Arrays.asList(Day.WEDNESDAY),new ArrayList<>(),false,false));
         dayTypes.add(new DayType(7l,"Everyday",Arrays.asList(Day.EVERYDAY),new ArrayList<>(),false,false));
         List<CountryHolidayCalender> countryHolidayCalenders = new ArrayList<>();
         countryHolidayCalenders.add(new CountryHolidayCalender(java.time.LocalDate.of(2017,12,11),null,null));
@@ -257,30 +284,87 @@ public class ShiftPlanningGenerator {
 
     }
 
-    public List<Employee> generateEmployeeList(List<LocalDate> planningDays, Unit unit) {
+    public List<Employee> generateEmployeeList(List<LocalDate> planningDays, Unit unit, TimeType[] timeTypes) {
         List<Employee> employees = new ArrayList<>();
-        Employee employee = getEmployee("145","Sachin Verma",123l,createTags1(),unit);
+        Expertise expertise = Expertise.builder().id(12l).build();
+        EmploymentType fullTimer = EmploymentType.builder().id(123l).name("FullTimer").employmentCategories(newHashSet(EmploymentCategory.PERMANENT)).build();
+        EmploymentType hourlyPaid = EmploymentType.builder().id(126l).name("FullTimer").employmentCategories(newHashSet(EmploymentCategory.TEMPORARY)).build();
+        EmploymentLine employmentLine = EmploymentLine.builder().startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).hourlyCost(BigDecimal.TEN).totalWeeklyMinutes(35*60).workingDaysInWeek(5).build();
+        Employment employment = Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(EmploymentSubType.MAIN).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(fullTimer).build();
+        Employee employee = getEmployee("145","Sachin Verma",employment,createTags1(),unit);
+        Map<LocalDate, Function> functionMap = getFunctionMap(planningDays);
         Map<LocalDate,Map<ConstraintSubType, WTABaseRuleTemplate>> wtaTemplateMap = getWTAMap(planningDays);
+        Set<Long> functionIds = functionMap.values().stream().map(function -> function.getId()).collect(Collectors.toSet());
+        Map<LocalDate,List<CTARuleTemplate>> localDateListMap = getCtaRuletemplateMap(planningDays, functionIds);
+        Activity breakActivity = new Activity(idGenerator(),new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[2], 1,10, null,new HashSet<>());
+        BreakSettings breakSettings = BreakSettings.builder().breakDurationInMinute(15l).shiftDurationInMinute(60l).activity(breakActivity).build();
         employee.setWtaRuleTemplateMap(wtaTemplateMap);
+        employee.setBreakSettings(breakSettings);
+        employee.setLocalDateCTARuletemplateMap(localDateListMap);
         employees.add(employee);
-        Employee employee2 = getEmployee("160","Pradeep Singh",126l,createTags2(), unit);
+        employment = Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(EmploymentSubType.MAIN).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(fullTimer).build();
+        Employee employee2 = getEmployee("160","Pradeep Singh",employment,createTags2(), unit);
         employee2.setWtaRuleTemplateMap(wtaTemplateMap);
+        employee2.setBreakSettings(breakSettings);
+        employee2.setLocalDateCTARuletemplateMap(localDateListMap);
         employee2.setNightWorker(true);
         employees.add(employee2);
-        Employee employee3 = getEmployee("170", "Arvind Das", 123l, createTags2(), unit);
+        employment = Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(EmploymentSubType.SECONDARY).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(hourlyPaid).build();
+        Employee employee3 = getEmployee("170", "Arvind Das", employment, createTags2(), unit);
         employee3.setWtaRuleTemplateMap(wtaTemplateMap);
+        employee3.setLocalDateCTARuletemplateMap(localDateListMap);
+        employee3.setBreakSettings(breakSettings);
         employee3.setNightWorker(true);
         employees.add(employee3);
-        Employee employee4 = getEmployee("180","Ulrik",126l,createTags3(), unit);
+        employment = Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(EmploymentSubType.MAIN).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(fullTimer).build();
+        Employee employee4 = getEmployee("180","Ulrik",employment,createTags3(), unit);
         employee4.setWtaRuleTemplateMap(wtaTemplateMap);
+        employee4.setLocalDateCTARuletemplateMap(localDateListMap);
+        employee4.setBreakSettings(breakSettings);
         employees.add(employee4);
-        Employee employee5 = getEmployee("190", "Ramanuj", 123l, createTags4(), unit);
+        employment = Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(EmploymentSubType.SECONDARY).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(hourlyPaid).build();
+        Employee employee5 = getEmployee("190", "Ramanuj", employment, createTags4(), unit);
         employee5.setWtaRuleTemplateMap(wtaTemplateMap);
+        employee5.setLocalDateCTARuletemplateMap(localDateListMap);
+        employee5.setBreakSettings(breakSettings);
         employees.add(employee5);
-        Employee employee6 = getEmployee("195", "Dravid", 145l, createTags4(), unit);
+        employment = Employment.builder().employmentLines(newArrayList(employmentLine)).employmentSubType(EmploymentSubType.MAIN).startDate(planningDays.get(0)).endDate(planningDays.get(planningDays.size()-1)).expertise(expertise).dateWiseFunctionMap(new HashMap<>()).employmentType(fullTimer).build();
+        Employee employee6 = getEmployee("195", "Dravid", employment, createTags4(), unit);
+        employee6.setLocalDateCTARuletemplateMap(localDateListMap);
+        employee6.setBreakSettings(breakSettings);
         employee6.setWtaRuleTemplateMap(wtaTemplateMap);
         employees.add(employee6);
         return employees;
+    }
+
+    private Map<LocalDate, Function> getFunctionMap(List<LocalDate> planningDays) {
+        Map<LocalDate, Function> functionMap = new HashMap<>();
+        for (LocalDate planningDay : planningDays) {
+            functionMap.put(planningDay, Function.builder().id(123l).value(BigDecimal.valueOf(140)).build());
+        }
+        return functionMap;
+    }
+
+    private Map<LocalDate, List<CTARuleTemplate>> getCtaRuletemplateMap(List<LocalDate> planningDays,Set<Long> functionIds) {
+        Map<LocalDate, List<CTARuleTemplate>> localDateListMap = new HashMap<>();
+        CTARuleTemplate ctaRuleTemplate = getRuleTemplates(functionIds, AccountType.TIMEBANK_ACCOUNT, CalculationFor.SCHEDULED_HOURS);
+        CTARuleTemplate bonusRuletemplate = getRuleTemplates(functionIds, AccountType.TIMEBANK_ACCOUNT, CalculationFor.BONUS_HOURS);
+        CTARuleTemplate function = getRuleTemplates(functionIds, AccountType.TIMEBANK_ACCOUNT, CalculationFor.FUNCTIONS);
+        List<CTARuleTemplate> ctaRuleTemplates = newArrayList(ctaRuleTemplate,bonusRuletemplate,function);
+        for (LocalDate planningDay : planningDays) {
+            localDateListMap.put(planningDay,ctaRuleTemplates);
+        }
+        return localDateListMap;
+    }
+
+    private CTARuleTemplate getRuleTemplates(Set<Long> functionIds, AccountType accountType, CalculationFor calculationFor) {
+        FixedValue fixedValue = FixedValue.builder().type(FixedValueType.PER_ACTIVITY).build();
+        CalculateValueAgainst calculateValueAgainst = CalculateValueAgainst.builder().calculateValue(CalculateValueType.FIXED_VALUE).fixedValue(fixedValue).build();
+        CompensationTableInterval compensationTableInterval = CompensationTableInterval.builder().compensationMeasurementType(CompensationMeasurementType.MINUTES).from(LocalTime.MIDNIGHT).to(LocalTime.MIDNIGHT).value(20).build();
+        CompensationTable compensationTable = CompensationTable.builder().compensationTableInterval(newArrayList(compensationTableInterval)).granularityLevel(30).build();
+        PlannedTimeWithFactor plannedTimeWithFactor = PlannedTimeWithFactor.builder().accountType(accountType).scale(12f).build();
+        List<CTARuleTemplatePhaseInfo> ctaRuleTemplatePhaseInfos = phaseIds.stream().map(phaseId->CTARuleTemplatePhaseInfo.builder().phaseId(phaseId).build()).collect(Collectors.toList());
+        return CTARuleTemplate.builder().id(idGenerator()).activityIds(activityIds).timeTypeIds(timeTypeIds).plannedTimeIds(plannedTimeIds).activityTypeForCostCalculation(COST_CALCULATION_ACTIVITY).calculateValueAgainst(calculateValueAgainst).calculationFor(calculationFor).calculationUnit(CalculationUnit.HOURS).compensationTable(compensationTable).dayTypeIds(dayTypeIds).employmentTypes(employmentIds).phaseInfo(ctaRuleTemplatePhaseInfos).staffFunctions(functionIds).plannedTimeWithFactor(plannedTimeWithFactor).disabled(true).build();
     }
 
     private Map<LocalDate, Map<ConstraintSubType, WTABaseRuleTemplate>> getWTAMap(List<LocalDate> planningDays) {
@@ -289,16 +373,21 @@ public class ShiftPlanningGenerator {
         for (LocalDate planningDay : planningDays) {
             Map<ConstraintSubType, WTABaseRuleTemplate> wtaBaseRuleTemplateMap = new HashMap<>();
             AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = AverageScheduledTimeWTATemplate.builder().intervalLength(1).intervalUnit(WEEKS).minMaxSetting(MinMaxSetting.MAXIMUM).shiftLengthAndAverageSetting(ShiftLengthAndAverageSetting.DIFFERENCE_BETWEEN_START_END_TIME).phaseTemplateValues(newArrayList(phaseTemplateValue)).build();
+            BreakAvailabilitySettings daySetting = BreakAvailabilitySettings.builder().timeSlot(PartOfDay.DAY).endBeforeMinutes((short) 10).startAfterMinutes((short)10).shiftPercentage((short)25).build();
+            BreakAvailabilitySettings eveningSetting = BreakAvailabilitySettings.builder().timeSlot(PartOfDay.EVENING).endBeforeMinutes((short)10).startAfterMinutes((short)10).shiftPercentage((short)25).build();
+            BreakAvailabilitySettings nightSetting = BreakAvailabilitySettings.builder().timeSlot(PartOfDay.NIGHT).endBeforeMinutes((short)10).startAfterMinutes((short)10).shiftPercentage((short)25).build();
+            BreakWTATemplate breakWTATemplate = BreakWTATemplate.builder().wtaTemplateType(WTA_FOR_BREAKS_IN_SHIFT).breakAvailability(newHashSet(daySetting,eveningSetting,nightSetting)).build();
+            wtaBaseRuleTemplateMap.put(ConstraintSubType.WTA_FOR_BREAKS_IN_SHIFT, breakWTATemplate);
             wtaBaseRuleTemplateMap.put(ConstraintSubType.AVERAGE_SHEDULED_TIME, averageScheduledTimeWTATemplate);
             wtaTemplateMap.put(planningDay,wtaBaseRuleTemplateMap);
         }
         return wtaTemplateMap;
     }
 
-    private Employee getEmployee(String s, String s2, long l, Set<Tag> tags2, Unit unit) {
-        Employee employee = new Employee(Long.valueOf(s), s2, createSkillSet(), null, 0, 0, PaidOutFrequencyEnum.HOURLY, null);
+    private Employee getEmployee(String s, String s2, Employment employment, Set<Tag> tags2, Unit unit) {
+        Employee employee = new Employee(Long.valueOf(s), s2, createSkillSet(),  PaidOutFrequencyEnum.HOURLY);
         employee.setBaseCost(BigDecimal.valueOf(1.5));
-        employee.setEmploymentTypeId(l);
+        employee.setEmployment(employment);
         employee.setTags(tags2);
         employee.setUnit(unit);
         return employee;
@@ -313,8 +402,8 @@ public class ShiftPlanningGenerator {
         return IntStream.of(0).mapToObj(i->weekStart.plusDays(i)).collect(Collectors.toList());
     }
 
-    private Object[] dailyStaffingLines(){
-        return generateActivityLine();
+    private Object[] dailyStaffingLines(TimeType[] timeTypes){
+        return generateActivityLine(timeTypes);
     }
 
     /**
@@ -328,11 +417,11 @@ public class ShiftPlanningGenerator {
     public static String getAbsenceId(){
         return ""+ ++seq*2;
     }
-    public Object[] generateActivityLine(){
+    public Object[] generateActivityLine(TimeType[] timeTypes){
         List<DailyStaffingLine> dailyStaffingLines = new ArrayList<>();
         List<LocalDate> planningWeekDates=getPlanningDays();
         int intervalMins=15;
-        List<Activity> activityPlannerEntities =getActivities();
+        List<Activity> activityPlannerEntities = getActivities(timeTypes);
         Map<LocalDate,List<Activity>> activitiesPerDay= new HashMap<>();
         planningWeekDates.forEach(date->{
             DailyActivityLine dailyActivityLine = getDailyActivityLine(intervalMins, activityPlannerEntities, activitiesPerDay, date);
@@ -402,24 +491,53 @@ public class ShiftPlanningGenerator {
 
     public TimeType[] createTimeTypes(){
         TimeType[] timeTypes= new TimeType[4];
-        timeTypes[0]= new TimeType(BigInteger.valueOf(new Date().getTime()),"presence", TimeTypeEnum.PRESENCE ,true);
-        timeTypes[1]= new TimeType(BigInteger.valueOf(new Date().getTime()),"absence",TimeTypeEnum.ABSENCE,true);
+        BigInteger id = idGenerator();
+        timeTypeIds.add(id);
+        timeTypes[0]= new TimeType(id,"presence", TimeTypeEnum.PRESENCE ,true, TimeTypes.WORKING_TYPE);
+        id = idGenerator();
+        timeTypeIds.add(id);
+        timeTypes[1]= new TimeType(id,"absence",TimeTypeEnum.ABSENCE,true,TimeTypes.WORKING_TYPE);
+        id = idGenerator();
+        timeTypeIds.add(id);
+        timeTypes[2]= new TimeType(id,"Paid break",TimeTypeEnum.PAID_BREAK,true,TimeTypes.WORKING_TYPE);
+        id = idGenerator();
+        timeTypes[3]= new TimeType(id,"Blank",TimeTypeEnum.GAP,true,TimeTypes.NON_WORKING_TYPE);
         return timeTypes;
     }
-    private List<Activity> getActivities(){
-        TimeType[] timeTypes= createTimeTypes();
+
+    private List<Activity> getActivities(TimeType[] timeTypes){
         Set<Tag> tags1 = createTags1();
         Set<Tag> tags2 = createTags2();
         Set<Tag> tags3 = createTags3();
         Set<Tag> tags4 = createTags4();
         List<Activity> activityPlannerEntities = new ArrayList<>();
-        Activity activity = new Activity(BigInteger.valueOf(new Date().getTime()),new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[0], 1,10, null,tags1);
+        BigInteger id = idGenerator();
+        activityIds.add(id);
+        Activity activity = new Activity(id,new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[0], 1,10, null,tags1);
+        activity.setMethodForCalculatingTime(ShiftPlanningUtility.ENTERED_TIMES);
+        activity.setFixedTimeValue(30l);
+        activity.setFullDayCalculationType(TimeCalaculationType.WEEKLY_HOURS_TYPE);
         activity.setConstraints(getActivityContraints());
-        Activity activity2 =new Activity(BigInteger.valueOf(new Date().getTime()),new ArrayList<>(createSkillSet2()),2,"Team B",timeTypes[0], 2,9, null, tags2);
+        id = idGenerator();
+        activityIds.add(id);
+        Activity activity2 =new Activity(id,new ArrayList<>(createSkillSet2()),2,"Team B",timeTypes[0], 2,9, null, tags2);
+        activity2.setMethodForCalculatingTime(ShiftPlanningUtility.FIXED_TIME);
+        activity2.setFixedTimeValue(30l);
+        activity2.setFullDayCalculationType(TimeCalaculationType.WEEKLY_HOURS_TYPE);
         activity2.setConstraints(getActivityContraints());
-        Activity activity3 = new Activity(BigInteger.valueOf(new Date().getTime()),new ArrayList<>(createSkillSet2()),2,"Day Off",timeTypes[1], 3,2, null,tags3 );
+        id = idGenerator();
+        activityIds.add(id);
+        Activity activity3 = new Activity(id,new ArrayList<>(createSkillSet2()),2,"Day Off",timeTypes[1], 3,2, null,tags3 );
         activity3.setConstraints(getActivityContraints());
-        Activity activity4 = new Activity(BigInteger.valueOf(new Date().getTime()),new ArrayList<>(createSkillSet2()),2, BLANK_ACTIVITY,timeTypes[0], 4,1, null,tags4);
+        activity3.setFixedTimeValue(30l);
+        activity3.setFullDayCalculationType(TimeCalaculationType.WEEKLY_HOURS_TYPE);
+        activity3.setMethodForCalculatingTime(ShiftPlanningUtility.WEEKLY_HOURS);
+        id = idGenerator();
+        activityIds.add(id);
+        Activity activity4 = new Activity(id,new ArrayList<>(createSkillSet2()),2, BLANK_ACTIVITY,timeTypes[3], 4,1, null,tags4);
+        activity4.setMethodForCalculatingTime(ShiftPlanningUtility.ENTERED_MANUALLY);
+        activity4.setFixedTimeValue(30l);
+        activity4.setFullDayCalculationType(TimeCalaculationType.WEEKLY_HOURS_TYPE);
         activity4.setConstraints(getActivityContraints());
         activityPlannerEntities.add(activity);
         activityPlannerEntities.add(activity2);
@@ -483,18 +601,33 @@ public class ShiftPlanningGenerator {
         unitConstraints.put(ConstraintSubType.PREFER_PERMANENT_EMPLOYEE,preferedEmployementType);
         unitConstraints.put(ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS,shiftOnWeekend);
         Map<Long, DayType> dayTypeMap = getDayTypes().stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        dayTypeIds = dayTypeMap.keySet();
         Map<String,TimeSlot> timeSlotMap = new HashMap<>();
-        timeSlotMap.put(NIGHT,TimeSlot.builder().startHour(23).endHour(7).build());
-        timeSlotMap.put(DAY,TimeSlot.builder().startHour(7).endHour(15).build());
-        timeSlotMap.put(EVENING,TimeSlot.builder().startHour(15).endHour(23).build());
-        Unit unit = Unit.builder().phase(new Phase(BigInteger.valueOf(13l), PhaseDefaultName.CONSTRUCTION, PhaseType.PLANNING)).planningPeriod(new PlanningPeriod(BigInteger.valueOf(12l),planningDays.get(0),planningDays.get(planningDays.size()-1))).dayTypeMap(dayTypeMap).timeSlotMap(timeSlotMap).id(1l).constraints(unitConstraints).build();
+        timeSlotMap.put(NIGHT,TimeSlot.builder().startHour(23).endHour(7).name(NIGHT).build());
+        timeSlotMap.put(DAY,TimeSlot.builder().startHour(7).endHour(15).name(DAY).build());
+        timeSlotMap.put(EVENING,TimeSlot.builder().startHour(15).endHour(23).name(EVENING).build());
+        BigInteger phaseId = idGenerator();
+        phaseIds.add(phaseId);
+        Phase phase = new Phase(phaseId, PhaseDefaultName.CONSTRUCTION, PhaseType.PLANNING);
+        PlanningPeriod planningPeriod = new PlanningPeriod(BigInteger.valueOf(12l), planningDays.get(0), planningDays.get(planningDays.size() - 1));
+        Unit unit = Unit.builder().phase(phase).planningPeriod(planningPeriod).dayTypeMap(dayTypeMap).timeSlotMap(timeSlotMap).id(1l).constraints(unitConstraints).build();
         unit.setConstraints(unitConstraints);
-        unit.setAbsencePlannedTime(new AbsencePlannedTime(unit.getPhase().getId(),newArrayList(BigInteger.valueOf(3l)),false));
-        unit.setPresencePlannedTime(new PresencePlannedTime(unit.getPhase().getId(),newArrayList(BigInteger.valueOf(5l))));
-        unit.setNonWorkingPlannedTime(new NonWorkingPlannedTime(unit.getPhase().getId(),newArrayList(BigInteger.valueOf(3l)),false));
+        BigInteger plannedTimeId = idGenerator();
+        plannedTimeIds.add(plannedTimeId);
+        unit.setAbsencePlannedTime(new AbsencePlannedTime(unit.getPhase().getId(),newArrayList(plannedTimeId),false));
+        plannedTimeId = idGenerator();
+        plannedTimeIds.add(plannedTimeId);
+        unit.setPresencePlannedTime(new PresencePlannedTime(unit.getPhase().getId(),newArrayList(plannedTimeId)));
+        plannedTimeId = idGenerator();
+        plannedTimeIds.add(plannedTimeId);
+        unit.setNonWorkingPlannedTime(new NonWorkingPlannedTime(unit.getPhase().getId(),newArrayList(plannedTimeId),false));
         unit.setId(1l);
         return unit;
     }
 
+    private BigInteger idGenerator(){
+         id = id.add(BigInteger.valueOf(1));
+         return id;
+    }
 
 }

@@ -7,6 +7,7 @@ import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.TimeSlot;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +19,7 @@ import static com.kairos.commons.utils.DateUtils.getStartOfDay;
 @Getter
 @Setter
 @AllArgsConstructor
+@EqualsAndHashCode
 public class DislikeNightShiftsForNonNightWorkers implements Constraint {
     private ScoreLevel level;
     private int weight;

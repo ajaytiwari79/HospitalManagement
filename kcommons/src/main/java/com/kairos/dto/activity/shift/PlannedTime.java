@@ -20,7 +20,7 @@ import java.util.Date;
 public class PlannedTime {
     private BigInteger plannedTimeId;
     private Date startDate;
-    private Date endDate;2
+    private Date endDate;
 
     public PlannedTime(BigInteger plannedTimeId, Date startDate, Date endDate) {
         this.plannedTimeId = plannedTimeId;

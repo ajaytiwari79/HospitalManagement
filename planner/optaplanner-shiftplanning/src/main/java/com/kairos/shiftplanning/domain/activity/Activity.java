@@ -1,6 +1,7 @@
 package com.kairos.shiftplanning.domain.activity;
 
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
+import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.shiftplanning.constraints.Constraint;
@@ -32,6 +33,7 @@ import java.util.Set;
 @XStreamAlias("Activity")
 public class Activity {
 
+    public static final double DEFAULT_VALUE = 1d;
     private static Logger log= LoggerFactory.getLogger(Activity.class);
 
     private BigInteger id;
@@ -49,6 +51,11 @@ public class Activity {
     private CutOffIntervalUnit cutOffIntervalUnit;
     private Integer cutOffdayValue;
     private boolean breakAllowed;
+    private String methodForCalculatingTime;
+    private Double multiplyWithValue = DEFAULT_VALUE;
+    private Long fixedTimeValue;
+    private TimeCalaculationType fullDayCalculationType;
+    private TimeCalaculationType fullWeekCalculationType;
 
 
 

@@ -1,10 +1,7 @@
 package com.kairos.shiftplanning.domain.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
@@ -15,6 +12,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.getIntervalAsS
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class PlannedTime {
     private BigInteger plannedTimeId;
     private ZonedDateTime startDate;

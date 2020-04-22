@@ -1,10 +1,7 @@
 package com.kairos.shiftplanning.domain.staff;
 
 import com.kairos.shiftplanning.domain.activity.Activity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
@@ -12,8 +9,8 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
-@Document
 public class BreakSettings{
     private Long countryId;
     private Long shiftDurationInMinute;

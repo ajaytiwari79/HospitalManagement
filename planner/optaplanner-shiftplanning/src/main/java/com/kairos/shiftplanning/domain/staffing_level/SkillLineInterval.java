@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.skill.Skill;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import java.time.ZonedDateTime;
 @Setter
 @NoArgsConstructor
 @PlanningEntity
+@EqualsAndHashCode
 public class SkillLineInterval implements StaffingLineInterval {
     private ZonedDateTime start;
     private ZonedDateTime end;

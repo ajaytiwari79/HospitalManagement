@@ -3,6 +3,7 @@ package com.kairos.shiftplanning.domain.staffing_level;
 import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode
 @XStreamAlias("staffinglevel")
 public class StaffingLevelPlannerEntity {
     private String id;

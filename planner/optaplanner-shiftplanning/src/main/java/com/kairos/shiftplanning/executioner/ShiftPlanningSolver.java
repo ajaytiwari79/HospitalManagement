@@ -124,6 +124,7 @@ public class ShiftPlanningSolver {
             printIndictment((Map<Object,Indictment>)solvedSolution[1]);
             return (ShiftRequestPhasePlanningSolution)solvedSolution[0];
     }
+
     public Object[] getSolution(ShiftRequestPhasePlanningSolution unsolvedSolution){
         if(unsolvedSolution==null) {
             unsolvedSolution = getUnsolvedSolution(readFromFile);
@@ -157,7 +158,7 @@ public class ShiftPlanningSolver {
     private void printBreaksAndIndirectActivities(BreaksIndirectAndActivityPlanningSolution solvedBreaksSolution) {
         StringBuilder sb = new StringBuilder();
         solvedBreaksSolution.getShifts().forEach(s->{
-            sb.append("\n"+"shift:"+s.getPrettyId()+","+s.getInterval()+","+s.getEmployee().getName());
+            sb.append("\n"+"shift:"+s.getId()+","+s.getInterval()+","+s.getEmployee().getName());
             sb.append(solvedBreaksSolution.getShiftBreaks().stream().filter(sbrk->sbrk.getShift().getId().equals(s.getId())).sorted(Comparator.comparing(ShiftBreak::getOrder)).
                     map(sbrk->ShiftPlanningUtility.getIntervalAsString(sbrk.getInterval())).collect(Collectors.toList()).toString());
         });
@@ -292,7 +293,7 @@ public class ShiftPlanningSolver {
                 if(!emp.getId().equals(shift.getEmployee().getId())){
                     return;
                 }
-                log.info("Shift A--------"+shift.getPrettyId()+","+shift.getEmployee().getId()+","+shift.getDate()+":["+shift.getInterval()+"("+shift.getShiftActivities().size()+")"+"]:"+shift.getShiftActivities()+
+                log.info("Shift A--------"+shift.getId()+","+shift.getEmployee().getId()+","+shift.getDate()+":["+shift.getInterval()+"("+shift.getShiftActivities().size()+")"+"]:"+shift.getShiftActivities()+
                         "["+Optional.ofNullable(shift.getBreaks()).orElse(Collections.emptyList()).stream().collect(StringBuilder::new ,(b1,b2)-> b1.append(b2.toString()),(b1,b2)->b2.append(",").append(b1))+"]");
             })
         );

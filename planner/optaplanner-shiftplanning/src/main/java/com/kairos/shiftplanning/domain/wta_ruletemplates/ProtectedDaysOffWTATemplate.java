@@ -19,7 +19,7 @@ import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
     private BigInteger activityId;
 
