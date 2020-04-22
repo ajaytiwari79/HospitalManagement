@@ -1,6 +1,7 @@
 package com.kairos.service.weather;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.user.weather.WeatherInfoDTO;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.weather.WeatherInfo;
@@ -9,7 +10,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -39,13 +40,12 @@ public class WeatherService {
     @Inject
     private ExceptionService exceptionService;
     @Inject
+    @Qualifier("restTemplateWithoutAuth")
     private RestTemplate restTemplate;
-    @Value("${weather.api.key}")
-    private String weatherApiKey;
-    @Value("${weather.api}")
-    private String weatherApi ;
+    @Inject private EnvConfig envConfig;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WeatherService.class);
+
 
     private Map<String,String> mapOfCityAndWeatherInfo = new HashMap<>();
 
@@ -73,9 +73,10 @@ public class WeatherService {
                 city = city.substring(0, city.lastIndexOf(' '));
             }
             if(!mapOfCityAndWeatherInfo.containsKey(city)) {
-                String weatherApiUrl = weatherApi + "?q=" + city + "&appid=" + weatherApiKey;
+                String weatherApiUrl = envConfig.getWeatherApi() + "?q=" + city + "&appid=" + envConfig.getWeatherApiKey();
                 LOGGER.info("Weather URL is ======> {}",weatherApiUrl);
                 Map responseData=restTemplate.getForObject(weatherApiUrl, Map.class);
+                LOGGER.info("response {}",responseData);
                 //remove this call if api is call for 16 day
                 removeDuplicateDataFromResponse(responseData);
                 mapOfCityAndWeatherInfo.put(city, ObjectMapperUtils.objectToJsonString(responseData));
