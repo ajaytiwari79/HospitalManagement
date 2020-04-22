@@ -7,9 +7,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,6 +21,7 @@ public class StaffingLevelInterval {
     private Duration staffingLevelDuration;
     private Set<StaffingLevelActivity> staffingLevelActivities=new LinkedHashSet<>();
     private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
+    private TreeSet<StaffingLevelIntervalLog> staffingLevelIntervalLogs;
 
 
 

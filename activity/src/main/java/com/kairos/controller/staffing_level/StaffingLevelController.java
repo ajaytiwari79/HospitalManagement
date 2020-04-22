@@ -44,8 +44,7 @@ public class StaffingLevelController {
 
     @RequestMapping(value = "/presence", method = RequestMethod.POST)
     @ApiOperation("Create staffing_level for presence")
-    public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto,
-                                                                @PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 staffingLevelService.createStaffingLevel(presenceStaffingLevelDto,unitId));
     }
@@ -172,5 +171,12 @@ public class StaffingLevelController {
     public ResponseEntity<Map<String, Object>> getStaffingLevelIfUpdated(@PathVariable Long unitId, @RequestBody @Valid @NotNull(message = "message.staffingLevel.currentDate.not.exists") List<UpdatedStaffingLevelDTO> updatedStaffingLevels) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 staffingLevelService.getStaffingLevelIfUpdated(unitId, updatedStaffingLevels));
+    }
+
+    @RequestMapping(value = "/staffing_level/{staffingLevelId}/publish", method = RequestMethod.PUT)
+    @ApiOperation("publish staffing_level")
+    public ResponseEntity<Map<String, Object>> publishStaffingLevel(@PathVariable Long unitId,@PathVariable BigInteger staffingLevelId,@RequestParam("typee") StaffingLevel.Type type) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                staffingLevelService.publishStaffingLevel(staffingLevelId,type));
     }
 }
