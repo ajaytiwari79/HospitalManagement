@@ -17,7 +17,6 @@ public enum ScoreLevel {
         this.value = value;
     }
 
-    @JsonValue
     public String toValue() {
         return value;
     }
