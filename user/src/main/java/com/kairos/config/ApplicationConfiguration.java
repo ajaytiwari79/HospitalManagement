@@ -6,13 +6,11 @@ import com.kairos.commons.service.mail.EmailServicesConfiguration;
 import com.kairos.commons.service.mail.KMailService;
 import com.kairos.configuration.PermissionSchemaScanner;
 import com.kairos.service.kpermissions.PermissionService;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.thymeleaf.TemplateEngine;
 
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 

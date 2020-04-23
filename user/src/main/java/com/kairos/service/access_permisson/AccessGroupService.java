@@ -898,13 +898,7 @@ public class AccessGroupService {
         for (DayTypeCountryHolidayCalenderQueryResult dayTypeCountryHolidayCalenderQueryResult : dayTypeCountryHolidayCalenderQueryResults) {
             if (dayTypeCountryHolidayCalenderQueryResult.isHolidayType()) {
                 for (CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult : dayTypeCountryHolidayCalenderQueryResult.getCountryHolidayCalenders()) {
-                    DateTimeInterval dateTimeInterval;
-                    if (dayTypeCountryHolidayCalenderQueryResult.isAllowTimeSettings()) {
-                        LocalTime holidayEndTime = countryHolidayCalendarQueryResult.getEndTime().get(ChronoField.MINUTE_OF_DAY) == 0 ? LocalTime.MAX : countryHolidayCalendarQueryResult.getEndTime();
-                        dateTimeInterval = new DateTimeInterval(asDate(countryHolidayCalendarQueryResult.getHolidayDate(), countryHolidayCalendarQueryResult.getStartTime()), asDate(countryHolidayCalendarQueryResult.getHolidayDate(), holidayEndTime));
-                    } else {
-                        dateTimeInterval = new DateTimeInterval(asDate(countryHolidayCalendarQueryResult.getHolidayDate()), asDate(countryHolidayCalendarQueryResult.getHolidayDate().plusDays(1)));
-                    }
+                    DateTimeInterval dateTimeInterval = getDateTimeInterval(dayTypeCountryHolidayCalenderQueryResult, countryHolidayCalendarQueryResult);
                     valid = dateTimeInterval.contains(date);
                     if (valid) {
                         break;
@@ -920,6 +914,17 @@ public class AccessGroupService {
         return valid;
     }
 
+    private DateTimeInterval getDateTimeInterval(DayTypeCountryHolidayCalenderQueryResult dayTypeCountryHolidayCalenderQueryResult, CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult) {
+        DateTimeInterval dateTimeInterval;
+        if (dayTypeCountryHolidayCalenderQueryResult.isAllowTimeSettings()) {
+            LocalTime holidayEndTime = countryHolidayCalendarQueryResult.getEndTime().get(ChronoField.MINUTE_OF_DAY) == 0 ? LocalTime.MAX : countryHolidayCalendarQueryResult.getEndTime();
+            dateTimeInterval = new DateTimeInterval(asDate(countryHolidayCalendarQueryResult.getHolidayDate(), countryHolidayCalendarQueryResult.getStartTime()), asDate(countryHolidayCalendarQueryResult.getHolidayDate(), holidayEndTime));
+        } else {
+            dateTimeInterval = new DateTimeInterval(asDate(countryHolidayCalendarQueryResult.getHolidayDate()), asDate(countryHolidayCalendarQueryResult.getHolidayDate().plusDays(1)));
+        }
+        return dateTimeInterval;
+    }
+
     private void validateDayTypes(boolean allowedDayTypes, Set<Long> dayTypeIds) {
         if ((allowedDayTypes && CollectionUtils.isEmpty(dayTypeIds))) {
             exceptionService.actionNotPermittedException(ERROR_DAY_TYPE_ABSENT);
@@ -929,4 +934,8 @@ public class AccessGroupService {
 
 
     }
+    public List<AccessGroupQueryResult> getCountryAccessGroupByOrgCategory(Long countryId, String orgCategory){
+        return accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, orgCategory);
+    }
+
 }

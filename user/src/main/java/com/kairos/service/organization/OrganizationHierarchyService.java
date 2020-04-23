@@ -77,35 +77,39 @@ public class OrganizationHierarchyService {
         List<FilterResponseDTO> filterResponseDTOList = new ArrayList<>();
         for (String filterType : filterTypeDataMap.keySet()) {
             FilterResponseDTO filterResponseDTO = new FilterResponseDTO();
-            switch (filterType) {
-                case ORGANIZATION_TYPES:
-                    filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_TYPES.value);
-                    filterResponseDTO.setName(FilterType.ORGANIZATION_TYPES);
-                    break;
-                case ORGANIZATION_SUB_TYPES:
-                    filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_SUB_TYPES.value);
-                    filterResponseDTO.setName(FilterType.ORGANIZATION_SUB_TYPES);
-                    break;
-                case ORGANIZATION_SERVICES:
-                    filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_SERVICES.value);
-                    filterResponseDTO.setName(FilterType.ORGANIZATION_SERVICES);
-                    break;
-                case ORGANIZATION_SUB_SERVICES:
-                    filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_SUB_SERVICES.value);
-                    filterResponseDTO.setName(FilterType.ORGANIZATION_SUB_SERVICES);
-                    break;
-                case ACCOUNT_TYPES:
-                    filterResponseDTO.setDisplayName(FilterType.ACCOUNT_TYPES.value);
-                    filterResponseDTO.setName(FilterType.ACCOUNT_TYPES);
-                    break;
-                default:
-            }
+            setDetails(filterType, filterResponseDTO);
             List<FilterAttributes> filterAttributes = ObjectMapperUtils.copyCollectionPropertiesByMapper((List<Map>) filterTypeDataMap.get(filterType), FilterAttributes.class);
             filterResponseDTO.setFilterData(filterAttributes);
             filterResponseDTOList.add(filterResponseDTO);
         }
         filterAndFavouriteFilter.setAllFilters(filterResponseDTOList);
         return filterAndFavouriteFilter;
+    }
+
+    private void setDetails(String filterType, FilterResponseDTO filterResponseDTO) {
+        switch (filterType) {
+            case ORGANIZATION_TYPES:
+                filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_TYPES.value);
+                filterResponseDTO.setName(FilterType.ORGANIZATION_TYPES);
+                break;
+            case ORGANIZATION_SUB_TYPES:
+                filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_SUB_TYPES.value);
+                filterResponseDTO.setName(FilterType.ORGANIZATION_SUB_TYPES);
+                break;
+            case ORGANIZATION_SERVICES:
+                filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_SERVICES.value);
+                filterResponseDTO.setName(FilterType.ORGANIZATION_SERVICES);
+                break;
+            case ORGANIZATION_SUB_SERVICES:
+                filterResponseDTO.setDisplayName(FilterType.ORGANIZATION_SUB_SERVICES.value);
+                filterResponseDTO.setName(FilterType.ORGANIZATION_SUB_SERVICES);
+                break;
+            case ACCOUNT_TYPES:
+                filterResponseDTO.setDisplayName(FilterType.ACCOUNT_TYPES.value);
+                filterResponseDTO.setName(FilterType.ACCOUNT_TYPES);
+                break;
+            default:
+        }
     }
 
     private QueryResult setUnitPermission(OrganizationBaseEntity organizationHierarchy, boolean countryAdmin) {

@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 
+import com.kairos.annotations.KPermissionField;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
@@ -8,7 +9,6 @@ import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -28,6 +28,7 @@ public class RulesActivityTab  {
     private boolean eligibleForRequest;
     private boolean lockLengthPresent;
     private boolean eligibleToBeForced;
+    @KPermissionField
     private List<Long> dayTypes= new ArrayList<>();
     private boolean eligibleForStaffingLevel;
     private boolean breakAllowed;
@@ -41,10 +42,13 @@ public class RulesActivityTab  {
     private boolean transferAll;
     private int noOfTransferLeave;
     // in Minutes
-
+    @KPermissionField
     private LocalTime earliestStartTime;
+    @KPermissionField
     private LocalTime latestStartTime;
+    @KPermissionField
     private Short shortestTime;
+    @KPermissionField
     private Short longestTime;
     private boolean eligibleForCopy;
     private DurationField plannedTimeInAdvance;

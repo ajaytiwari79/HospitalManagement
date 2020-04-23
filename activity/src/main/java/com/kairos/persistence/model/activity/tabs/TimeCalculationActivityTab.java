@@ -1,13 +1,13 @@
 package com.kairos.persistence.model.activity.tabs;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.KPermissionField;
 import com.kairos.constants.ApiConstants;
 import com.kairos.enums.TimeCalaculationType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -19,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 public class TimeCalculationActivityTab  {
 
+    @KPermissionField
     private String methodForCalculatingTime;
     private TimeCalaculationType fullDayCalculationType;
     private TimeCalaculationType fullWeekCalculationType;
