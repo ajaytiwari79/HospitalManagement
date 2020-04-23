@@ -1504,7 +1504,7 @@ public class ShiftService extends MongoBaseService {
 
         public StaffingLevel getStaffingLevel(LocalDate localDate) {
             if (!this.staffingLevelMap.containsKey(localDate)) {
-                List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseOrderByCurrentDateASC(this.unitId, asDate(localDate), asDate(localDate));
+                List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseOrderByCurrentDate(this.unitId, asDate(localDate), asDate(localDate));
                 if (CollectionUtils.isEmpty(staffingLevels)) {
                     exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ABSENT);
                 }
