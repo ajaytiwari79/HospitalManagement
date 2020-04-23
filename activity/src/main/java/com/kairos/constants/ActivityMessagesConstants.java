@@ -63,6 +63,7 @@ public class ActivityMessagesConstants {
     public static final String ERROR_TASKTYPE_TITLE_NOTNULL = "error.Tasktype.title.notnull";
     public static final String EXCEPTION_DATANOTFOUND = "exception.dataNotFound";
     public static final String EXCEPTION_DUPLICATEDATA = "exception.duplicateData";
+    public static final String REQUEST_ABSENCE_ACTIVITY_TYPE = "request.absence.activity.type";
     public static final String ERROR_EXCEPTION_TYPE_NOTEXIST = "error.exception.type.notexist";
     public static final String ERROR_EXCEPTION_NOTFOUND = "error.exception.notfound";
     public static final String MESSAGE_CATEGORY_RENAME = "message.category.rename";

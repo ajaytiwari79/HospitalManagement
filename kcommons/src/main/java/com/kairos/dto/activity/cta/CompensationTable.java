@@ -14,6 +14,7 @@ import java.util.Objects;
 @NoArgsConstructor
 public class CompensationTable {
     private int granularityLevel;
+    @Builder.Default
     private List<CompensationTableInterval> compensationTableInterval=new ArrayList<>();
     //use for protected days off calculation
     private CompensationMeasurementType unusedDaysOffType;

@@ -189,9 +189,9 @@ public class CostTimeAgreementService {
 
     public void assignOrganisationActivitiesToRuleTemplate(List<CTARuleTemplateDTO> ruleTemplateDTOS, Map<Long, BigInteger> parentUnitActivityMap) {
         ruleTemplateDTOS.forEach(ctaRuleTemplateDTO -> {
-            List<BigInteger> parentActivityIds = ctaRuleTemplateDTO.getActivityIds();
+            Set<BigInteger> parentActivityIds = ctaRuleTemplateDTO.getActivityIds();
             if (parentActivityIds != null) {
-                List<BigInteger> unitActivityIds = new ArrayList<>();
+                Set<BigInteger> unitActivityIds = new HashSet<>();
                 parentActivityIds.forEach(parentActivityId -> {
                     if (Optional.ofNullable(parentUnitActivityMap).isPresent() && Optional.ofNullable(parentUnitActivityMap.get(parentActivityId)).isPresent()) {
                         unitActivityIds.add(parentUnitActivityMap.get(parentActivityId));
@@ -497,7 +497,7 @@ public class CostTimeAgreementService {
     private void setActivityBasesCostCalculationSettings(CTARuleTemplate ctaRuleTemplate) {
         switch (ctaRuleTemplate.getActivityTypeForCostCalculation()) {
             case TIME_TYPE_ACTIVITY:
-                ctaRuleTemplate.setActivityIds(new ArrayList<>());
+                ctaRuleTemplate.setActivityIds(new HashSet<>());
                 break;
             default:
                 ctaRuleTemplate.setPlannedTimeIds(null);

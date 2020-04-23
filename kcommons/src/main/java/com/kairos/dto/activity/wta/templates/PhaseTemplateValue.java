@@ -24,4 +24,15 @@ public class PhaseTemplateValue {
     private boolean staffCanIgnore;
     private boolean managementCanIgnore;
 
+    public PhaseTemplateValue(BigInteger phaseId, String phaseName, short staffValue, short managementValue, boolean disabled, boolean staffCanIgnore, boolean managementCanIgnore, int sequence) {
+        this.phaseId = phaseId;
+        this.phaseName = phaseName;
+        this.staffValue = staffValue;
+        this.managementValue = managementValue;
+        this.disabled = disabled;
+        this.staffCanIgnore = staffCanIgnore;
+        this.managementCanIgnore = managementCanIgnore;
+        this.sequence = sequence;
+    }
+
 }

@@ -140,7 +140,7 @@ public class RequestAbsenceService {
                 shiftWithViolatedInfoDTOS = updateShiftWithRequestAbsence(activityWrapper,shift,staffAdditionalInfoDTO);
             }
             response = updateStatusAfterUpdateShift(todo, shiftWithViolatedInfoDTOS);
-            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString().replace("ED","")23) , todo.getComment());
+            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString().replace("ED","")) , todo.getComment());
         }else if(DISAPPROVE.equals(todo.getStatus())){
             shiftOptional.get().setRequestAbsence(null);
             //todo.setDeleted(true);

@@ -311,7 +311,7 @@ public class ShiftPlanningUtility {
                 return !phaseTemplateValue.isDisabled();
             }
         }
-        return false;g
+        return false;
     }
 
     public static Integer getStaffingLevelSatisfaction(StaffingLevelPlannerEntity staffingLevel, Shift shift) {

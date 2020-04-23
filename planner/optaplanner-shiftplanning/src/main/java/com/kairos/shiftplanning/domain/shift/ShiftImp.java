@@ -47,7 +47,7 @@ public class ShiftImp implements Shift{
     private BigInteger id;
     private Employee employee;
     @CustomShadowVariable(variableListenerClass = ShiftStartTimeListener.class,
-          sources = @PlanningVariableReference(variableName = "activityLineIntervals"))
+            sources = @PlanningVariableReference(variableName = "activityLineIntervals"))
     @XStreamConverter(LocalTimeConverter.class)
     private LocalTime startTime;
     @XStreamConverter(LocalTimeConverter.class)
