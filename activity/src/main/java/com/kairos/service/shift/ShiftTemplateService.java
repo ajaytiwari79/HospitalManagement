@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -187,7 +188,8 @@ public class ShiftTemplateService{
             List<ShiftActivityDTO> shiftActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().size());
             individualShiftTemplateDTO.getActivities().forEach(shiftTemplateActivity -> {
                 Date startDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(), shiftTemplateActivity.getStartTime());
-                Date endDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(), shiftTemplateActivity.getEndTime());
+                LocalDate localEndDate =shiftTemplateActivity.getStartTime().isAfter(shiftTemplateActivity.getEndTime())?shiftDTO.getTemplate().getStartDate().plusDays(1):shiftDTO.getTemplate().getStartDate();
+                Date endDate = DateUtils.asDate(localEndDate, shiftTemplateActivity.getEndTime());
                 ShiftActivityDTO shiftActivity = new ShiftActivityDTO(shiftTemplateActivity.getActivityName(), startDate, endDate, shiftTemplateActivity.getActivityId(), shiftTemplateActivity.getAbsenceReasonCodeId());
                 shiftActivities.add(shiftActivity);
             });

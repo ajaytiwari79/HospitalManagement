@@ -5,14 +5,10 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
-import com.kairos.dto.user_context.UserContext;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
-import com.kairos.rest_client.UserIntegrationService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.List;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;

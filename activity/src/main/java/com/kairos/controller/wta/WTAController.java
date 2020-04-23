@@ -152,8 +152,8 @@ public class WTAController {
 
     @ApiOperation(value = "Update WTA of Employment")
     @PutMapping(value =  UNIT_URL + "/wta")
-    public ResponseEntity<Map<String, Object>> updateWtaOfEmployment(@PathVariable long unitId, @RequestBody @Valid WTADTO wtadto, @RequestParam Boolean employmentPublished) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updateWtaOfEmployment(unitId, wtadto, employmentPublished));
+    public ResponseEntity<Map<String, Object>> updateWtaOfEmployment(@PathVariable long unitId, @RequestBody @Valid WTADTO wtadto, @RequestParam Boolean employmentPublished,@RequestParam("save") Boolean save) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updateWtaOfEmployment(unitId, wtadto, employmentPublished,save));
     }
 
 

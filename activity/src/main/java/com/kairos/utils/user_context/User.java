@@ -6,9 +6,6 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 
 import static com.kairos.constants.ActivityMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;

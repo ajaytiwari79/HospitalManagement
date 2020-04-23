@@ -2,6 +2,9 @@ package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.annotation.PermissionClass;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -10,32 +13,10 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@PermissionClass(name = "Activity")
 public class ActivityWithSelectedDTO {
-    List<ActivityTagDTO> allActivities;
-    List<ActivityTagDTO> selectedActivities;
-
-    public ActivityWithSelectedDTO(List<ActivityTagDTO> allActivities, List<ActivityTagDTO> selectedActivities) {
-        this.allActivities = allActivities;
-        this.selectedActivities = selectedActivities;
-    }
-
-    public ActivityWithSelectedDTO() {
-
-    }
-
-    public List<ActivityTagDTO> getAllActivities() {
-        return allActivities;
-    }
-
-    public void setAllActivities(List<ActivityTagDTO> allActivities) {
-        this.allActivities = allActivities;
-    }
-
-    public List<ActivityTagDTO> getSelectedActivities() {
-        return selectedActivities;
-    }
-
-    public void setSelectedActivities(List<ActivityTagDTO> selectedActivities) {
-        this.selectedActivities = selectedActivities;
-    }
+    private List<ActivityTagDTO> allActivities;
+    private List<ActivityTagDTO> selectedActivities;
 }

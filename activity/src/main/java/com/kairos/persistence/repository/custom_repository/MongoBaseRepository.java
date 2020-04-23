@@ -7,6 +7,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Collection;
 
 @NoRepositoryBean
 public interface MongoBaseRepository<T, ID extends Serializable> extends MongoRepository<T, ID> {
@@ -19,6 +20,7 @@ public interface MongoBaseRepository<T, ID extends Serializable> extends MongoRe
 	boolean existsByNameAndNotEqualToId(String name,BigInteger id);
 	<T extends MongoBaseEntity> T findLastOrFirstByField(Sort sort);
 	BigInteger nextSequence(String sequenceName);
+	Collection<T> findAllById(Collection<ID>  id);
 
 
 }

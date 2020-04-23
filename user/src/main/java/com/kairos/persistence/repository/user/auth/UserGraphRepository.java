@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -49,7 +50,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "MATCH (user)<-[:"+BELONGS_TO+"]-(:Staff)<-[:"+BELONGS_TO+"]-(:Position)<-[:"+ HAS_POSITIONS +"]-(organization:Organization{isEnable:true,boardingCompleted: true,deleted:false}) RETURN user")
     User findUserByEmailInAnyOrganization(String email);
 
-    User findByKmdExternalId(Long kmdExternalId);
+    Optional<User> findByKmdExternalId(Long kmdExternalId);
 
     @Query("MATCH (staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(staff)={0} RETURN user")
     User getUserByStaffId(Long staffId);
@@ -64,7 +65,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     // This is used to get the very first user of the organization
     @Query("MATCH (org) WHERE id(org)={0}" +
             "OPTIONAL MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission,position\n" +
-            "OPTIONAL MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'})-[:"+HAS_PARENT_ACCESS_GROUP+"]-(parentAG:AccessGroup) WITH org,unitPermission,position,r1,ag,parentAG\n" +
+            "OPTIONAL MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false})-[:"+HAS_PARENT_ACCESS_GROUP+"]-(parentAG:AccessGroup) WITH org,unitPermission,position,r1,ag,parentAG\n" +
             "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "RETURN  id(org) AS organizationId ,id(user) AS id, user.email AS email,user.firstName AS firstName," +
             "user.userName AS userName,ag.name AS accessGroupName,id(parentAG) AS parentAccessGroupId,id(ag) AS " +

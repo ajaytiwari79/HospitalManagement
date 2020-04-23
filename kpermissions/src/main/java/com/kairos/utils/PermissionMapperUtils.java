@@ -23,7 +23,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PermissionMapperUtils {
 
-    public static final Set<String> personalisedModel = newHashSet("Staff");
+    public static final Set<String> personalisedModel = newHashSet("Staff","Activity");
     private static final boolean DEFAULT_BOOLEAN = false;
     private static final byte DEFAULT_BYTE = 0;
     private static final short DEFAULT_SHORT = 0;

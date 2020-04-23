@@ -5,20 +5,11 @@ import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.enums.constraint.ConstraintLevel;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
-import com.kairos.shiftplanning.dto.ShiftDTO;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.Interval;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static com.kairos.enums.constraint.ConstraintSubType.*;
 

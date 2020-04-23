@@ -43,7 +43,6 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static java.lang.Math.toIntExact;
 import static java.time.ZoneId.systemDefault;

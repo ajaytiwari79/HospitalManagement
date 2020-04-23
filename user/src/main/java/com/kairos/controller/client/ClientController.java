@@ -2,7 +2,6 @@ package com.kairos.controller.client;
 
 import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.dto.activity.task.TaskDemandRequestWrapper;
-import com.kairos.dto.user.client.ClientExceptionDTO;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.staff.ContactPersonDTO;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
@@ -10,7 +9,6 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.client.relationships.ClientRelativeRelation;
-import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.StaffClientData;
 import com.kairos.service.client.ClientAddressService;
 import com.kairos.service.client.ClientBatchService;
@@ -103,13 +101,6 @@ public class ClientController {
     ResponseEntity<Map<String, Object>> updateClientGeneralInformation(@RequestBody @Validated ClientPersonalDto client) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.setGeneralDetails(client));
     }
-
-    @ApiOperation("Get General Information for a Client")
-    @RequestMapping(value = "/{clientId}/general", method = RequestMethod.GET)
-    ResponseEntity<Map<String, Object>> getClientGeneralInformation(@PathVariable long clientId, @PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.retrieveCompleteDetails(clientId, unitId));
-    }
-
 
     //People in household
     @ApiOperation("Add People In HouseHold")
@@ -236,15 +227,15 @@ public class ClientController {
     // Client Relative Information
     @ApiOperation("Update a Relative Information")
     @RequestMapping(value = "/{clientId}/relative/{relativeId}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> updateClientRelativeInformation(@PathVariable long clientId, @PathVariable long relativeId, @RequestBody Map<String, Object> clientRelativeRelation) {
-        ClientRelativeRelation relation = clientExtendedService.setRelativeDetails(clientRelativeRelation, clientId, relativeId);
+    ResponseEntity<Map<String, Object>> updateClientRelativeInformation(@PathVariable long relativeId, @RequestBody Map<String, Object> clientRelativeRelation) {
+        ClientRelativeRelation relation = clientExtendedService.setRelativeDetails(clientRelativeRelation, relativeId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, relation);
     }
 
     @ApiOperation("Create a Relative Information")
     @RequestMapping(value = "/{clientId}/relative", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> saveClientRelativeInformation(@PathVariable long clientId, @RequestBody Map<String, Object> clientRelativeRelation) {
-        ClientRelativeRelation relation = clientExtendedService.setNewRelativeDetails(clientRelativeRelation, clientId);
+    ResponseEntity<Map<String, Object>> saveClientRelativeInformation(@RequestBody Map<String, Object> clientRelativeRelation) {
+        ClientRelativeRelation relation = clientExtendedService.setNewRelativeDetails(clientRelativeRelation);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, relation);
     }
 
@@ -306,9 +297,9 @@ public class ClientController {
     // Get units
     @ApiOperation("Get Organization Units serving citizen")
     @RequestMapping(value = "/{clientId}/organization", method = RequestMethod.GET)
-    ResponseEntity<Map<String, Object>> getClientOrganizationInformation(@PathVariable long clientId, @PathVariable long unitId) {
+    ResponseEntity<Map<String, Object>> getClientOrganizationInformation(@PathVariable long clientId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.getUnitData(clientId, unitId));
+                clientService.getUnitData(clientId));
     }
 
     //anil maurya this endpoints have dependency of task micro service
@@ -437,13 +428,6 @@ public class ClientController {
     }
 
 
-    // ----Team
-    @ApiOperation("Add Client Restricted Team")
-    @RequestMapping(value = "/{clientId}/team/restricted", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> setRestrictedTeam(@PathVariable long clientId, @RequestBody Map<String, Long[]> teamIds) {
-        List<Team> restrictedTeamList = clientService.setRestrictedTeam(clientId, teamIds);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, restrictedTeamList);
-    }
 
 
     // Client Profile Picture
@@ -490,15 +474,6 @@ public class ClientController {
     public ResponseEntity<Map<String, Object>> markClientAsDead(@PathVariable Long clientId,@RequestParam("deathDate") String deathDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 clientService.markClientAsDead(clientId,deathDate));
-    }
-
-
-
-    @RequestMapping(method = RequestMethod.PUT, value = "/basic_info")
-    @ApiOperation("update client from excel sheet")
-    private ResponseEntity<Map<String, Object>> updateClientFromExcel(@RequestParam("file")  MultipartFile multipartFile){
-        clientBatchService.updateClientFromExcel(multipartFile);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,true);
     }
 
     /**
@@ -639,23 +614,6 @@ public class ClientController {
 
 
     /**
-     * @auther anil maurya
-     * this endpoint is call from ClientExceptionRestClient in task micro service
-     * @param clientExceptionDto
-     * @param unitId
-     * @param clientId
-     * @return
-     */
-    @RequestMapping(value = "/{clientId}/updateClientTempAddress", method = RequestMethod.POST)
-    @ApiOperation("updateClientTempAddress")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> changeLocationUpdateClientAddress(@RequestBody ClientExceptionDTO clientExceptionDto,
-                                                                                 @PathVariable Long unitId, @PathVariable Long clientId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.changeLocationUpdateClientAddress(clientExceptionDto, unitId, clientId));
-
-    }
-
-    /**
      * TODO need to verify
      * @auther anil maurya
      *  this endpoint is called from planner service in task micro service
@@ -692,7 +650,7 @@ public class ClientController {
 
     @RequestMapping(value = "/clientAggregation",method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getClientAggregation(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,clientService.getClientAggregation(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,clientExtendedService.getClientAggregation(unitId));
     }
 
     @RequestMapping(value = "/clientsByIds",method = RequestMethod.POST)
@@ -704,13 +662,6 @@ public class ClientController {
     public ResponseEntity<Map<String,Object>> getClientByCprNumber(@PathVariable Long clientId,
                                                                    @PathVariable String cprNumber, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,clientService.findByCPRNumber(clientId,unitId,cprNumber));
-    }
-
-    //Prefer Staff
-    @ApiOperation("Fetch Client Contact Person")
-    @RequestMapping(value = "/{clientId}/staff/contact-person", method = RequestMethod.GET)
-    ResponseEntity<Map<String, Object>> getContactPerson(@PathVariable long unitId, @PathVariable long clientId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getDetailsForContactPersonTab(unitId, clientId));
     }
 
     //Prefer Staff
@@ -787,8 +738,8 @@ public class ClientController {
     @ApiOperation(value = "Get Organization Clients with filters")
     @PostMapping("/filters")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationClientsWithFilters(@PathVariable Long unitId, @RequestBody ClientFilterDTO clientFilterDTO, @RequestParam("start") String start, @RequestParam("moduleId") String moduleId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrganizationClientsWithFilter(unitId, clientFilterDTO, start, moduleId));
+    public ResponseEntity<Map<String, Object>> getOrganizationClientsWithFilters(@PathVariable Long unitId, @RequestBody ClientFilterDTO clientFilterDTO, @RequestParam("moduleId") String moduleId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrganizationClientsWithFilter(unitId, clientFilterDTO, moduleId));
     }
 
 }
