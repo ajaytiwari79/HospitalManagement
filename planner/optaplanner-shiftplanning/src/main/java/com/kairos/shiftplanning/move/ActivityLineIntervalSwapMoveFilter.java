@@ -39,7 +39,6 @@ public class ActivityLineIntervalSwapMoveFilter implements SelectionFilter<Shift
         if(shiftImp2 !=null && !shiftImp2.getDate().equals(activityLineInterval2.getStart().toLocalDate())){
             return false;
         }
-        //log.info("Acceptable swap move activity:"+selection);
         return true;
     }
 }

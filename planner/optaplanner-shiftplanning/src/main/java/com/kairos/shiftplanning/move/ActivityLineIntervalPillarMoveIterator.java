@@ -28,17 +28,9 @@ public class ActivityLineIntervalPillarMoveIterator<T>
     public ActivityLineIntervalPillarMove next() {
        int index=workingRandom==null?n:workingRandom.nextInt(activityLineIntervalWrappersList.size());
        n++;
-        //int index=n++;
         List<ActivityLineIntervalWrapper> activityLineIntervalWrappers= activityLineIntervalWrappersList.get(index);
-        /*if(activityLineInterval.size()==11){
-            log.info("probably absence move");
-        }*/
-
         List<ActivityLineIntervalWrapper> exActivityLineIntervalWrappersThisShift= ShiftPlanningUtility.buildNullAssignWrappersForExIntervals(activityLineIntervalWrappers);
         ActivityLineIntervalPillarMove pillarMove = new ActivityLineIntervalPillarMove(activityLineIntervalWrappers,exActivityLineIntervalWrappersThisShift);
-        /*if(activityLineInterval.get(0).getShiftImp().getPrettyId().equals("4fe1fc")){
-            log.trace("sds");
-        }*/
         log.debug("providing move ::::::::::::::{}",pillarMove);
         return pillarMove;
     }

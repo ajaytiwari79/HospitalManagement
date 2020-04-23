@@ -3,6 +3,7 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.MinMaxSetting;
@@ -18,7 +19,7 @@ import javax.validation.constraints.Positive;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
+import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
@@ -84,7 +85,7 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         List<DateTimeInterval> intervals = new ArrayList<>();
         for (ShiftWithActivityDTO s : sortShifts(shifts)) {
             if(restingTimeAllowed){
-                intervals.add(new DateTimeInterval(s.getStartDate(),asDate(asZoneDateTime(s.getEndDate()).plusMinutes(s.getRestingMinutes()))));
+                intervals.add(new DateTimeInterval(s.getStartDate(),asDate(DateUtils.asZonedDateTime(s.getEndDate()).plusMinutes(s.getRestingMinutes()))));
             }else {
                 intervals.add(s.getDateTimeInterval());
             }

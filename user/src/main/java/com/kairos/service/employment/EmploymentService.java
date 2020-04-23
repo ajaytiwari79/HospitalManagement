@@ -233,11 +233,11 @@ public class EmploymentService {
             exceptionService.actionNotPermittedException(MESSAGE_LASTDATE_NOTLESSTHAN_ENDDATE);
         }
         oldEmployment.setLastWorkingDate(employmentDTO.getLastWorkingDate());
-        EmploymentLine employmentLine = new EmploymentLine.EmploymentLineBuilder().setAvgDailyWorkingHours(employmentDTO.getAvgDailyWorkingHours())
-                .setTotalWeeklyMinutes((employmentDTO.getTotalWeeklyHours() * 60) + employmentDTO.getTotalWeeklyMinutes())
-                .setHourlyCost(employmentDTO.getHourlyCost())
-                .setStartDate(employmentDTO.getStartDate())
-                .setFullTimeWeeklyMinutes(oldEmploymentLine.getFullTimeWeeklyMinutes()).setWorkingDaysInWeek(oldEmploymentLine.getWorkingDaysInWeek()).setEndDate(employmentDTO.getEndDate()).setSeniorityLevel(oldEmploymentLine.getSeniorityLevel()).build();
+        EmploymentLine employmentLine = EmploymentLine.builder().avgDailyWorkingHours(employmentDTO.getAvgDailyWorkingHours())
+                .totalWeeklyMinutes((employmentDTO.getTotalWeeklyHours() * 60) + employmentDTO.getTotalWeeklyMinutes())
+                .hourlyCost(employmentDTO.getHourlyCost())
+                .startDate(employmentDTO.getStartDate())
+                .fullTimeWeeklyMinutes(oldEmploymentLine.getFullTimeWeeklyMinutes()).workingDaysInWeek(oldEmploymentLine.getWorkingDaysInWeek()).endDate(employmentDTO.getEndDate()).seniorityLevel(oldEmploymentLine.getSeniorityLevel()).build();
         oldEmploymentLine.setEndDate(employmentDTO.getStartDate().minusDays(1));
         if (Optional.ofNullable(employmentDTO.getEndDate()).isPresent()) {
             if (!Optional.ofNullable(employmentDTO.getReasonCodeId()).isPresent()) {
@@ -902,15 +902,15 @@ public class EmploymentService {
     }
 
     private EmploymentLine getEmploymentLine(ExpertiseLine expertiseLine, Employment employment, LocalDate startDate, LocalDate endDate, EmploymentLine employmentLine, Long expertiseId) {
-        return new EmploymentLine.EmploymentLineBuilder()
-                .setSeniorityLevel(expertiseLine == null ? employmentLine.getSeniorityLevel() : seniorityLevelService.getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), expertiseLine, expertiseId))
-                .setStartDate(startDate)
-                .setEndDate(endDate)
-                .setTotalWeeklyMinutes(employmentLine.getTotalWeeklyMinutes())
-                .setFullTimeWeeklyMinutes(expertiseLine == null ? employmentLine.getFullTimeWeeklyMinutes() : expertiseLine.getFullTimeWeeklyMinutes())
-                .setWorkingDaysInWeek(expertiseLine == null ? employmentLine.getWorkingDaysInWeek() : expertiseLine.getNumberOfWorkingDaysInWeek())
-                .setAvgDailyWorkingHours(employmentLine.getAvgDailyWorkingHours())
-                .setHourlyCost(employmentLine.getHourlyCost())
+        return EmploymentLine.builder()
+                .seniorityLevel(expertiseLine == null ? employmentLine.getSeniorityLevel() : seniorityLevelService.getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), expertiseLine, expertiseId))
+                .startDate(startDate)
+                .endDate(endDate)
+                .totalWeeklyMinutes(employmentLine.getTotalWeeklyMinutes())
+                .fullTimeWeeklyMinutes(expertiseLine == null ? employmentLine.getFullTimeWeeklyMinutes() : expertiseLine.getFullTimeWeeklyMinutes())
+                .workingDaysInWeek(expertiseLine == null ? employmentLine.getWorkingDaysInWeek() : expertiseLine.getNumberOfWorkingDaysInWeek())
+                .avgDailyWorkingHours(employmentLine.getAvgDailyWorkingHours())
+                .hourlyCost(employmentLine.getHourlyCost())
                 .build();
     }
 

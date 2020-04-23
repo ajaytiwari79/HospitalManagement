@@ -38,8 +38,6 @@ public class ActivityLineIntervalSwapMove extends AbstractMove<ShiftRequestPhase
     }
     @Override
     protected AbstractMove<ShiftRequestPhasePlanningSolution> createUndoMove(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
-        /*return new ActivityLineIntervalSwapMove(rightActivityLineInterval, rightActivityLineInterval.getShift(), rightExActivityLineIntervalsForThisShift, rightToShift,
-                leftActivityLineInterval, leftActivityLineInterval.getShift(), leftExActivityLineIntervalsForThisShift, leftToShift);*/
         return new ActivityLineIntervalSwapMove(leftActivityLineInterval, leftActivityLineInterval.getShift(), leftExActivityLineIntervals,rightActivityLineInterval.getShift(),
                 rightActivityLineInterval, rightActivityLineInterval.getShift(), rightExActivityLineIntervals,leftActivityLineInterval.getShift());
     }
@@ -47,15 +45,11 @@ public class ActivityLineIntervalSwapMove extends AbstractMove<ShiftRequestPhase
     @Override
     protected void doMoveOnGenuineVariables(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
         try {
-            //log.info("Swap:"+this);
-            //ActivityLineIntervalChangeMoveHelper.
-              //      assignActivityIntervalToShift(scoreDirector, leftActivityLineInterval, rightActivityLineInterval.getShift(), rightActivityLineInterval, leftActivityLineInterval.getShift());
             ActivityLineIntervalChangeMoveHelper.assignActivityIntervalToShift
                     (scoreDirector, leftActivityLineInterval, leftToShift, leftExActivityLineIntervals, leftExToShift);
             ActivityLineIntervalChangeMoveHelper.assignActivityIntervalToShift
                     (scoreDirector, rightActivityLineInterval, rightToShift, rightExActivityLineIntervals, rightExToShift);
         }catch(Exception e){
-           // e.printStackTrace();
             log.error("",e);
             throw e;
         }
@@ -76,7 +70,6 @@ public class ActivityLineIntervalSwapMove extends AbstractMove<ShiftRequestPhase
 
     @Override
     public Collection<?> getPlanningValues() {
-        //return Arrays.asList(leftToShift,rightToShift);
         return Arrays.asList(leftActivityLineInterval.getShift(),rightActivityLineInterval.getShift());
     }
 

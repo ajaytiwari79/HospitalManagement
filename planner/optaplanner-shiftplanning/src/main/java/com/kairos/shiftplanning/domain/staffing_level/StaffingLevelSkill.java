@@ -1,7 +1,9 @@
 package com.kairos.shiftplanning.domain.staffing_level;
 
 import com.kairos.shiftplanning.domain.skill.Skill;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode
 public class StaffingLevelSkill {
     private Skill skill;
     private int staffRequired;

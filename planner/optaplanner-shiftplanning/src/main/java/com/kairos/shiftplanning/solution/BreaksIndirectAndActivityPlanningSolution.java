@@ -10,8 +10,6 @@ import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelMatrix;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
@@ -21,6 +19,8 @@ import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreXStreamConverter;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @PlanningSolution
@@ -48,7 +48,7 @@ public class BreaksIndirectAndActivityPlanningSolution {
     private List<ShiftBreak> shiftBreaks;
     @ProblemFactCollectionProperty
     @ValueRangeProvider(id = "possibleStartDateTimes")
-    private List<DateTime> possibleStartDateTimes;
+    private List<ZonedDateTime> possibleStartDateTimes;
 	@XStreamConverter(HardMediumSoftLongScoreXStreamConverter.class)
 	@PlanningScore
     private HardMediumSoftLongScore score;
@@ -128,11 +128,11 @@ public class BreaksIndirectAndActivityPlanningSolution {
         this.skillLineIntervals = skillLineIntervals;
     }
 
-    public List<DateTime> getPossibleStartDateTimes() {
+    public List<ZonedDateTime> getPossibleStartDateTimes() {
         return possibleStartDateTimes;
     }
 
-    public void setPossibleStartDateTimes(List<DateTime> possibleStartDateTimes) {
+    public void setPossibleStartDateTimes(List<ZonedDateTime> possibleStartDateTimes) {
         this.possibleStartDateTimes = possibleStartDateTimes;
     }
 

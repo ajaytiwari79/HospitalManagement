@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain.shift;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
@@ -11,35 +12,38 @@ import org.joda.time.Interval;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
+import java.math.BigInteger;
+import java.time.ZonedDateTime;
+
 @Getter
 @Setter
 @PlanningEntity
 @XStreamAlias("ShiftBreak")
 public class ShiftBreak {
-    private String id;
+    private BigInteger id;
     @PlanningVariable(valueRangeProviderRefs = "possibleStartDateTimes",nullable = true)
-    private DateTime startTime;
+    private ZonedDateTime startTime;
     private int order;
     private ShiftImp shift;
     private int duration;
     public ShiftBreak(){}
-    public ShiftBreak(String id, int order, int duration, ShiftImp shift) {
+    public ShiftBreak(BigInteger id, int order, int duration, ShiftImp shift) {
         this.id = id;
         this.order = order;
         this.duration=duration;
         this.shift=shift;
     }
 
-    public DateTime getEndTime() {
+    public ZonedDateTime getEndTime() {
         return startTime.plusMinutes(duration);
     }
 
-    public Interval getInterval(){
+    public DateTimeInterval getInterval(){
         if(startTime ==null) return null;
-        return new Interval(startTime, startTime.plusMinutes(duration));
+        return new DateTimeInterval(startTime, startTime.plusMinutes(duration));
     }
     public Integer getMinutes(){
-        return getInterval()==null?0:getInterval().toDuration().toStandardMinutes().getMinutes();
+        return getInterval()==null?0:(int)getInterval().getMinutes();
     }
 
     @Override
@@ -64,11 +68,11 @@ public class ShiftBreak {
 
     @Override
     public String toString() {
-        return startTime !=null?("SB:{"+ startTime.toString("HH:mm")+"-"+getEndTime().toString("HH:mm")+"}"):"Not Planned:"+duration;
+        return startTime !=null?("SB:{"+ startTime.toLocalTime()+"-"+getEndTime().toLocalTime()+"}"):"Not Planned:"+duration;
     }
 
     public boolean isPlannedInInterval(){
-        Interval validStartInterval=ShiftPlanningUtility.getPossibleBreakStartInterval(this,this.getShift());
+        DateTimeInterval validStartInterval=ShiftPlanningUtility.getPossibleBreakStartInterval(this,this.getShift());
         //return validStartInterval.contains(startTime) || validStartInterval.getEnd().equals(startTime);
         return ShiftPlanningUtility.intervalConstainsTimeIncludingEnd(validStartInterval,startTime);
     }

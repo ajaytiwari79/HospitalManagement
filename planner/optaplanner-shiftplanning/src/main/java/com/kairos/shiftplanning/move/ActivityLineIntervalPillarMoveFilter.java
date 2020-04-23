@@ -3,12 +3,12 @@ package com.kairos.shiftplanning.move;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionFilter;
 import org.optaplanner.core.impl.heuristic.selector.move.generic.PillarChangeMove;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,10 +19,9 @@ public class ActivityLineIntervalPillarMoveFilter implements SelectionFilter<Shi
         List objects = selection.getPillar();
         List<ActivityLineInterval> activityLineIntervalList=(List<ActivityLineInterval>)objects;
         Set<LocalDate> dates=new HashSet<>();
-        Set<DateTime> dateTimes=new HashSet<>();
+        Set<ZonedDateTime> dateTimes=new HashSet<>();
         ShiftImp shift=(ShiftImp)selection.getToPlanningValue();
         if(shift==null){
-            //If all the entities are being assigned to null then this might fix some broken constraint. So it's fine.
             return true;
         }
         for (ActivityLineInterval activityLineInterval:activityLineIntervalList) {
@@ -32,7 +31,6 @@ public class ActivityLineIntervalPillarMoveFilter implements SelectionFilter<Shi
                     return false;
                 }
         }
-
         return true;
     }
 }

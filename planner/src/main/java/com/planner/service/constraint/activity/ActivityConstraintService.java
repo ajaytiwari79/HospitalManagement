@@ -15,7 +15,7 @@ import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.enums.constraint.ConstraintLevel.HARD;
+import static com.kairos.enums.constraint.ScoreLevel.HARD;
 
 @Service
 public class ActivityConstraintService {

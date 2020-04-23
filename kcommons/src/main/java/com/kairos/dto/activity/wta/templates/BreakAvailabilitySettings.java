@@ -4,14 +4,14 @@ package com.kairos.dto.activity.wta.templates;/*
  */
 
 import com.kairos.enums.wta.PartOfDay;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Objects;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class BreakAvailabilitySettings {
     private PartOfDay timeSlot;

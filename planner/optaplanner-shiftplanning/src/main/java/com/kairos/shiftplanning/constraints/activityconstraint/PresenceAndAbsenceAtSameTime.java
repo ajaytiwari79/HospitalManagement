@@ -2,11 +2,12 @@ package com.kairos.shiftplanning.constraints.activityconstraint;
 
 
 import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanning.constraints.Constraint;
-import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 * */
 @Getter
 @Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 public class PresenceAndAbsenceAtSameTime implements Constraint {
 
@@ -42,7 +44,7 @@ public class PresenceAndAbsenceAtSameTime implements Constraint {
     @Override
     public int checkConstraints(List<ShiftImp> shifts) {
         shifts.sort(Comparator.comparing(ShiftImp::getStartDate));
-        List<ShiftActivity> shiftActivities = shifts.stream().flatMap(shiftImp -> shiftImp.getShiftActivities().stream()).sorted(Comparator.comparing(ShiftActivity::getStartTime)).collect(Collectors.toList());
+        List<ShiftActivity> shiftActivities = shifts.stream().flatMap(shiftImp -> shiftImp.getShiftActivities().stream()).sorted(Comparator.comparing(ShiftActivity::getStartDate)).collect(Collectors.toList());
         int contraintPenality = 0;
         for (int i = 1; i < shiftActivities.size(); i++) {
             ShiftActivity shiftActivity = shiftActivities.get(i - 1);
