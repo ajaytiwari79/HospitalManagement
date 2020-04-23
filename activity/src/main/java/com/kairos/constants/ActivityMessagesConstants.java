@@ -216,6 +216,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_TEAM_ACTIVITY_NOT_ASSIGN = "message.team.activity.not.assign";
     public static final String MESSAGE_WTA_NAME_DUPLICATE = "message.wta.name.duplicate";
     public static final String MESSAGE_WTA_ID = "message.wta.id";
+    public static final String MESSAGE_WTA_VALUE = "message.wta.value";
     public static final String MESSAGE_WTA_EXPIRED_UNIT = "message.wta.expired-unit";
     public static final String MESSAGE_WTA_START_ENDDATE = "message.wta.start-end-date";
     public static final String MESSAGE_WTA_NAME_ALREADYEXISTS = "message.wta.name.alreadyExists";
@@ -383,5 +384,6 @@ public class ActivityMessagesConstants {
     public static final String CUT_OFF_CONFIGUATION = "activity.cutoff.configuration";
     public static final String ACTIVITY_NOT_ASSIGN_IN_PROTECTED_DAYS_OFF_RULE_TEMPLATE = "activity.not.assign.in.protected.days.off.rule.template";
     public static final String STAFF_ALREADY_SICK="staff.already.sick";
+    public static final String MESSAGE_CTA_VALUE ="message.cta.value";
 
 }

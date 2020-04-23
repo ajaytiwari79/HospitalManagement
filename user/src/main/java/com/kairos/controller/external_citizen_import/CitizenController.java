@@ -1,6 +1,5 @@
 package com.kairos.controller.external_citizen_import;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.service.external_citizen_import.AuthService;
 import com.kairos.service.external_citizen_import.CitizenService;
 import io.swagger.annotations.Api;
@@ -43,20 +42,6 @@ public class CitizenController {
         return citizenService.getCitizensFromKMD(unitId);
     }
 
-    /**
-     * Get Citizen Grants data from KMD Nexus
-     *
-     * @return
-     * @params
-     */
-   @GetMapping(value = "/grants")
-    public String getCitizenGrants(){
-        logger.info("Start syncing grants---------> {}",DateUtils.getCurrentDate());
-        authService.kmdAuth();
-        citizenService.getCitizenGrantsFromKMD();
-        logger.info("End syncing grants---------> {}",DateUtils.getCurrentDate());
-        return "Citizen Grants Sync";
-    }
 
     /**
      * Get Citizen Relative data from KMD Nexus

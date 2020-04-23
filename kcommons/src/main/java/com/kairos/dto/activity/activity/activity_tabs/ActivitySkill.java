@@ -1,7 +1,5 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
-import java.io.Serializable;
-
 /**
  * Created by pawanmandhan on 28/8/17.
  */

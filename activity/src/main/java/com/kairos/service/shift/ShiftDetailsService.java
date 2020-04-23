@@ -5,9 +5,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
-import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.enums.shift.ShiftType;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -172,9 +170,6 @@ public class ShiftDetailsService extends MongoBaseService {
 
     public Activity getWorkingSickActivity(ShiftDTO shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         Activity activity = null;
-        if (shift.getActivities().size() == 1) {
-            return activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getActivity();
-        }
         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
             if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().isSicknessSettingValid()) {
                 return activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();

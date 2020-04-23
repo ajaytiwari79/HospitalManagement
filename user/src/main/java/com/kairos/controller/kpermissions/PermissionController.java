@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_V1;
 
@@ -55,6 +56,18 @@ public class PermissionController {
     @GetMapping(value = "/get_default_data_of_permission")
     public ResponseEntity getDefaultDataOfPermission(@RequestParam Long referenceId, @RequestParam ConfLevel confLevel)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getDefaultDataOfPermission(referenceId,confLevel));
+
+    }
+
+    @PutMapping(value = "/validate_permission")
+    public ResponseEntity validatePermission(@RequestParam Long referenceId, @RequestParam ConfLevel confLevel)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getDefaultDataOfPermission(referenceId,confLevel));
+
+    }
+
+    @PostMapping(value = "/unit/{unitId}/fetch_permissions")
+    public ResponseEntity fetchPermission(@RequestBody Set<String> objects, @PathVariable Long unitId)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.fetchPermissions(objects,unitId));
 
     }
 

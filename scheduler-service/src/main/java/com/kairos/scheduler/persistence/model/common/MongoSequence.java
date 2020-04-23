@@ -4,8 +4,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serializable;
-
 /**
  * Created by pankaj on 4/3/17.
  */

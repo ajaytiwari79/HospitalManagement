@@ -7,11 +7,9 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import lombok.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter

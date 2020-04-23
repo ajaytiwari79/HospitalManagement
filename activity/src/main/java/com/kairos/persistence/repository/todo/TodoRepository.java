@@ -1,10 +1,8 @@
 package com.kairos.persistence.repository.todo;
 
 import com.kairos.dto.activity.todo.TodoDTO;
-import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoType;
-import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;

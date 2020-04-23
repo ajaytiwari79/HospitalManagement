@@ -254,11 +254,8 @@ public class ShiftService extends MongoBaseService {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(newArrayList(), shiftDTO);
         mainShift.setPlanningPeriodId(planningPeriod.getId());
         mainShift.setPhaseId(phase.getId());
-
         List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(shiftDTO.getId() != null, mainShift, activityWrapperMap, staffAdditionalInfoDTO, wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets(), mainShift);
         mainShift.setBreakActivities(breakActivities);
-
-
         activityConfigurationService.addPlannedTimeInShift(mainShift, activityWrapperMap, staffAdditionalInfoDTO, false);
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(mainShift, ShiftDTO.class);
         shiftDTO.setShiftType(updateShiftType(activityWrapperMap,mainShift));

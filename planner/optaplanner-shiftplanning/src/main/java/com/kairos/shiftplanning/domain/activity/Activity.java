@@ -7,7 +7,6 @@ import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
-import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
 import com.kairos.shiftplanning.executioner.ShiftPlanningGenerator;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;

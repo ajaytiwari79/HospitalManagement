@@ -1,23 +1,23 @@
 package com.kairos.service.weather;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.user.weather.WeatherInfoDTO;
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.weather.WeatherInfo;
 import com.kairos.persistence.repository.weather.WeatherRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.service.organization.UnitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,6 +26,7 @@ import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.ERROR_RESOURCE_DATE_INCORRECT;
 import static com.kairos.constants.UserMessagesConstants.ERROR_WEATHER_NOTFOUND;
+
 
 /**
  * Created By G.P.Ranjan on 8/4/20
@@ -38,10 +39,15 @@ public class WeatherService {
     private OrganizationService organizationService;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    @Qualifier("restTemplateForThirdPartyAPI")
+    private RestTemplate restTemplate;
+    @Inject private EnvConfig envConfig;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WeatherService.class);
-    private static final String API_KEY = "b6907d289e10d714a6e88b30761fae22";
-    private static final String WEATHER_API = "https://samples.openweathermap.org/data/2.5/weather";
+
+
+    private Map<String,String> mapOfCityAndWeatherInfo = new HashMap<>();
 
     public WeatherInfoDTO getTodayWeatherInfo(Long unitId) {
         WeatherInfo weatherInfo = weatherRepository.getTodayWeatherInfoByUnitId(unitId);
@@ -50,11 +56,11 @@ public class WeatherService {
             if(isNotNull(weatherInfo)){
                 weatherRepository.save(weatherInfo);
             }else{
-                exceptionService.actionNotPermittedException(ERROR_WEATHER_NOTFOUND);
+                exceptionService.dataNotFoundByIdException(ERROR_WEATHER_NOTFOUND);
             }
         }
         WeatherInfoDTO weatherInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(weatherInfo, WeatherInfoDTO.class);
-            weatherInfoDTO.setWeatherInfo(ObjectMapperUtils.jsonStringToObject(weatherInfo.getWeatherInfoInJson(), Map.class));
+        weatherInfoDTO.setWeatherInfo(ObjectMapperUtils.jsonStringToObject(weatherInfo.getWeatherInfoInJson(), Map.class));
         return weatherInfoDTO;
     }
 
@@ -62,34 +68,52 @@ public class WeatherService {
         OrganizationBaseEntity  org = organizationService.getOrganizationById(unitId);
         WeatherInfo weatherInfo = null;
         try{
-            RestTemplate restTemplate = new RestTemplate();
-            String uri = WEATHER_API + "?q=" + org.getContactAddress().getCity() + "&appid=" + API_KEY;
-            String weatherInfoInJSON = restTemplate.getForObject(uri, String.class);
-            Map responseMap = ObjectMapperUtils.jsonStringToObject(weatherInfoInJSON, Map.class);
-            if(Integer.parseInt(responseMap.get("cod").toString()) == 200){
-                weatherInfo = new WeatherInfo(unitId, getLocalDate(), weatherInfoInJSON);
+            String city = org.getContactAddress().getCity();
+            if(city.indexOf(' ') != -1) {
+                city = city.substring(0, city.lastIndexOf(' '));
             }
+            if(!mapOfCityAndWeatherInfo.containsKey(city)) {
+                String weatherApiUrl = envConfig.getWeatherApi() + "?q=" + city + "&appid=" + envConfig.getWeatherApiKey();
+                LOGGER.info("Weather URL is ======> {}",weatherApiUrl);
+                Map responseData=restTemplate.getForObject(weatherApiUrl, Map.class);
+                LOGGER.info("response {}",responseData);
+                //remove this call if api is call for 16 day
+                removeDuplicateDataFromResponse(responseData);
+                mapOfCityAndWeatherInfo.put(city, ObjectMapperUtils.objectToJsonString(responseData));
+            }
+            weatherInfo = new WeatherInfo(unitId, getLocalDate(), mapOfCityAndWeatherInfo.get(city));
         }catch (Exception ex){
             LOGGER.info("Exception --------> {}",ex.getMessage());
         }
         return weatherInfo;
     }
-
-    public List<WeatherInfoDTO> getAllWeatherInfoBetweenDate(Long unitId, LocalDate startDate, LocalDate endDate) {
-        if(startDate.isAfter(getLocalDate()) || endDate.isAfter(getLocalDate()) || endDate.isBefore(startDate)){
-            exceptionService.actionNotPermittedException(ERROR_RESOURCE_DATE_INCORRECT);
+    //this method removed if response have no repeat data for one day.
+    private void removeDuplicateDataFromResponse(Map responseData) {
+        List<Map> list = (List<Map>) responseData.get("list");
+        Map<String,Map> newList = new HashMap<>();
+        for (Map map : list) {
+            String date = map.get("dt_txt").toString();
+            date = date.substring(0,10);
+            newList.put(date,map);
         }
-        List<WeatherInfo> weatherInfos = weatherRepository.findAllByUnitIdAndDates(unitId, startDate.toString(), endDate.toString());
-        List<WeatherInfoDTO> weatherInfoDTOS = new ArrayList<>();
-        for (WeatherInfo weatherInfo : weatherInfos) {
-            WeatherInfoDTO weatherInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(weatherInfo, WeatherInfoDTO.class);
-            weatherInfoDTO.setWeatherInfo(ObjectMapperUtils.jsonStringToObject(weatherInfo.getWeatherInfoInJson(), Map.class));
-            weatherInfoDTOS.add(weatherInfoDTO);
-        }
-        return weatherInfoDTOS;
+        responseData.put("cnt",newList.values().size());
+        responseData.put("list",newList.values());
     }
 
-    public void saveTodayWeatherInfoOfAllUnit(){
+    public WeatherInfoDTO getWeatherInfoAtDate(Long unitId, LocalDate date) {
+        if(date.isAfter(getLocalDate())){
+            exceptionService.actionNotPermittedException(ERROR_RESOURCE_DATE_INCORRECT);
+        }
+        WeatherInfo weatherInfo = weatherRepository.findWeatherInfoByUnitIdAndDate(unitId, date.toString());
+        if(isNull(weatherInfo)){
+            exceptionService.dataNotFoundByIdException(ERROR_WEATHER_NOTFOUND);
+        }
+        WeatherInfoDTO weatherInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(weatherInfo, WeatherInfoDTO.class);
+        weatherInfoDTO.setWeatherInfo(ObjectMapperUtils.jsonStringToObject(weatherInfo.getWeatherInfoInJson(), Map.class));
+        return weatherInfoDTO;
+    }
+
+    public void saveWeatherInfoOfAllUnit(){
         List<WeatherInfo> todayAllWeatherInfo = weatherRepository.getAllTodayWeatherInfo();
         Map<Long,WeatherInfo> mapOfUnitIdAndWeatherInfo = todayAllWeatherInfo.stream().collect(Collectors.toMap(WeatherInfo::getUnitId,v->v));
         List<Long> orgs = organizationService.getAllOrganizationIds();

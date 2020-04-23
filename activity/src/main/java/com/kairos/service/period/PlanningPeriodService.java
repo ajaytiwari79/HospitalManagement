@@ -67,6 +67,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.PLANNING_PERIOD_NAME;

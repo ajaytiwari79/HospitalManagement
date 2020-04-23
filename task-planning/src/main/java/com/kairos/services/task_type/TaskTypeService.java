@@ -39,7 +39,8 @@ import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_ORGANIZATION_TYPE;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_TIMESLOT_ID;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.IMAGES_PATH;
 import static com.kairos.utils.FileUtil.createDirectory;

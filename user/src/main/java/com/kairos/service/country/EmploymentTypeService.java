@@ -72,7 +72,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.enums.kpi.CalculationType.*;
-import static com.kairos.enums.kpi.CalculationType.ABSENCE_UNDER_STAFFING;
 
 
 /**

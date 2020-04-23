@@ -5,7 +5,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.counter.SkillKPIService;

@@ -399,16 +399,6 @@ public class OrganizationActivityService extends MongoBaseService {
 
     }
 
-   /* public ActivityTabsWrapper getBalanceSettingsTabOfType(BigInteger activityId, Long unitId) {
-        Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
-        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
-        PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
-        Activity activity = activityMongoRepository.findOne(activityId);
-        BalanceSettingsActivityTab balanceSettingsActivityTab = activity.getBalanceSettingsActivityTab();
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsActivityTab, presenceType);
-        activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(balanceSettingsActivityTab.getTimeTypeId(), presenceType.getCountryId()));
-        return activityTabsWrapper;
-    }*/
 
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long unitId) {
         List<DayType> dayTypes = userIntegrationService.getDayTypes(unitId);
@@ -580,11 +570,11 @@ public class OrganizationActivityService extends MongoBaseService {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_CHILD, parentActivity.getName());
         }
 
-        List<Activity> activityList = activityMongoRepository.findByActivityIdInChildActivities(parentActivity.getId(), activities.stream().map(k -> k.getId()).collect(Collectors.toList()));
-        if (isCollectionNotEmpty(activityList)) {
-            List<String> activityNames = activityList.stream().map(Activity::getName).collect(Collectors.toList());
-            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_CHILD, activityNames);
-        }
+//        List<Activity> activityList = activityMongoRepository.findByActivityIdInChildActivities(parentActivity.getId(), activities.stream().map(k -> k.getId()).collect(Collectors.toList()));
+//        if (isCollectionNotEmpty(activityList)) {
+//            List<String> activityNames = activityList.stream().map(Activity::getName).collect(Collectors.toList());
+//            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_CHILD, activityNames);
+//        }
         activities = activities.stream().filter(k -> isCollectionNotEmpty(k.getChildActivityIds())).collect(Collectors.toList());
         if (isCollectionNotEmpty(activities)) {
             List<String> activityNames = activities.stream().map(ActivityDTO::getName).collect(Collectors.toList());

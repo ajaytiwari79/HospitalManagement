@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.FUNCTIONS;
 
 /**

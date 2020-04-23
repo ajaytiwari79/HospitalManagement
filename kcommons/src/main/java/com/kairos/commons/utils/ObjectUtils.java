@@ -133,4 +133,9 @@ public class ObjectUtils {
         return new ArrayList<>();
     }
 
+    public static Object [] removeNull(Collection<Object> objects){
+        objects=objects.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        return objects.toArray();
+    }
+
 }

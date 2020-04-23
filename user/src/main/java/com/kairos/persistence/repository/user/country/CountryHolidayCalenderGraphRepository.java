@@ -35,4 +35,7 @@ public interface CountryHolidayCalenderGraphRepository extends Neo4jBaseReposito
             "return ch")
     List<CountryHolidayCalender> findAllByCountryIdAndHolidayDateBetween(Long countryId, String startDate, String endDate);
 
+    @Query("MATCH(ch:CountryHolidayCalender)-[r:" + DAY_TYPE + "]->(dayType:DayType) WHERE id(ch)={0} DETACH DELETE r \n")
+    void unlinkDayType(Long countryHolidayCalenderId);
+
 }

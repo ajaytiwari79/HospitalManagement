@@ -14,6 +14,8 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
+import com.kairos.dto.activity.wta.basic_details.WTADTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -32,12 +34,14 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
-import static com.kairos.constants.ApiConstants.GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS;
-import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
+import static com.kairos.constants.ApiConstants.*;
 
 @Service
 @Transactional
@@ -209,6 +213,16 @@ public class ActivityIntegrationService {
         requestBody.put("timeTypeIds",timeTypeIds);
         requestBody.put("activityIds",activityIds);
         return genericRestClient.publishRequest(requestBody, unitId, true, IntegrationOperation.CREATE, "/get_staff_filter_data", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffFilterDataDTO>>(){});
+    }
+
+    public WTAResponseDTO updateWTAOfEmployment(Long unitId,WTADTO wtadto, boolean employmentPublished,Boolean save) {
+        BasicNameValuePair employementPublished = new BasicNameValuePair("employmentPublished", employmentPublished +"");
+        BasicNameValuePair saveAsDrafts = new BasicNameValuePair("save", save + "");
+        List<NameValuePair> param = new ArrayList<>();
+        param.add(employementPublished);
+        param.add(saveAsDrafts);
+        return genericRestClient.publishRequest(wtadto, unitId, true, IntegrationOperation.UPDATE, "/wta", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>>(){});
+
     }
 }
 
