@@ -1,6 +1,6 @@
 package com.kairos.commons.planning_setting;
 
-import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.constraint.ScoreLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,12 +10,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PlanningSetting {
 
-    private ConstraintLevel constraintLevel;
+    private ScoreLevel scoreLevel;
     private int constraintWeight;
     private boolean mandatory;
 
-    public PlanningSetting(ConstraintLevel constraintLevel,int constraintWeight,boolean mandatory){
-        this.constraintLevel =constraintLevel;
+    public PlanningSetting(ScoreLevel scoreLevel, int constraintWeight, boolean mandatory){
+        this.scoreLevel = scoreLevel;
         this.constraintWeight = constraintWeight;
         this.mandatory  = mandatory;
     }

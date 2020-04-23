@@ -1,6 +1,7 @@
 package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import com.kairos.enums.Day;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 public class DayType {
     private Long id;
     private String name;

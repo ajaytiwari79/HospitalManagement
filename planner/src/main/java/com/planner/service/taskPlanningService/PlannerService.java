@@ -100,7 +100,6 @@ public class PlannerService {
         ShiftRequestPhasePlanningSolution problem=null;//shiftPlanningInitializationService.initializeShiftPlanning(unitId,null,null,null);
         FileIOUtil.writeShiftPlanningXMLToFile(problem,pathProvider.getProblemXmlpath());
         SolverConfigDTO solverConfig=unitSolverConfigService.getSolverConfigWithConstraints(planningSubmissionDTO.getSolverConfigId());
-        //FileIOUtil.writeXMLDocumentToFile(solverConfig,pathProvider.getProblemXmlpath());
         try {
             startShiftPlanningSolverOnThisVM(problem,solverConfig);
         } catch (Exception e) {
@@ -111,7 +110,7 @@ public class PlannerService {
     public boolean startShiftPlanningSolverOnThisVM(ShiftRequestPhasePlanningSolution problem,SolverConfigDTO solverConfig){
 
         ShiftPlanningSolver shiftPlanningSolver=new ShiftPlanningSolver(solverConfig);
-        ShiftRequestPhasePlanningSolution solution=shiftPlanningSolver.runSolverOnRequest(problem);
+        ShiftRequestPhasePlanningSolution solution = shiftPlanningSolver.runSolverOnRequest(problem);
         return true;
     }
 

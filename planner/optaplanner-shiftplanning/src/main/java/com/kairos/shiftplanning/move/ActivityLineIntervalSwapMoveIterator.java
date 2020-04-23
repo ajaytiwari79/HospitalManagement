@@ -29,7 +29,6 @@ public class ActivityLineIntervalSwapMoveIterator<T>
     }
     @Override
     public ActivityLineIntervalSwapMove next() {
-       // int index=workingRandom==null?n++:workingRandom.nextInt(activityLineInterval.size());
         n++;
         ActivityLineInterval leftActivityLineInterval= activityLineInterval.get(workingRandom.nextInt(activityLineInterval.size()));
         ActivityLineInterval rightActivityLineInterval= activityLineInterval.get(workingRandom.nextInt(activityLineInterval.size()));

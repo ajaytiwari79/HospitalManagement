@@ -1,5 +1,7 @@
 package com.kairos.shiftplanning.domain.activity;
 
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
+import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.shiftplanning.constraints.Constraint;
@@ -19,6 +21,8 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,9 +33,10 @@ import java.util.Set;
 @XStreamAlias("Activity")
 public class Activity {
 
+    public static final double DEFAULT_VALUE = 1d;
     private static Logger log= LoggerFactory.getLogger(Activity.class);
 
-    private String id;
+    private BigInteger id;
     private List<Skill> skills;
     private int priority;
     private String name;
@@ -42,10 +47,19 @@ public class Activity {
     private List<Long> expertises;
     private Set<Tag> tags;
     private Long teamId;
+    private LocalDate cutOffStartFrom;
+    private CutOffIntervalUnit cutOffIntervalUnit;
+    private Integer cutOffdayValue;
+    private boolean breakAllowed;
+    private String methodForCalculatingTime;
+    private Double multiplyWithValue = DEFAULT_VALUE;
+    private Long fixedTimeValue;
+    private TimeCalaculationType fullDayCalculationType;
+    private TimeCalaculationType fullWeekCalculationType;
 
 
 
-    public Activity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises, Set<Tag> tags) {
+    public Activity(BigInteger id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises, Set<Tag> tags) {
         this.id = id;
         this.skills = skills;
         this.priority = priority;
@@ -58,7 +72,7 @@ public class Activity {
     }
 
     public boolean isBlankActivity(){
-        return this.name== ShiftPlanningGenerator.BLANK_ACTIVITY;
+        return this.name.equals(ShiftPlanningGenerator.BLANK_ACTIVITY);
     }
     public boolean isTypePresence(){
         return TimeTypeEnum.PRESENCE.equals(timeType.getTimeTypeEnum());

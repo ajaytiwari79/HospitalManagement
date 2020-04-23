@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kairos.enums.constraint.ConstraintLevel.HARD;
+import static com.kairos.enums.constraint.ScoreLevel.HARD;
 
 @Service
 public class UnitConstraintService {

@@ -31,7 +31,7 @@ public class RulesActivityTab  {
     @KPermissionField
     private List<Long> dayTypes= new ArrayList<>();
     private boolean eligibleForStaffingLevel;
-    private boolean breakAllowed = false;
+    private boolean breakAllowed;
     private List<BigInteger> approvalAllowedPhaseIds=new ArrayList<>();
     private LocalDate cutOffStartFrom;
     private CutOffIntervalUnit cutOffIntervalUnit;

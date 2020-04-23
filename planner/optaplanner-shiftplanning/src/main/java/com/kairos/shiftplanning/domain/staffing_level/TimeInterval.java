@@ -1,15 +1,13 @@
 package com.kairos.shiftplanning.domain.staffing_level;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.joda.time.Interval;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class TimeInterval {
 
     //In minutes

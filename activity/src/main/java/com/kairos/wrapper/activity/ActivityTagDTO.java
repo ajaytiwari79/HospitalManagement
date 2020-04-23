@@ -58,7 +58,7 @@ public class ActivityTagDTO {
     // for filter FullDay and Full week activity
     private String methodForCalculatingTime;
 
-    private Map<String, TranslationInfo> translations ;
+    private Map<String, TranslationInfo> translations;
 
     public ActivityTagDTO() {
         //default constructor

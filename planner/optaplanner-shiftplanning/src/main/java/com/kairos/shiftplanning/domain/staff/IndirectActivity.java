@@ -1,15 +1,15 @@
 package com.kairos.shiftplanning.domain.staff;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.joda.time.LocalDate;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,9 +21,9 @@ import java.util.UUID;
 public class IndirectActivity {
     private UUID id;
     //To be used later if we predefine any time.
-    private DateTime preferredStartTime;
+    private ZonedDateTime preferredStartTime;
     @PlanningVariable(valueRangeProviderRefs = "possibleStartDateTimes",nullable = true)
-    private DateTime startTime;
+    private ZonedDateTime startTime;
     private int duration;
     private boolean canBeMoved;
     private List<Employee> employees;
@@ -42,13 +42,13 @@ public class IndirectActivity {
         return startTime ==null?null: startTime.toLocalDate();
     }
 
-    public Interval getInterval(){
-        return startTime ==null? null: new Interval(startTime, startTime.plusMinutes(duration));
+    public DateTimeInterval getInterval(){
+        return startTime ==null? null: new DateTimeInterval(startTime, startTime.plusMinutes(duration));
     }
     public boolean hasEmployee(Employee employee){
         return employees !=null && employees.contains(employee);
     }
-    public boolean overlapsInterval(Interval interval){
+    public boolean overlapsInterval(DateTimeInterval interval){
         return this.getInterval()!=null && interval!=null && interval.overlaps(this.getInterval());
     }
 }

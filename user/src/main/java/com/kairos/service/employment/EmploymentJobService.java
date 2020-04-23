@@ -106,16 +106,16 @@ public class EmploymentJobService {
                 .filter(pl -> !todayDate.isBefore(pl.getStartDate()) && (isNull(pl.getEndDate()) || !todayDate.isAfter(pl.getEndDate())))
                 .findAny();
         if (employmentLine.isPresent()) {
-            EmploymentLine newEmploymentLine = new EmploymentLine.EmploymentLineBuilder()
-                    .setAvgDailyWorkingHours(employmentLine.get().getAvgDailyWorkingHours())
-                    .setTotalWeeklyMinutes(employmentLine.get().getTotalWeeklyMinutes())
-                    .setHourlyCost(employmentLine.get().getHourlyCost())
-                    .setStartDate(todayDate)
-                    .setFunctions(employmentLine.get().getFunctions())
-                    .setFullTimeWeeklyMinutes(employmentLine.get().getFullTimeWeeklyMinutes())
-                    .setWorkingDaysInWeek(employmentLine.get().getWorkingDaysInWeek())
-                    .setEndDate(employmentLine.get().getEndDate())
-                    .setSeniorityLevel(employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getSeniorityLevel())
+            EmploymentLine newEmploymentLine = EmploymentLine.builder()
+                    .avgDailyWorkingHours(employmentLine.get().getAvgDailyWorkingHours())
+                    .totalWeeklyMinutes(employmentLine.get().getTotalWeeklyMinutes())
+                    .hourlyCost(employmentLine.get().getHourlyCost())
+                    .startDate(todayDate)
+                    .functions(employmentLine.get().getFunctions())
+                    .fullTimeWeeklyMinutes(employmentLine.get().getFullTimeWeeklyMinutes())
+                    .workingDaysInWeek(employmentLine.get().getWorkingDaysInWeek())
+                    .endDate(employmentLine.get().getEndDate())
+                    .seniorityLevel(employmentSeniorityLevelQueryResultMap.get(currentEmployment.getId()).getSeniorityLevel())
                     .build();
             employmentLine.get().setEndDate(todayDate.minusDays(1));
             currentEmployment.getEmploymentLines().add(newEmploymentLine);
