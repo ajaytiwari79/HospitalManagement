@@ -767,7 +767,7 @@ public class KPIBuilderCalculationService implements CounterService {
             }
         }
 
-        private Map<Long,Map<BigInteger,List<TodoDTO>>> getStaffIdBigIntegerIdTodoListMap(Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdAndBigIntegerTodoListMap,Map<Long,List<TodoDTO>> longTodoListMap) {
+        public Map<Long,Map<BigInteger,List<TodoDTO>>> getStaffIdBigIntegerIdTodoListMap(Map<Long,Map<BigInteger,List<TodoDTO>>> staffIdAndBigIntegerTodoListMap,Map<Long,List<TodoDTO>> longTodoListMap) {
             for (Map.Entry<Long, List<TodoDTO>> entry : longTodoListMap.entrySet()) {
                 Map<BigInteger,List<TodoDTO>> bigIntegerListMap = entry.getValue().stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId, Collectors.toList()));
                 staffIdAndBigIntegerTodoListMap.put(entry.getKey(),bigIntegerListMap);
