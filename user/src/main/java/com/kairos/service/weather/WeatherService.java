@@ -1,20 +1,20 @@
 package com.kairos.service.weather;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.user.weather.WeatherInfoDTO;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.weather.WeatherInfo;
 import com.kairos.persistence.repository.weather.WeatherRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
-import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +26,7 @@ import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.ERROR_RESOURCE_DATE_INCORRECT;
 import static com.kairos.constants.UserMessagesConstants.ERROR_WEATHER_NOTFOUND;
+
 
 /**
  * Created By G.P.Ranjan on 8/4/20
@@ -39,13 +40,12 @@ public class WeatherService {
     @Inject
     private ExceptionService exceptionService;
     @Inject
+    @Qualifier("restTemplateForThirdPartyAPI")
     private RestTemplate restTemplate;
-    @Value("${weather.api.key}")
-    private String weatherApiKey;
-    @Value("${weather.api}")
-    private String weatherApi ;
+    @Inject private EnvConfig envConfig;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WeatherService.class);
+
 
     private Map<String,String> mapOfCityAndWeatherInfo = new HashMap<>();
 
@@ -73,9 +73,10 @@ public class WeatherService {
                 city = city.substring(0, city.lastIndexOf(' '));
             }
             if(!mapOfCityAndWeatherInfo.containsKey(city)) {
-                String weatherApiUrl = weatherApi + "?q=" + city + "&appid=" + weatherApiKey;
+                String weatherApiUrl = envConfig.getWeatherApi() + "?q=" + city + "&appid=" + envConfig.getWeatherApiKey();
                 LOGGER.info("Weather URL is ======> {}",weatherApiUrl);
                 Map responseData=restTemplate.getForObject(weatherApiUrl, Map.class);
+                LOGGER.info("response {}",responseData);
                 //remove this call if api is call for 16 day
                 removeDuplicateDataFromResponse(responseData);
                 mapOfCityAndWeatherInfo.put(city, ObjectMapperUtils.objectToJsonString(responseData));
@@ -95,6 +96,7 @@ public class WeatherService {
             date = date.substring(0,10);
             newList.put(date,map);
         }
+        responseData.put("cnt",newList.values().size());
         responseData.put("list",newList.values());
     }
 

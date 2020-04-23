@@ -71,9 +71,12 @@ import static com.kairos.enums.user.UserType.USER_ACCOUNT;
  */
 @Service
 public class BootDataService {
+    public static final String SMITH_EMAIL = "smith@kairos.com";
+    public static final String ADMIN_KAIROS_COM = "admin@kairos.com";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
+    private
     com.kairos.service.organization.OrganizationService organizationService;
     @Inject
     StaffGraphRepository staffGraphRepository;
@@ -228,7 +231,7 @@ public class BootDataService {
         adminAsStaff.setSignature("will");
         adminAsStaff.setCardNumber("LPSPSW11323");
         adminAsStaff.setCopyKariosMailToLogin(true);
-        adminAsStaff.setContactDetail(new ContactDetail("smith@kairos.com", "admin@kairos.com", "5365433", "facebook.com/will_cool"));
+        adminAsStaff.setContactDetail(new ContactDetail(SMITH_EMAIL, ADMIN_KAIROS_COM, "5365433", "facebook.com/will_cool"));
         adminAsStaff.setFamilyName(COUNTRY_ADMIN_NAME);
         adminAsStaff.setFirstName(COUNTRY_ADMIN_NAME);
         adminAsStaff.setLastName("Smith");
@@ -236,7 +239,7 @@ public class BootDataService {
         adminAsStaff.setEmail(COUNTRY_ADMIN_EMAIL);
         adminAsStaff.setNationalInsuranceNumber("NIN44500331");
         adminAsStaff.setLanguage(danish);
-        adminAsStaff.setPassword(new BCryptPasswordEncoder().encode("smith@kairos.com"));
+        adminAsStaff.setPassword(new BCryptPasswordEncoder().encode(SMITH_EMAIL));
         return adminAsStaff;
     }
 
@@ -246,7 +249,7 @@ public class BootDataService {
         admin.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(admin.getCprNumber()));
         admin.setUserName(COUNTRY_ADMIN_EMAIL);
         admin.setEmail(COUNTRY_ADMIN_EMAIL);
-        admin.setPassword(new BCryptPasswordEncoder().encode("smith@kairos.com"));
+        admin.setPassword(new BCryptPasswordEncoder().encode(SMITH_EMAIL));
         admin.setFirstName(COUNTRY_ADMIN_NAME);
         admin.setNickName(COUNTRY_ADMIN_NAME);
         admin.setLastName("Smith");
@@ -343,7 +346,7 @@ public class BootDataService {
     }
 
     private void createMasterSkills() {
-        String personalSkills[] = new String[]{"Bathing Partial", "Full Bathing", "Assist with feeding"};
+        String[] personalSkills = new String[]{"Bathing Partial", "Full Bathing", "Assist with feeding"};
         SkillCategory personalSkillCategory = new SkillCategory("Personal Skills");
         personalSkillCategory.setCountry(denmark);
         skillList = new ArrayList<>();
@@ -355,7 +358,7 @@ public class BootDataService {
         }
         SkillCategory medicalSkillCategory = new SkillCategory("Medical Skills");
         medicalSkillCategory.setCountry(denmark);
-        String medicalSkills[] = new String[]{"Pharma knowledge", "Basic Medical Checkup", "Basic Nursing"};
+        String[] medicalSkills = new String[]{"Pharma knowledge", "Basic Medical Checkup", "Basic Nursing"};
         for (String medicalSkill : medicalSkills) {
             skill = new Skill(medicalSkill, medicalSkillCategory);
             skillGraphRepository.save(skill);
@@ -363,13 +366,12 @@ public class BootDataService {
         }
         SkillCategory homeSkillCategory = new SkillCategory("Home Skills");
         homeSkillCategory.setCountry(denmark);
-        String homeSkills[] = new String[]{"Home Cleaning", "Dish Washing", "Cooking food"};
+        String[] homeSkills = new String[]{"Home Cleaning", "Dish Washing", "Cooking food"};
         for (String homeSkill : homeSkills) {
             skill = new Skill(homeSkill, homeSkillCategory);
             skillGraphRepository.save(skill);
             skillList.add(skill.getId());
         }
-
         danish = new Language("Danish", false);
         danish.setCountry(denmark);
         danish = languageGraphRepository.save(danish);
@@ -494,7 +496,7 @@ public class BootDataService {
         adminAsStaff.setSignature("ulrik");
         adminAsStaff.setCardNumber("LPSPSW1134");
         adminAsStaff.setCopyKariosMailToLogin(true);
-        adminAsStaff.setContactDetail(new ContactDetail("admin@kairos.com", "admin@kairos.com", "536533", "facebook.com/ulrik"));
+        adminAsStaff.setContactDetail(new ContactDetail(ADMIN_KAIROS_COM, ADMIN_KAIROS_COM, "536533", "facebook.com/ulrik"));
         adminAsStaff.setFamilyName(ULRIK);
         adminAsStaff.setFirstName(ULRIK);
         adminAsStaff.setLastName("Rasmussen");

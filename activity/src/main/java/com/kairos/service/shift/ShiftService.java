@@ -254,11 +254,8 @@ public class ShiftService extends MongoBaseService {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(newArrayList(), shiftDTO);
         mainShift.setPlanningPeriodId(planningPeriod.getId());
         mainShift.setPhaseId(phase.getId());
-
         List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(shiftDTO.getId() != null, mainShift, activityWrapperMap, staffAdditionalInfoDTO, wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets(), mainShift);
         mainShift.setBreakActivities(breakActivities);
-
-
         activityConfigurationService.addPlannedTimeInShift(mainShift, activityWrapperMap, staffAdditionalInfoDTO, false);
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(mainShift, ShiftDTO.class);
         shiftDTO.setShiftType(updateShiftType(activityWrapperMap,mainShift));
@@ -1507,7 +1504,7 @@ public class ShiftService extends MongoBaseService {
 
         public StaffingLevel getStaffingLevel(LocalDate localDate) {
             if (!this.staffingLevelMap.containsKey(localDate)) {
-                List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(this.unitId, asDate(localDate), asDate(localDate));
+                List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseOrderByCurrentDateASC(this.unitId, asDate(localDate), asDate(localDate));
                 if (CollectionUtils.isEmpty(staffingLevels)) {
                     exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ABSENT);
                 }

@@ -9,7 +9,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.Email;
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_BASE_PAY_GRADE;
@@ -21,7 +20,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_B
 @Getter
 @Setter
 @NoArgsConstructor
-public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel>,Serializable {
+public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel> {
     private Integer from; // this is stored as years
     private Integer to;   // this is stored as years
 

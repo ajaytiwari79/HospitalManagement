@@ -2,7 +2,10 @@ package com.kairos.utils.service_util;
 
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.activity.common.UserInfo;
-import com.kairos.dto.activity.staffing_level.*;
+import com.kairos.dto.activity.staffing_level.Duration;
+import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
+import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
+import com.kairos.dto.activity.staffing_level.StaffingLevelIntervalLog;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.dto.user_context.UserContext;
@@ -13,11 +16,11 @@ import lombok.NoArgsConstructor;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getCurrentDate;
 import static com.kairos.persistence.model.staffing_level.StaffingLevel.Type.PRESENCE;
+
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StaffingLevelUtil {

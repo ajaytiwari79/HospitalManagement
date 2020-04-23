@@ -399,16 +399,6 @@ public class OrganizationActivityService extends MongoBaseService {
 
     }
 
-   /* public ActivityTabsWrapper getBalanceSettingsTabOfType(BigInteger activityId, Long unitId) {
-        Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
-        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
-        PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
-        Activity activity = activityMongoRepository.findOne(activityId);
-        BalanceSettingsActivityTab balanceSettingsActivityTab = activity.getBalanceSettingsActivityTab();
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsActivityTab, presenceType);
-        activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(balanceSettingsActivityTab.getTimeTypeId(), presenceType.getCountryId()));
-        return activityTabsWrapper;
-    }*/
 
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long unitId) {
         List<DayType> dayTypes = userIntegrationService.getDayTypes(unitId);

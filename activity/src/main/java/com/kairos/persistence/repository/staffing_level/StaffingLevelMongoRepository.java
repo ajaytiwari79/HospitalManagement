@@ -16,16 +16,21 @@ import java.util.Set;
 
 public interface StaffingLevelMongoRepository extends MongoBaseRepository<StaffingLevel,BigInteger>,StaffingLevelCustomRepository{
 
-    StaffingLevel findByUnitIdAndPhaseIdAndDeletedFalse(Long organizationId, Long phaseId);
     StaffingLevel findByUnitIdAndCurrentDateAndDeletedFalse(Long unitId, Date currentDate);
+
     boolean existsByUnitIdAndCurrentDateAndDeletedFalse(Long unitId, Date currentDate);
-    List<StaffingLevel> findByUnitIdAndCurrentDateBetweenAndDeletedFalse(Long unitId, Date startDate, Date endDate);
+
     @Query("{deleted:false,unitId:?0,currentDate:{$gte:?1,$lte:?2}}")
     List<StaffingLevel> findByUnitIdAndDates(Long unitId, Date startDate, Date endDate);
+
     @Query("{deleted:false,unitId:?0,currentDate:{$in:?1}}")
     List<StaffingLevel> findByUnitIdAndDates(Long unitId, Set<LocalDate> localDates);
+
     @Query("{deleted:false,currentDate:{$gt:?1},presenceStaffingLevelInterval:{$elemMatch:{staffingLevelActivities:{$elemMatch:{activityId:?0}}}}}")
     List<StaffingLevel> findPresenceStaffingLevelsByActivityId(BigInteger activityId,Date startDate);
+
     @Query("{deleted:false,currentDate:{$gt:?1},absenceStaffingLevelInterval:{$elemMatch:{staffingLevelActivities:{$elemMatch:{activityId:?0}}}}}")
     List<StaffingLevel> findAbsenceStaffingLevelsByActivityId(BigInteger activityId,Date startDate);
+
+    List<StaffingLevel> findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseOrderByCurrentDateASC(Long unitId, Date startDate, Date endDate);
 }

@@ -176,7 +176,6 @@ public class StaffingLevelController {
     @RequestMapping(value = "/staffing_level/{staffingLevelId}/publish", method = RequestMethod.PUT)
     @ApiOperation("publish staffing_level")
     public ResponseEntity<Map<String, Object>> publishStaffingLevel(@PathVariable Long unitId,@PathVariable BigInteger staffingLevelId,@RequestParam("typee") StaffingLevel.Type type) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.publishStaffingLevel(staffingLevelId,type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.publishStaffingLevel(staffingLevelId,type));
     }
 }

@@ -136,7 +136,7 @@ public class StaffingLevelService  {
     public PresenceStaffingLevelDto createStaffingLevel(PresenceStaffingLevelDto presenceStaffingLevelDTO, Long unitId) {
         LOGGER.debug("saving staffing level organizationId {}", unitId);
         StaffingLevel staffingLevel = null;
-        staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalseCustom(unitId, DateUtils.onlyDate(presenceStaffingLevelDTO.getCurrentDate()));
+        staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId, DateUtils.onlyDate(presenceStaffingLevelDTO.getCurrentDate()));
         if (Optional.ofNullable(staffingLevel).isPresent()) {
             if (staffingLevel.getPresenceStaffingLevelInterval().isEmpty()) {
                 List<StaffingLevelInterval> presenceStaffingLevelIntervals = new ArrayList<>();
@@ -170,7 +170,7 @@ public class StaffingLevelService  {
 
     public Map<String, StaffingLevel> getPresenceStaffingLevel(Long unitId, Date startDate, Date endDate) {
         LOGGER.debug("getting staffing level organizationId ,startDate ,endDate {},{},{}", unitId, startDate, endDate);
-        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(unitId, startDate, endDate);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseOrderByCurrentDateASC(unitId, startDate, endDate);
         Map<String, StaffingLevel> staffingLevelsMap = staffingLevels.parallelStream().collect(Collectors.toMap(staffingLevel -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(YYYY_MM_DD);
             LocalDateTime dateTime = DateUtils.asLocalDateTime(staffingLevel.getCurrentDate());
@@ -504,7 +504,7 @@ public class StaffingLevelService  {
     }
 
     public void submitShiftPlanningInfoToPlanner(Long unitId, Date startDate, Date endDate) {
-        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(unitId, startDate, endDate);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseOrderByCurrentDateASC(unitId, startDate, endDate);
 
         Map<String, Object> shiftPlanningInfo = new HashMap<>();
         Object[] objects = getStaffingLevelDto(staffingLevels);

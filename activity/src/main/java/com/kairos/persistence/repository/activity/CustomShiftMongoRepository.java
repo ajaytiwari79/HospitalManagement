@@ -4,7 +4,6 @@ import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.enums.FilterType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
