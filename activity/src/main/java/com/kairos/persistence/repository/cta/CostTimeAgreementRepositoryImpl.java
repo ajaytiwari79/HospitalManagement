@@ -140,7 +140,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
                 lookup(C_TA_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES)
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
-        return result.getMappedResults().isEmpty() ? null : result.getMappedResults().get(0);
+        return result.getMappedResults().isEmpty() ? new CTAResponseDTO() : result.getMappedResults().get(0);
     }
 
     @Override

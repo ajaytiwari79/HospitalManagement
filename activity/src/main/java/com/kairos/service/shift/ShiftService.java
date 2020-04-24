@@ -1036,9 +1036,8 @@ public class ShiftService extends MongoBaseService {
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate());
-        if(isNotNull(ctaResponseDTO)) {
-            staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-        }
+        staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
 
         ViolatedRulesDTO violatedRulesDTO = shiftValidatorService.validateRuleOnShiftDelete(activityWrapperMap, shift, staffAdditionalInfoDTO);
