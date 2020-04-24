@@ -2,6 +2,7 @@ package com.kairos.controller.staffing_level;
 
 import com.kairos.constants.ApiConstants;
 import com.kairos.dto.activity.staffing_level.StaffingLevelFromTemplateDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelPublishDTO;
 import com.kairos.dto.activity.staffing_level.UpdatedStaffingLevelDTO;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
@@ -173,9 +174,9 @@ public class StaffingLevelController {
                 staffingLevelService.getStaffingLevelIfUpdated(unitId, updatedStaffingLevels));
     }
 
-    @RequestMapping(value = "/staffing_level/{staffingLevelId}/publish", method = RequestMethod.PUT)
+    @RequestMapping(value = "/staffing_level/publish", method = RequestMethod.PUT)
     @ApiOperation("publish staffing_level")
-    public ResponseEntity<Map<String, Object>> publishStaffingLevel(@PathVariable Long unitId,@PathVariable BigInteger staffingLevelId,@RequestParam("typee") StaffingLevel.Type type) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.publishStaffingLevel(staffingLevelId,type));
+    public ResponseEntity<Map<String, Object>> publishStaffingLevel(@PathVariable Long unitId, @RequestBody StaffingLevelPublishDTO staffingLevelPublishDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.publishStaffingLevel(unitId,staffingLevelPublishDTO));
     }
 }

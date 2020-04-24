@@ -203,7 +203,7 @@ public class StaffingLevelService  {
             LOGGER.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), presenceStaffingLevelDTO.getCurrentDate());
             exceptionService.unsupportedOperationException(MESSAGE_STAFFLEVEL_CURRENTDATE_UPDATE);
         }
-        StaffingLevelUtil.setUserWiseLogs(staffingLevel,presenceStaffingLevelDTO, StaffingLevel.Type.PRESENCE);
+        StaffingLevelUtil.setUserWiseLogs(staffingLevel,presenceStaffingLevelDTO);
         staffingLevelMongoRepository.save(staffingLevel);
         publishStaffingLevel(presenceStaffingLevelDTO,unitId, staffingLevel);
        return ObjectMapperUtils.copyPropertiesByMapper(updateStaffingLevelAvailableStaffCount(asLocalDate(presenceStaffingLevelDTO.getCurrentDate()),unitId),PresenceStaffingLevelDto.class);
@@ -627,11 +627,11 @@ public class StaffingLevelService  {
                     LOGGER.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), absenceStaffingLevelDto.getCurrentDate());
                     exceptionService.unsupportedOperationException(MESSAGE_STAFFLEVEL_CURRENTDATE_UPDATE);
                 }
-                staffingLevel = StaffingLevelUtil.updateAbsenceStaffingLevels(absenceStaffingLevelDto, unitId, staffingLevel);
+                StaffingLevelUtil.setUserWiseLogsInAbsence(staffingLevel,absenceStaffingLevelDto);
             } else {
                 staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId, absenceStaffingLevelDto.getCurrentDate());
                 if (Optional.ofNullable(staffingLevel).isPresent()) {
-                    staffingLevel = StaffingLevelUtil.updateAbsenceStaffingLevels(absenceStaffingLevelDto, unitId, staffingLevel);
+                    StaffingLevelUtil.setUserWiseLogsInAbsence(staffingLevel,absenceStaffingLevelDto);
                 } else {
                     staffingLevel = StaffingLevelUtil.buildAbsenceStaffingLevels(absenceStaffingLevelDto, unitId);
                 }
@@ -639,6 +639,7 @@ public class StaffingLevelService  {
             staffingLevels.add(staffingLevel);
             StaffingLevelPlanningDTO staffingLevelPlanningDTO = new StaffingLevelPlanningDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
             staffingLevelPlanningDTOS.add(staffingLevelPlanningDTO);
+            absenceStaffingLevelDto.setStaffingLevelIntervalLogs(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelIntervalLogs());
         }
         staffingLevelMongoRepository.saveEntities(staffingLevels);
         absenceStaffingLevelDtos = StaffingLevelUtil.buildAbsenceStaffingLevelDto(staffingLevels);
@@ -955,10 +956,12 @@ public class StaffingLevelService  {
         return staffingLevelMongoRepository.findByUnitIdAndDates(unitId, startDate, endDate);
     }
 
-    public PresenceStaffingLevelDto publishStaffingLevel(BigInteger staffingLevelId,StaffingLevel.Type type){
-        StaffingLevel staffingLevel=staffingLevelMongoRepository.findOne(staffingLevelId);
-        StaffingLevelUtil.updateStaffingLevelToPublish(staffingLevel,type);
-        staffingLevelMongoRepository.save(staffingLevel);
-        return ObjectMapperUtils.copyPropertiesByMapper(staffingLevel,PresenceStaffingLevelDto.class);
+    public PresenceStaffingLevelDto publishStaffingLevel(Long unitId,StaffingLevelPublishDTO staffingLevelPublishDTO){
+        List<StaffingLevel> staffingLevels=staffingLevelMongoRepository.findByUnitIdAndDates(unitId,staffingLevelPublishDTO.getStartDate(),staffingLevelPublishDTO.getEndDate());
+        for (StaffingLevel staffingLevel:staffingLevels) {
+            StaffingLevelUtil.updateStaffingLevelToPublish(staffingLevelPublishDTO,staffingLevel);
+        }
+        staffingLevelMongoRepository.saveEntities(staffingLevels);
+        return ObjectMapperUtils.copyPropertiesByMapper(staffingLevels.get(0),PresenceStaffingLevelDto.class);
     }
 }
