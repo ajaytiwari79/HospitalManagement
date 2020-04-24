@@ -92,8 +92,7 @@ public class WTAOrganizationService extends MongoBaseService {
             wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(updateDTO.getRuleTemplates(), false);
         }
         boolean isValueChanged =workTimeAgreementService.isCalCulatedValueChangedForWTA(oldWta,wtaBaseRuleTemplates);
-
-        if (isValueChanged && updateDTO.getStartDate().isBefore(LocalDate.now())) {
+        if ((isValueChanged && updateDTO.getStartDate().isBefore(LocalDate.now()))) {
             exceptionService.actionNotPermittedException(MESSAGE_WTA_START_ENDDATE);
         }
         WorkingTimeAgreement agreement = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
