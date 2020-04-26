@@ -18,4 +18,6 @@ public class StaffingLevelPublishDTO {
     private Date endDate;
     private List<BigInteger> activityIds=new ArrayList<>();
     private List<Long> skillIds=new ArrayList<>();
+    private List<Long> skillIdsToRemove=new ArrayList<>();
+    private List<Long> activityIdsToRemove=new ArrayList<>();
 }
