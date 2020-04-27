@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
@@ -85,11 +86,11 @@ public class ShiftFilterService {
 
     private <G> ShiftFilter getTimeBankBalanceFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap, Set<Long> employmentIds) {
         //Update loop in a single call
-        Map<Long,Long> employmentIdAndActualTimeBankData = new HashMap<>();
+        Map<Long,Double> employmentIdAndActualTimeBankData = new HashMap<>();
         if(filterTypeMap.containsKey(TIME_BANK_BALANCE) && isCollectionNotEmpty(filterTypeMap.get(TIME_BANK_BALANCE))) {
             for (Long employmentId : employmentIds) {
-                Long timeBank = timeBankService.getAccumulatedTimebankAndDelta(employmentId, unitId, true);
-                employmentIdAndActualTimeBankData.put(employmentId, timeBank);
+                Double timeBank = DateUtils.getHoursByMinutes(Double.valueOf(timeBankService.getAccumulatedTimebankAndDelta(employmentId, unitId, true).toString()));
+                employmentIdAndActualTimeBankData.put(employmentId,timeBank);
             }
         }
         return new TimeBankBalanceFilter(filterTypeMap, employmentIdAndActualTimeBankData);

@@ -16,9 +16,9 @@ import static com.kairos.enums.FilterType.TIME_BANK_BALANCE;
  **/
 public class TimeBankBalanceFilter <G> implements ShiftFilter {
     private Map<FilterType, Set<G>> filterCriteriaMap;
-    private Map<Long,Long> employmentIdAndActualTimeBankData;
+    private Map<Long,Double> employmentIdAndActualTimeBankData;
 
-    public TimeBankBalanceFilter(Map<FilterType, Set<G>> filterCriteriaMap, Map<Long,Long> employmentIdAndActualTimeBankData) {
+    public TimeBankBalanceFilter(Map<FilterType, Set<G>> filterCriteriaMap, Map<Long,Double> employmentIdAndActualTimeBankData) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.employmentIdAndActualTimeBankData = employmentIdAndActualTimeBankData;
     }
