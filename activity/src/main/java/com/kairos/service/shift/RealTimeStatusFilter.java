@@ -43,8 +43,8 @@ public class RealTimeStatusFilter <G> implements ShiftFilter {
     }
 
     private boolean isCurrentDayShift(ShiftDTO shiftDTO){
-        Date currentDate = asDate(asZoneDateTime(getDate()).truncatedTo(ChronoUnit.DAYS));
-        Date shiftDate = asDate(asZoneDateTime(shiftDTO.getStartDate()).truncatedTo(ChronoUnit.DAYS));
+        Date currentDate = asDate(asZonedDateTime(getDate()).truncatedTo(ChronoUnit.DAYS));
+        Date shiftDate = asDate(asZonedDateTime(shiftDTO.getStartDate()).truncatedTo(ChronoUnit.DAYS));
         return currentDate.equals(shiftDate);
     }
 

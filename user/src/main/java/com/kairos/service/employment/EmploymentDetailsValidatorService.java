@@ -192,15 +192,15 @@ public class EmploymentDetailsValidatorService {
     }
 
     private void addEmploymentLines(EmploymentDTO employmentDTO, List<EmploymentLine> employmentLines, ExpertiseLine expertiseLine, LocalDate startDate, LocalDate endDate) {
-        employmentLines.add(new EmploymentLine.EmploymentLineBuilder()
-                .setSeniorityLevel(seniorityLevelService.getSeniorityLevelByStaffAndExpertise(employmentDTO.getStaffId(), expertiseLine, employmentDTO.getExpertiseId()))
-                .setStartDate(startDate)
-                .setEndDate(endDate)
-                .setTotalWeeklyMinutes(employmentDTO.getTotalWeeklyMinutes() + (employmentDTO.getTotalWeeklyHours() * 60))
-                .setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes())
-                .setWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek())
-                .setAvgDailyWorkingHours(employmentDTO.getAvgDailyWorkingHours())
-                .setHourlyCost(employmentDTO.getHourlyCost())
+        employmentLines.add(EmploymentLine.builder()
+                .seniorityLevel(seniorityLevelService.getSeniorityLevelByStaffAndExpertise(employmentDTO.getStaffId(), expertiseLine, employmentDTO.getExpertiseId()))
+                .startDate(startDate)
+                .endDate(endDate)
+                .totalWeeklyMinutes(employmentDTO.getTotalWeeklyMinutes() + (employmentDTO.getTotalWeeklyHours() * 60))
+                .fullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes())
+                .workingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek())
+                .avgDailyWorkingHours(employmentDTO.getAvgDailyWorkingHours())
+                .hourlyCost(employmentDTO.getHourlyCost())
                 .build());
     }
 

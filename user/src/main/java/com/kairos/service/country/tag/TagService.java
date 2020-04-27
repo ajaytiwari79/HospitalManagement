@@ -3,7 +3,7 @@ package com.kairos.service.country.tag;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.MasterDataTypeEnum;
-import com.kairos.enums.PenaltyScoreLevel;
+import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.PenaltyScore;
 import com.kairos.persistence.model.country.tag.Tag;
@@ -104,7 +104,7 @@ public class TagService {
         List<Organization> organizations = organizationGraphRepository.getOrganizationsBySubOrgTypeIds(tagDTO.getOrgSubTypeIds());
         if(isCollectionNotEmpty(organizations)) {
             for(Organization org : organizations) {
-                Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, new PenaltyScore(PenaltyScoreLevel.SOFT,0), tagDTO.getColor(),tagDTO.getShortName(),tagDTO.getUltraShortName());
+                Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, new PenaltyScore(ScoreLevel.SOFT,0), tagDTO.getColor(),tagDTO.getShortName(),tagDTO.getUltraShortName());
                 if (isCollectionNotEmpty(org.getTags())) {
                     org.getTags().add(tag);
                 } else {
@@ -119,7 +119,7 @@ public class TagService {
         Country country = countryGraphRepository.findOne(countryId);
         List<Tag> tags = new ArrayList<>();
         for(Tag tag : country.getTags().stream().filter(tag -> MasterDataTypeEnum.STAFF.equals(tag.getMasterDataType()) && CollectionUtils.containsAny(tag.getOrgSubTypeIds(),orgSubTypeId)).collect(Collectors.toList())){
-            tags.add(new Tag(tag.getName(),tag.getMasterDataType(),false,new PenaltyScore(PenaltyScoreLevel.SOFT,0),tag.getColor(),tag.getShortName(),tag.getUltraShortName()));
+            tags.add(new Tag(tag.getName(),tag.getMasterDataType(),false,new PenaltyScore(ScoreLevel.SOFT,0),tag.getColor(),tag.getShortName(),tag.getUltraShortName()));
         }
         return  tags;
     }

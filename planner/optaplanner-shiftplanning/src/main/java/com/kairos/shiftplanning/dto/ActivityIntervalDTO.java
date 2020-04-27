@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.dto;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
@@ -9,6 +10,8 @@ import lombok.Setter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
+import java.time.ZonedDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +20,7 @@ public class ActivityIntervalDTO {
     private String id;
     private ActivityLineInterval previous;
     private ActivityLineInterval next;
-    private DateTime start;
+    private ZonedDateTime start;
     private boolean required;
     private Activity activity;
     private ShiftImp shift;
@@ -39,7 +42,7 @@ public class ActivityIntervalDTO {
         this.staffNo = lineInterval.getStaffNo();
     }
 
-    public Interval getInterval(){
-        return start==null?null:new Interval(start,start.plusMinutes(duration));
+    public DateTimeInterval getInterval(){
+        return start==null?null:new DateTimeInterval(start,start.plusMinutes(duration));
     }
 }

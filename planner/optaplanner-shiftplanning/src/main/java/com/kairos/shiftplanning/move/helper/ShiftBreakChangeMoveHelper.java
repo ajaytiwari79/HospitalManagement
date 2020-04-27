@@ -7,11 +7,12 @@ import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSoluti
 import org.joda.time.DateTime;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public class ShiftBreakChangeMoveHelper {
     public static void assignShiftBreakToShift(ScoreDirector<BreaksIndirectAndActivityPlanningSolution> scoreDirector, ShiftBreak shiftBreak,
-                                               DateTime startTime, List<ActivityLineInterval> alis, ShiftImp shift){
+                                               ZonedDateTime startTime, List<ActivityLineInterval> alis, ShiftImp shift){
         /*log.debug("applying move:");
         for(ActivityLineInterval ali: alis){
             //scoreDirector.beforeVariableChanged(ali, "shift");

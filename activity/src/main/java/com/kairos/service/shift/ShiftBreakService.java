@@ -114,7 +114,7 @@ public class ShiftBreakService implements KPIService {
                     if (isNull(breakActivity)) {
                         Date breakStartDate = placeBreakAfterThisDate;
                         Optional<ShiftActivity> shiftActivityOptional = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getInterval().containsAndEqualsEndDate(breakStartDate)).findAny();
-                        Date breakEndDate = asDate(asZoneDateTime(placeBreakAfterThisDate).plusMinutes(breakSettings.getBreakDurationInMinute()));
+                        Date breakEndDate = asDate(asZonedDateTime(placeBreakAfterThisDate).plusMinutes(breakSettings.getBreakDurationInMinute()));
                         breakActivity = buildBreakActivity(placeBreakAfterThisDate, breakEndDate, breakSettings, staffAdditionalInfoDTO, activityWrapperMap);
                         ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivityOptional.get().getActivityId());
                         breakActivity.setBreakNotHeld(!activityWrapper.getActivity().getRulesActivityTab().isBreakAllowed());
@@ -177,10 +177,10 @@ public class ShiftBreakService implements KPIService {
             breakCanbePlace = breakCanbePlace ? new DateTimeInterval(shiftActivity.getStartDate().after(placeBreakAfterThisDate) ? shiftActivity.getStartDate() : placeBreakAfterThisDate, shiftActivity.getEndDate()).getMinutes() > breakSetting.getBreakDurationInMinute() : breakCanbePlace;
             if (breakCanbePlace && !placeBreakAnyWhereInShift) {
                 Date startDate = roundDateByMinutes(shiftActivity.getStartDate().after(placeBreakAfterThisDate) ? shiftActivity.getStartDate() : placeBreakAfterThisDate, 15);
-                Date endDate = asDate(asZoneDateTime(startDate).plusMinutes(breakSetting.getBreakDurationInMinute()));
+                Date endDate = asDate(asZonedDateTime(startDate).plusMinutes(breakSetting.getBreakDurationInMinute()));
                 if (endDate.after(shiftActivity.getEndDate())) {
                     endDate = shiftActivity.getEndDate();
-                    startDate = asDate(asZoneDateTime(endDate).minusMinutes(breakSetting.getBreakDurationInMinute()));
+                    startDate = asDate(asZonedDateTime(endDate).minusMinutes(breakSetting.getBreakDurationInMinute()));
                 }
                 breakActivity = buildBreakActivity(startDate, endDate, breakSetting, staffAdditionalInfoDTO, activityWrapperMap);
             }
@@ -196,8 +196,8 @@ public class ShiftBreakService implements KPIService {
     }
 
     private DateTimeInterval getBreakInterval(Shift shift, BreakAvailabilitySettings breakAvailabilitySettings, BreakSettings breakSettings, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
-        ZonedDateTime endDate = asZoneDateTime(shift.getEndDate()).minusMinutes(breakAvailabilitySettings.getEndBeforeMinutes());
-        ZonedDateTime startDateWithShiftPercentage = asZoneDateTime(shift.getStartDate()).plusMinutes(shift.getMinutes() * breakAvailabilitySettings.getShiftPercentage() / 100);
+        ZonedDateTime endDate = asZonedDateTime(shift.getEndDate()).minusMinutes(breakAvailabilitySettings.getEndBeforeMinutes());
+        ZonedDateTime startDateWithShiftPercentage = asZonedDateTime(shift.getStartDate()).plusMinutes(shift.getMinutes() * breakAvailabilitySettings.getShiftPercentage() / 100);
         ZonedDateTime startDate = isEqualOrAfter(startDateWithShiftPercentage, endDate.minusMinutes(breakSettings.getBreakDurationInMinute())) ? endDate.minusMinutes(breakSettings.getBreakDurationInMinute()) : startDateWithShiftPercentage;
         if (shift.getActivities().size() > 1 && shift.getActivities().stream().anyMatch(k -> !activityWrapperMap.get(k.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(k.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed() && k.getInterval().contains(startDate))) {
             return getDateTimeInterval(shift, breakSettings, activityWrapperMap, endDate, startDate);
@@ -213,13 +213,13 @@ public class ShiftBreakService implements KPIService {
                 if (i > 0) {
                     previousShiftActivity = shift.getActivities().get(i - 1);
                     if (activityWrapperMap.get(previousShiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() || activityWrapperMap.get(previousShiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
-                        endDate = asZoneDateTime(previousShiftActivity.getEndDate());
+                        endDate = asZonedDateTime(previousShiftActivity.getEndDate());
                         startDate = endDate.minusMinutes(breakSettings.getBreakDurationInMinute());
                     }
                 } else if (i < shift.getActivities().size() - 1) {
                     nextShiftActivity = shift.getActivities().get(i + 1);
                     if (activityWrapperMap.get(nextShiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() || activityWrapperMap.get(nextShiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
-                        endDate = asZoneDateTime(nextShiftActivity.getEndDate());
+                        endDate = asZonedDateTime(nextShiftActivity.getEndDate());
                         startDate = endDate.minusMinutes(breakSettings.getBreakDurationInMinute());
                     }
                 }
@@ -230,7 +230,7 @@ public class ShiftBreakService implements KPIService {
 
     private BreakAvailabilitySettings findCurrentBreakAvailability(Date startDate, List<TimeSlotWrapper> timeSlots, BreakWTATemplate breakWTATemplate) {
         BreakAvailabilitySettings breakAvailabilitySettings = null;
-        TimeSlotWrapper currentTimeSlot = timeSlots.stream().filter(current -> new TimeInterval((current.getStartHour() * ONE_HOUR_MINUTES) + current.getStartMinute(), (current.getEndHour() * ONE_HOUR_MINUTES) + current.getEndMinute() - 1).contains(asZoneDateTime(startDate).get(ChronoField.MINUTE_OF_DAY))).findFirst().orElse(null);
+        TimeSlotWrapper currentTimeSlot = timeSlots.stream().filter(current -> new TimeInterval((current.getStartHour() * ONE_HOUR_MINUTES) + current.getStartMinute(), (current.getEndHour() * ONE_HOUR_MINUTES) + current.getEndMinute() - 1).contains(asZonedDateTime(startDate).get(ChronoField.MINUTE_OF_DAY))).findFirst().orElse(null);
         if (currentTimeSlot != null && breakWTATemplate != null && !breakWTATemplate.isDisabled()) {
             breakAvailabilitySettings = breakWTATemplate.getBreakAvailability().stream().filter(currentAvailability -> (currentAvailability.getTimeSlot().toString().equalsIgnoreCase(currentTimeSlot.getName()))).findFirst().get();
         }

@@ -60,7 +60,7 @@ public class CTARuleTemplateDTO {
     private boolean calculateScheduledHours;
     private CalculationFor calculationFor;
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
-    private List<BigInteger> activityIds;
+    private Set<BigInteger> activityIds;
 
     private Set<BigInteger> timeTypeIds;
     private Set<BigInteger> plannedTimeIds;
@@ -73,15 +73,6 @@ public class CTARuleTemplateDTO {
     private String ruleTemplateCategoryName;
     private UserInfo lastModifiedBy;
 
-    public CTARuleTemplateDTO(String name,BigInteger id,List<CTARuleTemplatePhaseInfo> phaseInfo, List<Long> employmentTypes, List<BigInteger> activityIds, Set<BigInteger> timeTypeIds, Set<BigInteger> plannedTimeIds) {
-        this.name = name;
-        this.id = id;
-        this.phaseInfo = phaseInfo;
-        this.employmentTypes = employmentTypes;
-        this.activityIds = activityIds;
-        this.timeTypeIds = timeTypeIds;
-        this.plannedTimeIds = plannedTimeIds;
-    }
 
     public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
         this.phaseInfo = Optional.ofNullable(phaseInfo).orElse(new ArrayList<>());
@@ -96,12 +87,8 @@ public class CTARuleTemplateDTO {
         this.dayTypeIds = isNull(dayTypeIds) ? new ArrayList<>() : dayTypeIds;
     }
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
-
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = isNull(activityIds) ? new ArrayList<>() : activityIds;
+    public void setActivityIds(Set<BigInteger> activityIds) {
+        this.activityIds = isNull(activityIds) ? new HashSet<>() : activityIds;
     }
 
     public Set<BigInteger> getTimeTypeIds() {
@@ -194,7 +181,6 @@ public class CTARuleTemplateDTO {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(disabled, payrollType, payrollSystem, calculationUnit, compensationTable, calculateValueAgainst, approvalWorkFlow, phaseInfo, budgetType, calculateValueIfPlanned, employmentTypes, planningCategory, staffFunctions, plannedTimeWithFactor, calculateScheduledHours, calculationFor, activityTypeForCostCalculation, activityIds, timeTypeIds, plannedTimeIds, dayTypeIds, days, publicHolidays);
     }
 }

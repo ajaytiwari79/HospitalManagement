@@ -2,7 +2,7 @@ package com.planner.domain.constraint.country;
 
 import com.kairos.dto.planner.constarints.ConstraintDTO;
 import com.kairos.dto.planner.constarints.country.CountryConstraintDTO;
-import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.planner.domain.constraint.common.Constraint;
@@ -18,14 +18,14 @@ public class CountryConstraint extends Constraint {
         //Not in Use
     }
 
-    public CountryConstraint(ConstraintLevel constraintLevel, int penalty,String name) {
+    public CountryConstraint(ScoreLevel scoreLevel, int penalty, String name) {
         this.name = name;
-        this.constraintLevel = constraintLevel;
+        this.scoreLevel = scoreLevel;
         this.penalty = penalty;
     }
 
-    public CountryConstraint(BigInteger id, String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ConstraintLevel constraintLevel, int penalty, BigInteger planningProblemId, BigInteger parentCountryConstraintId, Long countryId, Long organizationServiceId, Long organizationSubServiceId) {
-        super(id, name, description, constraintType, constraintSubType, constraintLevel, penalty, planningProblemId, parentCountryConstraintId);
+    public CountryConstraint(BigInteger id, String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ScoreLevel scoreLevel, int penalty, BigInteger planningProblemId, BigInteger parentCountryConstraintId, Long countryId, Long organizationServiceId, Long organizationSubServiceId) {
+        super(id, name, description, constraintType, constraintSubType, scoreLevel, penalty, planningProblemId, parentCountryConstraintId);
         this.countryId = countryId;
         this.organizationServiceId = organizationServiceId;
         this.organizationSubServiceId = organizationSubServiceId;

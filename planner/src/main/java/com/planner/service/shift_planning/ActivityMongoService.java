@@ -8,7 +8,6 @@ import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
 import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.shiftplanning.constraints.Constraint;
-import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.constraints.activityconstraint.*;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.tag.Tag;

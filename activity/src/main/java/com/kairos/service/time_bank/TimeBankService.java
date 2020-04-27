@@ -816,9 +816,9 @@ public class TimeBankService implements KPIService {
         private long getStartDateByQueryParam(Date startDate, String query) {
             long timeStamp = startDate.getTime();
             if(query.equals(WEEK)){
-                timeStamp = asDate(asZoneDateTime(startDate).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))).getTime();
+                timeStamp = asDate(asZonedDateTime(startDate).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))).getTime();
             }else if(query.equals(CAMEL_CASE_MONTHLY)){
-                timeStamp = asDate(asZoneDateTime(startDate).with(TemporalAdjusters.firstDayOfMonth())).getTime();
+                timeStamp = asDate(asZonedDateTime(startDate).with(TemporalAdjusters.firstDayOfMonth())).getTime();
             }
             return timeStamp;
         }
@@ -826,9 +826,9 @@ public class TimeBankService implements KPIService {
         private long getEndTimeStampByQueryParam(String query, Date startDate) {
             long timeStamp = getEndOfDay(startDate).getTime();
             if(query.equals(WEEK)){
-                timeStamp = getEndOfDay(asDate(asZoneDateTime(startDate).with(TemporalAdjusters.next(DayOfWeek.SUNDAY)))).getTime();
+                timeStamp = getEndOfDay(asDate(asZonedDateTime(startDate).with(TemporalAdjusters.next(DayOfWeek.SUNDAY)))).getTime();
             }else if(query.equals(CAMEL_CASE_MONTHLY)){
-                timeStamp = getEndOfDay(asDate(asZoneDateTime(startDate).with(TemporalAdjusters.lastDayOfMonth()))).getTime();
+                timeStamp = getEndOfDay(asDate(asZonedDateTime(startDate).with(TemporalAdjusters.lastDayOfMonth()))).getTime();
             }
             return timeStamp;
         }

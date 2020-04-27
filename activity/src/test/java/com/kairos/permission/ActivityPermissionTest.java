@@ -56,7 +56,7 @@ public class ActivityPermissionTest {
         activityDTOS.add(activityDTO);
         activityDTOS.add(activityDTO1);
 
-        permissionService.updateObjectsPropertiesBeforeSend(fieldPermissionHelperDTO,newHashSet(FieldLevelPermission.READ));
+        //permissionService.updateObjectsPropertiesBeforeSend(fieldPermissionHelperDTO,newHashSet(FieldLevelPermission.READ));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class ActivityPermissionTest {
         ActivityDTO activityDTO1=new ActivityDTO(new BigInteger("15"),"team B Changed",null);
         activityDTOS.add(activityDTO);
         activityDTOS.add(activityDTO1);
-        permissionService.updateObjectsPropertiesBeforeSave(fieldPermissionHelperDTO,newHashSet(FieldLevelPermission.WRITE));
+        //permissionService.updateObjectsPropertiesBeforeSave(fieldPermissionHelperDTO,newHashSet(FieldLevelPermission.WRITE));
     }
 
 }
