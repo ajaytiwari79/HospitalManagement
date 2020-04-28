@@ -1,22 +1,32 @@
 package com.kairos.persistence.repository.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftType;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.repository.common.CustomAggregationOperation;
+import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.wrapper.shift.StaffShiftDetails;
+import lombok.Getter;
+import lombok.Setter;
+import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
+import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
 
@@ -36,11 +46,12 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     private static final String ID = "_id";
     private static final String ACTIVITIES_COLLECTION = "activities";
 
-
     @Inject
     private MongoTemplate mongoTemplate;
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private PhaseMongoRepository phaseMongoRepository;
 
     @Override
     public <T> List<StaffShiftDetails> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate) {
@@ -53,7 +64,6 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         criteria.and(EMPLOYMENT_ID).in(employmentIds);
         criteria.and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
 
-        //fixme below code has to be modified with front end api, if activities are  selected, send them in one array
         Set<String> activityIds = new HashSet<>();
         LookupOperation activityTimeTypeLookupOperation = null, ctaLookupOperation = null, ctaTemplateLookupOperation = null;
         Criteria activityDetailsMatchCriteria = null, ctaDetailsMatchCriteria = null;
@@ -77,16 +87,18 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
             } else if (entry.getKey().equals(FilterType.ACTIVITY_TIMECALCULATION_TYPE)) {
                 activityTimeTypeLookupOperation = getActivityLookupOperation(activityTimeTypeLookupOperation);
                 activityDetailsMatchCriteria = prepareActivityTimeCalculationMatchCriteria(activityDetailsMatchCriteria, (Set<String>) entry.getValue());
-            } else if (entry.getKey().equals(FilterType.REAL_TIME_STATUS)) {
-                prepareRealtimeStatusMatchQueries(criteriaArrayList, (Set<String>) entry.getValue());
-            } else if (entry.getKey().equals(FilterType.ESCALATION_CAUSED_BY)) {
-                criteria.and("shiftViolatedRules.escalationCausedBy").in(entry.getValue());
             } else if (entry.getKey().equals(FilterType.CTA_ACCOUNT_TYPE)) {
                 ctaLookupOperation = lookup(CTA_COLLECTION, EMPLOYMENT_ID, EMPLOYMENT_ID, "ctaList");
                 ctaTemplateLookupOperation = lookup(CTA_TEMPLATES_COLLECTION, "ctaList.ruleTemplateIds", ID, "ruleTemplates");
                 ctaDetailsMatchCriteria = new Criteria("ruleTemplates.plannedTimeWithFactor.accountType");
                 ctaDetailsMatchCriteria.in(entry.getValue());
+            } else if (entry.getKey().equals(FilterType.ESCALATION_CAUSED_BY)) {
+                criteria.and("shiftViolatedRules.escalationCausedBy").in(entry.getValue());
             }
+            //todo this has to be done with staff api filters
+            /*else if (entry.getKey().equals(FilterType.REAL_TIME_STATUS)) {
+                prepareRealtimeStatusMatchQueries(unitId,criteriaArrayList, (Set<String>) entry.getValue());
+            }*/
         }
         if (!activityIds.isEmpty()) {
             criteria.and(ACTIVITY_IDS).in(activityIds);
@@ -150,30 +162,6 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         return lookupActivityMatchCriteria;
     }
 
-    private void prepareRealtimeStatusMatchQueries(final List<Criteria> criteriaArrayList, Set<String> filterValues) {
-        Date date = getDate();
-        Criteria statusMatch = null;
-        Integer currentTimeStamp = ((date.getHours() * 60 * 60) + (date.getMinutes() * 60));
-        for (String filterValue : filterValues) {
-            statusMatch = new Criteria();
-            if (filterValue.equals("ON_BREAK")) {
-                statusMatch.and("breakActivities.startTime").gte(currentTimeStamp);
-            } else if (filterValue.equals("SICK")) {
-                statusMatch.and("sickShift").equals(true);
-                statusMatch.and(START_DATE).gte(date).lte(date);
-            } else if (filterValue.equals("CURRENTLY_WORKING")) {
-                statusMatch.and(START_DATE).lte(date).and(END_DATE).gte(date);
-            } else if (filterValue.equals("ON_LEAVE")) {
-                statusMatch.and("shiftType").equals(ShiftType.ABSENCE);
-            } else if (filterValue.equals("UPCOMING")) {
-                statusMatch.and(START_DATE).gt(date);
-            } else if (filterValue.equals("RESTING")) {
-                //todo to be implemented
-            }
-            criteriaArrayList.add(statusMatch);
-        }
-    }
-
     private void prepareTimeSlotCriteria(final Criteria criteria, final Set<String> values, final List<Criteria> criteriaArrayList, final Long unitId) {
         List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlotByNames(unitId, values);
         Criteria timeslotCriteria;
@@ -187,6 +175,160 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         if (isNotEmpty(criteriaArrayList)) {
             criteria.orOperator(orCriteriaArray);
         }
+    }
+
+    public Set<Long> getStaffListAsIdForRealtimeCriteria(final Long unitId, Set<String> filterValues) {
+        String today = DateUtils.getDateString(getDate(), "yyyy-MM-dd");
+        Date dateWithoutTime = null;
+        try {
+            dateWithoutTime = DateUtils.convertToOnlyDate(today, "yyyy-MM-dd");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Set<Long> staffIds = new HashSet<>();
+        for (String filterValue : filterValues) {
+
+            if (filterValue.equals("ON_BREAK")) {
+                staffIds.addAll(getStaffIdsOnBreak(unitId, dateWithoutTime));
+            } else if (filterValue.equals("SICK")) {
+                staffIds.addAll(getStaffSickForSelectedDay(unitId, dateWithoutTime));
+            } else if (filterValue.equals("CURRENTLY_WORKING")) {
+                staffIds.addAll(getStaffCurrentlyWorking(unitId, dateWithoutTime));
+            } else if (filterValue.equals("ON_LEAVE")) {
+                staffIds.addAll(getStaffIdsOnLeave(unitId, today));
+            } else if (filterValue.equals("UPCOMING")) {
+                staffIds.addAll(getStaffForUpcomingShift(unitId, dateWithoutTime));
+            } else if (filterValue.equals("RESTING")) {
+                staffIds.addAll(getStaffIdsOnRest(unitId, today));
+            }
+        }
+        return staffIds;
+    }
+
+    public Set<Long> getStaffCurrentlyWorking(Long unitId, Date date) {
+        Query query = new Query();
+        Criteria criteria = new Criteria();
+        criteria.and(UNIT_ID).is(unitId);
+        criteria.and("sickShift").is(false);
+        criteria.and(START_DATE).lt(date).and(END_DATE).gte(date);
+        query.addCriteria(criteria);
+        List<StaffOnBreak> staffIdDocuments = mongoTemplate.find(query, StaffOnBreak.class);
+        return staffIdDocuments.stream().map(d -> d.staffId).collect(Collectors.toSet());
+    }
+
+    public Set<Long> getStaffForUpcomingShift(Long unitId, Date date) {
+        Integer currentTimeStamp = ((date.getHours() * 60 * 60) + (date.getMinutes() * 60));
+        Query query = new Query();
+        Criteria criteria = new Criteria();
+        criteria.and(UNIT_ID).is(unitId);
+        criteria.and("sickShift").is(false);
+        criteria.and(START_TIME).gte(currentTimeStamp).and(START_DATE).lte(date);
+        query.addCriteria(criteria);
+        List<StaffOnBreak> staffIdDocuments = mongoTemplate.find(query, StaffOnBreak.class);
+        return staffIdDocuments.stream().map(d -> d.staffId).collect(Collectors.toSet());
+    }
+
+    public Set<Long> getStaffIdsOnBreak(Long unitId, Date today) {
+        Integer currentTimeStamp = ((today.getHours() * 60 * 60) + (today.getMinutes() * 60));
+        Query query = new Query();
+        Criteria criteria = new Criteria();
+        criteria.and(UNIT_ID).is(unitId).and(START_DATE).is(today)
+                .and("breakActivities.startTime").lte(currentTimeStamp)
+                .and("breakActivities.endTime").gte(currentTimeStamp);
+        query.addCriteria(criteria);
+        List<StaffOnBreak> staffIdDocuments = mongoTemplate.find(query, StaffOnBreak.class);
+        return staffIdDocuments.stream().map(d -> d.staffId).collect(Collectors.toSet());
+    }
+
+
+    public Set<Long> getStaffSickForSelectedDay(Long unitId, Date date) {
+        List<AggregationOperation> aggregationOperations = new ArrayList<>();
+        Criteria statusMatch = new Criteria();
+        statusMatch.and(START_DATE).is(date).and(UNIT_ID).is(unitId);
+        aggregationOperations.add(new MatchOperation(statusMatch));
+        aggregationOperations.add(getActivityLookupOperation(null));
+        aggregationOperations.add(match(Criteria.where("matchedActivities.rulesActivityTab.sicknessSettingValid").is(true)));
+        Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
+        List<Map> staffIdDocuments = mongoTemplate.aggregate(aggregation, Shift.class, Map.class).getMappedResults();
+        return staffIdDocuments.stream().map(d -> (Long) d.get(STAFF_ID)).collect(Collectors.toSet());
+    }
+
+    public Set<Long> getStaffIdsOnLeave(Long unitId, String date) {
+        List<AggregationOperation> aggregationOperations = new ArrayList<>();
+        Criteria statusMatch = new Criteria();
+        Set<String> absenceTypes = new HashSet<>();
+        Map<String, Object> dateFormatKeys = new HashMap();
+        dateFormatKeys.put("format", "%Y-%m-%d");
+        dateFormatKeys.put("date", "$startDate");
+        Document document = new Document("$addFields", new Document("shiftStartDate", new Document("$dateToString", new Document(dateFormatKeys))));
+        aggregationOperations.add(new CustomAggregationOperation(document));
+        absenceTypes.add("FULL_DAY");
+        absenceTypes.add("FULL_WEEK");
+        statusMatch.and("shiftType").is(ShiftType.ABSENCE);
+        statusMatch.and(UNIT_ID).is(unitId);
+        statusMatch.and("shiftStartDate").is(date);
+        aggregationOperations.add(getActivityLookupOperation(null));
+        aggregationOperations.add(new MatchOperation(getActivityLookupTimeTypeMatchCriteria(statusMatch, absenceTypes)));
+        Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
+        List<Map> staffIdDocuments = mongoTemplate.aggregate(aggregation, Shift.class, Map.class).getMappedResults();
+        return staffIdDocuments.stream().map(d -> (Long) d.get(STAFF_ID)).collect(Collectors.toSet());
+    }
+
+    public Set<Long> getStaffIdsOnRest(Long unitId, String date) {
+        final Phase phase = phaseMongoRepository.findByOrganizationIdAndPhaseEnumAndDeletedFalse(unitId, PhaseDefaultName.REALTIME);
+        final List<AggregationOperation> aggregationOperations = new ArrayList<>();
+
+        aggregationOperations.add(new CustomAggregationOperation(Document.parse(addFieldOperationForShiftTimes())));
+        String matchOperation = "{\n" +
+                "    \"$match\" : { \"shiftType\":\"PRESENCE\",\"unitId\":" + unitId + ",shiftEndDate:'" + date + "',\"deleted\":false  }\n" +
+                "}";
+        aggregationOperations.add(new CustomAggregationOperation(Document.parse(matchOperation)));
+
+        String lookupOperation = "{\n" +
+                "    \"$lookup\" : { \"from\":\"workingTimeAgreement\",\"localField\":\"employmentId\",\"foreignField\":\"employmentId\",\"as\":\"workAgreements\"}   \n" +
+                "}";
+        aggregationOperations.add(new CustomAggregationOperation(Document.parse(lookupOperation)));
+
+        String projectOperation = "{\n" +
+                "    \"$project\" : {\"workAgreements.ruleTemplateIds\":1 ,\"shiftEndTimeStamp\":1,\"currentTimeStamp\":1,\"endDate\":1,\"shiftEndDate\":1,\"workAgreements._id\":1,\"staffId\":1 } \n" +
+                "}";
+        aggregationOperations.add(new CustomAggregationOperation(Document.parse(projectOperation)));
+
+        String wtaLookup = "{\n" +
+                "   \"$lookup\" : { \"from\" : \"wtaBaseRuleTemplate\",\n" +
+                "             \"localField\":\"workAgreements.ruleTemplateIds\",\"foreignField\":\"_id\",\"as\":\"ruleTemplates\" } \n" +
+                "}";
+        aggregationOperations.add(new CustomAggregationOperation(Document.parse(wtaLookup)));
+        aggregationOperations.add(new CustomAggregationOperation(Document.parse(matchWTAAndPhaseOperation(phase.getId().toString()))));
+
+        Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
+        List<Map> staffIdDocuments = mongoTemplate.aggregate(aggregation, SHIFTS, Map.class).getMappedResults();
+        return staffIdDocuments.stream().map(d -> (Long) d.get(STAFF_ID)).collect(Collectors.toSet());
+    }
+
+    private String addFieldOperationForShiftTimes() {
+        return "{\n" +
+                "    \"$addFields\" : {\"shiftEndDate\" : { \"$dateToString\" : { \"format\": \"%Y-%m-%d\",\"date\":\"$endDate\" }},\n" +
+                "    \"currentTimeStamp\": " + getDate().getTime() + " ,\n" +
+                "     \"shiftEndTimeStamp\" : {\"$convert\" : {\"input\" : \"$endDate\",\"to\":\"long\"}} }\n" +
+                "}";
+    }
+
+    private String matchWTAAndPhaseOperation(final String phaseId) {
+        return "{\n" +
+                "    \"$match\" : {\"ruleTemplates.wtaTemplateType\":\"DURATION_BETWEEN_SHIFTS\",\"ruleTemplates.phaseTemplateValues.phaseId\":'" + phaseId + "'" +
+                "                ,\"$and\" : [{ \"$expr\":{ \"$lte\":[\"$shiftEndTimeStamp\",\"$currentTimeStamp\"]} }\n" +
+                "                ,{ \"$expr\" : { \"$gte\" :[\"$shiftEndTimeStamp\", {\"$sum\" :[\"$shiftEndTimeStamp\",\"$ruleTemplates.phaseTemplateValues.staffValue\"]}] }}\n" +
+                "                ]\n" +
+                "              }\n" +
+                "  }";
+
+    }
+
+    @Getter
+    @Setter
+    class StaffOnBreak {
+        private Long staffId;
     }
 
 }

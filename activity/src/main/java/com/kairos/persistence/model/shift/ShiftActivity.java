@@ -70,25 +70,28 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
 
     public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,String timeType) {
         this.activityId = activityId;
-        this.startDate = roundDateByMinutes(startDate,15);
-        this.endDate = roundDateByMinutes(endDate,15);
+        this.startDate = roundDateByMinutes(startDate, 15);
+        this.endDate = roundDateByMinutes(endDate, 15);
         this.activityName = activityName;
         this.timeType = timeType;
-        updateTimeValues();
+        this.startTime = timeInSeconds(this.getStartDate());
+        this.endTime = timeInSeconds(this.getEndDate());
     }
 
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;
-        updateTimeValues();
+        this.startTime = timeInSeconds(this.getStartDate());
+        this.endTime = timeInSeconds(this.getEndDate());
     }
 
     public ShiftActivity(BigInteger activityId, Date startDate,Date endDate,String activityName) {
         this.activityId = activityId;
-        this.startDate=roundDateByMinutes(startDate,15);
-        this.endDate=roundDateByMinutes(endDate,15);
+        this.startDate = roundDateByMinutes(startDate, 15);
+        this.endDate = roundDateByMinutes(endDate, 15);
         this.activityName = activityName;
-        updateTimeValues();
+        this.startTime = timeInSeconds(this.getStartDate());
+        this.endTime = timeInSeconds(this.getEndDate());
     }
 
     public void setPayoutPerShiftCTADistributions(List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions) {
@@ -118,7 +121,8 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
 
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
-        updateTimeValues();
+        this.startTime = timeInSeconds(this.getStartDate());
+
     }
 
     public void setEndDate(Date endDate) {
@@ -126,7 +130,7 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
             this.endDate = roundDateByMinutes(endDate, 15);
         }
         this.endDate = endDate;
-        updateTimeValues();
+        this.endTime = timeInSeconds(this.getEndDate());
     }
 
     public boolean isShiftActivityChanged(ShiftActivity shiftActivity){
@@ -149,12 +153,6 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
             }
         }
         return false;
-    }
-
-
-    private void updateTimeValues() {
-        this.startTime = timeInSeconds(this.getStartDate());
-        this.endTime = timeInSeconds(this.getEndDate());
     }
 
     private Integer timeInSeconds(Date date) {

@@ -14,4 +14,5 @@ public interface ShiftFilterRepository {
 
    <T> List<StaffShiftDetails> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> values, Long unitId, Date startDate, Date endDate);
 
+    Set<Long> getStaffListAsIdForRealtimeCriteria(Long unitId, Set<String> statuses);
 }

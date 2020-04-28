@@ -134,12 +134,16 @@ public class ShiftPlanningService {
       return  userIntegrationService.getAllPlanningStaffForUnit(unitId,shiftSearchDTO);
     }
 
-   private  List<StaffShiftDetails> assignShiftsToStaff(List<StaffShiftDetails> staffShiftPersonalDetailsList,List<StaffShiftDetails> shiftData){
-       Map<Long, List<ShiftWithActivityDTO>> shiftsMap = shiftData.stream().collect(Collectors.toMap(StaffShiftDetails::getId, StaffShiftDetails::getShifts));
-        for(StaffShiftDetails staffShiftDetails:staffShiftPersonalDetailsList){
+    private List<StaffShiftDetails> assignShiftsToStaff(List<StaffShiftDetails> staffShiftPersonalDetailsList, List<StaffShiftDetails> shiftData) {
+        Map<Long, List<ShiftWithActivityDTO>> shiftsMap = shiftData.stream().collect(Collectors.toMap(StaffShiftDetails::getId, StaffShiftDetails::getShifts));
+        for (StaffShiftDetails staffShiftDetails : staffShiftPersonalDetailsList) {
             staffShiftDetails.setShifts(shiftsMap.getOrDefault(staffShiftDetails.getId(), new ArrayList<>()));
         }
         return staffShiftPersonalDetailsList;
+    }
+
+    public Set<Long> getStaffListAsId(final Long unitId, final Set<String> statuses) {
+        return shiftMongoRepository.getStaffListAsIdForRealtimeCriteria(unitId, statuses);
     }
 
 

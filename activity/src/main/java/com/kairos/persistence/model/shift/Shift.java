@@ -84,7 +84,8 @@ public class Shift extends MongoBaseEntity {
         this.endDate = endDate;
         this.employmentId = employmentId;
         this.activities = shiftActivities;
-        updateShiftTimeValues();
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
     }
 
     // This is used in absance shift
@@ -97,7 +98,8 @@ public class Shift extends MongoBaseEntity {
         this.unitId = unitId;
         this.phaseId = phaseId;
         this.planningPeriodId = planningPeriodId;
-        updateShiftTimeValues();
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
 
     }
 
@@ -118,7 +120,8 @@ public class Shift extends MongoBaseEntity {
         this.planningPeriodId = planningPeriodId;
         this.staffUserId = staffUserId;
         this.shiftType = shiftType;
-        updateShiftTimeValues();
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
     }
 
     public void setBreakActivities(List<ShiftActivity> breakActivities) {
@@ -238,12 +241,12 @@ public class Shift extends MongoBaseEntity {
 
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
-        updateShiftTimeValues();
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
     }
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-        updateShiftTimeValues();
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
     }
 
 
@@ -272,7 +275,6 @@ public class Shift extends MongoBaseEntity {
     public void updateShiftTimeValues() {
         this.shiftStartTime = timeInSeconds(this.getStartDate());
         this.shiftEndTime = timeInSeconds(this.getEndDate());
-        ;
     }
 
     private Integer timeInSeconds(Date date) {
