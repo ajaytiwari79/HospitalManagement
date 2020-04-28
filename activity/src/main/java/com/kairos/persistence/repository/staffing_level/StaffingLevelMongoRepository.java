@@ -32,7 +32,5 @@ public interface StaffingLevelMongoRepository extends MongoBaseRepository<Staffi
     @Query("{deleted:false,currentDate:{$gt:?1},absenceStaffingLevelInterval:{$elemMatch:{staffingLevelActivities:{$elemMatch:{activityId:?0}}}}}")
     List<StaffingLevel> findAbsenceStaffingLevelsByActivityId(BigInteger activityId,Date startDate);
 
-    List<StaffingLevel> findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseAndPublishedTrueOrderByCurrentDate(Long unitId, Date startDate, Date endDate);
-
     List<StaffingLevel> findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseOrderByCurrentDate(Long unitId, Date startDate, Date endDate);
 }

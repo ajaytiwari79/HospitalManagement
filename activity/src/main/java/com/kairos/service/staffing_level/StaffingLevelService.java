@@ -514,7 +514,7 @@ public class StaffingLevelService  {
     }
 
     public void submitShiftPlanningInfoToPlanner(Long unitId, Date startDate, Date endDate) {
-        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseAndPublishedTrueOrderByCurrentDate(unitId, startDate, endDate);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseOrderByCurrentDate(unitId, startDate, endDate);
 
         Map<String, Object> shiftPlanningInfo = new HashMap<>();
         Object[] objects = getStaffingLevelDto(staffingLevels);
