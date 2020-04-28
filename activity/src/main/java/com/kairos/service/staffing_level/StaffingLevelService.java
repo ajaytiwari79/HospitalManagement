@@ -140,12 +140,11 @@ public class StaffingLevelService  {
         if (Optional.ofNullable(staffingLevel).isPresent()) {
             if (staffingLevel.getPresenceStaffingLevelInterval().isEmpty()) {
                 List<StaffingLevelInterval> presenceStaffingLevelIntervals = new ArrayList<>();
-                for (StaffingLevelInterval staffingLevelTimeSlotDTO : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval()) {
-                    StaffingLevelInterval presenceStaffingLevelInterval = new StaffingLevelInterval(staffingLevelTimeSlotDTO.getSequence(), staffingLevelTimeSlotDTO.getMinNoOfStaff(),
-                            staffingLevelTimeSlotDTO.getMaxNoOfStaff(), staffingLevelTimeSlotDTO.getStaffingLevelDuration()
-                    );
-                    presenceStaffingLevelInterval.addStaffLevelActivity(staffingLevelTimeSlotDTO.getStaffingLevelActivities());
-                    presenceStaffingLevelInterval.addStaffLevelSkill(staffingLevelTimeSlotDTO.getStaffingLevelSkills());
+                for (StaffingLevelInterval staffingLevelInterval : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval()) {
+                    StaffingLevelInterval presenceStaffingLevelInterval = new StaffingLevelInterval(staffingLevelInterval.getSequence(), staffingLevelInterval.getStaffingLevelDuration());
+                    StaffingLevelUtil.setUserWiseLogs(staffingLevel,presenceStaffingLevelDTO);
+                    presenceStaffingLevelInterval.addStaffLevelActivity(staffingLevelInterval.getStaffingLevelActivities());
+                    presenceStaffingLevelInterval.addStaffLevelSkill(staffingLevelInterval.getStaffingLevelSkills());
                     presenceStaffingLevelIntervals.add(presenceStaffingLevelInterval);
                 }
                 staffingLevel.setPresenceStaffingLevelInterval(presenceStaffingLevelIntervals);
@@ -504,7 +503,7 @@ public class StaffingLevelService  {
     }
 
     public void submitShiftPlanningInfoToPlanner(Long unitId, Date startDate, Date endDate) {
-        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseOrderByCurrentDate(unitId, startDate, endDate);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseAndPublishedTrueOrderByCurrentDate(unitId, startDate, endDate);
 
         Map<String, Object> shiftPlanningInfo = new HashMap<>();
         Object[] objects = getStaffingLevelDto(staffingLevels);

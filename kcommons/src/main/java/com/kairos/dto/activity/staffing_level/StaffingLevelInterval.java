@@ -46,6 +46,11 @@ public class StaffingLevelInterval {
         this.staffingLevelDuration = staffingLevelDuration;
     }
 
+    public StaffingLevelInterval(int sequence, Duration staffingLevelDuration) {
+        this.sequence = sequence;
+        this.staffingLevelDuration = staffingLevelDuration;
+    }
+
     public void addStaffLevelActivity(Set<StaffingLevelActivity> staffLevelActivitys) {
         if (staffLevelActivitys == null)
             throw new NullPointerException(CAN_T_ADD_NULL_STAFF_LEVEL_ACTIVITY);

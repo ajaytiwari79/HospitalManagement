@@ -38,6 +38,7 @@ public class StaffingLevel extends MongoBaseEntity {
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private List<StaffingLevelInterval> absenceStaffingLevelInterval =new ArrayList<>();
+    private boolean published;
 
     public StaffingLevel(Date currentDate, Integer weekCount,
                          Long organizationId, BigInteger phaseId, StaffingLevelSetting staffingLevelSetting) {
