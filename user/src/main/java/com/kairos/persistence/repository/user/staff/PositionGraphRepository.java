@@ -76,7 +76,7 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
 
     @Query("MATCH(position:Position) where id(position) IN {0} \n" +
             "MATCH(position)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) \n" +
-            "RETURN user")
-    List<User> getAllUserByPositionIds(List<Long> positionIds);
+            "RETURN DISTINCT user.userName")
+    List<String> getAllUserByPositionIds(List<Long> positionIds);
 }
 

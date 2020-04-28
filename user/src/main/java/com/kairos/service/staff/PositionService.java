@@ -620,9 +620,6 @@ public class PositionService {
     }
 
     private void deleteAuthTokenOfUsersByPositionIds(List<Long> positionIds){
-        List<User> users = positionGraphRepository.getAllUserByPositionIds(positionIds);
-        for (User user : users) {
-            redisService.invalidateAllTokenOfUser(user.getUserName());
-        }
+        List<String> userNames = positionGraphRepository.getAllUserByPositionIds(positionIds);
+        userNames.forEach(userName->redisService.invalidateAllTokenOfUser(userName));
     }
-}
