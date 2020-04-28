@@ -34,6 +34,10 @@ public class ShiftPlanningService {
         List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId, shiftSearchDTO);
         LOGGER.debug("staff found for planning are {}", staffListWithPersonalDetails);
 
+        if (validMatches.containsKey(FilterType.REAL_TIME_STATUS)) {
+            Set<Long> staffIds = shiftMongoRepository.getStaffListAsIdForRealtimeCriteria(unitId, (Set<String>) validMatches.get(FilterType.REAL_TIME_STATUS));
+            staffListWithPersonalDetails = staffListWithPersonalDetails.stream().filter(spd -> staffIds.contains(spd.getId())).collect(Collectors.toList());
+        }
         final Set<Long> employmentIds = new HashSet<>();
         staffListWithPersonalDetails.forEach(staffShiftDetails ->
                 employmentIds.addAll(staffShiftDetails.getEmployments().stream().map(EmploymentDTO::getId).collect(Collectors.toList()))
@@ -66,12 +70,17 @@ public class ShiftPlanningService {
     }
 
 
-    public List<StaffShiftDetails> getUnitPlanningAndShiftForSelectedStaff(Long unitId, ShiftSearchDTO shiftSearchDTO){
-        List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId,shiftSearchDTO);
+    public <T> List<StaffShiftDetails> getUnitPlanningAndShiftForSelectedStaff(Long unitId, ShiftSearchDTO shiftSearchDTO) {
+        Map<FilterType, Set<T>> validMatches = FilterUtils.filterOutEmptyQueriesAndPrepareMap(shiftSearchDTO);
+        List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId, shiftSearchDTO);
+        if (validMatches.containsKey(FilterType.REAL_TIME_STATUS)) {
+            Set<Long> staffIds = shiftMongoRepository.getStaffListAsIdForRealtimeCriteria(unitId, (Set<String>) validMatches.get(FilterType.REAL_TIME_STATUS));
+            staffListWithPersonalDetails = staffListWithPersonalDetails.stream().filter(spd -> staffIds.contains(spd.getId())).collect(Collectors.toList());
+        }
 
-        int i=-1;
+        int i = -1;
         StaffShiftDetails matchedStaff = null;
-        for(StaffShiftDetails staffShiftDetails:staffListWithPersonalDetails){
+        for (StaffShiftDetails staffShiftDetails : staffListWithPersonalDetails) {
             i++;
             if (shiftSearchDTO.getLoggedInUserId().equals(staffShiftDetails.getUserId())) {
                 matchedStaff = staffShiftDetails;
@@ -79,7 +88,7 @@ public class ShiftPlanningService {
             }
         }
 
-        if (i < staffListWithPersonalDetails.size()) {
+        if (i > 0) {
             staffListWithPersonalDetails.remove(i);
             staffListWithPersonalDetails.add(0, matchedStaff);
         }
