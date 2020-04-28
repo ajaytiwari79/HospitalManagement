@@ -572,19 +572,19 @@ public class PositionService {
         return true;
     }
 
-    public void createPosition(Organization organization, Staff staff, Long accessGroupId, Long employedSince,Long unitId) {
+    public void createPosition(Organization organization, Staff staff, Long accessGroupId, Long employedSince, Long unitId) {
         Position position = new Position();
         position.setName("Working as staff");
         position.setStaff(staff);
         position.setStartDateMillis(employedSince);
-        createStaffPermission(organization, accessGroupId, position,unitId);
+        createStaffPermission(organization, accessGroupId, position, unitId);
         positionGraphRepository.save(position);
         organization.getPositions().add(position);
         organizationGraphRepository.save(organization);
 
     }
 
-    private void createStaffPermission(Organization organization, Long accessGroupId, Position position,Long unitId) {
+    private void createStaffPermission(Organization organization, Long accessGroupId, Position position, Long unitId) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             exceptionService.dataNotFoundByIdException(ERROR_STAFF_ACCESSGROUP_NOTFOUND, accessGroupId);
@@ -595,8 +595,8 @@ public class PositionService {
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         unitPermission.setAccessGroup(accessGroup);
-        Unit unit=organization.getUnits().stream().filter(k->k.getId().equals(unitId)).findAny().orElse(null);
-        if(unit!=null){
+        Unit unit = organization.getUnits().stream().filter(k -> k.getId().equals(unitId)).findAny().orElse(null);
+        if (unit != null) {
             UnitPermission permissionForUnit = new UnitPermission();
             permissionForUnit.setUnit(unit);
             permissionForUnit.setAccessGroup(accessGroup);
@@ -619,7 +619,9 @@ public class PositionService {
         }
     }
 
-    private void deleteAuthTokenOfUsersByPositionIds(List<Long> positionIds){
+    private void deleteAuthTokenOfUsersByPositionIds(List<Long> positionIds) {
         List<String> userNames = positionGraphRepository.getAllUserByPositionIds(positionIds);
-        userNames.forEach(userName->redisService.invalidateAllTokenOfUser(userName));
+        userNames.forEach(userName -> redisService.invalidateAllTokenOfUser(userName));
     }
+}
+
