@@ -646,7 +646,7 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>>  getStaffEligibleForPlanning(@PathVariable Long unitId, @RequestBody StaffFilterDTO staffFilterDetails){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffForUnitWithEmploymentStatus(unitId,staffFilterDetails));
     }
-    @GetMapping(value = "/endPositionProcess")
+    @GetMapping(value = "/end_position_process")
     @ApiOperation("end position process")
     public ResponseEntity<Map<String, Object>> endPositionProcess() {
         positionService.endPositionProcess();

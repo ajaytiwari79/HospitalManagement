@@ -610,11 +610,19 @@ public class PositionService {
         if (isCollectionNotEmpty(positionIds)) {
             List<ExpiredPositionsQueryResult> expiredPositionsQueryResults = positionGraphRepository.findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(positionIds);
             accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(positionIds);
+            deleteAuthTokenOfUsersByPositionIds(positionIds);
             for (ExpiredPositionsQueryResult expiredPositionsQueryResult : expiredPositionsQueryResults) {
                 for (OrganizationBaseEntity unit : expiredPositionsQueryResult.getUnits()) {
                     createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true);
                 }
             }
+        }
+    }
+
+    private void deleteAuthTokenOfUsersByPositionIds(List<Long> positionIds){
+        List<User> users = positionGraphRepository.getAllUserByPositionIds(positionIds);
+        for (User user : users) {
+            redisService.invalidateAllTokenOfUser(user.getUserName());
         }
     }
 }

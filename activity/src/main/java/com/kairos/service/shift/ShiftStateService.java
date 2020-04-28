@@ -220,7 +220,7 @@ public class ShiftStateService {
     }
 
     public void updateShiftDailyTimeBankAndPaidOut(List<Shift> shifts, List<Shift> shiftsList, Long unitId) {
-        if (!Optional.ofNullable(shifts).isPresent()) {
+        if (isCollectionEmpty(shifts)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_IDS);
         }
         List<Long> staffIds = shifts.stream().map(Shift::getStaffId).collect(Collectors.toList());

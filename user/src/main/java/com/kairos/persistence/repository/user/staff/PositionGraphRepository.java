@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.staff;
 
+import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.position.ExpiredPositionsQueryResult;
 import com.kairos.persistence.model.staff.position.Position;
@@ -72,5 +73,10 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
             "MATCH (unitPermission)-[r:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) " +
             "RETURN DISTINCT id(position)")
     List<Long> findAllPositionsIdByEndDate(Long endDateMillis);
+
+    @Query("MATCH(position:Position) where id(position) IN {0} \n" +
+            "MATCH(position)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) \n" +
+            "RETURN user")
+    List<User> getAllUserByPositionIds(List<Long> positionIds);
 }
 
