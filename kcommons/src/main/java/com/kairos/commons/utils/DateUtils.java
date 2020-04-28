@@ -655,6 +655,8 @@ public  class DateUtils {
         return (int) totalMinutes/(60);
     }
 
+
+
     public static int getHourMinutesByMinutes(double totalMinutes){
         return (int)totalMinutes % 60;
     }
