@@ -10,6 +10,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityValidationError;
+import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.staffing_level.*;
@@ -89,6 +90,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
+import static com.kairos.utils.service_util.StaffingLevelUtil.initializeUserWiseLogs;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
 import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
 
@@ -142,10 +144,17 @@ public class StaffingLevelService  {
                 List<StaffingLevelInterval> presenceStaffingLevelIntervals = new ArrayList<>();
                 for (StaffingLevelInterval staffingLevelInterval : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval()) {
                     StaffingLevelInterval presenceStaffingLevelInterval = new StaffingLevelInterval(staffingLevelInterval.getSequence(), staffingLevelInterval.getStaffingLevelDuration());
-                    StaffingLevelUtil.setUserWiseLogs(staffingLevel,presenceStaffingLevelDTO);
-                    presenceStaffingLevelInterval.addStaffLevelActivity(staffingLevelInterval.getStaffingLevelActivities());
-                    presenceStaffingLevelInterval.addStaffLevelSkill(staffingLevelInterval.getStaffingLevelSkills());
+                    if(presenceStaffingLevelDTO.isDraft()){
+                        initializeUserWiseLogs(presenceStaffingLevelInterval);
+                    }else {
+                        presenceStaffingLevelInterval.addStaffLevelActivity(staffingLevelInterval.getStaffingLevelActivities());
+                        presenceStaffingLevelInterval.addStaffLevelSkill(staffingLevelInterval.getStaffingLevelSkills());
+                        presenceStaffingLevelInterval.setMinNoOfStaff(presenceStaffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMinNoOfStaff())));
+                        presenceStaffingLevelInterval.setMaxNoOfStaff(presenceStaffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMaxNoOfStaff())));
+
+                    }
                     presenceStaffingLevelIntervals.add(presenceStaffingLevelInterval);
+
                 }
                 staffingLevel.setPresenceStaffingLevelInterval(presenceStaffingLevelIntervals);
             } else {
@@ -159,6 +168,8 @@ public class StaffingLevelService  {
         publishStaffingLevel(presenceStaffingLevelDTO, unitId, staffingLevel);
         return presenceStaffingLevelDTO;
     }
+
+
 
 
     /**
