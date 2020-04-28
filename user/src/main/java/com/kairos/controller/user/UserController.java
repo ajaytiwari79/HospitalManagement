@@ -231,7 +231,8 @@ public class UserController {
     @ApiOperation("remove token of user")
     @GetMapping("/remove_token")
     public ResponseEntity<Map<String, Object>> invalidateTokeOfUser(@RequestParam String userName)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, redisService.invalidateAllTokenOfUser(userName));
+        redisService.invalidateAllTokenOfUser(userName);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null );
     }
 
 }
