@@ -1,6 +1,10 @@
 package com.kairos.dto.activity.pay_out;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.LocalDate;
 
 
@@ -9,29 +13,12 @@ import org.joda.time.LocalDate;
 *  Date-27/01/2018
 *
 * */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CalculatedPayOutByDateDTO {
 
     private LocalDate date;
     private int payOutMin;
-
-    public CalculatedPayOutByDateDTO(LocalDate date, int payOutMin) {
-        this.date = date;
-        this.payOutMin = payOutMin;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public int getPayOutMin() {
-        return payOutMin;
-    }
-
-    public void setPayOutMin(int payOutMin) {
-        this.payOutMin = payOutMin;
-    }
 }

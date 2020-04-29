@@ -1,7 +1,14 @@
 package com.kairos.dto.activity.pay_out;
 
-import com.kairos.commons.utils.TimeInterval;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CTAIntervalDTO {
 
     private String compensationType;
@@ -9,49 +16,4 @@ public class CTAIntervalDTO {
     private int startTime;
     private int endTime;
 
-    public CTAIntervalDTO(String compensationType, int compensationValue, int startTime, int endTime) {
-        this.compensationType = compensationType;
-        this.compensationValue = compensationValue;
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
-
-    public CTAIntervalDTO() {
-    }
-
-    public String getCompensationType() {
-        return compensationType;
-    }
-
-    public void setCompensationType(String compensationType) {
-        this.compensationType = compensationType;
-    }
-
-    public int getCompensationValue() {
-        return compensationValue;
-    }
-
-    public void setCompensationValue(int compensationValue) {
-        this.compensationValue = compensationValue;
-    }
-
-    public TimeInterval getInterval() {
-        return new TimeInterval(startTime,endTime);
-    }
-
-    public int getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(int startTime) {
-        this.startTime = startTime;
-    }
-
-    public int getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(int endTime) {
-        this.endTime = endTime;
-    }
 }
