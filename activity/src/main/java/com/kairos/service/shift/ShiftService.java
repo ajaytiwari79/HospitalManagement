@@ -554,6 +554,10 @@ public class ShiftService extends MongoBaseService {
                     updateWTACounterFlag = false;
                 }
                 shift.setPlanningPeriodId(planningPeriod.getId());
+
+                //todoService.createOrUpdateTodo(shift, TodoType.APPROVAL_REQUIRED, isNotNull(shiftDTO.getId()),staffAdditionalInfoDTO);
+                shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
+                updateShiftViolatedOnIgnoreCounter(shift, shiftOverLappedWithNonWorkingTime, updatedShiftWithViolatedInfo);
                 shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, isNotNull(shift.getId()), functionId, phase, shiftActionType);
                 if (isNotNull(todoType)) {
                     Todo todo = todoRepository.findByEntityIdAndType(shift.getId(), TodoType.REQUEST_ABSENCE);
@@ -561,9 +565,6 @@ public class ShiftService extends MongoBaseService {
                     todo.setApprovedOn(getDate());
                     todoRepository.save(todo);
                 }
-                //todoService.createOrUpdateTodo(shift, TodoType.APPROVAL_REQUIRED, isNotNull(shiftDTO.getId()),staffAdditionalInfoDTO);
-                shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
-                updateShiftViolatedOnIgnoreCounter(shift, shiftOverLappedWithNonWorkingTime, updatedShiftWithViolatedInfo);
                 activitySchedulerJobService.updateJobForShiftReminder(activityWrapperMap, shift);
                 if (updateShiftState) {
                     shiftDTO = shiftStateService.updateShiftStateAfterValidatingWtaRule(shiftDTO, shiftDTO.getId(), shiftDTO.getShiftStatePhaseId());
@@ -596,6 +597,7 @@ public class ShiftService extends MongoBaseService {
         shiftViolatedRules.setActivities(updatedShiftWithViolatedInfo.getViolatedRules().getActivities());
         shiftViolatedRules.setWorkTimeAgreements(updatedShiftWithViolatedInfo.getViolatedRules().getWorkTimeAgreements());
         shiftViolatedRules.setEscalationCausedBy(UserContext.getUserDetails().isManagement() ? MANAGEMENT : AccessGroupRole.STAFF);
+        shift.setShiftViolatedRules(shiftViolatedRules);
         shiftViolatedRulesMongoRepository.save(shiftViolatedRules);
     }
 
