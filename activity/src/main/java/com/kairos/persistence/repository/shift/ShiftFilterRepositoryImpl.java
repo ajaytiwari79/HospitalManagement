@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
+import static com.kairos.enums.FilterType.ABSENCE_ACTIVITY;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -65,40 +66,56 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         criteria.and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
 
         Set<String> activityIds = new HashSet<>();
-        LookupOperation activityTimeTypeLookupOperation = null, ctaLookupOperation = null, ctaTemplateLookupOperation = null;
-        Criteria activityDetailsMatchCriteria = null, ctaDetailsMatchCriteria = null;
+        LookupOperation activityTimeTypeLookupOperation = null;
+        LookupOperation ctaLookupOperation = null;
+        LookupOperation ctaTemplateLookupOperation = null;
+        Criteria activityDetailsMatchCriteria = null;
+        Criteria ctaDetailsMatchCriteria = null;
 
         for (Map.Entry<FilterType, Set<T>> entry : filterTypes.entrySet()) {
-            if (entry.getKey().equals(FilterType.ACTIVITY_STATUS)) {
-                criteria.and(ACTIVITY_STATUS).in(entry.getValue());
-            } else if (entry.getKey().equals(FilterType.ACTIVITY_IDS)) {
-                activityIds.addAll((Set<String>) filterTypes.get(FilterType.ACTIVITY_IDS));
-            } else if (entry.getKey().equals(FilterType.ABSENCE_ACTIVITY)) {
-                activityIds.addAll((Set<String>) filterTypes.get(FilterType.ABSENCE_ACTIVITY));
-            } else if (entry.getKey().equals(FilterType.PLANNED_TIME_TYPE)) {
-                criteria.and(PLANNED_TIME_IDS).in(entry.getValue());
-            } else if (entry.getKey().equals(FilterType.VALIDATED_BY)) {
-                criteria.and(VALIDATED_BY_ROLES).in(entry.getValue());
-            } else if (entry.getKey().equals(FilterType.TIME_SLOT)) {
-                prepareTimeSlotCriteria(criteria, (Set<String>) entry.getValue(), criteriaArrayList, unitId);
-            } else if (entry.getKey().equals(FilterType.TIME_TYPE)) {
-                activityTimeTypeLookupOperation = getActivityLookupOperation(activityTimeTypeLookupOperation);
-                activityDetailsMatchCriteria = getActivityLookupTimeTypeMatchCriteria(activityDetailsMatchCriteria, (Set<String>) entry.getValue());
-            } else if (entry.getKey().equals(FilterType.ACTIVITY_TIMECALCULATION_TYPE)) {
-                activityTimeTypeLookupOperation = getActivityLookupOperation(activityTimeTypeLookupOperation);
-                activityDetailsMatchCriteria = prepareActivityTimeCalculationMatchCriteria(activityDetailsMatchCriteria, (Set<String>) entry.getValue());
-            } else if (entry.getKey().equals(FilterType.CTA_ACCOUNT_TYPE)) {
-                ctaLookupOperation = lookup(CTA_COLLECTION, EMPLOYMENT_ID, EMPLOYMENT_ID, "ctaList");
-                ctaTemplateLookupOperation = lookup(CTA_TEMPLATES_COLLECTION, "ctaList.ruleTemplateIds", ID, "ruleTemplates");
-                ctaDetailsMatchCriteria = new Criteria("ruleTemplates.plannedTimeWithFactor.accountType");
-                ctaDetailsMatchCriteria.in(entry.getValue());
-            } else if (entry.getKey().equals(FilterType.ESCALATION_CAUSED_BY)) {
-                criteria.and("shiftViolatedRules.escalationCausedBy").in(entry.getValue());
+            switch (entry.getKey()) {
+                case ACTIVITY_STATUS:
+                    criteria.and(ACTIVITY_STATUS).in(entry.getValue());
+                    break;
+                case ACTIVITY_IDS:
+                    activityIds.addAll((Set<String>) filterTypes.get(FilterType.ACTIVITY_IDS));
+                    break;
+                case ABSENCE_ACTIVITY:
+                    activityIds.addAll((Set<String>) filterTypes.get(ABSENCE_ACTIVITY));
+                    break;
+                case PLANNED_TIME_TYPE:
+                    criteria.and(PLANNED_TIME_IDS).in(entry.getValue());
+                    break;
+                case VALIDATED_BY:
+                    criteria.and(VALIDATED_BY_ROLES).in(entry.getValue());
+                    break;
+                case TIME_SLOT:
+                    prepareTimeSlotCriteria(criteria, (Set<String>) entry.getValue(), criteriaArrayList, unitId);
+                    break;
+                case TIME_TYPE: {
+                    activityTimeTypeLookupOperation = getActivityLookupOperation(activityTimeTypeLookupOperation);
+                    activityDetailsMatchCriteria = getActivityLookupTimeTypeMatchCriteria(activityDetailsMatchCriteria, (Set<String>) entry.getValue());
+                    break;
+                }
+                case ACTIVITY_TIMECALCULATION_TYPE: {
+                    activityTimeTypeLookupOperation = getActivityLookupOperation(activityTimeTypeLookupOperation);
+                    activityDetailsMatchCriteria = prepareActivityTimeCalculationMatchCriteria(activityDetailsMatchCriteria, (Set<String>) entry.getValue());
+                    break;
+                }
+                case CTA_ACCOUNT_TYPE: {
+                    ctaLookupOperation = lookup(CTA_COLLECTION, EMPLOYMENT_ID, EMPLOYMENT_ID, "ctaList");
+                    ctaTemplateLookupOperation = lookup(CTA_TEMPLATES_COLLECTION, "ctaList.ruleTemplateIds", ID, "ruleTemplates");
+                    ctaDetailsMatchCriteria = new Criteria("ruleTemplates.plannedTimeWithFactor.accountType");
+                    ctaDetailsMatchCriteria.in(entry.getValue());
+                    break;
+                }
+                case ESCALATION_CAUSED_BY: {
+                    criteria.and("shiftViolatedRules.escalationCausedBy").in(entry.getValue());
+                    break;
+                }
+                default:
+
             }
-            //todo this has to be done with staff api filters
-            /*else if (entry.getKey().equals(FilterType.REAL_TIME_STATUS)) {
-                prepareRealtimeStatusMatchQueries(unitId,criteriaArrayList, (Set<String>) entry.getValue());
-            }*/
         }
         if (!activityIds.isEmpty()) {
             criteria.and(ACTIVITY_IDS).in(activityIds);
@@ -126,8 +143,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         Criteria tt;
         List<Criteria> criteriaList = new ArrayList<>();
         for (String filterValue : filterValues) {
-            tt = new Criteria();
-            tt.and("matchedActivities.path").regex(filterValue, "g");
+            tt = Criteria.where("matchedActivities.path").regex(filterValue, "g");
             criteriaList.add(tt);
         }
         return criteriaList;
@@ -188,18 +204,26 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         Set<Long> staffIds = new HashSet<>();
         for (String filterValue : filterValues) {
 
-            if (filterValue.equals("ON_BREAK")) {
-                staffIds.addAll(getStaffIdsOnBreak(unitId, dateWithoutTime));
-            } else if (filterValue.equals("SICK")) {
-                staffIds.addAll(getStaffSickForSelectedDay(unitId, dateWithoutTime));
-            } else if (filterValue.equals("CURRENTLY_WORKING")) {
-                staffIds.addAll(getStaffCurrentlyWorking(unitId, dateWithoutTime));
-            } else if (filterValue.equals("ON_LEAVE")) {
-                staffIds.addAll(getStaffIdsOnLeave(unitId, today));
-            } else if (filterValue.equals("UPCOMING")) {
-                staffIds.addAll(getStaffForUpcomingShift(unitId, dateWithoutTime));
-            } else if (filterValue.equals("RESTING")) {
-                staffIds.addAll(getStaffIdsOnRest(unitId, today));
+            switch (filterValue) {
+                case "ON_BREAK":
+                    staffIds.addAll(getStaffIdsOnBreak(unitId, dateWithoutTime));
+                    break;
+                case "SICK":
+                    staffIds.addAll(getStaffSickForSelectedDay(unitId, dateWithoutTime));
+                    break;
+                case "CURRENTLY_WORKING":
+                    staffIds.addAll(getStaffCurrentlyWorking(unitId, dateWithoutTime));
+                    break;
+                case "ON_LEAVE":
+                    staffIds.addAll(getStaffIdsOnLeave(unitId, today));
+                    break;
+                case "UPCOMING":
+                    staffIds.addAll(getStaffForUpcomingShift(unitId, dateWithoutTime));
+                    break;
+                case "RESTING":
+                    staffIds.addAll(getStaffIdsOnRest(unitId, today));
+                    break;
+                default:
             }
         }
         return staffIds;

@@ -8,11 +8,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 public class FilterUtils {
 
+    private FilterUtils() {
+
+    }
 
     public static <T> Map<FilterType, Set<T>> filterOutEmptyQueriesAndPrepareMap(ShiftSearchDTO shiftSearchDTO) {
-        return shiftSearchDTO.getFiltersData().stream().filter(e -> e.getValue().size() > 0).collect(Collectors.toMap(FilterSelectionDTO::getName, FilterSelectionDTO::getValue));
+        return shiftSearchDTO.getFiltersData().stream().filter(e -> isCollectionNotEmpty(e.getValue())).collect(Collectors.toMap(FilterSelectionDTO::getName, FilterSelectionDTO::getValue));
     }
 
 
