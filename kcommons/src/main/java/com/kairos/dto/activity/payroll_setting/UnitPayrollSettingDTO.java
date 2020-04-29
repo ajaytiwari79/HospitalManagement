@@ -3,6 +3,7 @@ package com.kairos.dto.activity.payroll_setting;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.payroll_setting.PayrollFrequency;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
@@ -16,6 +17,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
+@NoArgsConstructor
 public class UnitPayrollSettingDTO {
     private BigInteger id;
     // use when break table
@@ -30,6 +32,10 @@ public class UnitPayrollSettingDTO {
      // for use send default data
     private Set<Integer> years;
 
+
+    public UnitPayrollSettingDTO(Set<Integer> years) {
+        this.years = years;
+    }
 
     public void setPayrollPeriods(List<PayrollPeriodDTO> payrollPeriods) {
         if (isCollectionNotEmpty(payrollPeriods)) {

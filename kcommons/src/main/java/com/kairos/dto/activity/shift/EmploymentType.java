@@ -3,6 +3,7 @@ package com.kairos.dto.activity.shift;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -12,6 +13,7 @@ import lombok.Setter;
  @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@NoArgsConstructor
 public class EmploymentType {
     private String name;
     private String description;
@@ -19,4 +21,8 @@ public class EmploymentType {
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
     private Long id;
+
+    public EmploymentType(Long id) {
+        this.id = id;
+    }
 }

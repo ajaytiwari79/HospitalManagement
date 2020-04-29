@@ -40,4 +40,16 @@ public class PriorityGroupDTO {
         this.unitId = unitId;
     }
 
+    public DecisionCriteria getDecisionCriteria() {
+        return decisionCriteria=Optional.ofNullable(decisionCriteria).orElse(new DecisionCriteria());
+    }
+
+    public List<Long> getEmploymentTypeIds() {
+        return employmentTypeIds=Optional.ofNullable(employmentTypeIds).orElse(new ArrayList<>());
+    }
+
+    public List<Long> getExpertiseIds() {
+        return expertiseIds=Optional.ofNullable(expertiseIds).orElse(new ArrayList<>());
+    }
+
 }

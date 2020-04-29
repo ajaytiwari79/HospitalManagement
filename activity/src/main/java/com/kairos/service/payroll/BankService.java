@@ -104,7 +104,7 @@ public class BankService{
 
     public boolean linkBankDetailsForStaff(Long staffId, StaffBankAndPensionProviderDetailsDTO staffBankDetailsDTO){
         if (isNotNull(staffBankDetailsDTO.getStaffOfficialBank())) {
-            if(!staffBankDetailsDTO.getStaffOfficialBank().getUseNemkontoAccount()){
+            if(!staffBankDetailsDTO.getStaffOfficialBank().isUseNemkontoAccount()){
                 Bank bank = bankRepository.getByIdAndDeletedFalse(staffBankDetailsDTO.getStaffOfficialBank().getBankId());
                 if(isNull(bank)){
                     exceptionService.dataNotFoundException(BANK_NOT_FOUND);
@@ -116,7 +116,7 @@ public class BankService{
             }
             staffBank.setAccountNumber(staffBankDetailsDTO.getStaffOfficialBank().getAccountNumber());
             staffBank.setStaffId(staffId);
-            staffBank.setUseNemkontoAccount(staffBankDetailsDTO.getStaffOfficialBank().getUseNemkontoAccount());
+            staffBank.setUseNemkontoAccount(staffBankDetailsDTO.getStaffOfficialBank().isUseNemkontoAccount());
             staffBank.setBankId(staffBankDetailsDTO.getStaffOfficialBank().getBankId());
             staffBankDetailsRepository.save(staffBank);
         }

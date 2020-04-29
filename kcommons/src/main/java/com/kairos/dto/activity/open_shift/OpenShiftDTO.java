@@ -34,4 +34,16 @@ public class OpenShiftDTO {
         this.orderId = orderId;
         this.activityId = activityId;
     }
+
+    public List<Long> getInterestedStaff() {
+        return interestedStaff=Optional.ofNullable(interestedStaff).orElse(new ArrayList<>());
+    }
+
+    public List<Long> getDeclinedBy() {
+        return declinedBy=Optional.ofNullable(declinedBy).orElse(new ArrayList<>());
+    }
+
+    public List<Long> getAssignedStaff() {
+        return assignedStaff=Optional.ofNullable(assignedStaff).orElse(new ArrayList<>());
+    }
 }
