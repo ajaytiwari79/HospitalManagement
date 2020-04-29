@@ -19,4 +19,5 @@ public class ScheduleTimeByTimeTypeDTO {
     private int totalMin;
     private BigInteger timeTypeId;
     private String label;
+    private List<ScheduleTimeByTimeTypeDTO> children = new ArrayList();
 }

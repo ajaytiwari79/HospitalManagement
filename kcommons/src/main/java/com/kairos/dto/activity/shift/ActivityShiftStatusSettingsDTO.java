@@ -4,11 +4,15 @@ package com.kairos.dto.activity.shift;/*
  */
 
 import com.kairos.enums.shift.ShiftStatus;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Set;
 
+@Getter
+@Setter
 public class ActivityShiftStatusSettingsDTO {
     private BigInteger id;
     @NotNull
