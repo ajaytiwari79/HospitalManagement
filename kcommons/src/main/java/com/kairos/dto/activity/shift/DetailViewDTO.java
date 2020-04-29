@@ -1,6 +1,10 @@
 package com.kairos.dto.activity.shift;
 
 import com.kairos.dto.activity.attendance.AttendanceTimeSlotDTO;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -8,41 +12,12 @@ import java.util.List;
  * @author pradeep
  * @date - 28/9/18
  */
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class DetailViewDTO {
     private Long staffId;
     private ShiftDetailViewDTO shifts;
     private List<AttendanceTimeSlotDTO> attendanceTimeSlot;
-    public DetailViewDTO() {
-    }
-
-    public DetailViewDTO(Long staffId,ShiftDetailViewDTO shifts,List<AttendanceTimeSlotDTO> attendanceTimeSlot) {
-        this.staffId=staffId;
-        this.shifts = shifts;
-        this.attendanceTimeSlot=attendanceTimeSlot;
-    }
-
-    public ShiftDetailViewDTO getShifts() {
-        return shifts;
-    }
-
-    public void setShifts(ShiftDetailViewDTO shifts) {
-        this.shifts = shifts;
-    }
-
-    public List<AttendanceTimeSlotDTO> getAttendanceTimeSlot() {
-        return attendanceTimeSlot;
-    }
-
-    public void setAttendanceTimeSlot(List<AttendanceTimeSlotDTO> attendanceTimeSlot) {
-        this.attendanceTimeSlot = attendanceTimeSlot;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
 }

@@ -2,6 +2,9 @@ package com.kairos.dto.activity.pay_out;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +18,9 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class PayOutDTO {
 
     private Date startDate;
@@ -30,9 +36,6 @@ public class PayOutDTO {
     private PayOutCTADistributionDTO payOutDistribution;
 
 
-    public PayOutDTO() {
-    }
-
     public PayOutDTO(Date startDate, Date endDate, long totalPayOutAfterCtaMin, long totalPayOutBeforeCtaMin,long payOutChange, List<PayOutIntervalDTO> timeIntervals, PayOutCTADistributionDTO payOutDistribution,long protectedDaysOffMinutes) {
         this.startDate = startDate;
         this.endDate = endDate;
@@ -44,68 +47,4 @@ public class PayOutDTO {
         this.protectedDaysOffMinutes = protectedDaysOffMinutes;
     }
 
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public long getTotalPayOutAfterCtaMin() {
-        return totalPayOutAfterCtaMin;
-    }
-
-    public void setTotalPayOutAfterCtaMin(long totalPayOutAfterCtaMin) {
-        this.totalPayOutAfterCtaMin = totalPayOutAfterCtaMin;
-    }
-
-    public long getTotalPayOutBeforeCtaMin() {
-        return totalPayOutBeforeCtaMin;
-    }
-
-    public void setTotalPayOutBeforeCtaMin(long totalPayOutBeforeCtaMin) {
-        this.totalPayOutBeforeCtaMin = totalPayOutBeforeCtaMin;
-    }
-
-    public long getPayOutChange() {
-        return payOutChange;
-    }
-
-    public void setPayOutChange(long payOutChange) {
-        this.payOutChange = payOutChange;
-    }
-
-
-    public List<PayOutIntervalDTO> getTimeIntervals() {
-        return timeIntervals;
-    }
-
-    public void setTimeIntervals(List<PayOutIntervalDTO> timeIntervals) {
-        this.timeIntervals = timeIntervals;
-    }
-
-    public PayOutCTADistributionDTO getPayOutDistribution() {
-        return payOutDistribution;
-    }
-
-    public void setPayOutDistribution(PayOutCTADistributionDTO payOutDistribution) {
-        this.payOutDistribution = payOutDistribution;
-    }
-
-    public long getProtectedDaysOffMinutes() {
-        return protectedDaysOffMinutes;
-    }
-
-    public void setProtectedDaysOffMinutes(long protectedDaysOffMinutes) {
-        this.protectedDaysOffMinutes = protectedDaysOffMinutes;
-    }
 }

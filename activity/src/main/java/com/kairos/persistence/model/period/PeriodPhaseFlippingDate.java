@@ -1,5 +1,9 @@
 package com.kairos.persistence.model.period;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -7,15 +11,14 @@ import java.time.LocalTime;
 /**
  * Created by prerna on 6/4/18.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class PeriodPhaseFlippingDate {
     private BigInteger phaseId;
     private BigInteger schedulerPanelId;
     private LocalDate flippingDate;
     private LocalTime flippingTime;
-
-    public PeriodPhaseFlippingDate(){
-        // default constructor
-    }
 
     public PeriodPhaseFlippingDate(BigInteger phaseId, LocalDate flippingDate,LocalTime flippingTime){
         this.phaseId = phaseId;
@@ -23,35 +26,4 @@ public class PeriodPhaseFlippingDate {
         this.flippingTime = flippingTime;
     }
 
-    public BigInteger getPhaseId() {
-        return phaseId;
-    }
-
-    public void setPhaseId(BigInteger phaseId) {
-        this.phaseId = phaseId;
-    }
-
-    public LocalDate getFlippingDate() {
-        return flippingDate;
-    }
-
-    public void setFlippingDate(LocalDate flippingDate) {
-        this.flippingDate = flippingDate;
-    }
-
-    public LocalTime getFlippingTime() {
-        return flippingTime;
-    }
-
-    public void setFlippingTime(LocalTime flippingTime) {
-        this.flippingTime = flippingTime;
-    }
-
-    public BigInteger getSchedulerPanelId() {
-        return schedulerPanelId;
-    }
-
-    public void setSchedulerPanelId(BigInteger schedulerPanelId) {
-        this.schedulerPanelId = schedulerPanelId;
-    }
 }

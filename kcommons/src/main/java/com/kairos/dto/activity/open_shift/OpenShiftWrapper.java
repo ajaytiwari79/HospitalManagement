@@ -1,18 +1,20 @@
 package com.kairos.dto.activity.open_shift;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class OpenShiftWrapper {
     private int timeBank;
     private int plannedTime;
     private int restingTime;
     private List<OpenShiftResponseDTO> similarOpenShifts;
     private OpenShiftResponseDTO openShift;
-
-
-    public OpenShiftWrapper() {
-        //Default Constructor
-    }
 
     public OpenShiftWrapper(int timeBank, int plannedTime, int restingTime, List<OpenShiftResponseDTO> similarOpenShifts) {
         this.timeBank = timeBank;
@@ -27,46 +29,6 @@ public class OpenShiftWrapper {
         this.plannedTime = plannedTime;
         this.restingTime = restingTime;
         this.similarOpenShifts = similarOpenShifts;
-        this.openShift = openShift;
-    }
-
-    public int getTimeBank() {
-        return timeBank;
-    }
-
-    public void setTimeBank(int timeBank) {
-        this.timeBank = timeBank;
-    }
-
-    public int getPlannedTime() {
-        return plannedTime;
-    }
-
-    public void setPlannedTime(int plannedTime) {
-        this.plannedTime = plannedTime;
-    }
-
-    public int getRestingTime() {
-        return restingTime;
-    }
-
-    public void setRestingTime(int restingTime) {
-        this.restingTime = restingTime;
-    }
-
-    public List<OpenShiftResponseDTO> getSimilarOpenShifts() {
-        return similarOpenShifts;
-    }
-
-    public void setSimilarOpenShifts(List<OpenShiftResponseDTO> similarOpenShifts) {
-        this.similarOpenShifts = similarOpenShifts;
-    }
-
-    public OpenShiftResponseDTO getOpenShift() {
-        return openShift;
-    }
-
-    public void setOpenShift(OpenShiftResponseDTO openShift) {
         this.openShift = openShift;
     }
 }
