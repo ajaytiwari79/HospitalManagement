@@ -47,13 +47,12 @@ import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.shift.StaffShiftDetails;
@@ -186,8 +185,8 @@ public class UserIntegrationService {
         });
     }
 
-    public List<StaffPersonalDetail> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_DETAILS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffPersonalDetail>>>() {
+    public List<StaffDTO> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
+        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_DETAILS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
         });
     }
 
@@ -356,8 +355,8 @@ public class UserIntegrationService {
         });
     }
 
-    public StaffPersonalDetail getStaff(Long staffId) {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffPersonalDetail>>() {
+    public StaffDTO getStaff(Long staffId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
         }, staffId);
     }
 
@@ -377,8 +376,8 @@ public class UserIntegrationService {
         });
     }
 
-    public List<StaffPersonalDetail> getStaffListByUnit() {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_GET_STAFF_BY_UNIT, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffPersonalDetail>>>() {
+    public List<StaffDTO> getStaffListByUnit() {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_GET_STAFF_BY_UNIT, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
         });
     }
 
@@ -437,13 +436,13 @@ public class UserIntegrationService {
         }, employmentId);
     }
 
-    public StaffPersonalDetail getStaffByUser(Long userId) {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_CURRENT_USER_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffPersonalDetail>>() {
+    public StaffDTO getStaffByUser(Long userId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_CURRENT_USER_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
         }, userId);
     }
 
-    public List<StaffPersonalDetail> getStaffInfo(Long unitId, Set<Long> expertiseIds) {
-        return genericRestClient.publishRequest(expertiseIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_GET_STAFF_BY_EXPERTISES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffPersonalDetail>>>() {
+    public List<StaffDTO> getStaffInfo(Long unitId, Set<Long> expertiseIds) {
+        return genericRestClient.publishRequest(expertiseIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, STAFF_GET_STAFF_BY_EXPERTISES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
         });
     }
 
@@ -740,8 +739,8 @@ public class UserIntegrationService {
     }
 
 
-    public StaffPersonalDetail getStaff(Long unitId,Long staffId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffPersonalDetail>>() {}, staffId);
+    public StaffDTO getStaff(Long unitId, Long staffId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_WITH_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {}, staffId);
     }
 
     public Expertise getExpertise(Long countryId, Long expertiseId) {
@@ -870,14 +869,14 @@ public class UserIntegrationService {
 
     }
 
-    public Map<String, List<StaffPersonalDetail>> getSkillIdAndLevelByStaffIds(Long countryId, List<Long> staffIds,LocalDate selectedFromDate, LocalDate selectedToDate) {
+    public Map<String, List<StaffDTO>> getSkillIdAndLevelByStaffIds(Long countryId, List<Long> staffIds, LocalDate selectedFromDate, LocalDate selectedToDate) {
         BasicNameValuePair appliedFromDate = new BasicNameValuePair("selectedFromDate", selectedFromDate.toString());
         BasicNameValuePair appliedToDate = new BasicNameValuePair("selectedToDate", selectedToDate.toString());
-        return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_and_level_by_staff_ids", newArrayList(appliedFromDate, appliedToDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<StaffPersonalDetail>>>>() {});
+        return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_and_level_by_staff_ids", newArrayList(appliedFromDate, appliedToDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<StaffDTO>>>>() {});
     }
 
-    public List<StaffPersonalDetail> getAllSkillIdAndLevelByStaffIds(Long countryId, List<Long> staffIds) {
-        return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_ALL_and_level_by_staff_ids", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope< List<StaffPersonalDetail>>>() {});
+    public List<StaffDTO> getAllSkillIdAndLevelByStaffIds(Long countryId, List<Long> staffIds) {
+        return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_ALL_and_level_by_staff_ids", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope< List<StaffDTO>>>() {});
     }
 
     public List<EmploymentWithCtaDetailsDTO> getAllEmploymentByUnitId(Long unitId) {
@@ -890,8 +889,8 @@ public class UserIntegrationService {
         });
     }
 
-    public List<StaffPersonalDetail> getStaffByUnitId(Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_STAFF_BY_UNITID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffPersonalDetail>>>() {
+    public List<StaffDTO> getStaffByUnitId(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_STAFF_BY_UNITID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
         });
     }
 

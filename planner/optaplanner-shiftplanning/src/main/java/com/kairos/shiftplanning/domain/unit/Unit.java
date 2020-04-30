@@ -1,6 +1,7 @@
 package com.kairos.shiftplanning.domain.unit;
 
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.shiftplanning.constraints.Constraint;
@@ -25,8 +26,7 @@ public class Unit {
     private Long id;
     private Map<ConstraintSubType, Constraint> constraints;
     private Map<Long, DayType> dayTypeMap;
-    private UserAccessRoleDTO user;
-    private Phase phase;
+    private AccessGroupRole accessGroupRole;
     private PlanningPeriod planningPeriod;
     private PresencePlannedTime presencePlannedTime;
     private AbsencePlannedTime absencePlannedTime;

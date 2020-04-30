@@ -61,7 +61,7 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
 
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps) {
         int penality = 0;
-        if (!isDisabled() && isValidForPhase(unit.getPhase().getId(),this.phaseTemplateValues)) {
+        if (!isDisabled() && isValidForPhase(unit.getPlanningPeriod().getPhase().getId(),this.phaseTemplateValues)) {
             int count = 0;
             DateTimeInterval[] dateTimeIntervals = getIntervalsByRuleTemplate(shiftImp, intervalUnit, intervalLength);
             for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {

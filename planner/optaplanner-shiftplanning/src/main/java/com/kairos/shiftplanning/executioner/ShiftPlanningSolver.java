@@ -60,10 +60,31 @@ public class ShiftPlanningSolver {
     SolverFactory<ShiftRequestPhasePlanningSolution> solverFactory;
     Solver<BreaksIndirectAndActivityPlanningSolution> solverBreaks;
     SolverFactory<BreaksIndirectAndActivityPlanningSolution> solverFactoryBreaks;
+    public static String serverAddress;
 
     static{
         System.setProperty("user.timezone", "UTC");
     }
+
+    public static void main(String[] args){
+        if(args.length==0){
+            throw new RuntimeException("Please give the active profile");
+        }
+        updateServerAddress(args);
+    }
+
+    private static void updateServerAddress(String[] args) {
+        switch (args[0]){
+            case "development":serverAddress="http://dev.kairosplanning.com/";
+                break;
+            case "qa":serverAddress="http://qa.kairosplanning.com/";
+                break;
+            case "production":serverAddress="http://app.kairosplanning.com/";
+                break;
+            default:throw new RuntimeException("Invalid profile");
+        }
+    }
+
     public ShiftPlanningSolver(SolverConfigDTO solverConfig){
         List<File> droolsFiles = getDroolFilesByConstraints(solverConfig);
         solverFactory = SolverFactory.createFromXmlResource(SOLVER_XML);
@@ -112,11 +133,6 @@ public class ShiftPlanningSolver {
         plannerBenchmark.benchmark();
 
     }
-
-    public static void main(String[] s ){
-        new ShiftPlanningSolver().runSolver();
-    }
-
 
     public ShiftRequestPhasePlanningSolution runSolver() {
             Object[] solvedSolution = getSolution(null);
@@ -293,7 +309,7 @@ public class ShiftPlanningSolver {
                 if(!emp.getId().equals(shift.getEmployee().getId())){
                     return;
                 }
-                log.info("Shift A--------"+shift.getId()+","+shift.getEmployee().getId()+","+shift.getDate()+":["+shift.getInterval()+"("+shift.getShiftActivities().size()+")"+"]:"+shift.getShiftActivities()+
+                log.info("Shift A--------"+shift.getId()+","+shift.getEmployee().getId()+","+shift.getStartDate()+":["+shift.getInterval()+"("+shift.getShiftActivities().size()+")"+"]:"+shift.getShiftActivities()+
                         "["+Optional.ofNullable(shift.getBreaks()).orElse(Collections.emptyList()).stream().collect(StringBuilder::new ,(b1,b2)-> b1.append(b2.toString()),(b1,b2)->b2.append(",").append(b1))+"]");
             })
         );
@@ -323,7 +339,7 @@ public class ShiftPlanningSolver {
 
     public void sendSolutionToKairos(ShiftRequestPhasePlanningSolution solvedSolution){
         List<ShiftDTO> shiftDTOS = getShift(solvedSolution.getShifts());
-        ShiftPlanningUtility.solvedShiftPlanningProblem(shiftDTOS,solvedSolution.getUnitId());
+        ShiftPlanningUtility.solvedShiftPlanningProblem(shiftDTOS,solvedSolution.getUnit().getId());
     }
 
     private List<ShiftDTO> getShift(List<ShiftImp> shiftImp){

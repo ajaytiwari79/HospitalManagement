@@ -2,6 +2,7 @@ package com.kairos.shiftplanning.domain.activity;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.shift.AuditShiftActivityDTO;
 import com.kairos.enums.cta.AccountType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.shiftplanning.domain.shift.PlannedTime;
@@ -53,6 +54,10 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     public List<PayoutDistribution> getPayoutDistributions() {
         this.payoutDistributions = isNullOrElse(payoutDistributions,new ArrayList<>());
         return this.payoutDistributions;
+    }
+
+    public boolean isChanged(ShiftActivity shiftActivity){
+        return !this.startDate.equals(shiftActivity.startDate) || !this.endDate.equals(shiftActivity.endDate) || !activity.getId().equals(shiftActivity.getActivity().getId());
     }
 
     public DateTimeInterval getInterval() {

@@ -407,6 +407,7 @@ public class ActivityService {
     private void updateBalanceSettingDetails(GeneralActivityTabDTO generalActivityTabDTO, Activity activity, TimeType timeType) {
         activity.getBalanceSettingsActivityTab().setTimeTypeId(generalActivityTabDTO.getTimeTypeId());
         activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
+        activity.getBalanceSettingsActivityTab().setTimeTypes(timeType.getTimeTypes());
         activity.getBalanceSettingsActivityTab().setAddTimeTo(generalActivityTabDTO.getAddTimeTo());
         activity.getBalanceSettingsActivityTab().setOnCallTimePresent(generalActivityTabDTO.isOnCallTimePresent());
         activity.getBalanceSettingsActivityTab().setNegativeDayBalancePresent(generalActivityTabDTO.getNegativeDayBalancePresent());
@@ -900,6 +901,7 @@ public class ActivityService {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
             }
             activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
+            activity.getBalanceSettingsActivityTab().setTimeTypes(timeType.getTimeTypes());
             activities.add(activity);
         }
         return activities;

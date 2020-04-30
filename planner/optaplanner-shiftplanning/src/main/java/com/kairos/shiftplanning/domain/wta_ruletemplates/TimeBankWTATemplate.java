@@ -39,7 +39,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     }
 
     public void validateRules(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps) {
-        if(!isDisabled() && this.minMaxSetting.equals(MinMaxSetting.MAXIMUM) && isValidForPhase(unit.getPhase().getId(),this.phaseTemplateValues)){
+        if(!isDisabled() && this.minMaxSetting.equals(MinMaxSetting.MAXIMUM) && isValidForPhase(unit.getPlanningPeriod().getPhase().getId(),this.phaseTemplateValues)){
             int limit = getValueByPhaseAndCounter(unit, getPhaseTemplateValues());
             int penality = isValid(MAXIMUM, limit, 0);
         }

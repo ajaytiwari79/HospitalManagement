@@ -237,50 +237,50 @@ public class StaffService {
         return true;
     }
 
-    public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) {
+    public StaffDTO savePersonalDetail(long staffId, StaffDTO staffDTO, long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
 
         Staff staffToUpdate = staffGraphRepository.findOne(staffId);
-        if (StaffStatusEnum.ACTIVE.equals(staffPersonalDetail.getCurrentStatus()) && StringUtils.isBlank(staffPersonalDetail.getUserName())) {
+        if (StaffStatusEnum.ACTIVE.equals(staffDTO.getCurrentStatus()) && StringUtils.isBlank(staffDTO.getUserName())) {
             exceptionService.dataNotFoundByIdException(ERROR_STAFF_USERNAME_NOTNULL);
         }
         if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
         }
-        if (isNotNull(staffToUpdate) && isNotNull(staffToUpdate.getContactDetail()) && isNotNull(staffToUpdate.getContactDetail().getPrivateEmail()) && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffPersonalDetail.getContactDetail().getPrivateEmail())) {
-            if (staffGraphRepository.findStaffByEmailIdInOrganization(staffPersonalDetail.getContactDetail().getPrivateEmail(), parentUnit.getId()) != null) {
-                exceptionService.duplicateDataException(MESSAGE_EMAIL_ALREADYEXIST, "Staff", staffPersonalDetail.getContactDetail().getPrivateEmail());
+        if (isNotNull(staffToUpdate) && isNotNull(staffToUpdate.getContactDetail()) && isNotNull(staffToUpdate.getContactDetail().getPrivateEmail()) && !staffToUpdate.getContactDetail().getPrivateEmail().equals(staffDTO.getContactDetail().getPrivateEmail())) {
+            if (staffGraphRepository.findStaffByEmailIdInOrganization(staffDTO.getContactDetail().getPrivateEmail(), parentUnit.getId()) != null) {
+                exceptionService.duplicateDataException(MESSAGE_EMAIL_ALREADYEXIST, "Staff", staffDTO.getContactDetail().getPrivateEmail());
             }
         }
-        if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
+        if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffDTO.getCurrentStatus())) {
             exceptionService.actionNotPermittedException(MESSAGE_EMPLOY_NOTCONVERT_FICTIVE);
         }
         //todo we might create a job to inactive user from particular date
-        if (StaffStatusEnum.INACTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
+        if (StaffStatusEnum.INACTIVE.equals(staffDTO.getCurrentStatus())) {
             redisService.invalidateAllTokenOfUser(staffToUpdate.getUser().getUserName());
         }
-        List<Expertise> oldExpertise = assignExpertise(staffId, staffPersonalDetail, userAccessRoleDTO, staffToUpdate);
-        if (isNotNull(staffPersonalDetail.getLanguageId())) {
-            Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
+        List<Expertise> oldExpertise = assignExpertise(staffId, staffDTO, userAccessRoleDTO, staffToUpdate);
+        if (isNotNull(staffDTO.getLanguageId())) {
+            Language language = languageGraphRepository.findOne(staffDTO.getLanguageId());
             staffToUpdate.setLanguage(language);
         }
-        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
+        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffDTO.getExpertiseIds());
         // Setting Staff Details)
-        setStaffDetails(staffToUpdate, staffPersonalDetail);
-        staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyCollectionPropertiesByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
-        updateUserDetails(staffPersonalDetail, userAccessRoleDTO, staffToUpdate);
+        setStaffDetails(staffToUpdate, staffDTO);
+        staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyCollectionPropertiesByMapper(staffDTO.getStaffChildDetails(), StaffChildDetail.class));
+        updateUserDetails(staffDTO, userAccessRoleDTO, staffToUpdate);
         // Set if user is female and pregnant
-        User user = updateUserDetails(staffId, staffPersonalDetail);
-        staffPersonalDetail.setPregnant(user.isPregnant());
+        User user = updateUserDetails(staffId, staffDTO);
+        staffDTO.setPregnant(user.isPregnant());
         //saving addresses of staff
-        staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffPersonalDetail.getContactAddress(), staffPersonalDetail.getSecondaryContactAddress()));
-        assignTags(staffId, staffPersonalDetail, staffToUpdate);
+        staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffDTO.getContactAddress(), staffDTO.getSecondaryContactAddress()));
+        assignTags(staffId, staffDTO, staffToUpdate);
         staffGraphRepository.unlinkStaffChilds(staffId);
         staffToUpdate.getStaffChildDetails().forEach(staffChildDetail -> staffChildDetail.setId(null));
         Staff staff = staffGraphRepository.save(staffToUpdate);
-        staffPersonalDetail.setUserName(staff.getUser().getUserName());
-        setStaffChildDetailsInPersonalDetail(staff, staffPersonalDetail);
+        staffDTO.setUserName(staff.getUser().getUserName());
+        setStaffChildDetailsInPersonalDetail(staff, staffDTO);
         if (oldExpertise != null) {
             List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
@@ -288,49 +288,49 @@ public class StaffService {
         List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
         staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), SkillLevel.ADVANCE);
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = copyCollectionPropertiesByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
-        staffPersonalDetail.setSectorWiseExpertise(copyCollectionPropertiesByMapper(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults), SectorAndStaffExpertiseDTO.class));
-        teamService.assignStaffInTeams(staff, staffPersonalDetail.getTeams(), unitId);
+        staffDTO.setSectorWiseExpertise(copyCollectionPropertiesByMapper(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults), SectorAndStaffExpertiseDTO.class));
+        teamService.assignStaffInTeams(staff, staffDTO.getTeams(), unitId);
         return staffRetrievalService.getPersonalInfo(staffId, unitId);
     }
 
-    private User updateUserDetails(long staffId, StaffPersonalDetail staffPersonalDetail) {
+    private User updateUserDetails(long staffId, StaffDTO staffDTO) {
         User user = userGraphRepository.getUserByStaffId(staffId);
-        if (!ObjectUtils.isEquals(user.getCprNumber(), staffPersonalDetail.getCprNumber())) {
-            user.setCprNumber(staffPersonalDetail.getCprNumber());
-            user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffPersonalDetail.getCprNumber()));
-            user.setGender(CPRUtil.getGenderFromCPRNumber(staffPersonalDetail.getCprNumber()));
+        if (!ObjectUtils.isEquals(user.getCprNumber(), staffDTO.getCprNumber())) {
+            user.setCprNumber(staffDTO.getCprNumber());
+            user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffDTO.getCprNumber()));
+            user.setGender(CPRUtil.getGenderFromCPRNumber(staffDTO.getCprNumber()));
         }
-        user.setPregnant(Gender.FEMALE.equals(user.getGender()) && staffPersonalDetail.isPregnant());
-        user.setUserName(staffPersonalDetail.getUserName());
+        user.setPregnant(Gender.FEMALE.equals(user.getGender()) && staffDTO.isPregnant());
+        user.setUserName(staffDTO.getUserName());
         userGraphRepository.save(user);
         return user;
     }
 
-    private void assignTags(long staffId, StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate) {
-        Map<Long, TagDTO> tagDTOMap = staffPersonalDetail.getTags().stream().collect(Collectors.toMap(k -> k.getId().longValue(), Function.identity()));
-        List<Tag> tagList = tagGraphRepository.findAllById(staffPersonalDetail.getTags().stream().map(k -> k.getId().longValue()).collect(Collectors.toList()));
+    private void assignTags(long staffId, StaffDTO staffDTO, Staff staffToUpdate) {
+        Map<Long, TagDTO> tagDTOMap = staffDTO.getTags().stream().collect(Collectors.toMap(k -> k.getId().longValue(), Function.identity()));
+        List<Tag> tagList = tagGraphRepository.findAllById(staffDTO.getTags().stream().map(k -> k.getId().longValue()).collect(Collectors.toList()));
         tagList.forEach(tag -> {
             tag.setStartDate(tagDTOMap.get(tag.getId()).getStartDate());
             tag.setEndDate(tagDTOMap.get(tag.getId()).getEndDate());
         });
         staffToUpdate.setTags(tagList);
 
-        if (isCollectionNotEmpty(staffPersonalDetail.getTags())) {
+        if (isCollectionNotEmpty(staffDTO.getTags())) {
 
-            staffGraphRepository.unlinkTagsFromStaff(staffId, staffPersonalDetail.getTags().stream().map(tagDTO -> tagDTO.getId().longValue()).collect(Collectors.toList()));
+            staffGraphRepository.unlinkTagsFromStaff(staffId, staffDTO.getTags().stream().map(tagDTO -> tagDTO.getId().longValue()).collect(Collectors.toList()));
         } else {
             staffGraphRepository.unlinkAllTagsFromStaff(staffId);
         }
     }
 
-    private void updateUserDetails(StaffPersonalDetail staffPersonalDetail, UserAccessRoleDTO userAccessRoleDTO, Staff staffToUpdate) {
+    private void updateUserDetails(StaffDTO staffDTO, UserAccessRoleDTO userAccessRoleDTO, Staff staffToUpdate) {
         if (userAccessRoleDTO.getManagement() || staffToUpdate.getUser().getId().equals(UserContext.getUserDetails().getId())) {
-            if (isNull(staffToUpdate.getUser().getUserName()) || !staffToUpdate.getUser().getUserName().equalsIgnoreCase(staffPersonalDetail.getUserName()) && !staffToUpdate.getUser().isUserNameUpdated()) {
-                User user = userGraphRepository.findUserByUserName("(?i)" + staffPersonalDetail.getUserName());
+            if (isNull(staffToUpdate.getUser().getUserName()) || !staffToUpdate.getUser().getUserName().equalsIgnoreCase(staffDTO.getUserName()) && !staffToUpdate.getUser().isUserNameUpdated()) {
+                User user = userGraphRepository.findUserByUserName("(?i)" + staffDTO.getUserName());
                 if (!Optional.ofNullable(user).isPresent()) {
-                    staffToUpdate.getUser().setUserName(staffPersonalDetail.getUserName());
+                    staffToUpdate.getUser().setUserName(staffDTO.getUserName());
                     staffToUpdate.getUser().setUserNameUpdated(true);
-                    staffPersonalDetail.setUserNameUpdated(true);
+                    staffDTO.setUserNameUpdated(true);
                 } else {
                     exceptionService.duplicateDataException("message.user.userName.already.use");
                 }
@@ -338,9 +338,9 @@ public class StaffService {
         }
     }
 
-    public List<Expertise> assignExpertise(long staffId, StaffPersonalDetail staffPersonalDetail, UserAccessRoleDTO userAccessRoleDTO, Staff staffToUpdate) {
+    public List<Expertise> assignExpertise(long staffId, StaffDTO staffDTO, UserAccessRoleDTO userAccessRoleDTO, Staff staffToUpdate) {
         List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
-        List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExpertiseDTO::getExpertiseId).collect(Collectors.toList());
+        List<Long> expertises = staffDTO.getExpertiseWithExperience().stream().map(StaffExpertiseDTO::getExpertiseId).collect(Collectors.toList());
         if (!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.getManagement()) {
             exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_EXPERTISE_NOTCHANGED);
         }
@@ -350,18 +350,18 @@ public class StaffService {
         Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap = staffExperienceInExpertiseDTOList.stream().collect(Collectors.toMap(StaffExperienceInExpertiseDTO::getExpertiseId, Function.identity()));
         List<StaffExpertiseRelationShip> staffExpertiseRelationShips = staffExpertiseRelationShipGraphRepository.getRelationShipByStaffExcludingCurrentExpertise(staffId, expertises);
         staffExpertiseRelationShipGraphRepository.deleteAll(staffExpertiseRelationShips);
-        expertiseService.assignExpertiseToStaff(staffPersonalDetail, staffToUpdate, expertiseMap, staffExperienceInExpertiseDTOMap);
+        expertiseService.assignExpertiseToStaff(staffDTO, staffToUpdate, expertiseMap, staffExperienceInExpertiseDTOMap);
         return oldExpertise;
     }
 
-    private void setStaffChildDetailsInPersonalDetail(Staff staff, StaffPersonalDetail staffPersonalDetail) {
+    private void setStaffChildDetailsInPersonalDetail(Staff staff, StaffDTO staffDTO) {
         Map<Long, StaffChildDetailDTO> staffChildDetailDTOMap = new HashMap<>();
         staff.getStaffChildDetails().forEach(staffChildDetail -> {
             if (!staffChildDetailDTOMap.containsKey(staffChildDetail.getId())) {
                 staffChildDetailDTOMap.put(staffChildDetail.getId(), ObjectMapperUtils.copyPropertiesByMapper(staffChildDetail, StaffChildDetailDTO.class));
             }
         });
-        staffPersonalDetail.setStaffChildDetails(new ArrayList<>(staffChildDetailDTOMap.values()));
+        staffDTO.setStaffChildDetails(new ArrayList<>(staffChildDetailDTOMap.values()));
     }
 
     public Map<String, Object> saveNotes(long staffId, String generalNote, String requestFromPerson) {
@@ -391,8 +391,8 @@ public class StaffService {
     public StaffUploadBySheetQueryResult batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
         AccessGroup accessGroup = accessGroupRepository.findById(accessGroupId).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(ERROR_STAFF_ACCESSGROUP_NOTFOUND, accessGroupId)));
         validateAccessGroup(accessGroup);
-        List<StaffPersonalDetail> staffList = new ArrayList<>();
-        List<StaffPersonalDetail> staffErrorList = new ArrayList<>();
+        List<StaffDTO> staffList = new ArrayList<>();
+        List<StaffDTO> staffErrorList = new ArrayList<>();
         StaffUploadBySheetQueryResult staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
         staffUploadBySheetQueryResult.setStaffErrorList(staffErrorList);
         staffUploadBySheetQueryResult.setStaffList(staffList);
@@ -430,7 +430,7 @@ public class StaffService {
                 String userName = getUserName(staffErrorList, row, cprAsLong, firstName, lastName, "", random);
                 String externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
                 if (isCollectionNotEmpty(missingMandatoryFields) || cprAsLong == null || StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName) || StringUtils.isBlank(privateEmail) || StringUtils.isBlank(externalIdValueAsString)) {
-                    StaffPersonalDetail staffDTO = new StaffPersonalDetail();
+                    StaffDTO staffDTO = new StaffDTO();
                     staffDTO.setFirstName(firstName);
                     staffDTO.setLastName(lastName);
                     staffDTO.setErrorMessage("Missing field(s) : " + StringUtils.join(missingMandatoryFields, ", "));
@@ -453,7 +453,7 @@ public class StaffService {
         return staffUploadBySheetQueryResult;
     }
 
-    private String getUserName(List<StaffPersonalDetail> staffErrorList, Row row, Long cprAsLong, String firstName, String lastName, String userName, Random rand) {
+    private String getUserName(List<StaffDTO> staffErrorList, Row row, Long cprAsLong, String firstName, String lastName, String userName, Random rand) {
         if (StringUtils.isEmpty(String.valueOf(row.getCell(19)))) {
             userName = createNewUserName(firstName, lastName, rand);
 
@@ -469,7 +469,7 @@ public class StaffService {
         }
     }
 
-    private String getExistingUserName(List<StaffPersonalDetail> staffErrorList, Row row, Long cprAsLong, String firstName, String lastName, String userName) {
+    private String getExistingUserName(List<StaffDTO> staffErrorList, Row row, Long cprAsLong, String firstName, String lastName, String userName) {
         User user = userGraphRepository.findUserByUserName(getStringValueOfIndexedCell(row, 19));
         if (Optional.ofNullable(user).isPresent()) {
             prepareStaffDTO(staffErrorList, cprAsLong, firstName, lastName, "UserName already exist");
@@ -506,7 +506,7 @@ public class StaffService {
         }
     }
 
-    private void setInformationAndSaveStaff(Long accessGroupId, List<StaffPersonalDetail> staffList, List<StaffPersonalDetail> staffErrorList, Organization organization, List<Long> alreadyAddedStaffIds, SystemLanguage defaultSystemLanguage, Row row, List<String> missingMandatoryFields, Long cprAsLong, String firstName, String lastName, String privateEmail, String externalIdValueAsString, String userName) {
+    private void setInformationAndSaveStaff(Long accessGroupId, List<StaffDTO> staffList, List<StaffDTO> staffErrorList, Organization organization, List<Long> alreadyAddedStaffIds, SystemLanguage defaultSystemLanguage, Row row, List<String> missingMandatoryFields, Long cprAsLong, String firstName, String lastName, String privateEmail, String externalIdValueAsString, String userName) {
         Long externalId = (StringUtils.isBlank(externalIdValueAsString)) ? 0 : Long.parseLong(externalIdValueAsString);
         if (alreadyAddedStaffIds.contains(externalId)) {
             prepareStaffDTO(staffErrorList, cprAsLong, firstName, lastName, "Duplicate External Id");
@@ -528,7 +528,7 @@ public class StaffService {
         User user = null;
         user = setMissingMandatoryFieldInUser(defaultSystemLanguage, row, missingMandatoryFields, cprAsLong, firstName, lastName, privateEmail, userName, staff, contactDetail, user);
         staffGraphRepository.save(staff);
-        StaffPersonalDetail staffDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffPersonalDetail.class);
+        StaffDTO staffDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffDTO.class);
         staffDTO.setGender(user.getGender());
         staffDTO.setAge(Period.between(CPRUtil.getDateOfBirthFromCPR(user.getCprNumber()), LocalDate.now()).getYears());
         staffList.add(staffDTO);
@@ -552,8 +552,8 @@ public class StaffService {
         return staff;
     }
 
-    private void prepareStaffDTO(List<StaffPersonalDetail> staffErrorList, Long cprAsLong, String firstName, String lastName, String s) {
-        StaffPersonalDetail staffDTO = new StaffPersonalDetail();
+    private void prepareStaffDTO(List<StaffDTO> staffErrorList, Long cprAsLong, String firstName, String lastName, String s) {
+        StaffDTO staffDTO = new StaffDTO();
         staffDTO.setFirstName(firstName);
         staffDTO.setLastName(lastName);
         staffDTO.setErrorMessage(s);
@@ -836,9 +836,9 @@ public class StaffService {
         return unitManagerDTO;
     }
 
-    public StaffPersonalDetail getStaffById(long staffId) {
+    public StaffDTO getStaffById(long staffId) {
         Staff staff = staffGraphRepository.findOne(staffId, 1);
-        StaffPersonalDetail staffDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffPersonalDetail.class);
+        StaffDTO staffDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffDTO.class);
         staffDTO.getContactDetail().setPrivateEmail(staff.getUser().getEmail());
         return staffDTO;
     }
@@ -944,28 +944,28 @@ public class StaffService {
         }
     }
 
-    private void setStaffDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) {
-        staffToUpdate.setFirstName(staffPersonalDetail.getFirstName());
-        staffToUpdate.setLastName(staffPersonalDetail.getLastName());
-        staffToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());
-        staffToUpdate.setCurrentStatus(staffPersonalDetail.getCurrentStatus());
-        staffToUpdate.setSpeedPercent(staffPersonalDetail.getSpeedPercent());
-        staffToUpdate.setWorkPercent(staffPersonalDetail.getWorkPercent());
-        staffToUpdate.setOvertime(staffPersonalDetail.getOvertime());
-        staffToUpdate.setCostDay(staffPersonalDetail.getCostDay());
-        staffToUpdate.setCostCall(staffPersonalDetail.getCostCall());
-        staffToUpdate.setCostKm(staffPersonalDetail.getCostKm());
-        staffToUpdate.setCostHour(staffPersonalDetail.getCostHour());
-        staffToUpdate.setCostHourOvertime(staffPersonalDetail.getCostHourOvertime());
-        staffToUpdate.setCapacity(staffPersonalDetail.getCapacity());
-        staffToUpdate.setCareOfName(staffPersonalDetail.getCareOfName());
-        staffToUpdate.setSignature(staffPersonalDetail.getSignature());
-        staffToUpdate.setContactDetail(ObjectMapperUtils.copyPropertiesByMapper(staffPersonalDetail.getContactDetail(), ContactDetail.class));
-        staffToUpdate.getUser().setFirstName(staffPersonalDetail.getFirstName());
-        staffToUpdate.getUser().setLastName(staffPersonalDetail.getLastName());
-        staffPersonalDetail.setExpertiseIds(staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
-        if (staffPersonalDetail.getCurrentStatus() == StaffStatusEnum.INACTIVE) {
-            staffToUpdate.setInactiveFrom(parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
+    private void setStaffDetails(Staff staffToUpdate, StaffDTO staffDTO) {
+        staffToUpdate.setFirstName(staffDTO.getFirstName());
+        staffToUpdate.setLastName(staffDTO.getLastName());
+        staffToUpdate.setFamilyName(staffDTO.getFamilyName());
+        staffToUpdate.setCurrentStatus(staffDTO.getCurrentStatus());
+        staffToUpdate.setSpeedPercent(staffDTO.getSpeedPercent());
+        staffToUpdate.setWorkPercent(staffDTO.getWorkPercent());
+        staffToUpdate.setOvertime(staffDTO.getOvertime());
+        staffToUpdate.setCostDay(staffDTO.getCostDay());
+        staffToUpdate.setCostCall(staffDTO.getCostCall());
+        staffToUpdate.setCostKm(staffDTO.getCostKm());
+        staffToUpdate.setCostHour(staffDTO.getCostHour());
+        staffToUpdate.setCostHourOvertime(staffDTO.getCostHourOvertime());
+        staffToUpdate.setCapacity(staffDTO.getCapacity());
+        staffToUpdate.setCareOfName(staffDTO.getCareOfName());
+        staffToUpdate.setSignature(staffDTO.getSignature());
+        staffToUpdate.setContactDetail(ObjectMapperUtils.copyPropertiesByMapper(staffDTO.getContactDetail(), ContactDetail.class));
+        staffToUpdate.getUser().setFirstName(staffDTO.getFirstName());
+        staffToUpdate.getUser().setLastName(staffDTO.getLastName());
+        staffDTO.setExpertiseIds(staffDTO.getExpertiseWithExperience().stream().map(StaffExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
+        if (staffDTO.getCurrentStatus() == StaffStatusEnum.INACTIVE) {
+            staffToUpdate.setInactiveFrom(parseDate(staffDTO.getInactiveFrom()).getTime());
         }
     }
 
@@ -985,9 +985,9 @@ public class StaffService {
         return newUserName;
     }
 
-    public List<StaffPersonalDetail> getAllStaffPersonalDetailsByUnit(Long unitId) {
+    public List<StaffDTO> getAllStaffPersonalDetailsByUnit(Long unitId) {
         List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        return copyCollectionPropertiesByMapper(staffPersonalDetailQueryResults, StaffPersonalDetail.class);
+        return copyCollectionPropertiesByMapper(staffPersonalDetailQueryResults, StaffDTO.class);
     }
 
     public void unlinkTagFromStaff(Long tagId) {

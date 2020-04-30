@@ -15,7 +15,7 @@ import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.night_worker.NightWorkerService;
@@ -205,9 +205,9 @@ public class ShiftFilterService {
     private <G> ShiftFilter getPlannedByFilter(Long unitId,Map<FilterType, Set<G>> filterTypeMap) {
         Set<Long> staffUserIds = new HashSet<>();
         if(filterTypeMap.containsKey(PLANNED_BY) && isCollectionNotEmpty(filterTypeMap.get(PLANNED_BY))){
-            List<StaffPersonalDetail> staffDTOS = userIntegrationService.getStaffByUnitId(unitId);
+            List<StaffDTO> staffDTOS = userIntegrationService.getStaffByUnitId(unitId);
             Set<AccessGroupRole> accessGroups = filterTypeMap.get(PLANNED_BY).stream().map(s -> AccessGroupRole.valueOf(s.toString())).collect(Collectors.toSet());
-            for (StaffPersonalDetail staffDTO : staffDTOS) {
+            for (StaffDTO staffDTO : staffDTOS) {
                 if(isNotNull(staffDTO.getRoles()) && CollectionUtils.containsAny(staffDTO.getRoles(),accessGroups)){
                     staffUserIds.add(staffDTO.getStaffUserId());
                 }
