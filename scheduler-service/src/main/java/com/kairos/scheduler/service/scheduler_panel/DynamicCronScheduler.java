@@ -59,7 +59,6 @@ public class DynamicCronScheduler{
 
         ScheduledFuture<?> future;
         threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);
-        threadPoolTaskScheduler.initialize();
         Runnable runnable = getTask(schedulerPanel, trigger, TimeZone.getTimeZone(timezone));
 
         if (!schedulerPanel.isOneTimeTrigger()) {

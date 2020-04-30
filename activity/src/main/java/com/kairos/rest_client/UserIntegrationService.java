@@ -826,27 +826,38 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, GET_PUBLIC_HOLIDAY_DAY_TYPE_REASON_CODE,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<SelfRosteringMetaData>>() {});
     }
 
-    public boolean verifyingIsActivityAlreadyAssigned(BigInteger activityId,long unitId){
-        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET,
-                IS_ACTIVITY_ASSIGNED,Arrays.asList(new BasicNameValuePair("activityId", activityId.toString())),
+    public boolean verifyingIsActivityAlreadyAssigned(BigInteger activityId, long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET,
+                IS_ACTIVITY_ASSIGNED, Arrays.asList(new BasicNameValuePair("activityId", activityId.toString())),
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-                },activityId);
+                }, activityId);
     }
 
-    public List<TimeSlotDTO> getUnitTimeSlot(long unitId){
-        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, "/get_time_slots",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotDTO>>>() {});
+    public List<TimeSlotDTO> getUnitTimeSlot(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/get_time_slots", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotDTO>>>() {
+        });
     }
 
-    public ShiftFilterDefaultData getShiftFilterDefaultData(SelfRosteringFilterDTO selfRosteringFilterDTO){
-        return genericRestClient.publishRequest(selfRosteringFilterDTO,selfRosteringFilterDTO.getUnitId(),RestClientUrlType.UNIT,HttpMethod.POST, "/get_filter_data",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftFilterDefaultData>>() {});
+    public List<TimeSlotDTO> getUnitTimeSlotByNames(Long unitId, Set<String> timeSlotNames) {
+        List<NameValuePair> queryParam = new ArrayList<>();
+        queryParam.add(new BasicNameValuePair("timeSlotIds", timeSlotNames.toString()));
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/get_time_slots_by_id", queryParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotDTO>>>() {
+        });
     }
 
-    public Boolean isUnit(long unitId){
-        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, "/is_unit",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
+    public ShiftFilterDefaultData getShiftFilterDefaultData(SelfRosteringFilterDTO selfRosteringFilterDTO) {
+        return genericRestClient.publishRequest(selfRosteringFilterDTO, selfRosteringFilterDTO.getUnitId(), RestClientUrlType.UNIT, HttpMethod.POST, "/get_filter_data", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftFilterDefaultData>>() {
+        });
+    }
+
+    public Boolean isUnit(long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/is_unit", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        });
     }
 
     public List<Long> getUnitIds(Long countryId) {
-       return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "/get_all_units", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "/get_all_units", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {
+        });
     }
 
     public List<EmploymentTypeDTO> getEmploymentTypeByCountry(Long countryId) {

@@ -578,7 +578,7 @@ public class CompanyCreationService {
         validateBasicDetails(units, exceptionService);
         List<Long> unitIds = getAllUnitIds(organizationId, parentOrganizationId, parent);
         staffPersonalDetailQueryResults = userGraphRepository.getUnitManagerOfOrganization(unitIds, parent.getId());
-        if(ObjectUtils.isCollectionNotEmpty(staffPersonalDetailQueryResults)) {
+        if(ObjectUtils.isCollectionEmpty(staffPersonalDetailQueryResults)) {
             exceptionService.invalidRequestException(ERROR_USER_DETAILS_MISSING);
         }
         validateUserDetails(staffPersonalDetailQueryResults, exceptionService);
