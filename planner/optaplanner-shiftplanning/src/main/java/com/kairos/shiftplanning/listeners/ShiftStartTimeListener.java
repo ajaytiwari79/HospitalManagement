@@ -69,7 +69,6 @@ public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
         updateTimeBankAndPayoutDetails(shiftImp);
         shiftImp.setShiftActivities((List<ShiftActivity>)objects[0]);
         shiftImp.setActivityIds((Set<BigInteger>)objects[1]);
-        shiftImp.setActivitiesPlannedTimeIds((Set<BigInteger>)objects[2]);
         shiftImp.setActivitiesTimeTypeIds((Set<BigInteger>)objects[3]);
         ZonedDateTime[] startAndEnd=getEarliestStartAndLatestEnd(shiftImp.getActivityLineIntervals());
         scoreDirector.beforeVariableChanged(shiftImp, START_TIME);

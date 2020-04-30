@@ -41,7 +41,7 @@ public class NoChangesToStaffWithCareBubble implements Constraint {
                     continue;
                 }
             }
-            if(tag.isValidTag(shift.getStartDate()) && shift.isChanged(shift.getEmployee().getActualShiftsMap().get(shift.getId()))){
+            if(tag.isValidTag(shift.getStartDate()) && shift.isChanged()){
                 count++;
             }
         }

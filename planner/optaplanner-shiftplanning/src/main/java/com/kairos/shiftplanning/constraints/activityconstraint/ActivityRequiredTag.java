@@ -20,13 +20,11 @@ import java.util.Set;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class ActivityRequiredTag implements Constraint {
-
-    private Tag requiredTag;
+    
     private ScoreLevel level;
     private int weight;
 
-    public ActivityRequiredTag(Tag requiredTag, ScoreLevel level, int weight) {
-        this.requiredTag = requiredTag;
+    public ActivityRequiredTag(ScoreLevel level, int weight) {
         this.level = level;
         this.weight = weight;
     }

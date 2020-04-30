@@ -28,7 +28,7 @@ import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -254,7 +254,7 @@ public class StaffCreationService {
         return admin;
     }
 
-    public StaffPersonalDetail createStaff(Long unitId, StaffCreationDTO payload) {
+    public StaffDTO createStaff(Long unitId, StaffCreationDTO payload) {
         User user = null;
         Staff staff;
         Organization organization = organizationService.fetchParentOrganization(unitId);
@@ -305,10 +305,10 @@ public class StaffCreationService {
             defaultKPISettingDTO.setParentUnitId(organization.getId());
             activityIntegrationService.createDefaultKPISettingForStaff(defaultKPISettingDTO, unitId);
         }
-        StaffPersonalDetail staffPersonalDetail = ObjectMapperUtils.copyPropertiesByMapper(staff,StaffPersonalDetail.class);
-        staffPersonalDetail.setGender(user.getGender());
-        staffPersonalDetail.setAge(user.getAge());
-        return staffPersonalDetail;
+        StaffDTO staffDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffDTO.class);
+        staffDTO.setGender(user.getGender());
+        staffDTO.setAge(user.getAge());
+        return staffDTO;
     }
 
     public void validateRequireFieldOfStaff(StaffCreationDTO staffCreationDTO){

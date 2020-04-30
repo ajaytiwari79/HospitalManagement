@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -51,7 +52,7 @@ public class ObjectMapperUtils {
     }
 
 
-    public static <T,E,F extends Collection> F copyCollectionPropertiesByMapper(Collection<T> objects, Class<E> elementClass, Class... type) {
+    public static <T,E,F extends Collection> F copyCollectionPropertiesByMapper(Collection<T> objects, Class<E> elementClass) {
         Class className = getClassByIntance(objects);
         try {
             return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
@@ -62,10 +63,7 @@ public class ObjectMapperUtils {
        return (F) Collections.emptyList();
     }
 
-    private static <T> Class getClassByIntance(Collection<T> object,Class... type){
-        if(type.length>0){
-            return type[0];
-        }
+    private static <T> Class getClassByIntance(Collection<T> object){
         if(object instanceof Set){
             return Set.class;
         }else if (object instanceof List){
@@ -105,9 +103,9 @@ public class ObjectMapperUtils {
         return null;
     }
 
-    public static <E extends Object> List<E> jsonStringToList(String json, Class className) {
+    public static <F> List<F> jsonStringToList(String jsonString, Class<F> className) {
         try {
-            return mapper.readValue(json, mapper.getTypeFactory().constructCollectionType(
+            return mapper.readValue(jsonString, mapper.getTypeFactory().constructCollectionType(
                     List.class, className));
         } catch (IOException e) {
             LOGGER.error(ERROR,e);

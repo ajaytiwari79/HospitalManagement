@@ -17,7 +17,7 @@ public class ActivityLineIntervalMoveListFactory implements MoveListFactory<Shif
         List<ShiftImp> shifts= solution.getShifts();
         for (ShiftImp shift:shifts){
             for (ActivityLineInterval activityLineInterval:activityLineIntervals) {
-                if(activityLineInterval.getStart().toLocalDate().equals(shift.getDate())){
+                if(activityLineInterval.getStart().toLocalDate().equals(shift.getStartDate())){
                     ActivityLineIntervalIteratorMove activityLineIntervalWrapper = new ActivityLineIntervalIteratorMove(activityLineInterval,shift);
                     possibleActivityLineIntervals.add(activityLineIntervalWrapper);
                 }

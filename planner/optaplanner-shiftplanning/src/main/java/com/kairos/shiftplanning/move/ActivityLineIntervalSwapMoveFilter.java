@@ -33,10 +33,10 @@ public class ActivityLineIntervalSwapMoveFilter implements SelectionFilter<Shift
             return false;
         }
 
-        if(shiftImp1 !=null && !shiftImp1.getDate().equals(activityLineInterval1.getStart().toLocalDate())){
+        if(shiftImp1 !=null && !shiftImp1.getStartDate().equals(activityLineInterval1.getStart().toLocalDate())){
             return false;
         }
-        if(shiftImp2 !=null && !shiftImp2.getDate().equals(activityLineInterval2.getStart().toLocalDate())){
+        if(shiftImp2 !=null && !shiftImp2.getStartDate().equals(activityLineInterval2.getStart().toLocalDate())){
             return false;
         }
         return true;

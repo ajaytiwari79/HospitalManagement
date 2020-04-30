@@ -40,7 +40,7 @@ public class ShiftBreakChangeMoveIteratorFactory  implements MoveIteratorFactory
         LocalDate date=workingSolution.getWeekDates().get(workingRandom.nextInt(workingSolution.getWeekDates().size()));
         List<ShiftBreakChangeMove> shiftBreakChangeMoves= new ArrayList<>();
         for(ShiftBreak shiftBreak:workingSolution.getShiftBreaks()){
-            if(!date.equals(shiftBreak.getShift().getDate())){
+            if(!date.equals(shiftBreak.getShift().getStartDate())){
                 continue;
             }
             DateTimeInterval possibleBreakInterval= ShiftPlanningUtility.getPossibleBreakStartInterval(shiftBreak,shiftBreak.getShift());

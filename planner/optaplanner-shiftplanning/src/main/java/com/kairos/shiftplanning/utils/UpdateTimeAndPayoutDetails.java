@@ -75,7 +75,7 @@ public class UpdateTimeAndPayoutDetails {
             for (ShiftActivity shiftActivityForCalculation : shiftActivities) {
                 ShiftActivity shiftActivity = getShiftActivityDTO(shift, shiftActivityForCalculation);
                 if(isNotNull(shiftActivity)){
-                    ruleTemplateValid = validateCTARuleTemplate(ruleTemplate, shift.getEmployee().getEmployment(), shift.getEmployee().getUnit().getPhase().getId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getTimeType().getId(), shiftActivity.getPlannedTimes());
+                    ruleTemplateValid = validateCTARuleTemplate(ruleTemplate, shift.getEmployee().getEmployment(), shift.getEmployee().getUnit().getPlanningPeriod().getPhase().getId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getTimeType().getId(), shiftActivity.getPlannedTimes());
                     LOGGER.debug("rule template : {} valid {}", ruleTemplate.getId(), ruleTemplateValid);
                     if (ruleTemplateValid) {
                         updateScheduledAndBonusMinutes(ruleTemplate, shiftActivityForCalculation, shiftActivity);

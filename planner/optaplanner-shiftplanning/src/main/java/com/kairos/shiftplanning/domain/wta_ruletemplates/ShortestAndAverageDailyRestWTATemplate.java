@@ -47,7 +47,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
 
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps) {
         int penality = 0;
-        if(!isDisabled() && isValidForPhase(unit.getPhase().getId(),this.phaseTemplateValues)  && CollectionUtils.containsAny(timeTypeIds,shiftImp.getActivitiesTimeTypeIds())){
+        if(!isDisabled() && isValidForPhase(unit.getPlanningPeriod().getPhase().getId(),this.phaseTemplateValues)  && CollectionUtils.containsAny(timeTypeIds,shiftImp.getActivitiesTimeTypeIds())){
             DateTimeInterval interval = getIntervalByRuleTemplate(shiftImp,intervalUnit,intervalLength);
             shiftImps = filterShiftsByPlannedTypeAndTimeTypeIds(shiftImps,timeTypeIds,plannedTimeIds);
             shiftImps = getShiftsByInterval(interval,shiftImps,null);

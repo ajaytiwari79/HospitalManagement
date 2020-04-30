@@ -5,8 +5,7 @@ import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLineInterval;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
@@ -24,31 +23,27 @@ import java.util.Objects;
  */
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @PlanningEntity
 public class ActivityLineInterval implements StaffingLineInterval, Comparable<ActivityLineInterval> {
 
     private static Logger log = LoggerFactory.getLogger(ActivityLineInterval.class);
 
-    private String id;
-    private ActivityLineInterval previous;
-    private ActivityLineInterval next;
+    private BigInteger id;
     private ZonedDateTime start;
     private boolean required;
     private Activity activity;
     @PlanningVariable(valueRangeProviderRefs = "shifts", nullable = true)
     private ShiftImp shift;
     private BigInteger actualShiftId;
-
-
-
-
-    public ActivityLineInterval() {
-    }
-
     private int duration;
     private int staffNo;
 
-    public ActivityLineInterval(String id, ZonedDateTime start, int duration, boolean required, Activity activity, int staffNo) {
+
+
+    public ActivityLineInterval(BigInteger id, ZonedDateTime start, int duration, boolean required, Activity activity, int staffNo) {
         this.id = id;
         this.start = start;
         this.duration = duration;

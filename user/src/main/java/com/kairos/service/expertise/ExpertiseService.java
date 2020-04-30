@@ -36,7 +36,7 @@ import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryRes
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.response.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -678,27 +678,27 @@ public class ExpertiseService {
         return expertise;
     }
 
-    public void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
+    public void assignExpertiseToStaff(StaffDTO staffDTO, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
         List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
-        for (int i = 0; i < staffPersonalDetail.getExpertiseWithExperience().size(); i++) {
-            Expertise expertise = expertiseMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
+        for (int i = 0; i < staffDTO.getExpertiseWithExperience().size(); i++) {
+            Expertise expertise = expertiseMap.get(staffDTO.getExpertiseWithExperience().get(i).getExpertiseId());
             expertise =findById(expertise.getId(), 2);
-            StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExperienceInExpertiseDTOMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
+            StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExperienceInExpertiseDTOMap.get(staffDTO.getExpertiseWithExperience().get(i).getExpertiseId());
             Long id = null;
             ExpertiseLine expertiseLine = expertise.getCurrentlyActiveLine(null);
             if (Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent())
                 id = staffExperienceInExpertiseDTO.getId();
-            Date expertiseStartDate = staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseStartDate();
-            staffExpertiseRelationShips.add(new StaffExpertiseRelationShip(id, staffToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate));
+            Date expertiseStartDate = staffDTO.getExpertiseWithExperience().get(i).getExpertiseStartDate();
+            staffExpertiseRelationShips.add(new StaffExpertiseRelationShip(id, staffToUpdate, expertise, staffDTO.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate));
             boolean isSeniorityLevelMatched = false;
             for (SeniorityLevel seniorityLevel : expertiseLine.getSeniorityLevel()) {
-                if (staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() >= seniorityLevel.getFrom() * 12 && (seniorityLevel.getTo() == null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() < seniorityLevel.getTo() * 12)) {
+                if (staffDTO.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() >= seniorityLevel.getFrom() * 12 && (seniorityLevel.getTo() == null || staffDTO.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() < seniorityLevel.getTo() * 12)) {
                     isSeniorityLevelMatched = true;
                     break;
                 }
             }
             if (!isSeniorityLevelMatched) {
-                exceptionService.actionNotPermittedException(ERROR_NOSENIORITYLEVELFOUND, "seniorityLevel " + staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
+                exceptionService.actionNotPermittedException(ERROR_NOSENIORITYLEVELFOUND, "seniorityLevel " + staffDTO.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
             }
         }
         if (CollectionUtils.isNotEmpty(staffExpertiseRelationShips)) {

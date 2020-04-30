@@ -7,7 +7,7 @@ import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdatio
 import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.counter.KPIDashboard;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
@@ -50,10 +50,10 @@ public class DynamicTabService extends MongoBaseService {
 
         List<KPIDashboard> kpiDashboards = new ArrayList<>();
         if (ConfLevel.STAFF.equals(level)) {
-            List<StaffPersonalDetail> staffDTOS = userIntegrationService.getStaffListByUnit();
+            List<StaffDTO> staffDTOS = userIntegrationService.getStaffListByUnit();
             List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboardsOfStaffs(refId, level, staffDTOS.stream().map(k -> k.getId()).collect(Collectors.toList()));
             Map<Long, List<KPIDashboardDTO>> staffDefaultMap = kpiDashboardDTOS.stream().collect(Collectors.groupingBy(k -> k.getStaffId()));
-            for (StaffPersonalDetail staff : staffDTOS) {
+            for (StaffDTO staff : staffDTOS) {
                 if (staffDefaultMap.getOrDefault(staff.getId(),new ArrayList<>()).stream().noneMatch(k -> DEFAULT_TAB.equals(k.getName()))) {
                     kpiDashboards.add(new KPIDashboard(PARENT_MODULE_ID, MODULE_ID, DEFAULT_TAB, COUNTRY_ID, refId, staff.getId(), level, true));
                 }
@@ -99,9 +99,9 @@ public class DynamicTabService extends MongoBaseService {
             kpiDashboards.stream().forEach(kpiDashboard -> kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(), kpiDashboard.getParentModuleId())));
             counterRepository.saveEntities(kpiDashboards);
         }
-        List<StaffPersonalDetail> staffDTOS = userIntegrationService.getStaffListByUnit();
+        List<StaffDTO> staffDTOS = userIntegrationService.getStaffListByUnit();
         if (ConfLevel.UNIT.equals(level)) {
-            createTabsForStaff(unitId, kpiDashboards, staffDTOS.stream().map(StaffPersonalDetail::getId).collect(Collectors.toList()));
+            createTabsForStaff(unitId, kpiDashboards, staffDTOS.stream().map(StaffDTO::getId).collect(Collectors.toList()));
         }
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(kpiDashboards, KPIDashboardDTO.class);
     }

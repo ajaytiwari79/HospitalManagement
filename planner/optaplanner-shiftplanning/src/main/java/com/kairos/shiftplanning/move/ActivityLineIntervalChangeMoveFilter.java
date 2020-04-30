@@ -23,7 +23,7 @@ public class ActivityLineIntervalChangeMoveFilter implements SelectionFilter<Shi
         if(Objects.equals(activityLineInterval.getShift(), shiftImp)){
             return false;
         }
-        if(shiftImp !=null && !shiftImp.getDate().equals(activityLineInterval.getStart().toLocalDate())){
+        if(shiftImp !=null && !shiftImp.getStartDate().equals(activityLineInterval.getStart().toLocalDate())){
             return false;
         }
         return true;

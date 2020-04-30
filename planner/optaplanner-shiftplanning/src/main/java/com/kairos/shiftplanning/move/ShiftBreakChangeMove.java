@@ -54,6 +54,6 @@ public class ShiftBreakChangeMove extends AbstractMove<BreaksIndirectAndActivity
 
     @Override
     public String toString() {
-        return "Shift:"+shiftBreak.getShift().getDate()+"["+shiftBreak.getDuration()+"]"+"{"+shiftBreak.getStartTime()+"}"+"->{"+breakTime+"}";
+        return "Shift:"+shiftBreak.getShift().getStartDate()+"["+shiftBreak.getDuration()+"]"+"{"+shiftBreak.getStartTime()+"}"+"->{"+breakTime+"}";
     }
 }

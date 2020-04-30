@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+
 /**
  * Created by vipul on 21/8/17.
  */
@@ -71,6 +74,10 @@ public class WTAResponseDTO {
         this.organizationType = organizationType;
         this.organizationSubType = organizationSubType;
         this.tags = tags;
+    }
+
+    public boolean isValidWorkTimeAgreement(LocalDate localDate){
+        return (isNull(this.getEndDate()) && !this.getStartDate().isAfter(localDate)) || (isNotNull(this.getEndDate()) && !this.getStartDate().isAfter(localDate) && !this.getEndDate().isBefore(localDate));
     }
 
 }

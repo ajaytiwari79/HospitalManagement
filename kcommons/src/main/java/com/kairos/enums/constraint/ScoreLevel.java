@@ -21,8 +21,8 @@ public enum ScoreLevel {
         return value;
     }
 
-    public static PlanningType getEnumByString(String status) {
-        for (PlanningType is : PlanningType.values()) {
+    public static ScoreLevel getEnumByString(String status) {
+        for (ScoreLevel is : ScoreLevel.values()) {
             if (status.equals(is.toValue()))
                 return is;
         }
