@@ -70,7 +70,6 @@ public class PermissionService {
     @Inject private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject private TeamGraphRepository teamGraphRepository;
     @Inject private EmploymentTypeGraphRepository employmentTypeGraphRepository;
-
     private static OrganizationService organizationService;
     private static StaffService staffService;
     private static AccessGroupService accessGroupService;
@@ -360,20 +359,20 @@ public class PermissionService {
         if(updateOrganisationCategories){
             kPermissionField.setOrganizationCategories(fieldDTO.getOrganizationCategories());
         }else {
-            if(kPermissionField == null){
-                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_PERMISSION_FIELD, fieldDTO.getId());
-            }else{
-                permissionModelRepository.createAccessGroupPermissionFieldRelationshipType(kPermissionField.getId(), accessGroupIds, fieldDTO.getPermissions(),fieldDTO.getForOtherPermissions().getExpertiseIds(),fieldDTO.getForOtherPermissions().getUnionIds(),fieldDTO.getForOtherPermissions().getTeamIds(),fieldDTO.getForOtherPermissions().getEmploymentTypeIds(),fieldDTO.getForOtherPermissions().getTagIds(),fieldDTO.getForOtherPermissions().getStaffStatuses(),fieldDTO.getForOtherPermissions().getPermissions());
+                if (kPermissionField == null) {
+                    exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_PERMISSION_FIELD, fieldDTO.getId());
+                } else {
+                    permissionModelRepository.createAccessGroupPermissionFieldRelationshipType(kPermissionField.getId(), accessGroupIds, fieldDTO.getPermissions(), fieldDTO.getForOtherPermissions().getExpertiseIds(), fieldDTO.getForOtherPermissions().getUnionIds(), fieldDTO.getForOtherPermissions().getTeamIds(), fieldDTO.getForOtherPermissions().getEmploymentTypeIds(), fieldDTO.getForOtherPermissions().getTagIds(), fieldDTO.getForOtherPermissions().getStaffStatuses(), fieldDTO.getForOtherPermissions().getPermissions());
+                }
             }
-        }
     }
 
     private void updateModelPermissionOrOrganisationCategory(List<Long> accessGroupIds, boolean updateOrganisationCategories, ModelDTO modelDTO, KPermissionModel kPermissionModel) {
-        if(updateOrganisationCategories){
-            kPermissionModel.setOrganizationCategories(modelDTO.getOrganizationCategories());
-        }else {
-            permissionModelRepository.createAccessGroupPermissionModelRelationship(kPermissionModel.getId(), accessGroupIds, modelDTO.getPermissions(),modelDTO.getForOtherPermissions().getExpertiseIds(),modelDTO.getForOtherPermissions().getUnionIds(),modelDTO.getForOtherPermissions().getTeamIds(),modelDTO.getForOtherPermissions().getEmploymentTypeIds(),modelDTO.getForOtherPermissions().getTagIds(),modelDTO.getForOtherPermissions().getStaffStatuses(),modelDTO.getForOtherPermissions().getPermissions());
-        }
+           if (updateOrganisationCategories) {
+               kPermissionModel.setOrganizationCategories(modelDTO.getOrganizationCategories());
+           } else {
+               permissionModelRepository.createAccessGroupPermissionModelRelationship(kPermissionModel.getId(), accessGroupIds, modelDTO.getPermissions(), modelDTO.getForOtherPermissions().getExpertiseIds(), modelDTO.getForOtherPermissions().getUnionIds(), modelDTO.getForOtherPermissions().getTeamIds(), modelDTO.getForOtherPermissions().getEmploymentTypeIds(), modelDTO.getForOtherPermissions().getTagIds(), modelDTO.getForOtherPermissions().getStaffStatuses(), modelDTO.getForOtherPermissions().getPermissions());
+           }
     }
 
     private KPermissionFieldQueryResult getkPermissionFieldQueryResult(ModelDTO modelDTO, FieldDTO fieldDTO) {

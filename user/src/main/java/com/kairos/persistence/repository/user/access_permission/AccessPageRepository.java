@@ -49,6 +49,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Create unique (accessPermission)-[:" + HAS_ACCESS_PAGE_PERMISSION + "{isEnabled:r.isEnabled,isRead:true,isWrite:false}]->(accessPage) RETURN accessPermission")
     List<AccessPage> setDefaultPermission(long accessPermissionId, long accessGroupId);
 
+
     @Query("MATCH (accessGroup:AccessGroup{deleted:false})-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(accessPage:AccessPage) WHERE id(accessPage)={1} AND id(accessGroup)={0} RETURN r.read as read, r.write as write")
     AccessPageQueryResult getAccessPermissionForAccessPage(Long accessGroupId, Long accessPageId);
 
