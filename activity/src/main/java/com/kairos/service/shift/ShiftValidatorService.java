@@ -113,8 +113,7 @@ public class ShiftValidatorService {
     private
     WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
     @Inject
-    private
-    ShiftMongoRepository shiftMongoRepository;
+    private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private TimeBankService timeBankService;
     @Inject
@@ -143,7 +142,6 @@ public class ShiftValidatorService {
     private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @Inject
     private ExpertiseNightWorkerSettingRepository expertiseNightWorkerSettingRepository;
-
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
@@ -176,10 +174,15 @@ public class ShiftValidatorService {
         return exceptionService.convertMessage(exception, param);
     }
 
-    public boolean validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, Phase phase) {
-        String timeZone = userIntegrationService.getTimeZoneByUnitId(unitId);
-        DateTimeInterval graceInterval = getGracePeriodInterval(phase, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
-        return graceInterval.contains(DateUtils.getDateFromTimeZone(timeZone));
+    public boolean validateGracePeriod(Date shiftDate, Boolean validatedByStaff, Long unitId, Phase phase) {
+        boolean valid=true;
+        if(TIME_AND_ATTENDANCE.equals(phase.getName())){
+            String timeZone = userIntegrationService.getTimeZoneByUnitId(unitId);
+            DateTimeInterval graceInterval = getGracePeriodInterval(phase, shiftDate, validatedByStaff);
+            valid= graceInterval.contains(DateUtils.getDateFromTimeZone(timeZone));
+        }
+
+        return valid;
     }
 
     public DateTimeInterval getGracePeriodInterval(Phase phase, Date date, boolean forStaff) {
@@ -218,6 +221,7 @@ public class ShiftValidatorService {
         }
         validateAbsenceReasonCodeRule(activityWrapperMap, shift, ruleTemplateSpecificInfo);
         updateScheduledAndDurationMinutesInShift(shift, staffAdditionalInfoDTO, activityWrapperMap);
+        validateGracePeriod(shift.getStartDate(),UserContext.getUserDetails().isStaff(),shift.getUnitId(),phase);
         DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate().getTime(), shift.getEndDate().getTime());
         Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         TimeBankCalculationService.CalculatePlannedHoursAndScheduledHours calculatePlannedHoursAndScheduledHours = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours(staffAdditionalInfoDTO, dateTimeInterval, newArrayList(shift), false, false, dayTypeDTOMap).calculate();
@@ -229,6 +233,7 @@ public class ShiftValidatorService {
         Specification<ShiftWithActivityDTO> staffActivitySpecification = new StaffActivitySpecification(ruleTemplateSpecificInfo, allActivities);
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
         Specification<ShiftWithActivityDTO> activitySpecification = activityExpertiseSpecification.and(activitySkillSpec).and(wtaRulesSpecification).and(tagSpecification).and(staffActivitySpecification);
+
         if (byUpdate) {
             Specification<ShiftWithActivityDTO> activityPhaseSettingSpecification = new ActivityPhaseSettingSpecification(staffAdditionalInfoDTO, phase, activityWrapperMap.values(), oldShift);
             activitySpecification = activitySpecification.and(activityPhaseSettingSpecification);
@@ -267,7 +272,7 @@ public class ShiftValidatorService {
 
     public ViolatedRulesDTO validateRuleOnShiftDelete(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), null);
-
+        validateGracePeriod(shift.getStartDate(),UserContext.getUserDetails().isStaff(),shift.getUnitId(),phase);
         Specification<Shift> shiftSpecification = new ShiftAllowedToDelete(activityWrapperMap, phase.getId());
         shiftSpecification.validateRules(shift);
         ViolatedRulesDTO violatedRulesDTO = new ViolatedRulesDTO();
@@ -793,7 +798,7 @@ public class ShiftValidatorService {
     public List<ShiftWithViolatedInfoDTO> validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId) {
         BigInteger shiftStateId = shiftDTO.getId();
         Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
-        boolean validate = validateGracePeriod(shiftDTO, validatedByStaff, unitId, actualPhases);
+        boolean validate = validateGracePeriod(shiftDTO.getStartDate(), validatedByStaff, unitId, actualPhases);
         if (!validate) {
             exceptionService.invalidRequestException(MESSAGE_SHIFT_CANNOT_UPDATE);
         }
