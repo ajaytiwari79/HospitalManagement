@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.Minutes;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.variable.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

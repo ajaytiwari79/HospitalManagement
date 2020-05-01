@@ -40,6 +40,7 @@ import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.domain.unit.*;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.WTABaseRuleTemplate;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
+import com.kairos.shiftplanning.integration.UserIntegration;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 
 import java.math.BigInteger;
@@ -64,10 +65,12 @@ import static com.kairos.shiftplanning.executioner.ShiftPlanningGenerator.INTERV
 public class ShiftPlanningInitializer {
 
     private BigInteger id;
+    private UserIntegration userIntegration = new UserIntegration();
 
     public ShiftRequestPhasePlanningSolution initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
         Long unitId = shiftPlanningProblemSubmitDTO.getUnitId();
         List<Long> staffIds = shiftPlanningProblemSubmitDTO.getStaffIds();
+        List<StaffDTO> staffDTOS = userIntegration.getStaffData(staffIds);
         Unit unit = getUnit(unitId, shiftPlanningProblemSubmitDTO);
         List<Long> employmentIds = new LinkedList<>();
         for (StaffDTO staffDTO : shiftPlanningProblemSubmitDTO.getStaffs()) {
@@ -196,7 +199,7 @@ public class ShiftPlanningInitializer {
         Map<BigInteger, Activity> activityMap = new HashMap<>();
         Map<LocalDate, List<Activity>> dateActivityMap = new HashMap<>();
         Set<LocalDate> localDates = new HashSet<>();
-        Map<BigInteger,ActivityDTO> activityDTOMap = shiftPlanningProblemSubmitDTO.getActivities().stream().collect(Collectors.toMap(k->k.getId(),v-v));
+        Map<BigInteger,ActivityDTO> activityDTOMap = shiftPlanningProblemSubmitDTO.getActivities().stream().collect(Collectors.toMap(k->k.getId(),v->v));
         Map<String, List<ActivityLineInterval>> activityLineIntervalMap = new HashMap<>();
         for (Map.Entry<LocalDate, List<StaffingLevelInterval>> localDateListEntry : localDateStaffingLevelTimeSlotMap.entrySet()) {
             localDates.add(localDateListEntry.getKey());

@@ -14,10 +14,7 @@ import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.organization.TimeSlot;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -32,6 +29,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class ShiftPlanningProblemSubmitDTO {
 
