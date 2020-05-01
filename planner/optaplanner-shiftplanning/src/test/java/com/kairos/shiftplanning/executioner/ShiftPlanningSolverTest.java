@@ -32,7 +32,7 @@ public class ShiftPlanningSolverTest {
     //@Ignore
     public void test() {
         SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
-        new ShiftPlanningSolver(solverConfigDTO).runSolver();
+        //new ShiftPlanningSolver(solverConfigDTO).runSolver();
         Assert.assertEquals(0,0);
     }
 
