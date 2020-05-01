@@ -301,7 +301,8 @@ public class ActivityService {
         generalTab.setTags(null);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
         generalActivityTabWithTagDTO.setTags(null);
-        if (!activity.getTags().isEmpty()) {
+        if (!activity.getTags().isEmpty())
+        {
             generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         }
         generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
