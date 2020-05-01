@@ -821,6 +821,22 @@ public class StaffRetrievalService {
         return map;
     }
 
+    public Collection<StaffDTO> getStaffsByIds(List<Long> staffIds){
+        List<Employment> employments = employmentGraphRepository.getEmploymentByStaffIds(staffIds);
+        Set<Long> expertiseIds = employments.stream().map(employment -> employment.getExpertise().getId()).collect(Collectors.toSet());
+        ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO = activityIntegrationService.getNightWorkerDetails(staffIds,expertiseIds);
+        Map<Long,StaffDTO> staffDTOMap = new HashMap<>();
+        for (Employment employment : employments) {
+            StaffDTO staffDTO = staffDTOMap.getOrDefault(employment.getStaff().getId(), getStaffDTO(employment));
+            EmploymentDTO employmentDTO = ObjectMapperUtils.copyPropertiesByMapper(employment, EmploymentDTO.class);
+            employmentDTO.setExpertiseNightWorkerSetting(shiftPlanningProblemSubmitDTO.getExpertiseNightWorkerSettingMap().get(employmentDTO.getExpertise().getId()));
+            employmentDTO.setBreakSettings(shiftPlanningProblemSubmitDTO.getBreakSettingMap().get(employmentDTO.getExpertise().getId()));
+            staffDTO.setNightWorker(shiftPlanningProblemSubmitDTO.getNightWorkerDetails().getOrDefault(staffDTO.getId(),false));
+            staffDTO.getEmployments().add(employmentDTO);
+        }
+        return staffDTOMap.values();
+    }
+
     private StaffDTO getStaffDTO(Employment employment) {
         List<TagDTO>tagDTOS = copyCollectionPropertiesByMapper(employment.getStaff().getTags(), TagDTO.class);
         List<StaffChildDetailDTO> staffChildDetails = copyCollectionPropertiesByMapper(employment.getStaff().getStaffChildDetails(), StaffChildDetailDTO.class);
