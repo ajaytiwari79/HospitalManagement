@@ -13,19 +13,15 @@ import javax.inject.Inject;
 
 import static com.planner.constants.AppConstants.*;
 
-@Configuration
-@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
+//@Configuration
+//@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
 public class Neo4jConfig {
     private final static Logger logger = LoggerFactory.getLogger(Neo4jConfig.class);
 
+/*
     @Inject
      Environment environment;
 
-    /**
-     * Note here method name must be{sessionFactory}  else
-     * spring will not find it.
-     * @return
-     */
     @Bean
     public SessionFactory sessionFactory() {
         // with domain entity base package(s)
@@ -47,4 +43,5 @@ public class Neo4jConfig {
     public Neo4jTransactionManager transactionManager() {
         return new Neo4jTransactionManager(sessionFactory());
     }
+*/
 }

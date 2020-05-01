@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 public class UserNeo4jService {
-    @Inject
+    //@Inject
     private UserNeo4jRepo userNeo4jRepo;
 
 

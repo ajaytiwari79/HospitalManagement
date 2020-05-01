@@ -25,14 +25,14 @@ public class DefaultCountryConstraintService {
     static final int PENALTY_SOFT = -1;
     static final int PENALTY_MEDIUM = -5;
     static final int PENALTY_HARD = -1;
-    static final ConstraintSubType AVERAGE_SHEDULED_TIME = ConstraintSubType.AVERAGE_SCHEDULED_TIME;
+    static final ConstraintSubType AVERAGE_SHEDULED_TIME = ConstraintSubType.AVERAGE_SHEDULED_TIME;
     static final ConstraintSubType CONSECUTIVE_WORKING_PARTOFDAY = ConstraintSubType.CONSECUTIVE_WORKING_PARTOFDAY;
     static final ConstraintSubType DAYS_OFF_IN_PERIOD = ConstraintSubType.DAYS_OFF_IN_PERIOD;
     static final ConstraintSubType NUMBER_OF_PARTOFDAY = ConstraintSubType.NUMBER_OF_PARTOFDAY;
     static final ConstraintSubType SHIFT_LENGTH = ConstraintSubType.SHIFT_LENGTH;
     static final ConstraintSubType NUMBER_OF_SHIFTS_IN_INTERVAL = ConstraintSubType.NUMBER_OF_SHIFTS_IN_INTERVAL;
     static final ConstraintSubType TIME_BANK = ConstraintSubType.TIME_BANK;
-    static final ConstraintSubType VETO_PER_PERIOD = ConstraintSubType.VETO_PER_PERIOD;
+    static final ConstraintSubType VETO_PER_PERIOD = ConstraintSubType.VETO_AND_STOP_BRICKS;
     static final ConstraintSubType DAILY_RESTING_TIME = ConstraintSubType.DAILY_RESTING_TIME;
     static final ConstraintSubType DURATION_BETWEEN_SHIFTS = ConstraintSubType.DURATION_BETWEEN_SHIFTS;
     static final ConstraintSubType REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS = ConstraintSubType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;

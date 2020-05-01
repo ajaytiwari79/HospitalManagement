@@ -10,9 +10,9 @@ import org.springframework.context.annotation.PropertySource;
  * Created by anil on 27/7/17.
  */
 @PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
-@Configuration
 @Getter
 @Setter
+@Configuration
 public class EnvConfigCommon {
 
     @Value("${gateway.userservice.url}")
