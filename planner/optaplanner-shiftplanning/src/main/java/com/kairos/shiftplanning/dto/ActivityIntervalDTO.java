@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
+import java.math.BigInteger;
 import java.time.ZonedDateTime;
 
 @Getter
@@ -17,7 +18,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 public class ActivityIntervalDTO {
 
-    private String id;
+    private BigInteger id;
     private ActivityLineInterval previous;
     private ActivityLineInterval next;
     private ZonedDateTime start;

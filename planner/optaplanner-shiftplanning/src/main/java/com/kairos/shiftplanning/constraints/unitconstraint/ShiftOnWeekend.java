@@ -35,6 +35,6 @@ public class ShiftOnWeekend implements Constraint {
 
     @Override
     public int checkConstraints(List<ShiftImp> shifts) {
-        return (int)shifts.stream().filter(shiftImp -> weekEndSet.contains(shiftImp.getDate().getDayOfWeek())).count();
+        return (int)shifts.stream().filter(shiftImp -> weekEndSet.contains(shiftImp.getStartDate().getDayOfWeek())).count();
     }
 }

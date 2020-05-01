@@ -71,7 +71,6 @@ public class ShiftPlanningInitializationService {
      * ShiftRequestPhasePlanningSolution(Opta-planner planning Solution)
      */
     public ShiftRequestPhasePlanningSolution initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
-
         Long unitId = shiftPlanningProblemSubmitDTO.getUnitId();
         Date fromPlanningDate;
         Date toPlanningDate;
@@ -125,7 +124,7 @@ public class ShiftPlanningInitializationService {
 
         List<ShiftImp> shiftImp = getShiftRequestPhase(employmentIds, fromPlanningDate, toPlanningDate, employeeList);
         Map<LocalDate,Object[]> staffingLevelMatrix=createStaffingLevelMatrix(activityLineIntervalList,15,activitiesPerDayList);
-        int[] activitiesRank=activityList.stream().mapToInt(a->a.getRank()).toArray();
+        int[] activitiesRank=activityList.stream().mapToInt(a->a.getActivityPrioritySequence()).toArray();
         //
         ShiftRequestPhasePlanningSolution shiftRequestPhasePlanningSolution = new ShiftRequestPhasePlanningSolution();
         shiftRequestPhasePlanningSolution.setEmployees(employeeList);

@@ -11,9 +11,7 @@ import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.executioner.ShiftPlanningGenerator;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.kie.api.runtime.rule.RuleContext;
@@ -29,6 +27,8 @@ import java.util.Set;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @XStreamAlias("Activity")
 public class Activity {
@@ -38,12 +38,12 @@ public class Activity {
 
     private BigInteger id;
     private List<Skill> skills;
-    private int priority;
     private String name;
     private Map<ConstraintSubType, Constraint> constraints;
+    private Set<Long> validDayTypeIds;
     private TimeType timeType;
     private int order;
-    private int rank;
+    private int activityPrioritySequence;
     private List<Long> expertises;
     private Set<Tag> tags;
     private Long teamId;
@@ -52,6 +52,7 @@ public class Activity {
     private Integer cutOffdayValue;
     private boolean breakAllowed;
     private String methodForCalculatingTime;
+    @Builder.Default
     private Double multiplyWithValue = DEFAULT_VALUE;
     private Long fixedTimeValue;
     private TimeCalaculationType fullDayCalculationType;
@@ -59,14 +60,13 @@ public class Activity {
 
 
 
-    public Activity(BigInteger id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises, Set<Tag> tags) {
+    public Activity(BigInteger id, List<Skill> skills, String name, TimeType timeType, int order, int activityPrioritySequence, List<Long> expertises, Set<Tag> tags) {
         this.id = id;
         this.skills = skills;
-        this.priority = priority;
         this.name = name;
         this.timeType=timeType;
         this.order = order;
-        this.rank=rank;
+        this.activityPrioritySequence = activityPrioritySequence;
         this.expertises = expertises;
         this.tags = tags;
     }
@@ -96,19 +96,6 @@ public class Activity {
         constraints.get(constraintSubType).breakLevelConstraints(scoreHolder,kContext,constraintPenality);
     }
 
-    public void broketaskPriorityConstraints(HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext){
-        switch (priority){
-            case 1:scoreHolder.addSoftConstraintMatch(kContext,-1);
-            break;
-            case 2:scoreHolder.addMediumConstraintMatch(kContext,-1);
-            break;
-            case 3:scoreHolder.addSoftConstraintMatch(kContext,-1);
-            break;
-            default:
-                break;
-        }
-    }
-
     public int skillsSatisFaction(ShiftImp shift) {
         List<Skill> skills = (List<Skill>) CollectionUtils.subtract(this.skills, shift.getEmployee().getSkillSet());
         int weight = skills.stream().mapToInt(s -> s.getWeight()).sum();
@@ -131,7 +118,6 @@ public class Activity {
         return new HashCodeBuilder(17, 37)
                 .append(id)
                 .append(skills)
-                .append(priority)
                 .append(name)
                 .append(constraints)
                 .toHashCode();

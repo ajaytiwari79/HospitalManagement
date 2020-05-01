@@ -2,10 +2,12 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
@@ -188,7 +190,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 count().as(COUNT)
         );
         AggregationResults<Map> result = mongoTemplate.aggregate(aggregation, Shift.class, Map.class);
-        return isCollectionNotEmpty(result.getMappedResults())? ((Integer)result.getMappedResults().get(0).get(COUNT)).longValue():0l;
+        return isCollectionNotEmpty(result.getMappedResults()) ? ((Integer) result.getMappedResults().get(0).get(COUNT)).longValue() : 0L;
     }
 
 
@@ -635,7 +637,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         activityIds.addAll(shift.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         if(isCollectionNotEmpty(shift.getBreakActivities())) {
-            activityIds.addAll(shift.getBreakActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toList()));
+            activityIds.addAll(shift.getBreakActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         }
         return activityIds;
     }
@@ -684,6 +686,170 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 project("_id", MOSTLY_USED_COUNT,"secondLevelTimtype").and("activityPriority.sequence").arrayElementAt(0).as(ACTIVITY_PRIORITY)
         );
         return mongoTemplate.aggregate(aggregation, Shift.class, ActivityWithCompositeDTO.class).getMappedResults();
+    }
+
+    @Override
+    public ShiftPlanningProblemSubmitDTO findDataForAutoPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO){
+        Set<BigInteger> breakActivityIds = shiftPlanningProblemSubmitDTO.getBreakSettingMap().values().stream().map(BreakSettingsDTO::getActivityId).collect(Collectors.toSet());
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("_id").is(shiftPlanningProblemSubmitDTO.getPlanningPeriodId())),
+                getlookupOperationOfShiftsForPlanning(),
+                new CustomAggregationOperation(Document.parse("{$addFields: { activityIds:\"$shifts.activities.activityId\"}}")),
+                getProjectionWithReduceForPlanning(breakActivityIds),
+                getActivitiesLookupForPlanning(),
+                getStaffingLevelLookupForPlanning(),
+                getActivityConfigurationLookupForPlanning(),
+                new CustomAggregationOperation(Document.parse("{ $addFields: { activityConfiguration: { $mergeObjects: \"$activityConfiguration\" } } }")),
+                getProjectionForPlanning()
+
+        );
+        List<ShiftPlanningProblemSubmitDTO> shiftPlanningProblemSubmitDTOS = mongoTemplate.aggregate(aggregation, Shift.class, ShiftPlanningProblemSubmitDTO.class).getMappedResults();
+        if(isCollectionNotEmpty(shiftPlanningProblemSubmitDTOS)){
+            shiftPlanningProblemSubmitDTO.setActivities(shiftPlanningProblemSubmitDTOS.get(0).getActivities());
+            shiftPlanningProblemSubmitDTO.setActivityConfiguration(shiftPlanningProblemSubmitDTOS.get(0).getActivityConfiguration());
+            shiftPlanningProblemSubmitDTO.setPlanningPeriod(shiftPlanningProblemSubmitDTOS.get(0).getPlanningPeriod());
+            shiftPlanningProblemSubmitDTO.setStaffingLevel(shiftPlanningProblemSubmitDTOS.get(0).getStaffingLevel());
+            shiftPlanningProblemSubmitDTO.setShifts(shiftPlanningProblemSubmitDTOS.get(0).getShifts());
+        }
+        return shiftPlanningProblemSubmitDTO;
+    }
+
+    private CustomAggregationOperation getProjectionForPlanning() {
+        return new CustomAggregationOperation(Document.parse("{$project:{\n" +
+                "          \"planningPeriod.startDate\":\"$startDate\",\n" +
+                "          \"planningPeriod.endDate\":\"$endDate\",\n" +
+                "          \"planningPeriod.id\":\"$_id\",\n" +
+                "          \"planningPeriod.unitId\":\"$unitId\",\n" +
+                "          \"planningPeriod.currentPhaseId\":\"$currentPhaseId\",\n" +
+                "          \"shifts\":1,\n" +
+                "          \"activityConfiguration\":1,\n" +
+                "          \"staffingLevel\":1,\n" +
+                "          \"activities\":1\n" +
+                "          }}"));
+    }
+
+    private CustomAggregationOperation getActivityConfigurationLookupForPlanning() {
+        return new CustomAggregationOperation(Document.parse("{\n" +
+                "        $lookup:{\n" +
+                "            \n" +
+                "         from: \"activityConfiguration\",\n" +
+                "            let: { unitId: \"$unitId\",phaseId:\"$currentPhaseId\" },\n" +
+                "         pipeline: [\n" +
+                "              { $match:\n" +
+                "                 { $expr:\n" +
+                "                    { $or:\n" +
+                "                       [\n" +
+                "                         {$eq:[\"$presencePlannedTime.phaseId\",\"$$phaseId\"]},\n" +
+                "                         {$eq:[\"$absencePlannedTime.phaseId\",\"$$phaseId\"]},\n" +
+                "                         {$eq:[\"$nonWorkingPlannedTime.phaseId\",\"$$phaseId\"]}\n" +
+                "                        \n" +
+                "                       ]\n" +
+                "                    }\n" +
+                "                 }\n" +
+                "              },{\n" +
+                "                  $project:{\n" +
+                "                      \"presencePlannedTime\":1,\n" +
+                "                      \"absencePlannedTime\":1,\n" +
+                "                      \"nonWorkingPlannedTime\":1,\n" +
+                "                      \"_id\":0\n" +
+                "                      \n" +
+                "                      }\n" +
+                "                  }\n" +
+                "           ],\n" +
+                "            as: \"activityConfiguration\"\n" +
+                "            }\n" +
+                "        }"));
+    }
+
+    private CustomAggregationOperation getStaffingLevelLookupForPlanning() {
+        return new CustomAggregationOperation(Document.parse("{\n" +
+                "        $lookup:{\n" +
+                "            \n" +
+                "         from: \"staffing_level\",\n" +
+                "            let: { startDate: \"$startDate\", endDate: \"$endDate\",unitId: \"$unitId\" },\n" +
+                "         pipeline: [\n" +
+                "              { $match:\n" +
+                "                 { $expr:\n" +
+                "                    { $and:\n" +
+                "                       [\n" +
+                "                         { $gte: [ \"$currentDate\",  \"$$startDate\" ] },\n" +
+                "                         { $lte: [ \"$currentDate\", \"$$endDate\" ] },\n" +
+                "                         {$eq:[\"$unitId\",\"$$unitId\"]}\n" +
+                "                       ]\n" +
+                "                    }\n" +
+                "                 }\n" +
+                "              }\n" +
+                "           ],\n" +
+                "            as: \"staffingLevel\"\n" +
+                "            }\n" +
+                "        }"));
+    }
+
+    private CustomAggregationOperation getActivitiesLookupForPlanning() {
+        return new CustomAggregationOperation(Document.parse("{\n" +
+                "        $lookup:{\n" +
+                "            \n" +
+                "         from: \"activities\",\n" +
+                "            let: { activityIds: \"$activityIds\",unitId:\"$unitId\" },\n" +
+                "         pipeline: [\n" +
+                "              { $match:{ $expr:\n" +
+                "                    { $and:\n" +
+                "                       [\n" +
+                "                         { $in: [ \"$_id\",  \"$$activityIds\" ] },\n" +
+                "                         \n" +
+                "                       ]\n" +
+                "                    }\n" +
+                "                 }\n" +
+                "           \n" +
+                "              },{\n" +
+                "                  \"$project\":{\"balanceSettingsActivityTab\":1,\"rulesActivityTab\":1,\"timeCalculationActivityTab\":1,\"skillActivityTab\":1,\"tags\":1,\"employmentTypes\":1}\n" +
+                "                  }\n" +
+                "           ],\n" +
+                "            as: \"activities\"\n" +
+                "            }\n" +
+                "        }"));
+    }
+
+    private CustomAggregationOperation getProjectionWithReduceForPlanning(Set<BigInteger> breakActivityIds) {
+        return new CustomAggregationOperation(Document.parse("{\n" +
+                "      $project: {\n" +
+                "          \"startDate\":1,\n" +
+                "          \"endDate\":1,\n" +
+                "          \"unitId\":1,\n" +
+                "          \"currentPhaseId\":1,\n" +
+                "          \"shifts\":1,\n" +
+                "        \"activityIds\": {\n" +
+                "          $reduce: {\n" +
+                "            input: \"$activityIds\",\n" +
+                "            initialValue:"+breakActivityIds.toString()+
+                "            in: { $concatArrays: [ \"$$value\", \"$$this\" ] }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }"));
+    }
+
+    private CustomAggregationOperation getlookupOperationOfShiftsForPlanning() {
+        return new CustomAggregationOperation(Document.parse("{\n" +
+                "        $lookup:{\n" +
+                "         from: \"shifts\",\n" +
+                "            let: { startDate: \"$startDate\", endDate: \"$endDate\",unitId: \"$unitId\" },\n" +
+                "         pipeline: [\n" +
+                "              { $match:\n" +
+                "                 { $expr:\n" +
+                "                    { $and:\n" +
+                "                       [\n" +
+                "                         { $gte: [ \"$startDate\",  \"$$startDate\" ] },\n" +
+                "                         { $lte: [ \"$endDate\", \"$$endDate\" ] },\n" +
+                "                         {$eq:[\"$unitId\",\"$$unitId\"]}\n" +
+                "                       ]\n" +
+                "                    }\n" +
+                "                 }\n" +
+                "              }\n" +
+                "           ],\n" +
+                "            as: \"shifts\"\n" +
+                "            }\n" +
+                "        }"));
     }
 
 }

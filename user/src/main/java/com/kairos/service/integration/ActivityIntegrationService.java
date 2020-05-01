@@ -16,6 +16,7 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -34,10 +35,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
@@ -222,7 +220,13 @@ public class ActivityIntegrationService {
         param.add(employementPublished);
         param.add(saveAsDrafts);
         return genericRestClient.publishRequest(wtadto, unitId, true, IntegrationOperation.UPDATE, "/wta", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>>(){});
+    }
 
+    public ShiftPlanningProblemSubmitDTO getNightWorkerDetails(List<Long> staffIds, Set<Long> expertiseIds){
+        Map<String,Collection<Long>> requestBody = new HashMap<>();
+        requestBody.put("staffIds",staffIds);
+        requestBody.put("expertiseIds",expertiseIds);
+        return genericRestClient.publishRequest(requestBody, null, false, IntegrationOperation.GET, "/get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftPlanningProblemSubmitDTO>>(){});
     }
 }
 

@@ -8,11 +8,9 @@ import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.WTABaseRuleTemplate;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.kie.api.runtime.rule.RuleContext;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 import org.slf4j.Logger;
@@ -29,6 +27,8 @@ import java.util.Set;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @XStreamAlias("Employee")
 public class Employee {
@@ -36,14 +36,12 @@ public class Employee {
     private Long id;
     private BigDecimal baseCost;
     private Map<java.time.LocalDate,List<CTARuleTemplate>> localDateCTARuletemplateMap;
-    private Location location;
     private String name;
     private Set<Skill> skillSet;
     private PaidOutFrequencyEnum paidOutFrequencyEnum;
     private SeniorAndChildCareDays seniorAndChildCareDays;
     private List<StaffChildDetail> staffChildDetails;
     private Set<Tag> tags;
-    private Map<BigInteger,ShiftImp> actualShiftsMap;
     private Set<Team> teams;
     private boolean nightWorker;
     private Employment employment;
@@ -51,14 +49,14 @@ public class Employee {
     private Unit unit;
     private Map<LocalDate,Map<ConstraintSubType, WTABaseRuleTemplate>> wtaRuleTemplateMap;
     private BreakSettings breakSettings;
+    @Builder.Default
     private Map<LocalDate,BigDecimal> functionalBonus = new HashMap<>();
 
-    public Employee(Long id, String name, Set<Skill> skillSet, PaidOutFrequencyEnum paidOutFrequencyEnum) {
+    public Employee(Long id, String name, Set<Skill> skillSet) {
         super();
         this.id = id;
         this.name = name;
         this.skillSet = skillSet;
-        this.paidOutFrequencyEnum=paidOutFrequencyEnum;
 
     }
 
@@ -85,13 +83,13 @@ public class Employee {
         Employee employee = (Employee) o;
 
         return new EqualsBuilder()
-                .append(id, employee.id)
+                .append(this.id, employee.id).append(this.employment.getId(),employee.getEmployment().getId())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return new HashCodeBuilder().append(id.hashCode()).append(this.getEmployment().getId()).hashCode();
     }
 
 }

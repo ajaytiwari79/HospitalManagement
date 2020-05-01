@@ -3,21 +3,21 @@ package com.kairos.persistence.model.staff.personal_details;
 import com.kairos.commons.annotation.PermissionClass;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
-import com.kairos.dto.user.staff.EmploymentDTO;
+import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -30,9 +30,11 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
  */
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @PermissionClass(name = "Staff")
-public class StaffPersonalDetail {
+public class StaffDTO {
 
     private Long id;
     @NotBlank(message = "error.Staff.firstname.notnull")
@@ -84,10 +86,13 @@ public class StaffPersonalDetail {
     private Long staffUserId;
     private Long externalId;
     private Set<AccessGroupRole> roles;
-    private List<EmploymentDTO> employments;
+    @Builder.Default
+    private List<EmploymentDTO> employments = new ArrayList<>();
     private String privateEmail;
+    private boolean nightWorker;
+    private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
 
-    public StaffPersonalDetail(Long id, List<SkillLevelDTO> skills) {
+    public StaffDTO(Long id, List<SkillLevelDTO> skills) {
         this.id = id;
         this.skills = skills;
     }
@@ -103,7 +108,7 @@ public class StaffPersonalDetail {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StaffPersonalDetail that = (StaffPersonalDetail) o;
+        StaffDTO that = (StaffDTO) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(firstName, that.firstName) &&
                 Objects.equals(contactDetail, that.contactDetail) &&

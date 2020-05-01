@@ -115,7 +115,7 @@ public class ShiftPlanningUtility {
 
     public static int getValueByPhaseAndCounter(Unit unit, List<PhaseTemplateValue> phaseTemplateValues) {
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-            if (unit.getPhase().getId().equals(phaseTemplateValue.getPhaseId())) {
+            if (unit.getPlanningPeriod().getId().equals(phaseTemplateValue.getPhaseId())) {
                 return (int)phaseTemplateValue.getManagementValue();
             }
         }

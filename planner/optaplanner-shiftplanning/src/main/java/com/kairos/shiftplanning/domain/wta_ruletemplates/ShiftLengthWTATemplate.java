@@ -57,7 +57,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps) {
         int penality = 0;
-        if (!isDisabled() && isValidForPhase(unit.getPhase().getId(), this.phaseTemplateValues)) {
+        if (!isDisabled() && isValidForPhase(unit.getPlanningPeriod().getPhase().getId(), this.phaseTemplateValues)) {
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, unit.getTimeSlotMap(), shiftImp);
             if (isNull(timeInterval)) {
                 boolean isValidShift = isCollectionEmpty(timeTypeIds) || CollectionUtils.containsAny(timeTypeIds, shiftImp.getActivitiesTimeTypeIds());

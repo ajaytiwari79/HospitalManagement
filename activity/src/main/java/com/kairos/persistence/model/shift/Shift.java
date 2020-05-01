@@ -36,6 +36,8 @@ public class Shift extends MongoBaseEntity {
 
     protected Date startDate;
     protected Date endDate;
+    protected Integer shiftStartTime;
+    protected Integer shiftEndTime;
     protected boolean disabled = false;
     @NotNull(message = "error.ShiftDTO.staffId.notnull")
     protected Long staffId;
@@ -70,6 +72,7 @@ public class Shift extends MongoBaseEntity {
     protected List<ShiftActivity> breakActivities;
     protected AccessGroupRole accessGroupRole;
     protected LocalDate validated;
+    private ShiftViolatedRules shiftViolatedRules;
 
     public Shift() {
         //Default Constructor
@@ -81,6 +84,8 @@ public class Shift extends MongoBaseEntity {
         this.endDate = endDate;
         this.employmentId = employmentId;
         this.activities = shiftActivities;
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
     }
 
     // This is used in absance shift
@@ -93,6 +98,8 @@ public class Shift extends MongoBaseEntity {
         this.unitId = unitId;
         this.phaseId = phaseId;
         this.planningPeriodId = planningPeriodId;
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
 
     }
 
@@ -113,6 +120,8 @@ public class Shift extends MongoBaseEntity {
         this.planningPeriodId = planningPeriodId;
         this.staffUserId = staffUserId;
         this.shiftType = shiftType;
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
     }
 
     public void setBreakActivities(List<ShiftActivity> breakActivities) {
@@ -232,10 +241,12 @@ public class Shift extends MongoBaseEntity {
 
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
     }
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
     }
 
 
@@ -250,15 +261,24 @@ public class Shift extends MongoBaseEntity {
     @JsonIgnore
     public boolean isActivityMatch(BigInteger activityId,boolean includeDraftShift){
         boolean activityMatch;
-        if(!includeDraftShift && this.draft){
+        if (!includeDraftShift && this.draft) {
             activityMatch = false;
-        }else {
+        } else {
             activityMatch = this.getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getActivityId().equals(activityId));
             if (!activityMatch && includeDraftShift) {
                 activityMatch = isNotNull(this.getDraftShift()) ? this.getDraftShift().getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getActivityId().equals(activityId)) : false;
             }
         }
         return activityMatch;
+    }
+
+    public void updateShiftTimeValues() {
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
+    }
+
+    private Integer timeInSeconds(Date date) {
+        return ((date.getHours() * 60 * 60) + (date.getMinutes() * 60));
     }
 
     @Override

@@ -46,7 +46,7 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
         ShiftRequestPhasePlanningSolution solution = scoreDirector.getWorkingSolution();
         List<List<ActivityLineIntervalWrapper>> possibleActivityLineIntervalWrappersList= new ArrayList<>();
         LocalDate date=solution.getWeekDates().get(workingRandom.nextInt(solution.getWeekDates().size()));
-        List<ShiftImp> shifts= solution.getShifts().stream().filter(s->s.getDate().equals(date)).collect(Collectors.toList());
+        List<ShiftImp> shifts= solution.getShifts().stream().filter(s->s.getStartDate().equals(date)).collect(Collectors.toList());
         Map<String,List<ActivityLineInterval>> groupedAlis= solution.getActivitiesIntervalsGroupedPerDay();
         List<List<ActivityLineInterval>> activityLineIntervalsPerDay= new ArrayList<>();
         for(Activity activity :solution.getActivitiesPerDay().get(date)){

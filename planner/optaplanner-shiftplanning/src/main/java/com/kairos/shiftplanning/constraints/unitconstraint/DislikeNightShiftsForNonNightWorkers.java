@@ -33,6 +33,7 @@ public class DislikeNightShiftsForNonNightWorkers implements Constraint {
     @Override
     public int checkConstraints(Activity activity, ShiftImp shift) {
         int penality = 0;
+        this.nightTimeSlot = shift.getEmployee().getUnit().getTimeSlotMap().get("Night");
         if(shift.getEmployee().isNightWorker() && shiftTimeContainsInNightInterval(shift.getStart())){
             penality = 1;
         }

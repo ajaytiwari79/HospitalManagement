@@ -15,6 +15,8 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Employment {
+
+    private Long id;
     private Expertise expertise;
     private LocalDate startDate;
     private LocalDate endDate;
