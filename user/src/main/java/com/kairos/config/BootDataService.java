@@ -364,8 +364,7 @@ public class BootDataService {
             skillGraphRepository.save(skill);
             skillList.add(skill.getId());
         }
-        SkillCategory homeSkillCategory = new SkillCategory("Home Skills");
-        homeSkillCategory.setCountry(denmark);
+        SkillCategory homeSkillCategory = new SkillCategory(denmark,"Home Skills");
         String[] homeSkills = new String[]{"Home Cleaning", "Dish Washing", "Cooking food"};
         for (String homeSkill : homeSkills) {
             skill = new Skill(homeSkill, homeSkillCategory);

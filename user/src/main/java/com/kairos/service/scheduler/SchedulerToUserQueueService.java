@@ -27,29 +27,23 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerToUserQueueService.class);
 
     public void execute(KairosSchedulerExecutorDTO job) {
-        LOGGER.info("Job type----------------->{}",job.getJobSubType());
+        LOGGER.info("Job type----------------->{} with id {}",job.getJobSubType(),job.getId());
         switch(job.getJobSubType()) {
             case INTEGRATION:
-                LOGGER.info("Integration----------------->{}",job.getId());
                 integrationJobService.runJob(job);
                 break;
             case POSITION_END:
-                LOGGER.info("End Position----------------->{}",job.getId());
                 positionService.endPositionProcess();
                 break;
             case QUESTIONAIRE_NIGHTWORKER:
-                LOGGER.info("Questionaire nightworker----------------->{}",job.getId());
                 break;
             case SENIORITY_LEVEL:
-                LOGGER.info("Update Seniority Level----------------->{}",job.getId());
                 employmentJobService.updateSeniorityLevelOnJobTrigger(job.getId(),job.getUnitId());
                 break;
             case NIGHT_WORKER:
-                LOGGER.info("Update Night Workers----------------->{}",job.getId());
                 employmentJobService.updateNightWorkers();
                 break;
             case ADD_WEATHER_INFO:
-                LOGGER.info("Save Weather Info Of All Unit----------------->{}",job.getId());
                 weatherService.saveWeatherInfoOfAllUnit();
                 break;
             default:
