@@ -39,6 +39,11 @@ public class SkillCategory extends UserBaseEntity {
         this.name = name;
     }
 
+    public SkillCategory(Country country, @NotBlank(message = "error.SkillCategory.name.notEmpty") String name) {
+        this.country = country;
+        this.name = name;
+    }
+
     public Map<String,Object> retieveDetails() {
         Map<String,Object> objectMap = new HashMap<>();
         objectMap.put("id",this.id);
