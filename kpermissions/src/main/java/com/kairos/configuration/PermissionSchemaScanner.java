@@ -96,18 +96,20 @@ public class PermissionSchemaScanner {
                         for (Type fieldArgType : fieldArgTypes) {
                             Class fieldArgClass = (Class) fieldArgType;
                             subModelMetaData.put(MODEL_CLASS, fieldArgClass.toString());
+                            subModelMetaData.put(MODEL_NAME, fieldArgClass.getSimpleName());
                             getFieldsOFModelAndSubModel(fieldArgClass.getDeclaredFields(), subModelFields);
                         }
                     } else {
                         subModelMetaData.put(MODEL_CLASS, permissionField.getType().toString());
+                        subModelMetaData.put(MODEL_NAME, permissionField.getType().getSimpleName());
                         getFieldsOFModelAndSubModel(permissionField.getType().getDeclaredFields(), subModelFields);
                     }
                     if (isCollectionNotEmpty(subModelFields)) {
                         subModelMetaData.put(MODEL_NAME, permissionField.getName());
                         subModelMetaData.put(FIELDS, subModelFields);
                         subModelMetaData.put(IS_PERMISSION_SUB_MODEL, true);
-                        subModelData.add(subModelMetaData);
                     }
+                    subModelData.add(subModelMetaData);
                 });
         return subModelData;
     }

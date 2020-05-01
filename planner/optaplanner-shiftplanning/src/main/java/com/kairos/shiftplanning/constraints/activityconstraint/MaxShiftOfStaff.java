@@ -1,11 +1,10 @@
 package com.kairos.shiftplanning.constraints.activityconstraint;
 
+import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanning.constraints.Constraint;
-import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.activity.Activity;
-import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
-import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 public class MaxShiftOfStaff implements Constraint {
 
     private int maxAllocationPerShift;

@@ -20,7 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.CommonConstants.DAYS;
+import static com.kairos.constants.CommonConstants.CAMELCASE_DAYS;
 import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
@@ -80,7 +80,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     public ZonedDateTime getNextDateOfInterval(ZonedDateTime dateTime){
         ZonedDateTime zonedDateTime = null;
         switch (intervalUnit){
-            case DAYS:dateTime.plusDays(intervalLength);
+            case CAMELCASE_DAYS:dateTime.plusDays(intervalLength);
                 break;
             case WEEKS:dateTime.plusWeeks(intervalLength);
                 break;

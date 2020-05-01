@@ -9,17 +9,18 @@ import org.joda.time.DateTime;
 import org.optaplanner.core.impl.heuristic.move.AbstractMove;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 public class ShiftBreakChangeMove extends AbstractMove<BreaksIndirectAndActivityPlanningSolution> {
     private ShiftBreak shiftBreak;
-    private DateTime breakTime;
+    private ZonedDateTime breakTime;
     private List<ActivityLineInterval> activityLineIntervals;
     private ShiftImp shift;
 
-    public ShiftBreakChangeMove(ShiftBreak shiftBreak, DateTime breakTime, List<ActivityLineInterval> activityLineIntervals, ShiftImp shift) {
+    public ShiftBreakChangeMove(ShiftBreak shiftBreak, ZonedDateTime breakTime, List<ActivityLineInterval> activityLineIntervals, ShiftImp shift) {
         this.shiftBreak = shiftBreak;
         this.breakTime = breakTime;
         this.activityLineIntervals = activityLineIntervals;
@@ -53,6 +54,6 @@ public class ShiftBreakChangeMove extends AbstractMove<BreaksIndirectAndActivity
 
     @Override
     public String toString() {
-        return "Shift:"+shiftBreak.getShift().getDate()+"["+shiftBreak.getDuration()+"]"+"{"+shiftBreak.getStartTime()+"}"+"->{"+breakTime+"}";
+        return "Shift:"+shiftBreak.getShift().getStartDate()+"["+shiftBreak.getDuration()+"]"+"{"+shiftBreak.getStartTime()+"}"+"->{"+breakTime+"}";
     }
 }

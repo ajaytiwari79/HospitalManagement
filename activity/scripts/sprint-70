@@ -25,7 +25,6 @@ count: { "$gt": 1 }
 ],
 {allowDiskUse: true}
 ).forEach(function(doc) {
-doc.dups.shift();
 var valid = false;
 doc.dups.forEach( function(dupId){
 if(valid){
@@ -36,4 +35,4 @@ valid = true;
 }
 }
 )
-})
+});

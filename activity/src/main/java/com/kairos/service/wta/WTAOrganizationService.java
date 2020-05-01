@@ -86,7 +86,13 @@ public class WTAOrganizationService extends MongoBaseService {
 
 
     public WTAResponseDTO updateWtaOfOrganization(Long unitId, BigInteger wtaId, WTADTO updateDTO) {
-        if (updateDTO.getStartDate().isBefore(LocalDate.now())) {
+        WorkingTimeAgreement oldWta = workingTimeAgreementMongoRepository.findOne(wtaId);
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
+        if (isCollectionNotEmpty(updateDTO.getRuleTemplates())) {
+            wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(updateDTO.getRuleTemplates(), false);
+        }
+        boolean isValueChanged =workTimeAgreementService.isCalCulatedValueChangedForWTA(oldWta,wtaBaseRuleTemplates);
+        if ((isValueChanged && updateDTO.getStartDate().isBefore(LocalDate.now()))) {
             exceptionService.actionNotPermittedException(MESSAGE_WTA_START_ENDDATE);
         }
         WorkingTimeAgreement agreement = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
@@ -94,7 +100,7 @@ public class WTAOrganizationService extends MongoBaseService {
             LOGGER.info("Duplicate WTA name in organization {}", wtaId);
             exceptionService.duplicateDataException(MESSAGE_WTA_NAME_ALREADYEXISTS, updateDTO.getName());
         }
-        WorkingTimeAgreement oldWta = workingTimeAgreementMongoRepository.findOne(wtaId);
+
         if (!Optional.ofNullable(oldWta).isPresent()) {
             LOGGER.info("wta not found while updating at unit {}", wtaId);
             exceptionService.dataNotFoundByIdException(MESSAGE_WTA_ID, wtaId);
@@ -177,7 +183,7 @@ public class WTAOrganizationService extends MongoBaseService {
             });
             wtaQueryResultDTOS=wtaQueryResultMap.values().stream().collect(Collectors.toList());
         }
-        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getDefaultCTAOfExpertiseAndDate(unitId, expertiseId, selectedDate);
         return new CTAWTAAndAccumulatedTimebankWrapper(ctaResponseDTOS, wtaResponseDTOS);
     }

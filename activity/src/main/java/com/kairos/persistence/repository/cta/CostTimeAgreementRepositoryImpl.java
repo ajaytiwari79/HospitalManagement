@@ -103,20 +103,20 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     @Override
     public List<CTAResponseDTO> getDefaultCTAOfExpertiseAndDate(Long unitId, Long expertiseId,LocalDate selectedDate) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and("expertise._id").is(expertiseId).and(DELETED).is(false).and(EMPLOYMENT_ID).exists(false).orOperator(Criteria.where(START_DATE).lte(selectedDate).and(END_DATE).gte(selectedDate), Criteria.where(END_DATE).exists(false).and(START_DATE).lte(selectedDate)));
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
 
     @Override
     public List<CTAResponseDTO> getDefaultCTA(Long unitId, Long expertiseId) {
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and("expertise._id").is(expertiseId).and(DELETED).is(false).and(EMPLOYMENT_ID).exists(false));
         query.fields().include("name").include(DESCRIPTION).include(EMPLOYMENT_ID).include(START_DATE).include(END_DATE).include(PARENT_ID).include(ORGANIZATION_PARENT_ID);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query, CostTimeAgreement.class), CTAResponseDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, CostTimeAgreement.class), CTAResponseDTO.class);
     }
 
     @Override
     public List<CTAResponseDTO> getCTAByUpIds(Set<Long> employmentIds) {
         Query query = new Query(Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds));
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
 
 
@@ -133,7 +133,8 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Override
     public CTAResponseDTO getCTAByEmploymentIdAndDate(Long employmentId, Date date) {
-        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).orOperator(Criteria.where(START_DATE).lte(date).and(END_DATE).gte(date),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(date));
+        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId)
+                .orOperator(Criteria.where(START_DATE).lte(date).and(END_DATE).gte(date),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(date));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("tag", "tags", "_id", "tags"),

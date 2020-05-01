@@ -2,8 +2,6 @@ package com.kairos.config.neo4j;
 
 import com.kairos.config.env.EnvConfig;
 import org.neo4j.ogm.session.SessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
@@ -28,9 +26,6 @@ import static com.kairos.constants.Neo4jConstant.*;
 @EnableNeo4jAuditing
 public class Neo4jConfig  implements EnvironmentAware {
 
-    private final Logger logger = LoggerFactory.getLogger(Neo4jConfig.class);
-
-
     @Inject
     private Environment environment;
 
@@ -41,7 +36,7 @@ public class Neo4jConfig  implements EnvironmentAware {
     }
 
     @Bean
-    public Neo4jTransactionManager transactionManager() throws Exception {
+    public Neo4jTransactionManager transactionManager() {
         return new Neo4jTransactionManager(sessionFactory());
     }
 

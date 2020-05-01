@@ -12,6 +12,7 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.FormatUtil;
 import org.apache.poi.ss.usermodel.Cell;
@@ -25,10 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_ZIPCODE_NOTFOUND;
 
 /**
  * Created by prabjot on 12/12/16.
@@ -42,7 +44,8 @@ public class RegionService {
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
-
+    @Inject
+    private CountryService countryService;
 
     @Inject
     private MunicipalityGraphRepository municipalityGraphRepository;
@@ -162,62 +165,17 @@ public class RegionService {
     }
 
     public Object batchProcessGeographyExcelSheet(MultipartFile multipartFile, Long countryId) {
-        long startTime = System.currentTimeMillis();
-        Country country = countryGraphRepository.findOne(countryId);
-        List<Region> response = new ArrayList<>();
-        if (country==null){
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
-
-        }
-
         try {
-
-            // Prepare Sheet Stream
-            InputStream inputStream = multipartFile.getInputStream();
-            if (inputStream==null){
-                logger.info("Steam is null");
-                return null;
-            }
-            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-            XSSFSheet sheet = workbook.getSheetAt(0);
-            Iterator<Row> rowIterator = sheet.iterator();
-
-            if(!rowIterator.hasNext()){
-                exceptionService.internalServerError(ERROR_XSSFSHEET_NOMOREROW,1);
-
-            }
-
-            Region region;
-            Province province;
-            Municipality municipality;
-            ZipCode zipCode;
-
+            Iterator<Row> rowIterator = getRowIterator(multipartFile);
             Hashtable<String,ZipCode> zipCodeHashtable = new Hashtable<>();
             Hashtable<String,Municipality> municipalityHashtable = new Hashtable<>();
             Hashtable<String,Region> regionHashtable = new Hashtable<>();
             Hashtable<String,Province> provinceHashtable = new Hashtable<>();
-
-
-
-            int regionCount=0;
-            int provinceCount= 0;
-            int municipalityCount= 0;
-            int cityCount = 0;
-            int zipCodeCount = 0;
-
+            int regionCount=0, provinceCount= 0,municipalityCount= 0,cityCount = 0,zipCodeCount = 0;
             while (rowIterator.hasNext()) {
-
                 Row row = rowIterator.next();
-                if (row.getCell(0) == null || row.getCell(0).toString().isEmpty()) {
-                    logger.info("No more rows");
-                    return response;
-                }
-                if (row.getRowNum() <= 1) {
-                    logger.info("Header Row found");
-                    continue;
-                }
-
-                // Initialize Cells
+                if (validateEmptyRow(row)) return Collections.emptyList();
+                if (row.getRowNum() <= 1) continue;
                 Cell provinceCell = row.getCell(6);
                 Cell regionCodeCell = row.getCell(0);
                 Cell regionNameCell = row.getCell(1);
@@ -225,179 +183,127 @@ public class RegionService {
                 Cell municipalityNameCell = row.getCell(3);
                 Cell cityNameCell = row.getCell(5);
                 Cell zipCodeCell = row.getCell(4);
-
-
-                // Set Cell type
-                provinceCell.setCellType(Cell.CELL_TYPE_STRING);
-                regionCodeCell.setCellType(Cell.CELL_TYPE_STRING);
-                regionNameCell.setCellType(Cell.CELL_TYPE_STRING);
-                municipalityCodeCell.setCellType(Cell.CELL_TYPE_STRING);
-                municipalityNameCell.setCellType(Cell.CELL_TYPE_STRING);
-                cityNameCell.setCellType(Cell.CELL_TYPE_STRING);
-                zipCodeCell.setCellType(Cell.CELL_TYPE_STRING);
-
-
-                if(!regionHashtable.containsKey(regionCodeCell.getStringCellValue())){
-                    region = regionGraphRepository.findByCode(regionCodeCell.getStringCellValue().trim());
-                    if(region == null){
-                        region = new Region();
-                        region.setCountry(country);
-                        region.setName(regionNameCell.getStringCellValue().trim());
-                        region.setCode(regionCodeCell.getStringCellValue());
-                        regionGraphRepository.save(region);
-                        regionCount++;
-                    }
-                    regionHashtable.put(regionCodeCell.getStringCellValue(),region);
-                }
-
-                if(!provinceHashtable.containsKey(provinceCell.getStringCellValue())){
-                    province = provinceGraphRepository.findByName(provinceCell.getStringCellValue().trim());
-                    if(province == null){
-                        province = new Province();
-                        province.setName(provinceCell.getStringCellValue().trim());
-                        provinceCount++;
-                    }
-                    province.setRegion(regionHashtable.get(regionCodeCell.getStringCellValue()));
-                    provinceGraphRepository.save(province);
-                    provinceHashtable.put(provinceCell.getStringCellValue(),province);
-                }
-
-
-                if(!municipalityHashtable.containsKey(municipalityCodeCell.getStringCellValue())){
-                    municipality = municipalityGraphRepository.findByCode(municipalityCodeCell.getStringCellValue().trim());
-                    if(municipality == null){
-                        municipality = new Municipality();
-                        municipality.setName(municipalityNameCell.getStringCellValue().trim());
-                        municipality.setCode(municipalityCodeCell.getStringCellValue());
-                    }
-                    municipality.setProvince(provinceHashtable.get(provinceCell.getStringCellValue()));
-                    municipalityGraphRepository.save(municipality);
-                    municipalityHashtable.put(municipalityCodeCell.getStringCellValue(),municipality);
-                    municipalityCount++;
-                }
-
-                if(!zipCodeHashtable.containsKey(zipCodeCell.getStringCellValue())){
-                    zipCode = zipCodeGraphRepository.findByZipCode(Integer.valueOf(zipCodeCell.getStringCellValue().trim()));
-                    if(zipCode == null){
-                        zipCode = new ZipCode();
-                        zipCode.setZipCode(Integer.parseInt(zipCodeCell.getStringCellValue()));
-                        zipCode.setName(cityNameCell.getStringCellValue().trim());
-                        zipCodeCount++;
-                    }
-                    List<Municipality> municipalities = zipCode.getMunicipalities();
-                    municipalities.add(municipalityHashtable.get(municipalityCodeCell.getStringCellValue()));
-                    zipCode.setMunicipalities(municipalities);
-                    zipCodeGraphRepository.save(zipCode);
-                    zipCodeHashtable.put(zipCodeCell.getStringCellValue(),zipCode);
-                } else {
-                    zipCode = zipCodeHashtable.get(zipCodeCell.getStringCellValue());
-                    List<Municipality> municipalities = zipCode.getMunicipalities();
-                    municipalities.add(municipalityHashtable.get(municipalityCodeCell.getStringCellValue()));
-                    zipCode.setMunicipalities(municipalities);
-                    zipCodeGraphRepository.save(zipCode);
-                }
-
-
-
-
-
-
-                /*if (!regionLastCode.contains(regionCodeCell.getStringCellValue())) {
-                    region = regionGraphRepository.findByCode(regionCodeCell.getStringCellValue());
-                    if (region == null) {
-                        logger.info("Unique Region found: " + regionCodeCell.getStringCellValue());
-                        region = new Region();
-                        region.setCountry(country);
-                        region.setName(regionNameCell.getStringCellValue().trim());
-                        region.setCode(regionCodeCell.getStringCellValue());
-                        regionLastCode.add(regionCodeCell.getStringCellValue());
-                        regionGraphRepository.save(region);
-                        regionCount++;
-                    } else {
-                        logger.info("Existing Region found: " + regionCodeCell.getStringCellValue());
-                    }
-                }
-
-                if (!provinceLastValue.contains(provinceCell.getStringCellValue())) {
-                    province = provinceGraphRepository.findByName(provinceCell.getStringCellValue());
-                    if (province != null) {
-                        logger.info("Existing Province found: " + provinceCell.getStringCellValue());
-
-                        province.setRegion(region);
-                    } else {
-                        logger.info("Unique Province found: " + provinceCell.getStringCellValue());
-                        province = new Province();
-                        province.setName(provinceCell.getStringCellValue().trim());
-                        provinceLastValue.add(provinceCell.getStringCellValue());
-                        province.setRegion(region);
-                        provinceGraphRepository.save(province);
-                        provinceCount++;
-
-                    }
-                }
-
-                if (!municipalityLastCode.contains(municipalityCodeCell.getStringCellValue())) {
-                    municipality = municipalityGraphRepository.findByCode(municipalityCodeCell.getStringCellValue());
-
-                    if (municipality != null) {
-                        logger.info("Existing Municipality found: " + zipCodeCell.getStringCellValue());
-
-                        municipality.setProvince(province);
-                    } else {
-                        logger.info("Unique Municipality found: " + municipalityCodeCell.getStringCellValue());
-                        province = provinceGraphRepository.findByName(provinceCell.getStringCellValue());
-                        municipality = new Municipality();
-                        municipality.setName(municipalityNameCell.getStringCellValue().trim());
-                        municipality.setCode(municipalityCodeCell.getStringCellValue());
-
-                        municipalityLastCode.add(municipalityCodeCell.getStringCellValue());
-                        municipality.setProvince(province);
-                        municipalityGraphRepository.save(municipality);
-                        municipalityCount++;
-                    }
-
-
-                }
-
-                if (!zipCodeLastValue.contains(zipCodeCell.getStringCellValue())) {
-                    logger.info("Unique ZipCode found: " + zipCodeCell.getStringCellValue());
-                    municipality = municipalityGraphRepository.findByCode(municipalityCodeCell.getStringCellValue());
-                    zipCode = new ZipCode();
-                    zipCode.setZipCode(Integer.parseInt(zipCodeCell.getStringCellValue()));
-                    zipCode.setName(cityNameCell.getStringCellValue().trim());
-                    zipCodeLastValue.add(zipCodeCell.getStringCellValue());
-                    zipCode.setMunicipality(municipality);
-                    zipCodeGraphRepository.save(zipCode);
-
-                    zipCodeCount++;
-                } else {
-                    zipCode = zipCodeGraphRepository.findByZipCode(Integer.parseInt(zipCodeCell.getStringCellValue()));
-                    if (zipCode != null) {
-                        logger.info("Existing ZipCode found: " + zipCodeCell.getStringCellValue());
-                        zipCode.setMunicipality(municipality);
-                    }
-                    zipCode.setMunicipality(municipality);
-                }*/
+                setCellType(provinceCell, regionCodeCell, regionNameCell, municipalityCodeCell, municipalityNameCell, cityNameCell, zipCodeCell);
+                regionCount = setRegionDetails(countryId, regionHashtable, regionCount, regionCodeCell, regionNameCell);
+                provinceCount = setProvinceDetails(regionHashtable, provinceHashtable, provinceCount, provinceCell, regionCodeCell);
+                municipalityCount = setMunicipalityDetails(municipalityHashtable, provinceHashtable, municipalityCount, provinceCell, municipalityCodeCell, municipalityNameCell);
+                zipCodeCount = setZipDetails(zipCodeHashtable, municipalityHashtable, zipCodeCount, municipalityCodeCell, cityNameCell, zipCodeCell);
             }
-
-            logger.info("--------------------------------");
-            logger.info("No. of Province: "+provinceCount);
-            logger.info("No. of Region: "+regionCount);
-            logger.info("No. of Municipality: "+municipalityCount);
-            logger.info("No. of City: "+cityCount);
-            logger.info("No. of ZipCode: "+zipCodeCount);
-
-            long endTime = System.currentTimeMillis();
-            logger.info("total time taken by sheet processing logic--->" + (endTime-startTime) + " ms");
-
-
         }
-        catch (Exception e){
-            logger.info("Exception: "+e.toString());
-            e.printStackTrace();
-        }
-
+        catch (Exception ignored){ }
         return FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId));
+    }
+
+    private boolean validateEmptyRow(Row row) {
+        if (row.getCell(0) == null || row.getCell(0).toString().isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    private Iterator<Row> getRowIterator(MultipartFile multipartFile) throws IOException {
+        // Prepare Sheet Stream
+        InputStream inputStream = multipartFile.getInputStream();
+        XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+        XSSFSheet sheet = workbook.getSheetAt(0);
+        return sheet.iterator();
+    }
+
+    private void setCellType(Cell provinceCell, Cell regionCodeCell, Cell regionNameCell, Cell municipalityCodeCell, Cell municipalityNameCell, Cell cityNameCell, Cell zipCodeCell) {
+        provinceCell.setCellType(Cell.CELL_TYPE_STRING);
+        regionCodeCell.setCellType(Cell.CELL_TYPE_STRING);
+        regionNameCell.setCellType(Cell.CELL_TYPE_STRING);
+        municipalityCodeCell.setCellType(Cell.CELL_TYPE_STRING);
+        municipalityNameCell.setCellType(Cell.CELL_TYPE_STRING);
+        cityNameCell.setCellType(Cell.CELL_TYPE_STRING);
+        zipCodeCell.setCellType(Cell.CELL_TYPE_STRING);
+    }
+
+    private void printInfo(int regionCount, int provinceCount, int municipalityCount, int cityCount, int zipCodeCount) {
+        logger.info("--------------------------------");
+        logger.info("No. of Province: {}",provinceCount);
+        logger.info("No. of Region: {}",regionCount);
+        logger.info("No. of Municipality: {}",municipalityCount);
+        logger.info("No. of City: {}",cityCount);
+        logger.info("No. of ZipCode: {}",zipCodeCount);
+        long endTime = System.currentTimeMillis();
+        logger.info("total time taken by sheet processing logic--->{} ms", (endTime-System.currentTimeMillis()) );
+    }
+
+    private int setZipDetails(Hashtable<String, ZipCode> zipCodeHashtable, Hashtable<String, Municipality> municipalityHashtable, int zipCodeCount, Cell municipalityCodeCell, Cell cityNameCell, Cell zipCodeCell) {
+        ZipCode zipCode;
+        if(!zipCodeHashtable.containsKey(zipCodeCell.getStringCellValue())){
+            zipCode = zipCodeGraphRepository.findByZipCode(Integer.valueOf(zipCodeCell.getStringCellValue().trim()));
+            if(zipCode == null){
+                zipCode = new ZipCode();
+                zipCode.setZipCode(Integer.parseInt(zipCodeCell.getStringCellValue()));
+                zipCode.setName(cityNameCell.getStringCellValue().trim());
+                zipCodeCount++;
+            }
+            List<Municipality> municipalities = zipCode.getMunicipalities();
+            municipalities.add(municipalityHashtable.get(municipalityCodeCell.getStringCellValue()));
+            zipCode.setMunicipalities(municipalities);
+            zipCodeGraphRepository.save(zipCode);
+            zipCodeHashtable.put(zipCodeCell.getStringCellValue(),zipCode);
+        } else {
+            zipCode = zipCodeHashtable.get(zipCodeCell.getStringCellValue());
+            List<Municipality> municipalities = zipCode.getMunicipalities();
+            municipalities.add(municipalityHashtable.get(municipalityCodeCell.getStringCellValue()));
+            zipCode.setMunicipalities(municipalities);
+            zipCodeGraphRepository.save(zipCode);
+        }
+        return zipCodeCount;
+    }
+
+    private int setMunicipalityDetails(Hashtable<String, Municipality> municipalityHashtable, Hashtable<String, Province> provinceHashtable, int municipalityCount, Cell provinceCell, Cell municipalityCodeCell, Cell municipalityNameCell) {
+        Municipality municipality;
+        if(!municipalityHashtable.containsKey(municipalityCodeCell.getStringCellValue())){
+            municipality = municipalityGraphRepository.findByCode(municipalityCodeCell.getStringCellValue().trim());
+            if(municipality == null){
+                municipality = new Municipality();
+                municipality.setName(municipalityNameCell.getStringCellValue().trim());
+                municipality.setCode(municipalityCodeCell.getStringCellValue());
+            }
+            municipality.setProvince(provinceHashtable.get(provinceCell.getStringCellValue()));
+            municipalityGraphRepository.save(municipality);
+            municipalityHashtable.put(municipalityCodeCell.getStringCellValue(),municipality);
+            municipalityCount++;
+        }
+        return municipalityCount;
+    }
+
+    private int setProvinceDetails(Hashtable<String, Region> regionHashtable, Hashtable<String, Province> provinceHashtable, int provinceCount, Cell provinceCell, Cell regionCodeCell) {
+        Province province;
+        if(!provinceHashtable.containsKey(provinceCell.getStringCellValue())){
+            province = provinceGraphRepository.findByName(provinceCell.getStringCellValue().trim());
+            if(province == null){
+                province = new Province();
+                province.setName(provinceCell.getStringCellValue().trim());
+                provinceCount++;
+            }
+            province.setRegion(regionHashtable.get(regionCodeCell.getStringCellValue()));
+            provinceGraphRepository.save(province);
+            provinceHashtable.put(provinceCell.getStringCellValue(),province);
+        }
+        return provinceCount;
+    }
+
+    private int setRegionDetails(Long countryId, Hashtable<String, Region> regionHashtable, int regionCount, Cell regionCodeCell, Cell regionNameCell) {
+        Region region;
+        Country country=countryService.findById(countryId);
+        if(!regionHashtable.containsKey(regionCodeCell.getStringCellValue())){
+            region = regionGraphRepository.findByCode(regionCodeCell.getStringCellValue().trim());
+            if(region == null){
+                region = new Region();
+                region.setCountry(country);
+                region.setName(regionNameCell.getStringCellValue().trim());
+                region.setCode(regionCodeCell.getStringCellValue());
+                regionGraphRepository.save(region);
+                regionCount++;
+            }
+            regionHashtable.put(regionCodeCell.getStringCellValue(),region);
+        }
+        return regionCount;
     }
 
     public boolean setMunicipalityInContactAddress(){
@@ -409,7 +315,7 @@ public class RegionService {
                 contactAddress.setMunicipality(municipality);
                 contactAddressGraphRepository.save(contactAddress);
             } else {
-                logger.info("zip code null of contact address  " + contactAddress.getId());
+                logger.info("zip code null of contact address  {}" , contactAddress.getId());
             }
 
         });

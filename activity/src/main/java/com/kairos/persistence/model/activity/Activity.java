@@ -3,6 +3,9 @@ package com.kairos.persistence.model.activity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.KPermissionField;
+import com.kairos.annotations.KPermissionModel;
+import com.kairos.annotations.KPermissionSubModel;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.tabs.*;
@@ -15,7 +18,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,9 +33,12 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Activity extends MongoBaseEntity implements Serializable {
+@KPermissionModel
+public class Activity extends MongoBaseEntity {
 
+    @KPermissionField
     private String name;
+    @KPermissionField
     private String description;
     private Long countryId;
     private List<Long> expertises;
@@ -42,6 +47,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private List<Long> regions;
     private List<Long> levels;
     private List<Long> employmentTypes;
+    @KPermissionField
     private List<BigInteger> tags = new ArrayList<>();
     private ActivityStateEnum state = ActivityStateEnum.DRAFT;
 
@@ -50,17 +56,22 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private BigInteger parentId;
     @JsonIgnore
     private boolean isParentActivity = true;
+    @KPermissionSubModel
     private GeneralActivityTab generalActivityTab;
     private BalanceSettingsActivityTab balanceSettingsActivityTab;
-
+    @KPermissionSubModel
     private IndividualPointsActivityTab individualPointsActivityTab;
-
     private Set<BigInteger> childActivityIds=new HashSet<>();
+    @KPermissionSubModel
     private NotesActivityTab notesActivityTab;
     private CommunicationActivityTab communicationActivityTab;
+    @KPermissionSubModel
     private BonusActivityTab bonusActivityTab;
+    @KPermissionSubModel
     private RulesActivityTab rulesActivityTab;
+    @KPermissionSubModel
     private TimeCalculationActivityTab timeCalculationActivityTab;
+    @KPermissionSubModel
     private SkillActivityTab skillActivityTab;
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
     private OptaPlannerSettingActivityTab optaPlannerSettingActivityTab;
@@ -80,6 +91,8 @@ public class Activity extends MongoBaseEntity implements Serializable {
         this.tags = tags;
 
     }
+
+
 
 
     public Activity(BalanceSettingsActivityTab balanceSettingsActivityTab) {

@@ -5,14 +5,13 @@ import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.country.default_data.PaymentTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepository;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.List;
-
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
 
 /**
  * Created by prabjot on 9/1/17.
@@ -27,21 +26,18 @@ public class PaymentTypeService {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private CountryService countryService;
 
     public PaymentTypeDTO createPaymentType(long countryId, PaymentTypeDTO paymentTypeDTO) {
-        Country country = countryGraphRepository.findOne(countryId);
-        PaymentType paymentType = null;
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-        } else {
-            Boolean paymentTypeExistInCountryByName = paymentTypeGraphRepository.paymentTypeExistInCountryByName(countryId, "(?i)" + paymentTypeDTO.getName(), -1L);
+        Country country = countryService.findById(countryId);
+            boolean paymentTypeExistInCountryByName = paymentTypeGraphRepository.paymentTypeExistInCountryByName(countryId, "(?i)" + paymentTypeDTO.getName(), -1L);
             if (paymentTypeExistInCountryByName) {
                 exceptionService.duplicateDataException("error.PaymentType.name.exist");
             }
-            paymentType = new PaymentType(paymentTypeDTO.getName(), paymentTypeDTO.getDescription());
+            PaymentType paymentType  = new PaymentType(paymentTypeDTO.getName(), paymentTypeDTO.getDescription());
             paymentType.setCountry(country);
             paymentTypeGraphRepository.save(paymentType);
-        }
         paymentTypeDTO.setId(paymentType.getId());
         return paymentTypeDTO;
 
@@ -52,7 +48,7 @@ public class PaymentTypeService {
     }
 
     public PaymentTypeDTO updatePaymentType(long countryId, PaymentTypeDTO paymentTypeDTO) {
-        Boolean paymentTypeExistInCountryByName = paymentTypeGraphRepository.paymentTypeExistInCountryByName(countryId, "(?i)" + paymentTypeDTO.getName(), paymentTypeDTO.getId());
+        boolean paymentTypeExistInCountryByName = paymentTypeGraphRepository.paymentTypeExistInCountryByName(countryId, "(?i)" + paymentTypeDTO.getName(), paymentTypeDTO.getId());
         if (paymentTypeExistInCountryByName) {
             exceptionService.duplicateDataException("error.PaymentType.name.exist");
         }

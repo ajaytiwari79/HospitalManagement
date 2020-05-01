@@ -2,11 +2,11 @@ package com.kairos.persistence.model.activity.tabs;
 
 import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.TimeTypes;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
@@ -15,8 +15,7 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BalanceSettingsActivityTab implements Serializable{
-
+public class BalanceSettingsActivityTab{
 
     private Integer addTimeTo;
     private BigInteger timeTypeId;
@@ -24,11 +23,10 @@ public class BalanceSettingsActivityTab implements Serializable{
     private boolean onCallTimePresent ;
     private Boolean negativeDayBalancePresent;
     private PriorityFor priorityFor;
-
+    private TimeTypes timeTypes;
     public BalanceSettingsActivityTab(boolean onCallTimePresent, Boolean negativeDayBalancePresent) {
         this.onCallTimePresent = onCallTimePresent;
         this.negativeDayBalancePresent = negativeDayBalancePresent;
     }
-
 
 }

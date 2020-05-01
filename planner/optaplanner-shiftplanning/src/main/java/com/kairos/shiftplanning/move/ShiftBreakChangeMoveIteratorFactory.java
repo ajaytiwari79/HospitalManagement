@@ -1,18 +1,18 @@
 package com.kairos.shiftplanning.move;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
 import com.kairos.shiftplanning.executioner.ShiftPlanningGenerator;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.joda.time.LocalDate;
 import org.optaplanner.core.impl.heuristic.move.Move;
 import org.optaplanner.core.impl.heuristic.selector.move.factory.MoveIteratorFactory;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -40,14 +40,14 @@ public class ShiftBreakChangeMoveIteratorFactory  implements MoveIteratorFactory
         LocalDate date=workingSolution.getWeekDates().get(workingRandom.nextInt(workingSolution.getWeekDates().size()));
         List<ShiftBreakChangeMove> shiftBreakChangeMoves= new ArrayList<>();
         for(ShiftBreak shiftBreak:workingSolution.getShiftBreaks()){
-            if(!date.equals(shiftBreak.getShift().getDate())){
+            if(!date.equals(shiftBreak.getShift().getStartDate())){
                 continue;
             }
-            Interval possibleBreakInterval= ShiftPlanningUtility.getPossibleBreakStartInterval(shiftBreak,shiftBreak.getShift());
-            for(DateTime dateTime:workingSolution.getPossibleStartDateTimes()){
+            DateTimeInterval possibleBreakInterval= ShiftPlanningUtility.getPossibleBreakStartInterval(shiftBreak,shiftBreak.getShift());
+            for(ZonedDateTime dateTime:workingSolution.getPossibleStartDateTimes()){
                 if(ShiftPlanningUtility.intervalConstainsTimeIncludingEnd(possibleBreakInterval,dateTime) && !dateTime.equals(shiftBreak.getStartTime())){
                     shiftBreakChangeMoves.add(new ShiftBreakChangeMove(shiftBreak,dateTime,
-                            ShiftPlanningUtility.getOverlappingActivityLineIntervalsWithInterval(shiftBreak.getShift(),new Interval(dateTime,dateTime.plusMinutes(shiftBreak.getDuration()))),null));
+                            ShiftPlanningUtility.getOverlappingActivityLineIntervalsWithInterval(shiftBreak.getShift(),new DateTimeInterval(dateTime,dateTime.plusMinutes(shiftBreak.getDuration()))),null));
                 }
             }
         }

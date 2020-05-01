@@ -135,7 +135,7 @@ public class CountryCTAService extends MongoBaseService {
      */
     public void buildCTA(Map<PhaseDefaultName, BigInteger> unitPhaseIdsMap, CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, boolean doUpdate, boolean creatingFromCountry, CTABasicDetailsDTO ctaBasicDetailsDTO, Map<BigInteger, PhaseDefaultName> phaseDefaultNameMap) {
         // Get Rule Templates
-        List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(collectiveTimeAgreementDTO.getRuleTemplates(), CTARuleTemplate.class);
+        List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyCollectionPropertiesByMapper(collectiveTimeAgreementDTO.getRuleTemplates(), CTARuleTemplate.class);
         List<BigInteger> ruleTemplateIds = new ArrayList<>();
         if (!ruleTemplates.isEmpty()) {
             ruleTemplates.forEach(ctaRuleTemplate -> {
@@ -181,6 +181,23 @@ public class CountryCTAService extends MongoBaseService {
         Long countryId = costTimeAgreement.getCountryId();
         costTimeAgreement.setCountryId(null);
         List<CostTimeAgreement> costTimeAgreementList = costTimeAgreementRepository.findCTAByUnitIdAndOrgTypeAndName(organizationIds, collectiveTimeAgreementDTO.getName());
+        Map[] phaseDetails = getPhasesDetails(unitId, organizationIds, countryId);
+        Map<Long, Map<PhaseDefaultName, BigInteger>> unitPhasesMap = phaseDetails[0];
+        Map<BigInteger, PhaseDefaultName> phaseDefaultNameMap = phaseDetails[1];
+        Map<String, CostTimeAgreement> costTimeAgreementMap = costTimeAgreementList.stream().collect(Collectors.toMap(k -> k.getName() + "_" + k.getOrganization().getId() + "_" + k.getOrganizationType().getId(), v -> v, (previous, current) -> previous));
+        for (OrganizationBasicDTO organization : ctaBasicDetailsDTO.getOrganizations()) {
+            if (costTimeAgreementMap.get(collectiveTimeAgreementDTO.getName() + "_" + organization.getId() + "_" + costTimeAgreement.getOrganizationType().getId()) == null) {
+                CostTimeAgreement newCostTimeAgreement = createCostTimeAgreementForOrganization(unitPhasesMap.get(organization.getId()), costTimeAgreement, collectiveTimeAgreementDTO, unitActivities.get(organization.getId()), ctaBasicDetailsDTO, organization, phaseDefaultNameMap);
+                costTimeAgreements.add(newCostTimeAgreement);
+            }
+        }
+        if (!costTimeAgreements.isEmpty()) {
+            costTimeAgreementRepository.saveEntities(costTimeAgreements);
+        }
+        return true;
+    }
+
+    private Map[] getPhasesDetails(Long unitId, List<Long> organizationIds, Long countryId) {
         Map<Long, Map<PhaseDefaultName, BigInteger>> unitPhasesMap;
         Map<BigInteger, PhaseDefaultName> phaseDefaultNameMap;
         if (!Optional.ofNullable(unitId).isPresent()) {
@@ -193,17 +210,7 @@ public class CountryCTAService extends MongoBaseService {
             List<Phase> unitPhase = phaseMongoRepository.findAllByUnitIdsAndDeletedFalse(organizationIds);
             unitPhasesMap = getUnitIdAndphaseDefaultNameAndIdMap(unitPhase);
         }
-        Map<String, CostTimeAgreement> costTimeAgreementMap = costTimeAgreementList.stream().collect(Collectors.toMap(k -> k.getName() + "_" + k.getOrganization().getId() + "_" + k.getOrganizationType().getId(), v -> v, (previous, current) -> previous));
-        for (OrganizationBasicDTO organization : ctaBasicDetailsDTO.getOrganizations()) {
-            if (costTimeAgreementMap.get(collectiveTimeAgreementDTO.getName() + "_" + organization.getId() + "_" + costTimeAgreement.getOrganizationType().getId()) == null) {
-                CostTimeAgreement newCostTimeAgreement = createCostTimeAgreementForOrganization(unitPhasesMap.get(organization.getId()), costTimeAgreement, collectiveTimeAgreementDTO, unitActivities.get(organization.getId()), ctaBasicDetailsDTO, organization, phaseDefaultNameMap);
-                costTimeAgreements.add(newCostTimeAgreement);
-            }
-        }
-        if (!costTimeAgreements.isEmpty()) {
-            costTimeAgreementRepository.saveEntities(costTimeAgreements);
-        }
-        return true;
+        return new Map[]{unitPhasesMap,phaseDefaultNameMap};
     }
 
 

@@ -50,6 +50,10 @@ public class EnvConfig {
     private String sendGridApiKey;
     @Value("${spring.profiles.active}")
     private String currentProfile;
+    @Value("${weather.api.key}")
+    private String weatherApiKey;
+    @Value("${weather.api}")
+    private String weatherApi;
 
     public String getGoogleCalendarAPIV3Url(String vCardId){
         return googleCalendarAPIV3Url.replace("{countryVCard}" ,vCardId);

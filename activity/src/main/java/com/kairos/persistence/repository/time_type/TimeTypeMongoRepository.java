@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Repository
 public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, BigInteger> ,CustomTimeTypeMongoRepository {
@@ -65,4 +64,8 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     boolean existsByIdAndCountryIdAndDeletedFalse(BigInteger id, Long countryId);
 
     boolean existsByIdAndPartOfTeam(BigInteger id, boolean partOfTeam);
+
+
+    @Query(value = "{deleted:false, sicknessSettingValid:true}")
+    List<TimeType> findAllSickTimeTypes();
 }

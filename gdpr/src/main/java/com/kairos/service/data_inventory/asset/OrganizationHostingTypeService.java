@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +57,7 @@ public class OrganizationHostingTypeService {
             }
             hostingTypeRepository.saveAll(hostingTypes);
         }
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(hostingTypes, HostingTypeDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(hostingTypes, HostingTypeDTO.class);
     }
 
 
@@ -90,16 +89,6 @@ public class OrganizationHostingTypeService {
         }
     }
 
-
-    public Boolean deleteHostingType(Long unitId, BigInteger hostingTypeId) {
-
-      /*  List<AssetBasicResponseDTO> assetsLinkedWithHostingType = assetMongoRepository.findAllAssetLinkedWithHostingType(unitId, hostingTypeId);
-        if (CollectionUtils.isNotEmpty(assetsLinkedWithHostingType)) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Type", new StringBuilder(assetsLinkedWithHostingType.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
-        }
-        hostingTypeMongoRepository.safeDeleteById(hostingTypeId);*/
-        return true;
-    }
 
 
     /**

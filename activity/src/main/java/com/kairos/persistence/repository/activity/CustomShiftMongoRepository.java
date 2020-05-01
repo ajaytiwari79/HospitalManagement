@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.activity;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
@@ -10,6 +11,7 @@ import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
+import com.kairos.wrapper.shift.StaffShiftDetails;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -25,6 +27,10 @@ public interface CustomShiftMongoRepository {
     List<ShiftDTO> findAllShiftsBetweenDuration(Long employmentId, Long staffId, Date startDate, Date endDate, Long unitId);
 
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(Set<Long> employmentIds, Date startDate, Date endDate ,Set<BigInteger> activityIds);
+
+    List<StaffShiftDetails> findAllShiftsByEmploymentsAndBetweenDuration(Set<Long> employmentIds, Date startDate, Date endDate );
+
+    StaffShiftDetails getAllShiftsForOneStaffWithEmploymentsAndBetweenDuration(Set<Long> employmentIds, Date startDate, Date endDate);
 
     List<ShiftDTO> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate);
 
@@ -90,10 +96,16 @@ public interface CustomShiftMongoRepository {
     List<Shift> findShiftByShiftActivityIdAndBetweenDate(Collection<BigInteger> shiftActivityIds,LocalDate startDate,LocalDate endDate,Long staffId);
 
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdNotEqualShiftIds(Long employmentId, Date startDate, Date endDate,List<BigInteger> shiftIds);
+
+
+    List<Shift> findAllSicknessShiftByEmploymentIdAndActivityIds(Long employmentId,Collection<BigInteger> activityIds,Date startDate);
+
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIds(BigInteger shiftId,Collection<Long> employmentIds, Date startDate, Date endDate,Boolean draftShift);
 
     List<ActivityWithCompositeDTO> findMostlyUsedActivityByStaffId(Long staffId);
 
     void updateValidateDetailsOfShift(BigInteger shiftId, AccessGroupRole accessGroupRole, LocalDate localDate);
+
+    ShiftPlanningProblemSubmitDTO findDataForAutoPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO);
 
 }

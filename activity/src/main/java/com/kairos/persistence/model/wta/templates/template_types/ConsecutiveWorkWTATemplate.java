@@ -21,7 +21,9 @@ import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.enums.wta.MinMaxSetting.MAXIMUM;
 import static com.kairos.enums.wta.MinMaxSetting.MINIMUM;
 import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
@@ -65,8 +67,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                     if(MAXIMUM.equals(minMaxSetting)){
                         shiftQueryResultWithActivities.add(infoWrapper.getShift());
                     }
-                    Set<LocalDate> shiftDates = getSortedAndUniqueDates(shiftQueryResultWithActivities);
-                    int consecutiveDays = getConsecutiveDaysInDate(new ArrayList<>(shiftDates));
+                    int consecutiveDays = getConsecutiveDays(getSortedAndUniqueDates(shiftQueryResultWithActivities), asLocalDate(infoWrapper.getShift().getStartDate()));
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], consecutiveDays);
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
@@ -74,6 +75,18 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                 }
             }
         }
+    }
+
+    private int getConsecutiveDays(Set<LocalDate> shiftDates, LocalDate localDate){
+        int beforeConsecutiveDays = getConsecutiveDaysInDate(shiftDates.stream().filter(date-> !date.isAfter(localDate)).collect(Collectors.toList()));
+        int afterConsecutiveDays = getConsecutiveDaysInDate(shiftDates.stream().filter(date-> !date.isBefore(localDate)).collect(Collectors.toList()));
+        int consecutiveDays;
+        if(MAXIMUM.equals(minMaxSetting)){
+            consecutiveDays = beforeConsecutiveDays > afterConsecutiveDays ? beforeConsecutiveDays : afterConsecutiveDays;
+        }else{
+            consecutiveDays = beforeConsecutiveDays < afterConsecutiveDays ? beforeConsecutiveDays : afterConsecutiveDays;
+        }
+        return consecutiveDays;
     }
 
     public ConsecutiveWorkWTATemplate(String name, String description) {

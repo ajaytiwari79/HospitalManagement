@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -17,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.SENIO
 @NodeEntity
 @Getter
 @Setter
-public class FunctionalPaymentMatrix extends UserBaseEntity implements Serializable {
+public class FunctionalPaymentMatrix extends UserBaseEntity  {
 
     @Relationship(type = HAS_PAY_GROUP_AREA)
     private Set<PayGroupArea> payGroupAreas;

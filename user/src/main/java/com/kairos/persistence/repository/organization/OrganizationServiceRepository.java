@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -41,7 +42,7 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
     OrganizationService checkDuplicateSubService(Long id, String name);
 
     @Query("MATCH (os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ss:OrganizationService) WHERE id(os)={0} AND ss.name= {1} return ss")
-    OrganizationService checkDuplicateSubServiceWithSpecialCharacters(Long id, String name);
+    Optional<OrganizationService> checkDuplicateSubServiceWithSpecialCharacters(Long id, String name);
 
     OrganizationService findByKmdExternalId(String kmdExternalId);
 

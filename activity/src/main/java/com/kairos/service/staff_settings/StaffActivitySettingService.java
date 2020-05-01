@@ -2,14 +2,13 @@ package com.kairos.service.staff_settings;
 
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.common.StaffFilterDataDTO;
 import com.kairos.dto.activity.shift.StaffActivityResponse;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffAndActivitySettingWrapper;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -102,8 +101,8 @@ public class StaffActivitySettingService extends MongoBaseService {
         }
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger,Activity> activityMap=activities.stream().collect(Collectors.toMap(Activity::getId,v->v));
-        List<StaffPersonalDetail> staffExpertiseWrappers= userIntegrationService.getStaffDetailByIds(unitId,staffAndActivitySettingWrapper.getStaffIds());
-        Map<Long,StaffPersonalDetail> staffExpertiseWrapperMap=staffExpertiseWrappers.stream().collect(Collectors.toMap(StaffPersonalDetail::getId,v->v));
+        List<StaffDTO> staffExpertiseWrappers= userIntegrationService.getStaffDetailByIds(unitId,staffAndActivitySettingWrapper.getStaffIds());
+        Map<Long, StaffDTO> staffExpertiseWrapperMap=staffExpertiseWrappers.stream().collect(Collectors.toMap(StaffDTO::getId, v->v));
         Map<String,List<StaffActivityResponse>> responseMap=new HashMap<>();
         for(Long currentStaffId:staffAndActivitySettingWrapper.getStaffIds()){
             responseMap=assignActivitySettingsForCurrentStaff(responseMap,activityMap,staffExpertiseWrapperMap,currentStaffId,staffAndActivitySettingWrapper.getStaffActivitySettings(),unitId,staffActivitySettings);
@@ -161,20 +160,20 @@ public class StaffActivitySettingService extends MongoBaseService {
             staffActivitySetting.setUnitId(unitId);
             staffActivitySetting.setStaffId(staffId);
         });
-        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffActivitySettings,StaffActivitySetting.class);
+        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyCollectionPropertiesByMapper(staffActivitySettings,StaffActivitySetting.class);
         save(staffActivitySettingsList);
         return staffActivitySettings;
    }
 
 
-    private  String validateActivitySettingsForCurrentStaff(StaffPersonalDetail staffDTO, Activity activity){
-        Specification<StaffPersonalDetail> staffDTOSpecification=new StaffExpertiseSpecification(activity);
+    private  String validateActivitySettingsForCurrentStaff(StaffDTO staffDTO, Activity activity){
+        Specification<StaffDTO> staffDTOSpecification=new StaffExpertiseSpecification(activity);
         List<String> messages = staffDTOSpecification.isSatisfiedString(staffDTO);
         return (!messages.isEmpty())?localeService.getMessage(messages.get(0)):null;
     }
 
-   private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap,Map<BigInteger,Activity> activityMap,Map<Long,StaffPersonalDetail> staffExpertiseWrapperMap,Long staffId,
-                                                                                         List<StaffActivitySettingDTO> staffActivitySettingDTOS,Long unitId,Set<StaffActivitySetting> staffActivitySettings){
+   private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap, Map<BigInteger,Activity> activityMap, Map<Long, StaffDTO> staffExpertiseWrapperMap, Long staffId,
+                                                                                         List<StaffActivitySettingDTO> staffActivitySettingDTOS, Long unitId, Set<StaffActivitySetting> staffActivitySettings){
        List<StaffActivityResponse> success=(responseMap.get(SUCCESS)==null)?new ArrayList<>():responseMap.get(SUCCESS);
        List<StaffActivityResponse> error=(responseMap.get(ERROR)==null)?new ArrayList<>():responseMap.get(ERROR);
        Set<StaffActivitySetting> staffActivitySettingSet=new HashSet<>();

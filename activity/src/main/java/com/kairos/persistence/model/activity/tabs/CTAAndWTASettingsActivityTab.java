@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 /**
  * Created by vipul on 30/11/17.
  */
@@ -14,6 +12,6 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CTAAndWTASettingsActivityTab implements Serializable{
+public class CTAAndWTASettingsActivityTab{
     private  boolean eligibleForCostCalculation;
 }

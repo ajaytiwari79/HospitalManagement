@@ -77,4 +77,10 @@ public class SkillController {
     public ResponseEntity<Map<String, Object>> getStaffAllSkillAndLevelByStaffIds(@RequestBody List<Long> StaffIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.getStaffAllSkillAndLevelByStaffIds(StaffIds));
     }
+
+    @ApiOperation(value = "Get all skills by unitId")
+    @GetMapping(value = "/unit/{unitId}/skills_and_expertise_by_unit")
+    public ResponseEntity<Map<String,Object>> getSkillsByUnit(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,skillService.getSkillByUnit(unitId));
+    }
 }

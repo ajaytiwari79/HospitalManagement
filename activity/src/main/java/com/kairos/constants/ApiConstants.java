@@ -11,6 +11,7 @@ public final class ApiConstants {
     public static final String COUNTRY_URL = "/country/{countryId}";
     public static final String API_V1 = "/api/v1";
     public static final String API_UNIT_URL = API_V1 + UNIT_URL;
+    public static final String API_UNIT_PLANNING_URL = API_V1 + UNIT_URL + "/planning";
     public static final String API_ABSENCE_PLANNING_URL = API_V1 + UNIT_URL + "/absence_planning";
     public static final String API_NOTIFICATION_URL = API_V1 + "/notification";
     public static final String API_REQUEST_COMPONENT_URL = API_V1 + "/resourceComponent";
@@ -175,6 +176,7 @@ public final class ApiConstants {
     public static final String REQUEST_ABSENCE = API_V1+"/request_absence";
     public static final String TODO = API_V1 + UNIT_URL+"/todo";
     public static final Long DEFAULT_ID =-1l;
+    public static final double DEFAULT_VALUE =1;
 
 
 }

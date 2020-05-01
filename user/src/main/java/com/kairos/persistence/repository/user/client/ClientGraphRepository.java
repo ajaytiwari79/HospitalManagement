@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -252,7 +253,7 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
     NextToKinQueryResult getNextToKinByCprNumber(String cprNumber, String imageUrl);
 
     @Query("Match (c:Client)-[r:" + NEXT_TO_KIN + "]->(nextToKin:User{cprNumber:{1}}) where id(c)={0} return count(r)>0")
-    Boolean citizenInNextToKinList(Long clientId, String cprNumber);
+    boolean citizenInNextToKinList(Long clientId, String cprNumber);
 
     @Query("MATCH (citizen:Client{citizenDead:false})-[:GET_SERVICE_FROM]->(o:Unit)  where id(o)= {0} with citizen\n" +
             "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,citizen\n" +
@@ -282,7 +283,7 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
     Long getIdOfHomeAddress(Long nextToKinId);
 
     @Query("Match (nextToKin:Client)-[:" + HAS_CONTACT_DETAIL + "]->(contactDetail:ContactDetail) where id(nextToKin)={0} return contactDetail")
-    ContactDetail getContactDetailOfNextToKin(Long nextToKinId);
+    Optional<ContactDetail> getContactDetailOfNextToKin(Long nextToKinId);
 
     @Query("Match (citizen:Client) where id(citizen)={0} with citizen\n" +
             "Match (nextToKin:User) where id(nextToKin)={1} with nextToKin,citizen\n" +
@@ -323,10 +324,6 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
     @Query("Match (n:Client)-[:" + CLIENT_CONTACT_PERSON_RELATION_TYPE + "]->(clientContactPerson:ClientContactPerson)-[:" + CLIENT_CONTACT_PERSON_SERVICE + "]->(os:OrganizationService) where id(os)={0} AND id(n)={1}\n" +
             "detach delete clientContactPerson")
     void deleteContactPersonForService(Long organizationId, Long clientId);
-
-    @Query("Match (n:ClientContactPerson)-[:CLIENT_CONTACT_PERSON_STAFF]->(s:Staff) where id(s)={0}\n" +
-            "Match (n)<-[:CLIENT_CONTACT_PERSON_RELATION_TYPE]-(client:Client) return id(client) as id,client.firstName as firstName,client.lastName as lastName")
-    List<ClientMinimumDTO> getCitizenListForThisContactPerson(Long staffId);
 
     // TO check if home address exists for client
     @Query("Match  (c:Client) WHERE id(c) = {0}  RETURN EXISTS((c)-[:" + HAS_HOME_ADDRESS + "]->(:ContactAddress))")

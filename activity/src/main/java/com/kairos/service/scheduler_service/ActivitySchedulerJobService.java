@@ -121,7 +121,7 @@ public class ActivitySchedulerJobService extends MongoBaseService {
     public void registerJobForActivityCutoff(List<Activity> activities) {
         for (Activity activity : activities) {
             BasicNameValuePair jobSubType = new BasicNameValuePair("jobSubType", JobSubType.ACTIVITY_REMINDER.toString());
-            schedulerRestClient.publishRequest(null, activity.getUnitId(), true, IntegrationOperation.DELETE, "/scheduler_panel/entity/{entityId}/delete_job", newArrayList(jobSubType), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {}, activity.getId());
+            schedulerRestClient.publishRequest(null, activity.getUnitId(), true, IntegrationOperation.DELETE, "/scheduler_panel/entity/{entityId}/delete_job", newArrayList(jobSubType), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Boolean>>>() {}, activity.getId());
             List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
             if(activity.getCommunicationActivityTab().isAllowActivityCutoffReminder()) {
                 calculateTriggerDateTimeList(activity).forEach(reminderDateTime ->
@@ -139,7 +139,9 @@ public class ActivitySchedulerJobService extends MongoBaseService {
         for (ActivityReminderSettings activityCutoffReminderSetting : activity.getCommunicationActivityTab().getActivityCutoffReminderSettings()) {
             for (CutOffInterval cutOffInterval : activity.getRulesActivityTab().getCutOffIntervals()) {
                 LocalDateTime reminderDateTime = substractDurationInLocalDateTime(asLocalDateTime(asDate(cutOffInterval.getEndDate())), activityCutoffReminderSetting.getSendReminder().getTimeValue(), activityCutoffReminderSetting.getSendReminder().getDurationType());
-                reminderDateTimes.add(reminderDateTime);
+                if(!reminderDateTime.isBefore(getCurrentLocalDateTime().minusDays(1))){
+                    reminderDateTimes.add(reminderDateTime);
+                }
                 if (activityCutoffReminderSetting.isRepeatAllowed()) {
                     reminderDateTimes.addAll(calculateRepeatTriggerDateTimeList(activityCutoffReminderSetting, cutOffInterval, reminderDateTime));
                 }
@@ -152,7 +154,9 @@ public class ActivitySchedulerJobService extends MongoBaseService {
         Set<LocalDateTime> repeatTriggerDateTimes = new HashSet<>();
         reminderDateTime = addDurationInLocalDateTime(reminderDateTime, activityCutoffReminderSetting.getRepeatReminder().getTimeValue(), activityCutoffReminderSetting.getRepeatReminder().getDurationType(), 1);
         while (reminderDateTime.isBefore(cutOffInterval.getEndDate().plusDays(1).atStartOfDay())){
-            repeatTriggerDateTimes.add(reminderDateTime);
+            if(!reminderDateTime.isBefore(getCurrentLocalDateTime().minusDays(1))) {
+                repeatTriggerDateTimes.add(reminderDateTime);
+            }
             reminderDateTime = addDurationInLocalDateTime(reminderDateTime, activityCutoffReminderSetting.getRepeatReminder().getTimeValue(), activityCutoffReminderSetting.getRepeatReminder().getDurationType(), 1);
         }
         return repeatTriggerDateTimes;

@@ -124,10 +124,10 @@ public class UnitSolverConfigService {
     }
 
     public DefaultDataDTO getDefaultData(Long unitId) {
-        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
+        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
       //  Long countryId=userNeo4jRepo.getCountryIdByUnitId(unitId);
         DefaultDataDTO defaultDataDTO = new DefaultDataDTO()
-                .setOrganizationServicesBuilder(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(userNeo4jRepo.getAllOrganizationServicesByUnitId(unitId),OrganizationServiceDTO.class))
+                .setOrganizationServicesBuilder(ObjectMapperUtils.copyCollectionPropertiesByMapper(userNeo4jRepo.getAllOrganizationServicesByUnitId(unitId),OrganizationServiceDTO.class))
 
                 //get All Phases
                 .setPhaseDTOSBuilder(getAllPhases(unitId))
@@ -140,13 +140,13 @@ public class UnitSolverConfigService {
     }
 
     private List<PhaseDTO> getAllPhases(Long unitId) {
-        List<PhaseDTO> phaseDTOS = activityMongoRepository.getAllPhasesByUnitId(unitId);
+        List<PhaseDTO> phaseDTOS = null;//activityMongoRepository.getAllPhasesByUnitId(unitId);
         ;
         return phaseDTOS;
     }
 
     private List<PlanningPeriodDTO> getAllPlanningPeriods(Long unitId) {
-        return activityMongoRepository.getAllPlanningPeriodByUnitId(unitId);
+        return null;//activityMongoRepository.getAllPlanningPeriodByUnitId(unitId);
     }
 
     private boolean preValidateUnitSolverConfigDTO(UnitSolverConfigDTO unitSolverConfigDTO) {

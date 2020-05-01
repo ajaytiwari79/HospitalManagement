@@ -43,8 +43,6 @@ public class WTAController {
     private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
     @Inject
     private WTAOrganizationService wtaOrganizationService;
-    @Inject
-    private ActivitySchedulerJobService activitySchedulerJobService;
 
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value =   COUNTRY_URL + "/wta")
@@ -152,8 +150,8 @@ public class WTAController {
 
     @ApiOperation(value = "Update WTA of Employment")
     @PutMapping(value =  UNIT_URL + "/wta")
-    public ResponseEntity<Map<String, Object>> updateWtaOfEmployment(@PathVariable long unitId, @RequestBody @Valid WTADTO wtadto, @RequestParam Boolean employmentPublished) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updateWtaOfEmployment(unitId, wtadto, employmentPublished));
+    public ResponseEntity<Map<String, Object>> updateWtaOfEmployment(@PathVariable long unitId, @RequestBody @Valid WTADTO wtadto, @RequestParam Boolean employmentPublished,@RequestParam("save") Boolean save) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updateWtaOfEmployment(unitId, wtadto, employmentPublished,save));
     }
 
 
@@ -266,14 +264,6 @@ public class WTAController {
                                                                            @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate,
                                                                            @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getWorktimeAgreementBalance(unitId, employmentId,startDate,endDate));
-    }
-
-
-
-    @ApiOperation(value = "Update Phases in Ruletemplates")
-    @GetMapping(value =  UNIT_URL+ "/update_phases_in_ruletemplate")
-    public ResponseEntity<Map<String, Object>> updatePhasesInRuletemplate(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updatePhasesInRuletemplate());
     }
 
 

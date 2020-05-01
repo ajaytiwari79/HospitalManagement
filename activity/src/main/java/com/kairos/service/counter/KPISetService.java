@@ -222,6 +222,7 @@ public class KPISetService {
                         kpiResponseDTO = counterDataService.generateKPISetCalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId(),startDate);
                     }
                     if (isNotNull(kpiResponseDTO)) {
+                        kpiResponseDTO.setKpiName(applicableKPI.getTitle());
                         kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(), kpiResponseDTO);
                     }
                 }

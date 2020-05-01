@@ -106,20 +106,20 @@ public class RuletemplateUtils {
         }
         switch (intervalUnit) {
             case DAYS:
-                interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
-                interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getStartDate()).plusDays(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval[0] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZonedDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZonedDateTime(shift.getStartDate()).plusDays(intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
             case WEEKS:
-                interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
-                interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusWeeks(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval[0] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZonedDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZonedDateTime(shift.getStartDate()).plusWeeks(intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
             case MONTHS:
-                interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
-                interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getStartDate()).plusMonths(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval[0] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZonedDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZonedDateTime(shift.getStartDate()).plusMonths(intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
             case YEARS:
-                interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
-                interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getStartDate()).plusYears(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval[0] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZonedDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZonedDateTime(shift.getStartDate()).plusYears(intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
             default:
                 break;
@@ -136,7 +136,7 @@ public class RuletemplateUtils {
                     int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
                     int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
                     TimeInterval interval = new TimeInterval(startMinutesOfInterval, endMinutesOfInterval);
-                    int minuteOfTheDay = DateUtils.asZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
+                    int minuteOfTheDay = DateUtils.asZonedDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
                     if (minuteOfTheDay == (int) interval.getStartFrom() || interval.contains(minuteOfTheDay)) {
                         timeInterval = interval;
                         break;
@@ -158,7 +158,7 @@ public class RuletemplateUtils {
                     int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
                     int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
                     TimeInterval interval = new TimeInterval(startMinutesOfInterval, endMinutesOfInterval);
-                    int minuteOfTheDay = DateUtils.asZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
+                    int minuteOfTheDay = DateUtils.asZonedDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
                     timeIntervals[i] = interval;
                     i++;
                     if (!valid && (minuteOfTheDay == (int) interval.getStartFrom() || interval.contains(minuteOfTheDay))) {
@@ -193,16 +193,16 @@ public class RuletemplateUtils {
         }
         switch (intervalUnit) {
             case DAYS:
-                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
+                interval = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZonedDateTime(shift.getEndDate()).plusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
                 break;
             case WEEKS:
-                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
+                interval = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZonedDateTime(shift.getEndDate()).plusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
                 break;
             case MONTHS:
-                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
+                interval = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZonedDateTime(shift.getEndDate()).plusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
                 break;
             case YEARS:
-                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
+                interval = new DateTimeInterval(DateUtils.asZonedDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZonedDateTime(shift.getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
                 break;
             default:
                 break;
@@ -213,7 +213,7 @@ public class RuletemplateUtils {
     public static List<ShiftWithActivityDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, TimeInterval timeInterval) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         shifts.forEach(s -> {
-            if ((dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.getEndLocalDate().equals(s.getEndLocalDate())) && (timeInterval == null || timeInterval.contains(DateUtils.asZoneDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
+            if ((dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.getEndLocalDate().equals(s.getEndLocalDate())) && (timeInterval == null || timeInterval.contains(DateUtils.asZonedDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
                 updatedShifts.add(s);
             }
         });
@@ -224,7 +224,7 @@ public class RuletemplateUtils {
         Set<BigInteger> updatedShifts = new HashSet<>();
         shifts.forEach(s -> {
             for (TimeInterval timeInterval : timeIntervals) {
-                if ((dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.getEndDate().equals(s.getStartDate())) && (timeInterval == null || timeInterval.contains(DateUtils.asZoneDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
+                if ((dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.getEndDate().equals(s.getStartDate())) && (timeInterval == null || timeInterval.contains(DateUtils.asZonedDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
                     updatedShifts.add(s.getId());
                 }
             }
@@ -316,14 +316,14 @@ public class RuletemplateUtils {
 
     public static int getConsecutiveDaysInDate(List<LocalDate> localDates) {
         if (localDates.size() < 2) return 0;
-        int count = 1;
+        int count = 0;
         int max = 0;
         int l = 1;
         while (l < localDates.size()) {
             if (localDates.get(l - 1).equals(localDates.get(l).minusDays(1))) {
                 count++;
             } else {
-                count = 1;
+                count = 0;
             }
             if (count > max) {
                 max = count;

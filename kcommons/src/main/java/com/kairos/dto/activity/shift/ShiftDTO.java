@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftEscalationReason;
@@ -85,11 +86,26 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     protected RequestAbsenceDTO requestAbsence;
     protected List<ShiftActivityDTO> breakActivities;
     protected boolean hasOriginalShift;
+    private boolean sickShift;
     protected UserInfo createdBy;
+    private boolean disabled;
 
 
     public ShiftDTO() {
         //default Const
+    }
+
+    public ShiftDTO(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivityDTO> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.staffId = staffId;
+        this.activities = activities;
+        this.employmentId = employmentId;
+        this.unitId = unitId;
+        this.sickShift = true;
+        this.phaseId = phaseId;
+        this.planningPeriodId = planningPeriodId;
+
     }
 
     public ShiftDTO(@NotNull(message = "message.shift.shiftDate") LocalDate shiftDate,List<ShiftActivityDTO> activities,BigInteger id) {
@@ -137,10 +153,9 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     public void setActivities(List<ShiftActivityDTO> activities) {
         if (Optional.ofNullable(activities).isPresent() && activities.size()>1) {
             activities = activities.stream().filter(shiftActivityDTO -> Optional.ofNullable(shiftActivityDTO.getStartDate()).isPresent()).sorted(Comparator.comparing(ShiftActivityDTO::getStartDate)).collect(Collectors.toList());
-            activities = mergeShiftActivity(activities);
+            activities = ObjectUtils.mergeShiftActivity(activities);
         }
         this.activities = activities;
-
     }
 
 
@@ -158,7 +173,27 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
         return breakActivities;
     }
 
+    @JsonIgnore
+    public void mergeShiftActivity(){
+        if(isCollectionNotEmpty(activities)) {
+            Collections.sort(activities);
+            ShiftActivityDTO activityDTO = activities.get(0);
+            List<ShiftActivityDTO> mergedShiftActivityDTOS = new ArrayList<>();
+            for (ShiftActivityDTO shiftActivityDTO : activities) {
+                if (activityDTO.getEndDate().equals(shiftActivityDTO.getStartDate()) && activityDTO.getActivityId().equals(shiftActivityDTO.getActivityId())) {
+                    activityDTO.setEndDate(shiftActivityDTO.getEndDate());
+                } else if ((activityDTO.getEndDate().before(shiftActivityDTO.getStartDate())) || activityDTO.getEndDate().equals(shiftActivityDTO.getStartDate()) && !activityDTO.getActivityId().equals(shiftActivityDTO.getActivityId())) {
+                    mergedShiftActivityDTOS.add(activityDTO);
+                    activityDTO = shiftActivityDTO;
+                }
+            }
+            //to add last one
+            mergedShiftActivityDTOS.add(activityDTO);
+            activities = mergedShiftActivityDTOS;
+        }
+    }
 
+    //todo don't remove this method it is for frontend
     public boolean isMultipleActivity() {
         Set<BigInteger> multipleActivityCount = new HashSet<>();
         for (ShiftActivityDTO activity : this.getActivities()) {
@@ -211,7 +246,9 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
         return !asLocalDate(this.startDate).equals(asLocalDate(this.endDate));
     }
 
-
+    public LocalDate getShiftDate() {
+        return shiftDate=shiftDate==null?this.getActivities().get(0).getStartLocalDate():shiftDate;
+    }
 
     @Override
     public String toString() {

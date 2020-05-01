@@ -28,7 +28,8 @@ import java.util.*;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.enums.kpi.CalculationType.PRESENCE_UNDER_STAFFING;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 
 /**
  * Created By G.P.Ranjan on 26/2/20
@@ -69,7 +70,7 @@ public class StaffingLevelCalculationServiceTest {
     public void testPresenceStaffingLevelDataPerHour(){
         Mockito.when(staffingLevelService.findByUnitIdAndDates(anyLong(),any(Date.class),any(Date.class))).thenReturn(getStaffingLevelList());
         Mockito.when(kpiBuilderCalculationService.getShiftActivityCriteria(any(KPIBuilderCalculationService.KPICalculationRelatedInfo.class))).thenReturn(KPIBuilderCalculationService.ShiftActivityCriteria.builder().teamActivityIds(new HashSet<>()).build());
-        Mockito.when(staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(any(), any(), anyMap())).thenReturn(null);
+        Mockito.when(staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(any(), any(),any())).thenReturn(null);
         Map<Integer, Long> staffingLevelData = staffingLevelCalculationKPIService.getPresenceStaffingLevelDataPerHour(dateTimeInterval, kpiCalculationRelatedInfo);
         Assert.assertEquals(180L,Long.parseLong(staffingLevelData.get(0).toString()));
     }

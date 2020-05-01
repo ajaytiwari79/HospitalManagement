@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -72,5 +73,12 @@ public class NightWorkerController {
     }
 
 
+
+    @ApiOperation(value = "get night worker details")
+    @PutMapping(value = "/get_night_worker_details")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getNightWorkerDetails(@RequestBody Map<String, Collection<Long>> requestBody) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,nightWorkerService.getNightWorkerDetails(requestBody));
+    }
 
 }

@@ -17,10 +17,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -194,7 +191,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "set r.isEnabled=false")
     void removeSkillsByExpertise(long staffId, List<Long> expertiseIds);
 
-    Staff findByKmdExternalId(Long kmdExternalId);
+    Optional<Staff> findByKmdExternalId(Long kmdExternalId);
 
 
     @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]-(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff) WHERE id(organization)={0} AND id(staff)={1}\n" +
@@ -451,7 +448,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff)={0} and id(skill) IN {1}\n" +
             "MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory) WITH skill, staff, skillCategory, r\n" +
-            "MATCH (organization:Unit)-[orgHasSkill:" + ORGANISATION_HAS_SKILL + "]->(skill:Skill) WHERE id(organization)={2} WITH skill, staff, skillCategory,orgHasSkill, r \n" +
+            "MATCH (organization:OrganizationBaseEntity)-[orgHasSkill:" + ORGANISATION_HAS_SKILL + "]->(skill:Skill) WHERE id(organization)={2} WITH skill, staff, skillCategory,orgHasSkill, r \n" +
             "RETURN {id:id(r),skillId:id(skill),name:orgHasSkill.customName,skillCategory:skillCategory.name,startDate:r.startDate,endDate:r.endDate,visitourId:skill.visitourId,lastSyncInVisitour:r.lastModificationDate,status:r.isEnabled,skillLevel:r.skillLevel} AS data")
     List<Map<String, Object>> getStaffSkillInfo(long staffId, List<Long> skillId, long unitId);
 
@@ -488,6 +485,15 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]->(:Position)-[:" + BELONGS_TO + "]->(staff:Staff) WHERE id(organization)={1}" +
             "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={0} RETURN id(staff)")
     Long getStaffIdByUserId(Long userId, Long parentOrganizationId);
+
+    @Query("MATCH (employments:Employment)-[:IN_UNIT]-(unit:Unit) WHERE id(unit)={0} AND ( employments.endDate > {1} OR employments.endDate is null) " +
+            "WITH employments MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments)" +
+            "WITH user,staff,employments OPTIONAL MATCH (staff)-[:BELONGS_TO_TAGS]-(tags:Tag)"+
+            "RETURN distinct id(staff) as id, id(user) as userId, staff.firstName as firstName,staff.lastName as lastName," +
+            "collect(employments) as employments," +
+            "collect(tags) as tags " +
+            "ORDER BY staff.firstName")
+    List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId, String dateToCompare);
 
     @Query("MATCH(user:User)-[rel:BELONGS_TO]-(staff:Staff)-[rela:BELONGS_TO]-(position:Position)-[relb:HAS_POSITIONS]-(o:Organization)\n" +
             "WHERE id(o)={0} AND id(user)={1} RETURN staff")

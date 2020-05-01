@@ -7,15 +7,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OptaPlannerSettingActivityTab implements Serializable {
+public class OptaPlannerSettingActivityTab  {
 
     private int maxThisActivityPerShift;
     private int minLength;

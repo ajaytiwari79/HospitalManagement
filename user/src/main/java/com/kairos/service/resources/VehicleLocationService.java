@@ -28,7 +28,7 @@ public class VehicleLocationService {
     private ExceptionService exceptionService;
 
     public VehicleLocationDTO createVehicleLocation(VehicleLocationDTO vehicleLocationDTO) {
-        Boolean vehicleLocationExistByName = vehicleLocationRepository.vehicleLocationExistByName("(?i)" + vehicleLocationDTO.getName(), -1L);
+        boolean vehicleLocationExistByName = vehicleLocationRepository.vehicleLocationExistByName("(?i)" + vehicleLocationDTO.getName(), -1L);
         if (vehicleLocationExistByName) {
             exceptionService.duplicateDataException(MESSAGE_VEHICLELOCATION_NAME_EXIST);
         }
@@ -39,7 +39,7 @@ public class VehicleLocationService {
     }
 
     public VehicleLocationDTO updateVehicleLocation(VehicleLocationDTO vehicleLocationDTO) {
-        Boolean vehicleLocationExistByName = vehicleLocationRepository.vehicleLocationExistByName("(?i)" + vehicleLocationDTO.getName(), vehicleLocationDTO.getId());
+        boolean vehicleLocationExistByName = vehicleLocationRepository.vehicleLocationExistByName("(?i)" + vehicleLocationDTO.getName(), vehicleLocationDTO.getId());
         if (vehicleLocationExistByName) {
             exceptionService.duplicateDataException(MESSAGE_VEHICLELOCATION_NAME_EXIST);
         }

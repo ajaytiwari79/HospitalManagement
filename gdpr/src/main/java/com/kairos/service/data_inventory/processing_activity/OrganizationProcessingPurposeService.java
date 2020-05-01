@@ -65,7 +65,7 @@ public class OrganizationProcessingPurposeService{
                 }
                processingPurposeRepository.saveAll(processingPurposes);
             }
-            return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingPurposes,ProcessingPurposeDTO.class);
+            return ObjectMapperUtils.copyCollectionPropertiesByMapper(processingPurposes,ProcessingPurposeDTO.class);
     }
 
 

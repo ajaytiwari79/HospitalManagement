@@ -6,13 +6,14 @@ import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @XStreamAlias("StaffingLevelMatrix")
+@EqualsAndHashCode
 public class StaffingLevelMatrix {
 
     public static final String SL_MATRIX_DEDUCTION_TOOK = "SL matrix deduction took:";

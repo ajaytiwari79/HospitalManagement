@@ -35,6 +35,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_SHIFT_IDS;
 import static com.kairos.constants.ActivityMessagesConstants.PAST_DATE_ALLOWED;
@@ -123,7 +124,7 @@ public class ShiftStateService {
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=oldTimeAndAttendanceShiftStates.stream().filter(shiftState -> shiftState.getShiftStatePhaseId().equals(phase.getId())).collect(Collectors.toMap(ShiftState::getShiftId, v->v));
         List<ShiftState> timeAndAttendanceShiftStates = getShiftStateLists( shifts, phase.getId(), timeAndAttendanceShiftStateMap);
         for (ShiftState timeAndAttendanceShiftState : timeAndAttendanceShiftStates) {
-            if(shiftValidatorService.validateGracePeriod(ObjectMapperUtils.copyPropertiesByMapper(timeAndAttendanceShiftState, ShiftDTO.class),true,timeAndAttendanceShiftState.getUnitId(),phase)){
+            if(shiftValidatorService.validateGracePeriod(timeAndAttendanceShiftState.getStartDate(),true,timeAndAttendanceShiftState.getUnitId(),phase)){
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.STAFF);
             }else {
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
@@ -142,7 +143,7 @@ public class ShiftStateService {
         ShiftState newshiftState;
         List<ShiftState> shiftState = new CopyOnWriteArrayList<>(timeAndAttendanceShiftStates);
         for (ShiftState timeAndAttendanceShiftState : shiftState) {
-            if(!shiftValidatorService.validateGracePeriod(ObjectMapperUtils.copyPropertiesByMapper(timeAndAttendanceShiftState, ShiftDTO.class),true,timeAndAttendanceShiftState.getUnitId(),phase) && !AccessGroupRole.MANAGEMENT.equals(timeAndAttendanceShiftState.getAccessGroupRole())){
+            if(!shiftValidatorService.validateGracePeriod(timeAndAttendanceShiftState.getStartDate(),true,timeAndAttendanceShiftState.getUnitId(),phase) && !AccessGroupRole.MANAGEMENT.equals(timeAndAttendanceShiftState.getAccessGroupRole())){
                 newshiftState=ObjectMapperUtils.copyPropertiesByMapper(timeAndAttendanceShiftState,ShiftState.class);
                 newshiftState.setId(null);
                 newshiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
@@ -219,7 +220,7 @@ public class ShiftStateService {
     }
 
     public void updateShiftDailyTimeBankAndPaidOut(List<Shift> shifts, List<Shift> shiftsList, Long unitId) {
-        if (!Optional.ofNullable(shifts).isPresent()) {
+        if (isCollectionEmpty(shifts)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_IDS);
         }
         List<Long> staffIds = shifts.stream().map(Shift::getStaffId).collect(Collectors.toList());

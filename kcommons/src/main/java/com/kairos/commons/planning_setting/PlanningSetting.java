@@ -1,23 +1,23 @@
 package com.kairos.commons.planning_setting;
 
-import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.constraint.ScoreLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class PlanningSetting {
-    Logger log= LoggerFactory.getLogger(PlanningSetting .class);
-    private ConstraintLevel constraintLevel;
-    private int constraintWeight;
 
-    public PlanningSetting(ConstraintLevel constraintLevel,int constraintWeight){
-        this.constraintLevel =constraintLevel;
+    private ScoreLevel scoreLevel;
+    private int constraintWeight;
+    private boolean mandatory;
+
+    public PlanningSetting(ScoreLevel scoreLevel, int constraintWeight, boolean mandatory){
+        this.scoreLevel = scoreLevel;
         this.constraintWeight = constraintWeight;
+        this.mandatory  = mandatory;
     }
 
 

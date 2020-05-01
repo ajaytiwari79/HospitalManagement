@@ -1,6 +1,8 @@
 package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -104,20 +106,9 @@ public class OrganizationAddressService {
     }
 
     public ContactAddress updateContactAddressOfUnit(AddressDTO addressDTO, long id) {
-        ContactAddress contactAddress;
-        contactAddress = contactAddressGraphRepository.findOne(addressDTO.getId());
-        if (contactAddress == null) {
-            logger.info("Creating new Address");
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONADDRESS_CONTACTADDRESS_NOTFOUND);
-
-        }
-
-        ZipCode zipCode;
+        ContactAddress contactAddress= contactAddressGraphRepository.findById(addressDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATIONADDRESS_CONTACTADDRESS_NOTFOUND)));
+        ZipCode zipCode=null;
         if (addressDTO.isVerifiedByGoogleMap()) {
-            if (addressDTO.getZipCode().getZipCode() == 0) {
-                logger.debug("No ZipCode value received");
-                return null;
-            }
             zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCode().getZipCode());
             contactAddress.setLatitude(addressDTO.getLatitude());
             contactAddress.setLongitude(addressDTO.getLongitude());
@@ -126,49 +117,33 @@ public class OrganizationAddressService {
             // Send Address to verify
             Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(addressDTO, id);
             if (tomtomResponse != null) {
-                // -------Parse Address from DTO -------- //
-
                 contactAddress.setCountry("Denmark");
-                // Coordinates
                 contactAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
                 contactAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
-
-                // Start And End Dates for Address
-                logger.debug("StartDate: " + addressDTO.getStartDate() + " End date " + addressDTO.getEndDate());
                 contactAddress.setStartDate(addressDTO.getStartDate());
                 contactAddress.setEndDate(addressDTO.getEndDate());
                 contactAddress.setVerifiedByVisitour(true);
                 zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCode().getId());
-            } else {
-                return null;
             }
         }
-
-
-        if (zipCode == null) {
-            logger.debug("Incorrect zipcode id");
-            return null;
-        }
-
-        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId());
-        if (municipality == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
-
-        }
+        Municipality municipality = municipalityGraphRepository.findById(addressDTO.getMunicipality().getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_MUNICIPALITY_NOTFOUND)));
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
-        if (geographyData == null) {
-            logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
+        updateAddressDetails(addressDTO, contactAddress, zipCode, municipality, geographyData);
+        Unit unit = unitGraphRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, id)));
+        unit.setContactAddress(contactAddress);
+        unitGraphRepository.save(unit);
+        return contactAddress;
+    }
 
+    private void updateAddressDetails(AddressDTO addressDTO, ContactAddress contactAddress, ZipCode zipCode, Municipality municipality, Map<String, Object> geographyData) {
+        if (geographyData != null) {
+            contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
+            contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
+            contactAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
         }
-        logger.info("Geography Data: " + geographyData);
-
-
         // Geography Data
         contactAddress.setMunicipality(municipality);
-        contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
-        contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-        contactAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
+
         contactAddress.setZipCode(zipCode);
         contactAddress.setCity(zipCode.getName());
         contactAddress.setVerifiedByVisitour(true);
@@ -178,43 +153,12 @@ public class OrganizationAddressService {
         contactAddress.setHouseNumber(addressDTO.getHouseNumber());
         contactAddress.setFloorNumber(addressDTO.getFloorNumber());
         contactAddress.setCity(zipCode.getName());
-
-
-        Unit unit = unitGraphRepository.findOne(id);
-        if (unit == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, id);
-
-
-        }
-        unit.setContactAddress(contactAddress);
-        unitGraphRepository.save(unit);
-
-        return contactAddress;
     }
 
     public Map<String, Object> saveBillingAddress(AddressDTO addressDTO, long unitId, boolean isAddressAlreadyExist) {
-
-        ContactAddress billingAddress = null;
-        if (isAddressAlreadyExist && addressDTO.getId() == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONADDRESS_CONTACTAADDRESS_NOTNULL);
-            //throw new DataNotFoundByIdException("Address not found to update");
-        } else if (isAddressAlreadyExist && addressDTO.getId() != null) {
-            billingAddress = contactAddressGraphRepository.findOne(addressDTO.getId());
-            if (billingAddress == null)
-                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONADDRESS_CONTACTADDRESS_NOTFOUND);
-
-        } else {
-            billingAddress = new ContactAddress();
-        }
-
-        Unit unit = unitGraphRepository.findOne(unitId);
-        if (unit == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
-
-        }
-
-        ZipCode zipCode;
-
+        ContactAddress billingAddress = getBillingAddress(addressDTO, isAddressAlreadyExist);
+        Unit unit = unitGraphRepository.findById(unitId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
+        ZipCode zipCode=null;
         if (addressDTO.isVerifiedByGoogleMap()) {
             zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCode().getZipCode());
             billingAddress.setLongitude(addressDTO.getLongitude());
@@ -222,48 +166,42 @@ public class OrganizationAddressService {
         } else {
             Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(addressDTO, unitId);
             if (tomtomResponse != null) {
-                // Coordinates
-                billingAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
-                billingAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
-
-                // Start And End Dates for Address
-                logger.debug("StartDate: " + addressDTO.getStartDate() + " End date " + addressDTO.getEndDate());
-
-                billingAddress.setStartDate(addressDTO.getStartDate());
-                billingAddress.setEndDate(addressDTO.getEndDate());
-                billingAddress.setVerifiedByVisitour(true);
+                setBillingAddressDetails(addressDTO, billingAddress, tomtomResponse);
                 zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCode().getId());
-            } else {
-                return null;
             }
         }
-
-        if (zipCode == null) {
-            logger.debug("Incorrect zipcode id");
-            return null;
-        }
-
-        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId());
-        if (municipality == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
-
-        }
-
-
+        Municipality municipality = municipalityGraphRepository.findById(addressDTO.getMunicipality().getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_MUNICIPALITY_NOTFOUND)));
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
-        if (geographyData == null) {
-            logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
+        setBillingAddressDetails(addressDTO, billingAddress, zipCode, municipality, geographyData);
+        long paymentTypeId = addressDTO.getPaymentTypeId();
+        long currencyId = addressDTO.getCurrencyId();
+        Currency currency = currencyGraphRepository.findById(currencyId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATIONADDRESS_CURRENCYORPAYMENTID_INCORRECT)));
+        PaymentType paymentType = paymentTypeGraphRepository.findById(paymentTypeId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATIONADDRESS_CURRENCYORPAYMENTID_INCORRECT)));
+        billingAddress.setPaymentType(paymentType);
+        billingAddress.setCurrency(currency);
+        unit.setBillingAddress(billingAddress);
+        unitGraphRepository.save(unit);
+        return prepareResponse(billingAddress, zipCode, currency, paymentType);
+    }
+
+    private void setBillingAddressDetails(AddressDTO addressDTO, ContactAddress billingAddress, Map<String, Object> tomtomResponse) {
+        billingAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
+        billingAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
+        billingAddress.setStartDate(addressDTO.getStartDate());
+        billingAddress.setEndDate(addressDTO.getEndDate());
+        billingAddress.setVerifiedByVisitour(true);
+    }
+
+    private void setBillingAddressDetails(AddressDTO addressDTO, ContactAddress billingAddress, ZipCode zipCode, Municipality municipality, Map<String, Object> geographyData) {
+        if (geographyData != null) {
+            billingAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
+            billingAddress.setCountry(String.valueOf(geographyData.get("countryName")));
+            billingAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
 
         }
-        logger.info("Geography Data: " + geographyData);
-
-
         // Geography Data
         billingAddress.setMunicipality(municipality);
-        billingAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
-        billingAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-        billingAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
+
         billingAddress.setZipCode(zipCode);
         billingAddress.setCity(zipCode.getName());
         billingAddress.setVerifiedByVisitour(true);
@@ -274,21 +212,9 @@ public class OrganizationAddressService {
         billingAddress.setFloorNumber(addressDTO.getFloorNumber());
         billingAddress.setCity(zipCode.getName());
         billingAddress.setContactPersonForBillingAddress(addressDTO.getBillingPerson());
-        long paymentTypeId = addressDTO.getPaymentTypeId();
-        long currencyId = addressDTO.getCurrencyId();
+    }
 
-        Currency currency = currencyGraphRepository.findOne(currencyId);
-        PaymentType paymentType = paymentTypeGraphRepository.findOne(paymentTypeId);
-
-        if (currency == null || paymentType == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONADDRESS_CURRENCYORPAYMENTID_INCORRECT);
-
-        }
-        billingAddress.setPaymentType(paymentType);
-        billingAddress.setCurrency(currency);
-        unit.setBillingAddress(billingAddress);
-        unitGraphRepository.save(unit);
-
+    private Map<String, Object> prepareResponse(ContactAddress billingAddress, ZipCode zipCode, Currency currency, PaymentType paymentType) {
         Map<String, Object> response = new HashMap<>();
         response.put("paymentTypeId", paymentType.getId());
         response.put("currencyId", currency.getId());
@@ -309,6 +235,19 @@ public class OrganizationAddressService {
         return response;
     }
 
+    private ContactAddress getBillingAddress(AddressDTO addressDTO, boolean isAddressAlreadyExist) {
+        ContactAddress billingAddress=null;
+        if (isAddressAlreadyExist && addressDTO.getId() == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONADDRESS_CONTACTAADDRESS_NOTNULL);
+        } else if (isAddressAlreadyExist && addressDTO.getId() != null) {
+            billingAddress = contactAddressGraphRepository.findOne(addressDTO.getId());
+            if (billingAddress == null)
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONADDRESS_CONTACTADDRESS_NOTFOUND);
+
+        }
+        return billingAddress==null?new ContactAddress():billingAddress;
+    }
+
     /**
      * This method is used to add Organizations's unit address of given UnitId.
      *
@@ -324,7 +263,7 @@ public class OrganizationAddressService {
                 logger.info("No address found");
                 address = new ContactAddress();
             }
-            logger.info("New address " + addressMap);
+            logger.info("New address {}" , addressMap);
             address.setHouseNumber((String) (addressMap.get("houseNumber")));
             address.setFloorNumber(Integer.parseInt(String.valueOf(addressMap.get("floorNumber"))));
             address.setStreet((String) (addressMap.get("street1")));
@@ -341,7 +280,7 @@ public class OrganizationAddressService {
     public ReasonCodeWrapper getAddressAndReasonCodeOfOrganization(Set<Long> absenceReasonCodeIds, Long unitId) {
         Map<String, Object> contactAddressData = unitGraphRepository.getContactAddressOfParentOrganization(unitId);
         List<ReasonCode> reasonCodes = reasonCodeGraphRepository.findByIds(absenceReasonCodeIds);
-        List<ReasonCodeDTO> reasonCodeDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(reasonCodes, ReasonCodeDTO.class);
+        List<ReasonCodeDTO> reasonCodeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodes, ReasonCodeDTO.class);
         return new ReasonCodeWrapper(reasonCodeDTOS, contactAddressData);
     }
 

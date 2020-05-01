@@ -1,12 +1,13 @@
 package com.kairos.persistence.model.activity.tabs;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.KPermissionField;
+import com.kairos.constants.ApiConstants;
 import com.kairos.enums.TimeCalaculationType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -16,8 +17,9 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TimeCalculationActivityTab implements Serializable {
+public class TimeCalculationActivityTab  {
 
+    @KPermissionField
     private String methodForCalculatingTime;
     private TimeCalaculationType fullDayCalculationType;
     private TimeCalaculationType fullWeekCalculationType;
@@ -26,7 +28,7 @@ public class TimeCalculationActivityTab implements Serializable {
     private String methodForCalculatingTimeInMonths;
     private List<String> balanceType;
     private Boolean multiplyWith;
-    private Double multiplyWithValue;
+    private Double multiplyWithValue = ApiConstants.DEFAULT_VALUE;
     private Boolean multiplyByVacationFactor;
     private Boolean multiplyByFinalSchedule;
     private DayOfWeek fullWeekStart;
@@ -35,6 +37,8 @@ public class TimeCalculationActivityTab implements Serializable {
     private int historyDuration;
     private LocalTime defaultStartTime;
     private List<Long> dayTypes = new ArrayList<>();
+    private boolean replaceWithPublishedShiftTime;
+    private boolean replaceWithUnapprovedAbsenceRequest;
 
     public TimeCalculationActivityTab(String methodForCalculatingTime, Long fixedTimeValue, Boolean multiplyWith, LocalTime defaultStartTime,Double multiplyWithValue) {
         this.methodForCalculatingTime = methodForCalculatingTime;

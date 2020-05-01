@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.staff;
 
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.persistence.model.country.tag.TagQueryResult;
 import com.kairos.persistence.model.organization.team.TeamDTO;
@@ -32,6 +33,7 @@ public class StaffKpiFilterQueryResult {
     private List<StaffChildDetailDTO> staffChildDetails;
     private long payTableAmount;
     private List<TagQueryResult> tags;
+    private List<SkillLevelDTO> skills;
 
     public StaffKpiFilterQueryResult() {
         //Default Constructor

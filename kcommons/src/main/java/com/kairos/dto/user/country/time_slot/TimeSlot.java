@@ -1,12 +1,11 @@
 package com.kairos.dto.user.country.time_slot;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
+
 public class TimeSlot {
 
     private int startHour;

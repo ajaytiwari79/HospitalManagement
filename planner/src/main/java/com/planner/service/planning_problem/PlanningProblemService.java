@@ -38,7 +38,7 @@ public class PlanningProblemService {
 
     public List<PlanningProblemDTO> getAllPlanningProblem() {
         List<PlanningProblem> planningProblems = planningProblemRepository.findAll();
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(planningProblems, PlanningProblemDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(planningProblems, PlanningProblemDTO.class);
     }
 
     public void updatePlanningProblem(PlanningProblemDTO planningProblemDTO) {

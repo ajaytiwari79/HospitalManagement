@@ -2,8 +2,11 @@ package com.kairos.dto.user.staff.employment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
+import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.employment_type.EmploymentCategory;
 import lombok.Getter;
@@ -15,8 +18,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by pawanmandhan on 27/7/17.
@@ -83,6 +85,10 @@ public class EmploymentDTO {
     //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
     private LocalDate accumulatedTimebankDate;
+    private Map<LocalDate,FunctionsDTO> dateWiseFunctionMap = new HashMap<>();
+    private List<EmploymentLinesDTO> employmentLines;
+    private ExpertiseNightWorkerSettingDTO expertiseNightWorkerSetting;
+    private BreakSettingsDTO breakSettings;
 
 
     public EmploymentDTO(Long expertiseId, LocalDate startDate, LocalDate endDate, int totalWeeklyMinutes,

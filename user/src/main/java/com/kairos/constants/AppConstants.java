@@ -158,6 +158,8 @@ public class AppConstants {
     public static final String MODULE_ID_PRFIX = "module_";
     public static final String TAB_ID_PRFIX = "tab_";
     public static final String ACCESS_PAGE_HAS_LANGUAGE ="ACCESS_PAGE_HAS_LANGUAGE";
+    public static final String TAB_119 = "tab_119";
+    public static final String MODULE_11 = "module_11";
 
     //Tomtom
     public static final String TOMTOM_KEY = "key";

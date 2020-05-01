@@ -4,8 +4,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.system_setting.GeneralSettingDTO;
 import com.kairos.persistence.model.system_setting.GeneralSetting;
 import com.kairos.persistence.repository.system_setting.GeneralSettingGraphRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +17,6 @@ import java.util.List;
 @Transactional
 @Service
 public class GeneralSettingService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Inject
     private GeneralSettingGraphRepository generalSettingGraphRepository;
 

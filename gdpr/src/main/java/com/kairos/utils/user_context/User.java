@@ -1,20 +1,18 @@
 package com.kairos.utils.user_context;
 
+import com.kairos.utils.CPRUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
-class User implements Serializable{
+class User{
     private Long id;
 
     private String cprNumber;
@@ -67,7 +65,6 @@ class User implements Serializable{
     }
 
     public int getAge() {
-        int age = 0;
         if (cprNumber==null){
             return this.age;
 
@@ -77,45 +74,7 @@ class User implements Serializable{
         }
         //System.out.print("\n CPR: ----"+cprNumber+"---\n");
         if (cprNumber!=null){
-            Integer year= Integer.valueOf(cprNumber.substring(4,6));
-            Integer month = Integer.valueOf(cprNumber.substring(2,4));
-            Integer day= Integer.valueOf(cprNumber.substring(0,2));
-            Integer century = Integer.parseInt(cprNumber.substring(6,7));
-
-            if (century>=0 && century<=3){
-                century = 1900;
-            }
-            if (century==4){
-                if (year<=36){
-                    century = 2000;
-                }
-                else {
-                    century = 1900;
-                }
-            }
-            if (century>=5 && century<=8){
-                if (year<=57){
-                    century =2000;
-                }
-                if (year>=58 && year<=99){
-                    century = 1800;
-                }
-            }
-            if (century==9){
-                if (year<=36){
-                    century = 2000;
-                }
-                else {
-                    century = 1900;
-                }
-            }
-            year = century+year;
-            LocalDate today = LocalDate.now();
-            LocalDate birthday = LocalDate.of(year, month, day);
-            // Calculating age in yeas from DOB
-            Period period = Period.between(birthday, today);
-            age = period.getYears();
-            this.age = age;
+            this.age = CPRUtil.getAgeFromCPRNumber(cprNumber);
         }
         return this.age;
     }

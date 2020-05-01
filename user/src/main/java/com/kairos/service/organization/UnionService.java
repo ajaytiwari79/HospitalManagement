@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.organization.MunicipalityDTO;
@@ -13,6 +14,7 @@ import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.address.MunicipalityQueryResult;
 import com.kairos.persistence.model.address.ZipCodeSectorQueryResult;
 import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -36,14 +38,13 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.wrapper.StaffUnionWrapper;
 import io.jsonwebtoken.lang.Assert;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,11 +61,12 @@ import static com.kairos.constants.UserMessagesConstants.*;
 @Service
 @Transactional
 public class UnionService {
-    private final Logger LOGGER = LoggerFactory.getLogger(UnionService.class);
     @Inject
     private UnitGraphRepository unitGraphRepository;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
+    @Inject
+    private CountryService countryService;
     @Inject
     private ZipCodeGraphRepository zipCodeGraphRepository;
     @Inject
@@ -225,26 +227,9 @@ public class UnionService {
 
 
     public UnionDTO createUnion(UnionDTO unionData, long countryId, boolean publish) {
-
-        Country country = countryGraphRepository.findOne(countryId);
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-        }
-
-        if (organizationGraphRepository.existsByName("(?i)" + unionData.getName(), -1l)) {
-            exceptionService.duplicateDataException(MESSAGE_UNION_NAME_EXISTS, unionData.getName());
-
-        }
-        ContactAddress address = null;
-        if (!Optional.ofNullable(unionData.getMainAddress()).isPresent() && publish) {
-            exceptionService.invalidRequestException(MESSAGE_PUBLISH_ADDRESS_MISSING);
-        } else if (Optional.ofNullable(unionData.getMainAddress()).isPresent()) {
-
-            address = getAddress(unionData.getMainAddress(), false, false, null, null, null);
-        }
-
+        Country country = validateDetails(unionData, countryId);
+        ContactAddress address = getContactAddress(unionData, publish);
         boolean boardingCompleted = false;
-
         if (publish) {
             validateAddress(unionData.getMainAddress());
             boardingCompleted = true;
@@ -262,11 +247,34 @@ public class UnionService {
         if (isCollectionEmpty(union.getLocations()) && publish) {
             union.getLocations().add(new Location(AppConstants.MAIN_LOCATION, true, address));
         }
-
         organizationGraphRepository.save(union);
         unionData.setSectors(sectors.stream().map(sector -> new SectorDTO(sector.getId(), sector.getName())).collect(Collectors.toList()));
         unionData.setId(union.getId());
         return unionData;
+    }
+
+    private ContactAddress getContactAddress(UnionDTO unionData, boolean publish) {
+        ContactAddress address = null;
+        if (!Optional.ofNullable(unionData.getMainAddress()).isPresent() && publish) {
+            exceptionService.invalidRequestException(MESSAGE_PUBLISH_ADDRESS_MISSING);
+        } else if (Optional.ofNullable(unionData.getMainAddress()).isPresent()) {
+
+            address = getAddress(unionData.getMainAddress(), false, false, null, null, null);
+        }
+        return address;
+    }
+
+    private Country validateDetails(UnionDTO unionData, long countryId) {
+        Country country = countryGraphRepository.findOne(countryId);
+        if (country == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
+        }
+
+        if (organizationGraphRepository.existsByName("(?i)" + unionData.getName(), -1l)) {
+            exceptionService.duplicateDataException(MESSAGE_UNION_NAME_EXISTS, unionData.getName());
+
+        }
+        return country;
     }
 
 
@@ -307,18 +315,8 @@ public class UnionService {
     }
 
     public UnionDTO updateUnion(UnionDTO unionData, long countryId, Long unionId, boolean publish) {
-        Country country = countryGraphRepository.findOne(countryId);
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-        }
-        if (organizationGraphRepository.existsByName("(?i)" + unionData.getName(), unionId)) {
-            exceptionService.duplicateDataException(MESSAGE_UNION_NAME_EXISTS, unionData.getName());
-        }
         List<UnionDataQueryResult> unionDataQueryResults = organizationGraphRepository.getUnionCompleteById(unionId, unionData.getName());
-
-        if (CollectionUtils.isEmpty(unionDataQueryResults) || (unionDataQueryResults.size() == 1 && !unionDataQueryResults.get(0).getUnion().getId().equals(unionId))) {
-            exceptionService.dataNotFoundByIdException("message.union.not.found", unionId);
-        }
+        validateDetails(unionData, unionId, unionDataQueryResults);
         Organization union = unionDataQueryResults.get(0).getUnion();
         union.setLocations(unionDataQueryResults.get(0).getLocations());
         if (!publish && union.isBoardingCompleted()) {
@@ -327,38 +325,26 @@ public class UnionService {
         List<Long> sectorIDsToBeCreated = new ArrayList<>();
         List<SectorDTO> sectorDTOS = new ArrayList<>();
         filterSectorsWithIdsAndSectorWithOutId(unionData, sectorIDsToBeCreated, sectorDTOS);
-        Set<Long> sectorIdsDb = unionDataQueryResults.get(0).getSectors().stream().map(sector -> sector.getId()).collect(Collectors.toSet());
+        Set<Long> sectorIdsDb = unionDataQueryResults.get(0).getSectors().stream().map(UserBaseEntity::getId).collect(Collectors.toSet());
         List<Long> sectorIds = new ArrayList<>(sectorIDsToBeCreated);
         sectorIDsToBeCreated.removeAll(sectorIdsDb);
         sectorIdsDb.removeAll(sectorIds);
-        if (!sectorIdsDb.isEmpty() && !union.isBoardingCompleted()) {
-            unitGraphRepository.deleteUnionSectorRelationShip(new ArrayList<>(sectorIdsDb), unionId);
-        } else if (!sectorIdsDb.isEmpty() && union.isBoardingCompleted()) {
-            exceptionService.unsupportedOperationException(MESSAGE_SECTOR_UNLINKED);
-        }
-        if (!sectorIDsToBeCreated.isEmpty()) {
-            unitGraphRepository.createUnionSectorRelationShip(sectorIDsToBeCreated, unionId);
-        }
-        if (!sectorDTOS.isEmpty()) {
-            List<Sector> sectors = createSectors(countryId, sectorDTOS);
-            union.getSectors().addAll(sectors);
-            unionData.getSectors().addAll(sectors.stream().map(sector -> new SectorDTO(sector.getId(), sector.getName())).collect(Collectors.toList()));
-
-        }
+        setSectorInfo(unionData, countryId, unionId, union, sectorIDsToBeCreated, sectorDTOS, sectorIdsDb);
         ContactAddress address = null;
         boolean zipCodeUpdated = false;
         boolean municipalityUpdated = false;
         UnionDataQueryResult unionDataQueryResult = unionDataQueryResults.get(0);
+        updateDataInUnion(unionData, publish, union, address, zipCodeUpdated, municipalityUpdated, unionDataQueryResult);
+        unionData.setId(union.getId());
+        return unionData;
+    }
 
+    private void updateDataInUnion(UnionDTO unionData, boolean publish, Organization union, ContactAddress address, boolean zipCodeUpdated, boolean municipalityUpdated, UnionDataQueryResult unionDataQueryResult) {
         if (!Optional.ofNullable(unionData.getMainAddress()).isPresent() && publish) {
             exceptionService.invalidRequestException(MESSAGE_PUBLISH_ADDRESS_MISSING);
         } else if (Optional.ofNullable(unionData.getMainAddress()).isPresent()) {
-            if (Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()) {
-                zipCodeUpdated = !unionDataQueryResult.getZipCode().getId().equals(unionData.getMainAddress().getZipCodeId());
-            }
-            if (Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent()) {
-                municipalityUpdated = !unionDataQueryResult.getMunicipality().getId().equals(unionData.getMainAddress().getMunicipalityId());
-            }
+            zipCodeUpdated = isZipCodeUpdated(unionData, zipCodeUpdated, unionDataQueryResult);
+            municipalityUpdated = isMunicipalityUpdated(unionData, municipalityUpdated, unionDataQueryResult);
             Long zipCodeIdDB = Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent() ? unionDataQueryResult.getZipCode().getId() : null;
             Long municipalityIdDB = Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent() ? unionDataQueryResult.getMunicipality().getId() : null;
             address = getAddress(unionData.getMainAddress(), zipCodeUpdated, municipalityUpdated, Optional.ofNullable(unionDataQueryResult.getAddress()).isPresent() ?
@@ -375,18 +361,57 @@ public class UnionService {
             union.getLocations().add(new Location(AppConstants.MAIN_LOCATION, true, address));
         }
         organizationGraphRepository.save(union);
-        unionData.setId(union.getId());
-        return unionData;
+    }
+
+    private boolean isMunicipalityUpdated(UnionDTO unionData, boolean municipalityUpdated, UnionDataQueryResult unionDataQueryResult) {
+        if (Optional.ofNullable(unionDataQueryResult.getMunicipality()).isPresent()) {
+            municipalityUpdated = !unionDataQueryResult.getMunicipality().getId().equals(unionData.getMainAddress().getMunicipalityId());
+        }
+        return municipalityUpdated;
+    }
+
+    private boolean isZipCodeUpdated(UnionDTO unionData, boolean zipCodeUpdated, UnionDataQueryResult unionDataQueryResult) {
+        if (Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()) {
+            zipCodeUpdated = !unionDataQueryResult.getZipCode().getId().equals(unionData.getMainAddress().getZipCodeId());
+        }
+        return zipCodeUpdated;
+    }
+
+    private void validateDetails(UnionDTO unionData, Long unionId, List<UnionDataQueryResult> unionDataQueryResults) {
+        if (organizationGraphRepository.existsByName("(?i)" + unionData.getName(), unionId)) {
+            exceptionService.duplicateDataException(MESSAGE_UNION_NAME_EXISTS, unionData.getName());
+        }
+
+        if (CollectionUtils.isEmpty(unionDataQueryResults) || (unionDataQueryResults.size() == 1 && !unionDataQueryResults.get(0).getUnion().getId().equals(unionId))) {
+            exceptionService.dataNotFoundByIdException("message.union.not.found", unionId);
+        }
+    }
+
+    private void setSectorInfo(UnionDTO unionData, long countryId, Long unionId, Organization union, List<Long> sectorIDsToBeCreated, List<SectorDTO> sectorDTOS, Set<Long> sectorIdsDb) {
+        if (!sectorIdsDb.isEmpty() && !union.isBoardingCompleted()) {
+            unitGraphRepository.deleteUnionSectorRelationShip(new ArrayList<>(sectorIdsDb), unionId);
+        } else if (!sectorIdsDb.isEmpty() && union.isBoardingCompleted()) {
+            exceptionService.unsupportedOperationException(MESSAGE_SECTOR_UNLINKED);
+        }
+        if (!sectorIDsToBeCreated.isEmpty()) {
+            unitGraphRepository.createUnionSectorRelationShip(sectorIDsToBeCreated, unionId);
+        }
+        if (!sectorDTOS.isEmpty()) {
+            List<Sector> sectors = createSectors(countryId, sectorDTOS);
+            union.getSectors().addAll(sectors);
+            unionData.getSectors().addAll(sectors.stream().map(sector -> new SectorDTO(sector.getId(), sector.getName())).collect(Collectors.toList()));
+
+        }
     }
 
     public boolean validateAddress(ContactAddressDTO addressDTO) {
-        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getHouseNumber()), exceptionService.convertMessage(MESSAGE_HOUSENUMBER_NULL));
-        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getProvince()), exceptionService.convertMessage("message.province.null"));
-        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getStreet()), exceptionService.convertMessage("message.street.null"));
-        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getCity()), exceptionService.convertMessage("message.city.null"));
-        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getRegionName()), exceptionService.convertMessage("message.region.null"));
-        Assert.notNull(addressDTO.getZipCodeId(), exceptionService.convertMessage("message.zipCodeId.null"));
-        Assert.notNull(addressDTO.getMunicipalityId(), exceptionService.convertMessage("message.municipality.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getHouseNumber()), CommonsExceptionUtil.convertMessage(MESSAGE_HOUSENUMBER_NULL));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getProvince()), CommonsExceptionUtil.convertMessage("message.province.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getStreet()), CommonsExceptionUtil.convertMessage("message.street.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getCity()), CommonsExceptionUtil.convertMessage("message.city.null"));
+        Assert.isTrue(StringUtils.isNotEmpty(addressDTO.getRegionName()), CommonsExceptionUtil.convertMessage("message.region.null"));
+        Assert.notNull(addressDTO.getZipCodeId(), CommonsExceptionUtil.convertMessage("message.zipCodeId.null"));
+        Assert.notNull(addressDTO.getMunicipalityId(), CommonsExceptionUtil.convertMessage("message.municipality.null"));
         return true;
     }
 
@@ -434,7 +459,6 @@ public class UnionService {
     }
 
     public UnionGlobalDataDTO getUnionData(Long countryId) {
-
         List<UnionDataQueryResult> unionDataObjects = unitGraphRepository.getUnionData(countryId);
         List<Long> locationIds = unionDataObjects.stream().flatMap(unionDataQueryResult -> unionDataQueryResult.getLocations().stream().map(Location::getId)).collect(
                 Collectors.toList());
@@ -450,30 +474,36 @@ public class UnionService {
         List<ZipCodeDTO> zipCodes = null;
         List<SectorDTO> sectors = null;
         if (CollectionUtils.isNotEmpty(zipCodesSectors.getZipCodes())) {
-            zipCodes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(zipCodesSectors.getZipCodes(), ZipCodeDTO.class);
+            zipCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(zipCodesSectors.getZipCodes(), ZipCodeDTO.class);
         }
         if (CollectionUtils.isNotEmpty(zipCodesSectors.getSectors())) {
-            sectors = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(zipCodesSectors.getSectors(), SectorDTO.class);
+            sectors = ObjectMapperUtils.copyCollectionPropertiesByMapper(zipCodesSectors.getSectors(), SectorDTO.class);
         }
         UnionGlobalDataDTO globalDataDTO = new UnionGlobalDataDTO(zipCodes, sectors);
 
         Map<Long, LocationDataQueryResult> locationDataMap = locationDataObjects.stream().collect(Collectors.toMap(LocationDataQueryResult::getLocationId,
                 locationDataQueryResult -> locationDataQueryResult, (first, second) -> second));
         List<UnionDataDTO> unionDataDTOS = new ArrayList<>();
+        updateUnionData(unionDataObjects, municipalityMap, locationDataMap, unionDataDTOS);
+        globalDataDTO.setUnions(unionDataDTOS);
+        return globalDataDTO;
+    }
+
+    private void updateUnionData(List<UnionDataQueryResult> unionDataObjects, Map<Long, MunicipalityQueryResult> municipalityMap, Map<Long, LocationDataQueryResult> locationDataMap, List<UnionDataDTO> unionDataDTOS) {
         for (UnionDataQueryResult unionDataQueryResult : unionDataObjects) {
 
             UnionDataDTO unionDataDTO = new UnionDataDTO();
             unionDataDTO.setId(unionDataQueryResult.getUnion().getId());
             unionDataDTO.setName(unionDataQueryResult.getUnion().getName());
-            unionDataDTO.setSectors(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(unionDataQueryResult.getSectors(), SectorDTO.class));
-            List<LocationDTO> locationDTOS = new ArrayList<LocationDTO>();
+            unionDataDTO.setSectors(ObjectMapperUtils.copyCollectionPropertiesByMapper(unionDataQueryResult.getSectors(), SectorDTO.class));
+            List<LocationDTO> locationDTOS = new ArrayList<>();
             List<MunicipalityDTO> municipalitiesUnion;
             if (Optional.ofNullable(unionDataQueryResult.getAddress()).isPresent()) {
                 ContactAddressDTO contactAddressDTOUnion = ObjectMapperUtils.copyPropertiesByMapper(unionDataQueryResult.getAddress(), ContactAddressDTO.class);
                 if (Optional.ofNullable(unionDataQueryResult.getZipCode()).isPresent()) {
                     contactAddressDTOUnion.setZipCodeId(unionDataQueryResult.getZipCode().getId());
                     contactAddressDTOUnion.setZipCodeValue(unionDataQueryResult.getZipCode().getZipCode());
-                    municipalitiesUnion = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(unionDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
+                    municipalitiesUnion = ObjectMapperUtils.copyCollectionPropertiesByMapper(unionDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
                     updateMunicipalities(municipalitiesUnion, municipalityMap);
                     unionDataDTO.setMunicipalities(municipalitiesUnion);
                 }
@@ -491,8 +521,6 @@ public class UnionService {
 
             unionDataDTOS.add(unionDataDTO);
         }
-        globalDataDTO.setUnions(unionDataDTOS);
-        return globalDataDTO;
     }
 
     public void updateMunicipalities(List<MunicipalityDTO> municipalities, Map<Long, MunicipalityQueryResult> municipalityMap) {
@@ -517,7 +545,7 @@ public class UnionService {
                 if (Optional.ofNullable(locationDataQueryResult.getZipCode()).isPresent()) {
                     contactAddressDTO.setZipCodeId(locationDataQueryResult.getZipCode().getId());
                     contactAddressDTO.setZipCodeValue(locationDataQueryResult.getZipCode().getZipCode());
-                    municipalitiesLocation = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(locationDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
+                    municipalitiesLocation = ObjectMapperUtils.copyCollectionPropertiesByMapper(locationDataQueryResult.getMunicipalities(), MunicipalityDTO.class);
                     updateMunicipalities(municipalitiesLocation, municipalityMap);
                 }
                 if (Optional.ofNullable(locationDataQueryResult.getMunicipality()).isPresent()) {
@@ -543,7 +571,7 @@ public class UnionService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_NOTFOUND);
 
         }
-        List<Long> organizationSubTypeIds = organizationBaseEntity.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
+        List<Long> organizationSubTypeIds = organizationBaseEntity.getOrganizationSubTypes().parallelStream().map(UserBaseEntity::getId).collect(Collectors.toList());
         List<UnionResponseDTO> unions = unitGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
         List<OrganizationBasicResponse> organizationHierarchy = unitGraphRepository.getOrganizationHierarchy(organization.getId());
 

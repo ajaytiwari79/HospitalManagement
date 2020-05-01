@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +36,6 @@ public class LanguageService {
     public List<Language> getAllLanguage(){
         return languageGraphRepository.findAll();
     }
-// TODO FIX LATER
     public Language save( Language language){
         return languageGraphRepository.save(language);
     }
@@ -49,7 +49,7 @@ public class LanguageService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
 
-            Boolean languageExistInCountryByName = languageGraphRepository.languageExistInCountryByName(countryId, "(?i)" + language.getName(), -1L);
+            boolean languageExistInCountryByName = languageGraphRepository.languageExistInCountryByName(countryId, "(?i)" + language.getName(), -1L);
             if (languageExistInCountryByName) {
                 exceptionService.duplicateDataException("error.Language.name.exist");
             }
@@ -64,7 +64,7 @@ public class LanguageService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
 
-            Boolean languageExistInCountryByName = languageGraphRepository.languageExistInCountryByName(countryId, "(?i)" + language.getName(), language.getId());
+            boolean languageExistInCountryByName = languageGraphRepository.languageExistInCountryByName(countryId, "(?i)" + language.getName(), language.getId());
             if (languageExistInCountryByName) {
                 exceptionService.duplicateDataException("error.Language.name.exist");
             }
@@ -91,15 +91,14 @@ public class LanguageService {
     public List<Map<String, Object>> getUnitAvailableLanguages(long unitId) {
 
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-
+        List<Map<String, Object>> data = null;
         if (countryId != null) {
 
-            logger.info("Finding available languages for CountryId: " + countryId);
-            List<Map<String, Object>> data = languageGraphRepository.getLanguageByCountryIdAnotherFormat(countryId);
-            return data != null ? FormatUtil.formatNeoResponse(data) : null;
-
+            logger.info("Finding available languages for CountryId: {}" , countryId);
+            data  = languageGraphRepository.getLanguageByCountryIdAnotherFormat(countryId);
+            return data != null ? FormatUtil.formatNeoResponse(data) : new ArrayList<>();
         }
-        return null;
+        return data;
     }
 
 

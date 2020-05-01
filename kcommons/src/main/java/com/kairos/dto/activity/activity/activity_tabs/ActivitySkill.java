@@ -1,11 +1,9 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
-import java.io.Serializable;
-
 /**
  * Created by pawanmandhan on 28/8/17.
  */
-public class ActivitySkill implements Serializable {
+public class ActivitySkill  {
     private  String name;
     private String level;
     private Long skillId;

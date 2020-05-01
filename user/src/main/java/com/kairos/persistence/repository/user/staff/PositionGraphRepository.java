@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.staff;
 
+import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.position.ExpiredPositionsQueryResult;
 import com.kairos.persistence.model.staff.position.Position;
@@ -63,9 +64,8 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
     Staff findStaffByPositionId(Long positionId);
 
     @Query("MATCH (organization),(user:User) WHERE id(organization)={0} AND id(user)={1}\n" +
-            "Match (organization)<-[:" + HAS_SUB_ORGANIZATION+"*]-(org:Organization{isParentOrganization:true,isKairosHub:false})" +
             "MATCH (user)-[:"+ BELONGS_TO +"]-(staff:Staff)" +
-            "MATCH (org)-[:"+ HAS_POSITIONS +"]->(position:Position{deleted:false})-[" + BELONGS_TO + "]->(staff) RETURN position")
+            "MATCH (organization)-[:"+ HAS_POSITIONS +"]->(position:Position{deleted:false})-[" + BELONGS_TO + "]->(staff) RETURN position")
     Position findPositionByOrganizationIdAndUserId(long organizationId, long userId);
 
     @Query("MATCH(position:Position) WHERE position.endDateMillis={0} \n" +
@@ -73,5 +73,10 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
             "MATCH (unitPermission)-[r:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) " +
             "RETURN DISTINCT id(position)")
     List<Long> findAllPositionsIdByEndDate(Long endDateMillis);
+
+    @Query("MATCH(position:Position) where id(position) IN {0} \n" +
+            "MATCH(position)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) \n" +
+            "RETURN DISTINCT user.userName")
+    List<String> getAllUserByPositionIds(List<Long> positionIds);
 }
 

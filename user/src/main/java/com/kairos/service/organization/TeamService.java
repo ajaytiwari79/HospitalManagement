@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
-import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
@@ -17,7 +18,6 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -82,38 +82,19 @@ public class TeamService {
     @Inject private CommonRepository commonRepository;
 
     public TeamDTO createTeam(Long unitId, TeamDTO teamDTO) {
-
         OrganizationContactAddress organizationContactAddress = unitGraphRepository.getOrganizationByOrganizationId(unitId);
-        if (organizationContactAddress.getUnit() == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_UNIT_ID_NOTFOUND_BY_GROUP);
-        }
-        boolean teamExistInOrganizationByName = teamGraphRepository.teamExistInOrganizationByName(unitId, -1L, "(?i)" + teamDTO.getName());
-        if (teamExistInOrganizationByName) {
-            exceptionService.duplicateDataException(MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT, teamDTO.getName());
-        }
-
+        validateDetails(unitId, teamDTO, organizationContactAddress);
         Unit unit = organizationContactAddress.getUnit();
-
-        ContactAddress contactAddress;
-        ZipCode zipCode;
-        Municipality municipality;
-
-        zipCode = organizationContactAddress.getZipCode();
-        LOGGER.debug("zip code found is " + zipCode);
+        ZipCode zipCode = organizationContactAddress.getZipCode();
         if (zipCode == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
         }
-        municipality = organizationContactAddress.getMunicipality();
+        Municipality municipality = organizationContactAddress.getMunicipality();
         if (municipality == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
         }
-        Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
-        if (geographyData == null) {
-            LOGGER.info("Geography  not found with zipcodeId: " + zipCode.getId());
-            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
-        }
-        contactAddress = new ContactAddress(municipality, organizationContactAddress.getContactAddress().getLongitude(), organizationContactAddress.getContactAddress().getLatitude(),
+        ContactAddress contactAddress = new ContactAddress(municipality, organizationContactAddress.getContactAddress().getLongitude(), organizationContactAddress.getContactAddress().getLatitude(),
                 organizationContactAddress.getContactAddress().getProvince(), organizationContactAddress.getContactAddress().getRegionName(), organizationContactAddress.getContactAddress().getCity(),
                 organizationContactAddress.getContactAddress().getCountry(), zipCode, organizationContactAddress.getContactAddress().getHouseNumber(),
                 organizationContactAddress.getContactAddress().getStreet(), organizationContactAddress.getContactAddress().getStreetUrl(), organizationContactAddress.getContactAddress().getFloorNumber()
@@ -122,12 +103,21 @@ public class TeamService {
         Team team = new Team(teamDTO.getName(), teamDTO.getDescription(), contactAddress);
         teamGraphRepository.save(team);
         teamDTO.setId(team.getId());
-
         unit.getTeams().add(team);
         unitGraphRepository.save(unit, 2);
         teamDTO.setId(team.getId());
         assignTeamLeadersToTeam(teamDTO, team);
         return teamDTO;
+    }
+
+    private void validateDetails(Long unitId, TeamDTO teamDTO, OrganizationContactAddress organizationContactAddress) {
+        if (organizationContactAddress.getUnit() == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_UNIT_ID_NOTFOUND_BY_GROUP);
+        }
+        boolean teamExistInOrganizationByName = teamGraphRepository.teamExistInOrganizationByName(unitId, -1L, "(?i)" + teamDTO.getName());
+        if (teamExistInOrganizationByName) {
+            exceptionService.duplicateDataException(MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT, teamDTO.getName());
+        }
     }
 
     public TeamDTO updateTeam(Long unitId, Long teamId, TeamDTO teamDTO) {
@@ -231,11 +221,7 @@ public class TeamService {
 
     public boolean addStaffInTeam(long teamId, long staffId, boolean isAssigned) {
 
-        Staff staff = staffGraphRepository.findOne(staffId);
-        Team team = teamGraphRepository.findOne(teamId, 0);
-        if (staff == null || team == null) {
-            exceptionService.internalServerError(ERROR_TEAMSERVICE_STAFFORTEAM_NOTEMPTY);
-        }
+        Staff staff = staffGraphRepository.findById(staffId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(ERROR_TEAMSERVICE_STAFFORTEAM_NOTEMPTY)));
         int countOfRel = teamGraphRepository.countRelBetweenStaffAndTeam(teamId, staffId);
         if (countOfRel == 0) {
 
@@ -330,11 +316,7 @@ public class TeamService {
     }
 
     public TeamDTO updateTeamGeneralDetails(long teamId, TeamDTO teamDTO) {
-
-        Team team = teamGraphRepository.findOne(teamId);
-        if (team == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_TEAM_NOTFOUND, teamId);
-        }
+        Team team = teamGraphRepository.findById(teamId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_TEAMSERVICE_TEAM_NOTFOUND, teamId)));
         team.setName(teamDTO.getName());
         teamGraphRepository.save(team);
         return teamDTO;

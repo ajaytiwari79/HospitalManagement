@@ -4,13 +4,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serializable;
-
 /**
  * Created by pankaj on 4/3/17.
  */
 @Document(collection = "kairos_sequence")
-public class MongoSequence implements Serializable {
+public class MongoSequence  {
 
     @Id
     private String id;

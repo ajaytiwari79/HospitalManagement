@@ -54,6 +54,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.GdprMessagesConstants.*;
+
 @Service
 public class AssessmentService {
 
@@ -114,7 +116,7 @@ public class AssessmentService {
 
         Asset asset = assetRepository.findByIdAndOrganizationIdAndDeletedFalse(assetId, unitId);
         if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "message.asset", assetId);
         } else if (!asset.isActive()) {
             exceptionService.invalidRequestException("message.asset.inactive");
         } else if (!Optional.ofNullable(assessmentDTO.getRelativeDeadlineDuration()).isPresent() || !Optional.ofNullable(assessmentDTO.getRelativeDeadlineType()).isPresent()) {
@@ -164,11 +166,11 @@ public class AssessmentService {
      * @param assessmentDTO        Assessment Dto contain detail about who assign assessment and to whom assessment is assigned
      * @return
      */
-    public AssessmentDTO launchAssessmentForProcessingActivity(Long unitId, Long processingActivityId, AssessmentDTO assessmentDTO, boolean subProcessingActivity) {
+    public AssessmentDTO launchAssessmentForProcessingActivity(Long unitId, Long processingActivityId, AssessmentDTO assessmentDTO) {
 
         ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedAndIsSubProcessingActivity(processingActivityId, unitId, false);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.ProcessingActivity", processingActivityId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "message.ProcessingActivity", processingActivityId);
         } else if (!processingActivity.isActive()) {
             exceptionService.invalidRequestException("message.processing.activity.inactive");
         }
@@ -207,7 +209,7 @@ public class AssessmentService {
         } else if (assessmentDTO.getEndDate().isBefore(LocalDate.now()) || assessmentDTO.getEndDate().isBefore(assessmentDTO.getStartDate())) {
             exceptionService.invalidRequestException("message.assessment.enter.valid.enddate");
         }
-        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getStartDate(), assessmentDTO.getEndDate(), assessmentDTO.getComment(), ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessmentDTO.getAssigneeList(), com.kairos.persistence.model.embeddables.Staff.class), ObjectMapperUtils.copyPropertiesByMapper(assessmentDTO.getApprover(), com.kairos.persistence.model.embeddables.Staff.class), unitId);
+        Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getStartDate(), assessmentDTO.getEndDate(), assessmentDTO.getComment(), ObjectMapperUtils.copyCollectionPropertiesByMapper(assessmentDTO.getAssigneeList(), com.kairos.persistence.model.embeddables.Staff.class), ObjectMapperUtils.copyPropertiesByMapper(assessmentDTO.getApprover(), com.kairos.persistence.model.embeddables.Staff.class), unitId);
         QuestionnaireTemplate questionnaireTemplate;
         switch (templateType) {
             case ASSET_TYPE:
@@ -394,10 +396,10 @@ public class AssessmentService {
 
         Assessment assessment = assessmentRepository.findByOrganizationIdAndId(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "Assessment", assessmentId);
         }
         QuestionnaireTemplate assessmentQuestionnaireTemplate = assessment.getQuestionnaireTemplate();
-        List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessmentQuestionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class);
+        List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections = ObjectMapperUtils.copyCollectionPropertiesByMapper(assessmentQuestionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class);
         if (assessment.isRiskAssessment()) {
             getRiskAssessmentAnswer(assessment, assessmentQuestionnaireSections);
         } else {
@@ -447,19 +449,19 @@ public class AssessmentService {
 
         switch (assetAttributeName) {
             case HOSTING_PROVIDER:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(hostingProviderRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(hostingProviderRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case HOSTING_TYPE:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(hostingTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(hostingTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ASSET_TYPE:
                 return assetTypeService.getAllAssetTypeWithSubAssetTypeAndRisk(unitId);
             case STORAGE_FORMAT:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(storageFormatRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(storageFormatRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case DATA_DISPOSAL:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataDisposalRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(dataDisposalRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case TECHNICAL_SECURITY_MEASURES:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(technicalSecurityMeasureRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(technicalSecurityMeasureRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ORGANIZATION_SECURITY_MEASURES:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(organizationalSecurityMeasureRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationalSecurityMeasureRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             default:
                 return null;
         }
@@ -473,17 +475,17 @@ public class AssessmentService {
 
         switch (processingActivityAttributeName) {
             case RESPONSIBILITY_TYPE:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(responsibilityTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(responsibilityTypeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case PROCESSING_PURPOSES:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingPurposeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(processingPurposeRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case DATA_SOURCES:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataSourceRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(dataSourceRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case TRANSFER_METHOD:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(transferMethodRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(transferMethodRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case ACCESSOR_PARTY:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessorPartyRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(accessorPartyRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             case PROCESSING_LEGAL_BASIS:
-                return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingLegalBasisRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
+                return ObjectMapperUtils.copyCollectionPropertiesByMapper(processingLegalBasisRepository.findAllByOrganizationId(unitId), MetaDataCommonResponseDTO.class);
             default:
                 return null;
         }
@@ -498,7 +500,7 @@ public class AssessmentService {
 
         Assessment assessment = assessmentRepository.findByOrganizationIdAndId(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assessment", assessmentId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "message.assessment", assessmentId);
         } else if (AssessmentStatus.COMPLETED.equals(assessment.getAssessmentStatus())) {
             exceptionService.invalidRequestException("message.assessment.completed.cannot.fill.answer");
         } else if ((AssessmentStatus.NEW.equals(assessment.getAssessmentStatus()) && AssessmentStatus.COMPLETED.equals(status)) || AssessmentStatus.NEW.equals(status)) {
@@ -507,13 +509,13 @@ public class AssessmentService {
 
         UserVO currentUser = new UserVO(UserContext.getUserDetails().getId(), UserContext.getUserDetails().getUserName(), UserContext.getUserDetails().getEmail(), UserContext.getUserDetails().getFirstName(), UserContext.getUserDetails().getLastName());
         if ((AssessmentStatus.IN_PROGRESS.equals(status) && AssessmentStatus.IN_PROGRESS.equals(assessment.getAssessmentStatus())) && !currentUser.equals(assessment.getAssessmentLastAssistBy())) {
-            exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
+            exceptionService.invalidRequestException(MESSAGE_NOTAUTHORIZED_TOCHANGE_ASSESSMENT_STATUS);
         }
         validateAssessmentAnswer(assessment, assessmentAnswerValueObjects);
         assessment.setAssessmentStatus(status);
         if (AssessmentStatus.COMPLETED.equals(status)) {
             if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
-                exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
+                exceptionService.invalidRequestException(MESSAGE_NOTAUTHORIZED_TOCHANGE_ASSESSMENT_STATUS);
             }
             assessment.setCompletedDate(LocalDate.now());
         }
@@ -571,20 +573,20 @@ public class AssessmentService {
         switch (assessmentStatus) {
             case IN_PROGRESS:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
-                    exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
+                    exceptionService.invalidRequestException(MESSAGE_ASSESSMENT_INVALID_STATUS, assessment.getAssessmentStatus(), assessmentStatus);
                 }
                 break;
             case COMPLETED:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
-                    exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
+                    exceptionService.invalidRequestException(MESSAGE_ASSESSMENT_INVALID_STATUS, assessment.getAssessmentStatus(), assessmentStatus);
                 } else if (!currentUser.equals(assessment.getAssessmentLastAssistBy())) {
-                    exceptionService.invalidRequestException("message.notAuthorized.toChange.assessment.status");
+                    exceptionService.invalidRequestException(MESSAGE_NOTAUTHORIZED_TOCHANGE_ASSESSMENT_STATUS);
                 }
                 mapAssessmentAnswerToAssetOrProcessingActivity(assessment);
                 break;
             case NEW:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.IN_PROGRESS) || assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
-                    exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
+                    exceptionService.invalidRequestException(MESSAGE_ASSESSMENT_INVALID_STATUS, assessment.getAssessmentStatus(), assessmentStatus);
                 }
                 break;
             default:
@@ -606,7 +608,7 @@ public class AssessmentService {
                 if (Optional.ofNullable(assetAssessmentAnswer.getAttributeName()).isPresent()) {
                     saveAssessmentAnswerAsAssetValueOnCompletionOfAssessment(AssetAttributeName.valueOf(assetAssessmentAnswer.getAttributeName()), assetAssessmentAnswer.getValue(), asset);
                 } else {
-                    exceptionService.invalidRequestException("message.assessment.answer.attribute.null");
+                    exceptionService.invalidRequestException(MESSAGE_ASSESSMENT_ANSWER_ATTRIBUTE_NULL);
                 }
             });
             assetRepository.save(asset);
@@ -618,7 +620,7 @@ public class AssessmentService {
                 if (Optional.ofNullable(processingActivityAssessmentAnswer.getAttributeName()).isPresent()) {
                     saveAssessmentAnswerAsProcessingActivityValueOnCompletionOfAssessment(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentAnswer.getAttributeName()), processingActivityAssessmentAnswer.getValue(), processingActivity);
                 } else {
-                    exceptionService.invalidRequestException("message.assessment.answer.attribute.null");
+                    exceptionService.invalidRequestException(MESSAGE_ASSESSMENT_ANSWER_ATTRIBUTE_NULL);
                 }
             });
             processingActivityRepository.save(processingActivity);
@@ -635,13 +637,13 @@ public class AssessmentService {
         Long staffId = gDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         });
         List<Assessment> assessments = assessmentRepository.getAllAssessmentByUnitIdAndStaffId(unitId, staffId, assessmentStatusList);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessments, AssessmentBasicResponseDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(assessments, AssessmentBasicResponseDTO.class);
     }
 
 
     public List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId) {
         List<Assessment> assessments = assessmentRepository.getAllAssessmentByUnitId(unitId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessments, AssessmentResponseDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(assessments, AssessmentResponseDTO.class);
     }
 
     public AssessmentSchedulingFrequency[] getSchedulingFrequency() {
@@ -779,8 +781,8 @@ public class AssessmentService {
         assessments.forEach(assessment -> {
             AssessmentBasicResponseDTO assessmentBasicResponseDTO = new AssessmentBasicResponseDTO(assessment.getId(), assessment.getName(), assessment.getEndDate(), assessment.getCompletedDate(), assessment.getStartDate(), assessment.getComment(), assessment.getAssessmentStatus(), assessment.getAssessmentLaunchedDate(), assessment.getAssessmentSchedulingFrequency());
             assessmentBasicResponseDTO.setApprover(ObjectMapperUtils.copyPropertiesByMapper(assessment.getApprover(), Staff.class));
-            assessmentBasicResponseDTO.setAssigneeList(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessment.getAssigneeList(), Staff.class));
-            assessmentBasicResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assessment.getRisks(), RiskBasicResponseDTO.class));
+            assessmentBasicResponseDTO.setAssigneeList(ObjectMapperUtils.copyCollectionPropertiesByMapper(assessment.getAssigneeList(), Staff.class));
+            assessmentBasicResponseDTO.setRisks(ObjectMapperUtils.copyCollectionPropertiesByMapper(assessment.getRisks(), RiskBasicResponseDTO.class));
             assessmentBasicResponseDTOList.add(assessmentBasicResponseDTO);
         });
         return assessmentBasicResponseDTOList;

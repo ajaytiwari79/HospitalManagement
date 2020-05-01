@@ -13,7 +13,6 @@ public class TimeAttendanceGracePeriod extends MongoBaseEntity {
 
     public TimeAttendanceGracePeriod(Long unitId) {
         this.unitId = unitId;
-
     }
 
     public Long getUnitId() {

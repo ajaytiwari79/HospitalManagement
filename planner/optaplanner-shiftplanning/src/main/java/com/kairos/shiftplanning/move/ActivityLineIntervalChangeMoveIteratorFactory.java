@@ -64,13 +64,13 @@ public class ActivityLineIntervalChangeMoveIteratorFactory implements MoveIterat
         List<ShiftImp> shifts=new ArrayList<>(workingShifts);
         //Pick a random date's shift and ALIs
         ShiftImp shift=shifts.get(new Random().nextInt(shifts.size()));
-        Activity activity =solution.getActivitiesPerDay().get(shift.getDate()).get(workingRandom.nextInt(solution.getActivitiesPerDay().get(shift.getDate()).size()));
+        Activity activity =solution.getActivitiesPerDay().get(shift.getStartDate()).get(workingRandom.nextInt(solution.getActivitiesPerDay().get(shift.getStartDate()).size()));
         for (ActivityLineInterval activityLineInterval:activityLineIntervals) {
             //if(activityLineInterval.getShift()!=null)continue;
             if(!activity.getId().equals(activityLineInterval.getActivity().getId())){// ||  !activityLineInterval.isRequired()
                 continue;
             }
-            if(activityLineInterval.getStart().toLocalDate().equals(shift.getDate())){
+            if(activityLineInterval.getStart().toLocalDate().equals(shift.getStartDate())){
                 possibleActivityLineIntervals.add(new ActivityLineIntervalWrapper(activityLineInterval,shift));
                 //nullActivityLineIntervals.add(new ActivityLineIntervalWrapper(activityLineInterval,null));
             }

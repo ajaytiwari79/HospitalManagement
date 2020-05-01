@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.task_type.TaskTypeEnum;
 
-import java.io.Serializable;
-
 /**
  * Created by prabjot on 7/10/16.
  */
-public class TaskTypeDefination implements Serializable {
+public class TaskTypeDefination  {
 
     private TaskTypeEnum.TaskTypeStatus taskTypeStatus;
 

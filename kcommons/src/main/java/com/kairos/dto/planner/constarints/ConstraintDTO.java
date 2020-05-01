@@ -1,6 +1,6 @@
 package com.kairos.dto.planner.constarints;
 
-import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import lombok.Getter;
@@ -19,17 +19,17 @@ public class ConstraintDTO {
     protected String description;
     protected ConstraintType constraintType;
     protected ConstraintSubType constraintSubType;
-    protected ConstraintLevel constraintLevel;
+    protected ScoreLevel scoreLevel;
     protected int penalty;
     protected Long planningProblemId;
 
 
-    public ConstraintDTO(String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ConstraintLevel constraintLevel, int penalty, Long planningProblemId) {
+    public ConstraintDTO(String name, String description, ConstraintType constraintType, ConstraintSubType constraintSubType, ScoreLevel scoreLevel, int penalty, Long planningProblemId) {
         this.name = name;
         this.description = description;
         this.constraintType = constraintType;
         this.constraintSubType = constraintSubType;
-        this.constraintLevel = constraintLevel;
+        this.scoreLevel = scoreLevel;
         this.penalty = penalty;
         this.planningProblemId = planningProblemId;
     }

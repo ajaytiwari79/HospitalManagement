@@ -2,6 +2,7 @@ package com.kairos.dto.activity.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.annotation.PermissionClass;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
@@ -30,6 +31,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Setter
 @Builder
 @AllArgsConstructor
+@PermissionClass(name = "Activity")
 public class ActivityDTO  {
     private BigInteger id;
     @NotBlank(message = "message.activity.name.notEmpty")
@@ -68,6 +70,7 @@ public class ActivityDTO  {
     private BigInteger activityPriorityId;
     private int activitySequence;
     private BigInteger countryParentId;
+    private Long teamId;
     @Builder.Default
     private Map<String, TranslationInfo> translations = new HashMap<>();
 

@@ -14,8 +14,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
-import static com.kairos.commons.utils.ObjectUtils.isEquals;
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * @author pradeep
@@ -24,7 +23,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ShiftActivity implements Comparable<ShiftActivity>{
+public class ShiftActivity implements Comparable<ShiftActivity> {
 
 
     private BigInteger activityId;
@@ -32,6 +31,8 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     private Date endDate;
     private int scheduledMinutes;
     private int durationMinutes;
+    private Integer startTime;
+    private Integer endTime;
     private String activityName;
     //used in T&A view
     private Long reasonCodeId;
@@ -69,22 +70,28 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
 
     public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,String timeType) {
         this.activityId = activityId;
-        this.startDate = roundDateByMinutes(startDate,15);;
-        this.endDate = roundDateByMinutes(endDate,15);
+        this.startDate = roundDateByMinutes(startDate, 15);
+        this.endDate = roundDateByMinutes(endDate, 15);
         this.activityName = activityName;
         this.timeType = timeType;
+        this.startTime = timeInSeconds(this.getStartDate());
+        this.endTime = timeInSeconds(this.getEndDate());
     }
 
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;
+        this.startTime = timeInSeconds(this.getStartDate());
+        this.endTime = timeInSeconds(this.getEndDate());
     }
 
     public ShiftActivity(BigInteger activityId, Date startDate,Date endDate,String activityName) {
         this.activityId = activityId;
-        this.startDate=roundDateByMinutes(startDate,15);
-        this.endDate=roundDateByMinutes(endDate,15);
-        this.activityName=activityName;
+        this.startDate = roundDateByMinutes(startDate, 15);
+        this.endDate = roundDateByMinutes(endDate, 15);
+        this.activityName = activityName;
+        this.startTime = timeInSeconds(this.getStartDate());
+        this.endTime = timeInSeconds(this.getEndDate());
     }
 
     public void setPayoutPerShiftCTADistributions(List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions) {
@@ -103,6 +110,10 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
         this.childActivities = isNullOrElse(childActivities,new ArrayList<>());
     }
 
+    public Set<ShiftStatus> getStatus() {
+        return isNullOrElse(status,newHashSet());
+    }
+
     @Override
     public int compareTo(ShiftActivity shiftActivity) {
         return this.startDate.compareTo(shiftActivity.startDate);
@@ -110,10 +121,16 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
 
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
+        this.startTime = timeInSeconds(this.getStartDate());
+
     }
 
     public void setEndDate(Date endDate) {
+        if(isNotNull(endDate)) {
+            this.endDate = roundDateByMinutes(endDate, 15);
+        }
         this.endDate = endDate;
+        this.endTime = timeInSeconds(this.getEndDate());
     }
 
     public boolean isShiftActivityChanged(ShiftActivity shiftActivity){
@@ -128,13 +145,17 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
         if (this.getChildActivities().size() != shiftActivity.getChildActivities().size()) {
             return true;
         }
-        for (int i = 0; i <this.getChildActivities().size() ; i++) {
-            ShiftActivity thisChildActivity=this.getChildActivities().get(i);
-            ShiftActivity childActivity=shiftActivity.getChildActivities().get(i);
-            if(thisChildActivity.isShiftActivityChanged(childActivity)){
+        for (int i = 0; i < this.getChildActivities().size(); i++) {
+            ShiftActivity thisChildActivity = this.getChildActivities().get(i);
+            ShiftActivity childActivity = shiftActivity.getChildActivities().get(i);
+            if (thisChildActivity.isShiftActivityChanged(childActivity)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private Integer timeInSeconds(Date date) {
+        return ((date.getHours() * 60 * 60) + (date.getMinutes() * 60));
     }
 }

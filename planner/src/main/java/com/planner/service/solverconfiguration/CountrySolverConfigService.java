@@ -31,8 +31,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.TimeTypeEnum.*;
-import static com.kairos.enums.constraint.ConstraintSubType.TIME_BANK;
 import static com.kairos.enums.constraint.ConstraintSubType.*;
+import static com.kairos.enums.constraint.ConstraintSubType.TIME_BANK;
 import static com.kairos.enums.constraint.ConstraintType.*;
 
 @Service
@@ -74,8 +74,8 @@ public class CountrySolverConfigService {
     private void copyUnitSolverConfigByOrganizationServiceAndSubService(CountrySolverConfig countrySolverConfig) {
         List<Long> applicableUnitIdForSolverConfig = userNeo4jRepo.getUnitIdsByOrganizationSubServiceIds(countrySolverConfig.getOrganizationSubServiceIds());
         List<UnitSolverConfig> unitSolverConfigList = new ArrayList<>();
-        PhaseDTO phaseDTO = activityMongoRepository.getOnePhaseById(new BigInteger(countrySolverConfig.getPhaseId().toString()));
-        List<PhaseDTO> phaseDTOS = activityMongoRepository.getPhaseByUnitIdAndPhaseEnum(applicableUnitIdForSolverConfig,phaseDTO.getPhaseEnum());
+        PhaseDTO phaseDTO = null;//activityMongoRepository.getOnePhaseById(new BigInteger(countrySolverConfig.getPhaseId().toString()));
+        List<PhaseDTO> phaseDTOS = null;//activityMongoRepository.getPhaseByUnitIdAndPhaseEnum(applicableUnitIdForSolverConfig,phaseDTO.getPhaseEnum());
         Map<Long,PhaseDTO> phaseDTOMap = phaseDTOS.stream().collect(Collectors.toMap(k->k.getOrganizationId(),v->v));
         List<UnitSolverConfig> unitSolverConfigs = solverConfigRepository.getAllSolverConfigByParentId(countrySolverConfig.getId());
         Map<Long,UnitSolverConfig> unitSolverConfigMap = unitSolverConfigs.stream().collect(Collectors.toMap(UnitSolverConfig::getUnitId,v->v));
@@ -98,7 +98,7 @@ public class CountrySolverConfigService {
                 UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig, UnitSolverConfig.class);
                 unitSolverConfig.setId(null);//Unset Id
                 unitSolverConfig.setUnitId(unitId);
-                List<UnitConstraint> unitConstraints = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(solverConfigConstraints,UnitConstraint.class);
+                List<UnitConstraint> unitConstraints = ObjectMapperUtils.copyCollectionPropertiesByMapper(solverConfigConstraints,UnitConstraint.class);
                 if(isCollectionNotEmpty(unitConstraints)) {
                     constraintsRepository.saveList(unitConstraints);
                 }
@@ -133,7 +133,7 @@ public class CountrySolverConfigService {
             List<CountryConstraint> solverConfigConstraints = constraintsRepository.findAllCountryConstraintByIds(solverConfig.getConstraintIds());
             List<CountryConstraint> countryConstraints = new ArrayList<>();
             for (CountryConstraint solverConfigConstraint : solverConfigConstraints) {
-                countryConstraints.add(new CountryConstraint(solverConfigConstraint.getConstraintLevel(),solverConfigConstraint.getPenalty(),solverConfigConstraint.getName()));
+                countryConstraints.add(new CountryConstraint(solverConfigConstraint.getScoreLevel(),solverConfigConstraint.getPenalty(),solverConfigConstraint.getName()));
             }
             constraintsRepository.saveList(countryConstraints);
             List<BigInteger> countraintids = countryConstraints.stream().map(countryConstraint -> countryConstraint.getId()).collect(Collectors.toList());
@@ -175,12 +175,12 @@ public class CountrySolverConfigService {
         for (ConstraintDTO constraintDTO : countrySolverConfigDTO.getConstraints()) {
             if(countryConstraintDTOMap.containsKey(constraintDTO.getId())) {
                 CountryConstraint countryConstraint = countryConstraintDTOMap.get(constraintDTO.getId());
-                countryConstraint.setConstraintLevel(constraintDTO.getConstraintLevel());
+                countryConstraint.setScoreLevel(constraintDTO.getScoreLevel());
                 countryConstraint.setPenalty(constraintDTO.getPenalty());
                 countryConstraints.add(countryConstraint);
             }
             else {
-                countryConstraints.add(new CountryConstraint(constraintDTO.getConstraintLevel(),constraintDTO.getPenalty(),constraintDTO.getName()));
+                countryConstraints.add(new CountryConstraint(constraintDTO.getScoreLevel(),constraintDTO.getPenalty(),constraintDTO.getName()));
             }
         }
         if(isCollectionNotEmpty(countryConstraints)) {
@@ -195,7 +195,7 @@ public class CountrySolverConfigService {
     }
 
     public DefaultDataDTO getDefaultData(Long countryId) {
-        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
+        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
         return new DefaultDataDTO()
                 .setOrganizationServicesBuilder(getOrganizationServicesAndItsSubServices(countryId))
                 .setPhaseDTOSBuilder(getAllPhases(countryId)).setTimeTypeEnumSBuilder(newArrayList(PRESENCE,ABSENCE,PAID_BREAK,UNPAID_BREAK))
@@ -209,14 +209,12 @@ public class CountrySolverConfigService {
                 MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF,
                 ACTIVITY_VALID_DAYTYPE,
                 ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS));
-        constraintTypeSetMap.put(WTA,newHashSet( AVERAGE_SCHEDULED_TIME,
-                CONSECUTIVE_WORKING_PARTOFDAY,
+        constraintTypeSetMap.put(WTA,newHashSet( CONSECUTIVE_WORKING_PARTOFDAY,
                 DAYS_OFF_IN_PERIOD,
                 NUMBER_OF_PARTOFDAY,
                 SHIFT_LENGTH,
                 NUMBER_OF_SHIFTS_IN_INTERVAL,
                 TIME_BANK,
-                VETO_PER_PERIOD,
                 DAILY_RESTING_TIME,
                 DURATION_BETWEEN_SHIFTS,
                 REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS,
@@ -235,11 +233,11 @@ public class CountrySolverConfigService {
 
     private List<OrganizationServiceDTO> getOrganizationServicesAndItsSubServices(Long countryId) {
         List<OrganizationServiceQueryResult> organizationServiceQueryResults = userNeo4jRepo.getAllOrganizationServices(countryId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
     }
 
     private List<PhaseDTO> getAllPhases(Long countryId) {
-        return activityMongoRepository.getAllPhasesByCountryId(countryId);
+        return null;//activityMongoRepository.getAllPhasesByCountryId(countryId);
     }
 
     private boolean preValidateCountrySolverConfigDTO(CountrySolverConfigDTO countrySolverConfigDTO) {

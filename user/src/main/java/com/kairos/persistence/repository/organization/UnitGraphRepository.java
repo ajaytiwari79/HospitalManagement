@@ -404,12 +404,14 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
 
     @Query("MATCH (org:OrganizationType{isEnable:true}) WHERE id(org) in {0} \n" +
             "RETURN count(org) as count ")
-    Long findAllOrgCountMatchedByIds(List<Long> Ids);
+    Long findAllOrgCountMatchedByIds(List<Long> organizationIds);
 
 
     @Query("MATCH (o:Unit{deleted:false,boardingCompleted:true}) RETURN id(o)")
-    List<Long> findAllOrganizationIds();
+    List<Long> findAllUnitIds();
 
+    @Query("MATCH (o:OrganizationBaseEntity{deleted:false}) RETURN id(o)")
+    List<Long> findAllOrganizationIds();
 
     @Query("MATCH (organization:Organization) - [:" + BELONGS_TO + "] -> (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(organization)={0} AND et.deleted={1}\n" +
@@ -464,11 +466,11 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
 
     @Query("MATCH (org{isEnable:true}) WHERE org.desiredUrl=~{0}\n" +
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
-    Boolean checkOrgExistWithUrl(String desiredUrl);
+    boolean checkOrgExistWithUrl(String desiredUrl);
 
     @Query("MATCH (org{isEnable:true}) WHERE org.name=~{0}\n" +
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
-    Boolean checkOrgExistWithName(String name);
+    boolean checkOrgExistWithName(String name);
 
     // This 8 is hardCoded because we only need to get the last Integer value of the organization's company Id
     // OOD-KAI-01    OOD-KAI-    >>  8
@@ -591,6 +593,23 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "RETURN id(sub) as id,sub.name as name,sub.description as description,sub.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId," +
             "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY sub.name")
     List<OrganizationBasicResponse> getAllOrganizationOfOrganization(Long orgId);
+
+    @Query("MATCH(org:Organization{isEnable:true,boardingCompleted: false}) where id(org)={0}\n" +
+       "OPTIONAL MATCH(org)-[:HAS_UNIT]-(unit:Unit)\n" +
+      " OPTIONAL MATCH(org)-[:HAS_POSITIONS]-(pos:Position)\n" +
+      "OPTIONAL MATCH(pos)-[:HAS_PERMISSION]-(per:UnitPermission)\n" + "Optional MATCH(pos)-[:BELONGS_TO]-(staff:Staff)\n" +
+      "OPTIONAL MATCH(staff)-[:HAS_CONTACT_ADDRESS]-(ca:ContactAddress)\n" +
+      "OPTIONAL MATCH(staff)-[:SECONDARY_CONTACT_ADDRESS]-(sca:ContactAddress)\n" +
+      "DETACH DELETE org,unit,pos,per,staff,ca,sca return true")
+    Boolean deleteUnpublishedOrganizationById(Long orgId);
+
+    @Query("MATCH(up:UnitPermission)-[:APPLICABLE_IN_UNIT]-(unit:Unit{isEnable:true,boardingCompleted:false}) where id(unit)={0}\n" +
+    "OPTIONAL MATCH(pos:Position)-[:HAS_UNIT_PERMISSIONS]-(up)\n"+
+    "OPTIONAL MATCH(pos)-[:BELONGS_TO]-(staff:Staff)\n"+
+    "OPTIONAL MATCH(staff)-[:HAS_CONTACT_ADDRESS]-(ca:ContactAddress)\n" +
+    "OPTIONAL MATCH(staff)-[:SECONDARY_CONTACT_ADDRESS]-(sca:ContactDetail)\n" +
+    "DETACH DELETE up,unit,pos,staff,ca,sca return true")
+    Boolean deleteUnpublishedUnitById(Long unitId);
 
 
 }

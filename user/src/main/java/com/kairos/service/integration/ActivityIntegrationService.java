@@ -14,6 +14,9 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
+import com.kairos.dto.activity.wta.basic_details.WTADTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -24,8 +27,6 @@ import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,8 +39,7 @@ import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
-import static com.kairos.constants.ApiConstants.GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS;
-import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
+import static com.kairos.constants.ApiConstants.*;
 
 @Service
 @Transactional
@@ -48,7 +48,6 @@ public class ActivityIntegrationService {
     GenericRestClient genericRestClient;
     @Inject
     RestClientForSchedulerMessages restClientForSchedulerMessages;
-    private Logger logger = LoggerFactory.getLogger(ActivityIntegrationService.class);
 
     public void createDefaultPriorityGroupsFromCountry(long countryId, long unitId) {
         Map<String, Object> countryDetail = new HashMap<>();
@@ -60,7 +59,7 @@ public class ActivityIntegrationService {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/orders_and_activities", null), OrderAndActivityDTO.class);
     }
 
-    public void crateDefaultDataForOrganization(Long unitId, Long parentOrganizationId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
+    public void crateDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
 
         genericRestClient.publish(orgTypeAndSubTypeDTO, unitId, true, IntegrationOperation.CREATE, "/organization_default_data", null);
     }
@@ -70,7 +69,7 @@ public class ActivityIntegrationService {
     }
 
     public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/activities_categories", null), ActivityDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/activities_categories", null), ActivityDTO.class);
     }
 
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypesByUnit(Long unitId, Long countryId) {
@@ -212,6 +211,22 @@ public class ActivityIntegrationService {
         requestBody.put("timeTypeIds",timeTypeIds);
         requestBody.put("activityIds",activityIds);
         return genericRestClient.publishRequest(requestBody, unitId, true, IntegrationOperation.CREATE, "/get_staff_filter_data", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffFilterDataDTO>>(){});
+    }
+
+    public WTAResponseDTO updateWTAOfEmployment(Long unitId,WTADTO wtadto, boolean employmentPublished,Boolean save) {
+        BasicNameValuePair employementPublished = new BasicNameValuePair("employmentPublished", employmentPublished +"");
+        BasicNameValuePair saveAsDrafts = new BasicNameValuePair("save", save + "");
+        List<NameValuePair> param = new ArrayList<>();
+        param.add(employementPublished);
+        param.add(saveAsDrafts);
+        return genericRestClient.publishRequest(wtadto, unitId, true, IntegrationOperation.UPDATE, "/wta", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>>(){});
+    }
+
+    public ShiftPlanningProblemSubmitDTO getNightWorkerDetails(List<Long> staffIds, Set<Long> expertiseIds){
+        Map<String,Collection<Long>> requestBody = new HashMap<>();
+        requestBody.put("staffIds",staffIds);
+        requestBody.put("expertiseIds",expertiseIds);
+        return genericRestClient.publishRequest(requestBody, null, false, IntegrationOperation.GET, "/get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftPlanningProblemSubmitDTO>>(){});
     }
 }
 

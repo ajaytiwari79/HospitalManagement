@@ -66,6 +66,7 @@ public class CountryHolidayCalenderService {
                 if (dayType.isHolidayType() && isNotNull(countryHolidayCalenderDTO.getStartTime()) && isNotNull(countryHolidayCalenderDTO.getEndTime()) && !LocalTime.MIN.equals(countryHolidayCalenderDTO.getEndTime()) && countryHolidayCalenderDTO.getEndTime().isBefore(countryHolidayCalenderDTO.getStartTime())) {
                     exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
                 }
+                countryHolidayCalenderGraphRepository.unlinkDayType(calender.getId());
                 dayType.setColorCode(countryHolidayCalenderDTO.getColorCode());
                 calender.setHolidayDate(countryHolidayCalenderDTO.getHolidayDate());
                 calender.setHolidayTitle(countryHolidayCalenderDTO.getHolidayTitle());

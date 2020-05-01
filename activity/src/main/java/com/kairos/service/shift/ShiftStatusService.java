@@ -21,7 +21,7 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -336,15 +336,24 @@ public class ShiftStatusService {
     }
 
     public void updateStatusOfShiftIfPhaseValid(PlanningPeriod planningPeriod, Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
+
             if (planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) {
-                shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+                if(!activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())||(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())&&UserContext.getUserDetails().isStaff())) {
+                    shiftActivity.getStatus().add(PUBLISH);
+                }else {
+                    if(shiftActivity.getStatus().contains(REQUEST)) {
+                        shiftActivity.setStatus(newHashSet(APPROVE,PUBLISH));
+                    }
+                }
             } else if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
-                    shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? ShiftStatus.APPROVE : ShiftStatus.REQUEST);
+                    shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? ShiftStatus.APPROVE : REQUEST);
                 }
-            }
-            if(shiftActivity.getStatus().contains(APPROVE)){
+            }else if(shiftActivity.getStatus().contains(REQUEST)&&UserContext.getUserDetails().isManagement()){
+                shiftActivity.setStatus(newHashSet(APPROVE));
+            } else if(shiftActivity.getStatus().contains(APPROVE)){
                 ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
                 Map<BigInteger,Activity> activityMap = new HashMap<>();
                 activityMap.put(activityWrapper.getActivity().getId(),activityWrapper.getActivity());
@@ -355,7 +364,7 @@ public class ShiftStatusService {
 
 
     public void sendMailToStaffWhenStatusChange(Shift shift, String activityName, ShiftStatus shiftStatus, String disapproveComments) {
-        StaffPersonalDetail staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
+        StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
         LocalDateTime shiftDate = DateUtils.asLocalDateTime(shift.getStartDate());
         String bodyPart1 = "The status of the ";
         String bodyPart2 = activityName;

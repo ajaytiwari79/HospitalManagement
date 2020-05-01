@@ -42,94 +42,126 @@ public class IntegrationJobsExecutorService {
     private KafkaProducer kafkaProducer;
 
     public void runJob(KairosSchedulerExecutorDTO job) {
-
         String plainClientCredentials = "cluster:cluster";
         String base64ClientCredentials = new String(Base64.encodeBase64(plainClientCredentials.getBytes()));
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
         headers.add("Authorization", "Basic " + base64ClientCredentials);
         HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-        String importShiftStatusXMLURI = envConfig.
+        String importShiftStatusXMLURI = envConfig.getCarteServerHost()+KETTLE_TRANS_STATUS;
+        Long workplaceId = getWorkPlaceId(job);
+        int weeks = 35;
+        String uniqueKey = job.getIntegrationSettingsDTO().getUniqueKey();
+        logger.info("uniqueKey----> {}",uniqueKey);
+        RestTemplate restTemplate = new RestTemplate();
+        importData(job, entity, importShiftStatusXMLURI, workplaceId, weeks, uniqueKey, restTemplate);
+    }
 
-                getCarteServerHost()+KETTLE_TRANS_STATUS;
-        //   String startDate = DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy-MM-dd");
-        //     String endDate = DateFormatUtils.format(DateUtil.addWeeksInDate(DateUtil.getCurrentDate(), 5), "yyyy-MM-dd");
-        //  String startDate = DateFormatUtils.format(controlPanel.getStartDate(), "yyyy-MM-dd");
-        //  String endDate = DateFormatUtils.format(controlPanel.getEndDate(), "yyyy-MM-dd");
+    private void importData(KairosSchedulerExecutorDTO job, HttpEntity<String> entity, String importShiftStatusXMLURI, Long workplaceId, int weeks, String uniqueKey, RestTemplate restTemplate) {
+        switch(uniqueKey){
+            case IMPORT_TIMECARE_SHIFTS:
+                importTimecareShifts(job, entity, importShiftStatusXMLURI, workplaceId, weeks, restTemplate);
+                break;
+            case IMPORT_KMD_CITIZEN:
+                importKMDCitizen(job, entity, restTemplate);
+                break;
+            case IMPORT_KMD_CITIZEN_NEXT_TO_KIN:
+                importNextToKin(entity, restTemplate);
+                break;
+            case IMPORT_KMD_CITIZEN_GRANTS:
+                importGrants(entity, restTemplate);
+                break;
+            case IMPORT_KMD_STAFF_AND_WORKING_HOURS:
+                importWorkingHours(job, entity, restTemplate);
+                break;
+            case IMPORT_KMD_TASKS:
+                importTasks(job, entity, restTemplate);
+                break;
+            case IMPORT_KMD_TIME_SLOTS:
+                importTimeSlots(job, entity, restTemplate);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private Long getWorkPlaceId(KairosSchedulerExecutorDTO job) {
         Long workplaceId = Long.valueOf(String.valueOf("15"));
         if(job.getUnitId() != null){
             Unit unit = unitGraphRepository.findOne(job.getUnitId());
             if(unit.getExternalId() != null) workplaceId = Long.valueOf(unit.getExternalId());
         }
-        String importShiftURI = "";
-        int weeks = 35;
-        String uniqueKey = job.getIntegrationSettingsDTO().getUniqueKey();
-        logger.info("uniqueKey----> "+uniqueKey);
-        RestTemplate restTemplate = new RestTemplate();
-        switch(uniqueKey){
-            case IMPORT_TIMECARE_SHIFTS:
-                logger.info("!!===============Hit to carte server from Kairos==============!!");
-                importShiftURI = envConfig.getCarteServerHost()+KETTLE_EXECUTE_TRANS+IMPORT_TIMECARE_SHIFTS_PATH+"&intWorkPlaceId="+workplaceId+"&weeks="+weeks+"&jobId="+job.getId();
-                logger.info("importShiftURI----> "+importShiftURI);
-               // Date started = DateUtil.getCurrentDate();
-                LocalDateTime started = LocalDateTime.now();
-                ResponseEntity<String> importResult = restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                if (importResult.getStatusCodeValue() == 200) {
-                    ResponseEntity<String> resultStatusXml = restTemplate.exchange(importShiftStatusXMLURI, HttpMethod.GET, entity, String.class);
-                    LocalDateTime stopped = LocalDateTime.now();
-                    try {
-                        JAXBContext jaxbContext = JAXBContext.newInstance(Transstatus.class);
-                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-                        StringReader reader = new StringReader(resultStatusXml.getBody());
-                        Transstatus transstatus = (Transstatus) jaxbUnmarshaller.unmarshal(reader);
-                        logger.info("trans status---> " + transstatus.getId());
-                        String loggingString = StringEscapeUtils.escapeHtml4(transstatus.getLogging_string());
-                        loggingString = loggingString.substring(loggingString.indexOf("[CDATA[")+7,loggingString.indexOf("]]&gt"));
-                        byte[] bytes = Base64.decodeBase64(loggingString);
-                        String unzipped;
-                        try(GZIPInputStream zi = new GZIPInputStream(new ByteArrayInputStream(bytes))) {
-                            unzipped = IOUtils.toString(zi);
-                        }
-                        userSchedulerJobService.updateJobForTimecareShift(job, started, stopped, transstatus, unzipped);
+        return workplaceId;
+    }
 
-                    } catch (JAXBException exception) {
-                        logger.info("trans status---exception > " + exception);
-                    }
-                    catch(IOException exception){
-                        logger.info("exception while logging job details-- > " + exception);
-                    }
+    private void importTimeSlots(KairosSchedulerExecutorDTO job, HttpEntity<String> entity, RestTemplate restTemplate) {
+        String importShiftURI;
+        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+job.getUnitId()+"/getTimeSlots";
+        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
+    }
 
-                }
-                break;
-            case IMPORT_KMD_CITIZEN:
-                importShiftURI = envConfig.getServerHost()+KMD_CARE_CITIZEN_URL+job.getUnitId();
-                restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                break;
-            case IMPORT_KMD_CITIZEN_NEXT_TO_KIN:
-                importShiftURI = envConfig.getServerHost()+API_KMD_CARE_CITIZEN_RELATIVE_DATA;
-                restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                break;
-            case IMPORT_KMD_CITIZEN_GRANTS:
-                importShiftURI = envConfig.getServerHost()+API_KMD_CARE_CITIZEN_GRANTS;
-                restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                break;
-            case IMPORT_KMD_STAFF_AND_WORKING_HOURS:
-                importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+job.getUnitId()+"/getShifts/"+job.getFilterId();
-                restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                break;
-            case IMPORT_KMD_TASKS:
-                importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+job.getUnitId()+"/getTasks/"+job.getFilterId();
-                restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                break;
-            case IMPORT_KMD_TIME_SLOTS:
-                importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+job.getUnitId()+"/getTimeSlots";
-                restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                break;
-            default:
-                break;
+    private void importTasks(KairosSchedulerExecutorDTO job, HttpEntity<String> entity, RestTemplate restTemplate) {
+        String importShiftURI;
+        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+job.getUnitId()+"/getTasks/"+job.getFilterId();
+        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
+    }
 
+    private void importWorkingHours(KairosSchedulerExecutorDTO job, HttpEntity<String> entity, RestTemplate restTemplate) {
+        String importShiftURI;
+        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+job.getUnitId()+"/getShifts/"+job.getFilterId();
+        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
+    }
+
+    private void importGrants(HttpEntity<String> entity, RestTemplate restTemplate) {
+        String importShiftURI;
+        importShiftURI = envConfig.getServerHost()+API_KMD_CARE_CITIZEN_GRANTS;
+        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
+    }
+
+    private void importNextToKin(HttpEntity<String> entity, RestTemplate restTemplate) {
+        String importShiftURI;
+        importShiftURI = envConfig.getServerHost()+API_KMD_CARE_CITIZEN_RELATIVE_DATA;
+        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
+    }
+
+    private void importKMDCitizen(KairosSchedulerExecutorDTO job, HttpEntity<String> entity, RestTemplate restTemplate) {
+        String importShiftURI;
+        importShiftURI = envConfig.getServerHost()+KMD_CARE_CITIZEN_URL+job.getUnitId();
+        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
+    }
+
+    private void importTimecareShifts(KairosSchedulerExecutorDTO job, HttpEntity<String> entity, String importShiftStatusXMLURI, Long workplaceId, int weeks, RestTemplate restTemplate) {
+        String importShiftURI;
+        logger.info("!!===============Hit to carte server from Kairos==============!!");
+        importShiftURI = envConfig.getCarteServerHost()+KETTLE_EXECUTE_TRANS+IMPORT_TIMECARE_SHIFTS_PATH+"&intWorkPlaceId="+workplaceId+"&weeks="+weeks+"&jobId="+job.getId();
+        LocalDateTime started = LocalDateTime.now();
+        ResponseEntity<String> importResult = restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
+        if (importResult.getStatusCodeValue() == 200) {
+            ResponseEntity<String> resultStatusXml = restTemplate.exchange(importShiftStatusXMLURI, HttpMethod.GET, entity, String.class);
+            LocalDateTime stopped = LocalDateTime.now();
+            try {
+                updateJobForTimeCareShifts(job, started, resultStatusXml, stopped);
+            } catch (JAXBException | IOException exception ) {
+                logger.info("trans status---exception > {}" , exception);
+            }
         }
+        return;
+    }
 
+    private void updateJobForTimeCareShifts(KairosSchedulerExecutorDTO job, LocalDateTime started, ResponseEntity<String> resultStatusXml, LocalDateTime stopped) throws JAXBException, IOException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(Transstatus.class);
+        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        StringReader reader = new StringReader(resultStatusXml.getBody());
+        Transstatus transstatus = (Transstatus) jaxbUnmarshaller.unmarshal(reader);
+        logger.info("trans status---> {}" , transstatus.getId());
+        String loggingString = StringEscapeUtils.escapeHtml4(transstatus.getLogging_string());
+        loggingString = loggingString.substring(loggingString.indexOf("[CDATA[")+7,loggingString.indexOf("]]&gt"));
+        byte[] bytes = Base64.decodeBase64(loggingString);
+        String unzipped;
+        try(GZIPInputStream zi = new GZIPInputStream(new ByteArrayInputStream(bytes))) {
+            unzipped = IOUtils.toString(zi);
+        }
+        userSchedulerJobService.updateJobForTimecareShift(job, started, stopped, transstatus, unzipped);
     }
 
 }
