@@ -74,8 +74,8 @@ public class CountrySolverConfigService {
     private void copyUnitSolverConfigByOrganizationServiceAndSubService(CountrySolverConfig countrySolverConfig) {
         List<Long> applicableUnitIdForSolverConfig = userNeo4jRepo.getUnitIdsByOrganizationSubServiceIds(countrySolverConfig.getOrganizationSubServiceIds());
         List<UnitSolverConfig> unitSolverConfigList = new ArrayList<>();
-        PhaseDTO phaseDTO = activityMongoRepository.getOnePhaseById(new BigInteger(countrySolverConfig.getPhaseId().toString()));
-        List<PhaseDTO> phaseDTOS = activityMongoRepository.getPhaseByUnitIdAndPhaseEnum(applicableUnitIdForSolverConfig,phaseDTO.getPhaseEnum());
+        PhaseDTO phaseDTO = null;//activityMongoRepository.getOnePhaseById(new BigInteger(countrySolverConfig.getPhaseId().toString()));
+        List<PhaseDTO> phaseDTOS = null;//activityMongoRepository.getPhaseByUnitIdAndPhaseEnum(applicableUnitIdForSolverConfig,phaseDTO.getPhaseEnum());
         Map<Long,PhaseDTO> phaseDTOMap = phaseDTOS.stream().collect(Collectors.toMap(k->k.getOrganizationId(),v->v));
         List<UnitSolverConfig> unitSolverConfigs = solverConfigRepository.getAllSolverConfigByParentId(countrySolverConfig.getId());
         Map<Long,UnitSolverConfig> unitSolverConfigMap = unitSolverConfigs.stream().collect(Collectors.toMap(UnitSolverConfig::getUnitId,v->v));
@@ -209,14 +209,12 @@ public class CountrySolverConfigService {
                 MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF,
                 ACTIVITY_VALID_DAYTYPE,
                 ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS));
-        constraintTypeSetMap.put(WTA,newHashSet( AVERAGE_SCHEDULED_TIME,
-                CONSECUTIVE_WORKING_PARTOFDAY,
+        constraintTypeSetMap.put(WTA,newHashSet( CONSECUTIVE_WORKING_PARTOFDAY,
                 DAYS_OFF_IN_PERIOD,
                 NUMBER_OF_PARTOFDAY,
                 SHIFT_LENGTH,
                 NUMBER_OF_SHIFTS_IN_INTERVAL,
                 TIME_BANK,
-                VETO_PER_PERIOD,
                 DAILY_RESTING_TIME,
                 DURATION_BETWEEN_SHIFTS,
                 REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS,
@@ -239,7 +237,7 @@ public class CountrySolverConfigService {
     }
 
     private List<PhaseDTO> getAllPhases(Long countryId) {
-        return activityMongoRepository.getAllPhasesByCountryId(countryId);
+        return null;//activityMongoRepository.getAllPhasesByCountryId(countryId);
     }
 
     private boolean preValidateCountrySolverConfigDTO(CountrySolverConfigDTO countrySolverConfigDTO) {

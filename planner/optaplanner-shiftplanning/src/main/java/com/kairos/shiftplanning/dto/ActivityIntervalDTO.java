@@ -33,8 +33,6 @@ public class ActivityIntervalDTO {
 
     public ActivityIntervalDTO(ActivityLineInterval lineInterval) {
         this.id = lineInterval.getId();
-        this.previous = lineInterval.getPrevious();
-        this.next = lineInterval.getNext();
         this.start = lineInterval.getStart();
         this.required = lineInterval.isRequired();
         this.activity = lineInterval.getActivity();

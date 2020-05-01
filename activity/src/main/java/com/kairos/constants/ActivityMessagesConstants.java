@@ -387,4 +387,5 @@ public class ActivityMessagesConstants {
     public static final String STAFF_ALREADY_SICK="staff.already.sick";
     public static final String MESSAGE_CTA_VALUE ="message.cta.value";
 
+
 }

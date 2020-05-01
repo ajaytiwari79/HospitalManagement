@@ -821,7 +821,7 @@ public class StaffRetrievalService {
         return map;
     }
 
-    public Collection<StaffDTO> getStaffsByIds(List<Long> staffIds){
+    public Collection<StaffDTO> getStaffsByIds(Long unitId, List<Long> staffIds){
         List<Employment> employments = employmentGraphRepository.getEmploymentByStaffIds(staffIds);
         Set<Long> expertiseIds = employments.stream().map(employment -> employment.getExpertise().getId()).collect(Collectors.toSet());
         ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO = activityIntegrationService.getNightWorkerDetails(staffIds,expertiseIds);

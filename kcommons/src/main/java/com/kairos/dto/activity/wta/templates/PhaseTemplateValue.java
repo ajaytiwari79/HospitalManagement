@@ -34,5 +34,19 @@ public class PhaseTemplateValue {
         this.managementCanIgnore = managementCanIgnore;
         this.sequence = sequence;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PhaseTemplateValue)) return false;
+        PhaseTemplateValue that = (PhaseTemplateValue) o;
+        return phaseId.equals(that.phaseId) &&
+                staffValue == that.staffValue &&
+                managementValue == that.managementValue &&
+                disabled == that.disabled &&
+                sequence == that.sequence &&
+                staffCanIgnore == that.staffCanIgnore &&
+                managementCanIgnore == that.managementCanIgnore &&
+                Objects.equals(phaseName, that.phaseName);
+    }
 
 }
