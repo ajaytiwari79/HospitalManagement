@@ -449,7 +449,7 @@ public class CompanyCreationService {
         unitGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         setCompanyData(unit, organizationBasicDTO);
         if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
-            setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager());
+            setUserInfoInOrganization(unit.getId(), unit, organizationBasicDTO.getUnitManager());
         }
         //Assign Parent Organization's level to unit
         return organizationBasicDTO;
@@ -566,11 +566,10 @@ public class CompanyCreationService {
     public QueryResult onBoardOrganization(Long countryId, Long organizationId, Long parentOrganizationId) {
         OrganizationBaseEntity organization = organizationBaseRepository.findById(organizationId, 2).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId)));
         Organization parent = prepareHierarchy(organization);
-        List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults;
         List<OrganizationBaseEntity> units = getOrganizationBaseEntities(organization, parent);
         validateBasicDetails(units, exceptionService);
         List<Long> unitIds = getAllUnitIds(organizationId, parentOrganizationId, parent);
-        staffPersonalDetailQueryResults = userGraphRepository.getUnitManagerOfOrganization(unitIds, parent.getId());
+        List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = userGraphRepository.getUnitManagerOfOrganization(unitIds, parent.getId());
         if (ObjectUtils.isCollectionEmpty(staffPersonalDetailQueryResults)) {
             exceptionService.invalidRequestException(ERROR_USER_DETAILS_MISSING);
         }

@@ -47,6 +47,7 @@ public class StaffCreationDTO {
     @NotNull(message = "error.staff.accessGroup.id.notnull")
     private Long accessGroupId;
     private StaffStatusEnum currentStatus;
+    private String email;
 
     private List<TagDTO> tags;
 
@@ -68,5 +69,9 @@ public class StaffCreationDTO {
         this.userName = userName;
         this.externalId = externalId;
         this.accessGroupId = accessGroupId;
+    }
+
+    public String getPrivateEmail() {
+        return privateEmail=privateEmail==null?email:privateEmail;
     }
 }

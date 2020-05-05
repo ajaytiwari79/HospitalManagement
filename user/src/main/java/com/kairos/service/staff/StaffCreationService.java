@@ -136,7 +136,7 @@ public class StaffCreationService {
         ObjectMapper objectMapper = new ObjectMapper();
         ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
         staff.setContactDetail(contactDetail);
-        staff.setCurrentStatus(payload.getCurrentStatus());
+        staff.setCurrentStatus(payload.getCurrentStatus()==null?StaffStatusEnum.ACTIVE:payload.getCurrentStatus());
         staff.setTags(ObjectMapperUtils.copyCollectionPropertiesByMapper(payload.getTags(), Tag.class));
         if (Optional.ofNullable(staffQueryResult).isPresent()) {
             contactAddress.setId(staffQueryResult.getContactAddressId());
