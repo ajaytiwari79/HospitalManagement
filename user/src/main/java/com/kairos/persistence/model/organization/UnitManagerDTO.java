@@ -3,6 +3,8 @@ package com.kairos.persistence.model.organization;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.client.ContactDetail;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -15,66 +17,21 @@ import static com.kairos.constants.UserMessagesConstants.*;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class UnitManagerDTO {
 
     @NotBlank(message = ERROR_FIRSTNAME_NOTNULL)
-    String firstName;
+    private String firstName;
     @NotBlank(message = ERROR_LASTNAME_NOTNULL)
-    String lastName;
+    private String lastName;
     @Email
-    String email;
+    private String email;
     @NotNull(message = ERROR_ORGANIZATION_UNITMANAGER_ACCESSGROUPID_NOTNULL)
-    Long accessGroupId;
-    ContactDetail contactDetail;
-    Long staffId;
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Long getAccessGroupId() {
-        return accessGroupId;
-    }
-
-    public ContactDetail getContactDetail() {
-        return contactDetail;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setAccessGroupId(Long accessGroupId) {
-        this.accessGroupId = accessGroupId;
-    }
-
-    public void setContactDetail(ContactDetail contactDetail) {
-        this.contactDetail = contactDetail;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
+    private Long accessGroupId;
+    private ContactDetail contactDetail;
+    private Long staffId;
+    private Long id;
 
     public String getFullName(){
         return this.firstName+" "+this.getLastName();
