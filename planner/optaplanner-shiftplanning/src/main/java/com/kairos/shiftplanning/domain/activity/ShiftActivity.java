@@ -1,5 +1,7 @@
 package com.kairos.shiftplanning.domain.activity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.AuditShiftActivityDTO;
@@ -10,6 +12,7 @@ import com.kairos.shiftplanning.domain.staff.CTARuleTemplate;
 import com.kairos.shiftplanning.domain.staff.PayoutDistribution;
 import com.kairos.shiftplanning.domain.staff.TimeBankDistribution;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import com.kairos.shiftplanning.utils.ZonedDateTimeDeserializer;
 import lombok.*;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -26,8 +29,10 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class ShiftActivity implements Comparable<ShiftActivity>{
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     private ZonedDateTime startDate;
     private Activity activity;
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     private ZonedDateTime endDate;
     private List<PlannedTime> plannedTimes;
     private int scheduledMinutes;

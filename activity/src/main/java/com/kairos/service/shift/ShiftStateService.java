@@ -3,6 +3,7 @@ package com.kairos.service.shift;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -39,6 +40,7 @@ import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_SHIFT_IDS;
 import static com.kairos.constants.ActivityMessagesConstants.PAST_DATE_ALLOWED;
+import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 import static java.util.stream.Collectors.groupingBy;
 
 /*
@@ -254,5 +256,22 @@ public class ShiftStateService {
 
     public List<ShiftState> findAllByShiftIdsByAccessgroupRole(Set<BigInteger> shiftIds, Set<String> accessGroupRole){
         return shiftStateMongoRepository.findAllByShiftIdsByAccessgroupRole(shiftIds,accessGroupRole);
+    }
+
+    public ButtonConfig findButtonConfig(List<ShiftDTO> shifts, boolean management) {
+        ButtonConfig buttonConfig = new ButtonConfig();
+        if (management && isCollectionNotEmpty(shifts)) {
+            Set<BigInteger> shiftIds = shifts.stream().map(ShiftDTO::getId).collect(Collectors.toSet());
+            List<ShiftState> shiftStates = shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds, MANAGEMENT);
+            Set<BigInteger> shiftStateIds = shiftStates.stream().map(ShiftState::getShiftId).collect(Collectors.toSet());
+            for (BigInteger shiftId : shiftIds) {
+                if (!shiftStateIds.contains(shiftId)) {
+                    buttonConfig.setSendToPayrollEnabled(false);
+                    break;
+                }
+                buttonConfig.setSendToPayrollEnabled(true);
+            }
+        }
+        return buttonConfig;
     }
 }

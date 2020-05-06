@@ -12,6 +12,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.StaffingLevelHelper;
 import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
@@ -23,7 +24,9 @@ import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.SkillLevel;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -40,7 +43,9 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
+import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.utils.service_util.StaffingLevelUtil;
+import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -86,6 +91,8 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.OVERSTAFFING;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
@@ -127,6 +134,7 @@ public class StaffingLevelService  {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private ShiftService shiftService;
+    @Inject private ShiftValidatorService shiftValidatorService;
 
 
     /**
@@ -953,5 +961,74 @@ public class StaffingLevelService  {
 
     public List<StaffingLevel> findByUnitIdAndDates(Long unitId, Date startDate, Date endDate){
         return staffingLevelMongoRepository.findByUnitIdAndDates(unitId, startDate, endDate);
+    }
+
+    public void validateStaffingLevel(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, Shift oldStateShift) {
+        ShiftType oldStateShiftType = oldStateShift.getShiftType();
+        ShiftType shiftType = shift.getShiftType();
+        boolean activityReplaced = activityReplaced(oldStateShift, shift);
+        RuleTemplateSpecificInfo ruleTemplateSpecificInfo = new RuleTemplateSpecificInfo();
+        StaffingLevelHelper staffingLevelHelper = new StaffingLevelHelper();
+        if (activityReplaced) {
+            for (int i = 0; i < oldStateShift.getActivities().size(); i++) {
+                try {
+                    if (activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor().equals(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor())) {
+                        shift.setShiftType(oldStateShiftType);
+                        shiftValidatorService.validateStaffingLevel(phase, oldStateShift, activityWrapperMap, false, oldStateShift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper);
+                        shift.setShiftType(shiftType);
+                        shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper);
+                        if (isNull(activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority()) || isNull(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority())) {
+                            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
+                        }
+                        int rankOfOld = activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
+                        int rankOfNew = activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
+                        long durationMinutesOfOld = oldStateShift.getActivities().get(i).getInterval().getMinutes();
+                        long durationMinutesOfNew = shift.getActivities().get(i).getInterval().getMinutes();
+                        boolean allowedForReplace = true;
+                        String staffingLevelState = null;
+                        if (UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld()) && OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
+                            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, OVERSTAFFING);
+                        }
+                        if (BALANCED.equals(staffingLevelHelper.getStaffingLevelForNew()) && UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld())) {
+                            if (!(rankOfNew < rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
+                                allowedForReplace = false;
+                                staffingLevelState = UNDERSTAFFING;
+                            }
+                        }
+                        if (BALANCED.equals(staffingLevelHelper.getStaffingLevelForOld()) && OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
+                            if (!(rankOfNew < rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
+                                allowedForReplace = false;
+                                staffingLevelState = OVERSTAFFING;
+                            }
+                        }
+
+                        if (!allowedForReplace) {
+                            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, staffingLevelState);
+                        }
+                    }
+                    //else {
+//                        shift.setShiftType(oldStateShiftType);
+//                        shiftValidatorService.validateStaffingLevel(phase, oldStateShift, activityWrapperMap, false, oldStateShift.getActivities().get(i), ruleTemplateSpecificInfo,new StaffingLevelHelper());
+//                        shift.setShiftType(shiftType);
+//                        shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shift.getActivities().get(i), ruleTemplateSpecificInfo,new StaffingLevelHelper());
+//                    }
+                } catch (IndexOutOfBoundsException e) {
+                    //Intentionally left blank
+                }
+            }
+        }
+    }
+
+    private boolean activityReplaced(Shift dbShift, Shift shift) {
+        boolean activityReplaced = false;
+        if (shift.getActivities().size() == dbShift.getActivities().size()) {
+            for (int i = 0; i < shift.getActivities().size(); i++) {
+                if (!shift.getActivities().get(i).getActivityId().equals(dbShift.getActivities().get(i).getActivityId())) {
+                    activityReplaced = true;
+                    break;
+                }
+            }
+        }
+        return activityReplaced;
     }
 }

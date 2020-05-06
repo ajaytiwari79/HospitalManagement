@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class ShiftServiceUnitTest {
     @InjectMocks
-    private ShiftService shiftService;
+    private ShiftStateService shiftStateService;
     @InjectMocks
     private ShiftValidatorService shiftValidatorService;
 
@@ -98,7 +98,7 @@ public class ShiftServiceUnitTest {
 
         when(shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT)).thenReturn(shiftStates);
 
-        ButtonConfig buttonConfig = shiftService.findButtonConfig(shifts,true);
+        ButtonConfig buttonConfig = shiftStateService.findButtonConfig(shifts,true);
         Assert.assertEquals(buttonConfig.isSendToPayrollEnabled(),false);;
 
 
@@ -131,7 +131,7 @@ public class ShiftServiceUnitTest {
 
         when(shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT)).thenReturn(shiftStates);
 
-        ButtonConfig buttonConfig = shiftService.findButtonConfig(shifts,true);
+        ButtonConfig buttonConfig = shiftStateService.findButtonConfig(shifts,true);
         Assert.assertEquals(buttonConfig.isSendToPayrollEnabled(),true);;
 
 

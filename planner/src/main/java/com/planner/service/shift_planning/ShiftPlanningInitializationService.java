@@ -5,6 +5,7 @@ import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.enums.constraint.ScoreLevel;
+import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.kairos.shiftplanning.utils.ShiftPlanningInitializer;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class ShiftPlanningInitializationService {
      */
     public ShiftRequestPhasePlanningSolution initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
         shiftPlanningProblemSubmitDTO.setSolverConfig(getSolverConfigDTO());
+        ShiftPlanningSolver.serverAddress = "http://localdev.kairosplanning.com/";
         new ShiftPlanningInitializer().initializeShiftPlanning(shiftPlanningProblemSubmitDTO);
         return null;
     }

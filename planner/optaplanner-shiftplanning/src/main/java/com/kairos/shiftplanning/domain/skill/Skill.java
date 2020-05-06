@@ -2,6 +2,7 @@ package com.kairos.shiftplanning.domain.skill;
 
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kairos.shiftplanning.enums.SkillType;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @XStreamAlias("Skill")
 public class Skill {
 
+	@JsonProperty("skillId")
 	private Long id;
 	private String name;
 	private SkillType skillType;

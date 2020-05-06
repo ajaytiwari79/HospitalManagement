@@ -1,4 +1,4 @@
-package com.kairos.activity.config.mongo_converter;
+package com.planner.mongo_converter;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;

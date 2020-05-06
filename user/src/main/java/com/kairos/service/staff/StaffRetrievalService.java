@@ -17,6 +17,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
@@ -30,6 +31,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
+import com.kairos.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupDayTypesQueryResult;
@@ -825,7 +827,7 @@ public class StaffRetrievalService {
         return map;
     }
 
-    public Collection<StaffDTO> getStaffsByIds(Long unitId, List<Long> staffIds){
+    public ShiftPlanningProblemSubmitDTO getStaffsByIds(Long unitId, List<Long> staffIds){
         List<Employment> employments = employmentGraphRepository.getEmploymentByStaffIds(staffIds);
         Set<Long> expertiseIds = employments.stream().map(employment -> employment.getExpertise().getId()).collect(Collectors.toSet());
         ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO = activityIntegrationService.getNightWorkerDetails(staffIds,expertiseIds);
@@ -837,8 +839,15 @@ public class StaffRetrievalService {
             employmentDTO.setBreakSettings(shiftPlanningProblemSubmitDTO.getBreakSettingMap().get(employmentDTO.getExpertise().getId()));
             staffDTO.setNightWorker(shiftPlanningProblemSubmitDTO.getNightWorkerDetails().getOrDefault(staffDTO.getId(),false));
             staffDTO.getEmployments().add(employmentDTO);
+            staffDTOMap.put(employment.getStaff().getId(), staffDTO);
         }
-        return staffDTOMap.values();
+        List<DayType> dayTypes = dayTypeGraphRepository.getDayTypeByOrganizationById(unitId);
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unitId, TimeSlotMode.STANDARD);
+        Collection<TimeSlotDTO> timelots = copyCollectionPropertiesByMapper(timeSlotWrappers, TimeSlotDTO.class);
+        Map<String, TimeSlotDTO> timeSlotMap = timelots.stream().collect(Collectors.toMap(k->k.getName(), v->v));
+        Collection<com.kairos.dto.user.country.day_type.DayType> dayTypeList = copyCollectionPropertiesByMapper(dayTypes, com.kairos.dto.user.country.day_type.DayType.class);
+        Map<Long, com.kairos.dto.user.country.day_type.DayType> dayTypeMap = dayTypeList.stream().collect(Collectors.toMap(k->k.getId(), v->v));
+        return ShiftPlanningProblemSubmitDTO.builder().staffs(new ArrayList(staffDTOMap.values())).expertiseNightWorkerSettingMap(shiftPlanningProblemSubmitDTO.getExpertiseNightWorkerSettingMap()).breakSettingMap(shiftPlanningProblemSubmitDTO.getBreakSettingMap()).dayTypeMap(dayTypeMap).timeSlotMap(timeSlotMap).build();
     }
 
     private StaffDTO getStaffDTO(Employment employment) {
@@ -846,6 +855,8 @@ public class StaffRetrievalService {
         List<StaffChildDetailDTO> staffChildDetails = copyCollectionPropertiesByMapper(employment.getStaff().getStaffChildDetails(), StaffChildDetailDTO.class);
         return StaffDTO.builder()
                 .id(employment.getStaff().getId())
+                .firstName(employment.getStaff().getFirstName())
+                .lastName(employment.getStaff().getLastName())
                 .tags(tagDTOS)
                 .cprNumber(employment.getStaff().getUser().getCprNumber())
                 .staffChildDetails(staffChildDetails)

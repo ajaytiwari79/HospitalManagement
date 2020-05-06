@@ -2,7 +2,13 @@ package com.kairos.service.dashboard;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
+import com.kairos.dto.activity.tags.TagDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.EmploymentSubType;
+import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -11,6 +17,7 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftSickService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,8 +32,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.constants.ActivityMessagesConstants.ERROR_EMPTY_STAFF_OR_UNIT_SETTING;
+import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 
 /**
  * CreatedBy vipulpandey on 30/8/18
@@ -110,5 +118,24 @@ public class SickService {
 //            });
 //
 //        }
+    }
+
+    public void validateSickSettings(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<Shift> shifts, List<String> errorMessages, SicknessSetting sicknessSetting) {
+        if (!(sicknessSetting.isCanOnlyUsedOnMainEmployment() && EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType()))) {
+            errorMessages.add(exceptionService.convertMessage(MESSAGE_STAFF_MAIN_EMPLOYMENT_NOT_FOUND));
+        }
+        if (isCollectionNotEmpty(activityWrapper.getActivity().getRulesActivityTab().getStaffTagIds())) {
+            Set<BigInteger> tadIds = staffAdditionalInfoDTO.getTags().stream().map(TagDTO::getId).collect(Collectors.toSet());
+            if (CollectionUtils.containsAny(tadIds, activityWrapper.getActivity().getRulesActivityTab().getStaffTagIds())) {
+                errorMessages.add(exceptionService.convertMessage(STAFF_NOT_ALLOWED_ON_TAG));
+            }
+
+        }
+        if (sicknessSetting.isValidForChildCare() && isCollectionEmpty(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays())) {
+            errorMessages.add(exceptionService.convertMessage(MESSAGE_STAFF_CARE_DAYS_NOT_FOUND));
+        }
+        if (sicknessSetting.isUsedOnFreeDays() && isCollectionNotEmpty(shifts)) {
+            errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_FREEDAY));
+        }
     }
 }

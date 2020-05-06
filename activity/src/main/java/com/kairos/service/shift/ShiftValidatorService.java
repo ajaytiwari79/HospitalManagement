@@ -6,6 +6,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
@@ -42,6 +43,7 @@ import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
+import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;
 import com.kairos.persistence.repository.night_worker.NightWorkerMongoRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -59,6 +61,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.*;
 import com.kairos.service.activity.ActivityUtil;
+import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.staffing_level.StaffingLevelService;
@@ -93,8 +96,7 @@ import static com.kairos.enums.shift.ShiftOperationType.CREATE;
 import static com.kairos.enums.wta.WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
 import static com.kairos.enums.wta.WTATemplateType.NUMBER_OF_PARTOFDAY;
 import static com.kairos.utils.CPRUtil.getAgeByCPRNumberAndStartDate;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByRuleTemplates;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
  * @author pradeep
@@ -162,6 +164,8 @@ public class ShiftValidatorService {
 
     @Inject
     private BlockSettingService blockSettingService;
+    @Inject private ShiftSickService shiftSickService;
+    @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
 
     @Autowired
     public void setExceptionService(ExceptionService exceptionService) {
@@ -180,6 +184,20 @@ public class ShiftValidatorService {
         String timeZone = userIntegrationService.getTimeZoneByUnitId(unitId);
         DateTimeInterval graceInterval = getGracePeriodInterval(phase, shiftDTO.getActivities().get(0).getStartDate(), validatedByStaff);
         return graceInterval.contains(DateUtils.getDateFromTimeZone(timeZone));
+    }
+
+    public ShiftWithViolatedInfoDTO validateRuleCheck(Shift shift, boolean ruleCheckRequired, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, boolean valid, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shiftWithActivityDTO, Shift oldStateShift) {
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
+        if (ruleCheckRequired) {
+            if (!valid && oldStateShift.getShiftType().equals(shift.getShiftType())) {
+                staffingLevelService.validateStaffingLevel(shift, activityWrapperMap, phase, oldStateShift);
+            }
+            shiftWithViolatedInfoDTO = validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldStateShift, activityWrapperMap, true, false);
+        }
+        if (isNull(shiftWithViolatedInfoDTO)) {
+            shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO(new ViolatedRulesDTO());
+        }
+        return shiftWithViolatedInfoDTO;
     }
 
     public DateTimeInterval getGracePeriodInterval(Phase phase, Date date, boolean forStaff) {
@@ -250,7 +268,7 @@ public class ShiftValidatorService {
         }
         shift.setTimeType(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getTimeType());
         activitySpecification.validateRules(shift);
-        ActivityRuleViolation activityRuleViolation = shiftService.validateAndUpdateSicknessShift(activityWrapperMap,shift,staffAdditionalInfoDTO);
+        ActivityRuleViolation activityRuleViolation = shiftSickService.validateAndUpdateSicknessShift(activityWrapperMap,shift,staffAdditionalInfoDTO);
         if(isCollectionNotEmpty(activityRuleViolation.getErrorMessages())){
                 ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
     }
@@ -1093,6 +1111,24 @@ public class ShiftValidatorService {
 
     public List<ShiftViolatedRules> findAllViolatedRulesByShiftIds(List<BigInteger> shiftIds, boolean draft) {
         return shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds, draft);
+    }
+
+    public ViolatedRulesDTO validateRule(Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        validateStatusOfShiftActivity(shift);
+        Set<BigInteger> activityIds = new HashSet<>();
+        for (ShiftActivity activity : shift.getActivities()) {
+            activityIds.add(activity.getActivityId());
+            activityIds.addAll(activity.getChildActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet()));
+        }
+        List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate());
+        staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+        setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+
+        ViolatedRulesDTO violatedRulesDTO = validateRuleOnShiftDelete(activityWrapperMap, shift, staffAdditionalInfoDTO);
+
+        return violatedRulesDTO;
     }
 
 }

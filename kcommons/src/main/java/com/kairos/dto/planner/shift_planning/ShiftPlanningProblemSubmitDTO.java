@@ -1,5 +1,6 @@
 package com.kairos.dto.planner.shift_planning;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
@@ -7,6 +8,8 @@ import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
@@ -22,6 +25,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+
 /**
  * @author pradeep
  * @date - 23/11/18
@@ -36,6 +41,7 @@ public class ShiftPlanningProblemSubmitDTO {
     private BigInteger planningProblemId;
     private SolverConfigDTO solverConfig;
     private BigInteger solverConfigId;
+    @Builder.Default
     private List<Long> staffIds=new ArrayList<>();
     private Long unitId;
     private BigInteger planningPeriodId;
@@ -47,7 +53,7 @@ public class ShiftPlanningProblemSubmitDTO {
     private List<ShiftDTO> shifts;
     private List<ActivityDTO> activities;
     private PlanningPeriodDTO planningPeriod;
-    private StaffingLevelDto staffingLevel;
+    private List<PresenceStaffingLevelDto> staffingLevels;
     private ActivityConfigurationDTO activityConfiguration;
     private Set<BigInteger> lockedShiftIds;
     private Map<BigInteger,Integer> activityOrderMap;
@@ -56,13 +62,16 @@ public class ShiftPlanningProblemSubmitDTO {
     Map<Long, ExpertiseNightWorkerSettingDTO> expertiseNightWorkerSettingMap;
     Map<Long, BreakSettingsDTO> breakSettingMap;
     Map<Long, Boolean> nightWorkerDetails;
+    Map<BigInteger, TimeTypeDTO> timeTypeMap;
 
-
+    @JsonIgnore
     public Map<BigInteger,Integer> getActivityOrderMap(){
         AtomicInteger atomicInteger = new AtomicInteger(0);
         activityOrderMap = activities.stream().sorted(Comparator.comparing(ActivityDTO::getActivitySequence)).collect(Collectors.toMap(ActivityDTO::getId,v->atomicInteger.addAndGet(1)));
         return activityOrderMap;
     }
 
-
+    public Set<BigInteger> getLockedShiftIds() {
+        return isNullOrElse(lockedShiftIds,new HashSet<>());
+    }
 }
