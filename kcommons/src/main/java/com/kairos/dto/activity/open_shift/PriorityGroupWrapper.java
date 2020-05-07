@@ -1,35 +1,17 @@
 package com.kairos.dto.activity.open_shift;
 
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PriorityGroupWrapper {
     private PriorityGroupDefaultData defaultData;
     private List<PriorityGroupDTO> priorityGroupData;
-
-    public PriorityGroupWrapper() {
-        //Default Constructor
-    }
-
-    public PriorityGroupWrapper(PriorityGroupDefaultData defaultData, List<PriorityGroupDTO> priorityGroupData) {
-        this.defaultData = defaultData;
-        this.priorityGroupData = priorityGroupData;
-    }
-
-    public PriorityGroupDefaultData getDefaultData() {
-        return defaultData;
-    }
-
-    public void setDefaultData(PriorityGroupDefaultData defaultData) {
-        this.defaultData = defaultData;
-    }
-
-    public List<PriorityGroupDTO> getPriorityGroupData() {
-        return priorityGroupData;
-    }
-
-    public void setPriorityGroupData(List<PriorityGroupDTO> priorityGroupData) {
-        this.priorityGroupData = priorityGroupData;
-    }
 }

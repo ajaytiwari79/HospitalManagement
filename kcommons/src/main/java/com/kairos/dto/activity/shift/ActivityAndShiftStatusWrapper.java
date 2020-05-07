@@ -5,30 +5,13 @@ package com.kairos.dto.activity.shift;
  */
 
 import com.kairos.enums.shift.ShiftStatus;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
-
+@Getter
+@Setter
 public class ActivityAndShiftStatusWrapper {
     private ShiftStatus status;
     private List<ActivityShiftStatusSettingsDTO> activityAndShiftStatusSettings;
-
-    public ActivityAndShiftStatusWrapper() {
-        //Default Constructor
-    }
-
-    public ShiftStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ShiftStatus status) {
-        this.status = status;
-    }
-
-    public List<ActivityShiftStatusSettingsDTO> getActivityAndShiftStatusSettings() {
-        return activityAndShiftStatusSettings;
-    }
-
-    public void setActivityAndShiftStatusSettings(List<ActivityShiftStatusSettingsDTO> activityAndShiftStatusSettings) {
-        this.activityAndShiftStatusSettings = activityAndShiftStatusSettings;
-    }
 }

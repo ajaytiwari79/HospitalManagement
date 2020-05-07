@@ -190,7 +190,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 count().as(COUNT)
         );
         AggregationResults<Map> result = mongoTemplate.aggregate(aggregation, Shift.class, Map.class);
-        return isCollectionNotEmpty(result.getMappedResults())? ((Integer)result.getMappedResults().get(0).get(COUNT)).longValue():0l;
+        return isCollectionNotEmpty(result.getMappedResults()) ? ((Integer) result.getMappedResults().get(0).get(COUNT)).longValue() : 0L;
     }
 
 
@@ -637,7 +637,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         activityIds.addAll(shift.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         if(isCollectionNotEmpty(shift.getBreakActivities())) {
-            activityIds.addAll(shift.getBreakActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toList()));
+            activityIds.addAll(shift.getBreakActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         }
         return activityIds;
     }

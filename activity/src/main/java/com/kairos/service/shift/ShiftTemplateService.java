@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -186,11 +188,14 @@ public class ShiftTemplateService{
             newShiftDTO.setEmploymentId(shiftDTO.getEmploymentId());
             newShiftDTO.setShiftDate(shiftDTO.getShiftDate());
             List<ShiftActivityDTO> shiftActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().size());
+            List<ShiftActivityDTO> childActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().get(0).getChildActivities().size());
             individualShiftTemplateDTO.getActivities().forEach(shiftTemplateActivity -> {
-                Date startDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(), shiftTemplateActivity.getStartTime());
-                LocalDate localEndDate =shiftTemplateActivity.getStartTime().isAfter(shiftTemplateActivity.getEndTime())?shiftDTO.getTemplate().getStartDate().plusDays(1):shiftDTO.getTemplate().getStartDate();
-                Date endDate = DateUtils.asDate(localEndDate, shiftTemplateActivity.getEndTime());
-                ShiftActivityDTO shiftActivity = new ShiftActivityDTO(shiftTemplateActivity.getActivityName(), startDate, endDate, shiftTemplateActivity.getActivityId(), shiftTemplateActivity.getAbsenceReasonCodeId());
+                shiftTemplateActivity.getChildActivities().forEach(shiftTemplateActivity1 -> {
+                    ShiftActivityDTO  shiftChildActivity =getShiftActivityDTO(shiftDTO,shiftTemplateActivity1);
+                    childActivities.add(shiftChildActivity);
+                });
+                ShiftActivityDTO shiftActivity = getShiftActivityDTO(shiftDTO, shiftTemplateActivity);
+                shiftActivity.setChildActivities(childActivities);
                 shiftActivities.add(shiftActivity);
             });
             newShiftDTO.setActivities(shiftActivities);
@@ -209,6 +214,13 @@ public class ShiftTemplateService{
             shiftWithViolatedInfoDTOS.addAll(result);
         });
         return shiftWithViolatedInfoDTOS;
+    }
+
+    private ShiftActivityDTO getShiftActivityDTO(ShiftDTO shiftDTO, ShiftTemplateActivity shiftTemplateActivity) {
+        Date startDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(), shiftTemplateActivity.getStartTime());
+        LocalDate localEndDate =shiftTemplateActivity.getStartTime().isAfter(shiftTemplateActivity.getEndTime())?shiftDTO.getTemplate().getStartDate().plusDays(1):shiftDTO.getTemplate().getStartDate();
+        Date endDate = DateUtils.asDate(localEndDate, shiftTemplateActivity.getEndTime());
+        return new ShiftActivityDTO(shiftTemplateActivity.getActivityName(), startDate, endDate, shiftTemplateActivity.getActivityId(), shiftTemplateActivity.getAbsenceReasonCodeId());
     }
 
 

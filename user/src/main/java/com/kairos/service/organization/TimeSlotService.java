@@ -336,13 +336,22 @@ public class TimeSlotService {
         return timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode());
     }
 
-    public List<TimeSlotDTO> getUnitTimeSlot(Long unitId){
+    public List<TimeSlotDTO> getUnitTimeSlot(Long unitId) {
         OrganizationBaseEntity unit = organizationBaseRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
         }
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getUnitTimeSlotsByType(unit.getId(), unit.getTimeSlotMode(),TimeSlotType.SHIFT_PLANNING);
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(timeSlotWrappers,TimeSlotDTO.class);
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getUnitTimeSlotsByType(unit.getId(), unit.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(timeSlotWrappers, TimeSlotDTO.class);
+    }
+
+    public List<TimeSlotDTO> getUnitTimeSlotByNames(Long unitId, Set<String> timeslotNames) {
+        OrganizationBaseEntity unit = organizationBaseRepository.findOne(unitId, 0);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
+        }
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getUnitTimeSlotsByIds(unit.getId(), timeslotNames, STANDARD, TimeSlotType.SHIFT_PLANNING);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(timeSlotWrappers, TimeSlotDTO.class);
     }
 
     public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotExternalId(Long unitId, Long kmdExternalId) {

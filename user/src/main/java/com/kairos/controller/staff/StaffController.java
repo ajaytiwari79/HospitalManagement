@@ -644,9 +644,10 @@ public class StaffController {
     @PostMapping(value = "/get_all_planning_staff")
     @ApiOperation("Get all staff eligible for planning")
     public ResponseEntity<Map<String, Object>>  getStaffEligibleForPlanning(@PathVariable Long unitId, @RequestBody StaffFilterDTO staffFilterDetails){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffForUnitWithEmploymentStatus(unitId,staffFilterDetails));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getAllStaffForUnitWithEmploymentStatus(unitId,staffFilterDetails));
     }
-    @GetMapping(value = "/endPositionProcess")
+
+    @GetMapping(value = "/end_position_process")
     @ApiOperation("end position process")
     public ResponseEntity<Map<String, Object>> endPositionProcess() {
         positionService.endPositionProcess();
@@ -656,7 +657,7 @@ public class StaffController {
     @PostMapping(value = "/get_all_staff_for_planning")
     @ApiOperation("Get all staff eligible for planning")
     public ResponseEntity<Map<String, Object>>  getStaffsByIds(@PathVariable Long unitId, @RequestBody List<Long> staffIds){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsByIds(unitId,staffIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsByIds(staffIds));
     }
 
 }

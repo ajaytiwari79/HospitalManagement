@@ -7,6 +7,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.employment.EmploymentService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.staff.UserSickService;
@@ -49,6 +50,7 @@ public class UserController {
     private AccessGroupService accessGroupService;
     @Inject private StaffRetrievalService staffRetrievalService;
     @Inject private EmploymentService employmentService;
+    @Inject private RedisService redisService;
 
    /* @Inject
     TaskReportService taskReportService;*/
@@ -224,5 +226,6 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> getCurrentUser()  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getCurrentUser());
     }
+
 
 }

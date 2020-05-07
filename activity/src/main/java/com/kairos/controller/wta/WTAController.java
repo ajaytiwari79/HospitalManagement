@@ -43,8 +43,6 @@ public class WTAController {
     private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
     @Inject
     private WTAOrganizationService wtaOrganizationService;
-    @Inject
-    private ActivitySchedulerJobService activitySchedulerJobService;
 
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value =   COUNTRY_URL + "/wta")
@@ -266,14 +264,6 @@ public class WTAController {
                                                                            @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate,
                                                                            @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getWorktimeAgreementBalance(unitId, employmentId,startDate,endDate));
-    }
-
-
-
-    @ApiOperation(value = "Update Phases in Ruletemplates")
-    @GetMapping(value =  UNIT_URL+ "/update_phases_in_ruletemplate")
-    public ResponseEntity<Map<String, Object>> updatePhasesInRuletemplate(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updatePhasesInRuletemplate());
     }
 
 
