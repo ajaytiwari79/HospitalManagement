@@ -1,6 +1,6 @@
 package com.planner.service.constraint.activity;
 
-import com.kairos.commons.planning_setting.PlanningSetting;
+import com.kairos.commons.planning_setting.ConstraintSetting;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityConstraintDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
@@ -26,7 +26,7 @@ public class ActivityConstraintService {
         ActivityConstraint activityConstraint = activityConstraintRepository.findByActivityIdAndConstraintSubTypeAndDeletedFalse(activityConstraintDTO.getActivityId(),activityConstraintDTO.getConstraintSubType());
         if (isNotNull(activityConstraint)) {
             if(!activityConstraint.getMandatory()){
-                activityConstraint.setPlanningSetting(activityConstraintDTO.getPlanningSetting());
+                activityConstraint.setConstraintSetting(activityConstraintDTO.getConstraintSetting());
             }
         }else {
             activityConstraint = ObjectMapperUtils.copyPropertiesByMapper(activityConstraintDTO, ActivityConstraint.class);
@@ -54,8 +54,8 @@ public class ActivityConstraintService {
         List<ActivityConstraintDTO> activityConstraintDTOS = new ArrayList<>();
 
         for(int i = 0; i < ConstraintSubType.values().length; i++) {
-            PlanningSetting planningSetting1 = new PlanningSetting(HARD,2,false);
-            ActivityConstraintDTO activityConstraintDTO1 = new ActivityConstraintDTO(planningSetting1,ConstraintSubType.values()[i]);
+            ConstraintSetting constraintSetting1 = new ConstraintSetting(HARD,2,false);
+            ActivityConstraintDTO activityConstraintDTO1 = new ActivityConstraintDTO(constraintSetting1,ConstraintSubType.values()[i]);
             activityConstraintDTOS.add(activityConstraintDTO1);
         }
 

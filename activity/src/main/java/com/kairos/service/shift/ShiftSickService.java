@@ -2,7 +2,9 @@ package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.EmploymentSubType;
@@ -12,6 +14,7 @@ import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
@@ -26,6 +29,7 @@ import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.dashboard.SickService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -85,6 +89,7 @@ public class ShiftSickService extends MongoBaseService {
     @Inject private ActivityService activityService;
     @Inject
     private ShiftDetailsService shiftDetailsService;
+    @Inject private SickService sickService;
 
 
     public List<ShiftWithViolatedInfoDTO> createSicknessShiftsOfStaff(ShiftDTO shiftDTO,StaffAdditionalInfoDTO staffAdditionalInfoDTO,ActivityWrapper activityWrapper) {
@@ -229,6 +234,48 @@ public class ShiftSickService extends MongoBaseService {
         }));
         return activityIds;
     }
+
+    public ActivityRuleViolation validateAndUpdateSicknessShift(Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        ActivityWrapper activityWrapper = activityWrapperMap.get(shift.getActivities().get(0).getActivityId());
+        List<String> errorMessages = new ArrayList<>();
+        if (isNotNull(activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting()) && !activityWrapper.getActivity().getRulesActivityTab().isAllowedAutoAbsence()) {
+            List<Shift> shifts = shiftMongoRepository.findAllShiftByIntervalAndEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), getStartOfDay(shift.getStartDate()), DateUtils.getEndOfDay(shift.getEndDate()));
+            List<Activity> protectedDaysOffActivities = activityRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, newHashSet(shift.getUnitId()));
+            validateSicknessShift(shift, staffAdditionalInfoDTO, activityWrapper, shifts, protectedDaysOffActivities);
+            if (isCollectionEmpty(errorMessages)) {
+                for (Shift oldShift : shifts) {
+                    oldShift.setDisabled(true);
+                }
+                shiftMongoRepository.saveEntities(shifts);
+                shift.setSickShift(true);
+            }
+        }
+        return new ActivityRuleViolation(activityWrapper.getActivity().getId(), activityWrapper.getActivity().getName(), 0, new HashSet<>(errorMessages));
+    }
+
+
+    public void validateSicknessShift(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<Shift> shifts, List<Activity> activities) {
+        List<String> errorMessages = new ArrayList<>();
+        SicknessSetting sicknessSetting = activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting();
+        sickService.validateSickSettings(staffAdditionalInfoDTO, activityWrapper, shifts, errorMessages, sicknessSetting);
+        if (sicknessSetting.isUsedOnProtecedDaysOff()) {
+            Set<BigInteger> activityIds = activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
+            for (Shift oldShift : shifts) {
+                if (!activityIds.contains(oldShift.getActivities().stream().map(ShiftActivity::getActivityId))) {
+                    errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_PROTECTEDDAYSOFF));
+                }
+            }
+        }
+        if (!sicknessSetting.isCanNotUsedTopOfApprovedAbsences()) {
+            for (Shift currentElement : shifts) {
+                if (ShiftType.ABSENCE.equals(currentElement.getShiftType()) && !shift.getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getStatus().contains(ShiftStatus.APPROVE))) {
+                    errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_APPROVEABSENCES));
+                }
+            }
+        }
+    }
+
+
 }
 
 

@@ -1,18 +1,18 @@
-package com.kairos.activity.config.mongo_converter;
+package com.planner.mongo_converter;
+
 import com.kairos.commons.utils.DateUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @ReadingConverter
-public class LocalDateReadConverter implements Converter<Date, LocalDate> {
-
+public class LocalDateTimeReadConverter implements Converter<Date, LocalDateTime> {
     @Override
-    public LocalDate convert(Date source) {
+    public LocalDateTime convert(Date source) {
         //default, ISO_LOCAL_DATE
-        return DateUtils.asLocalDate(source);
+        return DateUtils.asLocalDateTime(source);
 
     }
 }

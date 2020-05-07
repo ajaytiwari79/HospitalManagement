@@ -5,16 +5,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class PlanningSetting {
+public class ConstraintSetting {
 
     private ScoreLevel scoreLevel;
     private int constraintWeight;
     private boolean mandatory;
 
-    public PlanningSetting(ScoreLevel scoreLevel, int constraintWeight, boolean mandatory){
+    public ScoreLevel getScoreLevel() {
+        return isNullOrElse(scoreLevel,ScoreLevel.SOFT);
+    }
+
+    public ConstraintSetting(ScoreLevel scoreLevel, int constraintWeight, boolean mandatory){
         this.scoreLevel = scoreLevel;
         this.constraintWeight = constraintWeight;
         this.mandatory  = mandatory;

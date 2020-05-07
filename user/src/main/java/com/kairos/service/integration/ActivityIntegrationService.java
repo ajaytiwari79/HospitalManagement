@@ -226,7 +226,7 @@ public class ActivityIntegrationService {
         Map<String,Collection<Long>> requestBody = new HashMap<>();
         requestBody.put("staffIds",staffIds);
         requestBody.put("expertiseIds",expertiseIds);
-        return genericRestClient.publishRequest(requestBody, null, false, IntegrationOperation.GET, "/get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftPlanningProblemSubmitDTO>>(){});
+        return genericRestClient.publishRequest(requestBody, null, false, IntegrationOperation.CREATE, "get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftPlanningProblemSubmitDTO>>(){});
     }
 }
 

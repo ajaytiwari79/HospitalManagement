@@ -1,6 +1,6 @@
 package com.planner.domain.constraint.activity;
 
-import com.kairos.commons.planning_setting.PlanningSetting;
+import com.kairos.commons.planning_setting.ConstraintSetting;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.planner.domain.common.MongoBaseEntity;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import java.math.BigInteger;
 @Document
 public class ActivityConstraint extends MongoBaseEntity {
     private BigInteger activityId;
-    private PlanningSetting planningSetting;
+    private ConstraintSetting constraintSetting;
     private ConstraintSubType constraintSubType;
     private Boolean  mandatory;
 

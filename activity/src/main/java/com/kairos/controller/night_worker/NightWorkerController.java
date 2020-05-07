@@ -75,7 +75,7 @@ public class NightWorkerController {
 
 
     @ApiOperation(value = "get night worker details")
-    @PutMapping(value = "/get_night_worker_details")
+    @PostMapping(value = "/get_night_worker_details")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getNightWorkerDetails(@RequestBody Map<String, Collection<Long>> requestBody) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,nightWorkerService.getNightWorkerDetails(requestBody));

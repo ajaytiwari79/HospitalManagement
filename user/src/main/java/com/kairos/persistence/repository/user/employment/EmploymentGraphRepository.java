@@ -371,12 +371,12 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "RETURN employmentLine,seniorityLevel,seniorityRel,payGrade,payGradeRel")
     List<EmploymentLine> getEmploymentLineByIds(List<Long> employmentLineIds);
 
-    @Query("match (e:Employment)<-[staffRel:BELONGS_TO_STAFF]-(s:Staff) where id(s) in [2284,2364]\n" +
+    @Query("match (e:Employment)<-[staffRel:BELONGS_TO_STAFF]-(s:Staff) where id(s) in {0}\n" +
             "match(e)-[expRel:HAS_EXPERTISE_IN]-(ex:Expertise)\n" +
             "match(e)-[empLineRel:HAS_EMPLOYMENT_LINES]-(em:EmploymentLine)\n" +
             "match(s)-[tagRel:BELONGS_TO_TAGS]-(tag:Tag)\n" +
             "match(s)-[userRel:BELONGS_TO]-(user:User)\n" +
-            "OptionalMatch(s)-[childRel:HAS_CHILDREN]-(child:StaffChildDetail)\n" +
+            "Optional Match(s)-[childRel:HAS_CHILDREN]-(child:StaffChildDetail)\n" +
             "return e,staffRel,s,expRel,ex,empLineRel,em,tagRel,tag,userRel,user,childRel,child")
     List<Employment> getEmploymentByStaffIds(List<Long> staffIds);
 
