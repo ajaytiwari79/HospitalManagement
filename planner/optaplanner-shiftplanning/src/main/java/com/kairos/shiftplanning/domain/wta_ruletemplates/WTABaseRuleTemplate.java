@@ -2,7 +2,7 @@ package com.kairos.shiftplanning.domain.wta_ruletemplates;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.kairos.commons.planning_setting.PlanningSetting;
+import com.kairos.commons.planning_setting.ConstraintSetting;
 import com.kairos.dto.activity.wta.templates.*;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.wta.WTATemplateType;
@@ -63,7 +63,7 @@ public class WTABaseRuleTemplate implements Constraint {
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected Integer staffCanIgnoreCounter;
     protected Integer managementCanIgnoreCounter;
-    protected PlanningSetting planningSetting;
+    protected ConstraintSetting constraintSetting;
     protected boolean checkRuleFromView;
 
     public WTABaseRuleTemplate(String name, String description) {
@@ -78,11 +78,11 @@ public class WTABaseRuleTemplate implements Constraint {
 
     @Override
     public ScoreLevel getLevel() {
-        return this.planningSetting.getScoreLevel();
+        return this.constraintSetting.getScoreLevel();
     }
 
     @Override
     public int getWeight() {
-        return this.planningSetting.getConstraintWeight();
+        return this.constraintSetting.getConstraintWeight();
     }
 }

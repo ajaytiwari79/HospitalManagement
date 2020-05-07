@@ -1,6 +1,6 @@
 package com.planner.domain.constraint.unit;
 
-import com.kairos.commons.planning_setting.PlanningSetting;
+import com.kairos.commons.planning_setting.ConstraintSetting;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.planner.domain.common.MongoBaseEntity;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class UnitConstraint extends MongoBaseEntity {
     private Long unitId;
-    private PlanningSetting planningSetting;
+    private ConstraintSetting constraintSetting;
     private ConstraintSubType constraintSubType;
     private Boolean  mandatory;
 

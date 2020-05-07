@@ -1,6 +1,6 @@
 package com.kairos.dto.activity.activity;
 
-import com.kairos.commons.planning_setting.PlanningSetting;
+import com.kairos.commons.planning_setting.ConstraintSetting;
 import com.kairos.enums.constraint.ConstraintSubType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,12 +14,12 @@ import java.math.BigInteger;
 public class ActivityConstraintDTO {
 
     private BigInteger activityId;
-    private PlanningSetting planningSetting;
+    private ConstraintSetting constraintSetting;
     private ConstraintSubType constraintSubType;
     private Boolean mandatory;
 
-    public ActivityConstraintDTO( PlanningSetting planningSetting,ConstraintSubType constraintSubType){
-        this.planningSetting = planningSetting;
+    public ActivityConstraintDTO(ConstraintSetting constraintSetting, ConstraintSubType constraintSubType){
+        this.constraintSetting = constraintSetting;
         this.constraintSubType = constraintSubType;
     }
 }
