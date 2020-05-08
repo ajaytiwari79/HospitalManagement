@@ -3,7 +3,9 @@ package com.kairos.service.organization;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
@@ -47,6 +49,7 @@ import static com.kairos.commons.utils.ArrayUtil.getUnionOfList;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+import static com.kairos.constants.AppConstants.MAIN_TEAM_RANKING;
 import static com.kairos.constants.UserMessagesConstants.*;
 /**
  * Created by oodles on 7/10/16.
@@ -159,7 +162,6 @@ public class TeamService {
             if (staffTeamDTO.getLeaderType() != null && !accessGroupService.findStaffAccessRole(unitId, staffTeamDTO.getStaffId()).getManagement()) {
                 exceptionService.actionNotPermittedException(STAFF_CAN_NOT_BE_TEAM_LEADER);
             }
-
             Team team = teamGraphRepository.findByIdAndDeletedFalse(teamId);
             Staff staff = staffGraphRepository.findByStaffId(staffTeamDTO.getStaffId());
             StaffTeamRelationShipQueryResult staffTeamRelationShipQueryResult = staffTeamRelationshipGraphRepository.findByStaffIdAndTeamId(staffTeamDTO.getStaffId(), teamId);
@@ -167,19 +169,22 @@ public class TeamService {
                     new StaffTeamRelationship(staffTeamRelationShipQueryResult.getId(), team, staff, staffTeamRelationShipQueryResult.getLeaderType(), staffTeamDTO.getTeamType());
             staffTeamRelationship.setStartDate(staffTeamDTO.getStartDate());
             staffTeamRelationship.setEndDate(staffTeamDTO.getEndDate());
-            if(!isSequenceExistOrNot(staffTeamDTO)) {
-                staffTeamRelationship.setSequence(staffTeamDTO.getSequence());
-            }else{
-                exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
+            if(TeamType.MAIN.equals(staffTeamRelationship.getTeamType())){
+                staffTeamRelationship.setSequence(MAIN_TEAM_RANKING);
+            }else {
+                if (!isSequenceExistOrNot(staffTeamDTO.getStaffId(),staffTeamDTO.getSequence(),staffTeamDTO.getTeamId())||staffTeamRelationship.getSequence()==staffTeamDTO.getSequence()) {
+                    staffTeamRelationship.setSequence(staffTeamDTO.getSequence());
+                } else {
+                    exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
+                }
             }
             staffTeamRelationshipGraphRepository.save(staffTeamRelationship);
         }
         return staffTeamDTOs;
     }
 
-    public boolean isSequenceExistOrNot(StaffTeamDTO staffTeamDTO){
-        boolean isExist =staffTeamRelationshipGraphRepository.sequenceIsExists(staffTeamDTO.getSequence());
-        return isExist;
+    public boolean isSequenceExistOrNot(Long staffId,int sequence,Long teamId){
+        return staffTeamRelationshipGraphRepository.sequenceIsExists(staffId,sequence,teamId);
     }
 
 
@@ -371,6 +376,14 @@ public class TeamService {
         teamGraphRepository.removeStaffFromAllTeams(staff.getId());
         List<Team> teams = teamGraphRepository.findAllById(new ArrayList<>(staffTeamDetails.stream().map(k -> k.getId()).collect(Collectors.toSet())));
         Map<Long, Team> teamMap = teams.stream().collect(Collectors.toMap(k -> k.getId(), Function.identity()));
+        for(com.kairos.dto.user.team.TeamDTO teamDTO :staffTeamDetails){
+            if(TeamType.MAIN.equals(teamDTO.getTeamType())){
+                teamDTO.setSequence(MAIN_TEAM_RANKING);
+            }
+            else if(isSequenceExistOrNot(staff.getId(),teamDTO.getSequence(),teamDTO.getId())){
+                exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
+            }
+        }
         List<StaffTeamRelationship> staffTeamRelationshipList = staffTeamDetails.stream().map(staffTeamDetail -> new StaffTeamRelationship(null, teamMap.get(staffTeamDetail.getId()), staff, staffTeamDetail.getLeaderType(), staffTeamDetail.getTeamType(),staffTeamDetail.getStartDate(),staffTeamDetail.getEndDate(),staffTeamDetail.getSequence())).collect(Collectors.toList());
         if (isCollectionNotEmpty(staffTeamRelationshipList)) {
             staffTeamRelationshipGraphRepository.saveAll(staffTeamRelationshipList);
