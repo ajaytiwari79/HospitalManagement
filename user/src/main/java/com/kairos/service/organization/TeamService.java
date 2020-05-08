@@ -185,6 +185,8 @@ public class TeamService {
 
     public boolean isSequenceExistOrNot(Long staffId,int sequence,Long teamId){
         return staffTeamRelationshipGraphRepository.sequenceIsExists(staffId,sequence,teamId);
+
+        //aaya q nhi hit?debugger band kiya hua hai q? Query kha gyiiiiiiiiiiii ?user boot run ko click karo fir f8 dabao
     }
 
 
@@ -373,9 +375,6 @@ public class TeamService {
         if (staffTeamDetails.stream().anyMatch(k -> k.getLeaderType() != null) && !accessGroupService.findStaffAccessRole(unitId, staff.getId()).getManagement()) {
             exceptionService.actionNotPermittedException(STAFF_CAN_NOT_BE_TEAM_LEADER);
         }
-        teamGraphRepository.removeStaffFromAllTeams(staff.getId());
-        List<Team> teams = teamGraphRepository.findAllById(new ArrayList<>(staffTeamDetails.stream().map(k -> k.getId()).collect(Collectors.toSet())));
-        Map<Long, Team> teamMap = teams.stream().collect(Collectors.toMap(k -> k.getId(), Function.identity()));
         for(com.kairos.dto.user.team.TeamDTO teamDTO :staffTeamDetails){
             if(TeamType.MAIN.equals(teamDTO.getTeamType())){
                 teamDTO.setSequence(MAIN_TEAM_RANKING);
@@ -384,6 +383,9 @@ public class TeamService {
                 exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
             }
         }
+        teamGraphRepository.removeStaffFromAllTeams(staff.getId());
+        List<Team> teams = teamGraphRepository.findAllById(new ArrayList<>(staffTeamDetails.stream().map(k -> k.getId()).collect(Collectors.toSet())));
+        Map<Long, Team> teamMap = teams.stream().collect(Collectors.toMap(k -> k.getId(), Function.identity()));
         List<StaffTeamRelationship> staffTeamRelationshipList = staffTeamDetails.stream().map(staffTeamDetail -> new StaffTeamRelationship(null, teamMap.get(staffTeamDetail.getId()), staff, staffTeamDetail.getLeaderType(), staffTeamDetail.getTeamType(),staffTeamDetail.getStartDate(),staffTeamDetail.getEndDate(),staffTeamDetail.getSequence())).collect(Collectors.toList());
         if (isCollectionNotEmpty(staffTeamRelationshipList)) {
             staffTeamRelationshipGraphRepository.saveAll(staffTeamRelationshipList);

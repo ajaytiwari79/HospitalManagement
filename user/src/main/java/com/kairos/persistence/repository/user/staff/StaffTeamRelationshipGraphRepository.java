@@ -31,7 +31,7 @@ public interface StaffTeamRelationshipGraphRepository extends Neo4jBaseRepositor
             " RETURN COUNT(rel)>0")
     boolean anyMainTeamExists(Long staffId, Long teamId);
 
-    @Query("MATCH(t:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(staff) = {0} AND id(t)<>{2} AND rel.sequence = {1} RETURN COUNT(rel)>0")
+    @Query("MATCH(t:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(staff) = {0} AND id(t)<>{2} AND rel.sequence = {1} RETURN COUNT(rel)>0 ")
     boolean sequenceIsExists(Long staffId,int sequence,Long teamId);
 
 
