@@ -49,16 +49,6 @@ public class ShiftTemplateService{
 
         //Check for activity is absence type or not
         Set<BigInteger> activityIds = shiftTemplateDTO.getShiftList().stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toSet());
-        List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
-        activities.forEach(activity -> {
-            /*if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
-                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ABSENCETYPE, activity.getId());
-            }*/
-
-            if (TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType())){
-                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ABSENCETYPE, activity.getId());
-            }
-        });
 
         //Check for validating duplicate by name
         boolean alreadyExistsByName = shiftTemplateRepository.
