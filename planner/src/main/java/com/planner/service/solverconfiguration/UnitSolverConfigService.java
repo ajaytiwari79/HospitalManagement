@@ -9,7 +9,6 @@ import com.planner.component.exception.ExceptionService;
 import com.planner.component.rest_client.IntegrationService;
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.planning_problem.PlanningProblemRepository;
-import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.solver_config.SolverConfigRepository;
 import com.planner.service.planning_problem.PlanningProblemService;
 import org.springframework.stereotype.Service;
@@ -26,8 +25,6 @@ import static com.kairos.enums.TimeTypeEnum.*;
 public class UnitSolverConfigService {
     @Inject
     private SolverConfigRepository solverConfigRepository;
-    @Inject
-    private ActivityMongoRepository activityMongoRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject private CountrySolverConfigService countrySolverConfigService;

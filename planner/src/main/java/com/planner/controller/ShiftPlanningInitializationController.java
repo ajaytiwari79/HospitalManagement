@@ -2,7 +2,6 @@ package com.planner.controller;
 
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.planner.commonUtil.ResponseHandler;
-import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.service.shift_planning.ShiftPlanningInitializationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
