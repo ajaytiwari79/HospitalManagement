@@ -5,6 +5,7 @@ ext {
     versionoptaplannerbom='7.34.0.Final'
 }
 apply plugin: 'java'
+/*
 apply plugin: 'eclipse'
 apply plugin: 'application'
 
@@ -24,6 +25,7 @@ jar {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
+*/
 
 repositories {
     mavenCentral()

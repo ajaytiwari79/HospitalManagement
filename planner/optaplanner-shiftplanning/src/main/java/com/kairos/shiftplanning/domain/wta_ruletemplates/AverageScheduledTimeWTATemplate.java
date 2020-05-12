@@ -6,8 +6,6 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
-import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.Unit;
 import lombok.*;

@@ -12,23 +12,17 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.dto.planner.constarints.ConstraintDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
-import com.kairos.enums.TimeTypes;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.constraints.activityconstraint.*;
-import com.kairos.shiftplanning.constraints.unitconstraint.DislikeNightShiftsForNonNightWorkers;
-import com.kairos.shiftplanning.constraints.unitconstraint.MaxLengthOfShiftInNightTimeSlot;
-import com.kairos.shiftplanning.constraints.unitconstraint.PreferedEmployementType;
-import com.kairos.shiftplanning.constraints.unitconstraint.ShiftOnWeekend;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
@@ -40,14 +34,12 @@ import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.domain.unit.*;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.WTABaseRuleTemplate;
-import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.integration.ActivityIntegration;
 import com.kairos.shiftplanning.integration.UserIntegration;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 
 import java.math.BigInteger;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -61,8 +53,6 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.constraint.ConstraintSubType.ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH;
 import static com.kairos.enums.constraint.ConstraintSubType.MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF;
-import static com.kairos.enums.constraint.ScoreLevel.HARD;
-import static com.kairos.enums.constraint.ScoreLevel.SOFT;
 import static com.kairos.shiftplanning.executioner.ShiftPlanningGenerator.INTERVAL_MINS;
 
 public class ShiftPlanningInitializer {
@@ -103,13 +93,6 @@ public class ShiftPlanningInitializer {
         shiftRequestPhasePlanningSolution.setUnit(unit);
     }
 
-
-    public SolverConfigDTO getSolverConfigDTO() {
-        List<ConstraintDTO> constraintDTOS = new ArrayList<>();
-        constraintDTOS.add(new ConstraintDTO("Shortest duration for this activity, relative to shift length", "Shortest duration for this activity, relative to shift length", ConstraintType.ACTIVITY, ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH, ScoreLevel.HARD, 5, 5l));
-        constraintDTOS.add(new ConstraintDTO("Max number of allocations pr. shift for this activity per staff", "Max number of allocations pr. shift for this activity per staff", ConstraintType.ACTIVITY, MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, ScoreLevel.HARD, 5, 5l));
-        return new SolverConfigDTO(constraintDTOS);
-    }
 
     public void updateEmployees(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO, ShiftRequestPhasePlanningSolution shiftRequestPhasePlanningSolution) {
         List<Employee> employeeList = new ArrayList<>();
@@ -257,9 +240,9 @@ public class ShiftPlanningInitializer {
                 .build();
     }
 
-    private Map<ConstraintSubType, Constraint> getActivityConstrainsts(ActivityDTO activityDTO) {
+    private Map<ConstraintSubType, ConstraintHandler> getActivityConstrainsts(ActivityDTO activityDTO) {
         //validateActivityTimeRules(activityDTO);
-        Map<ConstraintSubType, Constraint> constraintMap = new HashMap<>();
+        Map<ConstraintSubType, ConstraintHandler> constraintMap = new HashMap<>();
         /*LongestDuration longestDuration = new LongestDuration(activityDTO.getRulesActivityTab().getLongestTime(), SOFT,-5);
         ShortestDuration shortestDuration = new ShortestDuration(activityDTO.getRulesActivityTab().getShortestTime(), HARD,-2);
         MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(activityDTO.getRulesActivityTab().getRecurrenceTimes(), SOFT,-1);//3

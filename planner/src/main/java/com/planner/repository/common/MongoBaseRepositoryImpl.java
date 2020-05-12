@@ -5,8 +5,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
 import com.planner.domain.common.MongoBaseEntity;
 import com.planner.domain.common.MongoSequence;
-import com.planner.domain.constraint.common.Constraint;
-import com.planner.domain.solverconfig.common.SolverConfig;
+import com.planner.domain.solverconfig.SolverConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -139,7 +138,6 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
         String className = entity.getClass().getSimpleName();
         //By Pass, to saveEntity both type of solverConfig in same Collection
         if (entity instanceof SolverConfig) className = SolverConfig.class.getSimpleName();
-        if(entity instanceof Constraint) className = Constraint.class.getSimpleName();
         //Set Id if entity don't have Id
         if (entity.getId() == null) entity.setId(nextSequence(className,1));
         //Set createdAt if entity don't have createdAt
@@ -157,7 +155,6 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
         String className = objects.get(0).getClass().getSimpleName();
         //By Pass, to saveEntity both type of classes in same Collection
         if (objects.get(0) instanceof SolverConfig) className = SolverConfig.class.getSimpleName();
-        if(objects.get(0) instanceof Constraint) className = Constraint.class.getSimpleName();
 
         // Creating BulkWriteOperation object
         BulkWriteOperation bulkWriteOperation= ((MongoTemplate) mongoOperations).getMongoDbFactory().getLegacyDb().getCollection(collectionName).initializeUnorderedBulkOperation();

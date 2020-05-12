@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public interface Constraint{
-    Logger log= LoggerFactory.getLogger(Constraint.class);
+public interface ConstraintHandler {
+    Logger log= LoggerFactory.getLogger(ConstraintHandler.class);
 
     default int checkConstraints(Activity activity, ShiftImp shift){ return 0;}
     default int checkConstraints(List<ShiftImp> shifts){

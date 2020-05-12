@@ -6,7 +6,7 @@ import com.kairos.commons.planning_setting.ConstraintSetting;
 import com.kairos.dto.activity.wta.templates.*;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -50,7 +50,7 @@ import java.util.List;
 @Document(collection = "wtaBaseRuleTemplate")
 @NoArgsConstructor
 @EqualsAndHashCode
-public class WTABaseRuleTemplate implements Constraint {
+public class WTABaseRuleTemplate implements ConstraintHandler {
 
     protected BigInteger id;
     protected String name;

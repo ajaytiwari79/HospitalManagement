@@ -1,7 +1,7 @@
 package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import com.kairos.enums.constraint.ScoreLevel;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import lombok.EqualsAndHashCode;
@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.isValidForDayType;
@@ -23,7 +22,7 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.isValidForDayT
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class ActivityDayType implements Constraint {
+public class ActivityDayType implements ConstraintHandler {
 
 
     private ScoreLevel level;

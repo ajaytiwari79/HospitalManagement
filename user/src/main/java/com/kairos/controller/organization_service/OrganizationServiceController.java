@@ -122,7 +122,7 @@ public class OrganizationServiceController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServices);
     }
 
-    @RequestMapping(value = UNIT_URL+"/organization_service", method = RequestMethod.GET)
+    @RequestMapping(value = UNIT_URL+"/get_organisation_services_by_unit", method = RequestMethod.GET)
     @ApiOperation("Find all organization_service by unit")
     public ResponseEntity<Map<String, Object>> getAllOrganizationServiceByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.getAllOrganizationServicesByUnitId(unitId));

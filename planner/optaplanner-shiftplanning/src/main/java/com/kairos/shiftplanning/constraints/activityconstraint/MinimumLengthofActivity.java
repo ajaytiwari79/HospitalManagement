@@ -1,7 +1,7 @@
 package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import com.kairos.enums.constraint.ScoreLevel;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class MinimumLengthofActivity implements Constraint {
+public class MinimumLengthofActivity implements ConstraintHandler {
 
     //In minutes
     private int minimumLengthofActivity;
