@@ -664,7 +664,7 @@ public class ShiftPlanningUtility {
                 shiftActivity = ali.getShiftActivity();
                 id = ali.getActivity().getId();
             }
-            calculateScheduledAndDurationInMinutes(shiftActivity,shiftImp.getEmployee().getEmployment().getEmploymentLinesByDate(shiftActivity.getStartDate().toLocalDate()));
+            //calculateScheduledAndDurationInMinutes(shiftActivity,shiftImp.getEmployee().getEmployment().getEmploymentLinesByDate(shiftActivity.getStartDate().toLocalDate()));
         }
         //to add last one
         activityIds.add(shiftActivity.getActivity().getId());

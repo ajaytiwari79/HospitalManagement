@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,6 +70,7 @@ public class Activity {
         this.activityPrioritySequence = activityPrioritySequence;
         this.expertises = expertises;
         this.tags = tags;
+        this.validDayTypeIds = new HashSet<>();
     }
 
     public boolean isBlankActivity(){

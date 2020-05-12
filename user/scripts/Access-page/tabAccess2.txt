@@ -328,6 +328,12 @@ Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(acces
 Match(ap:AccessPage) where ap.moduleId="module_3" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Optaplanner Configurations",isModule:false,moduleId:"tab_422",active:true});
 Match(ap:AccessPage) where ap.moduleId="tab_422" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Shift Planning",isModule:false,moduleId:"tab_423",active:true});
 Match(ap:AccessPage) where ap.moduleId="tab_423" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Solver Configuration Settings",isModule:false,moduleId:"tab_424",active:true});
+
+Match(ap:AccessPage) where ap.moduleId="module_4" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Optaplanner Configurations",isModule:false,moduleId:"tab_425",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_425" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Shift Planning",isModule:false,moduleId:"tab_426",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_426" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Solver Configuration Settings",isModule:false,moduleId:"tab_427",active:true});
+
+
 Match(ap:AccessPage) where ap.moduleId="tab_253" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Non working time",isModule:false,moduleId:"tab_429",active:true});
 Match(ap:AccessPage) where ap.moduleId="tab_310" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Non working time",isModule:false,moduleId:"tab_431",active:true});
 Match(ap:AccessPage) where ap.moduleId="tab_367" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Force Planned",isModule:false,moduleId:"tab_432",active:true});

@@ -39,11 +39,11 @@ public class ShiftPlanningSolverTest {
 /*    @Test
     @Ignore*/
     public void buildBenchmarker() {
-        new ShiftPlanningSolver().buildBenchmarker();
+        new ShiftPlanningSolver(solverConfigDTO, droolFilePath, configurationFile).buildBenchmarker();
     }
 
     public void runBenchmarker() {
-        new ShiftPlanningSolver().runBenchmarker();
+        new ShiftPlanningSolver(solverConfigDTO, droolFilePath, configurationFile).runBenchmarker();
     }
 
 

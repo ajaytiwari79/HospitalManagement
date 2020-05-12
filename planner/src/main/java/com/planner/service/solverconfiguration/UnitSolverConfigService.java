@@ -10,6 +10,7 @@ import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.unit.UnitSolverConfigDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.planner.component.exception.ExceptionService;
+import com.planner.component.rest_client.IntegrationService;
 import com.planner.domain.constraint.unit.UnitConstraint;
 import com.planner.domain.solverconfig.common.SolverConfig;
 import com.planner.domain.solverconfig.unit.UnitSolverConfig;
@@ -44,6 +45,7 @@ public class UnitSolverConfigService {
     @Inject private CountrySolverConfigService countrySolverConfigService;
     @Inject private PlanningProblemRepository planningProblemRepository;
     @Inject private ConstraintsRepository constraintsRepository;
+    @Inject private IntegrationService integrationService;
 
 
     public UnitSolverConfigDTO createUnitSolverConfig(UnitSolverConfigDTO unitSolverConfigDTO,Long unitId) {
@@ -125,23 +127,16 @@ public class UnitSolverConfigService {
 
     public DefaultDataDTO getDefaultData(Long unitId) {
         List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
-      //  Long countryId=userNeo4jRepo.getCountryIdByUnitId(unitId);
-        DefaultDataDTO defaultDataDTO = new DefaultDataDTO()
-                .setOrganizationServicesBuilder(ObjectMapperUtils.copyCollectionPropertiesByMapper(userNeo4jRepo.getAllOrganizationServicesByUnitId(unitId),OrganizationServiceDTO.class))
-
-                //get All Phases
-                .setPhaseDTOSBuilder(getAllPhases(unitId))
-                //getAllPlanningPeriod
-                .setPlanningPeriodBuilder(getAllPlanningPeriods(unitId)).setTimeTypeEnumSBuilder(newArrayList(PRESENCE,ABSENCE,PAID_BREAK,UNPAID_BREAK))
-                .setConstraintTypesBuilder(countrySolverConfigService.getConstraintTypes()).setPlanningProblemsBuilder(planningProblemDTOS);
-
-
+        DefaultDataDTO defaultDataDTO = integrationService.getDefaultDataForSolverConfig(unitId);
+        defaultDataDTO.setTimeTypeEnumSBuilder(newArrayList(PRESENCE,ABSENCE,PAID_BREAK,UNPAID_BREAK));
+        defaultDataDTO.setOrganizationServices(integrationService.getOrganisationServiceByunitId(unitId));
+        defaultDataDTO.setConstraintTypesBuilder(countrySolverConfigService.getConstraintTypes()).setPlanningProblemsBuilder(planningProblemDTOS);
         return defaultDataDTO;
     }
 
     private List<PhaseDTO> getAllPhases(Long unitId) {
-        List<PhaseDTO> phaseDTOS = null;//activityMongoRepository.getAllPhasesByUnitId(unitId);
-        ;
+        List<PhaseDTO> phaseDTOS = null;
+
         return phaseDTOS;
     }
 
