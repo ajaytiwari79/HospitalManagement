@@ -93,20 +93,20 @@ public class ShiftPlanningSolver {
         System.setProperty("user.timezone", "UTC");
     }
 
-    public static void main(String[] args){
+  /*  public static void main(String[] args){
         SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
         String droolFilePath = "/home/droolsFile/Shift_Planning/";//"/home/droolsFile/Shift_Planning";
         String configurationFile = "/home/droolsFile/ShiftPlanning_Request_ActivityLine.solver.xml";
         ShiftPlanningSolver shiftPlanningSolver = new ShiftPlanningSolver(solverConfigDTO,droolFilePath,configurationFile);
         shiftPlanningSolver.runSolver();
-        /*
+        *//*
         if(args.length==0){
             throw new RuntimeException("Please give the active profile");
         }
         updateServerAddress(args);
-        * */
+        * *//*
     }
-
+*/
     public static SolverConfigDTO getSolverConfigDTO(){
         List<ConstraintDTO> constraintDTOS = new ArrayList<>();
         constraintDTOS.add(new ConstraintDTO(ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH, ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH, ConstraintType.ACTIVITY, ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS, ScoreLevel.HARD, 5, 5l));

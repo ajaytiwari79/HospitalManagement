@@ -11,7 +11,6 @@ import com.planner.domain.planning_problem.PlanningProblem;
 import com.planner.repository.constraint.ConstraintsRepository;
 import com.planner.repository.planning_problem.PlanningProblemRepository;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
-import com.planner.repository.shift_planning.UserNeo4jRepo;
 import com.planner.service.constraint.country.default_.DefaultCountryConstraintService;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +34,6 @@ public class CountryConstraintService {
     private ConstraintsRepository constraintsRepository;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-    @Inject
-    private UserNeo4jRepo userNeo4jRepo;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -62,7 +59,7 @@ public class CountryConstraintService {
      * @param countryConstraint
      */
     private void createUnitConstraintByOrganizationServiceAndSubService(Long organizationServiceId, Long organizationSubServiceId, CountryConstraint countryConstraint) {
-        List<Long> applicableUnitIdForConstraint = userNeo4jRepo.getUnitIdsByOrganizationServiceAndSubServiceId(organizationServiceId, organizationSubServiceId);
+        List<Long> applicableUnitIdForConstraint = null;//userNeo4jRepo.getUnitIdsByOrganizationServiceAndSubServiceId(organizationServiceId, organizationSubServiceId);
         List<UnitConstraint> unitConstraintList = new ArrayList<>();
         if (!applicableUnitIdForConstraint.isEmpty()) {
             for (Long unitId : applicableUnitIdForConstraint) {
@@ -122,7 +119,7 @@ public class CountryConstraintService {
      * @return
      */
     private boolean preValidateCountryConstraintDTO(CountryConstraintDTO countryConstraintDTO, boolean isCurrentObjectIdNull) {
-        String result = userNeo4jRepo.validateCountryOrganizationServiceAndSubService(countryConstraintDTO.getCountryId(), countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId());
+        String result = null;//userNeo4jRepo.validateCountryOrganizationServiceAndSubService(countryConstraintDTO.getCountryId(), countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId());
         if ("countryNotExists".equals(result)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, "Country", countryConstraintDTO.getCountryId());
         } else if (constraintsRepository.isNameExistsById(countryConstraintDTO.getName(), isCurrentObjectIdNull ? null : countryConstraintDTO.getId(), true, countryConstraintDTO.getCountryId())) {

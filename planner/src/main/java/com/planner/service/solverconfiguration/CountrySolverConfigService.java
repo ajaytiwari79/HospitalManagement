@@ -20,7 +20,6 @@ import com.planner.domain.solverconfig.unit.UnitSolverConfig;
 import com.planner.repository.constraint.ConstraintsRepository;
 import com.planner.repository.planning_problem.PlanningProblemRepository;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
-import com.planner.repository.shift_planning.UserNeo4jRepo;
 import com.planner.repository.solver_config.SolverConfigRepository;
 import org.springframework.stereotype.Service;
 
@@ -42,8 +41,6 @@ public class CountrySolverConfigService {
     private SolverConfigRepository solverConfigRepository;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-    @Inject
-    private UserNeo4jRepo userNeo4jRepo;
     @Inject
     private ExceptionService exceptionService;
     @Inject private PlanningProblemRepository planningProblemRepository;
@@ -72,7 +69,7 @@ public class CountrySolverConfigService {
      * @param countrySolverConfig
      */
     private void copyUnitSolverConfigByOrganizationServiceAndSubService(CountrySolverConfig countrySolverConfig) {
-        List<Long> applicableUnitIdForSolverConfig = userNeo4jRepo.getUnitIdsByOrganizationSubServiceIds(countrySolverConfig.getOrganizationSubServiceIds());
+        List<Long> applicableUnitIdForSolverConfig = null;//userNeo4jRepo.getUnitIdsByOrganizationSubServiceIds(countrySolverConfig.getOrganizationSubServiceIds());
         List<UnitSolverConfig> unitSolverConfigList = new ArrayList<>();
         PhaseDTO phaseDTO = null;//activityMongoRepository.getOnePhaseById(new BigInteger(countrySolverConfig.getPhaseId().toString()));
         List<PhaseDTO> phaseDTOS = null;//activityMongoRepository.getPhaseByUnitIdAndPhaseEnum(applicableUnitIdForSolverConfig,phaseDTO.getPhaseEnum());
@@ -232,7 +229,7 @@ public class CountrySolverConfigService {
     }
 
     private List<OrganizationServiceDTO> getOrganizationServicesAndItsSubServices(Long countryId) {
-        List<OrganizationServiceQueryResult> organizationServiceQueryResults = userNeo4jRepo.getAllOrganizationServices(countryId);
+        List<OrganizationServiceQueryResult> organizationServiceQueryResults = null;//userNeo4jRepo.getAllOrganizationServices(countryId);
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
     }
 

@@ -125,4 +125,10 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.findDataForAutoPlanning(shiftPlanningProblemSubmitDTO));
     }
 
+    @ApiOperation(value = "Get default data for solver config")
+    @GetMapping(value="/get_default_data_for_solver_cofig")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForPlanning(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getDefaultDataForPlanning(unitId));
+    }
+
 }

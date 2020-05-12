@@ -25,7 +25,7 @@ import java.util.Optional;
 
 
 
-@Service
+//@Service
 public class GenericRestClient {
     private static Logger logger = LoggerFactory.getLogger(GenericRestClient.class);
 
@@ -33,15 +33,15 @@ public class GenericRestClient {
     public static final String UNIT = "/unit/";
     public static final String COUNTRY = "/country/";
 
-    @Inject
+    //@Inject
     RestTemplate restTemplate;
-    @Inject
+    //@Inject
     private ExceptionService exceptionService;
 
-    @Value("${gateway.userservice.url}")
+    //@Value("${gateway.userservice.url}")
     private String userServiceUrl;
 
-    @Value("${gateway.activityservice.url}")
+    //@Value("${gateway.activityservice.url}")
     private String activityServiceUrl;
 
 

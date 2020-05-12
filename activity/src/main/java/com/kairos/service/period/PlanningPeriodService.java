@@ -17,6 +17,7 @@ import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
+import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeScheduledPanelIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
@@ -981,5 +982,14 @@ public class PlanningPeriodService extends MongoBaseService {
         submitDTO.setEmploymentIdAndWTAResponseMap(wtaResponse);
         submitDTO.setTimeTypeMap(timeTypeMap);
         return submitDTO;
+    }
+
+    public DefaultDataDTO getDefaultDataForPlanning(Long unitId) {
+        DefaultDataDTO defaultDataDTO = new DefaultDataDTO();
+        List<PlanningPeriodDTO> planningPeriodDTOS = planningPeriodMongoRepository.findAllPeriodsOfUnit(unitId);
+        List<PhaseDTO> phaseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId),PhaseDTO.class);
+        defaultDataDTO.setPhases(phaseDTOS);
+        defaultDataDTO.setPlanningPeriods(planningPeriodDTOS);
+        return defaultDataDTO;
     }
 }

@@ -8,7 +8,6 @@ import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.unit.UnitSolverConfigDTO;
-import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.planner.component.exception.ExceptionService;
 import com.planner.component.rest_client.IntegrationService;
 import com.planner.domain.constraint.unit.UnitConstraint;
@@ -17,7 +16,6 @@ import com.planner.domain.solverconfig.unit.UnitSolverConfig;
 import com.planner.repository.constraint.ConstraintsRepository;
 import com.planner.repository.planning_problem.PlanningProblemRepository;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
-import com.planner.repository.shift_planning.UserNeo4jRepo;
 import com.planner.repository.solver_config.SolverConfigRepository;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +36,6 @@ public class UnitSolverConfigService {
     private SolverConfigRepository solverConfigRepository;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-    @Inject
-    private UserNeo4jRepo userNeo4jRepo;
     @Inject
     private ExceptionService exceptionService;
     @Inject private CountrySolverConfigService countrySolverConfigService;
@@ -145,7 +141,7 @@ public class UnitSolverConfigService {
     }
 
     private boolean preValidateUnitSolverConfigDTO(UnitSolverConfigDTO unitSolverConfigDTO) {
-        String result = userNeo4jRepo.validateUnit(unitSolverConfigDTO.getUnitId());
+        String result = null;//userNeo4jRepo.validateUnit(unitSolverConfigDTO.getUnitId());
         if ("unitNotExists".equals(result)) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Unit", unitSolverConfigDTO.getUnitId());
         } else if (solverConfigRepository.isNameExistsById(unitSolverConfigDTO.getName(), unitSolverConfigDTO.getId(), false, unitSolverConfigDTO.getUnitId())) {

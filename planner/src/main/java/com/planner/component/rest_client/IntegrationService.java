@@ -15,15 +15,15 @@ import java.util.List;
 @Service
 @Transactional
 public class IntegrationService {
-    @Inject
-    GenericRestClient genericRestClient;
+   /* @Inject
+    GenericRestClient genericRestClient;*/
 
     public DefaultDataDTO getDefaultDataForSolverConfig(Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/get_default_data_for_solver_cofig", null,true, new ParameterizedTypeReference<RestTemplateResponseEnvelope<DefaultDataDTO>>(){});
+        return null;//genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/get_default_data_for_solver_cofig", null,true, new ParameterizedTypeReference<RestTemplateResponseEnvelope<DefaultDataDTO>>(){});
     }
 
     public List<OrganizationServiceDTO> getOrganisationServiceByunitId(Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/get_organisation_services_by_unit", null,true, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrganizationServiceDTO>>>(){});
+        return null;//genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/get_organisation_services_by_unit", null,true, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrganizationServiceDTO>>>(){});
     }
 }
 
