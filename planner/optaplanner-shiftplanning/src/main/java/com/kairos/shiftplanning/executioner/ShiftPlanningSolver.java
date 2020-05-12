@@ -40,10 +40,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigInteger;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -89,7 +95,7 @@ public class ShiftPlanningSolver {
 
     public static void main(String[] args){
         SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
-        String droolFilePath = "droolsFile/Shift_Planning";//"/home/droolsFile/Shift_Planning";
+        String droolFilePath = "/home/droolsFile/Shift_Planning/";//"/home/droolsFile/Shift_Planning";
         String configurationFile = "/home/droolsFile/ShiftPlanning_Request_ActivityLine.solver.xml";
         ShiftPlanningSolver shiftPlanningSolver = new ShiftPlanningSolver(solverConfigDTO,droolFilePath,configurationFile);
         shiftPlanningSolver.runSolver();
@@ -133,6 +139,12 @@ public class ShiftPlanningSolver {
 
     public ShiftPlanningSolver(SolverConfigDTO solverConfig,String droolFilePath, String configurationFile){
         droolFilePath = isNull(droolFilePath) ? DROOL_FILE_PATH : droolFilePath;
+    /*    try {
+            System.out.println(Arrays.toString(getResourceListing(this.getClass(),"droolsFile/Shift_Planning/")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(new File(droolFilePath).isDirectory());*/
         List<File> droolsFiles = getDroolFilesByConstraints(solverConfig,droolFilePath);
         File solverConfigFile = new File(configurationFile);
         LOGGER.info("drool file count {} and path {}",droolsFiles.size(),droolFilePath);
@@ -140,6 +152,49 @@ public class ShiftPlanningSolver {
         solverFactory = isNull(configurationFile) ? SolverFactory.createFromXmlResource(configurationFile) : SolverFactory.createFromXmlFile(solverConfigFile);
         solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(droolsFiles);
         solver = solverFactory.buildSolver();
+    }
+
+    String[] getResourceListing(Class clazz, String path) throws URISyntaxException, IOException {
+        URL dirURL = clazz.getClassLoader().getResource(path);
+        if (dirURL != null && dirURL.getProtocol().equals("file")) {
+            /* A file path: easy enough */
+            return new File(dirURL.toURI()).list();
+        }
+
+        if (dirURL == null) {
+            /*
+             * In case of a jar file, we can't actually find a directory.
+             * Have to assume the same jar as clazz.
+             */
+            String me = clazz.getName().replace(".", "/")+".class";
+            dirURL = clazz.getClassLoader().getResource(me);
+        }
+
+        if (dirURL.getProtocol().equals("jar")) {
+            /* A JAR path */
+            String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); //strip out only the JAR file
+            JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+            Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
+            Set<String> result = new HashSet<String>(); //avoid duplicates in case it is a subdirectory
+            while(entries.hasMoreElements()) {
+                String name = entries.nextElement().getName();
+                if(name.contains("drl")){
+                    System.out.println(name);
+                }
+                if (name.startsWith(path)) { //filter according to the path
+                    String entry = name.substring(path.length());
+                    int checkSubdir = entry.indexOf("/");
+                    if (checkSubdir >= 0) {
+                        // if it is a subdirectory, we just return the directory name
+                        entry = entry.substring(0, checkSubdir);
+                    }
+                    result.add(entry);
+                }
+            }
+            return result.toArray(new String[result.size()]);
+        }
+
+        throw new UnsupportedOperationException("Cannot list files for URL "+dirURL);
     }
 
     public ShiftRequestPhasePlanningSolution solveProblem(ShiftRequestPhasePlanningSolution planningProblem){
