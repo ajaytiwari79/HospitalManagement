@@ -7,3 +7,6 @@ activity.balanceSettingsActivityTab.timeTypes = timeType.timeTypes;
 db.activities.save(activity);
 }
 });
+
+db.activities.updateMany({"translations" : {$exists:false}},{$set:{"translations" : {}}});
+db.wtaBaseRuleTemplate.updateMany({},{$set:{"constraintSetting":{}}});

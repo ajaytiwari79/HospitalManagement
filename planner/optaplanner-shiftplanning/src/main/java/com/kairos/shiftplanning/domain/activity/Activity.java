@@ -4,7 +4,7 @@ import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.constraint.ConstraintSubType;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.tag.Tag;
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,7 +40,7 @@ public class Activity {
     private BigInteger id;
     private List<Skill> skills;
     private String name;
-    private Map<ConstraintSubType, Constraint> constraints;
+    private Map<ConstraintSubType, ConstraintHandler> constraints;
     private Set<Long> validDayTypeIds;
     private TimeType timeType;
     private int order;
@@ -69,6 +70,7 @@ public class Activity {
         this.activityPrioritySequence = activityPrioritySequence;
         this.expertises = expertises;
         this.tags = tags;
+        this.validDayTypeIds = new HashSet<>();
     }
 
     public boolean isBlankActivity(){

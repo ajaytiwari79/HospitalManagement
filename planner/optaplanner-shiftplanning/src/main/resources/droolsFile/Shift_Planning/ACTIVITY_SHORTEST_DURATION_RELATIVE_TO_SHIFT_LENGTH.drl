@@ -1,0 +1,21 @@
+package com.kairos.shiftplanning.rules;
+    dialect "java"
+import com.kairos.shiftplanning.domain.activity.*;
+import com.kairos.shiftplanning.domain.shift.*;
+import com.kairos.shiftplanning.domain.staffing_level.*;
+import com.kairos.shiftplanning.domain.skill.*;
+import com.kairos.enums.constraint.ConstraintSubType;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import java.util.ArrayList;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+global HardMediumSoftLongScoreHolder scoreHolder;
+/********Activity Rules*******/
+rule "Min Length of Activity"
+salience 20
+    when
+        $ac:Activity()
+        $shift:ShiftImp(!activityLineIntervals.isEmpty() && hasIntervalsForActivity($ac))
+        $constraintsPenality: Integer(intValue>0) from ($ac.checkConstraints($shift,ConstraintSubType.ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH))
+    then
+        $ac.breakContraints(scoreHolder,kcontext,$constraintsPenality, ConstraintSubType.ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH);
+end

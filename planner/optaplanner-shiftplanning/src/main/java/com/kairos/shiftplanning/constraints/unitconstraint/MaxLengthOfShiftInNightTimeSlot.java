@@ -2,7 +2,7 @@ package com.kairos.shiftplanning.constraints.unitconstraint;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.constraint.ScoreLevel;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.TimeSlot;
@@ -10,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -22,7 +20,7 @@ import static com.kairos.commons.utils.DateUtils.getStartOfDay;
 @Setter
 @AllArgsConstructor
 @EqualsAndHashCode
-public class MaxLengthOfShiftInNightTimeSlot implements Constraint {
+public class MaxLengthOfShiftInNightTimeSlot implements ConstraintHandler {
 
     private ScoreLevel level;
     private int weight;

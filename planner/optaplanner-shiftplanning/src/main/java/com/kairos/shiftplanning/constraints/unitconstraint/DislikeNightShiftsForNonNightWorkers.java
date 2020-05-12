@@ -2,7 +2,7 @@ package com.kairos.shiftplanning.constraints.unitconstraint;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.constraint.ScoreLevel;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.TimeSlot;
@@ -20,7 +20,7 @@ import static com.kairos.commons.utils.DateUtils.getStartOfDay;
 @Setter
 @AllArgsConstructor
 @EqualsAndHashCode
-public class DislikeNightShiftsForNonNightWorkers implements Constraint {
+public class DislikeNightShiftsForNonNightWorkers implements ConstraintHandler {
     private ScoreLevel level;
     private int weight;
     private TimeSlot nightTimeSlot;

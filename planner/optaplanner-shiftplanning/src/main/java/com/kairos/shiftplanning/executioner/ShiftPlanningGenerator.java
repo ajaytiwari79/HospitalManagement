@@ -17,7 +17,7 @@ import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.constraints.activityconstraint.*;
 import com.kairos.shiftplanning.constraints.unitconstraint.DislikeNightShiftsForNonNightWorkers;
 import com.kairos.shiftplanning.constraints.unitconstraint.MaxLengthOfShiftInNightTimeSlot;
@@ -233,7 +233,7 @@ public class ShiftPlanningGenerator {
     }
 
 
-    public Map<ConstraintSubType, Constraint> getActivityContraints(){
+    public Map<ConstraintSubType, ConstraintHandler> getActivityContraints(){
         LongestDuration longestDuration = new LongestDuration(80, SOFT,-5);
         ShortestDuration shortestDuration = new ShortestDuration(60, HARD,-2);
         MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(3, SOFT,-1);//3
@@ -242,7 +242,7 @@ public class ShiftPlanningGenerator {
         List<DayType> dayTypes = getDayTypes();
         ActivityDayType activityDayType = new ActivityDayType(SOFT,5);
         ActivityRequiredTag activityRequiredTag = new ActivityRequiredTag( HARD,1);
-        Map<ConstraintSubType, Constraint> constraintMap = new HashMap<>();
+        Map<ConstraintSubType, ConstraintHandler> constraintMap = new HashMap<>();
         TimeSlot timeSlot = new TimeSlot(23,7);
         constraintMap.put(ConstraintSubType.ACTIVITY_LONGEST_DURATION_RELATIVE_TO_SHIFT_LENGTH,longestDuration);
         constraintMap.put(ConstraintSubType.ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH,shortestDuration);
@@ -592,7 +592,7 @@ public class ShiftPlanningGenerator {
         ShiftOnWeekend shiftOnWeekend = new ShiftOnWeekend();
         shiftOnWeekend.setLevel(HARD);
         shiftOnWeekend.setWeight(3);
-        Map<ConstraintSubType,Constraint> unitConstraints = new HashMap<>();
+        Map<ConstraintSubType, ConstraintHandler> unitConstraints = new HashMap<>();
         PreferedEmployementType preferedEmployementType = new PreferedEmployementType();
         preferedEmployementType.setPreferedEmploymentTypeIds(newHashSet(123l,145l));
         preferedEmployementType.setLevel(SOFT);

@@ -48,7 +48,7 @@ public enum ConstraintSubType {
         this.value = value;
     }
 
-    @JsonValue
+//    @JsonValue
     public String toValue() {
         return value;
     }

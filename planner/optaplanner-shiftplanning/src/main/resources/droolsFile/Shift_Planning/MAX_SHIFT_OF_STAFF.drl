@@ -1,0 +1,21 @@
+package com.kairos.shiftplanning.rules;
+    dialect "java"
+import com.kairos.shiftplanning.domain.activity.*;
+import com.kairos.shiftplanning.domain.shift.*;
+import com.kairos.shiftplanning.domain.staffing_level.*;
+import com.kairos.shiftplanning.domain.skill.*;
+import com.kairos.enums.constraint.ConstraintSubType;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import java.util.ArrayList;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+global HardMediumSoftLongScoreHolder scoreHolder;
+/********Activity Rules*******/
+rule "Max Shift of staff"
+salience 20
+    when
+        $ac:Activity()
+        $shift:ShiftImp(!activityLineIntervals.isEmpty() && hasIntervalsForActivity($ac))
+        $constraintsPenality: Integer(intValue>0) from ($ac.checkConstraints($shift,ConstraintSubType.MAX_SHIFT_OF_STAFF))
+    then
+        $ac.breakContraints(scoreHolder,kcontext,$constraintsPenality,ConstraintSubType.MAX_SHIFT_OF_STAFF);
+end
