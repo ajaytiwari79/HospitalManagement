@@ -14,7 +14,6 @@ import com.planner.component.exception.ExceptionService;
 import com.planner.domain.query_results.organization_service.OrganizationServiceQueryResult;
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.planning_problem.PlanningProblemRepository;
-import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.solver_config.SolverConfigRepository;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +32,6 @@ public class CountrySolverConfigService {
 
     @Inject
     private SolverConfigRepository solverConfigRepository;
-    @Inject
-    private ActivityMongoRepository activityMongoRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject private PlanningProblemRepository planningProblemRepository;
