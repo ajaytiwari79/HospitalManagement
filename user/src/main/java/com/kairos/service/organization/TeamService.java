@@ -172,7 +172,7 @@ public class TeamService {
             if(TeamType.MAIN.equals(staffTeamRelationship.getTeamType())){
                 staffTeamRelationship.setSequence(MAIN_TEAM_RANKING);
             }else {
-                if (!isSequenceExistOrNot(staffTeamDTO.getStaffId(),staffTeamDTO.getSequence(),staffTeamDTO.getTeamId())||staffTeamRelationship.getSequence()==staffTeamDTO.getSequence()) {
+                if (!isSequenceExistOrNot(staffTeamDTO.getStaffId(),staffTeamDTO.getSequence(),staffTeamDTO.getTeamId())) {
                     staffTeamRelationship.setSequence(staffTeamDTO.getSequence());
                 } else {
                     exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
