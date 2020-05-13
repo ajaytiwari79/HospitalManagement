@@ -668,8 +668,7 @@ public class StaffingLevelService  {
             presenceStaffingLevelDto.setUpdatedAt(staffingLevel.getUpdatedAt());
             presenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
             List<BigInteger> activityIds =staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().stream().map(staffingLevelActivity -> staffingLevelActivity.getActivityId()).collect(Collectors.toList());
-            List<ActivityDTO> activities =activityMongoRepository.findActivitiesByUnitId(unitId,activityIds);
-            Map<BigInteger,Integer> activityRankings =activities.stream().collect(Collectors.toMap(ActivityDTO::getId,ActivityDTO::getActivitySequence));
+            Map<BigInteger, Integer> activityRankings = getActivityIdRankingMap(unitId, activityIds);
             presenceStaffingLevelDto.getStaffingLevelSetting().setActivitiesRank(activityRankings);
             presenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(presenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), presenceStaffingLevelDto);
         }
@@ -681,14 +680,18 @@ public class StaffingLevelService  {
             absenceStaffingLevelDto.setAbsentNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getAvailableNoOfStaff());
             absenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
             List<BigInteger> activityIds =staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().stream().map(staffingLevelActivity -> staffingLevelActivity.getActivityId()).collect(Collectors.toList());
-            List<ActivityDTO> activities =activityMongoRepository.findActivitiesByUnitId(unitId,activityIds);
-            Map<BigInteger,Integer> activityRankings =activities.stream().collect(Collectors.toMap(ActivityDTO::getId,ActivityDTO::getActivitySequence));
+            Map<BigInteger, Integer> activityRankings = getActivityIdRankingMap(unitId, activityIds);
             absenceStaffingLevelDto.setStaffingLevelSetting(new StaffingLevelSetting());
             absenceStaffingLevelDto.getStaffingLevelSetting().setActivitiesRank(activityRankings);
             absenceStaffingLevelDto.setUpdatedAt(staffingLevel.getUpdatedAt());
             absenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(absenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), absenceStaffingLevelDto);
         }
         return startDate;
+    }
+
+    private Map<BigInteger, Integer> getActivityIdRankingMap(Long unitId, List<BigInteger> activityIds) {
+        List<ActivityDTO> activities = activityMongoRepository.findActivitiesByUnitId(unitId, activityIds);
+        return activities.stream().collect(Collectors.toMap(ActivityDTO::getId, ActivityDTO::getActivitySequence));
     }
 
     private StaffingLevel updateAbsenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel, BigInteger activityId) {

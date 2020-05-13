@@ -1,13 +1,10 @@
 package com.kairos.service.activity;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityPriorityDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityPriority;
-import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ActivityPriorityMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -205,7 +202,8 @@ public class ActivityPriorityService {
         if (isNull(activityPriority)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_PRIORITY_ID, activityPriorityId);
         }
-        if(!isActivityPriorityIsExistOrNot(activity,activityPriorityId)) {
+        boolean isExist = isPriorityIdExists(activity,activityPriorityId);
+        if(!isExist) {
             activity.setActivityPriorityId(activityPriorityId);
         }
         activityMongoRepository.save(activity);
@@ -219,7 +217,7 @@ public class ActivityPriorityService {
     public ActivityPriority getActivityPriorityById(BigInteger activityPriorityId){
         return activityPriorityMongoRepository.findOne(activityPriorityId);
     }
-    public boolean isActivityPriorityIsExistOrNot(Activity activity,BigInteger activityPriorityId) {
+    public boolean isPriorityIdExists(Activity activity, BigInteger activityPriorityId) {
         if (PriorityFor.NONE.equals(activity.getBalanceSettingsActivityTab().getPriorityFor())) {
             exceptionService.dataNotFoundException(MESSAGE_ACTIVITY_PRIORITY_ID_NOT_SET, activityPriorityId);
         }

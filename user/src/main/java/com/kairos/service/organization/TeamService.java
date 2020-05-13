@@ -3,9 +3,7 @@ package com.kairos.service.organization;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
@@ -184,9 +182,7 @@ public class TeamService {
     }
 
     public boolean isSequenceExistOrNot(Long staffId,int sequence,Long teamId){
-        return staffTeamRelationshipGraphRepository.sequenceIsExists(staffId,sequence,teamId);
-
-        //aaya q nhi hit?debugger band kiya hua hai q? Query kha gyiiiiiiiiiiii ?user boot run ko click karo fir f8 dabao
+        return staffTeamRelationshipGraphRepository.sequenceExists(staffId,sequence,teamId);
     }
 
 

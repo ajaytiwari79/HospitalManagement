@@ -40,7 +40,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (team:Team)-[:" + TEAM_HAS_MEMBER + "{isEnabled:true}]->(staff:Staff) WHERE id(team)={0} " +
             " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " +
-            "RETURN id(staff) AS id")
+            "RETURN id(staff)")
     List<Long> getStaffIdsByTeamId(long teamId);
 
     @Query("MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit) WHERE id(organization)={0} WITH unitPermission\n" +
