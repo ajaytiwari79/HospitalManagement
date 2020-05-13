@@ -3,7 +3,7 @@ package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.constraint.ScoreLevel;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
-public class PresenceAndAbsenceAtSameTime implements Constraint {
+public class PresenceAndAbsenceAtSameTime implements ConstraintHandler {
 
     private ScoreLevel level;
     private int weight;

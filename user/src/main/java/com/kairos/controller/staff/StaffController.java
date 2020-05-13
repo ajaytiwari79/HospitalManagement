@@ -657,7 +657,7 @@ public class StaffController {
     @PostMapping(value = "/get_all_staff_for_planning")
     @ApiOperation("Get all staff eligible for planning")
     public ResponseEntity<Map<String, Object>>  getStaffsByIds(@PathVariable Long unitId, @RequestBody List<Long> staffIds){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsByIds(staffIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsByIds(unitId,staffIds));
     }
 
 }

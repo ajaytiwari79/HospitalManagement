@@ -52,7 +52,7 @@ public class RulesActivityTabDTO {
     private LocalTime maximumEndTime;
     private boolean allowedAutoAbsence;
     private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --
-    private byte recurrenceTimes;// -- the  shift of that staff will be entered.
+    private Byte recurrenceTimes;// -- the  shift of that staff will be entered.
     private PQLSettings pqlSettings;
     private boolean reasonCodeRequired;
     private ReasonCodeRequiredState reasonCodeRequiredState;

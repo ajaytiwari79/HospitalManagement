@@ -1,7 +1,7 @@
 package com.kairos.shiftplanning.constraints.unitconstraint;
 
 import com.kairos.enums.constraint.ScoreLevel;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 @Setter
 @Getter
 @NoArgsConstructor
-public class ShiftOnWeekend implements Constraint {
+public class ShiftOnWeekend implements ConstraintHandler {
 
     private ScoreLevel level;
     private int weight;

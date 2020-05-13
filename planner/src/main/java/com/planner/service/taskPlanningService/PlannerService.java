@@ -109,7 +109,7 @@ public class PlannerService {
     }
     public boolean startShiftPlanningSolverOnThisVM(ShiftRequestPhasePlanningSolution problem,SolverConfigDTO solverConfig){
 
-        ShiftPlanningSolver shiftPlanningSolver=new ShiftPlanningSolver(solverConfig);
+        ShiftPlanningSolver shiftPlanningSolver=new ShiftPlanningSolver(solverConfig,null,null);
         ShiftRequestPhasePlanningSolution solution = shiftPlanningSolver.runSolverOnRequest(problem);
         return true;
     }

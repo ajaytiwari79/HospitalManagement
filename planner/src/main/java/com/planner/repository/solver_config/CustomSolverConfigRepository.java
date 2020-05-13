@@ -1,8 +1,7 @@
 package com.planner.repository.solver_config;
 
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
-import com.planner.domain.solverconfig.common.SolverConfig;
-import com.planner.domain.solverconfig.unit.UnitSolverConfig;
+import com.planner.domain.solverconfig.SolverConfig;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -16,9 +15,11 @@ public interface CustomSolverConfigRepository {
 
     SolverConfigDTO getSolverConfigWithConstraints(BigInteger solverConfigId);
 
-    List<SolverConfigDTO> getAllSolverConfigWithConstraints(boolean checkForCountry, Long countryOrUnitId);
+    List<SolverConfig> getAllSolverConfigWithConstraintsByCountryId( Long countryId);
 
-    SolverConfig getSolverConfigById(BigInteger solverConfigId, boolean checkForCountry);
+    List<SolverConfig> getAllSolverConfigWithConstraintsByUnitId(Long unitId);
 
-    List<UnitSolverConfig> getAllSolverConfigByParentId(BigInteger solverConfigId);
+    SolverConfig getSolverConfigById(BigInteger solverConfigId);
+
+    List<SolverConfig> getAllSolverConfigByParentId(BigInteger solverConfigId);
 }

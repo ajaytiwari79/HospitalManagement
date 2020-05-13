@@ -1,6 +1,6 @@
 package com.planner.controller;
 
-import com.kairos.dto.planner.solverconfig.unit.UnitSolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.solverconfiguration.UnitSolverConfigService;
 import io.swagger.annotations.ApiOperation;
@@ -24,13 +24,13 @@ public class UnitSolverConfigController {
 
     @PostMapping
     @ApiOperation("Create UnitSolverConfigration")
-    public ResponseEntity<Map<String, Object>> createUnitSolverConfig(@PathVariable Long unitId,@RequestBody @Valid UnitSolverConfigDTO unitSolverConfigDTO) {
+    public ResponseEntity<Map<String, Object>> createUnitSolverConfig(@PathVariable Long unitId,@RequestBody @Valid SolverConfigDTO unitSolverConfigDTO) {
         return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK,unitSolverConfigService.createUnitSolverConfig(unitSolverConfigDTO,unitId));
     }
 
     @PostMapping(value = "/copy")
     @ApiOperation("Copy UnitSolverConfig")
-    public ResponseEntity<Map<String, Object>> copyUnitSolverConfig(@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
+    public ResponseEntity<Map<String, Object>> copyUnitSolverConfig(@RequestBody SolverConfigDTO unitSolverConfigDTO) {
         unitSolverConfigService.copyUnitSolverConfig(unitSolverConfigDTO);
         return ResponseHandler.generateResponse(SUCCESS, HttpStatus.OK);
     }
@@ -50,7 +50,7 @@ public class UnitSolverConfigController {
      */
     @PutMapping(value = "/{unitSolverConfigId}")
     @ApiOperation("Update UnitSolverConfigration")
-    public ResponseEntity<Map<String, Object>> updateUnitSolverConfig(@PathVariable Long unitId,@RequestBody @Valid UnitSolverConfigDTO unitSolverConfigDTO) {
+    public ResponseEntity<Map<String, Object>> updateUnitSolverConfig(@PathVariable Long unitId,@RequestBody @Valid SolverConfigDTO unitSolverConfigDTO) {
         return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK,unitSolverConfigService.updateUnitSolverConfig(unitId,unitSolverConfigDTO));
     }
 
