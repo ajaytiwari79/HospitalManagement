@@ -101,5 +101,10 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
     @Query("Match (organization)-[r:"+ORGANISATION_HAS_SKILL+"]->(skill:Skill) where id(organization)={0}  AND r.isEnabled=TRUE RETURN id(skill) ")
     List<Long> findAllSkillsByUnitId(Long unitId);
 
+    @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff)= {0} \n" +
+            "MATCH (staff)-[skillRel:" + STAFF_HAS_SKILLS + "]->(skill) WHERE skillRel.isEnabled=TRUE \n" +
+            "RETURN id(skill) ")
+    List<Long> getAllStaffSkillByStaffId(Long staffId);
+
 
 }
