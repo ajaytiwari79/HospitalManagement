@@ -9,9 +9,12 @@ import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
+import com.kairos.dto.user.staff.staff.StaffCreationDTO;
+import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.OrganizationGeneral;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.user.resources.ResourceDTO;
 import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -394,8 +397,9 @@ public class OrganizationController {
     @PostMapping(UNIT_URL + "/unit_manager")
     @ApiOperation("create unit manager")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createUnitManager(@PathVariable long unitId, @Validated @RequestBody com.kairos.persistence.model.organization.UnitManagerDTO unitManagerDTO) {
-        Map response = staffCreationService.createUnitManager(unitId, unitManagerDTO);
+    public ResponseEntity<Map<String, Object>> createUnitManager(@PathVariable long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) {
+        staffCreationDTO.setCurrentStatus(StaffStatusEnum.ACTIVE);
+        StaffDTO response = staffCreationService.createStaff(unitId, staffCreationDTO);
         if(response == null) {
             return ResponseHandler.generateResponse(HttpStatus.CONFLICT, true, false);
         }
