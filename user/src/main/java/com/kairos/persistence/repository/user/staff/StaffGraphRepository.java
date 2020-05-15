@@ -441,6 +441,10 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff)={0} AND id(skill) IN {1} MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill) set r.isEnabled=false,r.lastModificationDate={2} RETURN r")
     void deleteSkillFromStaff(long staffId, List<Long> skillId, long lastModificationDate);
 
+    @Query("MATCH(staff:Staff)-[r:" + STAFF_HAS_SKILLS +"]-(skill:Skill) WHERE id (staff)={0} AND id(skill) IN {1} RETURN COUNT(r)>1")
+    boolean isExists(long staffId, List<Long> skillId);
+
+
     @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff)={0} and id(skill) IN {1}\n" +
             "MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory) WITH skill, staff, skillCategory, r\n" +
             "MATCH (organization:OrganizationBaseEntity)-[orgHasSkill:" + ORGANISATION_HAS_SKILL + "]->(skill:Skill) WHERE id(organization)={2} WITH skill, staff, skillCategory,orgHasSkill, r \n" +
@@ -493,5 +497,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH(user:User)-[rel:BELONGS_TO]-(staff:Staff)-[rela:BELONGS_TO]-(position:Position)-[relb:HAS_POSITIONS]-(o:Organization)\n" +
             "WHERE id(o)={0} AND id(user)={1} RETURN staff")
     Staff getStaffByUnitIdAndUserId(Long unitId,Long userId);
+
+    @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_SKILLS + "]->(skill:Skill) where id(staff) = {0}  AND id(skill) IN {1} detach delete rel")
+    void deleteSkill(Long staffId,List<Long> skillIds);
 }
 
