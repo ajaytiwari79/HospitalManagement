@@ -2,10 +2,12 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
@@ -188,7 +190,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 count().as(COUNT)
         );
         AggregationResults<Map> result = mongoTemplate.aggregate(aggregation, Shift.class, Map.class);
-        return isCollectionNotEmpty(result.getMappedResults())? ((Integer)result.getMappedResults().get(0).get(COUNT)).longValue():0l;
+        return isCollectionNotEmpty(result.getMappedResults()) ? ((Integer) result.getMappedResults().get(0).get(COUNT)).longValue() : 0L;
     }
 
 
@@ -526,7 +528,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<ShiftWithActivityDTO> findOverlappedShiftsByEmploymentId(BigInteger shiftId, Long staffId, Date startDate, Date endDate) {
-        Criteria criteria = Criteria.where(DISABLED).is(false).and(DELETED).is(false).and(STAFF_ID).is(staffId).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate);
+        Criteria criteria = Criteria.where(DELETED).is(false).and(STAFF_ID).is(staffId).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate);
         if (isNotNull(shiftId)) {
             criteria.and("_id").ne(shiftId);
         }
@@ -635,7 +637,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         activityIds.addAll(shift.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         if(isCollectionNotEmpty(shift.getBreakActivities())) {
-            activityIds.addAll(shift.getBreakActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toList()));
+            activityIds.addAll(shift.getBreakActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         }
         return activityIds;
     }
@@ -685,5 +687,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         );
         return mongoTemplate.aggregate(aggregation, Shift.class, ActivityWithCompositeDTO.class).getMappedResults();
     }
+
+
 
 }

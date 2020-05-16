@@ -1,10 +1,11 @@
 package com.kairos.shiftplanning.constraints.unitconstraint;
 
-import com.kairos.shiftplanning.constraints.Constraint;
-import com.kairos.shiftplanning.constraints.ScoreLevel;
+import com.kairos.enums.constraint.ScoreLevel;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.tag.Tag;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +16,8 @@ import java.util.Optional;
 
 @Getter
 @Setter
-public class NoChangesToStaffWithCareBubble implements Constraint {
+@EqualsAndHashCode
+public class NoChangesToStaffWithCareBubble implements ConstraintHandler {
     private Long tagId;
     private ScoreLevel level;
     private int weight;
@@ -39,7 +41,7 @@ public class NoChangesToStaffWithCareBubble implements Constraint {
                     continue;
                 }
             }
-            if(tag.isValidTag(shift.getStartDate()) && shift.isChanged(shift.getEmployee().getActualShiftsMap().get(shift.getId()))){
+            if(tag.isValidTag(shift.getStartDate()) && shift.isChanged()){
                 count++;
             }
         }

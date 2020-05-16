@@ -576,7 +576,7 @@ public class WorkTimeAgreementService{
         return true;
     }
 
-    public WTAResponseDTO updateWtaOfEmployment(Long unitId, WTADTO wtadto, Boolean oldEmploymentPublished) {
+    public WTAResponseDTO updateWtaOfEmployment(Long unitId, WTADTO wtadto, Boolean oldEmploymentPublished,Boolean save) {
         Optional<WorkingTimeAgreement> oldWta = wtaRepository.findById(wtadto.getId());
         if (!Optional.ofNullable(oldWta).isPresent()) {
             logger.info("wta not found while updating at unit {}", wtadto.getId());
@@ -584,13 +584,13 @@ public class WorkTimeAgreementService{
         }
         WTAResponseDTO wtaResponseDTO;
         if (oldEmploymentPublished) {
-            wtaResponseDTO = updateWTAOfPublishedEmployment(oldWta.get(), wtadto, unitId);
+            wtaResponseDTO = updateWTAOfPublishedEmployment(oldWta.get(), wtadto, unitId,save);
         } else {
             wtaResponseDTO = updateWTAOfUnpublishedEmployment(oldWta.get(), wtadto, unitId);
             wtaRepository.save(oldWta.get());
         }
         wtaResponseDTO.setStartDate(wtadto.getStartDate());
-        if (isNotNull(wtadto.getEndDate())) {
+        if (isNotNull(wtadto.getEndDate())&&wtadto.getStartDate().isBefore(wtadto.getEndDate())) {
             wtaResponseDTO.setEndDate(wtadto.getEndDate());
         }
         return wtaResponseDTO;
@@ -719,7 +719,7 @@ public class WorkTimeAgreementService{
         return activities.stream().filter(distinctByKey(activity -> activity.getCountryParentId() + "-" + activity.getUnitId())).collect(toMap(k -> k.getCountryParentId() + "-" + k.getUnitId(), v -> v.getId()));
     }
 
-    private WTAResponseDTO updateWTAOfPublishedEmployment(WorkingTimeAgreement oldWta, WTADTO wtadto, Long unitId) {
+    private WTAResponseDTO updateWTAOfPublishedEmployment(WorkingTimeAgreement oldWta, WTADTO wtadto, Long unitId,Boolean save) {
         if (!wtadto.getStartDate().equals(oldWta.getStartDate())) {
             boolean wtaExists = wtaRepository.wtaExistsByEmploymentIdAndDatesAndNotEqualToId(oldWta.getId(), oldWta.getEmploymentId(), asDate(wtadto.getStartDate()), isNotNull(wtadto.getEndDate()) ? asDate(wtadto.getEndDate()) : null);
             if (wtaExists) {
@@ -727,23 +727,26 @@ public class WorkTimeAgreementService{
             }
         }
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
-        WTAResponseDTO wtaResponseDTO;
+        WTAResponseDTO wtaResponseDTO = null;
         if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
             wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), false);
         }
         boolean isCalculatedValueChanged = isCalCulatedValueChangedForWTA(oldWta, wtaBaseRuleTemplates);
-        if (wtadto.getStartDate().isBefore(oldWta.getStartDate()) || wtadto.getStartDate().equals(oldWta.getStartDate()) || !isCalculatedValueChanged) {
+        if (save&&(wtadto.getStartDate().isBefore(oldWta.getStartDate()) || wtadto.getStartDate().equals(oldWta.getStartDate()) || !isCalculatedValueChanged)) {
             wtaResponseDTO = updateWTAOfUnpublishedEmployment(oldWta, wtadto, unitId);
             oldWta.setStartDate(wtadto.getStartDate());
             wtaResponseDTO.setStartDate(wtadto.getStartDate());
             wtaRepository.save(oldWta);
-        } else {
+        }else if(!save && !isCalculatedValueChanged) {
+            exceptionService.actionNotPermittedException(MESSAGE_WTA_VALUE);
+        }
+        else if(!save && isCalculatedValueChanged){
             wtaResponseDTO = getcreateVersionOfPersionalisedWTA(oldWta, wtadto, unitId, wtaBaseRuleTemplates);
         }
-        return wtaResponseDTO;
+        return  wtaResponseDTO;
     }
 
-    private WTAResponseDTO getcreateVersionOfPersionalisedWTA(WorkingTimeAgreement oldWta, WTADTO wtadto, Long unitId, List<WTABaseRuleTemplate> wtaBaseRuleTemplates) {
+    private WTAResponseDTO getcreateVersionOfPersionalisedWTA(WorkingTimeAgreement oldWta, WTADTO wtadto, Long unitId, List<WTABaseRuleTemplate> wtaBaseRuleTemplates){
         WTAResponseDTO wtaResponseDTO;
         OrganizationDTO organization = userIntegrationService.getOrganizationWithCountryId(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
@@ -757,9 +760,9 @@ public class WorkTimeAgreementService{
         newWta.setEndDate(wtadto.getEndDate() != null ? wtadto.getEndDate() : null);
         newWta.setRuleTemplateIds(null);
         oldWta.setDisabled(true);
-        if (oldWta.getStartDate().isBefore(wtadto.getStartDate()) || (isNotNull(oldWta.getEndDate()) && oldWta.getEndDate().equals(wtadto.getEndDate()))) {
-            oldWta.setEndDate(wtadto.getStartDate().minusDays(1));
-        }
+            if (oldWta.getStartDate().isBefore(wtadto.getStartDate()) || (isNotNull(oldWta.getEndDate()) && oldWta.getEndDate().equals(wtadto.getEndDate()))) {
+                oldWta.setEndDate(wtadto.getStartDate().minusDays(1));
+            }
         oldWta.setId(null);
         if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
             wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);
@@ -845,75 +848,6 @@ public class WorkTimeAgreementService{
     }
 
 
-    //TODO please remvoe this method when sprint 44 is close
-    public boolean updatePhasesInRuletemplate() {
-        Map<Long, Map<String, BigInteger>> phasesMap = updatePhaseInWorkTimeAgreement();
-        List<WorkingTimeAgreement> workingTimeAgreements;
-        workingTimeAgreements = wtaRepository.findWTAOfEmployments();
-        Map<Long, Long> employmentAndUnitMap = new HashMap<>();
-        for (WorkingTimeAgreement workingTimeAgreement : workingTimeAgreements) {
-            Long unitId;
-            if (!employmentAndUnitMap.containsKey(workingTimeAgreement.getEmploymentId())) {
-                unitId = userIntegrationService.getUnitByEmploymentId(workingTimeAgreement.getEmploymentId());
-                if (isNotNull(unitId)) {
-                    employmentAndUnitMap.put(workingTimeAgreement.getEmploymentId(), unitId);
-                }
-            } else {
-                unitId = employmentAndUnitMap.get(workingTimeAgreement.getEmploymentId());
-            }
-            Map<String, BigInteger> stringBigIntegerMap = new HashMap<>();
-            boolean valid = false;
-            if (!phasesMap.containsKey(unitId) && isNotNull(unitId)) {
-                List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
-                if (phases.size() == 8) {
-                    valid = true;
-                    stringBigIntegerMap = phases.stream().collect(Collectors.toMap(k -> k.getName(), v -> v.getId()));
-                    phasesMap.put(unitId, stringBigIntegerMap);
-                }
-            } else {
-                stringBigIntegerMap = phasesMap.get(unitId);
-                valid = true;
-            }
-            updatePhasesInRuletemplate(workingTimeAgreement, unitId, stringBigIntegerMap, valid);
-        }
-        return true;
-    }
-
-    private void updatePhasesInRuletemplate(WorkingTimeAgreement workingTimeAgreement, Long unitId, Map<String, BigInteger> stringBigIntegerMap, boolean valid) {
-        if (valid && isNotNull(unitId)) {
-            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateRepository.findAllByIdInAndDeletedFalse(workingTimeAgreement.getRuleTemplateIds());
-            for (WTABaseRuleTemplate wtaBaseRuleTemplate : wtaBaseRuleTemplates) {
-                for (PhaseTemplateValue phaseTemplateValue : wtaBaseRuleTemplate.getPhaseTemplateValues()) {
-                    phaseTemplateValue.setPhaseId(stringBigIntegerMap.getOrDefault(phaseTemplateValue.getPhaseName(), phaseTemplateValue.getPhaseId()));
-
-                }
-            }
-            wtaBaseRuleTemplateRepository.saveAll(wtaBaseRuleTemplates);
-        }
-    }
-
-    private Map<Long, Map<String, BigInteger>> updatePhaseInWorkTimeAgreement() {
-        List<WorkingTimeAgreement> workingTimeAgreements = wtaRepository.findWTAofOrganization();
-        Map<Long, Map<String, BigInteger>> phasesMap = new HashMap<>();
-        for (WorkingTimeAgreement workingTimeAgreement : workingTimeAgreements) {
-            Map<String, BigInteger> stringBigIntegerMap = new HashMap<>();
-            boolean valid = false;
-            if (!phasesMap.containsKey(workingTimeAgreement.getOrganization().getId())) {
-                List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(workingTimeAgreement.getOrganization().getId());
-                if (phases.size() == 8) {
-                    valid = true;
-                    stringBigIntegerMap = phases.stream().collect(Collectors.toMap(k -> k.getName(), v -> v.getId()));
-                    phasesMap.put(workingTimeAgreement.getOrganization().getId(), stringBigIntegerMap);
-                }
-            } else {
-                stringBigIntegerMap = phasesMap.get(workingTimeAgreement.getOrganization().getId());
-                valid = true;
-            }
-            updatePhaseInRuletemplates(workingTimeAgreement, stringBigIntegerMap, valid);
-        }
-        return phasesMap;
-    }
-
     private void updatePhaseInRuletemplates(WorkingTimeAgreement workingTimeAgreement, Map<String, BigInteger> stringBigIntegerMap, boolean valid) {
         if (valid) {
             List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateRepository.findAllByIdInAndDeletedFalse(workingTimeAgreement.getRuleTemplateIds());
@@ -936,120 +870,9 @@ public class WorkTimeAgreementService{
         return wtaQueryResultDTO;
     }
 
-    public boolean getWtaByName(String wtaName, Long countryId) {
-        return wtaRepository.getWtaByName(wtaName, countryId);
-    }
-
-    public WorkingTimeAgreement getWTAByCountryId(long countryId, BigInteger wtaId) {
-        return wtaRepository.getWTAByCountryId(countryId, wtaId);
-    }
-
-    public boolean isWTAExistWithSameOrgTypeAndSubType(Long orgType, Long orgSubType, String name) {
-        return wtaRepository.isWTAExistWithSameOrgTypeAndSubType(orgType, orgSubType, name);
-    }
-
-    public List<WorkingTimeAgreement> findWTAByUnitIdsAndName(List<Long> organizationIds, String name) {
-        return wtaRepository.findWTAByUnitIdsAndName(organizationIds, name);
-    }
-
-    public boolean isWTAExistByOrganizationIdAndName(long organizationId, String wtaName) {
-        return wtaRepository.isWTAExistByOrganizationIdAndName(organizationId, wtaName);
-    }
-
-    public List<WorkingTimeAgreement> findWTAofOrganization() {
-        return wtaRepository.findWTAofOrganization();
-    }
-
-    public List<WorkingTimeAgreement> findWTAOfEmployments() {
-        return wtaRepository.findWTAOfEmployments();
-    }
-
-    public List<WTAQueryResultDTO> getWtaByOrganization(Long organizationId) {
-        return wtaRepository.getWtaByOrganization(organizationId);
-    }
-
-    public WTAQueryResultDTO getOne(BigInteger wtaId) {
-        return wtaRepository.getOne(wtaId);
-    }
-
-    public List<WTAQueryResultDTO> getAllWTAByCountryId(long countryId) {
-        return wtaRepository.getAllWTAByCountryId(countryId);
-    }
-
-    public List<WTAQueryResultDTO> getAllWTAByOrganizationSubTypeIdAndCountryId(long organizationSubTypeId, long countryId) {
-        return wtaRepository.getAllWTAByOrganizationSubTypeIdAndCountryId(organizationSubTypeId, countryId);
-    }
-
-    public List<WTAQueryResultDTO> getAllWTABySubType(List<Long> subTypeIds, Long countryId) {
-        return wtaRepository.getAllWTABySubType(subTypeIds, countryId);
-    }
-
-    public List<WTAQueryResultDTO> getAllWTAWithOrganization(long countryId) {
-        return wtaRepository.getAllWTAWithOrganization(countryId);
-    }
-
-    public List<WTAQueryResultDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId) {
-        return wtaRepository.getAllWTAWithWTAId(countryId, wtaId);
-    }
-
-    public List<WTAQueryResultDTO> getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId, LocalDate selectedDate) {
-        return wtaRepository.getAllWtaOfOrganizationByExpertise(unitId, expertiseId, selectedDate);
-    }
-
-    public List<WTAQueryResultDTO> getAllWtaOfEmploymentIdAndDate(Long employmentId, LocalDate selectedDate) {
-        return wtaRepository.getAllWtaOfEmploymentIdAndDate(employmentId, selectedDate);
-    }
-
-    public List<WTAQueryResultDTO> getAllWtaByIds(List<BigInteger> ids) {
-        return wtaRepository.getAllWtaByIds(ids);
-    }
-
-    public WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId) {
-        return wtaRepository.getWtaByNameExcludingCurrent(wtaName, countryId, wtaId, organizationTypeId, subOrganizationTypeId);
-    }
-
-    public WorkingTimeAgreement checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId) {
-        return wtaRepository.checkUniqueWTANameInOrganization(name, unitId, wtaId);
-    }
-
-    public List<WTAQueryResultDTO> getAllWTAByUpIds(Set<Long> upIds, Date date) {
-        return wtaRepository.getAllWTAByUpIds(upIds, date);
-    }
-
-    public List<WTAQueryResultDTO> getAllParentWTAByIds(List<Long> employmentIds) {
-        return wtaRepository.getAllParentWTAByIds(employmentIds);
-    }
-
-    public List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> employmentIds) {
-        return wtaRepository.getWTAWithVersionIds(employmentIds);
-    }
 
     public WTAQueryResultDTO getWTAByEmploymentIdAndDate(Long employmentId, Date date) {
         return wtaRepository.getWTAByEmploymentIdAndDate(employmentId, date);
-    }
-
-    public List<WTAQueryResultDTO> getWTAByEmploymentIds(List<Long> employmentIds, Date date) {
-        return wtaRepository.getWTAByEmploymentIds(employmentIds, date);
-    }
-
-    public List<WTAQueryResultDTO> getWTAByEmploymentIdsAndDates(List<Long> employmentIds, Date startDate, Date endDate) {
-        return wtaRepository.getWTAByEmploymentIdsAndDates(employmentIds, startDate, endDate);
-    }
-
-    public WorkingTimeAgreement getWTABasicByEmploymentAndDate(Long employmentId, Date date) {
-        return wtaRepository.getWTABasicByEmploymentAndDate(employmentId, date);
-    }
-
-    public void disableOldWta(BigInteger oldwtaId, LocalDate endDate) {
-        wtaRepository.disableOldWta(oldwtaId, endDate);
-    }
-
-    public void setEndDateToWTAOfEmployment(Long employmentId, LocalDate endDate) {
-        wtaRepository.setEndDateToWTAOfEmployment(employmentId, endDate);
-    }
-
-    public boolean wtaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger wtaId, Long employmentId, Date startDate, Date endDate) {
-        return wtaRepository.wtaExistsByEmploymentIdAndDatesAndNotEqualToId(wtaId, employmentId, startDate, endDate);
     }
 
     public List<WTAQueryResultDTO> getWTAByEmploymentIdAndDates(Long employmentId, Date startDate, Date endDate) {
@@ -1059,15 +882,6 @@ public class WorkTimeAgreementService{
     public List<WTAQueryResultDTO> getWTAByEmploymentIdAndDatesWithRuleTemplateType(Long employmentId, Date startDate, Date endDate, WTATemplateType templateType) {
         return wtaRepository.getWTAByEmploymentIdAndDatesWithRuleTemplateType(employmentId, startDate, endDate, templateType);
     }
-
-    public List<WTAQueryResultDTO> getAllWTAByEmploymentIds(Collection<Long> employmentIds) {
-        return wtaRepository.getAllWTAByEmploymentIds(employmentIds);
-    }
-
-    public List<WTAResponseDTO> getAllWTAByUnitId(long unitId){
-        return wtaRepository.findWTAByUnitId(unitId);
-    }
-
 
     public StaffFilterDTO getWorkTimeAgreement(StaffFilterDTO staffFilterDTO, LocalDate startDate, LocalDate endDate) {
         Set<Long> staffIds = staffFilterDTO.getMapOfStaffAndEmploymentIds().keySet();

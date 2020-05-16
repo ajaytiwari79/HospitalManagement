@@ -3,6 +3,7 @@ package com.kairos.commons.utils;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.joda.time.ReadableInterval;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -223,6 +224,24 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
         long thisStart = getStartMillis();
         long thisEnd = getEndMillis();
         return (date.getTime() >= thisStart && date.getTime() <= thisEnd);
+    }
+
+    public final boolean containsAndEqualsEndDate(ZonedDateTime zonedDateTime) {
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        Date date = asDate(zonedDateTime);
+        return (date.getTime() >= thisStart && date.getTime() <= thisEnd);
+    }
+
+    public boolean contains(DateTimeInterval interval) {
+        if (interval == null) {
+            return containsNow();
+        }
+        long otherStart = interval.getStartMillis();
+        long otherEnd = interval.getEndMillis();
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        return (thisStart <= otherStart && otherStart < thisEnd && otherEnd <= thisEnd);
     }
 
     public final boolean containsNow() {

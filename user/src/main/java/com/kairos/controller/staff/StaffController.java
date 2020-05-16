@@ -11,7 +11,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
 import com.kairos.persistence.model.staff.StaffSkillDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
 import com.kairos.persistence.model.staff.position.StaffPositionDetail;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -108,8 +108,8 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.PUT)
     @ApiOperation("update staff personal information")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> savePersonalDetail(@PathVariable long unitId, @PathVariable long staffId, @RequestBody @Valid StaffPersonalDetail staffPersonalDetail) throws ParseException {
-        StaffPersonalDetail response = staffService.savePersonalDetail(staffId, staffPersonalDetail, unitId);
+    public ResponseEntity<Map<String, Object>> savePersonalDetail(@PathVariable long unitId, @PathVariable long staffId, @RequestBody @Valid StaffDTO staffDTO) throws ParseException {
+        StaffDTO response = staffService.savePersonalDetail(staffId, staffDTO, unitId);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, Collections.EMPTY_MAP);
         }
@@ -370,8 +370,7 @@ public class StaffController {
     @ApiOperation("Get All  Staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllStaff() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffService.getAllStaff());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaff());
     }
 
     @RequestMapping(value = "/{staffId}/deleteStaff/{positionId}", method = RequestMethod.DELETE)
@@ -645,13 +644,20 @@ public class StaffController {
     @PostMapping(value = "/get_all_planning_staff")
     @ApiOperation("Get all staff eligible for planning")
     public ResponseEntity<Map<String, Object>>  getStaffEligibleForPlanning(@PathVariable Long unitId, @RequestBody StaffFilterDTO staffFilterDetails){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffForUnitWithEmploymentStatus(unitId,staffFilterDetails));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getAllStaffForUnitWithEmploymentStatus(unitId,staffFilterDetails));
     }
-    @GetMapping(value = "/endPositionProcess")
+
+    @GetMapping(value = "/end_position_process")
     @ApiOperation("end position process")
     public ResponseEntity<Map<String, Object>> endPositionProcess() {
         positionService.endPositionProcess();
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PostMapping(value = "/get_all_staff_for_planning")
+    @ApiOperation("Get all staff eligible for planning")
+    public ResponseEntity<Map<String, Object>>  getStaffsByIds(@PathVariable Long unitId, @RequestBody List<Long> staffIds){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsByIds(unitId,staffIds));
     }
 
 }

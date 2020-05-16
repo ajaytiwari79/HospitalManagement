@@ -2,8 +2,11 @@ package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.TimeTypes;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigInteger;
 
@@ -12,6 +15,8 @@ import java.math.BigInteger;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
+@Getter
+@Setter
 @AllArgsConstructor
 public class BalanceSettingActivityTabDTO {
 
@@ -22,6 +27,7 @@ public class BalanceSettingActivityTabDTO {
     private TimeTypeEnum timeType; // This is used to verify the activity is of  paid break or unpaid break
     private boolean onCallTimePresent;
     private Boolean negativeDayBalancePresent;
+    private TimeTypes timeTypes;
 
     public BalanceSettingActivityTabDTO() {
     }

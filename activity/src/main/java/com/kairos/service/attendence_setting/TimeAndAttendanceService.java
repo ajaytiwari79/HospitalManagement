@@ -38,7 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
+import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
@@ -221,7 +221,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
 
     // check out after job run
     public void checkOutBySchedulerJob(Long unitId, Date startDate, Long staffId) {
-        ZonedDateTime startZonedDateTime = asZoneDateTime(startDate).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime startZonedDateTime = DateUtils.asZonedDateTime(startDate).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endZonedDateTime = startZonedDateTime.plusDays(1);
         List<Shift> shifts = isNull(staffId) ? shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(asDate(startZonedDateTime), asDate(endZonedDateTime), newArrayList(unitId)) :
                 shiftMongoRepository.findShiftBetweenDurationByStaffId(staffId, asDate(startZonedDateTime), asDate(endZonedDateTime));

@@ -22,7 +22,6 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.exception.ExceptionService;
 import org.joda.time.Interval;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -39,7 +38,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.UserMessagesConstants.*;
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_LASTDATE_NOTLESSTHAN_STARTDATE;
 
 @Service
 public class EmploymentDetailsValidatorService {
@@ -194,15 +192,15 @@ public class EmploymentDetailsValidatorService {
     }
 
     private void addEmploymentLines(EmploymentDTO employmentDTO, List<EmploymentLine> employmentLines, ExpertiseLine expertiseLine, LocalDate startDate, LocalDate endDate) {
-        employmentLines.add(new EmploymentLine.EmploymentLineBuilder()
-                .setSeniorityLevel(seniorityLevelService.getSeniorityLevelByStaffAndExpertise(employmentDTO.getStaffId(), expertiseLine, employmentDTO.getExpertiseId()))
-                .setStartDate(startDate)
-                .setEndDate(endDate)
-                .setTotalWeeklyMinutes(employmentDTO.getTotalWeeklyMinutes() + (employmentDTO.getTotalWeeklyHours() * 60))
-                .setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes())
-                .setWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek())
-                .setAvgDailyWorkingHours(employmentDTO.getAvgDailyWorkingHours())
-                .setHourlyCost(employmentDTO.getHourlyCost())
+        employmentLines.add(EmploymentLine.builder()
+                .seniorityLevel(seniorityLevelService.getSeniorityLevelByStaffAndExpertise(employmentDTO.getStaffId(), expertiseLine, employmentDTO.getExpertiseId()))
+                .startDate(startDate)
+                .endDate(endDate)
+                .totalWeeklyMinutes(employmentDTO.getTotalWeeklyMinutes() + (employmentDTO.getTotalWeeklyHours() * 60))
+                .fullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes())
+                .workingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek())
+                .avgDailyWorkingHours(employmentDTO.getAvgDailyWorkingHours())
+                .hourlyCost(employmentDTO.getHourlyCost())
                 .build());
     }
 

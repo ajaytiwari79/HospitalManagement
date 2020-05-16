@@ -122,7 +122,7 @@ public class PayOutService extends MongoBaseService {
      */
     public void updatePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         updateActivityWrapper(shift,activityWrapperMap);
-        ZonedDateTime startDate = DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime startDate = DateUtils.asZonedDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = startDate.plusDays(1);
         DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
         ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shift,activityWrapperMap);

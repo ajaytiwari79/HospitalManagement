@@ -17,10 +17,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -189,7 +186,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "set r.isEnabled=false")
     void removeSkillsByExpertise(long staffId, List<Long> expertiseIds);
 
-    Staff findByKmdExternalId(Long kmdExternalId);
+    Optional<Staff> findByKmdExternalId(Long kmdExternalId);
 
 
     @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]-(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff) WHERE id(organization)={0} AND id(staff)={1}\n" +

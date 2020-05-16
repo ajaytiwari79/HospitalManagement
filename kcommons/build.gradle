@@ -1,5 +1,5 @@
 version '0.0.1-SNAPSHOT'
-
+group 'com.kcommon'
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
@@ -19,16 +19,13 @@ repositories {
 }
 
 dependencies {
-    //send grid
     compile ('com.sendgrid:sendgrid-java:4.0.1')
-
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '1.2.0.RELEASE'
     compile 'javax.validation:validation-api:2.0.0.Final'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.0'
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.5.Final'
     compile group: 'com.google.guava', name: 'guava', version: '24.1-jre'
     compile 'org.apache.commons:commons-lang3:3.7'
-    // https://mvnrepository.com/artifact/org.springframework/spring-beans
     compile group: 'org.springframework', name: 'spring-context', version: '5.0.9.RELEASE'
     compile group: 'de.danielbechler', name: 'java-object-diff', version: '0.95'
     compile group: 'org.springframework', name: 'spring-beans', version: '5.0.9.RELEASE'
@@ -42,20 +39,12 @@ dependencies {
     compile group: 'org.springframework.data', name: 'spring-data-mongodb', version: '2.0.0.RELEASE'
     compile group: 'org.springframework.data', name: 'spring-data-commons', version: '2.1.6.RELEASE'
     compile group: 'org.neo4j', name: 'neo4j-ogm-core', version: '3.1.10'
-    // compile group: 'org.springframework.data', name: 'spring-data-neo4j', version: '5.0.2.RELEASE'//As there are DTOs with neo4j annotations which needs to be fixed TODO
-    //compile 'org.neo4j:neo4j:3.3.4'
     compile group: 'ch.qos.logback', name: 'logback-core', version: versionlogback
     compile group: 'ch.qos.logback', name: 'logback-classic', version: versionlogback
     compile group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.714'
     compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.714'
-    // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-ses
     compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.714'
-
-    // https://mvnrepository.com/artifact/com.mindscapehq/core
     compile group: 'com.mindscapehq', name: 'core', version: '3.0.0'
-//    // https://mvnrepository.com/artifact/com.mindscapehq/raygun4java
-//    compile group: 'com.mindscapehq', name: 'raygun4java', version: '3.0.0', ext: 'pom'
-// https://mvnrepository.com/artifact/com.mindscapehq/webprovider
     compile group: 'com.mindscapehq', name: 'webprovider', version: '3.0.0'
     compile group: 'org.json', name: 'json', version: '20160810'
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion

@@ -35,6 +35,7 @@ public class SeniorDaysService {
         SeniorDays seniorDays = ObjectMapperUtils.copyPropertiesByMapper(careDaysDetails, SeniorDays.class);
         seniorDays.setExpertise(expertise);
         seniorDaysGraphRepository.save(seniorDays);
+        careDaysDetails.setId(seniorDays.getId());
         return careDaysDetails;
     }
 

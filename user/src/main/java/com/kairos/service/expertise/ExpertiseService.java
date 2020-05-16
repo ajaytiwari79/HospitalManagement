@@ -34,7 +34,7 @@ import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryRes
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.response.*;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseBasicDetails;
@@ -170,12 +170,7 @@ public class ExpertiseService {
     }
 
     public ExpertiseQueryResult updateExpertise(Long countryId, ExpertiseDTO expertiseDTO, Long expertiseId) {
-        if (StringUtils.isBlank(expertiseDTO.getName())) {
-            exceptionService.actionNotPermittedException("error.Expertise.name.notEmpty");
-        }
-        if (expertiseDTO.getEndDate() != null && expertiseDTO.getStartDate().isAfter(expertiseDTO.getEndDate())) {
-            exceptionService.actionNotPermittedException("message.start_date.less_than.end_date");
-        }
+        validateDetails(expertiseDTO);
         expertiseDTO.setId(expertiseId);
         Expertise currentExpertise = expertiseGraphRepository.findOne(expertiseId);
         Country country = countryGraphRepository.findOne(countryId);
@@ -203,6 +198,15 @@ public class ExpertiseService {
         return updatedExpertiseData(currentExpertise);
     }
 
+    private void validateDetails(ExpertiseDTO expertiseDTO) {
+        if (StringUtils.isBlank(expertiseDTO.getName())) {
+            exceptionService.actionNotPermittedException("error.Expertise.name.notEmpty");
+        }
+        if (expertiseDTO.getEndDate() != null && expertiseDTO.getStartDate().isAfter(expertiseDTO.getEndDate())) {
+            exceptionService.actionNotPermittedException("message.start_date.less_than.end_date");
+        }
+    }
+
     private void validateExpertiseDetails(Long countryId, ExpertiseDTO expertiseDTO, Long expertiseId, Expertise currentExpertise, Country country) {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, COUNTRY, countryId);
@@ -225,12 +229,7 @@ public class ExpertiseService {
         ExpertiseLine currentExpertiseLine = expertise.getExpertiseLines().stream().filter(k -> k.getId().equals(expertiseLineId)).findFirst().orElseThrow(() -> new ActionNotPermittedException(exceptionService.convertMessage(PLEASE_PROVIDE_THE_VALID_LINE_ID)));
         expertise.getExpertiseLines().sort(Comparator.comparing(ExpertiseLine::getStartDate));
         if (expertise.isPublished() && isExpertiseLineChanged(currentExpertiseLine, expertiseDTO.getOrganizationServiceIds(), expertiseDTO) && currentExpertiseLine.getStartDate().isBefore(expertiseDTO.getStartDate())) {
-            if (expertiseDTO.getStartDate().isBefore(currentExpertiseLine.getStartDate()) && (currentExpertiseLine.getEndDate() == null || currentExpertiseLine.getEndDate().isAfter(getLocalDate()))) {
-                exceptionService.actionNotPermittedException(PLEASE_SELECT_PUBLISHED_DATE_LESS_AFTER_CURRENT_LINE_START_DATE);
-            }
-            if (isNotNull(expertise.getEndDate()) && !expertiseDTO.getStartDate().isBefore(expertise.getEndDate())) {
-                exceptionService.actionNotPermittedException(PLEASE_SELECT_PUBLISHED_DATE_BEFORE_EXPERTISE_END_DATE);
-            }
+            validateDetails(expertiseDTO, expertise, currentExpertiseLine);
             ExpertiseLine expertiseLine = createExpertiseLine(expertiseDTO);
             currentExpertiseLine.setEndDate(expertiseDTO.getStartDate().minusDays(1L));
             if (expertise.getExpertiseLines().size() - 1 > expertise.getExpertiseLines().indexOf(currentExpertiseLine)) {
@@ -248,6 +247,15 @@ public class ExpertiseService {
             updateExistingLine(expertiseDTO, expertise, currentExpertiseLine);
         }
         return updatedExpertiseData(expertise);
+    }
+
+    private void validateDetails(ExpertiseDTO expertiseDTO, Expertise expertise, ExpertiseLine currentExpertiseLine) {
+        if (expertiseDTO.getStartDate().isBefore(currentExpertiseLine.getStartDate()) && (currentExpertiseLine.getEndDate() == null || currentExpertiseLine.getEndDate().isAfter(getLocalDate()))) {
+            exceptionService.actionNotPermittedException(PLEASE_SELECT_PUBLISHED_DATE_LESS_AFTER_CURRENT_LINE_START_DATE);
+        }
+        if (isNotNull(expertise.getEndDate()) && !expertiseDTO.getStartDate().isBefore(expertise.getEndDate())) {
+            exceptionService.actionNotPermittedException(PLEASE_SELECT_PUBLISHED_DATE_BEFORE_EXPERTISE_END_DATE);
+        }
     }
 
     public void updateExistingLine(ExpertiseDTO expertiseDTO, Expertise expertise, ExpertiseLine currentExpertiseLine) {
@@ -625,27 +633,27 @@ public class ExpertiseService {
         return expertise;
     }
 
-    public void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
+    public void assignExpertiseToStaff(StaffDTO staffDTO, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
         List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
-        for (int i = 0; i < staffPersonalDetail.getExpertiseWithExperience().size(); i++) {
-            Expertise expertise = expertiseMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
-            expertise = expertiseGraphRepository.findById(expertise.getId(), 2).orElse(null);
-            StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExperienceInExpertiseDTOMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
+        for (int i = 0; i < staffDTO.getExpertiseWithExperience().size(); i++) {
+            Expertise expertise = expertiseMap.get(staffDTO.getExpertiseWithExperience().get(i).getExpertiseId());
+            expertise =findById(expertise.getId(), 2);
+            StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExperienceInExpertiseDTOMap.get(staffDTO.getExpertiseWithExperience().get(i).getExpertiseId());
             Long id = null;
             ExpertiseLine expertiseLine = expertise.getCurrentlyActiveLine(null);
             if (Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent())
                 id = staffExperienceInExpertiseDTO.getId();
-            Date expertiseStartDate = staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseStartDate();
-            staffExpertiseRelationShips.add(new StaffExpertiseRelationShip(id, staffToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate));
+            Date expertiseStartDate = staffDTO.getExpertiseWithExperience().get(i).getExpertiseStartDate();
+            staffExpertiseRelationShips.add(new StaffExpertiseRelationShip(id, staffToUpdate, expertise, staffDTO.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate));
             boolean isSeniorityLevelMatched = false;
             for (SeniorityLevel seniorityLevel : expertiseLine.getSeniorityLevel()) {
-                if (staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() >= seniorityLevel.getFrom() * 12 && (seniorityLevel.getTo() == null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() < seniorityLevel.getTo() * 12)) {
+                if (staffDTO.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() >= seniorityLevel.getFrom() * 12 && (seniorityLevel.getTo() == null || staffDTO.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() < seniorityLevel.getTo() * 12)) {
                     isSeniorityLevelMatched = true;
                     break;
                 }
             }
             if (!isSeniorityLevelMatched) {
-                exceptionService.actionNotPermittedException(ERROR_NOSENIORITYLEVELFOUND, "seniorityLevel " + staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
+                exceptionService.actionNotPermittedException(ERROR_NOSENIORITYLEVELFOUND, "seniorityLevel " + staffDTO.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
             }
         }
         if (CollectionUtils.isNotEmpty(staffExpertiseRelationShips)) {

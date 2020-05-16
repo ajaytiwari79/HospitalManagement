@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -41,7 +42,7 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
     OrganizationService checkDuplicateSubService(Long id, String name);
 
     @Query("MATCH (os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ss:OrganizationService) WHERE id(os)={0} AND ss.name= {1} return ss")
-    OrganizationService checkDuplicateSubServiceWithSpecialCharacters(Long id, String name);
+    Optional<OrganizationService> checkDuplicateSubServiceWithSpecialCharacters(Long id, String name);
 
     OrganizationService findByKmdExternalId(String kmdExternalId);
 
@@ -79,4 +80,10 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
             "MATCH (ss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService {isEnabled:true} ) " +
             " RETURN {children: case when os  is NULL then [] else collect({id:id(ss),name:ss.name,description:ss.description}) END, id:id(os),name:os.name,description:os.description} as result ")
     List<Map<String,Object>> getOrgServicesByOrgSubTypesIds(Set<Long> organizationSubTypeIds);
+
+    @Query("MATCH  (unit:Organization)-[:SUB_TYPE_OF]-(o:OrganizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]->(ss:OrganizationService{isEnabled:true}) where id(unit) = {0} \n" +
+            "MATCH (ss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService {isEnabled:true} ) \n" +
+            "WITH case when os  is NULL then [] else collect({id:id(ss),name:ss.name}) END as organizationSubServices,os\n" +
+            "RETURN  id(os) as id ,os.name as name,organizationSubServices as organizationSubServices")
+    List<OrganizationServiceQueryResult> getAllOrganizationServicesByUnitId(Long unitId);
 }

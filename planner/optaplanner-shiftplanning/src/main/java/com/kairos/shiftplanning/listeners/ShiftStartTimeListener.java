@@ -1,14 +1,22 @@
 package com.kairos.shiftplanning.listeners;
 
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
-import org.joda.time.DateTime;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
+import java.math.BigInteger;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static com.kairos.shiftplanning.utils.PlannedTimeTypeUtils.addPlannedTimeInShift;
+import static com.kairos.shiftplanning.utils.ShiftBreakUtils.updateBreakInShift;
+import static com.kairos.shiftplanning.utils.UpdateTimeAndPayoutDetails.updateTimeBankAndPayoutDetails;
 
 public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
     public static final String START_TIME = "startTime";
@@ -47,20 +55,30 @@ public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
             scoreDirector.beforeVariableChanged(shiftImp, START_TIME);
             shiftImp.setStartTime(null);
             shiftImp.setShiftActivities(new ArrayList<>());
+            shiftImp.setActivityIds(new HashSet<>());
+            shiftImp.setBreakActivities(new ArrayList<>());
+            shiftImp.setActivitiesPlannedTimeIds(new HashSet<>());
+            shiftImp.setActivitiesTimeTypeIds(new HashSet<>());
             scoreDirector.afterVariableChanged(shiftImp, START_TIME);
             shiftImp.setEndTime(null);
             return;
         }
-        shiftImp.setShiftActivities(ShiftPlanningUtility.getMergedShiftActivitys(shiftImp.getActivityLineIntervals()));
-        DateTime[] startAndEnd=getEarliestStartAndLatestEnd(shiftImp.getActivityLineIntervals());
+        Object[] objects = ShiftPlanningUtility.getMergedShiftActivitys(shiftImp);
+        addPlannedTimeInShift(shiftImp);
+        updateBreakInShift(shiftImp);
+        updateTimeBankAndPayoutDetails(shiftImp);
+        shiftImp.setShiftActivities((List<ShiftActivity>)objects[0]);
+        shiftImp.setActivityIds((Set<BigInteger>)objects[1]);
+        shiftImp.setActivitiesTimeTypeIds((Set<BigInteger>)objects[3]);
+        ZonedDateTime[] startAndEnd=getEarliestStartAndLatestEnd(shiftImp.getActivityLineIntervals());
         scoreDirector.beforeVariableChanged(shiftImp, START_TIME);
         shiftImp.setStartTime(startAndEnd[0].toLocalTime());
         scoreDirector.afterVariableChanged(shiftImp, START_TIME);
         shiftImp.setEndTime(startAndEnd[1].toLocalTime());
 
     }
-    private DateTime[] getEarliestStartAndLatestEnd(List<ActivityLineInterval> activityLineIntervals){
-        DateTime[] startAndEnd= new DateTime[2];
+    private ZonedDateTime[] getEarliestStartAndLatestEnd(List<ActivityLineInterval> activityLineIntervals){
+        ZonedDateTime[] startAndEnd= new ZonedDateTime[2];
         for (ActivityLineInterval activityLineInterval:activityLineIntervals) {
             if(startAndEnd[0]==null && startAndEnd[1]==null){
                 startAndEnd[0]=activityLineInterval.getStart();

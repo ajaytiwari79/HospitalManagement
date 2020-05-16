@@ -18,7 +18,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.time_care.TimeCareSkill;
 import com.kairos.persistence.model.user.expertise.response.SkillLevelQueryResult;
@@ -333,13 +333,13 @@ public class SkillService {
         return map;
     }
 
-    public Map<String, List<StaffPersonalDetail>> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, LocalDate selectedFromDate,  LocalDate selectedToDate) {
-        Map<String, List<StaffPersonalDetail>> staffSkillsMap = new HashMap<>();
+    public Map<String, List<StaffDTO>> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, LocalDate selectedFromDate, LocalDate selectedToDate) {
+        Map<String, List<StaffDTO>> staffSkillsMap = new HashMap<>();
         while (!selectedFromDate.isAfter(selectedToDate)){
             List<StaffQueryResult> staffQueryResults = skillGraphRepository.getStaffSkillAndLevelByStaffIds(staffIds, selectedFromDate.toString());
-            List<StaffPersonalDetail> staffDTOS = new ArrayList<>();
+            List<StaffDTO> staffDTOS = new ArrayList<>();
             if(isCollectionNotEmpty(staffQueryResults)) {
-                staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffPersonalDetail(isNotNull(staffQueryResult.getStaff()) ? staffQueryResult.getStaff().getId() : staffQueryResult.getId(), staffQueryResult.getSkills())));
+                staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffDTO(isNotNull(staffQueryResult.getStaff()) ? staffQueryResult.getStaff().getId() : staffQueryResult.getId(), staffQueryResult.getSkills())));
             }
             staffSkillsMap.put(selectedFromDate.toString(), staffDTOS);
             selectedFromDate = selectedFromDate.plusDays(1);

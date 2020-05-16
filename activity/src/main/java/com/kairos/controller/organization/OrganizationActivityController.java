@@ -68,7 +68,7 @@ public class OrganizationActivityController {
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> addIconInActivity(@PathVariable BigInteger activityId, @RequestParam("file") MultipartFile file) throws
             IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.addIconInActivity(activityId, file));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.addIconInActivity(activityId, file));
     }
 
     @ApiOperation("Update GeneralActivityTab Tab of Activity")
@@ -216,14 +216,14 @@ public class OrganizationActivityController {
     @PostMapping(value = "/activity/{activityId}/upload_note")
     ResponseEntity<Map<String, Object>> addDocumentInNotesTab(@PathVariable BigInteger activityId, @RequestParam("file") MultipartFile file) throws
             IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.addDocumentInNotesTab(activityId, file));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.addDocumentInNotesTab(activityId, file));
     }
 
     @ApiOperation("Update Communication Tab of Activity")
     @PutMapping(value = "/activity/communication")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateCommunicationTabOfActivity(@RequestBody CommunicationActivityDTO communicationActivityDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateCommunicationTabOfActivity(communicationActivityDTO, true));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.updateCommunicationTabOfActivity(communicationActivityDTO, true));
     }
 
     @ApiOperation("get CommunicationTab of Activity")
@@ -379,7 +379,7 @@ public class OrganizationActivityController {
     @GetMapping(value = "/activity_with_phase")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId( @PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityAndPhaseByUnitId(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivityAndPhaseByUnitId(unitId));
     }
 
     @ApiOperation("Get all unit activities with categories ")
@@ -395,5 +395,4 @@ public class OrganizationActivityController {
     public ResponseEntity<Map<String, Object>> getAllAbsenceActivities(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getAllAbsenceActivity(unitId));
     }
-
 }

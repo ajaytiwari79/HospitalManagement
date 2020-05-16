@@ -2,7 +2,6 @@ package com.kairos.dto.planner.solverconfig;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.planner.constarints.ConstraintDTO;
 import com.kairos.enums.TimeTypeEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +9,7 @@ import lombok.Setter;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +41,10 @@ public class SolverConfigDTO {
     private List<ConstraintDTO> constraints;
     @NotNull(message = "error.timetype.not.exists")
     protected TimeTypeEnum typeOfTimeType;
+    private Long unitId;
+    private Long parentCountrySolverConfigId;
+    private List<Long> organizationSubServiceIds;
+    private Long countryId;
 
     public SolverConfigDTO() {
         this.constraints = new ArrayList<>();

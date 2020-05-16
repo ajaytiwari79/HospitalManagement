@@ -63,6 +63,7 @@ public class ActivityMessagesConstants {
     public static final String ERROR_TASKTYPE_TITLE_NOTNULL = "error.Tasktype.title.notnull";
     public static final String EXCEPTION_DATANOTFOUND = "exception.dataNotFound";
     public static final String EXCEPTION_DUPLICATEDATA = "exception.duplicateData";
+    public static final String REQUEST_ABSENCE_ACTIVITY_TYPE = "request.absence.activity.type";
     public static final String ERROR_EXCEPTION_TYPE_NOTEXIST = "error.exception.type.notexist";
     public static final String ERROR_EXCEPTION_NOTFOUND = "error.exception.notfound";
     public static final String MESSAGE_CATEGORY_RENAME = "message.category.rename";
@@ -216,6 +217,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_TEAM_ACTIVITY_NOT_ASSIGN = "message.team.activity.not.assign";
     public static final String MESSAGE_WTA_NAME_DUPLICATE = "message.wta.name.duplicate";
     public static final String MESSAGE_WTA_ID = "message.wta.id";
+    public static final String MESSAGE_WTA_VALUE = "message.wta.value";
     public static final String MESSAGE_WTA_EXPIRED_UNIT = "message.wta.expired-unit";
     public static final String MESSAGE_WTA_START_ENDDATE = "message.wta.start-end-date";
     public static final String MESSAGE_WTA_NAME_ALREADYEXISTS = "message.wta.name.alreadyExists";
@@ -358,7 +360,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SELFROSTERING_METADATA_NULL = "message.selfRostering.metaData.null";
     public static final String REQUEST_ABSENCE_APPROVED = "request.absence.approved";
     public static final String REQUEST_ABSENCE_REQUESTED = "request.absence.request";
-    public static final String REQUEST_ABSENCE_ACTIVITY_TYPE = "request.absence.activity.type";
+    public static final String REQUES4T_ABSENCE_ACTIVITY_TYPE = "request.absence.activity.type";
     public static final String REALTIME_DURATION_NOT_CONFIGURED = "realtime.duration.not.configured";
     public static final String SHIFT_NOT_EXISTS = "shift.not.exists";
     public static final String MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF = "message.organization.protected.days.off";
@@ -383,5 +385,7 @@ public class ActivityMessagesConstants {
     public static final String CUT_OFF_CONFIGUATION = "activity.cutoff.configuration";
     public static final String ACTIVITY_NOT_ASSIGN_IN_PROTECTED_DAYS_OFF_RULE_TEMPLATE = "activity.not.assign.in.protected.days.off.rule.template";
     public static final String STAFF_ALREADY_SICK="staff.already.sick";
+    public static final String MESSAGE_CTA_VALUE ="message.cta.value";
+
 
 }

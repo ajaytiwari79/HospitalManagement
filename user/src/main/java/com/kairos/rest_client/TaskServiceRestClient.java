@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,8 @@ import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 public class TaskServiceRestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(SkillServiceTemplateClient.class);
+    public static final String STATUS = "status {}";
+    public static final String RESPONSE = "response {}";
     @Autowired
     RestTemplate restTemplate;
     @Inject
@@ -56,8 +59,8 @@ public class TaskServiceRestClient {
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
@@ -92,8 +95,8 @@ public class TaskServiceRestClient {
                 throw new RuntimeException(response.getMessage());
             }
         } catch (HttpClientErrorException e) {
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
@@ -119,54 +122,13 @@ public class TaskServiceRestClient {
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
         return null;
     }
-
-
-
-    /**
-     *  @auther anil maurya
-     *  endpoint map in task controller
-     * @param staffId
-     * @param anonymousStaffId
-     * @return
-     */
-    public boolean  updateTaskForStaff(Long staffId,Long anonymousStaffId){
-
-        final String baseUrl=getBaseUrl(true);
-
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
-                    restTemplate.exchange(baseUrl+"/task/staff/{staffId}/{anonymousStaffId}",
-                            HttpMethod.
-                                    GET,null, typeReference,staffId,anonymousStaffId);
-
-            RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        }catch (HttpClientErrorException e) {
-
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
-            exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
-
-        }
-        return false;
-
-
-    }
-
-
 
     /**
      * @auther anil maurya
@@ -176,41 +138,29 @@ public class TaskServiceRestClient {
      * @return
      */
     public List<StaffAssignedTasksWrapper> getAssignedTasksOfStaff(long staffId, String date) {
-
-
         final String baseUrl = getBaseUrl(true);
-
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>>>() {
-            };
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>>>() {};
             String url = baseUrl + "/task/staff/{staffId}/assigned_tasks?date=" + date;
             // URI (URL) parameters
             Map<String, Object> uriParams = new HashMap<>();
             uriParams.put("staffId", staffId);
-
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
                     // Add query parameter
                     .queryParam("date", date);
-            ResponseEntity<RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>>> restExchange =
-                    restTemplate.exchange(url,
-                            HttpMethod.
-                                    GET, null, typeReference, staffId);
-
+            ResponseEntity<RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>>> restExchange = restTemplate.exchange(url, HttpMethod.GET, null, typeReference, staffId);
             RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
-
             } else {
                 throw new RuntimeException(response.getMessage());
             }
         } catch (HttpClientErrorException e) {
-
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
+            logger.info(STATUS, e.getStatusCode());
+            logger.info(RESPONSE, e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
-
         }
-        return null;
+        return Collections.emptyList();
 
     }
 
@@ -230,8 +180,8 @@ public class TaskServiceRestClient {
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }

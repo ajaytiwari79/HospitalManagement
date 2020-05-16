@@ -1,6 +1,7 @@
 package com.kairos.controller.period;
 
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
+import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.enums.planning_period.PlanningPeriodAction;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -115,6 +116,19 @@ public class PlanningPeriodController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> registerJobForExistingPlanningPeriod() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.registerJobForExistingPlanningPeriod());
+    }
+
+    @ApiOperation(value = "/get details for auto planning")
+    @PostMapping(value="/get_details_for_auto_planning")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> registerJobForExistingPlanningPeriod(@RequestBody ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.findDataForAutoPlanning(shiftPlanningProblemSubmitDTO));
+    }
+
+    @ApiOperation(value = "Get default data for solver config")
+    @GetMapping(value="/get_default_data_for_solver_cofig")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForPlanning(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getDefaultDataForPlanning(unitId));
     }
 
 }

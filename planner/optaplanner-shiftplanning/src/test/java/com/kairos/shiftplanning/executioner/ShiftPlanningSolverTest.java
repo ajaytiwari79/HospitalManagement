@@ -2,23 +2,14 @@ package com.kairos.shiftplanning.executioner;
 
 import com.kairos.dto.planner.constarints.ConstraintDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
-import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
-import com.kairos.shiftplanning.dto.ShiftDTO;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.Interval;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static com.kairos.enums.constraint.ConstraintSubType.*;
 
@@ -41,35 +32,36 @@ public class ShiftPlanningSolverTest {
     //@Ignore
     public void test() {
         SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
-        new ShiftPlanningSolver(solverConfigDTO).runSolver();
+        //new ShiftPlanningSolver(solverConfigDTO).runSolver();
         Assert.assertEquals(0,0);
     }
 
 /*    @Test
     @Ignore*/
     public void buildBenchmarker() {
-        new ShiftPlanningSolver().buildBenchmarker();
+        new ShiftPlanningSolver(solverConfigDTO, droolFilePath, configurationFile).buildBenchmarker();
     }
 
     public void runBenchmarker() {
-        new ShiftPlanningSolver().runBenchmarker();
+        new ShiftPlanningSolver(solverConfigDTO, droolFilePath, configurationFile).runBenchmarker();
     }
 
 
     public SolverConfigDTO getSolverConfigDTO(){
         List<ConstraintDTO> constraintDTOS = new ArrayList<>();
-        constraintDTOS.add(new ConstraintDTO(ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH, ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH, ConstraintType.ACTIVITY, ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS, ConstraintLevel.HARD, 5, 5l));
-        constraintDTOS.add(new ConstraintDTO(SHORTEST_DURATION_FOR_THIS_ACTIVITY_RELATIVE_TO_SHIFT_LENGTH,SHORTEST_DURATION_FOR_THIS_ACTIVITY_RELATIVE_TO_SHIFT_LENGTH, ConstraintType.ACTIVITY, ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH, ConstraintLevel.HARD, 5, 5l));
-        constraintDTOS.add(new ConstraintDTO(MAX_NUMBER_OF_ALLOCATIONS_PR_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, MAX_NUMBER_OF_ALLOCATIONS_PR_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF,  ConstraintType.ACTIVITY, MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, ConstraintLevel.HARD, 5,5l));
-        constraintDTOS.add(new ConstraintDTO(MINIMIZE_NO_OF_SHIFT_ON_WEEKEND, MINIMIZE_NO_OF_SHIFT_ON_WEEKEND,  ConstraintType.ACTIVITY, MINIMIZE_SHIFT_ON_WEEKENDS, ConstraintLevel.HARD, 5,5l));
-        constraintDTOS.add(new ConstraintDTO(PREFER_PERMAMENT_EMPLOYEE, PREFER_PERMAMENT_EMPLOYEE,ConstraintType.ACTIVITY,PREFER_PERMANENT_EMPLOYEE,ConstraintLevel.HARD,2,5l));
-        constraintDTOS.add(new ConstraintDTO(ACTIVITY_REQUIRED_TAG, ACTIVITY_REQUIRED_TAG,  ConstraintType.ACTIVITY, ConstraintSubType.ACTIVITY_REQUIRED_TAG, ConstraintLevel.HARD, 5,5l));
-        constraintDTOS.add(new ConstraintDTO(PRESENCE_AND_ABSENCE_SHOULD_NOT_BE_AT_SAME_TIME, PRESENCE_AND_ABSENCE_SHOULD_NOT_BE_AT_SAME_TIME,  ConstraintType.UNIT, PRESENCE_AND_ABSENCE_SAME_TIME, ConstraintLevel.HARD, 5,5l));
-        constraintDTOS.add(new ConstraintDTO(MAX_SHIFT_OF_STAFF, MAX_SHIFT_OF_STAFF,  ConstraintType.ACTIVITY, ConstraintSubType.MAX_SHIFT_OF_STAFF, ConstraintLevel.HARD, 5,5l));
+        constraintDTOS.add(new ConstraintDTO(ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH, ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH, ConstraintType.ACTIVITY, ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS, ScoreLevel.HARD, 5, 5l));
+        constraintDTOS.add(new ConstraintDTO(SHORTEST_DURATION_FOR_THIS_ACTIVITY_RELATIVE_TO_SHIFT_LENGTH,SHORTEST_DURATION_FOR_THIS_ACTIVITY_RELATIVE_TO_SHIFT_LENGTH, ConstraintType.ACTIVITY, ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH, ScoreLevel.HARD, 5, 5l));
+        constraintDTOS.add(new ConstraintDTO(MAX_NUMBER_OF_ALLOCATIONS_PR_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, MAX_NUMBER_OF_ALLOCATIONS_PR_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF,  ConstraintType.ACTIVITY, MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, ScoreLevel.HARD, 5,5l));
+        constraintDTOS.add(new ConstraintDTO(MINIMIZE_NO_OF_SHIFT_ON_WEEKEND, MINIMIZE_NO_OF_SHIFT_ON_WEEKEND,  ConstraintType.ACTIVITY, MINIMIZE_SHIFT_ON_WEEKENDS, ScoreLevel.HARD, 5,5l));
+        constraintDTOS.add(new ConstraintDTO(PREFER_PERMAMENT_EMPLOYEE, PREFER_PERMAMENT_EMPLOYEE,ConstraintType.ACTIVITY,PREFER_PERMANENT_EMPLOYEE, ScoreLevel.HARD,2,5l));
+        constraintDTOS.add(new ConstraintDTO(ACTIVITY_REQUIRED_TAG, ACTIVITY_REQUIRED_TAG,  ConstraintType.ACTIVITY, ConstraintSubType.ACTIVITY_REQUIRED_TAG, ScoreLevel.HARD, 5,5l));
+        constraintDTOS.add(new ConstraintDTO(PRESENCE_AND_ABSENCE_SHOULD_NOT_BE_AT_SAME_TIME, PRESENCE_AND_ABSENCE_SHOULD_NOT_BE_AT_SAME_TIME,  ConstraintType.UNIT, PRESENCE_AND_ABSENCE_SAME_TIME, ScoreLevel.HARD, 5,5l));
+        constraintDTOS.add(new ConstraintDTO(MAX_SHIFT_OF_STAFF, MAX_SHIFT_OF_STAFF,  ConstraintType.ACTIVITY, ConstraintSubType.MAX_SHIFT_OF_STAFF, ScoreLevel.HARD, 5,5l));
+        constraintDTOS.add(new ConstraintDTO(AVERAGE_SHEDULED_TIME.name(), AVERAGE_SHEDULED_TIME.name(),  ConstraintType.WTA, AVERAGE_SHEDULED_TIME, ScoreLevel.MEDIUM, 5,5l));
 /*
         constraintDTOS.add(new ConstraintDTO(FIX_ACTIVITY_SHOULD_NOT_CHANGE, FIX_ACTIVITY_SHOULD_NOT_CHANGE,  ConstraintType.ACTIVITY, ConstraintSubType.FIX_ACTIVITY_SHOULD_NOT_CHANGE, ConstraintLevel.HARD, 5,5l));
 */
-        constraintDTOS.add(new ConstraintDTO(IF_THIS_ACTIVITY_IS_USED_ON_A_TUESDAY, IF_THIS_ACTIVITY_IS_USED_ON_A_TUESDAY,  ConstraintType.ACTIVITY, ACTIVITY_VALID_DAYTYPE, ConstraintLevel.SOFT, 4,5l));
+        constraintDTOS.add(new ConstraintDTO(IF_THIS_ACTIVITY_IS_USED_ON_A_TUESDAY, IF_THIS_ACTIVITY_IS_USED_ON_A_TUESDAY,  ConstraintType.ACTIVITY, ACTIVITY_VALID_DAYTYPE, ScoreLevel.SOFT, 4,5l));
         return new SolverConfigDTO(constraintDTOS);
     }
 

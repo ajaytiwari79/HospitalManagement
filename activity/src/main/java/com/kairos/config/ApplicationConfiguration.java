@@ -16,20 +16,6 @@ import java.util.Map;
 
 @Configuration
 public class ApplicationConfiguration {
-    @Inject
-    private EnvConfigCommon envConfigCommon;
-
-    @Inject
-    private UserRestClient userRestClient;
-
-    @Inject
-    private ObjectMapper objectMapper;
-
-    @Bean
-    PermissionSchemaProcessor prePermissionSchemaProcessor(){
-        List<Map<String, Object>> permissionSchema= new PermissionSchemaScanner().createPermissionSchema(envConfigCommon.getModelPackagePath());
-        return new PermissionSchemaProcessor(permissionSchema, userRestClient,envConfigCommon.getUserServiceUrl(), envConfigCommon.getKpermissionDataPublish());
-    }
 
     @Bean
     KMailService kMailService(EmailServicesConfiguration emailServicesConfiguration, EnvConfigCommon envConfigCommon, TemplateEngine templateEngine){

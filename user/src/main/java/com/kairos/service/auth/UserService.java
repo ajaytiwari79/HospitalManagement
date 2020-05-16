@@ -20,10 +20,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.user.ChatStatus;
 import com.kairos.enums.user.UserType;
-import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessPage;
-import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
+import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.default_data.DayType;
@@ -84,6 +81,7 @@ import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 public class UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     public static final String ACCESS_TOKEN = "accessToken";
+    public static final String DESCRIPTION = "description";
 
     @Inject
     private UserGraphRepository userGraphRepository;
@@ -456,11 +454,13 @@ public class UserService {
         permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
         if (permissionData.isHub()) {
             Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
-            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId());
+            List<AccessGroupQueryResult> accessGroupQueryResults = accessGroupService.getCountryAccessGroupByOrgCategory(UserContext.getUserDetails().getCountryId(), OrganizationCategory.HUB.toString());
+            List<Long> accessGroupIds = accessGroupQueryResults.stream().map(AccessGroupQueryResult::getId).collect(Collectors.toList());
+            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId(), accessGroupIds);
+            Map<String, AccessPageQueryResult> permissionMap = prepareUnitPermissions(permissions,true);
             HashMap<String, Object> unitPermissionMap = new HashMap<>();
             for (AccessPageQueryResult permission : permissions) {
-                permission.setActive(permission.isRead() || permission.isWrite());
-                unitPermissionMap.put(permission.getModuleId(), permission);
+                unitPermissionMap.put(permission.getModuleId(), permissionMap.get(permission.getModuleId()));
             }
             permissionData.setHubPermissions(unitPermissionMap);
 
@@ -565,11 +565,11 @@ public class UserService {
             String token = forgetPasswordTokenService.createForgotPasswordToken(currentUser);
             Map<String, Object> templateParam = new HashMap<>();
             templateParam.put("receiverName", EMAIL_GREETING + currentUser.getFullName());
-            templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName())));
+            templateParam.put(DESCRIPTION, AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName())));
             templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
             templateParam.put("hyperLinkName", RESET_PASSCODE);
 //            sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
-            kMailService.sendMail(null,AppConstants.MAIL_SUBJECT,templateParam.get("description").toString(),templateParam.get("description").toString(),templateParam,DEFAULT_EMAIL_TEMPLATE,currentUser.getEmail());
+            kMailService.sendMail(null,AppConstants.MAIL_SUBJECT,templateParam.get(DESCRIPTION).toString(),templateParam.get(DESCRIPTION).toString(),templateParam,DEFAULT_EMAIL_TEMPLATE,currentUser.getEmail());
             return true;
         }
 

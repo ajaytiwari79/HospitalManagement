@@ -69,12 +69,12 @@ public class NightWorkerServiceTest {
     public void updateNightWorkers(){
         when(expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(anyCollection())).thenReturn(expertiseNightWorkerSettings);
         //when(shiftMongoRepository.findAllShiftBetweenDuration(any(Long.class), any(Date.class), any(Date.class))).thenReturn(shiftDTOS);
-        Map[] nightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,new HashMap<>(0));
+        Map[] nightWorkerMap = nightWorkerService.getNightWorkerDetailsAndFilterStaffOnTheBasisOfShiftFilter(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,new HashMap<>(0));
         Map<Long,Boolean> staffIdAndNightWorkerMap = nightWorkerMap[0];
          Assert.assertEquals(staffIdAndNightWorkerMap.get(160l).booleanValue(),false);
         expertiseNightWorkerSettings.get(0).setMinShiftsUnitToCheckNightWorker(XAxisConfig.PERCENTAGE);
         expertiseNightWorkerSettings.get(0).setMinShiftsValueToCheckNightWorker(50);
-        nightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,new HashMap<>(0));
+        nightWorkerMap = nightWorkerService.getNightWorkerDetailsAndFilterStaffOnTheBasisOfShiftFilter(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,new HashMap<>(0));
         staffIdAndNightWorkerMap = nightWorkerMap[0];
         Assert.assertEquals(staffIdAndNightWorkerMap.get(160l).booleanValue(),false);
     }
@@ -85,12 +85,12 @@ public class NightWorkerServiceTest {
         expertiseNightWorkerSettings.get(0).setMinShiftsValueToCheckNightWorker(3000);
         when(expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(anyCollection())).thenReturn(expertiseNightWorkerSettings);
         //when(shiftMongoRepository.findAllShiftBetweenDuration(any(Long.class), any(Date.class), any(Date.class))).thenReturn(shiftDTOS);
-        Map[] nightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,new HashMap<>(0));
+        Map[] nightWorkerMap = nightWorkerService.getNightWorkerDetailsAndFilterStaffOnTheBasisOfShiftFilter(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,new HashMap<>(0));
         Map<Long,Boolean> staffIdAndNightWorkerMap = nightWorkerMap[0];
         Assert.assertEquals(staffIdAndNightWorkerMap.get(160l).booleanValue(),false);
         expertiseNightWorkerSettings.get(0).setMinShiftsUnitToCheckNightWorker(XAxisConfig.PERCENTAGE);
         expertiseNightWorkerSettings.get(0).setMinShiftsValueToCheckNightWorker(70);
-        nightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,new HashMap<>(0));
+        nightWorkerMap = nightWorkerService.getNightWorkerDetailsAndFilterStaffOnTheBasisOfShiftFilter(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,new HashMap<>(0));
         staffIdAndNightWorkerMap = nightWorkerMap[0];
         Assert.assertEquals(staffIdAndNightWorkerMap.get(160l).booleanValue(),false);
     }

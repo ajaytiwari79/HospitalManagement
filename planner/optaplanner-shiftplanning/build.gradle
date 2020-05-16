@@ -1,43 +1,51 @@
 group 'optaplanner-shiftplanning'
 version '0.0.2'
+
 ext {
-    versionoptaplannerbom='7.14.0.Final'
-   // versionslf4j='1.7.23'
-   // versionlogback='1.2.3'
+    versionoptaplannerbom='7.34.0.Final'
 }
+apply plugin: 'java'
+/*
+apply plugin: 'eclipse'
+apply plugin: 'application'
 
-//apply plugin: 'java'
-
+version = '1.0'
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
+mainClassName = 'com.kairos.shiftplanning.executioner.ShiftPlanningSolver'
+jar {
+    baseName = 'shiftplanning'
+    version = '0.0.1-SNAPSHOT'
+    manifest {
+        attributes(
+                'Main-Class': 'com.kairos.shiftplanning.executioner.ShiftPlanningSolver'
+        )
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+*/
 
-/*repositories {
+repositories {
     mavenCentral()
-    mavenLocal()
-    *//*maven { url 'http://localhost:8080/repository/local.kairos/'
-        credentials {
-            username = "admin"
-            password = "admin2"
-        }}*//*
-}*/
+    jcenter()
+    maven { url 'https://repository.jboss.org/' }
+}
 
 
 dependencies {
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
     compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom
-    /*compile project (':dto')
-    compile 'org.freemarker:freemarker:2.3.28'
+    compile project(':kcommons')
     compile group: 'org.optaplanner', name: 'optaplanner-persistence-xstream', version: versionoptaplannerbom
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom
     compile group: 'org.optaplanner', name: 'optaplanner-benchmark', version: versionoptaplannerbom
-    compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
-    compile group: 'org.json',name: 'json',version: '20090211'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.2'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.2'
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: '2.9.2'
-    compile group: 'com.graphhopper', name: 'directions-api-client', version: '0.9.0'
-    compile group: 'ch.qos.logback', name: 'logback-core', version:versionlogback
+    compile group: 'ch.qos.logback', name: 'logback-core', version: versionlogback
     compile group: 'ch.qos.logback', name: 'logback-classic', version: versionlogback
+    compile 'org.freemarker:freemarker:2.3.28'
+    compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
-    testCompile group: 'junit', name: 'junit', version: '4.12'*/
 }

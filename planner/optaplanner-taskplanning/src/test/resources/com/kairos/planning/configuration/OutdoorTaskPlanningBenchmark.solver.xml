@@ -78,7 +78,7 @@
 
                         <entitySelector mimicSelectorRef="taskChainEntitySelector"/>
                         <valueSelector>
-                            <!-- This will break many hard contraints as phase caching will only fewer steps.-->
+                            <!-- This will break many hard constraints as phase caching will only fewer steps.-->
                             <!--<cacheType>PHASE</cacheType>
                             <selectionOrder>RANDOM</selectionOrder>-->
                             <variableName>previousTaskOrEmployee</variableName>
@@ -219,7 +219,7 @@
 
                         <entitySelector mimicSelectorRef="taskChainEntitySelector"/>
                         <valueSelector>
-                            <!-- This will break many hard contraints as phase caching will only fewer steps.-->
+                            <!-- This will break many hard constraints as phase caching will only fewer steps.-->
                             <!--<cacheType>PHASE</cacheType>
                             <selectionOrder>RANDOM</selectionOrder>-->
                             <variableName>previousTaskOrEmployee</variableName>

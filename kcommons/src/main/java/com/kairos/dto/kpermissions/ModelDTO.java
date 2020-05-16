@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Getter
 @Setter
@@ -34,6 +35,6 @@ public class ModelDTO {
     }
 
     public OtherPermissionDTO getForOtherPermissions() {
-        return forOtherPermissions;
+        return isNotNull(forOtherPermissions) ? forOtherPermissions : new OtherPermissionDTO();
     }
 }

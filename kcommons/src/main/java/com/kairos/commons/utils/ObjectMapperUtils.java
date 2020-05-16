@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -45,26 +46,16 @@ public class ObjectMapperUtils {
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(LOCALDATE_FORMATTER));
         javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(LOCALTIME_FORMATTER));
         javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(LOCALTIME_FORMATTER));
+        javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(LOCALTIME_FORMATTER));
+        /*javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(ofPattern("HH:mm:ss")));
+        javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(ofPattern("HH:mm:ss")));*/
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.registerModule(javaTimeModule);
     }
 
-    /*public static <T,E extends Object> List<E> copyProperties(List<T> objects1, Class className) {
-        List<E> objects = new ArrayList<>();
-        for (int i = 0; i < objects1.size(); i++) {
-            try {
-                E e = (E) className.newInstance();
-                PropertyUtils.copyProperties(e,objects1.get(i));
-                objects.add(e);
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |InstantiationException e) {
-            }
-        }
-        return objects;
-    }
-*/
 
-    public static <T,E,F extends Collection> F copyCollectionPropertiesByMapper(Collection<T> objects, Class<E> elementClass, Class... type) {
+    public static <T,E,F extends Collection> F copyCollectionPropertiesByMapper(Collection<T> objects, Class<E> elementClass) {
         Class className = getClassByIntance(objects);
         try {
             return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
@@ -75,10 +66,7 @@ public class ObjectMapperUtils {
        return (F) Collections.emptyList();
     }
 
-    private static <T> Class getClassByIntance(Collection<T> object,Class... type){
-        if(type.length>0){
-            return type[0];
-        }
+    private static <T> Class getClassByIntance(Collection<T> object){
         if(object instanceof Set){
             return Set.class;
         }else if (object instanceof List){
@@ -118,9 +106,9 @@ public class ObjectMapperUtils {
         return null;
     }
 
-    public static <E extends Object> List<E> jsonStringToList(String json, Class className) {
+    public static <F> List<F> jsonStringToList(String jsonString, Class<F> className) {
         try {
-            return mapper.readValue(json, mapper.getTypeFactory().constructCollectionType(
+            return mapper.readValue(jsonString, mapper.getTypeFactory().constructCollectionType(
                     List.class, className));
         } catch (IOException e) {
             LOGGER.error(ERROR,e);

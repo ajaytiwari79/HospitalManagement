@@ -21,7 +21,7 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -364,7 +364,7 @@ public class ShiftStatusService {
 
 
     public void sendMailToStaffWhenStatusChange(Shift shift, String activityName, ShiftStatus shiftStatus, String disapproveComments) {
-        StaffPersonalDetail staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
+        StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
         LocalDateTime shiftDate = DateUtils.asLocalDateTime(shift.getStartDate());
         String bodyPart1 = "The status of the ";
         String bodyPart2 = activityName;

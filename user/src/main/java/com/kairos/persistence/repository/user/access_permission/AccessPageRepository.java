@@ -49,6 +49,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Create unique (accessPermission)-[:" + HAS_ACCESS_PAGE_PERMISSION + "{isEnabled:r.isEnabled,isRead:true,isWrite:false}]->(accessPage) RETURN accessPermission")
     List<AccessPage> setDefaultPermission(long accessPermissionId, long accessGroupId);
 
+
     @Query("MATCH (accessGroup:AccessGroup{deleted:false})-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(accessPage:AccessPage) WHERE id(accessPage)={1} AND id(accessGroup)={0} RETURN r.read as read, r.write as write")
     AccessPageQueryResult getAccessPermissionForAccessPage(Long accessGroupId, Long accessPageId);
 
@@ -217,12 +218,12 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     @Query("MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(user)={0} WITH position \n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org{isEnable:true}) WHERE id(org)={1}  WITH unitPermission,org \n" +
-            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date()) WITH accessGroup,org,unitPermission \n" +
+            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) WHERE id(accessGroup) IN {2} AND (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date()) WITH accessGroup,org,unitPermission \n" +
             "MATCH (module:AccessPage)<-[modulePermission:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(accessGroup) WITH module,modulePermission,unitPermission,accessGroup\n" +
             "OPTIONAL MATCH (unitPermission)-[moduleCustomRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(module) WHERE moduleCustomRel.accessGroupId=id(accessGroup) \n" +
             "WITH module,modulePermission,unitPermission,moduleCustomRel,accessGroup\n" +
             "RETURN module.name as name,id(module) as id,module.moduleId as moduleId,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.read ELSE moduleCustomRel.read END as read,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.write ELSE moduleCustomRel.write END as write,module.isModule as module,module.sequence as sequence")
-    List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId);
+    List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId, List<Long> accessGroupIds);
 
     @Query("MATCH (u:User) WHERE id(u)={0} \n" +
             "MATCH (org:Organization{isEnable:true})-[:"+ HAS_POSITIONS +"]-(position:Position)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +

@@ -189,9 +189,9 @@ public class CostTimeAgreementService {
 
     public void assignOrganisationActivitiesToRuleTemplate(List<CTARuleTemplateDTO> ruleTemplateDTOS, Map<Long, BigInteger> parentUnitActivityMap) {
         ruleTemplateDTOS.forEach(ctaRuleTemplateDTO -> {
-            List<BigInteger> parentActivityIds = ctaRuleTemplateDTO.getActivityIds();
+            Set<BigInteger> parentActivityIds = ctaRuleTemplateDTO.getActivityIds();
             if (parentActivityIds != null) {
-                List<BigInteger> unitActivityIds = new ArrayList<>();
+                Set<BigInteger> unitActivityIds = new HashSet<>();
                 parentActivityIds.forEach(parentActivityId -> {
                     if (Optional.ofNullable(parentUnitActivityMap).isPresent() && Optional.ofNullable(parentUnitActivityMap.get(parentActivityId)).isPresent()) {
                         unitActivityIds.add(parentUnitActivityMap.get(parentActivityId));
@@ -241,7 +241,8 @@ public class CostTimeAgreementService {
     }
 
 
-    public StaffEmploymentDetails updateCostTimeAgreementForEmployment(Long unitId, Long employmentId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO) {
+
+    public StaffEmploymentDetails updateCostTimeAgreementForEmployment(Long unitId, Long employmentId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO,Boolean save) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>(),null);
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", employmentId);
@@ -253,14 +254,18 @@ public class CostTimeAgreementService {
             exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, ctaDTO.getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
         }
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
-        CTAResponseDTO responseCTA;
+        CTAResponseDTO responseCTA = null;
         boolean updateSameCTA = !staffAdditionalInfoDTO.getEmployment().isPublished() || ctaDTO.getStartDate().isBefore(oldCTA.getStartDate()) || ctaDTO.getStartDate().equals(oldCTA.getStartDate());
         if (!updateSameCTA) {
             updateSameCTA = !isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
         }
-        if (updateSameCTA) {
+        if (save) {
             responseCTA = updateEmploymentCTA(oldCTA, ctaDTO);
-        } else {
+        }
+        else if(!save&&updateSameCTA){
+            exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
+        }
+        else if(!save&&!updateSameCTA){
             responseCTA = updateEmploymentCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
         }
         staffAdditionalInfoDTO.getEmployment().setCostTimeAgreement(responseCTA);
@@ -316,6 +321,7 @@ public class CostTimeAgreementService {
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
         ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
         CTAResponseDTO responseCTA = new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false, oldCTA.getEmploymentId(), costTimeAgreement.getDescription());
+        responseCTA.setEndDate((isNotNull(responseCTA.getEndDate())&&responseCTA.getStartDate().isBefore(responseCTA.getEndDate()))?responseCTA.getEndDate():null);
         responseCTA.setParentId(oldCTA.getId());
         responseCTA.setOrganizationParentId(oldCTA.getOrganizationParentId());
         CTAResponseDTO versionCTA = ObjectMapperUtils.copyPropertiesByMapper(oldCTA, CTAResponseDTO.class);
@@ -492,7 +498,7 @@ public class CostTimeAgreementService {
     private void setActivityBasesCostCalculationSettings(CTARuleTemplate ctaRuleTemplate) {
         switch (ctaRuleTemplate.getActivityTypeForCostCalculation()) {
             case TIME_TYPE_ACTIVITY:
-                ctaRuleTemplate.setActivityIds(new ArrayList<>());
+                ctaRuleTemplate.setActivityIds(new HashSet<>());
                 break;
             default:
                 ctaRuleTemplate.setPlannedTimeIds(null);

@@ -1,13 +1,12 @@
 package com.kairos.persistence.model.activity.tabs;
 
 import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.TimeTypes;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Map;
 
 /**
  * Created by pawanmandhan on 22/8/17.
@@ -17,17 +16,16 @@ import java.util.Map;
 @NoArgsConstructor
 public class BalanceSettingsActivityTab{
 
-
     private Integer addTimeTo;
     private BigInteger timeTypeId;
     private TimeTypeEnum timeType; // This is used to verify the activity is of  paid break or unpaid break
     private boolean onCallTimePresent ;
     private Boolean negativeDayBalancePresent;
+    private TimeTypes timeTypes;
 
     public BalanceSettingsActivityTab(boolean onCallTimePresent, Boolean negativeDayBalancePresent) {
         this.onCallTimePresent = onCallTimePresent;
         this.negativeDayBalancePresent = negativeDayBalancePresent;
     }
-
 
 }

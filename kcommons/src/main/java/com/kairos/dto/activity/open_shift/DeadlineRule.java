@@ -1,34 +1,14 @@
 package com.kairos.dto.activity.open_shift;
 
-import java.time.LocalDate;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.LocalDate;
+@Getter
+@Setter
 public class DeadlineRule {
     LocalDate deadline;
     private Integer daysBeforeStart;
     private boolean expiresIfNoCandidateAfterDeadline;
-
-    public LocalDate getDeadline() {
-        return deadline;
-    }
-
-    public void setDeadline(LocalDate deadline) {
-        this.deadline = deadline;
-    }
-
-    public Integer getDaysBeforeStart() {
-        return daysBeforeStart;
-    }
-
-    public void setDaysBeforeStart(Integer daysBeforeStart) {
-        this.daysBeforeStart = daysBeforeStart;
-    }
-
-    public boolean isExpiresIfNoCandidateAfterDeadline() {
-        return expiresIfNoCandidateAfterDeadline;
-    }
-
-    public void setExpiresIfNoCandidateAfterDeadline(boolean expiresIfNoCandidateAfterDeadline) {
-        this.expiresIfNoCandidateAfterDeadline = expiresIfNoCandidateAfterDeadline;
-    }
 
 }

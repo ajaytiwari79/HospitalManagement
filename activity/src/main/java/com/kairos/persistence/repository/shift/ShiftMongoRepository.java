@@ -18,13 +18,13 @@ import java.util.List;
  * Created by vipul on 30/8/17.
  */
 @Repository
-public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInteger>, CustomShiftMongoRepository {
+public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInteger>, CustomShiftMongoRepository, ShiftFilterRepository {
 
     @Query(value = "{employmentId:?0,deleted:false,disabled:false,startDate:{$gte:?1,$lte:?2}}", fields = "{ 'startDate' : 1, 'endDate' : 1,'employmentId':1,'activities':1}")
     List<ShiftDTO> findAllShiftBetweenDuration(Long employmentId, Date startDate, Date endDate);
 
     @Query(value = "{'planningPeriodId':{'$in':?2},employmentId:?0,staffId:?1,unitId:?3,deleted:false,disabled:false,'$or':[{draftShift:{$exists:true}},{draft:true}]}")
-    List<Shift> getAllDraftShiftBetweenDuration(Long employmentId,Long staffId,List<BigInteger> planningPeriodIds,Long unitId);
+    List<Shift> getAllDraftShiftBetweenDuration(Long employmentId, Long staffId, List<BigInteger> planningPeriodIds, Long unitId);
 
     @Query(value = "{employmentId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<Shift> findShiftBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate);
@@ -87,4 +87,5 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query(value = "{deleted:false,staffId:?0,shiftType:?1, startDate:{$gte:?2}}",exists = true)
     boolean alreadySickReportedForStaff(Long staffId, ShiftType shiftType,Date selectedDate);
+
 }

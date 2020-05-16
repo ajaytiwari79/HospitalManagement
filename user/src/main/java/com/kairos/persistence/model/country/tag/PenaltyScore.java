@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.country.tag;
 
-import com.kairos.enums.PenaltyScoreLevel;
+import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,8 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class PenaltyScore extends UserBaseEntity {
-    private PenaltyScoreLevel penaltyScoreLevel;
+    private ScoreLevel penaltyScoreLevel;
     private int value;
 }

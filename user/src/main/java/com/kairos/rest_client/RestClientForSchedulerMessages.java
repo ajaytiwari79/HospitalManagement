@@ -44,18 +44,12 @@ public class RestClientForSchedulerMessages {
 
     public <T, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
         final String baseUrl = getBaseUrl(isUnit, id)+getURI(t,uri,queryParams,pathParams);
-
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
-            };
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {};
             HttpHeaders headers = new HttpHeaders();
             headers.add(AUTHORIZATION,"bearer "+ tokenAuthService.getAuthToken());
             HttpEntity<T> httpEntity= new HttpEntity<T>(t,headers);
-            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
-                    restTemplateWithoutAuth.exchange(
-                            baseUrl,
-                            getHttpMethod(integrationOperation),
-                            httpEntity, typeReference);
+            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange = restTemplateWithoutAuth.exchange(baseUrl, getHttpMethod(integrationOperation), httpEntity, typeReference);
             if(restExchange.getStatusCode().value()==401) {
                 tokenAuthService.getNewAuthToken();
                 headers.remove(AUTHORIZATION);
@@ -65,7 +59,6 @@ public class RestClientForSchedulerMessages {
                         baseUrl,
                         getHttpMethod(integrationOperation),
                         httpEntity, typeReference);
-
             }
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
@@ -77,7 +70,6 @@ public class RestClientForSchedulerMessages {
             logger.info("response {}", e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
         }
-
     }
 
     public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {

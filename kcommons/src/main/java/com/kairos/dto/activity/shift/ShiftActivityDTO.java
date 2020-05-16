@@ -108,6 +108,7 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
         this.success=success;
     }
 
+
     public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success) {
         this.message = message;
         this.success = success;

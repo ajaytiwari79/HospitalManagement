@@ -1,10 +1,11 @@
 package com.kairos.shiftplanning.constraints.unitconstraint;
 
-import com.kairos.shiftplanning.constraints.Constraint;
-import com.kairos.shiftplanning.constraints.ScoreLevel;
+import com.kairos.enums.constraint.ScoreLevel;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staff.Employee;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +16,8 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class AbsenceAndPresenceAtSameTime implements Constraint {
+@EqualsAndHashCode
+public class AbsenceAndPresenceAtSameTime implements ConstraintHandler {
 
     private ScoreLevel level;
     private int weight;

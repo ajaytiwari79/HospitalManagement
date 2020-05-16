@@ -1,7 +1,5 @@
 package com.kairos.rule_validator.task;
 
-import com.kairos.rule_validator.task.AbstractTaskSpecification;
-
 /**
  * Created by prabjot on 24/11/17.
  */

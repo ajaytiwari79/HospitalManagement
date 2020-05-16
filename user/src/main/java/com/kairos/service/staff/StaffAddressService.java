@@ -67,8 +67,7 @@ public class StaffAddressService {
      void saveAddress(Staff staff, List<AddressDTO> addressDTOs) {
          List<AddressDTO> addressDTOS = addressDTOs.stream().filter(addressDTO -> isNotNull(addressDTO)).collect(Collectors.toList());
          List<ContactAddress>  contactAddresses = contactAddressGraphRepository.findAllById(addressDTOS.stream().map(AddressDTO::getId).collect(Collectors.toList()));
-
-        Map<Long, ContactAddress> contactAddressMap = contactAddresses.stream().collect(Collectors.toMap(ContactAddress::getId, Function.identity()));
+         Map<Long, ContactAddress> contactAddressMap = contactAddresses.stream().collect(Collectors.toMap(ContactAddress::getId, Function.identity()));
         List<ZipCode> zipCodes = zipCodeGraphRepository.findAllByZipCode(addressDTOS.stream().map(addressDTO -> addressDTO.getZipCode().getZipCode()).collect(Collectors.toList()));
         Map<Integer, ZipCode> zipCodeMap = zipCodes.stream().collect(Collectors.toMap(ZipCode::getZipCode, Function.identity()));
         List<Municipality> municipalities = municipalityGraphRepository.findAllById(addressDTOS.stream().map(addressDTO->addressDTO.getMunicipality().getId()).collect(Collectors.toList()));
@@ -90,54 +89,49 @@ public class StaffAddressService {
                     continue;
                 }
                 Municipality municipality = municipalityMap.get(addressDTO.getMunicipality().getId());
-                if (municipality == null) {
-                    exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
-
-                }
-
-
                 Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
-                if (geographyData == null) {
-                    LOGGER.info("Geography  not found with zipcodeId: " + zipCode.getId());
-                    exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
-
-                }
-                LOGGER.info("Geography Data: " + geographyData);
-
-
-                // Geography Data
-                contactAddress.setMunicipality(municipality);
-                contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
-                contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-                contactAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
-                contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-
-                // Start And End Dates for Address
-                contactAddress.setStartDate(addressDTO.getStartDate());
-                LOGGER.info("StartDate: " + addressDTO.getStartDate());
-
-                contactAddress.setEndDate(addressDTO.getEndDate());
-                LOGGER.info("EndDate: " + addressDTO.getEndDate());
-
-
-                // Coordinates
-                contactAddress.setLongitude(addressDTO.getLongitude());
-                contactAddress.setLatitude(addressDTO.getLatitude());
-
-                // Native Details
-                contactAddress.setStreet(addressDTO.getStreet());
-                contactAddress.setHouseNumber(addressDTO.getHouseNumber());
-                contactAddress.setFloorNumber(addressDTO.getFloorNumber());
-                contactAddress.setZipCode(zipCode);
-                contactAddress.setCity(zipCode.getName());
-                contactAddress.setPrivateAddress(addressDTO.isAddressProtected());
-
-                if (addressDTO.isPrimary()) {
-                    staff.setContactAddress(contactAddress);
-                } else {
-                    staff.setSecondaryContactAddress(contactAddress);
-                }
+                validateDetails(municipality, geographyData);
+                setContactAddressInfo(addressDTO, contactAddress, zipCode, municipality, geographyData,staff);
             }
+    }
+
+    private void validateDetails(Municipality municipality, Map<String, Object> geographyData) {
+        if (municipality == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
+        }
+
+        if (geographyData == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
+
+        }
+    }
+
+    private void setContactAddressInfo(AddressDTO addressDTO, ContactAddress contactAddress, ZipCode zipCode, Municipality municipality, Map<String, Object> geographyData,Staff staff) {
+        // Geography Data
+        contactAddress.setMunicipality(municipality);
+        contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
+        contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
+        contactAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
+        contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
+        // Start And End Dates for Address
+        contactAddress.setStartDate(addressDTO.getStartDate());
+        contactAddress.setEndDate(addressDTO.getEndDate());
+        // Coordinates
+        contactAddress.setLongitude(addressDTO.getLongitude());
+        contactAddress.setLatitude(addressDTO.getLatitude());
+
+        // Native Details
+        contactAddress.setStreet(addressDTO.getStreet());
+        contactAddress.setHouseNumber(addressDTO.getHouseNumber());
+        contactAddress.setFloorNumber(addressDTO.getFloorNumber());
+        contactAddress.setZipCode(zipCode);
+        contactAddress.setCity(zipCode.getName());
+        contactAddress.setPrivateAddress(addressDTO.isAddressProtected());
+        if (addressDTO.isPrimary()) {
+            staff.setContactAddress(contactAddress);
+        } else {
+            staff.setSecondaryContactAddress(contactAddress);
+        }
     }
 
 

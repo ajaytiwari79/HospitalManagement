@@ -1,20 +1,21 @@
 package com.kairos.shiftplanning.move;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.move.helper.ActivityLineIntervalWrapper;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.joda.time.LocalDate;
 import org.optaplanner.core.impl.heuristic.move.Move;
 import org.optaplanner.core.impl.heuristic.selector.move.factory.MoveIteratorFactory;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,12 +46,12 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
         ShiftRequestPhasePlanningSolution solution = scoreDirector.getWorkingSolution();
         List<List<ActivityLineIntervalWrapper>> possibleActivityLineIntervalWrappersList= new ArrayList<>();
         LocalDate date=solution.getWeekDates().get(workingRandom.nextInt(solution.getWeekDates().size()));
-        List<ShiftImp> shifts= solution.getShifts().stream().filter(s->s.getDate().equals(date)).collect(Collectors.toList());
+        List<ShiftImp> shifts= solution.getShifts().stream().filter(s->s.getStartDate().equals(date)).collect(Collectors.toList());
         Map<String,List<ActivityLineInterval>> groupedAlis= solution.getActivitiesIntervalsGroupedPerDay();
         List<List<ActivityLineInterval>> activityLineIntervalsPerDay= new ArrayList<>();
         for(Activity activity :solution.getActivitiesPerDay().get(date)){
             for(Map.Entry<String,List<ActivityLineInterval>> entry:groupedAlis.entrySet()){
-                if(!entry.getKey().startsWith(date.toString("MM/dd/yyyy")+"_"+ activity.getId())) continue;
+                if(!entry.getKey().startsWith(date.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))+"_"+ activity.getId())) continue;
                 List<ActivityLineInterval> alis=entry.getValue();
                 activityLineIntervalsPerDay.add(alis);
             }
@@ -77,7 +78,7 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
         for(List<ActivityLineInterval> activityLineIntervalsOuter:activityLineIntervalsPerDay){
             if(activityLineIntervalsOuter.get(0).getActivity().isTypeAbsence())continue;
             int outerPartitionIndex=workingRandom.nextInt(activityLineIntervalsOuter.size());
-            DateTime outersPartitionTime=activityLineIntervalsOuter.get(outerPartitionIndex).getStart();
+            ZonedDateTime outersPartitionTime=activityLineIntervalsOuter.get(outerPartitionIndex).getStart();
             for(List<ActivityLineInterval> activityLineIntervalsInner:activityLineIntervalsPerDay){
                 updateActivityLineInterval(mergedActivityLines, activityLineIntervalsOuter, outerPartitionIndex, outersPartitionTime, activityLineIntervalsInner);
             }
@@ -85,7 +86,7 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
         activityLineIntervalsPerDay.addAll(mergedActivityLines);
     }
 
-    private void updateActivityLineInterval(List<List<ActivityLineInterval>> mergedActivityLines, List<ActivityLineInterval> activityLineIntervalsOuter, int outerPartitionIndex, DateTime outersPartitionTime, List<ActivityLineInterval> activityLineIntervalsInner) {
+    private void updateActivityLineInterval(List<List<ActivityLineInterval>> mergedActivityLines, List<ActivityLineInterval> activityLineIntervalsOuter, int outerPartitionIndex, ZonedDateTime outersPartitionTime, List<ActivityLineInterval> activityLineIntervalsInner) {
         if(activityLineIntervalsInner.get(0).getActivity().isTypeAbsence()) return;
         if(activityLineIntervalsInner==activityLineIntervalsOuter ||
                 activityLineIntervalsInner.get(0).getActivity().getId().equals(activityLineIntervalsOuter.get(0).getActivity().getId()))
@@ -111,7 +112,7 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
         return getInterval(activityLineIntervalsInner).overlaps(getInterval(activityLineIntervalsOuter));
     }
 
-    private Interval getInterval(List<ActivityLineInterval> activityLineIntervalsOuter) {
-        return new Interval(activityLineIntervalsOuter.get(0).getStart(),activityLineIntervalsOuter.get(activityLineIntervalsOuter.size()-1).getEnd());
+    private DateTimeInterval getInterval(List<ActivityLineInterval> activityLineIntervalsOuter) {
+        return new DateTimeInterval(activityLineIntervalsOuter.get(0).getStart(),activityLineIntervalsOuter.get(activityLineIntervalsOuter.size()-1).getEnd());
     }
 }

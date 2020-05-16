@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.period;
 
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
+import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 
@@ -30,4 +31,5 @@ public interface CustomPlanningPeriodMongoRepository {
     List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate, Date requestedEndDate);
     List<PlanningPeriod> findLastPlanningPeriodOfAllUnits();
     PlanningPeriod findFirstRequestPhasePlanningPeriodByUnitId(Long unitId);
+    ShiftPlanningProblemSubmitDTO findDataForAutoPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO);
 }

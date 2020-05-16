@@ -62,12 +62,10 @@ public class ActivityLineIntervalPillarMove extends AbstractMove<ShiftRequestPha
     @Override
     public boolean isMoveDoable(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
         return  true;
-        //return !Objects.equals(activityLineInterval.getShift(), toShift) && !ShiftPlanningUtility.intervalOverlapsBreak(toShift,activityLineInterval.getStart());
     }
 
     @Override
     public Collection<?> getPlanningEntities() {
-        //return Collections.singletonList(activityLineInterval.stream().map(a->a.getActivityLineInterval()).collect(Collectors.toList()));
         return activityLineIntervalWrappers.stream().map(a->a.getActivityLineInterval()).collect(Collectors.toList());
     }
 

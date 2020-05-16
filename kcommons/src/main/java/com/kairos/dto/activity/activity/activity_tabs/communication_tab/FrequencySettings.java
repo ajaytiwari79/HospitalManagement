@@ -2,8 +2,6 @@ package com.kairos.dto.activity.activity.activity_tabs.communication_tab;
 
 import com.kairos.enums.DurationType;
 
-import java.io.Serializable;
-
 /**
  * CreatedBy vipulpandey on 6/10/18
  **/

@@ -26,6 +26,7 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.pay_out.PayOutRepository;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
@@ -74,6 +75,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_CTA_NOTFOUND;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFFEMPLOYMENT_NOTFOUND;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -117,6 +119,7 @@ public class TimeBankService implements KPIService {
     @Inject private PlanningPeriodService planningPeriodService;
     @Inject private PayOutRepository payOutRepository;
     @Inject private ActivityService activityService;
+    @Inject private MongoSequenceRepository mongoSequenceRepository;
 
 
 
@@ -177,6 +180,7 @@ public class TimeBankService implements KPIService {
         DateTimeInterval interval = new DateTimeInterval(startDate.getMillis(), endDate.getMillis());
         shiftWithActivityDTOS = getShiftsByInterval(shiftWithActivityDTOS, interval);
         dailyTimeBankEntry = updateDailyTimeBankEntry(staffAdditionalInfoDTO, shift, validatedByPlanner, dailyTimeBankEntry, planningPeriodInterval, shiftWithActivityDTOS, interval);
+        timeBankCalculationService.updatePublishedBalances(dailyTimeBankEntry, staffAdditionalInfoDTO.getEmployment().getEmploymentLines(), staffAdditionalInfoDTO.getUnitId());
         if(isCollectionNotEmpty(draftShifts)){
             DailyTimeBankEntry draftDailyTimeBankEntry = updateDailyTimeBankEntry(staffAdditionalInfoDTO, shift, validatedByPlanner, null, planningPeriodInterval, draftShifts, interval);
             if(isNull(dailyTimeBankEntry)){
@@ -331,7 +335,7 @@ public class TimeBankService implements KPIService {
             endDate = DateUtils.getDateByZoneDateTime(endZonedDate);
         }
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = updateCostTimeAgreementDetails(employmentId, startDate, endDate);
-        DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
+        DateTimeInterval interval = new DateTimeInterval(startDate, endDate);//
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(null,employmentId, startDate, endDate,null);
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentId, startDate, endDate);
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
@@ -700,10 +704,12 @@ public class TimeBankService implements KPIService {
         DateTime endDate = startDate.plusDays(1);
         DailyTimeBankEntry dailyTimeBankEntriy = timeBankRepository.findByEmploymentAndDate(staffAdditionalInfoDTO.getEmployment().getId(), asLocalDate(startDate));
         DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(shift.getUnitId());
-        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(null,staffAdditionalInfoDTO.getEmployment().getId(), startDate.toDate(), endDate.toDate(),null);
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(shift.getId(),staffAdditionalInfoDTO.getEmployment().getId(), startDate.toDate(), endDate.toDate(),null);
         DateTimeInterval interval = new DateTimeInterval(startDate.getMillis(), endDate.getMillis());
         List<ShiftWithActivityDTO> shiftWithActivityDTOList = getShiftsByInterval(shiftWithActivityDTOS, interval);
-        shiftWithActivityDTOList.add(shift);
+        if(!shift.isDeleted()) {
+            shiftWithActivityDTOList.add(shift);
+        }
         staffAdditionalInfoDTO.getEmployment().setStaffId(staffAdditionalInfoDTO.getId());
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOList, dailyTimeBankEntriy, planningPeriodInterval, staffAdditionalInfoDTO.getDayTypes(), false);
         TreeMap<LocalDate, TimeBankIntervalDTO> timeBankByDateDTOMap = getAccumulatedTimebankAndDelta(staffAdditionalInfoDTO.getEmployment().getId(),shift.getUnitId(),null);
@@ -737,6 +743,48 @@ public class TimeBankService implements KPIService {
     public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
         return getTotalTimeBankOrContractual(staffId, dateTimeInterval, kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getCalculationType().equals(CalculationType.STAFFING_LEVEL_CAPACITY));
     }
+
+    public void updateScheduledAndDurationHours(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        int scheduledMinutes = 0;
+        int durationMinutes = 0;
+        for (ShiftActivity shiftActivity : shift.getActivities()) {
+            int[] scheduledAndDurationMinutes = updateScheduledHoursAndActivityDetailsInShiftActivity(shiftActivity, activityWrapperMap, staffAdditionalInfoDTO);
+            scheduledMinutes += scheduledAndDurationMinutes[0];
+            durationMinutes += scheduledAndDurationMinutes[1];
+            for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
+                updateScheduledHoursAndActivityDetailsInShiftActivity(childActivity, activityWrapperMap, staffAdditionalInfoDTO);
+            }
+        }
+        if (isCollectionNotEmpty(shift.getBreakActivities()) && activityWrapperMap.containsKey(shift.getBreakActivities().get(0).getActivityId()) && UNPAID_BREAK.equals(activityWrapperMap.get(shift.getBreakActivities().get(0).getActivityId()).getTimeType())) {
+            scheduledMinutes -= shift.getBreakActivities().get(0).getInterval().getMinutes();
+        }
+        shift.setScheduledMinutes(scheduledMinutes);
+        shift.setDurationMinutes(durationMinutes);
+    }
+
+    public int[] updateScheduledHoursAndActivityDetailsInShiftActivity(ShiftActivity shiftActivity, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        int scheduledMinutes = 0;
+        int durationMinutes = 0;
+        if (shiftActivity.getId() == null) {
+            shiftActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
+        }
+        ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
+        shiftActivity.setTimeType(activityWrapper.getTimeType());
+        if (CollectionUtils.isNotEmpty(staffAdditionalInfoDTO.getDayTypes())) {
+            Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
+            Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, activityWrapper.getActivity().getTimeCalculationActivityTab().getDayTypes());
+            if (activityDayTypes.contains(DateUtils.asLocalDate(shiftActivity.getStartDate()).getDayOfWeek())) {
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activityWrapper.getActivity(), staffAdditionalInfoDTO.getEmployment(), false);
+                scheduledMinutes = shiftActivity.getScheduledMinutes();
+                durationMinutes = shiftActivity.getDurationMinutes();
+            }
+        }
+        shiftActivity.setBackgroundColor(activityWrapper.getActivity().getGeneralActivityTab().getBackgroundColor());
+        shiftActivity.setActivityName(activityWrapper.getActivity().getName());
+        return new int[]{scheduledMinutes, durationMinutes};
+    }
+
+
 
     @Getter
     private class AdvanceViewData {
@@ -813,9 +861,9 @@ public class TimeBankService implements KPIService {
         private long getStartDateByQueryParam(Date startDate, String query) {
             long timeStamp = startDate.getTime();
             if(query.equals(WEEK)){
-                timeStamp = asDate(asZoneDateTime(startDate).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))).getTime();
+                timeStamp = asDate(asZonedDateTime(startDate).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))).getTime();
             }else if(query.equals(CAMEL_CASE_MONTHLY)){
-                timeStamp = asDate(asZoneDateTime(startDate).with(TemporalAdjusters.firstDayOfMonth())).getTime();
+                timeStamp = asDate(asZonedDateTime(startDate).with(TemporalAdjusters.firstDayOfMonth())).getTime();
             }
             return timeStamp;
         }
@@ -823,9 +871,9 @@ public class TimeBankService implements KPIService {
         private long getEndTimeStampByQueryParam(String query, Date startDate) {
             long timeStamp = getEndOfDay(startDate).getTime();
             if(query.equals(WEEK)){
-                timeStamp = getEndOfDay(asDate(asZoneDateTime(startDate).with(TemporalAdjusters.next(DayOfWeek.SUNDAY)))).getTime();
+                timeStamp = getEndOfDay(asDate(asZonedDateTime(startDate).with(TemporalAdjusters.next(DayOfWeek.SUNDAY)))).getTime();
             }else if(query.equals(CAMEL_CASE_MONTHLY)){
-                timeStamp = getEndOfDay(asDate(asZoneDateTime(startDate).with(TemporalAdjusters.lastDayOfMonth()))).getTime();
+                timeStamp = getEndOfDay(asDate(asZonedDateTime(startDate).with(TemporalAdjusters.lastDayOfMonth()))).getTime();
             }
             return timeStamp;
         }

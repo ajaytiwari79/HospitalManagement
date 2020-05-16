@@ -9,9 +9,12 @@ import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
+import com.kairos.dto.user.staff.staff.StaffCreationDTO;
+import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.OrganizationGeneral;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.user.resources.ResourceDTO;
 import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -126,6 +129,8 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getManageHierarchyData(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitService.getManageHierarchyData(unitId));
     }
+
+
 
     @ApiOperation(value = "Get skills of organization")
     @GetMapping(UNIT_URL + "/skill")
@@ -392,8 +397,9 @@ public class OrganizationController {
     @PostMapping(UNIT_URL + "/unit_manager")
     @ApiOperation("create unit manager")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createUnitManager(@PathVariable long unitId, @Validated @RequestBody com.kairos.persistence.model.organization.UnitManagerDTO unitManagerDTO) {
-        Map response = staffCreationService.createUnitManager(unitId, unitManagerDTO);
+    public ResponseEntity<Map<String, Object>> createUnitManager(@PathVariable long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) {
+        staffCreationDTO.setCurrentStatus(StaffStatusEnum.ACTIVE);
+        StaffDTO response = staffCreationService.createStaff(unitId, staffCreationDTO);
         if(response == null) {
             return ResponseHandler.generateResponse(HttpStatus.CONFLICT, true, false);
         }
@@ -445,8 +451,8 @@ public class OrganizationController {
     @DeleteMapping(UNIT_URL + "/deleteChildOrganization")
     @ApiOperation("Permanent Delete organization node, don't invoke this method")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteOrganizationById(@PathVariable Long organizationId, @PathVariable Long unitId) {
-        Boolean status = organizationService.deleteOrganizationById(organizationId, unitId);
+    public ResponseEntity<Map<String, Object>> deleteOrganizationById(@PathVariable Long unitId) {
+        Boolean status = organizationService.deleteOrganizationById(unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, status);
     }
 
@@ -965,6 +971,12 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Get time slots of organization")
+    @GetMapping(UNIT_URL + "/get_time_slots_by_id")
+    public ResponseEntity<Map<String, Object>> getTimeSlotOfUnitById(@PathVariable Long unitId, @RequestParam Set<String> timeSlotIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getUnitTimeSlotByNames(unitId, timeSlotIds));
+    }
+
+    @ApiOperation(value = "Get time slots of organization")
     @PostMapping(UNIT_URL + "/get_filter_data")
     public ResponseEntity<Map<String, Object>> getFilterDataBySelfRoasteringFilter(@RequestBody SelfRosteringFilterDTO selfRosteringFilterDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getFilterDataBySelfRosteringFilter(selfRosteringFilterDTO));
@@ -996,6 +1008,7 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getAllUnitIdsByCountryId(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllUnitIdsByCountryId(countryId));
     }
+
 
 }
 

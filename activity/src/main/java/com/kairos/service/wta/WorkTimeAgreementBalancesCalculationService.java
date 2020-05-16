@@ -56,8 +56,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
@@ -216,7 +216,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
         Map<Long , DayTypeDTO> dayTypeDTOMap =staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, dayTypeDTO -> dayTypeDTO));
         for(ShiftWithActivityDTO shiftWithActivityDTO :shiftWithActivityDTOS){
             for(ShiftActivityDTO shiftActivityDTO :shiftWithActivityDTO.getActivities()) {
-                if (isDayTypeValid(shiftWithActivityDTO.getStartDate(), activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getTimeCalculationActivityTab().getDayTypes(),dayTypeDTOMap)) {
+                if (activityWrapperMap.containsKey(shiftActivityDTO.getActivityId()) && isDayTypeValid(shiftWithActivityDTO.getStartDate(), activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getTimeCalculationActivityTab().getDayTypes(),dayTypeDTOMap)) {
                    validShiftActivityDTOSByDayType.add(shiftWithActivityDTO);
                 }
             }
