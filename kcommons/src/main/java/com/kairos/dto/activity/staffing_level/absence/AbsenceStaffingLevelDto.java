@@ -2,6 +2,7 @@ package com.kairos.dto.activity.staffing_level.absence;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
+import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class AbsenceStaffingLevelDto {
     private int maxNoOfStaff;
     private int absentNoOfStaff;
     private Date updatedAt;
+    private StaffingLevelSetting staffingLevelSetting;
     private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
     private Long unitId;
 

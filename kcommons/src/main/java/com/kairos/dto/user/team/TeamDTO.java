@@ -20,4 +20,5 @@ public class TeamDTO {
     private Set<BigInteger> activityIds;
     private LocalDate startDate;
     private LocalDate endDate;
+    private int sequence;
 }
