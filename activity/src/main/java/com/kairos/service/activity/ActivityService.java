@@ -27,6 +27,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.dto.user.organization.skill.Skill;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeTypeEnum;
@@ -345,7 +346,7 @@ public class ActivityService {
             activity.setSkillActivityTab(timeType.getSkillActivityTab());
             activity.setRegions(timeType.getRegions());
             activity.setLevels(timeType.getLevels());
-            activity.setActivityPriorityId(timeType.getActivityPriorityId());
+//            activity.setActivityPriorityId(timeType.getActivityPriorityId());
         }
         activity.getRulesActivityTab().setSicknessSettingValid(timeType.isSicknessSettingValid());
         activity.getRulesActivityTab().setSicknessSetting(timeType.getRulesActivityTab().getSicknessSetting());
@@ -367,6 +368,8 @@ public class ActivityService {
         activity.getBalanceSettingsActivityTab().setAddTimeTo(generalActivityTabDTO.getAddTimeTo());
         activity.getBalanceSettingsActivityTab().setOnCallTimePresent(generalActivityTabDTO.isOnCallTimePresent());
         activity.getBalanceSettingsActivityTab().setNegativeDayBalancePresent(generalActivityTabDTO.getNegativeDayBalancePresent());
+        activity.getBalanceSettingsActivityTab().setPriorityFor(timeType.getPriorityFor());
+        updateActivityCategory(activity, UserContext.getUserDetails().getCountryId());
     }
 
     private void updateBackgroundColorInActivityAndShift(Activity activity, TimeType timeType) {
@@ -750,6 +753,7 @@ public class ActivityService {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
             }
             activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
+            activity.getBalanceSettingsActivityTab().setPriorityFor(timeType.getPriorityFor());
             activity.getBalanceSettingsActivityTab().setTimeTypes(timeType.getTimeTypes());
             activities.add(activity);
         }

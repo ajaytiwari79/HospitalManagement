@@ -25,5 +25,6 @@ public class StaffTeamDTO {
     private LeaderType leaderType;
     private LocalDate startDate;
     private LocalDate endDate;
+    private int sequence;
 
 }
