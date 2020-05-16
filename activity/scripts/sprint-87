@@ -10,3 +10,6 @@ db.activities.save(activity);
 
 db.activities.updateMany({"translations" : {$exists:false}},{$set:{"translations" : {}}});
 db.wtaBaseRuleTemplate.updateMany({},{$set:{"constraintSetting":{}}});
+
+
+db.getCollection('shifts').remove({"staffId":2461,"employmentId":3125});
