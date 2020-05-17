@@ -255,9 +255,7 @@ public class OrganizationActivityService extends MongoBaseService {
         if(timeType.isPresent()){
             activityDTO.setActivityCanBeCopied(timeType.get().isActivityCanBeCopied());
         }*/
-        if(!activityPriorityService.isPriorityIdExists(activity,activity.getActivityPriorityId())) {
-            activityDTO.setActivityPriorityId(activity.getActivityPriorityId());
-        }
+        activityDTO.setActivityPriorityId(activity.getActivityPriorityId());
         return activityDTO;
 
     }
