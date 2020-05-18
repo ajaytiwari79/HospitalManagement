@@ -53,5 +53,6 @@ public class CommonConstants {
     public static final String DAY = "Day";
     public static final String EVENING = "Evening";
 
+    public static final int DEFAULT_SEQUENCE = 2;
     public static final int ONE_MINUTE_MILLIS = 60000;
 }

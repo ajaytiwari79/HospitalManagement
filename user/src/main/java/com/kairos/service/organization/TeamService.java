@@ -4,6 +4,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
@@ -44,8 +45,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ArrayUtil.getUnionOfList;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.MAIN_TEAM_RANKING;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -371,11 +371,21 @@ public class TeamService {
         if (staffTeamDetails.stream().anyMatch(k -> k.getLeaderType() != null) && !accessGroupService.findStaffAccessRole(unitId, staff.getId()).getManagement()) {
             exceptionService.actionNotPermittedException(STAFF_CAN_NOT_BE_TEAM_LEADER);
         }
+        List<Integer> teamRanking = staffTeamDetails.stream().filter(teamDTO -> TeamType.SECONDARY.equals(teamDTO.getTeamType())).map(teamDTO -> teamDTO.getSequence()).collect(Collectors.toList());
+        Collections.sort(teamRanking);
+        int sequence =teamRanking.get(teamRanking.size()-1);;
         for(com.kairos.dto.user.team.TeamDTO teamDTO :staffTeamDetails){
-            if(TeamType.MAIN.equals(teamDTO.getTeamType())){
+            if (TeamType.MAIN.equals(teamDTO.getTeamType())) {
                 teamDTO.setSequence(MAIN_TEAM_RANKING);
-            }
-            else if(isSequenceExistOrNot(staff.getId(),teamDTO.getSequence(),teamDTO.getId())){
+            }else if(TeamType.SECONDARY.equals(teamDTO.getTeamType())&&teamDTO.getSequence()==0){
+                if(sequence==0) {
+                    teamDTO.setSequence(CommonConstants.DEFAULT_SEQUENCE);
+                    sequence=CommonConstants.DEFAULT_SEQUENCE;
+                }else {
+                    teamDTO.setSequence(++sequence);
+                }
+
+            }else if(teamDTO.getSequence()!=0 && isSequenceExistOrNot(staff.getId(), teamDTO.getSequence(), teamDTO.getId())) {
                 exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
             }
         }
