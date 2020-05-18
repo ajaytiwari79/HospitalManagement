@@ -443,6 +443,7 @@ public class ActivityService {
         organizationActivityService.verifyChildActivity(activityMatched, activity);
         activity.setChildActivityIds(childActivitiesIds);
         activityMongoRepository.save(activity);
+
         return childActivitiesIds;
     }
 

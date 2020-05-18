@@ -339,6 +339,13 @@ public class TeamService {
 
     }
 
+    public boolean assignChildActivitiesToTeam(BigInteger activityId,Set<BigInteger> childActivityIds) {
+        List<Team> teamList= teamGraphRepository.findAllTeamByActivityId(activityId);
+        //teamList.f
+        return true;
+
+    }
+
     private void assignTeamLeadersToTeam(TeamDTO teamDTO, Team team) {
         Set<Long> staffIds = getUnionOfList(new ArrayList<>(teamDTO.getMainTeamLeaderIds()), new ArrayList<>(teamDTO.getActingTeamLeaderIds()));
         List<Staff> staffList = staffGraphRepository.findAllById(new ArrayList<>(staffIds));
