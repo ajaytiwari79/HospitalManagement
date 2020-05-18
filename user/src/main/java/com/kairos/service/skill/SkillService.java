@@ -8,6 +8,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationSkillDTO;
+import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.SkillLevel;
 import com.kairos.persistence.model.auth.StaffSkillLevelRelationship;
@@ -52,8 +53,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.DateUtils.getDate;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.enums.SkillLevel.BASIC;
@@ -431,11 +431,16 @@ public class SkillService {
         }
         List<Map<String, Object>> response;
         if (isSelected) {
+            boolean isStaffAndSkillRelationshipExistMoreThenOne =staffGraphRepository.isExists(staffId,removedSkillIds);
+            if(isStaffAndSkillRelationshipExistMoreThenOne){
+                staffGraphRepository.deleteSkill(staffId,removedSkillIds);
+            }
             staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getCurrentDate().getTime(), BASIC, true);
             response = prepareSelectedSkillResponse(staffId, removedSkillIds, unitId);
         } else {
             staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime());
-            response = Collections.emptyList();
+            response =Collections.emptyList();
+
         }
         return response;
 

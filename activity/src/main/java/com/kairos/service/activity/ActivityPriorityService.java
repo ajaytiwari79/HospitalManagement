@@ -2,6 +2,7 @@ package com.kairos.service.activity;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityPriorityDTO;
+import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -13,9 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
@@ -203,7 +202,10 @@ public class ActivityPriorityService {
         if (isNull(activityPriority)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_PRIORITY_ID, activityPriorityId);
         }
-        activity.setActivityPriorityId(activityPriorityId);
+        boolean isExist = isPriorityIdExists(activity,activityPriorityId);
+        if(!isExist) {
+            activity.setActivityPriorityId(activityPriorityId);
+        }
         activityMongoRepository.save(activity);
         return true;
     }
@@ -214,6 +216,16 @@ public class ActivityPriorityService {
 
     public ActivityPriority getActivityPriorityById(BigInteger activityPriorityId){
         return activityPriorityMongoRepository.findOne(activityPriorityId);
+    }
+    public boolean isPriorityIdExists(Activity activity, BigInteger activityPriorityId) {
+        if (PriorityFor.NONE.equals(activity.getBalanceSettingsActivityTab().getPriorityFor())) {
+            exceptionService.dataNotFoundException(MESSAGE_ACTIVITY_PRIORITY_ID_NOT_SET, activityPriorityId);
+        }
+        boolean isExist = activityMongoRepository.isActivityPriorityIdIsExistOrNot(activity.getBalanceSettingsActivityTab().getPriorityFor(), activityPriorityId,activity.getId());
+        if (isExist) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_DUPLICATE_ACTIVITY_PRIORITY_ID, activityPriorityId);
+        }
+        return isExist;
     }
 
 }
