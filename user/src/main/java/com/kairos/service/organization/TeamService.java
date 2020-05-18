@@ -139,15 +139,9 @@ public class TeamService {
     }
 
     public boolean updateActivitiesOfTeam(Long teamId, Set<BigInteger> activityIds) {
-        List<Team> teams=teamGraphRepository.findAllByDeletedFalseAndIsEnabledTrue();
-        teams.forEach(team -> {
-            if(team.getId().equals(teamId)){
-                team.setActivityIds(activityIds);
-            }else {
-                team.getActivityIds().removeAll(activityIds);
-            }
-        });
-        teamGraphRepository.saveAll(teams);
+        Team team = teamGraphRepository.findOne(teamId);
+        team.setActivityIds(activityIds);
+        teamGraphRepository.save(team);
         return true;
     }
 
