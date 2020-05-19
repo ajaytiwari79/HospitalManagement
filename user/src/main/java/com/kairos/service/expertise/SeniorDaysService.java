@@ -13,6 +13,7 @@ import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -113,37 +114,37 @@ public class SeniorDaysService {
         return ObjectMapperUtils.copyPropertiesByMapper(seniorDays,CareDaysDetails.class);
     }
 
-    public CareDaysDetails publishSeniorDays(Long seniorDaysId, CareDaysDetails careDaysDetails) {
-        SeniorDays seniorDays = seniorDaysGraphRepository.findById(seniorDaysId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, FUNCTIONALPAYMENT, careDaysDetails.getId())));
+    public CareDaysDetails publishSeniorDays(Long seniorDaysId, LocalDate publishedDate) {
+        SeniorDays seniorDays = seniorDaysGraphRepository.findById(seniorDaysId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, FUNCTIONALPAYMENT, seniorDaysId)));
         if (seniorDays.getCareDays().isEmpty()) {
             exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX);
         }
         if (seniorDays.isPublished()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_FUNCTIONALPAYMENT_ALREADYPUBLISHED);
         }
-        if (seniorDays.getStartDate().isAfter(careDaysDetails.getStartDate()) ||
-                (seniorDays.getEndDate()!=null && seniorDays.getEndDate().isBefore(careDaysDetails.getStartDate()))) {
+        if (seniorDays.getStartDate().isAfter(publishedDate) ||
+                (seniorDays.getEndDate()!=null && seniorDays.getEndDate().isBefore(publishedDate))) {
             exceptionService.dataNotFoundByIdException(MESSAGE_PUBLISHDATE_NOTLESSTHAN_STARTDATE);
         }
         seniorDays.setPublished(true);
-        seniorDays.setStartDate(careDaysDetails.getStartDate()); // changing
+        seniorDays.setStartDate(publishedDate); // changing
         SeniorDays parentSeniorDays = seniorDays.getParentSeniorDays();
         SeniorDays lastSeniorDays = seniorDaysGraphRepository.findLastByExpertiseId(seniorDays.getExpertise().getId());
         boolean onGoingUpdated = false;
-        if (lastSeniorDays != null && careDaysDetails.getStartDate().isAfter(lastSeniorDays.getStartDate()) && lastSeniorDays.getEndDate() == null) {
-            lastSeniorDays.setEndDate(careDaysDetails.getStartDate().minusDays(1));
+        if (lastSeniorDays != null && publishedDate.isAfter(lastSeniorDays.getStartDate()) && lastSeniorDays.getEndDate() == null) {
+            lastSeniorDays.setEndDate(publishedDate.minusDays(1));
             seniorDaysGraphRepository.save(lastSeniorDays);
             seniorDaysGraphRepository.detachSeniorDays(seniorDaysId, parentSeniorDays.getId());
             seniorDays.setEndDate(null);
             onGoingUpdated = true;
         }
         if (!onGoingUpdated && Optional.ofNullable(parentSeniorDays).isPresent()) {
-            if (parentSeniorDays.getStartDate().isEqual(careDaysDetails.getStartDate()) || parentSeniorDays.getStartDate().isAfter(careDaysDetails.getStartDate())) {
+            if (parentSeniorDays.getStartDate().isEqual(publishedDate) || parentSeniorDays.getStartDate().isAfter(publishedDate)) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_PUBLISHDATE_NOTLESSTHAN_OR_EQUALS_PARENT_STARTDATE);
             }
-            seniorDaysGraphRepository.setEndDateToSeniorDays(seniorDaysId, parentSeniorDays.getId(), careDaysDetails.getStartDate().minusDays(1L).toString());
-            parentSeniorDays.setEndDate(careDaysDetails.getStartDate().minusDays(1L));
-            if (lastSeniorDays == null && seniorDays.getEndDate() != null && seniorDays.getEndDate().isBefore(careDaysDetails.getStartDate())) {
+            seniorDaysGraphRepository.setEndDateToSeniorDays(seniorDaysId, parentSeniorDays.getId(), publishedDate.minusDays(1L).toString());
+            parentSeniorDays.setEndDate(publishedDate.minusDays(1L));
+            if (lastSeniorDays == null && seniorDays.getEndDate() != null && seniorDays.getEndDate().isBefore(publishedDate)) {
                 seniorDays.setEndDate(null);
             }
         }

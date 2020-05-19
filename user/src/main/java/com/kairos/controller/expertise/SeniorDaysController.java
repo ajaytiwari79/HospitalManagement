@@ -6,12 +6,14 @@ import com.kairos.service.expertise.SeniorDaysService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -63,7 +65,7 @@ public class SeniorDaysController {
 
     @ApiOperation(value = "published a senior days settings for expertise")
     @PutMapping(value =  COUNTRY_URL + "/senior_days/{seniorDayId}/published")
-    public ResponseEntity<Map<String, Object>> publishSeniorDays(@PathVariable Long seniorDayId, @RequestBody CareDaysDetails careDaysDetails) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, seniorDaysService.publishSeniorDays(seniorDayId, careDaysDetails));
+    public ResponseEntity<Map<String, Object>> publishSeniorDays(@PathVariable Long seniorDayId, @RequestParam("publishedDate")@DateTimeFormat(pattern="dd-MM-yyyy") LocalDate publishedDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, seniorDaysService.publishSeniorDays(seniorDayId, publishedDate));
     }
 }
