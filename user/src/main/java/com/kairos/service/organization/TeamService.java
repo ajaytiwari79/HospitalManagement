@@ -342,9 +342,7 @@ public class TeamService {
 
     public boolean assignChildActivitiesToTeam(BigInteger activityId,Set<BigInteger> childActivityIds) {
         List<Team> teamList= teamGraphRepository.findAllTeamByActivityId(activityId);
-        teamList.forEach(team->{
-            team.getActivityIds().addAll(childActivityIds);
-        });
+        teamList.forEach(team-> team.getActivityIds().addAll(childActivityIds));
         teamGraphRepository.saveAll(teamList);
         return true;
 
