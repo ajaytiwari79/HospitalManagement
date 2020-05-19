@@ -18,7 +18,7 @@ public interface SeniorDaysGraphRepository  extends Neo4jBaseRepository<SeniorDa
             " RETURN seniorDays, COLLECT(careDayRel) , COLLECT(careDays) ORDER BY seniorDays.startDate ASC")
     List<SeniorDays> getSeniorDaysOfExpertise(Long expertiseId);
 
-    @Query("MATCH(seniorDays:SeniorDays{deleted:false,published:true})-[:" + BELONGS_TO_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0} RETURN seniorDays ORDER BY seniorDays.startDate DESC LIMIT 1 ")
+    @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]-(seniorDays:SeniorDays{deleted:false,published:true})-[r:"+HAS_CARE_DAYS+"]-(careDays:CareDays) WHERE id(expertise)={0} RETURN seniorDays,expRel,expertise,COLLECT(r),COLLECT(careDays) ORDER BY seniorDays.startDate DESC LIMIT 1 ")
     SeniorDays findLastByExpertiseId(Long expertiseId);
 
     @Query("MATCH(child:SeniorDays{deleted:false})-[relation:VERSION_OF]->(seniorDays:SeniorDays{deleted:false}) " +

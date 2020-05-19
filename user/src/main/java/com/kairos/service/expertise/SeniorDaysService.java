@@ -101,6 +101,7 @@ public class SeniorDaysService {
             seniorDayCopy.setParentSeniorDays(seniorDays);
             seniorDayCopy.setId(null);
             List<CareDays> careDays=ObjectMapperUtils.copyCollectionPropertiesByMapper(ageRangeDTOS,CareDays.class);
+            careDays.forEach(careDays1 -> careDays1.setId(null));
             seniorDayCopy.setCareDays(careDays);
             seniorDaysGraphRepository.save(seniorDayCopy);
 
@@ -148,6 +149,7 @@ public class SeniorDaysService {
                 seniorDays.setEndDate(null);
             }
         }
+        seniorDays.setParentSeniorDays(null);
         seniorDaysGraphRepository.save(seniorDays);
         return ObjectMapperUtils.copyPropertiesByMapper(parentSeniorDays,CareDaysDetails.class);
 
