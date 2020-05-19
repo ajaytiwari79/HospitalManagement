@@ -184,11 +184,11 @@
                     teamService.isActivityAssignedToTeam(activityId));
         }
 
-        @GetMapping("/team/activity/{activityId}/assign_child_activities")
+        @PutMapping("/team/activity/{activityId}/assign_child_activities")
         @ApiOperation("verify is activity assign to any team")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         public ResponseEntity<Map<String, Object>> assignChildActivitiesToTeam(@PathVariable BigInteger activityId,@RequestBody Set<BigInteger> childActivityIds) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.isActivityAssignedToTeam(activityId));
+                    teamService.assignChildActivitiesToTeam(activityId,childActivityIds));
         }
     }
