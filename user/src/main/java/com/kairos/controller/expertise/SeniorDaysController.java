@@ -65,7 +65,7 @@ public class SeniorDaysController {
 
     @ApiOperation(value = "published a senior days settings for expertise")
     @PutMapping(value =  COUNTRY_URL + "/senior_days/{seniorDayId}/published")
-    public ResponseEntity<Map<String, Object>> publishSeniorDays(@PathVariable Long seniorDayId, @RequestParam("publishedDate")@DateTimeFormat(pattern="dd-MM-yyyy") LocalDate publishedDate) {
+    public ResponseEntity<Map<String, Object>> publishSeniorDays(@PathVariable Long seniorDayId, @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, seniorDaysService.publishSeniorDays(seniorDayId, publishedDate));
     }
 }
