@@ -476,7 +476,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         if (StringUtils.isNotBlank(searchText)) {
            matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) +
-                    " (  LOWER(staff.firstName+staff.lastName) CONTAINS LOWER({searchText}) OR user.cprNumber STARTS WITH {searchText} )";
+                    " (  REPLACE(LOWER(staff.firstName+staff.lastName),\" \",\"\") CONTAINS REPLACE(LOWER({searchText}),\" \",\"\") OR user.cprNumber STARTS WITH {searchText} )";
         }
         return matchQueryForStaff;
     }
