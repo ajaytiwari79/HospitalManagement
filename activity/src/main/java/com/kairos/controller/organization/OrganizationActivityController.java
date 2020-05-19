@@ -395,4 +395,11 @@ public class OrganizationActivityController {
     public ResponseEntity<Map<String, Object>> getAllAbsenceActivities(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getAllAbsenceActivity(unitId));
     }
+
+    @ApiOperation("Update Bonus Tab of Activity")
+    @PutMapping(value = "/activity/get_all_Children")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> getAllChildren(@RequestBody Set<BigInteger> activityIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getAllChildren(activityIds));
+    }
 }

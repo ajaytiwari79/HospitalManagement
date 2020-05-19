@@ -963,7 +963,7 @@ public class UserIntegrationService {
     }
 
     public void assignChildActivitiesInTeam(BigInteger activityId,Set<BigInteger> childActivityIds){
-        genericRestClient.publishRequest(childActivityIds, null, RestClientUrlType.ORGANIZATION,HttpMethod.PUT, "/team/activity/{activityId}/assign_child_activities", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},activityId);
+        genericRestClient.publishRequest(childActivityIds, null, RestClientUrlType.UNIT,HttpMethod.PUT, "/team/activity/{activityId}/assign_child_activities", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},activityId);
     }
 
 

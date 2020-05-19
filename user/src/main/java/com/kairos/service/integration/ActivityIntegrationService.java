@@ -228,5 +228,9 @@ public class ActivityIntegrationService {
         requestBody.put("expertiseIds",expertiseIds);
         return genericRestClient.publishRequest(requestBody, null, false, IntegrationOperation.CREATE, "get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftPlanningProblemSubmitDTO>>(){});
     }
+
+    public Set<BigInteger> getActivitiesWithAllChildren(Set<BigInteger> activityIds) {
+        return return genericRestClient.publishRequest(requestBody, null, false, IntegrationOperation.CREATE, "get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftPlanningProblemSubmitDTO>>(){});
+    }
 }
 

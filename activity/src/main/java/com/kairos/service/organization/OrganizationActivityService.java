@@ -604,7 +604,6 @@ public class OrganizationActivityService extends MongoBaseService {
         TimeType timeType = timeTypeMongoRepository.findOneById(parentActivity.getBalanceSettingsActivityTab().getTimeTypeId());
         if (!timeType.isAllowChildActivities()) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_SETTING_ENABLE, parentActivity.getName());
-
         }
         if (activityMongoRepository.existsByActivityIdInChildActivities(parentActivity.getId())) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_CHILD, parentActivity.getName());
@@ -798,5 +797,9 @@ public class OrganizationActivityService extends MongoBaseService {
             exceptionService.actionNotPermittedException(NEW_VALUE_CANT_BE_GREATER_THAN_PREVIOUS,
                     currentSettings.getSendReminder().getTimeValue(), currentSettings.getSendReminder().getDurationType(), frequencySettings.getTimeValue(), frequencySettings.getDurationType());
         }
+    }
+
+    public Set<BigInteger> getAllChildren(Set<BigInteger> activityIds) {
+        List<Activity> activities=activityMongoRepository.findAllById(activityIds);
     }
 }
