@@ -147,6 +147,6 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "RETURN DISTINCT id(teamMembers)")
     List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds);
 
-    @Query("MATCH(team:Team) WHERE ANY(activityId IN team.activityIds WHERE toInteger(activityId) IN {1}) ")
+    @Query("MATCH(team:Team) WHERE ANY(activityId IN team.activityIds WHERE toInteger(activityId) IN {1}) return team ")
     List<Team> findAllTeamByActivityId(BigInteger activityId);
 }
