@@ -77,9 +77,9 @@
         @ApiOperation(value = "Update Activities in Team")
         @PutMapping(value = "/team/{teamId}/update_activities")
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> updateActivitiesOfTeam(@PathVariable Long teamId,  @RequestBody Set<BigInteger> activityIds) {
+        public ResponseEntity<Map<String, Object>> updateActivitiesOfTeam(@PathVariable Long unitId,@PathVariable Long teamId,  @RequestBody Set<BigInteger> activityIds) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.updateActivitiesOfTeam(teamId, activityIds));
+                    teamService.updateActivitiesOfTeam(unitId,teamId, activityIds));
         }
 
         @ApiOperation(value = "Get Team Selected Skills")

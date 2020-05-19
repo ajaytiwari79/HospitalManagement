@@ -138,9 +138,9 @@ public class TeamService {
         return teamDTO;
     }
 
-    public boolean updateActivitiesOfTeam(Long teamId, Set<BigInteger> activityIds) {
+    public boolean updateActivitiesOfTeam(Long unitId , Long teamId, Set<BigInteger> activityIds) {
         Team team = teamGraphRepository.findOne(teamId);
-        Set<BigInteger> activityIdsToSet=activityIntegrationService.getActivitiesWithAllChildren(activityIds);
+        Set<BigInteger> activityIdsToSet=activityIntegrationService.getActivitiesWithAllChildren(unitId,activityIds);
         team.setActivityIds(activityIdsToSet);
         teamGraphRepository.save(team);
         return true;
