@@ -230,7 +230,7 @@ public class ActivityIntegrationService {
     }
 
     public Set<BigInteger> getActivitiesWithAllChildren(Set<BigInteger> activityIds) {
-        return return genericRestClient.publishRequest(requestBody, null, false, IntegrationOperation.CREATE, "get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftPlanningProblemSubmitDTO>>(){});
+        return genericRestClient.publishRequest(activityIds, null, true, IntegrationOperation.UPDATE, "/activity/get_all_Children", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>(){});
     }
 }
 

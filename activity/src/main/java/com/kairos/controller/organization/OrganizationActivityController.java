@@ -396,7 +396,7 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getAllAbsenceActivity(unitId));
     }
 
-    @ApiOperation("Update Bonus Tab of Activity")
+    @ApiOperation("Get all children of Activity")
     @PutMapping(value = "/activity/get_all_Children")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getAllChildren(@RequestBody Set<BigInteger> activityIds) {

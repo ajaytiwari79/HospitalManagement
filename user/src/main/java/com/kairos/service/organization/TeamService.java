@@ -141,7 +141,7 @@ public class TeamService {
     public boolean updateActivitiesOfTeam(Long teamId, Set<BigInteger> activityIds) {
         Team team = teamGraphRepository.findOne(teamId);
         Set<BigInteger> activityIdsToSet=activityIntegrationService.getActivitiesWithAllChildren(activityIds);
-        team.setActivityIds(activityIds);
+        team.setActivityIds(activityIdsToSet);
         teamGraphRepository.save(team);
         return true;
     }
