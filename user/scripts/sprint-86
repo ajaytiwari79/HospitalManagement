@@ -12,3 +12,7 @@ Match(ap:AccessPage) where ap.moduleId="tab_426" merge (ap)-[:SUB_PAGE]-(accessP
 Match (ag:AccessGroup) WHERE ag.name="Hub Manager"
 Match (ap:AccessPage)
 CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);
+
+
+MATCH (team:Team{isEnabled:true})-[staffTeamRel:TEAM_HAS_MEMBER]->(staff:Staff)
+SET staffTeamRel.teamMember=true

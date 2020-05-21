@@ -162,6 +162,7 @@ public class TeamService {
                     new StaffTeamRelationship(staffTeamRelationShipQueryResult.getId(), team, staff, staffTeamRelationShipQueryResult.getLeaderType(), staffTeamDTO.getTeamType());
             staffTeamRelationship.setStartDate(staffTeamDTO.getStartDate());
             staffTeamRelationship.setEndDate(staffTeamDTO.getEndDate());
+            staffTeamRelationship.setTeamMember(true);
             if(TeamType.MAIN.equals(staffTeamRelationship.getTeamType())){
                 staffTeamRelationship.setSequence(MAIN_TEAM_RANKING);
             }else {
@@ -351,8 +352,8 @@ public class TeamService {
     private void assignTeamLeadersToTeam(TeamDTO teamDTO, Team team) {
         Set<Long> staffIds = getUnionOfList(new ArrayList<>(teamDTO.getMainTeamLeaderIds()), new ArrayList<>(teamDTO.getActingTeamLeaderIds()));
         List<Staff> staffList = staffGraphRepository.findAllById(new ArrayList<>(staffIds));
-        teamGraphRepository.removeAllStaffsFromTeam(teamDTO.getId());
-
+        teamGraphRepository.removeLeaderTypeFromTeam(teamDTO.getId());
+        teamGraphRepository.removeAllStaffsFromTeam(teamDTO.getId(), staffIds);
         List<StaffTeamRelationship> staffTeamRelationships = new ArrayList<>();
         List<StaffTeamRelationship>  staffTeamRelationShipQueryResults = staffTeamRelationshipGraphRepository.findByStaffIdsAndTeamId(staffIds,teamDTO.getId());
         Map<Long,StaffTeamRelationship> staffTeamRelationShipQueryResultMap = staffTeamRelationShipQueryResults.stream().collect(Collectors.toMap(k->k.getStaff().getId(),v->v));
@@ -392,7 +393,22 @@ public class TeamService {
     }
 
     public boolean removeStaffsFromTeam(Long teamId, List<Long> staffIds) {
-        return teamGraphRepository.removeStaffsFromTeam(staffIds, teamId);
+        List<Long> validStaffIds = new ArrayList<>();
+        List<Long> onlyTeamLeader = new ArrayList<>();
+        for (Long staffId : staffIds) {
+            if(teamGraphRepository.isLeaderType(staffId, teamId)){
+                onlyTeamLeader.add(staffId);
+            } else {
+                validStaffIds.add(staffId);
+            }
+        }
+        if(isCollectionNotEmpty(onlyTeamLeader)) {
+            teamGraphRepository.setStaffIsOnlyTeamLeader(onlyTeamLeader, teamId);
+        }
+        if(isCollectionNotEmpty(validStaffIds)) {
+            teamGraphRepository.removeStaffsFromTeam(validStaffIds, teamId);
+        }
+        return true;
     }
 
     public List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds){
