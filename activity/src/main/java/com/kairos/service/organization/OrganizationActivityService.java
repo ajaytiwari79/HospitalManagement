@@ -353,6 +353,15 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setCountryId(null);
         //TODO Refactor below query or might need to add parent id in activity priority domain while copying from country to organization
         TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+
+//        if (isNotNull(timeType.getActivityPriorityId())) {
+//            ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(timeType.getActivityPriorityId());
+//            ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
+//            if (isNotNull(unitActivityPriority)) {
+//                activityCopied.setActivityPriorityId(unitActivityPriority.getId());
+//            }
+//        }
+
         if (isNotNull(timeType.getActivityPriorityId())) {
             ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(timeType.getActivityPriorityId());
             ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
@@ -595,7 +604,6 @@ public class OrganizationActivityService extends MongoBaseService {
         TimeType timeType = timeTypeMongoRepository.findOneById(parentActivity.getBalanceSettingsActivityTab().getTimeTypeId());
         if (!timeType.isAllowChildActivities()) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_SETTING_ENABLE, parentActivity.getName());
-
         }
         if (activityMongoRepository.existsByActivityIdInChildActivities(parentActivity.getId())) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_CHILD, parentActivity.getName());
@@ -789,5 +797,17 @@ public class OrganizationActivityService extends MongoBaseService {
             exceptionService.actionNotPermittedException(NEW_VALUE_CANT_BE_GREATER_THAN_PREVIOUS,
                     currentSettings.getSendReminder().getTimeValue(), currentSettings.getSendReminder().getDurationType(), frequencySettings.getTimeValue(), frequencySettings.getDurationType());
         }
+    }
+
+    public Set<BigInteger> getAllChildren(Set<BigInteger> activityIds) {
+        Set<BigInteger> activityIdsToSet=new HashSet<>();
+        List<Activity> activities = (List<Activity>)  activityMongoRepository.findAllById(activityIds);
+        activities.forEach(activity -> {
+            if(isCollectionNotEmpty(activity.getChildActivityIds()) || activityMongoRepository.existsByActivityIdInChildActivities(activity.getId())){
+                activityIdsToSet.add(activity.getId());
+                activityIdsToSet.addAll(activity.getChildActivityIds());
+            }
+        });
+        return activityIdsToSet;
     }
 }

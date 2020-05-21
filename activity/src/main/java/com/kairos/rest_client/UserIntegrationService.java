@@ -962,6 +962,11 @@ public class UserIntegrationService {
         genericRestClient.publishRequest(permissionSchema, null, RestClientUrlType.ORGANIZATION,HttpMethod.POST, "/create_permission_schema", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
     }
 
+    public void assignChildActivitiesInTeam(BigInteger activityId,Set<BigInteger> childActivityIds){
+        genericRestClient.publishRequest(childActivityIds, null, RestClientUrlType.UNIT,HttpMethod.PUT, "/team/activity/{activityId}/assign_child_activities", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},activityId);
+    }
+
+
 
 }
 

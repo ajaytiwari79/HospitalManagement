@@ -21,6 +21,7 @@ public class StaffTeamRelationShipQueryResult {
     private TeamType teamType;
     private Staff staff;
     private Team team;
+    private int sequence;
 
     public Staff getStaff() {
         return staff;
