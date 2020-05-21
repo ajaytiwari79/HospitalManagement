@@ -67,7 +67,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                     if(MAXIMUM.equals(minMaxSetting)){
                         shiftQueryResultWithActivities.add(infoWrapper.getShift());
                     }
-                    int consecutiveDays = getConsecutiveDays(getSortedAndUniqueDates(shiftQueryResultWithActivities), asLocalDate(infoWrapper.getShift().getStartDate()));
+                    int consecutiveDays = getConsecutiveDaysInDate(new ArrayList<>(getSortedAndUniqueDates(shiftQueryResultWithActivities)));
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], consecutiveDays);
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
@@ -75,18 +75,6 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
                 }
             }
         }
-    }
-
-    private int getConsecutiveDays(Set<LocalDate> shiftDates, LocalDate localDate){
-        int beforeConsecutiveDays = getConsecutiveDaysInDate(shiftDates.stream().filter(date-> !date.isAfter(localDate)).collect(Collectors.toList()));
-        int afterConsecutiveDays = getConsecutiveDaysInDate(shiftDates.stream().filter(date-> !date.isBefore(localDate)).collect(Collectors.toList()));
-        int consecutiveDays;
-        if(MAXIMUM.equals(minMaxSetting)){
-            consecutiveDays = beforeConsecutiveDays > afterConsecutiveDays ? beforeConsecutiveDays : afterConsecutiveDays;
-        }else{
-            consecutiveDays = beforeConsecutiveDays < afterConsecutiveDays ? beforeConsecutiveDays : afterConsecutiveDays;
-        }
-        return consecutiveDays;
     }
 
     public ConsecutiveWorkWTATemplate(String name, String description) {
