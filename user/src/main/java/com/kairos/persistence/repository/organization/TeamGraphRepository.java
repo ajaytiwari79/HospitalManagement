@@ -86,8 +86,8 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} AND EXISTS(staffTeamRel.leaderType) SET staffTeamRel.leaderType = null")
     void removeLeaderTypeFromTeam(long teamId);
 
-    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff) = {0} AND EXISTS(staffTeamRel.leaderType) RETURN COUNT(staffTeamRel)>0")
-    boolean isLeaderType(Long staffId, Long teamId);
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} RETURN {staffId:id(staff), leaderType:EXISTS(staffTeamRel.leaderType)} AS data")
+    List<Map<String,Object>> getStaffLeaderTypeMap(Long teamId);
 
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff) IN {0} DETACH DELETE staffTeamRel RETURN COUNT(staffTeamRel)>0")
     boolean removeStaffsFromTeam(List<Long> staffIds, Long teamId);
@@ -157,5 +157,5 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     List<Team> findAllTeamByActivityId(BigInteger activityId);
 
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff) IN {0} SET staffTeamRel.teamMember=false")
-    void setStaffIsOnlyTeamLeader(List<Long> staffIds, Long teamId);
+    void assignStaffAsTeamLeaderOnly(List<Long> staffIds, Long teamId);
 }
