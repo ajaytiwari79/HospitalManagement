@@ -373,7 +373,7 @@ public class TeamService {
         }
         List<Integer> teamRanking = staffTeamDetails.stream().filter(teamDTO -> TeamType.SECONDARY.equals(teamDTO.getTeamType())).map(teamDTO -> teamDTO.getSequence()).collect(Collectors.toList());
         Collections.sort(teamRanking);
-        int sequence =teamRanking.get(teamRanking.size()-1);;
+        int sequence = isCollectionNotEmpty(teamRanking)?teamRanking.get(teamRanking.size()-1):0;
         for(com.kairos.dto.user.team.TeamDTO teamDTO :staffTeamDetails){
             if (TeamType.MAIN.equals(teamDTO.getTeamType())) {
                 teamDTO.setSequence(MAIN_TEAM_RANKING);
