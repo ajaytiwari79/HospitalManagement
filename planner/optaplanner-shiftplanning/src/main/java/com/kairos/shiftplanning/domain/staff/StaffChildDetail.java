@@ -1,7 +1,6 @@
 package com.kairos.shiftplanning.domain.staff;
 
 import com.kairos.commons.annotation.CPRValidation;
-import com.kairos.enums.Gender;
 import com.kairos.utils.CPRUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

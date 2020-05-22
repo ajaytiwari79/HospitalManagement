@@ -19,7 +19,6 @@ import javax.validation.constraints.Positive;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**

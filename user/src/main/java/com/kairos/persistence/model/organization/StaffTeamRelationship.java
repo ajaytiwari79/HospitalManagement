@@ -9,14 +9,11 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_MEMBER;

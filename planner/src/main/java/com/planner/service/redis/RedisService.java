@@ -1,7 +1,5 @@
 package com.planner.service.redis;
 
-import com.kairos.commons.config.EnvConfigCommon;
-import com.kairos.commons.utils.CommonsExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -9,7 +7,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import javax.naming.AuthenticationException;
 import java.util.Map;
 import java.util.Optional;
 

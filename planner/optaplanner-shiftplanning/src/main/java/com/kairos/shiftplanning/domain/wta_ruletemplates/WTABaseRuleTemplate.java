@@ -3,11 +3,14 @@ package com.kairos.shiftplanning.domain.wta_ruletemplates;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.kairos.commons.planning_setting.ConstraintSetting;
-import com.kairos.dto.activity.wta.templates.*;
+import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.constraints.ConstraintHandler;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 

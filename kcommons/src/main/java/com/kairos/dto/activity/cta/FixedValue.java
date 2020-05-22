@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.FixedValueType;
 import lombok.*;
 
-import java.util.Objects;
-
 @Getter
 @Setter
 @Builder

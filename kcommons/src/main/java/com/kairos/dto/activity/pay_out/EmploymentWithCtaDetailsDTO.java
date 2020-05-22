@@ -3,7 +3,6 @@ package com.kairos.dto.activity.pay_out;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTimeZone;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
