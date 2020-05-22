@@ -26,6 +26,6 @@ public class StaffTeamDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private int sequence;
-    private boolean teamMember;
+    private boolean teamMembership;
 
 }

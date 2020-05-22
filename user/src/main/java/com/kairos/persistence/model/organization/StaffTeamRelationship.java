@@ -45,7 +45,7 @@ public class StaffTeamRelationship extends UserBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private int sequence;
-    private boolean teamMember;
+    private boolean teamMembership;
 
 
     public StaffTeamRelationship(Team team, Staff staff) {
@@ -65,7 +65,7 @@ public class StaffTeamRelationship extends UserBaseEntity {
         this.staff = staff;
         this.leaderType = leaderType;
         this.teamType = teamType;
-        this.teamMember = true;
+        this.teamMembership = true;
     }
 
     public StaffTeamRelationship(Long id,Team team, Staff staff, LeaderType leaderType, TeamType teamType,LocalDate startDate, LocalDate endDate,int sequence) {
