@@ -8,6 +8,9 @@ public class UserMessagesConstants {
 
     public static final String MESSAGE_DATANOTFOUND = "message.dataNotFound";
     public static final String TAB = "tab";
+    public static final String STAFF_ID = "staffId";
+    public static final String LEADER_TYPE = "leaderType";
+    public static final String DATA = "data";
     public static final String PARENTACCESSPAGE = "parentAccessPage";
     public static final String COUNTRY = "country";
     public static final String MESSAGE_DUPLICATE = "message.duplicate";

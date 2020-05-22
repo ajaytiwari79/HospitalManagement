@@ -801,7 +801,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public Set<BigInteger> getAllChildren(Set<BigInteger> activityIds) {
         Set<BigInteger> activityIdsToSet=new HashSet<>();
-        List<Activity> activities = (List<Activity>)  activityMongoRepository.findAllById(activityIds);
+        Collection<Activity> activities =  activityMongoRepository.findAllById(activityIds);
         activities.forEach(activity -> {
             if(isCollectionNotEmpty(activity.getChildActivityIds()) || activityMongoRepository.existsByActivityIdInChildActivities(activity.getId())){
                 activityIdsToSet.add(activity.getId());
