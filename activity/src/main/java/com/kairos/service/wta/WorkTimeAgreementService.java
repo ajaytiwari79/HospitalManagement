@@ -599,10 +599,6 @@ public class WorkTimeAgreementService{
         else {
             wtaResponseDTO = updateWTAOfPublishedEmployment(oldWta.get(), wtadto, unitId,save);
         }
-        wtaResponseDTO.setStartDate(wtadto.getStartDate());
-        if (isNotNull(wtadto.getEndDate())&&wtadto.getStartDate().isBefore(wtadto.getEndDate())) {
-            wtaResponseDTO.setEndDate(wtadto.getEndDate());
-        }
         return wtaResponseDTO;
     }
 
