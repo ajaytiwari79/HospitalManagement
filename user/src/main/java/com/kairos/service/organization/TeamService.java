@@ -348,8 +348,8 @@ public class TeamService {
     private void assignTeamLeadersToTeam(TeamDTO teamDTO, Team team) {
         Set<Long> staffIds = getUnionOfList(new ArrayList<>(teamDTO.getMainTeamLeaderIds()), new ArrayList<>(teamDTO.getActingTeamLeaderIds()));
         List<Staff> staffList = staffGraphRepository.findAllById(new ArrayList<>(staffIds));
-        teamGraphRepository.removeLeaderTypeFromTeam(teamDTO.getId());
         teamGraphRepository.removeAllStaffsFromTeam(teamDTO.getId(), staffIds);
+        teamGraphRepository.removeLeaderTypeFromTeam(teamDTO.getId());
         List<StaffTeamRelationship> staffTeamRelationships = new ArrayList<>();
         List<StaffTeamRelationship>  staffTeamRelationShipQueryResults = staffTeamRelationshipGraphRepository.findByStaffIdsAndTeamId(staffIds,teamDTO.getId());
         Map<Long,StaffTeamRelationship> staffTeamRelationShipQueryResultMap = staffTeamRelationShipQueryResults.stream().collect(Collectors.toMap(k->k.getStaff().getId(),v->v));
