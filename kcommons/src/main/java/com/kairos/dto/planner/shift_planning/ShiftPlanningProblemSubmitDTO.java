@@ -7,7 +7,6 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.staffing_level.StaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
@@ -15,7 +14,6 @@ import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.dto.user.organization.TimeSlot;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import lombok.*;
 

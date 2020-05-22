@@ -1,6 +1,5 @@
 package com.planner.controller.custom_responseEntityExceptionHandler;
 
-import com.mindscapehq.raygun4java.core.RaygunClient;
 import com.planner.common.custum_exceptions.DataNotFoundByIdException;
 import com.planner.common.custum_exceptions.FieldAlreadyExistsException;
 import com.planner.component.exception.ExceptionService;

@@ -4,7 +4,6 @@ import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
-import org.joda.time.DateTime;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
 import java.time.ZonedDateTime;

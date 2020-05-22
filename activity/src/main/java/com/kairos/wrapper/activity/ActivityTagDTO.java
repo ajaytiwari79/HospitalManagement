@@ -1,7 +1,5 @@
 package com.kairos.wrapper.activity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.annotation.PermissionClass;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.CompositeShiftActivityDTO;

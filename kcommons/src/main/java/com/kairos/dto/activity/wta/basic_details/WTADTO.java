@@ -31,6 +31,7 @@ public class WTADTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private Long expiryDate;
+    private LocalDate publishDate;
     @NotEmpty(message = "message.wta-base-rule-template.null-list")
     @Valid
     @ValidateIgnoreCounter

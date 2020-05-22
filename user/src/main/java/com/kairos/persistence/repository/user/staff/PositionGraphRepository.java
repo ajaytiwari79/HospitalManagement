@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.staff;
 
-import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.position.ExpiredPositionsQueryResult;
 import com.kairos.persistence.model.staff.position.Position;

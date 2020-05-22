@@ -2,8 +2,6 @@ package com.kairos.dto.activity.cta;
 
 import com.kairos.enums.cta.AccountType;
 import lombok.*;
-
-import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor

@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;

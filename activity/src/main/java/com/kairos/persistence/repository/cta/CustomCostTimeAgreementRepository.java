@@ -53,4 +53,7 @@ public interface CustomCostTimeAgreementRepository {
 
     boolean ctaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger ctaId, Long employmentId, Date startDate, Date endDate);
     List<CTARuleTemplateDTO> getCTARultemplateByEmploymentId(Long employmentId);
+
+    boolean isEmploymentCTAExistsOnDate(Long employmentId,LocalDate localDate,BigInteger ctaId);
+    boolean isGapExistsInEmploymentCTA(Long employmentId,LocalDate localDate,BigInteger ctaId);
 }
