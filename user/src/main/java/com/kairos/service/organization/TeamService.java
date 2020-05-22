@@ -32,8 +32,6 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.skill.SkillService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +53,6 @@ import static com.kairos.constants.UserMessagesConstants.*;
 @Transactional
 @Service
 public class TeamService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TeamService.class);
     @Inject
     private TeamGraphRepository teamGraphRepository;
     @Inject
@@ -188,7 +185,7 @@ public class TeamService {
     public Map<String, Object> getTeamsAndPrerequisite(long unitId) {
         List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);
         Map<String, Object> map = new HashMap<>();
-        map.put("teams", (teams.size() != 0) ? teams.get(0).get("teams") : Collections.emptyList());
+        map.put("teams", (isCollectionNotEmpty(teams)) ? teams.get(0).get("teams") : Collections.emptyList());
         List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         map.put("staffList", staffPersonalDetailQueryResults);
         map.put("skillList", skillService.getSkillsOfOrganization(unitId));
@@ -351,8 +348,8 @@ public class TeamService {
     private void assignTeamLeadersToTeam(TeamDTO teamDTO, Team team) {
         Set<Long> staffIds = getUnionOfList(new ArrayList<>(teamDTO.getMainTeamLeaderIds()), new ArrayList<>(teamDTO.getActingTeamLeaderIds()));
         List<Staff> staffList = staffGraphRepository.findAllById(new ArrayList<>(staffIds));
-        teamGraphRepository.removeAllStaffsFromTeam(teamDTO.getId());
-
+        teamGraphRepository.removeLeaderTypeFromTeam(teamDTO.getId());
+        teamGraphRepository.removeAllStaffsFromTeam(teamDTO.getId(), staffIds);
         List<StaffTeamRelationship> staffTeamRelationships = new ArrayList<>();
         List<StaffTeamRelationship>  staffTeamRelationShipQueryResults = staffTeamRelationshipGraphRepository.findByStaffIdsAndTeamId(staffIds,teamDTO.getId());
         Map<Long,StaffTeamRelationship> staffTeamRelationShipQueryResultMap = staffTeamRelationShipQueryResults.stream().collect(Collectors.toMap(k->k.getStaff().getId(),v->v));
@@ -392,7 +389,28 @@ public class TeamService {
     }
 
     public boolean removeStaffsFromTeam(Long teamId, List<Long> staffIds) {
-        return teamGraphRepository.removeStaffsFromTeam(staffIds, teamId);
+        List<Long> validStaffIds = new ArrayList<>();
+        List<Long> onlyTeamLeader = new ArrayList<>();
+        List<Map<String,Object>> staffLeaderTypes = teamGraphRepository.getStaffLeaderTypeMap(teamId);
+        Map<Long,Boolean> staffIdAndLeaderTypeMap = new HashMap<>();
+        staffLeaderTypes.forEach(staffLeaderType->{
+            Map<String,Object> data = (Map<String,Object>) staffLeaderType.get(DATA);
+            staffIdAndLeaderTypeMap.put(Long.valueOf(data.get(STAFF_ID).toString()), Boolean.valueOf(data.get(LEADER_TYPE).toString()));
+        });
+        for (Long staffId : staffIds) {
+            if(staffIdAndLeaderTypeMap.containsKey(staffId) && staffIdAndLeaderTypeMap.get(staffId)){
+                onlyTeamLeader.add(staffId);
+            } else {
+                validStaffIds.add(staffId);
+            }
+        }
+        if(isCollectionNotEmpty(onlyTeamLeader)) {
+            teamGraphRepository.assignStaffAsTeamLeaderOnly(onlyTeamLeader, teamId);
+        }
+        if(isCollectionNotEmpty(validStaffIds)) {
+            teamGraphRepository.removeStaffsFromTeam(validStaffIds, teamId);
+        }
+        return true;
     }
 
     public List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds){
