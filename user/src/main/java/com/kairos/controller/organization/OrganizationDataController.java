@@ -115,7 +115,7 @@ public class OrganizationDataController {
     @ApiOperation(value = "update  a child Organization")
     @PutMapping(value = "/parent_organization/{organizationId}/unit/{unitId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateUnit(@Validated @RequestBody OrganizationBasicDTO organizationBasicDTO, @PathVariable long unitId) {
+    public ResponseEntity<Map<String, Object>> updateUnit(@RequestBody @Valid OrganizationBasicDTO organizationBasicDTO, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 companyCreationService.updateUnit(organizationBasicDTO, unitId));
     }
