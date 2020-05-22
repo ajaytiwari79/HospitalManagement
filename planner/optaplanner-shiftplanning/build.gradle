@@ -1,10 +1,29 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.quarkus:quarkus-gradle-plugin:${quarkusPluginVersion}"
+    }
+    ext {
+        versionoptaplannerbom='7.34.0.Final'
+        versionlogback='1.2.3'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'io.quarkus' version '1.4.2.Final'
+}
+
 group 'optaplanner-shiftplanning'
 version '0.0.2'
 
-ext {
-    versionoptaplannerbom='7.34.0.Final'
-}
-apply plugin: 'java'
+
+
+//apply plugin: 'java'
+
 /*
 apply plugin: 'eclipse'
 apply plugin: 'application'
@@ -37,7 +56,7 @@ repositories {
 dependencies {
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
     compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom
-    compile project(':kcommons')
+    implementation project(':kcommons')
     compile group: 'org.optaplanner', name: 'optaplanner-persistence-xstream', version: versionoptaplannerbom
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom

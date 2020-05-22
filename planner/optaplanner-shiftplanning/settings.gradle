@@ -1,0 +1,13 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        gradlePluginPortal()
+    }
+    plugins {
+        id 'io.quarkus' version "${quarkusPluginVersion}"
+    }
+}
+rootProject.name='optaplanner-shiftplanning'
+include ':kcommons'
