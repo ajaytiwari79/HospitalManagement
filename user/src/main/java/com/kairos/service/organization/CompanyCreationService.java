@@ -2,6 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
@@ -54,6 +55,7 @@ import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.scheduler.UserSchedulerJobService;
+import com.kairos.service.staff.PositionService;
 import com.kairos.service.staff.StaffCreationService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tree_structure.TreeStructureService;
@@ -149,6 +151,8 @@ public class CompanyCreationService {
     private TagService tagService;
     @Inject
     private UserSchedulerJobService userSchedulerJobService;
+    @Inject
+    private PositionService positionService;
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -318,6 +322,10 @@ public class CompanyCreationService {
             staffCreationService.createStaff(unitId,staffCreationDTO);
         }
         else {
+            Staff staff = staffGraphRepository.getStaffByUnitIdAndUserId(organization.getId(), user.getId());
+            if(isNotNull(staff)){
+               positionService.createPosition(organization,staff,unitManagerDTO.getAccessGroupId(), DateUtils.getCurrentDateMillis(),unitId);
+            }
             setUserDetails(unitId, unitManagerDTO, organization, user, organizationBaseEntity);
         }
         return unitManagerDTO;
@@ -496,9 +504,9 @@ public class CompanyCreationService {
         updateOrganizationDetails(unit, organizationBasicDTO, false);
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
         setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO);
-        if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
-            setUserInfoInOrganization(unitId, unit, organizationBasicDTO.getUnitManager());
-        }
+//        if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
+//            setUserInfoInOrganization(unitId, unit, organizationBasicDTO.getUnitManager());
+//        }
         unitGraphRepository.save(unit);
         return organizationBasicDTO;
 
