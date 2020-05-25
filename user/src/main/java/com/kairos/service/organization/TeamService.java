@@ -373,20 +373,22 @@ public class TeamService {
         }
         List<Integer> teamRanking = staffTeamDetails.stream().filter(teamDTO -> TeamType.SECONDARY.equals(teamDTO.getTeamType())).map(teamDTO -> teamDTO.getSequence()).collect(Collectors.toList());
         Collections.sort(teamRanking);
-        int sequence =teamRanking.get(teamRanking.size()-1);;
-        for(com.kairos.dto.user.team.TeamDTO teamDTO :staffTeamDetails){
-            if (TeamType.MAIN.equals(teamDTO.getTeamType())) {
-                teamDTO.setSequence(MAIN_TEAM_RANKING);
-            }else if(TeamType.SECONDARY.equals(teamDTO.getTeamType())&&teamDTO.getSequence()==0){
-                if(sequence==0) {
-                    teamDTO.setSequence(CommonConstants.DEFAULT_SEQUENCE);
-                    sequence=CommonConstants.DEFAULT_SEQUENCE;
-                }else {
-                    teamDTO.setSequence(++sequence);
-                }
+        if(isCollectionNotEmpty(teamRanking)){
+            int sequence =teamRanking.get(teamRanking.size()-1);;
+            for(com.kairos.dto.user.team.TeamDTO teamDTO :staffTeamDetails){
+                if (TeamType.MAIN.equals(teamDTO.getTeamType())) {
+                    teamDTO.setSequence(MAIN_TEAM_RANKING);
+                }else if(TeamType.SECONDARY.equals(teamDTO.getTeamType())&&teamDTO.getSequence()==0){
+                    if(sequence==0) {
+                        teamDTO.setSequence(CommonConstants.DEFAULT_SEQUENCE);
+                        sequence=CommonConstants.DEFAULT_SEQUENCE;
+                    }else {
+                        teamDTO.setSequence(++sequence);
+                    }
 
-            }else if(teamDTO.getSequence()!=0 && isSequenceExistOrNot(staff.getId(), teamDTO.getSequence(), teamDTO.getId())) {
-                exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
+                }else if(teamDTO.getSequence()!=0 && isSequenceExistOrNot(staff.getId(), teamDTO.getSequence(), teamDTO.getId())) {
+                    exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
+                }
             }
         }
         teamGraphRepository.removeStaffFromAllTeams(staff.getId());
