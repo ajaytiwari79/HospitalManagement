@@ -6,12 +6,14 @@ import com.kairos.service.expertise.ChildCareDaysService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -57,13 +59,13 @@ public class ChildCareDaysController {
 
     @ApiOperation(value = "Add a child care days settings for child_care_days")
     @PutMapping(value =  COUNTRY_URL + "/child_care_days/{childCareDayId}")
-    public ResponseEntity<Map<String, Object>> updateMatrixInSeniorDays(@RequestBody @Valid CareDaysDetails careDaysDetails) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, childCareDaysService.updateMatrixInChildCareDays(careDaysDetails));
+    public ResponseEntity<Map<String, Object>> updateMatrixInSeniorDays(@PathVariable Long childCareDayId, @RequestBody @Valid List<AgeRangeDTO> careDaysDetails) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, childCareDaysService.updateMatrixInChildCareDays(childCareDayId,careDaysDetails));
     }
 
     @ApiOperation(value = "published a child care days settings for expertise")
     @PutMapping(value =  COUNTRY_URL + "/child_care_days/{childCareDayId}/published")
-    public ResponseEntity<Map<String, Object>> publishSeniorDays(@PathVariable Long childCareDayId, @RequestBody CareDaysDetails careDaysDetails) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, childCareDaysService.publishChildCareDays(childCareDayId, careDaysDetails));
+    public ResponseEntity<Map<String, Object>> publishSeniorDays(@PathVariable Long childCareDayId,  @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, childCareDaysService.publishChildCareDays(childCareDayId, publishedDate));
     }
 }

@@ -8,11 +8,13 @@ import com.kairos.dto.user.country.experties.CareDaysDetails;
 import com.kairos.persistence.model.user.expertise.CareDays;
 import com.kairos.persistence.model.user.expertise.ChildCareDays;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.SeniorDays;
 import com.kairos.persistence.repository.user.expertise.ChildCareDaysGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -83,68 +85,72 @@ public class ChildCareDaysService {
         return childCareDaysGraphRepository.findOne(childCareDaysId);
     }
 
-    public CareDaysDetails updateMatrixInChildCareDays(CareDaysDetails careDaysDetails) {
-        ChildCareDays childCareDays = childCareDaysGraphRepository.findById(careDaysDetails.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, FUNCTIONALPAYMENT, careDaysDetails.getId())));
+    public CareDaysDetails updateMatrixInChildCareDays(Long childCareDayId,List<AgeRangeDTO> ageRangeDTOS) {
+        ChildCareDays childCareDays = childCareDaysGraphRepository.findById(childCareDayId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, FUNCTIONALPAYMENT, childCareDayId)));
 
         if (childCareDays.isOneTimeUpdatedAfterPublish()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DRAFT_COPY_CREATED);
         }
-
+        validateAgeRange(ageRangeDTOS);
         if (childCareDays.isPublished()) {
             // functional payment is published so we need to create a  new copy and update in same
-            ChildCareDays childCareDayCopy = ObjectMapperUtils.copyPropertiesByMapper(careDaysDetails,ChildCareDays.class);
+            ChildCareDays childCareDayCopy = ObjectMapperUtils.copyPropertiesByMapper(childCareDays,ChildCareDays.class);
             childCareDayCopy.setPublished(false);
             childCareDayCopy.setOneTimeUpdatedAfterPublish(false);
             childCareDays.setOneTimeUpdatedAfterPublish(true);
             childCareDayCopy.setParentChildCareDays(childCareDays);
+            childCareDayCopy.setId(null);
+            List<CareDays> careDays=ObjectMapperUtils.copyCollectionPropertiesByMapper(ageRangeDTOS,CareDays.class);
+            careDays.forEach(careDays1 -> careDays1.setId(null));
+            childCareDayCopy.setCareDays(careDays);
             childCareDaysGraphRepository.save(childCareDayCopy);
-            careDaysDetails.setId(childCareDayCopy.getId());
 
         } else {
             // update in current copy
 
-            validateAgeRange(careDaysDetails.getCareDays());
-            List<CareDays> careDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(careDaysDetails.getCareDays(), CareDays.class);
+            List<CareDays> careDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(ageRangeDTOS, CareDays.class);
             childCareDays.setCareDays(careDays);
             childCareDaysGraphRepository.save(childCareDays);
         }
-        return careDaysDetails;
+        return ObjectMapperUtils.copyPropertiesByMapper(childCareDays,CareDaysDetails.class);
+
     }
 
-    public CareDaysDetails publishChildCareDays(Long childCareDaysId, CareDaysDetails careDaysDetails) {
-        ChildCareDays childCareDays = childCareDaysGraphRepository.findById(childCareDaysId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, FUNCTIONALPAYMENT, careDaysDetails.getId())));
+    public CareDaysDetails publishChildCareDays(Long childCareDaysId, LocalDate publishedDate) {
+        ChildCareDays childCareDays = childCareDaysGraphRepository.findById(childCareDaysId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, FUNCTIONALPAYMENT, childCareDaysId)));
         if (childCareDays.getCareDays().isEmpty()) {
             exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX);
         }
         if (childCareDays.isPublished()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_FUNCTIONALPAYMENT_ALREADYPUBLISHED);
         }
-        if (childCareDays.getStartDate().isAfter(careDaysDetails.getStartDate()) ||
-                (childCareDays.getEndDate()!=null && childCareDays.getEndDate().isBefore(careDaysDetails.getStartDate()))) {
+        if (childCareDays.getStartDate().isAfter(publishedDate) ||
+                (childCareDays.getEndDate()!=null && childCareDays.getEndDate().isBefore(publishedDate))) {
             exceptionService.dataNotFoundByIdException(MESSAGE_PUBLISHDATE_NOTLESSTHAN_STARTDATE);
         }
         childCareDays.setPublished(true);
-        childCareDays.setStartDate(careDaysDetails.getStartDate()); // changing
+        childCareDays.setStartDate(publishedDate); // changing
         ChildCareDays parentChildCareDays = childCareDays.getParentChildCareDays();
         ChildCareDays lastChildCareDays = childCareDaysGraphRepository.findLastByExpertiseId(childCareDays.getExpertise().getId());
         boolean onGoingUpdated = false;
-        if (lastChildCareDays != null && careDaysDetails.getStartDate().isAfter(lastChildCareDays.getStartDate()) && lastChildCareDays.getEndDate() == null) {
-            lastChildCareDays.setEndDate(careDaysDetails.getStartDate().minusDays(1));
+        if (lastChildCareDays != null && publishedDate.isAfter(lastChildCareDays.getStartDate()) && lastChildCareDays.getEndDate() == null) {
+            lastChildCareDays.setEndDate(publishedDate.minusDays(1));
             childCareDaysGraphRepository.save(lastChildCareDays);
             childCareDaysGraphRepository.detachChildCareDays(childCareDaysId, parentChildCareDays.getId());
             childCareDays.setEndDate(null);
             onGoingUpdated = true;
         }
         if (!onGoingUpdated && Optional.ofNullable(parentChildCareDays).isPresent()) {
-            if (parentChildCareDays.getStartDate().isEqual(careDaysDetails.getStartDate()) || parentChildCareDays.getStartDate().isAfter(careDaysDetails.getStartDate())) {
+            if (parentChildCareDays.getStartDate().isEqual(publishedDate) || parentChildCareDays.getStartDate().isAfter(publishedDate)) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_PUBLISHDATE_NOTLESSTHAN_OR_EQUALS_PARENT_STARTDATE);
             }
-            childCareDaysGraphRepository.setEndDateToChildCareDays(childCareDaysId, parentChildCareDays.getId(), careDaysDetails.getStartDate().minusDays(1L).toString());
-            parentChildCareDays.setEndDate(careDaysDetails.getStartDate().minusDays(1L));
-            if (lastChildCareDays == null && childCareDays.getEndDate() != null && childCareDays.getEndDate().isBefore(careDaysDetails.getStartDate())) {
+            childCareDaysGraphRepository.setEndDateToChildCareDays(childCareDaysId, parentChildCareDays.getId(), publishedDate.minusDays(1L).toString());
+            parentChildCareDays.setEndDate(publishedDate.minusDays(1L));
+            if (lastChildCareDays == null && childCareDays.getEndDate() != null && childCareDays.getEndDate().isBefore(publishedDate)) {
                 childCareDays.setEndDate(null);
             }
         }
+        childCareDays.setParentChildCareDays(null);
         childCareDaysGraphRepository.save(childCareDays);
         return ObjectMapperUtils.copyPropertiesByMapper(parentChildCareDays,CareDaysDetails.class);
 

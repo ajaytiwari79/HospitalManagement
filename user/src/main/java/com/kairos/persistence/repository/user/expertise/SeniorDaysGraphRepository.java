@@ -29,7 +29,7 @@ public interface SeniorDaysGraphRepository  extends Neo4jBaseRepository<SeniorDa
     @Query("MATCH(child:SeniorDays{deleted:false})-[relation:VERSION_OF]->(seniorDays:SeniorDays{deleted:false}) \n" +
             "WHERE id(child)={0} AND id(seniorDays)={1}\n" +
             "set seniorDays.endDate={2} detach delete relation")
-    void setEndDateToSeniorDays(Long id, Long parentFunctionalPaymentId, String endDate);
+    void setEndDateToSeniorDays(Long id, Long parentSeniorDaysId, String endDate);
 
     @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]->(seniorDays:SeniorDays{deleted:false})-[careDayRel:"+HAS_CARE_DAYS+"]-(careDays:CareDays) " +
             "WHERE id(expertise)={0} AND seniorDays.startDate <= DATE({1}) AND (seniorDays.endDate IS NULL  OR DATE({1})<=seniorDays.endDate) \" +\n" +
