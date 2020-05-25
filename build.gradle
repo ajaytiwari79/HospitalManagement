@@ -35,8 +35,12 @@ dependencies {
 }
 */
 plugins {
+    id 'idea'
     id 'net.researchgate.release' version '2.6.0'
     id "org.sonarqube" version "2.5"
+}
+ext{
+    lombokVersion = '1.18.12'
 }
 
 version '0.0.1'
@@ -69,6 +73,13 @@ subprojects{
         compile group: 'com.mindscapehq', name: 'core', version: '3.0.0'
         compile group: 'com.mindscapehq', name: 'raygun4java', version: '3.0.0'
         compile group: 'com.mindscapehq', name: 'webprovider', version: '3.0.0'
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+        testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        // https://mvnrepository.com/artifact/commons-collections/commons-collections
+        compile group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
+
     }
 }
 sonarqube {
@@ -116,4 +127,4 @@ task verifyRelease {
 }
 
 beforeReleaseBuild.dependsOn verifyRelease
-wrapper.gradleVersion = '4.4'
+wrapper.gradleVersion = '6.3'
