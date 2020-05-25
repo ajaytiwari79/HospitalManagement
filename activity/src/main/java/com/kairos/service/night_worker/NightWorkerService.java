@@ -2,7 +2,6 @@ package com.kairos.service.night_worker;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
@@ -14,7 +13,6 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
-import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.night_worker.QuestionAnswerPair;

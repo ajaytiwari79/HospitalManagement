@@ -39,6 +39,9 @@ public class ActivityMessagesConstants {
     public static final String ERROR_CTA_NOTFOUND  = "error.cta.notFound";
     public static final String ERROR_CTA_INVALID  = "error.cta.invalid";
     public static final String MESSAGE_CTA_NOTFOUND = "message.cta.notFound";
+    public static final String PUBLISH_DATE_SHOULD_BE_IN_FUTURE = "publish.date.should.be.in.future";
+    public static final String STARTDATE_CANNOT_CHANGE = "startDate.cannot.change";
+    public static final String ERROR_NO_GAP = "error.no.gap";
     public static final String ERROR_DAYVALUE_ZERO = "error.DayValue.zero";
     public static final String ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY = "error.OrganizationService.name.notEmpty";
     public static final String ERROR_EXPERTISE_NAME_NOTEMPTY = "error.Expertise.name.notEmpty";

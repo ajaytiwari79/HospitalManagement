@@ -39,7 +39,8 @@ import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS;
+import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
 
 @Service
 @Transactional

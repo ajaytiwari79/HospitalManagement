@@ -5,13 +5,11 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.Constraint;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

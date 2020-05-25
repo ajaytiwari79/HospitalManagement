@@ -225,6 +225,18 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     }
 
     @Override
+    public boolean isEmploymentCTAExistsOnDate(Long employmentId,LocalDate localDate,BigInteger ctaId){
+        Criteria criteria = (Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).and("_id").ne(ctaId).orOperator(Criteria.where(START_DATE).lte(localDate).and(END_DATE).gte(localDate),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(localDate)));
+        return mongoTemplate.exists(new Query(criteria),CostTimeAgreement.class);
+    }
+
+    @Override
+    public boolean isGapExistsInEmploymentCTA(Long employmentId,LocalDate localDate,BigInteger ctaId){
+        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).and("_id").ne(ctaId).and(START_DATE).gte(localDate).ne(localDate);
+        return mongoTemplate.exists(new Query(criteria),CostTimeAgreement.class);
+    }
+
+    @Override
     public List<CTAResponseDTO> getCTAByEmploymentIdsAndDate(List<Long> employmentIds, Date startDate, Date endDate) {
         Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).orOperator(Criteria.where(START_DATE).lte(endDate).and(END_DATE).gte(startDate),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(endDate));
         Aggregation aggregation = Aggregation.newAggregation(

@@ -2,9 +2,9 @@ package com.kairos.shiftplanning.executioner;
 
 import com.kairos.dto.planner.constarints.ConstraintDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
-import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
+import com.kairos.enums.constraint.ScoreLevel;
 import org.junit.Assert;
 import org.junit.Test;
 
