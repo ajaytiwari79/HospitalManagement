@@ -579,7 +579,7 @@ public class PositionService {
             position.setStaff(staff);
             position.setStartDateMillis(employedSince);
             createStaffPermission(organization, accessGroupId, position, unitId);
-            positionGraphRepository.save(position,2);
+            positionGraphRepository.save(position);
             organization.getPositions().add(position);
             organizationGraphRepository.save(organization);
         }else{
