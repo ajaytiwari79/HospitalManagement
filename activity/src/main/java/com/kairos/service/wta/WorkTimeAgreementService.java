@@ -587,17 +587,17 @@ public class WorkTimeAgreementService{
         if (!oldEmploymentPublished || isNull(wtadto.getPublishDate())) {
             wtaResponseDTO = updateWTAOfUnpublishedEmployment(oldWta.get(), wtadto, unitId);
             wtaRepository.save(oldWta.get());
-        }
-        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
-        if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
-            wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), false);
-        }
-        boolean calculatedValueChanged = isCalCulatedValueChangedForWTA(oldWta.get(), wtaBaseRuleTemplates);
-        if(!calculatedValueChanged){
-            exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
-        }
-        else {
-            wtaResponseDTO = updateWTAOfPublishedEmployment(oldWta.get(), wtadto, unitId,save);
+        }else {
+            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
+            if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
+                wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), false);
+            }
+            boolean calculatedValueChanged = isCalCulatedValueChangedForWTA(oldWta.get(), wtaBaseRuleTemplates);
+            if (!calculatedValueChanged) {
+                exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
+            } else {
+                wtaResponseDTO = updateWTAOfPublishedEmployment(oldWta.get(), wtadto, unitId, save);
+            }
         }
         return wtaResponseDTO;
     }

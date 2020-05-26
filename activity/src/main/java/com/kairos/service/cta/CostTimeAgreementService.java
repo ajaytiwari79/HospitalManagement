@@ -246,13 +246,13 @@ public class CostTimeAgreementService {
         CTAResponseDTO responseCTA = null;
         if (!staffAdditionalInfoDTO.getEmployment().isPublished() || isNull(ctaDTO.getPublishDate())) {
             responseCTA = updateEmploymentCTA(oldCTA, ctaDTO);
-        }
-        boolean calculatedValueChanged = isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
-        if(!calculatedValueChanged){
-            exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
-        }
-        else{
-            responseCTA = updateEmploymentCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
+        }else {
+            boolean calculatedValueChanged = isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
+            if (!calculatedValueChanged) {
+                exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
+            } else {
+                responseCTA = updateEmploymentCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
+            }
         }
         staffAdditionalInfoDTO.getEmployment().setCostTimeAgreement(responseCTA);
         timeBankService.updateDailyTimeBankOnCTAChangeOfEmployment(staffAdditionalInfoDTO, responseCTA);

@@ -122,10 +122,10 @@ public class EmploymentCTAWTAService {
 
         }
         if (employment.getEndDate() != null && updateDTO.getEndDate() != null && updateDTO.getEndDate().isBefore(employment.getEndDate())) {
-            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE);
+            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE,updateDTO.getEndDate(),employment.getEndDate());
         }
         if (employment.getEndDate() != null && updateDTO.getStartDate().isAfter(employment.getEndDate())) {
-            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE);
+            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE,updateDTO.getStartDate(),employment.getEndDate());
         }
         if(!activityIntegrationService.isStaffNightWorker(unitId,employment.getStaff().getId())) {
             List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS=updateDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplateDTO -> WTATemplateType.DAYS_OFF_AFTER_A_SERIES.equals(wtaBaseRuleTemplateDTO.getWtaTemplateType()) && !wtaBaseRuleTemplateDTO.isDisabled()).collect(Collectors.toList());
