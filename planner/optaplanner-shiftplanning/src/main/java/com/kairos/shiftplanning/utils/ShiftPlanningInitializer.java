@@ -13,16 +13,13 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
-import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
-import com.kairos.enums.constraint.ConstraintType;
-import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.shiftplanning.constraints.ConstraintHandler;
-import com.kairos.shiftplanning.constraints.activityconstraint.*;
+import com.kairos.shiftplanning.constraints.activityconstraint.DayType;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
@@ -51,8 +48,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.enums.constraint.ConstraintSubType.ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH;
-import static com.kairos.enums.constraint.ConstraintSubType.MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF;
 import static com.kairos.shiftplanning.executioner.ShiftPlanningGenerator.INTERVAL_MINS;
 
 public class ShiftPlanningInitializer {

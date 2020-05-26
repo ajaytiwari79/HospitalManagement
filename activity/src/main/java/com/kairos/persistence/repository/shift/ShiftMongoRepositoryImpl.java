@@ -2,12 +2,10 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
@@ -186,7 +184,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     @Override
     public Long countByActivityId(BigInteger activityId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(where(DELETED).is(false).orOperator(Criteria.where(ACTIVITIES_ACTIVITY_ID).is(activityId),Criteria.where("breakActivities.activityId").is(activityId))),
+                match(where(DELETED).is(false).orOperator(Criteria.where(ACTIVITIES_ACTIVITY_ID).is(activityId),Criteria.where("breakActivities.activityId").is(activityId),Criteria.where("activities.childActivities.activityId").is(activityId))),
                 count().as(COUNT)
         );
         AggregationResults<Map> result = mongoTemplate.aggregate(aggregation, Shift.class, Map.class);

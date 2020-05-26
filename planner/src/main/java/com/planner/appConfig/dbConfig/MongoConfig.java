@@ -1,9 +1,9 @@
 package com.planner.appConfig.dbConfig;
 
-import com.planner.mongo_converter.*;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.planner.mongo_converter.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

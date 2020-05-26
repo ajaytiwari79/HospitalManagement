@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.wta;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
@@ -243,6 +244,18 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
+    }
+
+    @Override
+    public boolean isEmploymentWTAExistsOnDate(Long employmentId, LocalDate localDate, BigInteger wtaId){
+        Criteria criteria = (Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).and("_id").ne(wtaId).orOperator(Criteria.where(START_DATE).lte(localDate).and(END_DATE).gte(localDate),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(localDate)));
+        return mongoTemplate.exists(new Query(criteria), WorkingTimeAgreement.class);
+    }
+
+    @Override
+    public boolean isGapExistsInEmploymentWTA(Long employmentId, LocalDate localDate, BigInteger wtaId){
+        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).and("_id").ne(wtaId).and(START_DATE).gte(localDate).ne(localDate);
+        return mongoTemplate.exists(new Query(criteria),WorkingTimeAgreement.class);
     }
 
     @Override

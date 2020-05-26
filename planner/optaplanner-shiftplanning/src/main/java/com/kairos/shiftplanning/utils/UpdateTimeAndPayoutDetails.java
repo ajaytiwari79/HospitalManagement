@@ -18,8 +18,6 @@ import com.kairos.shiftplanning.domain.staff.EmploymentLine;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

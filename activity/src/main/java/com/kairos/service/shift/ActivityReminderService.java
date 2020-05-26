@@ -4,7 +4,6 @@ import com.kairos.commons.service.mail.KMailService;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.wta.IntervalBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
-
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;

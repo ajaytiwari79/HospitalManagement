@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.Map;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
 

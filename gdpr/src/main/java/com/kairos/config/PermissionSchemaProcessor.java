@@ -1,13 +1,10 @@
 package com.kairos.config;
 
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.rest_client.UserRestClient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.List;
 import java.util.Map;

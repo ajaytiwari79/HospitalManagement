@@ -37,8 +37,8 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     List<Map<String,Object>> getTeams(long unitId);
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
-            "OPTIONAL MATCH (team)-[staffRel:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) \n" +
-            "WITH team,COLLECT(DISTINCT{staffId:id(teamMembers),teamType:staffRel.teamType,startDate:staffRel.startDate,endDate:staffRel.endDate,sequence:staffRel.sequence}) as staffDetails\n" +
+            "OPTIONAL MATCH (team)-[staffRel:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) where staffRel.teamMembership = true\n" +
+            "WITH team,COLLECT(DISTINCT{staffId:id(teamMembers),teamType:staffRel.teamType,startDate:staffRel.startDate,endDate:staffRel.endDate,sequence:staffRel.sequence,teamMembership:staffRel.teamMembership}) as staffDetails\n" +
             "OPTIONAL MATCH (team)-[:"+TEAM_HAS_SKILLS+"]->(skills:Skill) with team, COLLECT (id(skills)) as skillIds ,staffDetails\n" +
             "RETURN id(team) as id, team.name as name, team.description as description, team.activityIds as activityIds, skillIds as skillIds,staffDetails as staffDetails")
     TeamDTO getTeamDetailsById(long teamId);
@@ -80,8 +80,14 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "]->(staff) SET r.lastModificationDate={2},r.isEnabled={3} RETURN COUNT(r) as r")
     int updateStaffTeamRelationship(long teamId, long staffId, long lastModificationDate, boolean isEnabled);
 
-    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} AND EXISTS(staffTeamRel.leaderType) DETACH DELETE staffTeamRel")
-    void removeAllStaffsFromTeam(long teamId);
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} AND EXISTS(staffTeamRel.leaderType) AND staffTeamRel.teamMembership=false AND NOT id(staff) IN {1} DETACH DELETE staffTeamRel")
+    void removeAllStaffsFromTeam(long teamId, Set<Long> teamLeaderIds);
+
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} AND EXISTS(staffTeamRel.leaderType) SET staffTeamRel.leaderType = null")
+    void removeLeaderTypeFromTeam(long teamId);
+
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} RETURN {staffId:id(staff), leaderType:EXISTS(staffTeamRel.leaderType)} AS data")
+    List<Map<String,Object>> getStaffLeaderTypeMap(Long teamId);
 
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff) IN {0} DETACH DELETE staffTeamRel RETURN COUNT(staffTeamRel)>0")
     boolean removeStaffsFromTeam(List<Long> staffIds, Long teamId);
@@ -90,7 +96,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     void removeStaffFromAllTeams(long staffId);
 
     @Query("MATCH (organization:Unit)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} AND id(organization)={1} RETURN \n" +
-            "id(team) as id,team.name as name,staffTeamRel.teamType as teamType,staffTeamRel.leaderType as leaderType,staffTeamRel.sequence as sequence")
+            "id(team) as id,team.name as name,staffTeamRel.teamType as teamType,staffTeamRel.leaderType as leaderType,staffTeamRel.sequence as sequence,staffTeamRel.teamMembership as teamMembership")
     List<TeamDTO> getTeamDetailsOfStaff(Long staffId,Long unitId);
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
@@ -149,4 +155,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query("MATCH(team:Team) WHERE ANY(activityId IN team.activityIds WHERE toInteger(activityId) IN {0}) return team ")
     List<Team> findAllTeamByActivityId(BigInteger activityId);
+
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff) IN {0} SET staffTeamRel.teamMembership=false")
+    void assignStaffAsTeamLeaderOnly(List<Long> staffIds, Long teamId);
 }

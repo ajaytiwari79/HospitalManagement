@@ -3,7 +3,6 @@ package com.kairos.shiftplanning.domain.wta_ruletemplates;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.TimeInterval;
-import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;

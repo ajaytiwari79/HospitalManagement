@@ -60,7 +60,7 @@ public class SystemLanguageService {
             exceptionService.invalidRequestException(MESSAGE_SYSTEM_LANGUAGE_MUST_DEFAULT);
         }
 
-        SystemLanguage systemLanguage = new SystemLanguage(systemLanguageDTO.getName(), systemLanguageDTO.getCode(), systemLanguageDTO.isDefaultLanguage(), systemLanguageDTO.isActive());
+        SystemLanguage systemLanguage = new SystemLanguage(systemLanguageDTO.getName(), systemLanguageDTO.getCode(),  systemLanguageDTO.isActive(),systemLanguageDTO.isDefaultLanguage());
         systemLanguageGraphRepository.save(systemLanguage);
         systemLanguageDTO.setId(systemLanguage.getId());
         return systemLanguageDTO;

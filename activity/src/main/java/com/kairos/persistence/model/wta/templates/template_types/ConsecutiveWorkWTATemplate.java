@@ -19,11 +19,8 @@ import org.apache.commons.collections.CollectionUtils;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.enums.wta.MinMaxSetting.MAXIMUM;
 import static com.kairos.enums.wta.MinMaxSetting.MINIMUM;
 import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;

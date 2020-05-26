@@ -1,15 +1,12 @@
 package com.kairos.shiftplanning.domain.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.activity.shift.AuditShiftActivityDTO;
-import com.kairos.enums.audit_logging.LoggingType;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.staff.Employee;
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.listeners.ShiftStartTimeListener;
-import com.kairos.shiftplanning.utils.LocalDateConverter;
 import com.kairos.shiftplanning.utils.LocalTimeConverter;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -24,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
