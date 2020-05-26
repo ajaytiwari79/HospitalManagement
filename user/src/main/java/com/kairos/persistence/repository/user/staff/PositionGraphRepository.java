@@ -49,7 +49,7 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
             "OPTIONAL MATCH(position)-[:"+HAS_REASON_CODE+"]-(reasonCode:ReasonCode)  RETURN position, reasonCode")
     PositionReasonCodeQueryResult findEmploymentreasonCodeByStaff(Long staffId);
 
-    @Query("MATCH(staff:Staff)<-[:"+ BELONGS_TO +"]-(position:Position) WHERE id(staff) = {0} RETURN position,staff")
+    @Query("MATCH(staff:Staff)<-[:"+ BELONGS_TO +"]-(position:Position) WHERE id(staff) = {0} RETURN position")
     Position findByStaffId(Long staffId);
 
 

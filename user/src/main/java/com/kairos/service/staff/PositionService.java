@@ -572,8 +572,8 @@ public class PositionService {
     }
 
     public void createPosition(Organization organization, Staff staff, Long accessGroupId, Long employedSince, Long unitId) {
-        Position positions =positionGraphRepository.findByStaffId(staff.getId());
-        if(isNull(positions)) {
+        Position staffPosition =positionGraphRepository.findByStaffId(staff.getId());
+        if(isNull(staffPosition)) {
             Position position = new Position();
             position.setName("Working as staff");
             position.setStaff(staff);
@@ -583,8 +583,8 @@ public class PositionService {
             organization.getPositions().add(position);
             organizationGraphRepository.save(organization);
         }else{
-            createStaffPermission(organization, accessGroupId, positions, unitId);
-            organization.getPositions().add(positions);
+            createStaffPermission(organization, accessGroupId, staffPosition, unitId);
+            organization.getPositions().add(staffPosition);
             organizationGraphRepository.save(organization);
         }
 
