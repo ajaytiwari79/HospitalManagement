@@ -54,6 +54,7 @@ repositories {
 
 
 dependencies {
+    implementation 'io.quarkus:quarkus-core:1.4.2.Final'
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
     compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom
     implementation project(':kcommons')

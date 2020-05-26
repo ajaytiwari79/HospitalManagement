@@ -11,3 +11,4 @@ pluginManagement {
 }
 rootProject.name='optaplanner-shiftplanning'
 include ':kcommons'
+project(':kcommons').projectDir = new File('../../kcommons')
