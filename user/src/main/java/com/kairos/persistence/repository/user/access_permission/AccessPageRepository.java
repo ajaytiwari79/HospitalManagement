@@ -316,13 +316,5 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "RETURN id(unit) as unitId, CASE WHEN COUNT(r)>0 THEN TRUE ELSE FALSE END AS hasPermission")
     List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, Set<Long> organizationIds);
 
-    @Query("MATCH (fieldPermissionModel) WHERE id(fieldPermissionModel)={2} WITH fieldPermissionModel\n" +
-            "MATCH (staff:Staff) WHERE id(staff)={0} WITH staff,fieldPermissionModel\n" +
-            "MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff) WITH user,position,fieldPermissionModel\n" +
-            "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,fieldPermissionModel\n" +
-            "MATCH (unitPermission)-[r:"+HAS_CUSTOMIZED_PERMISSION+"]->(fieldPermissionModel) WHERE r.accessGroupId={3}\n" +
-            "RETURN r.permissions ")
-    Set<FieldLevelPermission> getCustomPermissionOfModel(Long staffId, Long unitId, Long fieldPermissionId, Long accessGroupId);
-
 
 }

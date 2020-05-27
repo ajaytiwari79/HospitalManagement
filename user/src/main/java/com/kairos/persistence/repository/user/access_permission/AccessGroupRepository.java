@@ -329,9 +329,9 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "MATCH (staff:Staff) WHERE  id(staff)={0} WITH staff,kPermissionTab,accessGroup\n" +
             "MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff) WITH position,kPermissionTab,accessGroup\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,kPermissionTab,accessGroup\n" +
-            "MERGE (unitPermission)-[r:"+HAS_CUSTOMIZED_PERMISSION+"{accessGroupId:{2}}]->(accessPage)\n" +
-            "ON CREATE SET r.permissions={4}\n" +
-            "ON MATCH SET r.read={4} RETURN distinct true")
+            "MERGE (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_FIELD +"{accessGroupId:{2}}]->(kPermissionTab)\n" +
+            "ON CREATE SET r.fieldLevelPermissions={4}\n" +
+            "ON MATCH SET r.fieldLevelPermissions={4} RETURN distinct true")
     void setCustomPermissionForSubModelAndFields(Long staffId, Long unitId, Long accessGroupId, Set<Long> kPermissionTabIds, Set<FieldLevelPermission> permissions);
 
 

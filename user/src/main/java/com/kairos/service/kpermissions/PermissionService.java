@@ -175,7 +175,7 @@ public class PermissionService {
         List<KPermissionModel> kPermissionModels = getkPermissionModels();
         permissionSchemaMap.put(PERMISSIONS_SCHEMA, copyCollectionPropertiesByMapper(kPermissionModels, ModelDTO.class));
         permissionSchemaMap.put(PERMISSIONS, FieldLevelPermission.values());
-        permissionSchemaMap.put(PERMISSION_DATA, copyCollectionPropertiesByMapper(getModelPermission(newArrayList(),accessGroupIds,false),ModelDTO.class));
+        permissionSchemaMap.put(PERMISSION_DATA, copyCollectionPropertiesByMapper(getModelPermission(newArrayList(),accessGroupIds,false,null),ModelDTO.class));
             return permissionSchemaMap;
     }
 
@@ -189,9 +189,9 @@ public class PermissionService {
         return kPermissionModels;
     }
 
-    private Map[] getMapOfPermission(Collection<Long> accessGroupIds,boolean hubMember) {
-        List<ModelPermissionQueryResult> modelPermissionQueryResults = permissionModelRepository.getAllModelPermission(accessGroupIds);
-        List<FieldPermissionQueryResult> fieldLevelPermissions = permissionModelRepository.getAllFieldPermission(accessGroupIds);
+    private Map[] getMapOfPermission(Collection<Long> accessGroupIds, boolean hubMember, Long staffId) {
+        List<ModelPermissionQueryResult> modelPermissionQueryResults = permissionModelRepository.getAllModelPermission(accessGroupIds,UserContext.getUserDetails().getLastSelectedOrganizationId(),staffId);
+        List<FieldPermissionQueryResult> fieldLevelPermissions = permissionModelRepository.getAllFieldPermission(accessGroupIds,UserContext.getUserDetails().getLastSelectedOrganizationId(),staffId);
         modelPermissionQueryResults = mergeModelPermissionQueryResult(modelPermissionQueryResults);
         fieldLevelPermissions = mergeFieldPermissionQueryResult(fieldLevelPermissions);
         Map<Long,FieldPermissionQueryResult> fieldLevelPermissionMap = new HashMap<>();
@@ -273,8 +273,8 @@ public class PermissionService {
         return modelPermissionQueryResult;
     }
 
-    public List<ModelPermissionQueryResult> getModelPermission(List<String> modelNames,Collection<Long> accessGroupIds,boolean hubMember){
-        Map[] permissionMap = getMapOfPermission(accessGroupIds,hubMember);
+    public List<ModelPermissionQueryResult> getModelPermission(List<String> modelNames,Collection<Long> accessGroupIds,boolean hubMember,Long staffId){
+        Map[] permissionMap = getMapOfPermission(accessGroupIds,hubMember,staffId);
         Map<Long,ModelPermissionQueryResult> modelPermissionMap = permissionMap[0];
         Map<Long,FieldPermissionQueryResult> fieldLevelPermissionMap = permissionMap[1];
         OrganizationCategory organizationCategory = UserContext.getUserDetails().getLastSelectedOrganizationCategory();
@@ -507,7 +507,7 @@ public class PermissionService {
             Set<String> modelNames = getModelNames(objects);
             List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
             hubMember = UserContext.getUserDetails().isHubMember();
-            List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember);
+            List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember,null);
             List<ModelDTO> modelDTOS = copyCollectionPropertiesByMapper(modelPermissionQueryResults,ModelDTO.class);
             modelMap = modelDTOS.stream().collect(Collectors.toMap(k -> k.getModelName(), v -> v));
             Map[] mapArray = getObjectByIds(objects,fieldLevelPermissions);
@@ -580,7 +580,7 @@ public class PermissionService {
     public <T> FieldPermissionUserData fetchPermissions(Set<String> modelNames, Long unitId){
         List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
         boolean hubMember = UserContext.getUserDetails().isHubMember();
-        List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember);
+        List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember,null);
         List<ModelDTO> modelDTOS = copyCollectionPropertiesByMapper(modelPermissionQueryResults,ModelDTO.class);
         Organization parentOrganisation=organizationService.fetchParentOrganization(unitId);
         Long currentUserStaffId = staffService.getStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganisation.getId());
