@@ -7,8 +7,6 @@ import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;

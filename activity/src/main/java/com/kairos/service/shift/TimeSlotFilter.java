@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.TIME_SLOT;
 

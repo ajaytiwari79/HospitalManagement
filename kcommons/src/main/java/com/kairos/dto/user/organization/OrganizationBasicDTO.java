@@ -1,6 +1,7 @@
 package com.kairos.dto.user.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.annotation.EnableStringTrimer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@EnableStringTrimer
 public class OrganizationBasicDTO {
     private Long id;
     @NotNull(message = "error.name.notnull")

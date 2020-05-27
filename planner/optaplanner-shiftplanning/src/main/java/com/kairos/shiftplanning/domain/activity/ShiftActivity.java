@@ -1,10 +1,7 @@
 package com.kairos.shiftplanning.domain.activity;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.shift.AuditShiftActivityDTO;
 import com.kairos.enums.cta.AccountType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.shiftplanning.domain.shift.PlannedTime;
@@ -14,12 +11,10 @@ import com.kairos.shiftplanning.domain.staff.TimeBankDistribution;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.kairos.shiftplanning.utils.ZonedDateTimeDeserializer;
 import lombok.*;
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 @Getter

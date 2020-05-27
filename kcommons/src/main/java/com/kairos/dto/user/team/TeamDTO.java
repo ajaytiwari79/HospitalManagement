@@ -21,4 +21,5 @@ public class TeamDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private int sequence;
+    private boolean teamMembership;
 }

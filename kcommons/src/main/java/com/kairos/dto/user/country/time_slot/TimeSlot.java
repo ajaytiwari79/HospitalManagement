@@ -1,6 +1,8 @@
 package com.kairos.dto.user.country.time_slot;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter

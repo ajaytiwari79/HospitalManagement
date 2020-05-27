@@ -74,6 +74,9 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getAllWTAByDate(Date date);
 
+    boolean isEmploymentWTAExistsOnDate(Long employmentId, LocalDate localDate, BigInteger wtaId);
+    boolean isGapExistsInEmploymentWTA(Long employmentId, LocalDate localDate, BigInteger wtaId);
+
 }
 
 

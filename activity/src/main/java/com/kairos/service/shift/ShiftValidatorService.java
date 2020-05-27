@@ -61,7 +61,6 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.*;
 import com.kairos.service.activity.ActivityUtil;
-import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.staffing_level.StaffingLevelService;

@@ -70,8 +70,8 @@ import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.constants.UserMessagesConstants.*;
-import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.FilterType.PAY_GRADE_LEVEL;
+import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 /**

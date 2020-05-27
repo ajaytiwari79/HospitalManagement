@@ -2,7 +2,6 @@ package com.kairos.permission;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.kpermissions.FieldPermissionUserData;
-import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.service.kpermissions.PermissionService;
 import org.junit.Before;
@@ -14,8 +13,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ActivityPermissionTest {

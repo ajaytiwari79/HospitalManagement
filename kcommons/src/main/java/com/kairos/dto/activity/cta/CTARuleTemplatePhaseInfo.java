@@ -3,7 +3,6 @@ package com.kairos.dto.activity.cta;
 import lombok.*;
 
 import java.math.BigInteger;
-import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor

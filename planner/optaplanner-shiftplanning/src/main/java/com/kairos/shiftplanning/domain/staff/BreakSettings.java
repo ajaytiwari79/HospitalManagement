@@ -2,9 +2,6 @@ package com.kairos.shiftplanning.domain.staff;
 
 import com.kairos.shiftplanning.domain.activity.Activity;
 import lombok.*;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.math.BigInteger;
 
 @Getter
 @Setter

@@ -39,7 +39,8 @@ import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS;
+import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
 
 @Service
 @Transactional
@@ -227,6 +228,10 @@ public class ActivityIntegrationService {
         requestBody.put("staffIds",staffIds);
         requestBody.put("expertiseIds",expertiseIds);
         return genericRestClient.publishRequest(requestBody, null, false, IntegrationOperation.CREATE, "get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftPlanningProblemSubmitDTO>>(){});
+    }
+
+    public Set<BigInteger> getActivitiesWithAllChildren(Long unitId,Set<BigInteger> activityIds) {
+        return genericRestClient.publishRequest(activityIds, unitId, true, IntegrationOperation.UPDATE, "/activity/get_all_Children", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>(){});
     }
 }
 

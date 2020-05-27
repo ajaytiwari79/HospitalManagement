@@ -122,7 +122,6 @@ public class ActivityService {
     private StaffingLevelService staffingLevelService;
     @Inject
     private ActivitySchedulerJobService activitySchedulerJobService;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
@@ -139,7 +138,6 @@ public class ActivityService {
         activity = buildActivity(activityDTO);
         initializeActivityTabs(activity, countryId, activityDTO);
         activityMongoRepository.save(activity);
-        // Fetch tags detail
         List<TagDTO> tags = tagMongoRepository.getTagsById(activityDTO.getTags());
         ActivityTagDTO activityTagDTO = new ActivityTagDTO();
         activityTagDTO.buildActivityTagDTO(activity, tags);
@@ -176,7 +174,6 @@ public class ActivityService {
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
         List<ActivityTagDTO> activityTagDTOS = activityMongoRepository.findAllActivityByCountry(countryId);
-        //In Country Module any Activity can be copied
         activityTagDTOS.forEach(activityTagDTO -> activityTagDTO.setActivityCanBeCopied(true));
         List<ActivityCategory> acivitityCategories = activityCategoryRepository.findByCountryId(countryId);
         response.put("activities", activityTagDTOS);
@@ -236,7 +233,6 @@ public class ActivityService {
     }
 
     public ActivityTabsWrapper updateGeneralTab(Long countryId, GeneralActivityTabDTO generalDTO) {
-        //check category is available in country
         validateActivityDetails(countryId, generalDTO);
         Activity activity = findActivityById(generalDTO.getActivityId());
         generalDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
@@ -443,7 +439,12 @@ public class ActivityService {
         organizationActivityService.verifyChildActivity(activityMatched, activity);
         activity.setChildActivityIds(childActivitiesIds);
         activityMongoRepository.save(activity);
+        assignChildActivitiesInTeam(activityId,childActivitiesIds);
         return childActivitiesIds;
+    }
+
+    private void assignChildActivitiesInTeam(BigInteger activityId,Set<BigInteger> childActivityIds) {
+        userIntegrationService.assignChildActivitiesInTeam(activityId,childActivityIds);
     }
 
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
@@ -719,8 +720,7 @@ public class ActivityService {
         return countryActivities;
     }
 
-    private List<Activity> createActivatesForCountryFromTimeCare(List<TimeCareActivity> timeCareActivities, Long unitId, Long countryId,
-                                                                 List<String> externalIdsOfAllActivities, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
+    private List<Activity> createActivatesForCountryFromTimeCare(List<TimeCareActivity> timeCareActivities, Long unitId, Long countryId, List<String> externalIdsOfAllActivities, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationDTO(unitId);
         if (isNull(organizationDTO)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID);
@@ -732,8 +732,7 @@ public class ActivityService {
         }
         Long orgType = organizationDTO.getOrganizationType().getId();
         List<Long> orgSubTypes = organizationDTO.getOrganizationSubTypes().stream().map(OrganizationTypeDTO::getId).collect(Collectors.toList());
-        Set<String> skillsOfAllTimeCareActivity = timeCareActivities.stream().flatMap(timeCareActivity -> timeCareActivity.getArrayOfSkill().stream().
-                map(skill -> skill)).collect(Collectors.toSet());
+        Set<String> skillsOfAllTimeCareActivity = timeCareActivities.stream().flatMap(timeCareActivity -> timeCareActivity.getArrayOfSkill().stream()).collect(Collectors.toSet());
         List<Skill> skills = userIntegrationService.getSkillsByName(skillsOfAllTimeCareActivity, countryId);
         List<Activity> activitiesByExternalIds = activityMongoRepository.findByExternalIdIn(externalIdsOfAllActivities);
         List<PhaseDTO> phases = phaseService.getPhasesByCountryId(countryId);
@@ -831,7 +830,6 @@ public class ActivityService {
     }
 
     public ActivityTabsWrapper updateLocationsTabOfActivity(LocationActivityTabDTO locationActivityTabDTO) {
-
         Activity activity =findActivityById(locationActivityTabDTO.getActivityId());
         LocationActivityTab locationActivityTab = new LocationActivityTab(locationActivityTabDTO.getGlideTimeForCheckIn(), locationActivityTabDTO.getGlideTimeForCheckOut());
         activity.setLocationActivityTab(locationActivityTab);
@@ -857,7 +855,6 @@ public class ActivityService {
         activityMongoRepository.save(activity);
         return activity.getTranslations();
     }
-
 
     public ActivityWithTimeTypeDTO getActivitiesWithTimeTypes(long countryId) {
         List<ActivityDTO> activityDTOS = activityMongoRepository.findAllActivitiesWithTimeTypes(countryId);
@@ -921,7 +918,6 @@ public class ActivityService {
         return activityMongoRepository.findAllActivityByUnitId(unitId, false);
     }
 
-
     public void validateActivityTimeRules( Short shortestTime, Short longestTime) {
         if (shortestTime != null && longestTime != null && shortestTime > longestTime) {
             exceptionService.actionNotPermittedException(SHORTEST_TIME_GREATER_LONGEST);
@@ -945,12 +941,9 @@ public class ActivityService {
         return activityMongoRepository.findAllActivityByDeletedFalseAndUnitId(unitIds);
     }
 
-    //remove expertise from activity via schedular job
-    public boolean unassighExpertiseFromActivities(BigInteger expertiseId) {
-        LOGGER.info("remove expertise from activities by job");
+    public void unassighExpertiseFromActivities(BigInteger expertiseId) {
         activityMongoRepository.unassignExpertiseFromActivitiesByExpertiesId(expertiseId.longValue());
         LOGGER.info("successfully remove expertise from activities by job");
-        return true;
     }
 
     public Map<BigInteger, ActivityWrapper> getActivityWrapperMap(List<Shift> shifts, ShiftDTO shiftDTO) {
