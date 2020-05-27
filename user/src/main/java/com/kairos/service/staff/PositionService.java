@@ -209,8 +209,7 @@ public class PositionService {
     }
 
     private StaffAccessGroupQueryResult removeUnitPermisssion(Long unitId, Long staffId, Long accessGroupId, Organization parentUnit) {
-        StaffAccessGroupQueryResult staffAccessGroupQueryResult;
-        staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
+        StaffAccessGroupQueryResult staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
         // need to remove unit permission
         if (unitPermissionGraphRepository.getAccessGroupRelationShipCountOfStaff(staffId) <= 1) {
             exceptionService.actionNotPermittedException(ERROR_PERMISSION_REMOVE);

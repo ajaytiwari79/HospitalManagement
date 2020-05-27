@@ -16,6 +16,7 @@ import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.kpermissions.*;
 import com.kairos.persistence.model.organization.Organization;
@@ -24,6 +25,8 @@ import com.kairos.persistence.repository.custom_repository.CommonRepositoryImpl;
 import com.kairos.persistence.repository.kpermissions.PermissionFieldRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionModelRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -74,6 +77,8 @@ public class PermissionService {
     private static StaffService staffService;
     private static AccessGroupService accessGroupService;
     private static PermissionModelRepository permissionModelRepository;
+    @Inject private AccessPageRepository accessPageRepository;
+    @Inject private AccessGroupRepository accessGroupRepository;
 
     @Inject
     public void setOrganizationService(OrganizationService organizationService) {
@@ -580,6 +585,20 @@ public class PermissionService {
         Organization parentOrganisation=organizationService.fetchParentOrganization(unitId);
         Long currentUserStaffId = staffService.getStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganisation.getId());
         return new FieldPermissionUserData(modelDTOS,currentUserStaffId);
+    }
+
+    public void assignPermission(Long unitId,Long accessGroupId, CustomPermissionDTO customPermissionDTO) {
+        Set<Long> kPermissionModelIds=permissionModelRepository.kPermissionModelIds(customPermissionDTO.getId());
+        accessGroupRepository.setCustomPermissionForSubModelAndFields(customPermissionDTO.getStaffId(), unitId, accessGroupId,kPermissionModelIds, customPermissionDTO.getPermissions());
+    }
+
+    private Set<Long> getAllIdsToSetPermissions(KPermissionModel kPermissionModel,Set<Long> kPermissionModelIds) {
+        kPermissionModelIds.add(kPermissionModel.getId());
+        kPermissionModelIds.addAll(kPermissionModel.getFieldPermissions().stream().map(UserBaseEntity::getId).collect(Collectors.toSet()));
+        kPermissionModel.getSubModelPermissions().forEach(subModel->{
+            getAllIdsToSetPermissions(subModel,kPermissionModelIds);
+        });
+        return kPermissionModelIds;
     }
 
 }
