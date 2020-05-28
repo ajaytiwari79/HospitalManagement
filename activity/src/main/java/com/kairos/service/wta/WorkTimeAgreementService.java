@@ -597,7 +597,7 @@ public class WorkTimeAgreementService{
             wtaRepository.save(oldWta.get());
         }else {
             if (!calculatedValueChanged) {
-                exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
+                exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE,"WTA");
             } else {
                 wtaResponseDTO = updateWTAOfPublishedEmployment(oldWta.get(), wtadto, unitId, save);
             }
