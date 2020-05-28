@@ -252,7 +252,7 @@ public class CostTimeAgreementService {
             responseCTA = updateEmploymentCTA(oldCTA, ctaDTO);
         }else {
             if (!calculatedValueChanged) {
-                exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
+                exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE,"CTA");
             } else {
                 responseCTA = updateEmploymentCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
             }
@@ -319,7 +319,7 @@ public class CostTimeAgreementService {
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", staffAdditionalInfoDTO.getEmployment().getId());
         }
-        if ((staffAdditionalInfoDTO.getEmployment().getEndDate() != null && collectiveTimeAgreementDTO.getEndDate() != null && collectiveTimeAgreementDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getEmployment().getEndDate())) || (isNull(staffAdditionalInfoDTO.getEmployment().getEndDate()) && isNotNull(collectiveTimeAgreementDTO.getEndDate()))) {
+        if ((staffAdditionalInfoDTO.getEmployment().getEndDate() != null && collectiveTimeAgreementDTO.getEndDate() != null && collectiveTimeAgreementDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getEmployment().getEndDate())) || (isNull(oldCTA.getEndDate()) && isNull(staffAdditionalInfoDTO.getEmployment().getEndDate()) && isNotNull(collectiveTimeAgreementDTO.getEndDate()))) {
             exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, collectiveTimeAgreementDTO.getEndDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
         }
         if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && collectiveTimeAgreementDTO.getStartDate().isAfter(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
