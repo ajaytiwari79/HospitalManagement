@@ -55,13 +55,11 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.enums.constraint.ConstraintSubType.*;
 
-
-//@QuarkusMain
 public class ShiftPlanningSolver implements QuarkusApplication {
     public static final String BASE_SRC = "src/main/resources/data/";
     public static final String STR = "\n------------------------\n";
     public static final String INFO = "info {}";
-    public static final String SOLVER_XML = "com/kairos/shiftplanning/configuration/ShiftPlanning_Request_ActivityLine.solver.xml";
+    public static final String SOLVER_XML = "com /kairos/shiftplanning/configuration/ShiftPlanning_Request_ActivityLine.solver.xml";
     public static final String ERROR = "Error {}";
     public static final String CONFIG_BREAKS = "com/kairos/shiftplanning/configuration/BreakAndIndirectActivityPlanning.solver.xml";
     public static final String CONFIG_WITH_WTA = "com/kairos/shiftplanning/configuration/ShiftPlanningRequest_activityLine_Wta.xml";
@@ -91,25 +89,25 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         System.setProperty("user.timezone", "UTC");
     }
 
-    public static void main(String[] args){
+    /*public static void main(String[] args){
         SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
         String droolFilePath = "/home/droolsFile/Shift_Planning/";//"/home/droolsFile/Shift_Planning";
         String configurationFile = "/home/droolsFile/ShiftPlanning_Request_ActivityLine.solver.xml";
         ShiftPlanningSolver shiftPlanningSolver = new ShiftPlanningSolver(solverConfigDTO,droolFilePath,configurationFile);
         shiftPlanningSolver.runSolver();
-        /*if(args.length==0){
+        *//*if(args.length==0){
             throw new RuntimeException("Please give the active profile");
         }
-        updateServerAddress(args);*/
+        updateServerAddress(args);*//*
 
-    }
-    public static SolverConfigDTO getSolverConfigDTO(){
+    }*/
+    public static SolverConfigDTO getSolverConfigDTO() {
         List<ConstraintDTO> constraintDTOS = new ArrayList<>();
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS, ScoreLevel.HARD, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH, ScoreLevel.HARD, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, ScoreLevel.HARD, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, MINIMIZE_SHIFT_ON_WEEKENDS, ScoreLevel.HARD, 5));
-        constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY,PREFER_PERMANENT_EMPLOYEE, ScoreLevel.HARD,2));
+        constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, PREFER_PERMANENT_EMPLOYEE, ScoreLevel.HARD, 2));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, ConstraintSubType.ACTIVITY_REQUIRED_TAG, ScoreLevel.HARD, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.UNIT, PRESENCE_AND_ABSENCE_SAME_TIME, ScoreLevel.HARD, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, ConstraintSubType.MAX_SHIFT_OF_STAFF, ScoreLevel.HARD, 5));
