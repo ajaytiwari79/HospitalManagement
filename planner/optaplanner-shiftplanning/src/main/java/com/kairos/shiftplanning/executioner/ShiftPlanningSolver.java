@@ -22,6 +22,7 @@ import com.kairos.shiftplanning.utils.ZonedDateTimeConverter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import io.quarkus.runtime.QuarkusApplication;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.optaplanner.benchmark.api.PlannerBenchmark;
@@ -55,11 +56,12 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.enums.constraint.ConstraintSubType.*;
 
+@NoArgsConstructor
 public class ShiftPlanningSolver implements QuarkusApplication {
     public static final String BASE_SRC = "src/main/resources/data/";
     public static final String STR = "\n------------------------\n";
     public static final String INFO = "info {}";
-    public static final String SOLVER_XML = "com /kairos/shiftplanning/configuration/ShiftPlanning_Request_ActivityLine.solver.xml";
+    public static final String SOLVER_XML = "com/kairos/shiftplanning/configuration/ShiftPlanning_Request_ActivityLine.solver.xml";
     public static final String ERROR = "Error {}";
     public static final String CONFIG_BREAKS = "com/kairos/shiftplanning/configuration/BreakAndIndirectActivityPlanning.solver.xml";
     public static final String CONFIG_WITH_WTA = "com/kairos/shiftplanning/configuration/ShiftPlanningRequest_activityLine_Wta.xml";
@@ -203,6 +205,9 @@ public class ShiftPlanningSolver implements QuarkusApplication {
     private List<File> getDroolFilesByConstraints(SolverConfigDTO solverConfig, String droolFilePath){
         File[] drlFiles = new File(droolFilePath).listFiles();
         Map<String,File> fileMap = Stream.of(drlFiles).collect(Collectors.toMap(k->k.getName(), v->v));
+        for (File drlFile : drlFiles) {
+            System.out.println(drlFile);
+        }
         List<File> droolsFiles = new ArrayList<>();
         droolsFiles.add(fileMap.get("SHIFTPLANNING_BASE.drl"));
         for (ConstraintDTO constraintDTO : solverConfig.getConstraints()) {
@@ -499,8 +504,9 @@ public class ShiftPlanningSolver implements QuarkusApplication {
 
     @Override
     public int run(String... args) throws Exception {
+        System.out.println("sdasdasdassadsad");
         SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
-        String droolFilePath = "/home/droolsFile/Shift_Planning/";//"/home/droolsFile/Shift_Planning";
+        String droolFilePath = "/home/droolsFile/Shift_Planning";
         String configurationFile = "/home/droolsFile/ShiftPlanning_Request_ActivityLine.solver.xml";
         ShiftPlanningSolver shiftPlanningSolver = new ShiftPlanningSolver(solverConfigDTO, droolFilePath, configurationFile);
         shiftPlanningSolver.runSolver();
