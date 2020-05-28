@@ -212,7 +212,8 @@ public class StaffCreationService {
         staff = updateStaffDetailsOnCreationOfStaff(organization, payload);
         staff.setUser(user);
         staffGraphRepository.save(staff);
-        positionService.createPosition(organization, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis(), unitId);
+        Long organizationAccessGroupId = accessGroupRepository.accessGroupByOrganizationIdAndParentAccessGroupId(organization.getId(),payload.getAccessGroupId());
+        positionService.createPosition(organization, staff, organizationAccessGroupId, DateUtils.getCurrentDateMillis(), unitId);
         if (StaffStatusEnum.ACTIVE.equals(payload.getCurrentStatus())) {
             staffService.addStaffInChatServer(staff);
             DefaultKPISettingDTO defaultKPISettingDTO = new DefaultKPISettingDTO(Arrays.asList(staff.getId()));

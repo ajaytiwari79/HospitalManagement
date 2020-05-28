@@ -77,5 +77,8 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
             "MATCH(position)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) \n" +
             "RETURN DISTINCT user.userName")
     List<String> getAllUserByPositionIds(List<Long> positionIds);
+
+    @Query("MATCH (p:Position)-[r:HAS_UNIT_PERMISSIONS]-(u:UnitPermission)-[:APPLICABLE_IN_UNIT]-(o:Organization) WHERE id(p)={0} AND id(o)={1}   RETURN Count(r)>0")
+    boolean isunitPermissionExist(Long positionId,Long organizationId);
 }
 

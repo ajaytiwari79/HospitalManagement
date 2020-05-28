@@ -170,12 +170,12 @@ public class PermissionService {
         return copyCollectionPropertiesByMapper(kPermissionModels, ModelDTO.class);
     }
 
-    public Map<String, Object> getPermissionSchema(List<Long> accessGroupIds){
+    public Map<String, Object> getPermissionSchema(List<Long> accessGroupIds,Long staffId){
         Map<String, Object> permissionSchemaMap = new HashMap<>();
         List<KPermissionModel> kPermissionModels = getkPermissionModels();
         permissionSchemaMap.put(PERMISSIONS_SCHEMA, copyCollectionPropertiesByMapper(kPermissionModels, ModelDTO.class));
         permissionSchemaMap.put(PERMISSIONS, FieldLevelPermission.values());
-        permissionSchemaMap.put(PERMISSION_DATA, copyCollectionPropertiesByMapper(getModelPermission(newArrayList(),accessGroupIds,false,null),ModelDTO.class));
+        permissionSchemaMap.put(PERMISSION_DATA, copyCollectionPropertiesByMapper(getModelPermission(newArrayList(),accessGroupIds,false,staffId),ModelDTO.class));
             return permissionSchemaMap;
     }
 

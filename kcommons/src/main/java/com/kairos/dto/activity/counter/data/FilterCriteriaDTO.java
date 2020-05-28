@@ -34,8 +34,9 @@ public class FilterCriteriaDTO {
     private IntervalUnit interval;
     private LocalDate startDate;
     private LocalDate endDate;
+    private boolean multiDimensional;
 
-    public FilterCriteriaDTO(List<FilterCriteria> filters, List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin,KPIRepresentation kpiRepresentation,IntervalUnit interval,int value,DurationType frequencyType) {
+    public FilterCriteriaDTO(List<FilterCriteria> filters, List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin,KPIRepresentation kpiRepresentation,IntervalUnit interval,int value,DurationType frequencyType,boolean multiDimensional) {
         this.filters = filters;
         this.kpiIds = kpiIds;
         this.countryId=countryId;
@@ -44,6 +45,7 @@ public class FilterCriteriaDTO {
         this.frequencyType=frequencyType;
         this.kpiRepresentation=kpiRepresentation;
         this.interval=interval;
+        this.multiDimensional = multiDimensional;
     }
 
     public FilterCriteriaDTO(Long unitId,Long staffId,List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin) {

@@ -510,6 +510,7 @@ public class AccessGroupService {
     public Boolean updatePermissionsForAccessTabsOfAccessGroup(Long accessGroupId, Long accessPageId, AccessPermissionDTO accessPermissionDTO, Boolean updateChildren) {
 
         AccessPageQueryResult readAndWritePermissionOfAccessPage = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, accessPageId);
+        List<Long> organizationAccessGroupIds = accessGroupRepository.getOrganizationAccessGroupIdsList(accessGroupId);
 
         Boolean write = accessPermissionDTO.isWrite();
         Boolean read = accessPermissionDTO.isRead();
@@ -522,6 +523,12 @@ public class AccessGroupService {
         else if (readAndWritePermissionOfAccessPage.isWrite() != write && write) {
             read = true;
         }
+        if(updateChildren && isCollectionNotEmpty(organizationAccessGroupIds)){
+            for(Long organizationAccessGroupId :organizationAccessGroupIds){
+                accessGroupRepository.updatePermissionsForAccessTabsAndChildrenOfAccessGroup(accessPageId, organizationAccessGroupId, read, write);
+            }
+        }
+
         if (updateChildren) {
             // Update read/write permission of tab and its children
             return accessGroupRepository.updatePermissionsForAccessTabsAndChildrenOfAccessGroup(accessPageId, accessGroupId, read, write);
