@@ -507,7 +507,7 @@ public class PermissionService {
             Set<String> modelNames = getModelNames(objects);
             List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
             hubMember = UserContext.getUserDetails().isHubMember();
-            List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember,null);
+            List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember,currentUserStaffId);
             List<ModelDTO> modelDTOS = copyCollectionPropertiesByMapper(modelPermissionQueryResults,ModelDTO.class);
             modelMap = modelDTOS.stream().collect(Collectors.toMap(k -> k.getModelName(), v -> v));
             Map[] mapArray = getObjectByIds(objects,fieldLevelPermissions);
