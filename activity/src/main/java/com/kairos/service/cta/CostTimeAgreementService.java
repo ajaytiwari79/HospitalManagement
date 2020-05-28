@@ -244,10 +244,13 @@ public class CostTimeAgreementService {
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         validateEmploymentCTAWhileUpdate(ctaDTO,staffAdditionalInfoDTO,oldCTA);
         CTAResponseDTO responseCTA = null;
+        boolean calculatedValueChanged = isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
+        if(calculatedValueChanged && isNull(ctaDTO.getPublishDate())){
+            exceptionService.actionNotPermittedException(ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL,"CTA");
+        }
         if (!staffAdditionalInfoDTO.getEmployment().isPublished() || isNull(ctaDTO.getPublishDate())) {
             responseCTA = updateEmploymentCTA(oldCTA, ctaDTO);
         }else {
-            boolean calculatedValueChanged = isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
             if (!calculatedValueChanged) {
                 exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
             } else {
@@ -316,14 +319,14 @@ public class CostTimeAgreementService {
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", staffAdditionalInfoDTO.getEmployment().getId());
         }
-        if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && collectiveTimeAgreementDTO.getEndDate() != null && collectiveTimeAgreementDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
+        if ((staffAdditionalInfoDTO.getEmployment().getEndDate() != null && collectiveTimeAgreementDTO.getEndDate() != null && collectiveTimeAgreementDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getEmployment().getEndDate())) || (isNull(staffAdditionalInfoDTO.getEmployment().getEndDate()) && isNotNull(collectiveTimeAgreementDTO.getEndDate()))) {
             exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, collectiveTimeAgreementDTO.getEndDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
         }
         if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && collectiveTimeAgreementDTO.getStartDate().isAfter(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
             exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, collectiveTimeAgreementDTO.getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
         }
         if(staffAdditionalInfoDTO.getEmployment().isPublished()){
-            if(isNotNull(collectiveTimeAgreementDTO.getPublishDate()) && !collectiveTimeAgreementDTO.getPublishDate().isAfter(LocalDate.now())){
+            if(isNotNull(collectiveTimeAgreementDTO.getPublishDate()) && collectiveTimeAgreementDTO.getPublishDate().isBefore(LocalDate.now())){
                 exceptionService.actionNotPermittedException(PUBLISH_DATE_SHOULD_BE_IN_FUTURE);
             }
             else if(isNotNull(collectiveTimeAgreementDTO.getPublishDate())){
