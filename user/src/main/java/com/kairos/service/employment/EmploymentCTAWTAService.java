@@ -51,7 +51,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
 import static com.kairos.constants.ApiConstants.GET_VERSION_WTA;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -121,7 +121,7 @@ public class EmploymentCTAWTAService {
             exceptionService.dataNotFoundByIdException(MESSAGE_INVALIDEMPLOYMENTID, employmentId);
 
         }
-        if (employment.getEndDate() != null && updateDTO.getEndDate() != null && updateDTO.getEndDate().isBefore(employment.getEndDate())) {
+        if ((employment.getEndDate() != null && updateDTO.getEndDate() != null && updateDTO.getEndDate().isBefore(employment.getEndDate())) || (isNull(employment.getEndDate()) && isNotNull(updateDTO.getEndDate()))) {
             exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE,updateDTO.getEndDate(),employment.getEndDate());
         }
         if (employment.getEndDate() != null && updateDTO.getStartDate().isAfter(employment.getEndDate())) {

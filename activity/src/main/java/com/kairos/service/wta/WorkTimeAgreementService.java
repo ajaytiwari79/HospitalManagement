@@ -584,15 +584,18 @@ public class WorkTimeAgreementService{
         }
         validateEmploymentCTAWhileUpdate(wtadto,oldEmploymentPublished,oldWta.get());
         WTAResponseDTO wtaResponseDTO = null;
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
+        if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
+            wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), false);
+        }
+        boolean calculatedValueChanged = isCalCulatedValueChangedForWTA(oldWta.get(), wtaBaseRuleTemplates);
+        if(calculatedValueChanged && isNull(wtadto.getPublishDate())){
+            exceptionService.actionNotPermittedException(ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL,"WTA");
+        }
         if (!oldEmploymentPublished || isNull(wtadto.getPublishDate())) {
             wtaResponseDTO = updateWTAOfUnpublishedEmployment(oldWta.get(), wtadto, unitId);
             wtaRepository.save(oldWta.get());
         }else {
-            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
-            if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
-                wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), false);
-            }
-            boolean calculatedValueChanged = isCalCulatedValueChangedForWTA(oldWta.get(), wtaBaseRuleTemplates);
             if (!calculatedValueChanged) {
                 exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
             } else {
@@ -633,7 +636,7 @@ public class WorkTimeAgreementService{
             exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, wtadto.getStartDate(), wtadto.getEmploymentEndDate());
         }
         if(oldEmploymentPublished){
-            if(isNotNull(wtadto.getPublishDate()) && !wtadto.getPublishDate().isAfter(LocalDate.now())){
+            if(isNotNull(wtadto.getPublishDate()) && wtadto.getPublishDate().isBefore(LocalDate.now())){
                 exceptionService.actionNotPermittedException(PUBLISH_DATE_SHOULD_BE_IN_FUTURE);
             }
             else if(isNotNull(wtadto.getPublishDate())){
