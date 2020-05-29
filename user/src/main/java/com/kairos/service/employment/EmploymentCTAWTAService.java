@@ -51,7 +51,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
 import static com.kairos.constants.ApiConstants.GET_VERSION_WTA;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -118,12 +118,6 @@ public class EmploymentCTAWTAService {
         if (!Optional.ofNullable(employment).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_INVALIDEMPLOYMENTID, employmentId);
 
-        }
-        if (employment.getEndDate() != null && updateDTO.getEndDate() != null && updateDTO.getEndDate().isBefore(employment.getEndDate())) {
-            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE);
-        }
-        if (employment.getEndDate() != null && updateDTO.getStartDate().isAfter(employment.getEndDate())) {
-            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE);
         }
         if(!activityIntegrationService.isStaffNightWorker(unitId,employment.getStaff().getId())) {
             List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS=updateDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplateDTO -> WTATemplateType.DAYS_OFF_AFTER_A_SERIES.equals(wtaBaseRuleTemplateDTO.getWtaTemplateType()) && !wtaBaseRuleTemplateDTO.isDisabled()).collect(Collectors.toList());

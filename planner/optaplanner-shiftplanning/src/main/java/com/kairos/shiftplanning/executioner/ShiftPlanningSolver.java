@@ -21,6 +21,8 @@ import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.kairos.shiftplanning.utils.ZonedDateTimeConverter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import io.quarkus.runtime.QuarkusApplication;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.optaplanner.benchmark.api.PlannerBenchmark;
@@ -54,7 +56,8 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.enums.constraint.ConstraintSubType.*;
 
-public class ShiftPlanningSolver {
+@NoArgsConstructor
+public class ShiftPlanningSolver implements QuarkusApplication {
     public static final String BASE_SRC = "src/main/resources/data/";
     public static final String STR = "\n------------------------\n";
     public static final String INFO = "info {}";
@@ -63,8 +66,8 @@ public class ShiftPlanningSolver {
     public static final String CONFIG_BREAKS = "com/kairos/shiftplanning/configuration/BreakAndIndirectActivityPlanning.solver.xml";
     public static final String CONFIG_WITH_WTA = "com/kairos/shiftplanning/configuration/ShiftPlanningRequest_activityLine_Wta.xml";
     public static String DROOL_FILE_PATH = new File("src").getAbsolutePath().replace("optaplanner-shiftplanning/src", "src/main/resources/droolsFile/Shift_Planning");
-    boolean readFromFile=false;
-    boolean disablePrimarySolver=false;
+    boolean readFromFile = false;
+    boolean disablePrimarySolver = false;
     boolean readSecondaryFromFile=false;
     boolean enableSecondarySolver=false;
     public static final String BENCH_MARKER_CONFIG = "com/kairos/shiftplanning/configuration/ShiftPlanningBenchmark.solver.xml";
@@ -88,27 +91,25 @@ public class ShiftPlanningSolver {
         System.setProperty("user.timezone", "UTC");
     }
 
-  /*  public static void main(String[] args){
+    /*public static void main(String[] args){
         SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
         String droolFilePath = "/home/droolsFile/Shift_Planning/";//"/home/droolsFile/Shift_Planning";
         String configurationFile = "/home/droolsFile/ShiftPlanning_Request_ActivityLine.solver.xml";
         ShiftPlanningSolver shiftPlanningSolver = new ShiftPlanningSolver(solverConfigDTO,droolFilePath,configurationFile);
         shiftPlanningSolver.runSolver();
-        *//*
-        if(args.length==0){
+        *//*if(args.length==0){
             throw new RuntimeException("Please give the active profile");
         }
-        updateServerAddress(args);
-        * *//*
-    }
-*/
-    public static SolverConfigDTO getSolverConfigDTO(){
+        updateServerAddress(args);*//*
+
+    }*/
+    public static SolverConfigDTO getSolverConfigDTO() {
         List<ConstraintDTO> constraintDTOS = new ArrayList<>();
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS, ScoreLevel.HARD, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH, ScoreLevel.HARD, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, ScoreLevel.HARD, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, MINIMIZE_SHIFT_ON_WEEKENDS, ScoreLevel.HARD, 5));
-        constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY,PREFER_PERMANENT_EMPLOYEE, ScoreLevel.HARD,2));
+        constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, PREFER_PERMANENT_EMPLOYEE, ScoreLevel.HARD, 2));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, ConstraintSubType.ACTIVITY_REQUIRED_TAG, ScoreLevel.HARD, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.UNIT, PRESENCE_AND_ABSENCE_SAME_TIME, ScoreLevel.HARD, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, ConstraintSubType.MAX_SHIFT_OF_STAFF, ScoreLevel.HARD, 5));
@@ -204,6 +205,9 @@ public class ShiftPlanningSolver {
     private List<File> getDroolFilesByConstraints(SolverConfigDTO solverConfig, String droolFilePath){
         File[] drlFiles = new File(droolFilePath).listFiles();
         Map<String,File> fileMap = Stream.of(drlFiles).collect(Collectors.toMap(k->k.getName(), v->v));
+        for (File drlFile : drlFiles) {
+            System.out.println(drlFile);
+        }
         List<File> droolsFiles = new ArrayList<>();
         droolsFiles.add(fileMap.get("SHIFTPLANNING_BASE.drl"));
         for (ConstraintDTO constraintDTO : solverConfig.getConstraints()) {
@@ -486,14 +490,26 @@ public class ShiftPlanningSolver {
             String xmlString = xstream.toXML(solution);
             writeXml(xmlString, fileName);
         }catch(Exception e){
-            log.error(ERROR,e.getMessage());
+            log.error(ERROR, e.getMessage());
         }
     }
-    public static  void writeXml(String xmlString,String fileName){
-        try(PrintWriter out = new PrintWriter(new File("" +fileName+".xml"))){
+
+    public static void writeXml(String xmlString, String fileName) {
+        try (PrintWriter out = new PrintWriter(new File("" + fileName + ".xml"))) {
             out.write(xmlString);
         } catch (FileNotFoundException e) {
-            log.error(ERROR,e.getMessage());
+            log.error(ERROR, e.getMessage());
         }
+    }
+
+    @Override
+    public int run(String... args) throws Exception {
+        System.out.println("sdasdasdassadsad");
+        SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
+        String droolFilePath = "/home/droolsFile/Shift_Planning";
+        String configurationFile = "/home/droolsFile/ShiftPlanning_Request_ActivityLine.solver.xml";
+        ShiftPlanningSolver shiftPlanningSolver = new ShiftPlanningSolver(solverConfigDTO, droolFilePath, configurationFile);
+        shiftPlanningSolver.runSolver();
+        return 0;
     }
 }

@@ -26,7 +26,7 @@ jar{
 }
 
 dependencies {
-    compile project(':kcommons')
+    implementation project(':kcommons')
     compile("org.aspectj:aspectjweaver:1.8.8")
     compile 'javax.validation:validation-api:2.0.0.Final'
     compile 'org.apache.commons:commons-lang3:3.7'

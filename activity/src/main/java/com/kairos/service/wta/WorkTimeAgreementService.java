@@ -502,10 +502,10 @@ public class WorkTimeAgreementService{
     }
 
     public List<WTAResponseDTO> getWTAOfEmployment(Long employmentId) {
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
+        /*List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
         List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
-        wtaResponseDTOS.addAll(ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)), WTAResponseDTO.class));
-        return wtaResponseDTOS;
+        wtaResponseDTOS.addAll();*/
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)), WTAResponseDTO.class);
     }
 
 
@@ -584,20 +584,23 @@ public class WorkTimeAgreementService{
         }
         validateEmploymentCTAWhileUpdate(wtadto,oldEmploymentPublished,oldWta.get());
         WTAResponseDTO wtaResponseDTO = null;
-        if (!oldEmploymentPublished || isNull(wtadto.getPublishDate())) {
-            wtaResponseDTO = updateWTAOfUnpublishedEmployment(oldWta.get(), wtadto, unitId);
-            wtaRepository.save(oldWta.get());
-        }
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
         if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
             wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), false);
         }
         boolean calculatedValueChanged = isCalCulatedValueChangedForWTA(oldWta.get(), wtaBaseRuleTemplates);
-        if(!calculatedValueChanged){
-            exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
+        if(calculatedValueChanged && isNull(wtadto.getPublishDate())){
+            exceptionService.actionNotPermittedException(ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL,"WTA");
         }
-        else {
-            wtaResponseDTO = updateWTAOfPublishedEmployment(oldWta.get(), wtadto, unitId,save);
+        if (!oldEmploymentPublished || isNull(wtadto.getPublishDate())) {
+            wtaResponseDTO = updateWTAOfUnpublishedEmployment(oldWta.get(), wtadto, unitId);
+            wtaRepository.save(oldWta.get());
+        }else {
+            if (!calculatedValueChanged) {
+                exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE,"WTA");
+            } else {
+                wtaResponseDTO = updateWTAOfPublishedEmployment(oldWta.get(), wtadto, unitId, save);
+            }
         }
         return wtaResponseDTO;
     }
@@ -626,6 +629,12 @@ public class WorkTimeAgreementService{
     }
 
     private void validateEmploymentCTAWhileUpdate(WTADTO wtadto, Boolean oldEmploymentPublished, WorkingTimeAgreement oldWTA){
+        if ((wtadto.getEmploymentEndDate() != null && wtadto.getEndDate() != null && wtadto.getEndDate().isBefore(wtadto.getEmploymentEndDate())) || (isNull(oldWTA.getEndDate()) && isNull(wtadto.getEmploymentEndDate()) && isNotNull(wtadto.getEndDate()))) {
+            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE);
+        }
+        if (wtadto.getEmploymentEndDate() != null && wtadto.getStartDate().isAfter(wtadto.getEmploymentEndDate())) {
+            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE);
+        }
         if (wtadto.getEmploymentEndDate() != null && wtadto.getEndDate() != null && wtadto.getEndDate().isBefore(wtadto.getEmploymentEndDate())) {
             exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, wtadto.getEndDate(), wtadto.getEmploymentEndDate());
         }
@@ -633,7 +642,7 @@ public class WorkTimeAgreementService{
             exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, wtadto.getStartDate(), wtadto.getEmploymentEndDate());
         }
         if(oldEmploymentPublished){
-            if(isNotNull(wtadto.getPublishDate()) && !wtadto.getPublishDate().isAfter(LocalDate.now())){
+            if(isNotNull(wtadto.getPublishDate()) && wtadto.getPublishDate().isBefore(LocalDate.now())){
                 exceptionService.actionNotPermittedException(PUBLISH_DATE_SHOULD_BE_IN_FUTURE);
             }
             else if(isNotNull(wtadto.getPublishDate())){
@@ -776,7 +785,6 @@ public class WorkTimeAgreementService{
         newWta.setOrganizationParentId(oldWta.getOrganizationParentId());
         newWta.setStartDate(publishDate);
         newWta.setRuleTemplateIds(null);
-        oldWta.setDisabled(true);
         oldWta.setEndDate(publishDate.equals(oldWta.getStartDate()) ? oldWta.getStartDate() : publishDate.minusDays(1));
         oldWta.setId(null);
         if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {

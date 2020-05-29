@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.ws.rs.QueryParam;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
@@ -223,7 +222,7 @@ public class CounterDistController {
     }
 
     @PostMapping(UNIT_URL + COUNTER_DIST_URL + "/staff/access_group/{accessGroupId}/update_kpi")
-    public ResponseEntity<Map<String, Object>> updateStaffAccessGroupKPISetting(@PathVariable Long unitId, @PathVariable Long accessGroupId, @RequestBody AccessGroupPermissionCounterDTO accessGroups, @QueryParam("created") Boolean created) {
+    public ResponseEntity<Map<String, Object>> updateStaffAccessGroupKPISetting(@PathVariable Long unitId, @PathVariable Long accessGroupId, @RequestBody AccessGroupPermissionCounterDTO accessGroups, @RequestParam("created") Boolean created) {
         counterManagementService.addAndRemoveStaffAccessGroupKPISetting(unitId, accessGroupId, accessGroups, created);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }

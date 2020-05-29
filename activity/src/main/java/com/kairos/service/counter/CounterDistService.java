@@ -304,7 +304,8 @@ public class CounterDistService extends MongoBaseService {
         List<ApplicableKPI> applicableKPIS = getApplicableKPIS(tabKPIMappingDTOS, unitId, level, accessGroupPermissionCounterDTO, entriesToSave, kpiIds, tabKpiMap);
         Map<BigInteger, String> kpiIdAndTitleMap = applicableKPIS.stream().collect(Collectors.toMap(ApplicableKPI::getActiveKpiId, ApplicableKPI::getTitle));
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffId(tabIds, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), unitId, level);
-        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(new FilterCriteriaDTO(unitId, staffId, kpiIds, accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin()), unitId, accessGroupPermissionCounterDTO.getStaffId());
+        FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(unitId, staffId, kpiIds, accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin());
+        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
         tabKPIDTOS.forEach(tabKPIDTO -> {
             tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
             if (kpiIdAndTitleMap.get(tabKPIDTO.getKpi().getId()) != null) {

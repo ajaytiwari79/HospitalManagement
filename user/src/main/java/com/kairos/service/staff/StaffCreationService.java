@@ -16,6 +16,7 @@ import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
@@ -212,7 +213,8 @@ public class StaffCreationService {
         staff = updateStaffDetailsOnCreationOfStaff(organization, payload);
         staff.setUser(user);
         staffGraphRepository.save(staff);
-        positionService.createPosition(organization, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis(), unitId);
+        Long organizationAccessGroupId =organization.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toList()).contains(payload.getAccessGroupId())?payload.getAccessGroupId(): accessGroupRepository.accessGroupByOrganizationIdAndParentAccessGroupId(organization.getId(),payload.getAccessGroupId());
+        positionService.createPosition(organization, staff, organizationAccessGroupId, DateUtils.getCurrentDateMillis(), unitId);
         if (StaffStatusEnum.ACTIVE.equals(payload.getCurrentStatus())) {
             staffService.addStaffInChatServer(staff);
             DefaultKPISettingDTO defaultKPISettingDTO = new DefaultKPISettingDTO(Arrays.asList(staff.getId()));

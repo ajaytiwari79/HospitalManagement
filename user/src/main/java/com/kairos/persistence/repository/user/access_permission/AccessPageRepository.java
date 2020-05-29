@@ -112,7 +112,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     @Query("MATCH (org:Unit) WHERE id(org)={0} WITH org\n" +
             "MATCH(org)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(accessgroup:AccessGroup{deleted: false}) WITH accessgroup\n" +
             "MATCH(accessgroup)-[r:" + HAS_ACCESS_OF_TABS + "]->(accessPage:AccessPage{isModule:true}) WITH  r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage\n" +
-            "RETURN DISTINCT id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.sequence as sequence," +
+            "RETURN DISTINCT id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.sequence as sequence,accessPage.editable as editable," +
             "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub, \n" +
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion, \n" +
             "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization  ORDER BY id(accessPage)")
@@ -124,7 +124,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH(subPage)-[subTabs:"+SUB_PAGE+"]->(sub:AccessPage)\n" +
             "WITH r,subPage,id(accessPage) as parentTabId,subTabs,\n" +
             "r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization\n" +
-            "RETURN id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,subPage.sequence as sequence, parentTabId, " +
+            "RETURN id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,subPage.sequence as sequence,subPage.editable as editable, parentTabId, " +
             "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
             "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +

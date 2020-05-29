@@ -39,7 +39,7 @@ repositories {
     maven { url "http://repo.spring.io/release/" }
 }
 
-task wrapper(type: Wrapper) { gradleVersion = '4.4' }
+task wrapper(type: Wrapper) { gradleVersion = '6.3' }
 
 ext {
     springCloudVersion = 'Finchley.RELEASE'
