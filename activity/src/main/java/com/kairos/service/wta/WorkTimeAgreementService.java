@@ -785,7 +785,6 @@ public class WorkTimeAgreementService{
         newWta.setOrganizationParentId(oldWta.getOrganizationParentId());
         newWta.setStartDate(publishDate);
         newWta.setRuleTemplateIds(null);
-        oldWta.setDisabled(true);
         oldWta.setEndDate(publishDate.equals(oldWta.getStartDate()) ? oldWta.getStartDate() : publishDate.minusDays(1));
         oldWta.setId(null);
         if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
