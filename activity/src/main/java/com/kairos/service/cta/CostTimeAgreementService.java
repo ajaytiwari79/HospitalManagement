@@ -288,7 +288,6 @@ public class CostTimeAgreementService {
         List<CTARuleTemplate> ctaRuleTemplates = getCtaRuleTemplates(ctaDTO, costTimeAgreement);
         costTimeAgreement.setId(oldCTA.getId());
         oldCTA.setId(null);
-        oldCTA.setDisabled(true);
         oldCTA.setEndDate(publishDate.equals(oldCTA.getStartDate()) ? oldCTA.getStartDate() : publishDate.minusDays(1));
         costTimeAgreementRepository.save(oldCTA);
         costTimeAgreement.setStartDate(oldCTA.getEndDate().plusDays(1));
@@ -609,9 +608,9 @@ public class CostTimeAgreementService {
     public CTATableSettingWrapper getVersionsCTA(Long unitId, List<Long> upIds) {
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTabId(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getParentCTAByUpIds(upIds);
-        Map<Long, List<CTAResponseDTO>> ctaResponseMap = costTimeAgreementRepository.getVersionsCTA(upIds).stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
+        /*Map<Long, List<CTAResponseDTO>> ctaResponseMap = costTimeAgreementRepository.getVersionsCTA(upIds).stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
         ctaResponseDTOS.forEach(c -> c.setVersions(ctaResponseMap.get(c.getEmploymentId())));
-        return new CTATableSettingWrapper(ctaResponseDTOS, tableConfiguration);
+        */return new CTATableSettingWrapper(ctaResponseDTOS, tableConfiguration);
     }
 
     public CTAResponseDTO getDefaultCTA(Long unitId, Long expertiseId) {

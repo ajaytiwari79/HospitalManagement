@@ -502,10 +502,10 @@ public class WorkTimeAgreementService{
     }
 
     public List<WTAResponseDTO> getWTAOfEmployment(Long employmentId) {
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
+        /*List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
         List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
-        wtaResponseDTOS.addAll(ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)), WTAResponseDTO.class));
-        return wtaResponseDTOS;
+        wtaResponseDTOS.addAll();*/
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)), WTAResponseDTO.class);
     }
 
 
@@ -629,6 +629,12 @@ public class WorkTimeAgreementService{
     }
 
     private void validateEmploymentCTAWhileUpdate(WTADTO wtadto, Boolean oldEmploymentPublished, WorkingTimeAgreement oldWTA){
+        if ((wtadto.getEmploymentEndDate() != null && wtadto.getEndDate() != null && wtadto.getEndDate().isBefore(wtadto.getEmploymentEndDate())) || (isNull(oldWTA.getEndDate()) && isNull(wtadto.getEmploymentEndDate()) && isNotNull(wtadto.getEndDate()))) {
+            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE);
+        }
+        if (wtadto.getEmploymentEndDate() != null && wtadto.getStartDate().isAfter(wtadto.getEmploymentEndDate())) {
+            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE);
+        }
         if (wtadto.getEmploymentEndDate() != null && wtadto.getEndDate() != null && wtadto.getEndDate().isBefore(wtadto.getEmploymentEndDate())) {
             exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, wtadto.getEndDate(), wtadto.getEmploymentEndDate());
         }
