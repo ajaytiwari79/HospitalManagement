@@ -15,8 +15,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class SeniorAndChildCareDaysDTO {
-    private List<CareDaysDTO> seniorDays = new ArrayList<>();
-    private List<CareDaysDTO> childCareDays = new ArrayList<>();
+    private List<CareDaysDTO> seniorDays;
+    private List<CareDaysDTO> childCareDays;
 
     public SeniorAndChildCareDaysDTO() {
         this.seniorDays = new ArrayList<>();
