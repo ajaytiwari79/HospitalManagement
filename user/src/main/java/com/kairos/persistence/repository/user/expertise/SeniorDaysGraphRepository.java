@@ -32,7 +32,7 @@ public interface SeniorDaysGraphRepository  extends Neo4jBaseRepository<SeniorDa
     void setEndDateToSeniorDays(Long id, Long parentSeniorDaysId, String endDate);
 
     @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]->(seniorDays:SeniorDays{deleted:false})-[careDayRel:"+HAS_CARE_DAYS+"]-(careDays:CareDays) " +
-            "WHERE id(expertise)={0} AND seniorDays.startDate <= DATE({1}) AND (seniorDays.endDate IS NULL  OR DATE({1})<=seniorDays.endDate) \" +\n" +
+            "WHERE id(expertise)={0} AND seniorDays.startDate <= DATE({1}) AND (seniorDays.endDate IS NULL  OR DATE({1})<=seniorDays.endDate) " +
             " RETURN seniorDays,COLLECT(careDayRel),COLLECT(careDays)")
     SeniorDays findSeniorDaysBySelectedDate(Long expertiseId, String selectedDate);
 }
