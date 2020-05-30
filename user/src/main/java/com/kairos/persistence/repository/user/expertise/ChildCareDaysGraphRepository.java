@@ -33,7 +33,7 @@ public interface ChildCareDaysGraphRepository extends Neo4jBaseRepository<ChildC
     void setEndDateToChildCareDays(Long id, Long childCareDaysId, String endDate);
 
     @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]->(ccd:ChildCareDays{deleted:false})-[careDayRel:"+HAS_CARE_DAYS+"]-(careDays:CareDays) " +
-            "WHERE id(expertise)={0} AND ccd.startDate <= DATE({1}) AND (ccd.endDate IS NULL  OR DATE({1})<=ccd.endDate) \" +\n" +
+            "WHERE id(expertise)={0} AND ccd.startDate <= DATE({1}) AND (ccd.endDate IS NULL  OR DATE({1})<=ccd.endDate) " +
             " RETURN ccd,COLLECT(careDayRel),COLLECT(careDays)")
     ChildCareDays findChildCareDaysBySelectedDate(Long expertiseId, String selectedDate);
 
