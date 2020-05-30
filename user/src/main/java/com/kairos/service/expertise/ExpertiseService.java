@@ -464,8 +464,8 @@ public class ExpertiseService {
         String date=selectedDate==null?getLocalDate().toString():selectedDate.toString();
         SeniorDays seniorDay=seniorDaysGraphRepository.findSeniorDaysBySelectedDate(expertiseId,date);
         ChildCareDays childCareDay=childCareDaysGraphRepository.findChildCareDaysBySelectedDate(expertiseId,date);
-        List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(seniorDay.getCareDays(), CareDaysDTO.class);
-        List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyCollectionPropertiesByMapper(childCareDay.getCareDays(), CareDaysDTO.class);
+        List<CareDaysDTO> childCareDays =isNull(seniorDay) ? new ArrayList<>(): ObjectMapperUtils.copyCollectionPropertiesByMapper(seniorDay.getCareDays(), CareDaysDTO.class);
+        List<CareDaysDTO> seniorDays = isNull(childCareDay) ? new ArrayList<>():ObjectMapperUtils.copyCollectionPropertiesByMapper(childCareDay.getCareDays(), CareDaysDTO.class);
         return new SeniorAndChildCareDaysDTO(seniorDays, childCareDays);
     }
 
