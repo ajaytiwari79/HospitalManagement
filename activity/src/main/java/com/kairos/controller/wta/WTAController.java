@@ -287,5 +287,12 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.getWorkTimeAgreement(staffFilterDTO,startDate,endDate));
     }
 
+    @ApiOperation(value = "update StartDate and EndDate")
+    @PostMapping(value = UNIT_URL+"/update_startDate_endDate")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffNightWorkerDetails(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateDatesInCTAWTA(unitId));
+    }
+
 
 }

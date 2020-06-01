@@ -20,7 +20,7 @@ import java.util.Optional;
  * @Modified added organization and staff for personal copy
  */
 @Document
-public class WorkingTimeAgreement extends MongoBaseEntity {
+public class WorkingTimeAgreement extends MongoBaseEntity implements Comparable<WorkingTimeAgreement>{
 
     @NotNull(message = "error.WorkingTimeAgreement.name.notnull")
     private String name;
@@ -207,4 +207,8 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     }
 
 
+    @Override
+    public int compareTo(WorkingTimeAgreement workingTimeAgreement) {
+        return this.startDate.compareTo(workingTimeAgreement.startDate);
+    }
 }
