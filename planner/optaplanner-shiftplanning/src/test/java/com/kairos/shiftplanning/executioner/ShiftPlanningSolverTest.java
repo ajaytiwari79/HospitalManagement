@@ -1,3 +1,4 @@
+
 package com.kairos.shiftplanning.executioner;
 
 import com.kairos.dto.planner.solverconfig.ConstraintDTO;

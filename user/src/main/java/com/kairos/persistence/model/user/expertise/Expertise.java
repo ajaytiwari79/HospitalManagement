@@ -45,15 +45,8 @@ public class Expertise extends UserBaseEntity {
 
     private boolean published;
 
-
-    @Relationship(type = HAS_SENIOR_DAYS)
-    private List<CareDays> seniorDays;
-
     @Relationship(type = HAS_PROTECTED_DAYS_OFF_SETTINGS)
     private List<ProtectedDaysOffSetting> protectedDaysOffSettings = new ArrayList<>();
-
-    @Relationship(type = HAS_CHILD_CARE_DAYS)
-    private List<CareDays> childCareDays;
 
     @Relationship(type = HAS_EXPERTISE_LINES)
     private List<ExpertiseLine> expertiseLines = new ArrayList<>();
@@ -93,15 +86,6 @@ public class Expertise extends UserBaseEntity {
         this.endDate = endDate;
         this.published = published;
         this.expertiseLines = expertiseLines;
-    }
-
-    public List<CareDays> getSeniorDays() {
-        return seniorDays = Optional.ofNullable(seniorDays).orElse(new ArrayList<>());
-    }
-
-
-    public List<CareDays> getChildCareDays() {
-        return childCareDays = Optional.ofNullable(childCareDays).orElse(new ArrayList<>());
     }
 
     public ExpertiseLine getCurrentlyActiveLine(LocalDate selectedDate) {
