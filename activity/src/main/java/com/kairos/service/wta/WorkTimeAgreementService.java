@@ -981,7 +981,7 @@ public class WorkTimeAgreementService{
                 updateCTADates(costTimeAgreements1, employmentLinesDTO);
                 updateWTADates(workTimeAgreements1, employmentLinesDTO);
             }
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentDTO.getId(), new HashSet<>());
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentDTO.getId(), new HashSet<>(),null);
             costTimeAgreementRepository.saveEntities(costTimeAgreements);
             for (CostTimeAgreement costTimeAgreement : costTimeAgreements) {
                 CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.findCTAById(costTimeAgreement.getId());
