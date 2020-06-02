@@ -156,5 +156,9 @@ public class ChildCareDaysService {
 
     }
 
+    public boolean deleteChildCareDays(Long childCareId) {
+        return childCareDaysGraphRepository.deleteChildCareDays(childCareId);
+    }
+
 
 }
