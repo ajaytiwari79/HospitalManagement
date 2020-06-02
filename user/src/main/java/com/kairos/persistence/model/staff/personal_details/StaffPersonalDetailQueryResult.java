@@ -64,6 +64,7 @@ public class StaffPersonalDetailQueryResult {
     private List<Long> expertiseIds;
     private List<Employment> employments;
     private String privateEmail;
+    private Set<Long> skillIds;
 
     public Integer getAge() {
         this.age=this.cprNumber!=null?Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears():null;

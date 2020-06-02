@@ -633,13 +633,10 @@ public class WorkTimeAgreementService{
 
     private void validateEmploymentCTAWhileUpdate(WTADTO wtadto, Boolean oldEmploymentPublished, WorkingTimeAgreement oldWTA){
         if ((wtadto.getEmploymentEndDate() != null && wtadto.getEndDate() != null && wtadto.getEndDate().isBefore(wtadto.getEmploymentEndDate())) || (isNull(oldWTA.getEndDate()) && isNull(wtadto.getEmploymentEndDate()) && isNotNull(wtadto.getEndDate()))) {
-            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE);
+            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, "WTA");
         }
         if (wtadto.getEmploymentEndDate() != null && wtadto.getStartDate().isAfter(wtadto.getEmploymentEndDate())) {
-            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE);
-        }
-        if (wtadto.getEmploymentEndDate() != null && wtadto.getEndDate() != null && wtadto.getEndDate().isBefore(wtadto.getEmploymentEndDate())) {
-            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, wtadto.getEndDate(), wtadto.getEmploymentEndDate());
+            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, "WTA");
         }
         if (wtadto.getEmploymentEndDate() != null && wtadto.getStartDate().isAfter(wtadto.getEmploymentEndDate())) {
             exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, wtadto.getStartDate(), wtadto.getEmploymentEndDate());
@@ -981,7 +978,7 @@ public class WorkTimeAgreementService{
                 updateCTADates(costTimeAgreements1, employmentLinesDTO);
                 updateWTADates(workTimeAgreements1, employmentLinesDTO);
             }
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentDTO.getId(), new HashSet<>());
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentDTO.getId(), new HashSet<>(),null);
             costTimeAgreementRepository.saveEntities(costTimeAgreements);
             for (CostTimeAgreement costTimeAgreement : costTimeAgreements) {
                 CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.findCTAById(costTimeAgreement.getId());
