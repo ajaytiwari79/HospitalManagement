@@ -68,4 +68,10 @@ public class SeniorDaysController {
     public ResponseEntity<Map<String, Object>> publishSeniorDays(@PathVariable Long seniorDayId, @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, seniorDaysService.publishSeniorDays(seniorDayId, publishedDate));
     }
+
+    @ApiOperation(value = "delete a senior days for expertise")
+    @DeleteMapping(value =  COUNTRY_URL + "/senior_days/{seniorDayId}")
+    public ResponseEntity<Map<String, Object>> deleteSeniorDays(@PathVariable Long seniorDayId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, seniorDaysService.deleteSeniorDays(seniorDayId));
+    }
 }

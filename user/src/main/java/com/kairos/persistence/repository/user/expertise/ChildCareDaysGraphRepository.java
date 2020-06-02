@@ -8,8 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO_EXPERTISE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CARE_DAYS;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface ChildCareDaysGraphRepository extends Neo4jBaseRepository<ChildCareDays, Long> {
@@ -36,5 +35,10 @@ public interface ChildCareDaysGraphRepository extends Neo4jBaseRepository<ChildC
             "WHERE id(expertise)={0} AND ccd.startDate <= DATE({1}) AND (ccd.endDate IS NULL  OR DATE({1})<=ccd.endDate) " +
             " RETURN ccd,COLLECT(careDayRel),COLLECT(careDays)")
     ChildCareDays findChildCareDaysBySelectedDate(Long expertiseId, String selectedDate);
+
+    @Query("MATCH(child:ChildCareDays{deleted:false,published:false}) WHERE id(child)={0}" +
+            "OPTIONAL MATCH(child)-[rel:"+VERSION_OF+"]-(version:ChildCareDays) " +
+            "SET child.deleted=true,version.oneTimeUpdatedAfterPublish=false RETURN count(child)>0")
+    boolean deleteChildCareDays(Long childCareId);
 
 }
