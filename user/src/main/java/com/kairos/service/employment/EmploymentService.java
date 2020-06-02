@@ -552,8 +552,7 @@ public class EmploymentService {
             ctawtaAndAccumulatedTimebankWrapper.getWta().forEach(wta -> {
                 LocalDate wtaStartDate = wta.getStartDate();
                 LocalDate wtaEndDate = wta.getEndDate();
-                if (employment.getId().equals(wta.getEmploymentId()) && employmentLine.getEndDate() == null && (wtaEndDate == null || wtaEndDate.plusDays(1).isAfter(employmentLine.getStartDate())) ||
-                        employmentLine.getEndDate() != null && (wtaStartDate.isBefore(employmentLine.getEndDate().plusDays(1))) && (wtaEndDate == null || wtaEndDate.isAfter(employmentLine.getStartDate()) || wtaEndDate.equals(employmentLine.getStartDate()))) {
+                if (employment.getId().equals(wta.getEmploymentId()) && employmentLine.isValid(wtaStartDate,wtaEndDate)) {
                     employmentLine.setWorkingTimeAgreement(wta);
                 }
             });
@@ -567,8 +566,7 @@ public class EmploymentService {
     }
 
     private void validateAndSetCTA(EmploymentQueryResult employment, EmploymentLinesQueryResult employmentLine, CTAResponseDTO cta) {
-        if (employment.getId().equals(cta.getEmploymentId()) && employmentLine.getEndDate() == null && (cta.getEndDate() == null || cta.getEndDate().plusDays(1).isAfter(employmentLine.getStartDate())) ||
-                employmentLine.getEndDate() != null && (cta.getStartDate().isBefore(employmentLine.getEndDate().plusDays(1))) && (cta.getEndDate() == null || cta.getEndDate().isAfter(employmentLine.getStartDate()) || cta.getEndDate().equals(employmentLine.getStartDate()))) {
+        if (employment.getId().equals(cta.getEmploymentId()) && employmentLine.isValid(cta.getStartDate(),cta.getEndDate())) {
             employmentLine.setCostTimeAgreement(cta);
         }
     }

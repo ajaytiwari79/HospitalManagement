@@ -27,7 +27,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CostTimeAgreement extends MongoBaseEntity {
+public class CostTimeAgreement extends MongoBaseEntity implements Comparable<CostTimeAgreement>{
     private String name;
     private String description;
     private Expertise expertise;
@@ -83,6 +83,11 @@ public class CostTimeAgreement extends MongoBaseEntity {
                 .append(endDate)
                 .append(disabled)
                 .toHashCode();
+    }
+
+    @Override
+    public int compareTo(CostTimeAgreement costTimeAgreement) {
+        return this.startDate.compareTo(costTimeAgreement.startDate);
     }
 }
 
