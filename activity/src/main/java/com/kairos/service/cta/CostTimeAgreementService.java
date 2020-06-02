@@ -320,10 +320,10 @@ public class CostTimeAgreementService {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", staffAdditionalInfoDTO.getEmployment().getId());
         }
         if ((staffAdditionalInfoDTO.getEmployment().getEndDate() != null && collectiveTimeAgreementDTO.getEndDate() != null && collectiveTimeAgreementDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getEmployment().getEndDate())) || (isNull(oldCTA.getEndDate()) && isNull(staffAdditionalInfoDTO.getEmployment().getEndDate()) && isNotNull(collectiveTimeAgreementDTO.getEndDate()))) {
-            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, collectiveTimeAgreementDTO.getEndDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
+            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, "CTA");
         }
         if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && collectiveTimeAgreementDTO.getStartDate().isAfter(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
-            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, collectiveTimeAgreementDTO.getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
+            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, "CTA");
         }
         if(staffAdditionalInfoDTO.getEmployment().isPublished()){
             if(isNotNull(collectiveTimeAgreementDTO.getPublishDate()) && collectiveTimeAgreementDTO.getPublishDate().isBefore(LocalDate.now())){

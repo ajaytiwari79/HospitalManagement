@@ -295,6 +295,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_STAFF_ACTIVITY_SETTINGS_ABSENT = "message.staff.activity.settings.absent";
     public static final String EMPLOYMENT_TYPE_ABSENT_ACTIVITY = "employment_type.absent.activity";
     public static final String EXPERTISE_ABSENT_ACTIVITY = "expertise.absent.activity";
+    public static final String STAFF_SKILL_DOES_NOT_MATCHED = "activity.skill.not.matched";
     public static final String DEFAULT_ADDED = "default.added";
     public static final String ERROR_EMPTY_STAFF_OR_ACTIVITY_SETTING = "error.empty.staff.or.activity.setting";
     public static final String EMPLOYMENT_ABSENT = "employment.absent";
