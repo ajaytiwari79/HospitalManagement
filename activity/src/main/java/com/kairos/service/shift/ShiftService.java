@@ -34,6 +34,7 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -67,6 +68,7 @@ import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.todo.TodoService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
+import lombok.Getter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.BeanUtils;
@@ -1167,7 +1169,6 @@ public class ShiftService extends MongoBaseService {
         return shiftList;
     }
 
-<<<<<<< HEAD
     @Getter
     public class ShiftHelper {
         private Map<Long, StaffAdditionalInfoDTO> employmentIdAndstaffAdditionalInfoMap = new HashMap<>();
@@ -1296,8 +1297,4 @@ public class ShiftService extends MongoBaseService {
             }
         }
     }
-
-
-=======
->>>>>>> c61cccc24addce546620ef5cac68662d17f3ef02
 }

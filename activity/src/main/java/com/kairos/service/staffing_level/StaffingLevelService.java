@@ -987,11 +987,80 @@ public class StaffingLevelService  {
     }
 
     public PresenceStaffingLevelDto publishStaffingLevel(Long unitId,StaffingLevelPublishDTO staffingLevelPublishDTO){
-        List<StaffingLevel> staffingLevels=staffingLevelMongoRepository.findByUnitIdAndDates(unitId,staffingLevelPublishDTO.getStartDate(),staffingLevelPublishDTO.getEndDate());
-        for (StaffingLevel staffingLevel:staffingLevels) {
-            StaffingLevelUtil.updateStaffingLevelToPublish(staffingLevelPublishDTO,staffingLevel);
+            List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, staffingLevelPublishDTO.getStartDate(), staffingLevelPublishDTO.getEndDate());
+            for (StaffingLevel staffingLevel : staffingLevels) {
+                StaffingLevelUtil.updateStaffingLevelToPublish(staffingLevelPublishDTO, staffingLevel);
+            }
+            staffingLevelMongoRepository.saveEntities(staffingLevels);
+            return ObjectMapperUtils.copyPropertiesByMapper(staffingLevels.get(0), PresenceStaffingLevelDto.class);
         }
-        staffingLevelMongoRepository.saveEntities(staffingLevels);
-        return ObjectMapperUtils.copyPropertiesByMapper(staffingLevels.get(0),PresenceStaffingLevelDto.class);
+
+    public void validateStaffingLevel(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, Shift oldStateShift) {
+        ShiftType oldStateShiftType = oldStateShift.getShiftType();
+        ShiftType shiftType = shift.getShiftType();
+        boolean activityReplaced = activityReplaced(oldStateShift, shift);
+        RuleTemplateSpecificInfo ruleTemplateSpecificInfo = new RuleTemplateSpecificInfo();
+        StaffingLevelHelper staffingLevelHelper = new StaffingLevelHelper();
+        if (activityReplaced) {
+            for (int i = 0; i < oldStateShift.getActivities().size(); i++) {
+                try {
+                    if (activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor().equals(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor())) {
+                        shift.setShiftType(oldStateShiftType);
+                        shiftValidatorService.validateStaffingLevel(phase, oldStateShift, activityWrapperMap, false, oldStateShift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper);
+                        shift.setShiftType(shiftType);
+                        shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper);
+                        if (isNull(activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority()) || isNull(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority())) {
+                            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
+                        }
+                        int rankOfOld = activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
+                        int rankOfNew = activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
+                        long durationMinutesOfOld = oldStateShift.getActivities().get(i).getInterval().getMinutes();
+                        long durationMinutesOfNew = shift.getActivities().get(i).getInterval().getMinutes();
+                        boolean allowedForReplace = true;
+                        String staffingLevelState = null;
+                        if (UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld()) && OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
+                            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, OVERSTAFFING);
+                        }
+                        if (BALANCED.equals(staffingLevelHelper.getStaffingLevelForNew()) && UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld())) {
+                            if (!(rankOfNew < rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
+                                allowedForReplace = false;
+                                staffingLevelState = UNDERSTAFFING;
+                            }
+                        }
+                        if (BALANCED.equals(staffingLevelHelper.getStaffingLevelForOld()) && OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
+                            if (!(rankOfNew < rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
+                                allowedForReplace = false;
+                                staffingLevelState = OVERSTAFFING;
+                            }
+                        }
+
+                        if (!allowedForReplace) {
+                            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, staffingLevelState);
+                        }
+                    }
+                    //else {
+//                        shift.setShiftType(oldStateShiftType);
+//                        shiftValidatorService.validateStaffingLevel(phase, oldStateShift, activityWrapperMap, false, oldStateShift.getActivities().get(i), ruleTemplateSpecificInfo,new StaffingLevelHelper());
+//                        shift.setShiftType(shiftType);
+//                        shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shift.getActivities().get(i), ruleTemplateSpecificInfo,new StaffingLevelHelper());
+//                    }
+                } catch (IndexOutOfBoundsException e) {
+                    //Intentionally left blank
+                }
+            }
+        }
+    }
+
+    private boolean activityReplaced(Shift dbShift, Shift shift) {
+        boolean activityReplaced = false;
+        if (shift.getActivities().size() == dbShift.getActivities().size()) {
+            for (int i = 0; i < shift.getActivities().size(); i++) {
+                if (!shift.getActivities().get(i).getActivityId().equals(dbShift.getActivities().get(i).getActivityId())) {
+                    activityReplaced = true;
+                    break;
+                }
+            }
+        }
+        return activityReplaced;
     }
 }
