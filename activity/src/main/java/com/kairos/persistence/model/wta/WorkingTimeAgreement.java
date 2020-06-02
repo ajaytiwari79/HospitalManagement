@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.wta;
 
-import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,7 +20,7 @@ import java.util.Optional;
  * @Modified added organization and staff for personal copy
  */
 @Document
-public class WorkingTimeAgreement extends MongoBaseEntity {
+public class WorkingTimeAgreement extends MongoBaseEntity implements Comparable<WorkingTimeAgreement>{
 
     @NotNull(message = "error.WorkingTimeAgreement.name.notnull")
     private String name;
@@ -57,17 +56,6 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private Date expiryDate;
-
-    private PlanningSetting planningSetting;
-
-
-    public PlanningSetting getPlanningSetting() {
-        return planningSetting;
-    }
-
-    public void setPlanningSetting(PlanningSetting planningSetting) {
-        this.planningSetting = planningSetting;
-    }
 
     public List<BigInteger> getRuleTemplateIds() {
         return ruleTemplateIds=Optional.ofNullable(ruleTemplateIds).orElse(new ArrayList<>());
@@ -219,4 +207,8 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     }
 
 
+    @Override
+    public int compareTo(WorkingTimeAgreement workingTimeAgreement) {
+        return this.startDate.compareTo(workingTimeAgreement.startDate);
+    }
 }

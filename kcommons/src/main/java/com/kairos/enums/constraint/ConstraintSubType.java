@@ -1,7 +1,5 @@
 package com.kairos.enums.constraint;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 public enum ConstraintSubType {
     //For Activity
     ACTIVITY_LONGEST_DURATION_RELATIVE_TO_SHIFT_LENGTH("Activity Longest Duration Relative To Shift Length"),
@@ -48,7 +46,7 @@ public enum ConstraintSubType {
         this.value = value;
     }
 
-    @JsonValue
+//    @JsonValue
     public String toValue() {
         return value;
     }

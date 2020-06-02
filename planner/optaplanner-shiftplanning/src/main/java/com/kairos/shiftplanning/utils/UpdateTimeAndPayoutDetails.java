@@ -18,8 +18,6 @@ import com.kairos.shiftplanning.domain.staff.EmploymentLine;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -75,7 +73,7 @@ public class UpdateTimeAndPayoutDetails {
             for (ShiftActivity shiftActivityForCalculation : shiftActivities) {
                 ShiftActivity shiftActivity = getShiftActivityDTO(shift, shiftActivityForCalculation);
                 if(isNotNull(shiftActivity)){
-                    ruleTemplateValid = validateCTARuleTemplate(ruleTemplate, shift.getEmployee().getEmployment(), shift.getEmployee().getUnit().getPhase().getId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getTimeType().getId(), shiftActivity.getPlannedTimes());
+                    ruleTemplateValid = validateCTARuleTemplate(ruleTemplate, shift.getEmployee().getEmployment(), shift.getEmployee().getUnit().getPlanningPeriod().getPhase().getId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getTimeType().getId(), shiftActivity.getPlannedTimes());
                     LOGGER.debug("rule template : {} valid {}", ruleTemplate.getId(), ruleTemplateValid);
                     if (ruleTemplateValid) {
                         updateScheduledAndBonusMinutes(ruleTemplate, shiftActivityForCalculation, shiftActivity);

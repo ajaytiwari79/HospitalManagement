@@ -1,21 +1,15 @@
 package com.kairos.service.kpi;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
-import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
-import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.todo.TodoDTO;
-import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
-import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoSubtype;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.service.counter.KPIBuilderCalculationService;
-import com.kairos.service.counter.PayLevelKPIService;
 import com.kairos.service.counter.TimeBankOffKPIService;
 import org.joda.time.DateTimeZone;
 import org.junit.Assert;

@@ -8,8 +8,8 @@ import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import lombok.*;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
@@ -22,10 +22,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_
 /**
  * Created by oodles on 6/10/16.
  */
+
+
 @Data
 @EqualsAndHashCode(callSuper=true)
 @KPermissionRelatedModel
 @RelationshipEntity(type = TEAM_HAS_MEMBER)
+@NoArgsConstructor
 public class StaffTeamRelationship extends UserBaseEntity {
 
     @KPermissionRelationshipTo
@@ -41,6 +44,8 @@ public class StaffTeamRelationship extends UserBaseEntity {
     private TeamType teamType;
     private LocalDate startDate;
     private LocalDate endDate;
+    private int sequence;
+    private boolean teamMembership;
 
 
     public StaffTeamRelationship(Team team, Staff staff) {
@@ -60,9 +65,10 @@ public class StaffTeamRelationship extends UserBaseEntity {
         this.staff = staff;
         this.leaderType = leaderType;
         this.teamType = teamType;
+        this.teamMembership = true;
     }
 
-    public StaffTeamRelationship(Long id,Team team, Staff staff, LeaderType leaderType, TeamType teamType,LocalDate startDate, LocalDate endDate) {
+    public StaffTeamRelationship(Long id,Team team, Staff staff, LeaderType leaderType, TeamType teamType,LocalDate startDate, LocalDate endDate,int sequence) {
         this.id=id;
         this.team = team;
         this.staff = staff;
@@ -70,6 +76,7 @@ public class StaffTeamRelationship extends UserBaseEntity {
         this.teamType = teamType;
         this.startDate =startDate;
         this.endDate =endDate;
+        this.sequence =sequence;
     }
 
 }

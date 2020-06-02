@@ -47,6 +47,7 @@ public class CollectiveTimeAgreementDTO {
     private LocalDate endDate;
     private List<Long> unitIds;
     private List<TagDTO> tags =new ArrayList<>();
+    private LocalDate publishDate;
 
 
     public void setRuleTemplates(List<CTARuleTemplateDTO> ruleTemplates) {

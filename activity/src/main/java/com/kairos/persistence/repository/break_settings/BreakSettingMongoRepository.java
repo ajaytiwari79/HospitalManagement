@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -21,7 +22,8 @@ public interface BreakSettingMongoRepository extends MongoBaseRepository<BreakSe
 
     List<BreakSettings> findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(Long expertiseId, Long shiftDurationInMinute);
 
-    List<BreakSettings> findAllByDeletedFalseAndExpertiseIdInOrderByCreatedAtAsc(List<Long> expertiseIds);
+    @Query("{deleted:false,primary:true,expertiseId:{$in:?0}}")
+    List<BreakSettings> findAllByExpertiseIds(Collection<Long> expertiseIds);
 
     @Query("{deleted:false,primary:true,expertiseId:?0}")
     BreakSettings findAllByDeletedFalseAndExpertiseId(Long expertiseId);

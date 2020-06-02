@@ -7,7 +7,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
-import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.Day;
 import com.kairos.enums.TimeCalaculationType;
@@ -25,7 +24,6 @@ import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staff.Employee;
-import com.kairos.shiftplanning.domain.staff.Employment;
 import com.kairos.shiftplanning.domain.staff.EmploymentLine;
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelActivityType;
@@ -47,7 +45,6 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
-import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +112,7 @@ public class ShiftPlanningUtility {
 
     public static int getValueByPhaseAndCounter(Unit unit, List<PhaseTemplateValue> phaseTemplateValues) {
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-            if (unit.getPhase().getId().equals(phaseTemplateValue.getPhaseId())) {
+            if (unit.getPlanningPeriod().getId().equals(phaseTemplateValue.getPhaseId())) {
                 return (int)phaseTemplateValue.getManagementValue();
             }
         }
@@ -664,7 +661,7 @@ public class ShiftPlanningUtility {
                 shiftActivity = ali.getShiftActivity();
                 id = ali.getActivity().getId();
             }
-            calculateScheduledAndDurationInMinutes(shiftActivity,shiftImp.getEmployee().getEmployment().getEmploymentLinesByDate(shiftActivity.getStartDate().toLocalDate()));
+            //calculateScheduledAndDurationInMinutes(shiftActivity,shiftImp.getEmployee().getEmployment().getEmploymentLinesByDate(shiftActivity.getStartDate().toLocalDate()));
         }
         //to add last one
         activityIds.add(shiftActivity.getActivity().getId());

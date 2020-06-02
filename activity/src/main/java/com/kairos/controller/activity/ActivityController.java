@@ -6,6 +6,7 @@ import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,6 +37,8 @@ public class ActivityController {
 
     @Inject
     private ActivityService activityService;
+    @Inject
+    private OrganizationActivityService organizationActivityService;
 
 
     @ApiOperation("Create Activity")
@@ -86,7 +89,7 @@ public class ActivityController {
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> addIconInActivity(@PathVariable BigInteger activityId, @RequestParam("file") MultipartFile file) throws
             IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.addIconInActivity(activityId, file));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.addIconInActivity(activityId, file));
     }
 
     /*
@@ -229,14 +232,14 @@ public class ActivityController {
     @ApiOperation("Upload Notes  in Activity")
     @PostMapping(value = "/activity/{activityId}/upload_note")
     ResponseEntity<Map<String, Object>> addDocumentInNotesTab(@PathVariable BigInteger activityId, @RequestParam("file") MultipartFile file) throws IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.addDocumentInNotesTab(activityId, file));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.addDocumentInNotesTab(activityId, file));
     }
 
     @ApiOperation("Update Communication Tab of Activity")
     @PutMapping(value = "/activity/communication")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateCommunicationTabOfActivity(@RequestBody CommunicationActivityDTO communicationActivityDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateCommunicationTabOfActivity(communicationActivityDTO, false));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.updateCommunicationTabOfActivity(communicationActivityDTO, false));
     }
 
     @ApiOperation("get CommunicationTab of Activity")

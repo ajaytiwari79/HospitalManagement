@@ -1,0 +1,21 @@
+package com.kairos.shiftplanning.rules;
+    dialect "java"
+import com.kairos.shiftplanning.domain.staff.*;
+import com.kairos.shiftplanning.domain.shift.*;
+import com.kairos.shiftplanning.domain.staffing_level.*;
+import com.kairos.shiftplanning.domain.skill.*;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import java.util.ArrayList;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+global HardMediumSoftLongScoreHolder scoreHolder;
+/********Employee WTA Rules*******/
+rule "Average scheduled Time"
+salience 20
+    when
+        $unit:Unit()
+        $shift:ShiftImp(!activityLineIntervals.isEmpty() && $employee:employee)
+        $shifts:List(size>0) from collect(ShiftImp($employee.equals(employee)))
+        $constraintsPenality: Integer(intValue>0) from ($employee.checkConstraints($unit,$shift,$shifts,ConstraintSubType.CHILD_CARE_DAYS_CHECK))
+    then
+        $employee.breakContraints($shift,scoreHolder,kcontext,$constraintsPenality,ConstraintSubType.CHILD_CARE_DAYS_CHECK);
+end

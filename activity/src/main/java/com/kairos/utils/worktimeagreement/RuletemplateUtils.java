@@ -316,7 +316,7 @@ public class RuletemplateUtils {
 
     public static int getConsecutiveDaysInDate(List<LocalDate> localDates) {
         if (localDates.size() < 2) return 0;
-        int count = 0;
+        int count = 1;
         int max = 0;
         int l = 1;
         while (l < localDates.size()) {

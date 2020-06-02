@@ -3,15 +3,13 @@ package com.kairos.shiftplanning.domain.timetype;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigInteger;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @XStreamAlias("TimeType")

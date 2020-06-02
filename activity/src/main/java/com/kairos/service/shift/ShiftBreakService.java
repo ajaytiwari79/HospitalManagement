@@ -26,6 +26,7 @@ import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.counter.KPIService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.time_bank.TimeBankService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -70,6 +71,7 @@ public class ShiftBreakService implements KPIService {
     @Inject
     private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @Inject private KPIBuilderCalculationService kpiBuilderCalculationService;
+    @Inject private TimeBankService timeBankService;
 
 
     public Map<BigInteger, ActivityWrapper> getBreakActivities(BreakSettings breakSetting, Long unitId) {
@@ -191,7 +193,7 @@ public class ShiftBreakService implements KPIService {
     private ShiftActivity buildBreakActivity(Date startDate, Date endDate, BreakSettings breakSettings, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         ActivityWrapper activityWrapper = activityWrapperMap.get(breakSettings.getActivityId());
         ShiftActivity shiftActivity = new ShiftActivity(activityWrapper.getActivity().getName(), startDate, endDate, activityWrapper.getActivity().getId(), activityWrapper.getTimeType());
-        shiftService.updateActivityDetailsInShiftActivity(shiftActivity, activityWrapperMap, staffAdditionalInfoDTO);
+        timeBankService.updateScheduledHoursAndActivityDetailsInShiftActivity(shiftActivity, activityWrapperMap, staffAdditionalInfoDTO);
         return shiftActivity;
     }
 

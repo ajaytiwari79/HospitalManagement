@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
@@ -54,7 +55,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps) {
         int penality = 0;
-        if(!isDisabled() && isValidForPhase(unit.getPhase().getId(),this.phaseTemplateValues)) {
+        if(!isDisabled() && isValidForPhase(unit.getPlanningPeriod().getPhase().getId(),this.phaseTemplateValues)) {
             if (CollectionUtils.containsAny(timeTypeIds,shiftImp.getActivitiesTimeTypeIds())) {
                 TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, unit.getTimeSlotMap(), shiftImp);
                 if (timeInterval != null) {

@@ -7,14 +7,11 @@ import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.staff.Employee;
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.listeners.ShiftStartTimeListener;
-import com.kairos.shiftplanning.utils.LocalDateConverter;
 import com.kairos.shiftplanning.utils.LocalTimeConverter;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
@@ -24,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -33,12 +29,13 @@ import java.time.temporal.ChronoField;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @PlanningEntity
 @XStreamAlias("ShiftImp")
@@ -53,30 +50,36 @@ public class ShiftImp implements Shift{
     @XStreamConverter(LocalTimeConverter.class)
     private LocalTime endTime;
     //These breaks are not useful while planner as those are realy planner entities
+    @Builder.Default
     private List<ShiftBreak> breaks= new ArrayList<>();
     private java.time.LocalDate startDate;
     private java.time.LocalDate endDate;
 
     @InverseRelationShadowVariable(sourceVariableName =  "shift")
+    @Builder.Default
     private List<ActivityLineInterval> activityLineIntervals = new ArrayList<>();
-    @XStreamConverter(LocalDateConverter.class)
-    private LocalDate date;
     private int scheduledMinutes;
     private int durationMinutes;
     private int plannedMinutesOfTimebank;
     private boolean isLocked;
     private boolean isCreatedByStaff;
+    @Builder.Default
     private List<ShiftActivity> actualShiftActivities = new ArrayList<>();
+    @Builder.Default
     private List<ShiftActivity> shiftActivities = new ArrayList<>();
+    @Builder.Default
     private List<ShiftActivity> breakActivities = new ArrayList<>();
+    @Builder.Default
     private Set<BigInteger> activitiesTimeTypeIds = new HashSet<>();
+    @Builder.Default
     private Set<BigInteger> activityIds = new HashSet<>();
+    @Builder.Default
     private Set<BigInteger> activitiesPlannedTimeIds = new HashSet<>();
     private int restingMinutes;
 
-    public ShiftImp(Employee employee, LocalDate date) {
+    public ShiftImp(Employee employee, LocalDate startDate) {
         this.employee = employee;
-        this.date = date;
+        this.startDate = startDate;
     }
 
     public int getBreaksDuration(List<ShiftBreak> breaks){
@@ -92,12 +95,12 @@ public class ShiftImp implements Shift{
 
     @Override
     public ZonedDateTime getStart() {
-        return startTime!=null? asZonedDateTime(date,startTime):null;
+        return startTime!=null? asZonedDateTime(startDate,startTime):null;
     }
 
     @Override
     public ZonedDateTime getEnd() {
-        return endTime!=null? endTime.isAfter(startTime) ? asZonedDateTime(date,endTime) : asZonedDateTime(date.plusDays(1),endTime) :null;
+        return endTime!=null? endTime.isAfter(startTime) ? asZonedDateTime(startDate,endTime) : asZonedDateTime(startDate.plusDays(1),endTime) :null;
     }
     @Override
     public Integer getMinutes(){
@@ -127,10 +130,22 @@ public class ShiftImp implements Shift{
         return id.equals(that.getId());
     }
 
-    public boolean isChanged(ShiftImp shiftImp){
-        if (shiftImp == null || getClass() != shiftImp.getClass()) return true;
-        return (!id.equals(shiftImp.id) || !this.startTime.equals(endTime) || !this.getEndTime().equals(shiftImp.getEndTime()) || !this.getActivityLineIntervals().equals(shiftImp.getActivityLineIntervals()) || ! this.employee.equals(shiftImp.employee));
+    public boolean isChanged(){
+        boolean isChanged;
+        shiftActivities = isNullOrElse(shiftActivities, new ArrayList<>());
+            actualShiftActivities = isNullOrElse(actualShiftActivities, new ArrayList<>());
+            isChanged = shiftActivities.size() != actualShiftActivities.size();
+            for (int i = 0; i < shiftActivities.size(); i++) {
+                if (!isChanged) {
+                    ShiftActivity activity = shiftActivities.get(i);
+                    ShiftActivity shiftActivity = actualShiftActivities.get(i);
+                    isChanged = activity.isChanged(shiftActivity);
+                }
+            }
+
+        return isChanged;
     }
+
 
     @Override
     public int hashCode() {
@@ -206,7 +221,7 @@ public class ShiftImp implements Shift{
     @Override
     public String toString() {
         return "Shift{"+id.toString()+":"+
-                date.format(DateTimeFormatter.ofPattern("[MM/dd]"))+"" + (Optional.ofNullable(startTime).isPresent()?startTime.format(DateTimeFormatter.ofPattern("HH:mm")):"") +
+                startDate.format(DateTimeFormatter.ofPattern("[MM/dd]"))+"" + (Optional.ofNullable(startTime).isPresent()?startTime.format(DateTimeFormatter.ofPattern("HH:mm")):"") +
                 "," +  (Optional.ofNullable(endTime).isPresent()?endTime.format(DateTimeFormatter.ofPattern("HH:mm")):"") +
                 "}";
     }
@@ -260,7 +275,7 @@ public class ShiftImp implements Shift{
     }
 
     public LocalDate getStartDate() {
-        return getDate();
+        return startDate;
     }
 
     public LocalDate getEndDate() {

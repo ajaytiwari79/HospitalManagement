@@ -58,7 +58,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps) {
         int penality = 0;
-        if (!isDisabled() && isValidForPhase(unit.getPhase().getId(), this.phaseTemplateValues) && isCollectionNotEmpty(plannedTimeIds) && CollectionUtils.containsAny(plannedTimeIds, shiftImp.getActivitiesPlannedTimeIds()) && isCollectionNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, shiftImp.getActivitiesTimeTypeIds())) {
+        if (!isDisabled() && isValidForPhase(unit.getPlanningPeriod().getPhase().getId(), this.phaseTemplateValues) && isCollectionNotEmpty(plannedTimeIds) && CollectionUtils.containsAny(plannedTimeIds, shiftImp.getActivitiesPlannedTimeIds()) && isCollectionNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, shiftImp.getActivitiesTimeTypeIds())) {
             if(isCollectionNotEmpty(shiftImps)){
                 int restingHours = getRestingHoursByTimeType(shiftImp,shiftImps,true);
                 int limit = getValueByPhaseAndCounter(unit, getPhaseTemplateValues());

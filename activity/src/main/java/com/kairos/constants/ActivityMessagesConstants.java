@@ -39,6 +39,9 @@ public class ActivityMessagesConstants {
     public static final String ERROR_CTA_NOTFOUND  = "error.cta.notFound";
     public static final String ERROR_CTA_INVALID  = "error.cta.invalid";
     public static final String MESSAGE_CTA_NOTFOUND = "message.cta.notFound";
+    public static final String PUBLISH_DATE_SHOULD_BE_IN_FUTURE = "publish.date.should.be.in.future";
+    public static final String STARTDATE_CANNOT_CHANGE = "startDate.cannot.change";
+    public static final String ERROR_NO_GAP = "error.no.gap";
     public static final String ERROR_DAYVALUE_ZERO = "error.DayValue.zero";
     public static final String ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY = "error.OrganizationService.name.notEmpty";
     public static final String ERROR_EXPERTISE_NAME_NOTEMPTY = "error.Expertise.name.notEmpty";
@@ -94,6 +97,8 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_OVERLAP_WITH_FULL_DAY = "message.shift.overlap.with.full_day";
     public static final String ERROR_ACTIVITY_ALREADYUSE_PRIORITY  = "error.activity.alreadyuse.priority";
     public static final String MESSAGE_ACTIVITY_PRIORITY_ID = "message.activity.priority.id";
+    public static final String MESSAGE_DUPLICATE_ACTIVITY_PRIORITY_ID = "message.duplicate.activity.priority.id";
+    public static final String MESSAGE_ACTIVITY_PRIORITY_ID_NOT_SET = "message.activity.priority.id.not.set";
     public static final String MESSAGE_ACTIVITY_PRIORITY_SAME_SEQUENCE  = "message.activity.priority.same.sequence";
     public static final String MESSAGE_ACTIVITY_PRIORITY_SEQUENCE  = "message.activity.priority.sequence";
     public static final String MESSAGE_TIMETYPE_LINKED = "message.timetype.linked";
@@ -386,5 +391,7 @@ public class ActivityMessagesConstants {
     public static final String ACTIVITY_NOT_ASSIGN_IN_PROTECTED_DAYS_OFF_RULE_TEMPLATE = "activity.not.assign.in.protected.days.off.rule.template";
     public static final String STAFF_ALREADY_SICK="staff.already.sick";
     public static final String MESSAGE_CTA_VALUE ="message.cta.value";
+    public static final String ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL = "error.value.changed.publish.date.null";
+
 
 }

@@ -10,7 +10,6 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.HttpRequestHolder;
-import com.kairos.utils.OptionalUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,21 +63,22 @@ public class UserOauth2Service implements UserDetailsService {
                 equals(UserType.SYSTEM_ACCOUNT.toString())) {
             return new UserPrincipal(user, getPermission(user));
         }
-        Optional<Integer> optInt = OptionalUtility.stringToInt(otpString);
         if(isNotNull(user.getLastSelectedOrganizationId())){
             Staff staff = staffGraphRepository.getByUser(user.getId());
             if(isNotNull(staff)){
                 user.setProfilePic(envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic());
             }
         }
+        //Todo please uncomment the code when threefactor authentication enabled
+        /*Optional<Integer> optInt = OptionalUtility.stringToInt(otpString);
         if (loggedUser.filter(u -> optInt.get().equals(u.getOtp())).isPresent()) {
             logger.info("user opt match{}", user.getOtp());
             return new UserPrincipal(user, getPermission(user));
         } else {
             // Not found...
             exceptionService.usernameNotFoundException(MESSAGE_USER_USERNAME_NOTFOUND, username);
-        }
-        return null;
+        }*/
+        return new UserPrincipal(user, getPermission(user));
     }
 
     private void updateLastSelectedOrganization(User user) {

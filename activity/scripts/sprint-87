@@ -1,0 +1,17 @@
+db.activities.find({}).forEach( function (activity) {
+var timeTypeId = activity.balanceSettingsActivityTab.timeTypeId
+if(timeTypeId){
+print("_id "+timeTypeId);
+var timeType = db.time_Type.findOne({"_id":timeTypeId});
+activity.balanceSettingsActivityTab.timeTypes = timeType.timeTypes;
+db.activities.save(activity);
+}
+});
+
+db.activities.updateMany({"translations" : {$exists:false}},{$set:{"translations" : {}}});
+db.wtaBaseRuleTemplate.updateMany({},{$set:{"constraintSetting":{}}});
+
+
+db.getCollection('shifts').remove({"staffId":2461,"employmentId":3125});
+
+Server URL/kairos/activity/api/v1/unit/2403/update_startDate_endDate  gPOST

@@ -119,7 +119,11 @@ public class CounterDataService {
         }
         for (BigInteger kpiId : new HashSet<>(filters.getKpiIds())) {
             if(kpiIdAndApplicableKPIMap.containsKey(kpiId)) {
-                Callable<CommonRepresentationData> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId), kpiIdAndApplicableKPIMap.get(kpiId));
+                Callable<CommonRepresentationData> data = () -> {
+                    KPI kpi = kpiMap.get(kpiId);
+                    kpi.setMultiDimensional(filters.isMultiDimensional());
+                    return counterServiceMapping.getService(kpi.getType()).getCalculatedKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpi, kpiIdAndApplicableKPIMap.get(kpiId));
+                };
                 Future<CommonRepresentationData> responseData = executorService.submit(data);
                 kpiResults.add(responseData);
             }
@@ -611,7 +615,8 @@ public class CounterDataService {
         TabKPIDTO tabKPIDTO = new TabKPIDTO();
         tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(copyKpi, KPIDTO.class));
         tabKPIDTO.getKpi().setSelectedFilters(counterDTO.getSelectedFilters());
-        Map<BigInteger, CommonRepresentationData> data = generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilters(), Arrays.asList(copyKpi.getId()), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin(),counterDTO.getKpiRepresentation(),counterDTO.getInterval(),counterDTO.getValue(),counterDTO.getFrequencyType()), UserContext.getUserDetails().getLastSelectedOrganizationId(), accessGroupPermissionCounterDTO.getStaffId());
+        FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(counterDTO.getSelectedFilters(), Arrays.asList(copyKpi.getId()), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin(), counterDTO.getKpiRepresentation(), counterDTO.getInterval(), counterDTO.getValue(), counterDTO.getFrequencyType(),counterDTO.isMultiDimensional());
+        Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteriaDTO, UserContext.getUserDetails().getLastSelectedOrganizationId(), accessGroupPermissionCounterDTO.getStaffId());
         if(isNotNull(data)) {
             tabKPIDTO.setData(data.get(copyKpi.getId()));
         }

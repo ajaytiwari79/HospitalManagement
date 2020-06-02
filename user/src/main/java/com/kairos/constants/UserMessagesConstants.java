@@ -8,6 +8,9 @@ public class UserMessagesConstants {
 
     public static final String MESSAGE_DATANOTFOUND = "message.dataNotFound";
     public static final String TAB = "tab";
+    public static final String STAFF_ID = "staffId";
+    public static final String LEADER_TYPE = "leaderType";
+    public static final String DATA = "data";
     public static final String PARENTACCESSPAGE = "parentAccessPage";
     public static final String COUNTRY = "country";
     public static final String MESSAGE_DUPLICATE = "message.duplicate";
@@ -275,6 +278,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_TEAMSERVICE_SOMETHINGWRONG = "message.teamservice.somethingwrong";
     public static final String MESSAGE_TEAMSERVICE_TEAM_NOTFOUND = "message.teamservice.team.notFound";
     public static final String STAFF_CAN_NOT_BE_TEAM_LEADER="message.staff.team.leader";
+    public static final String RANKING_SHOULD_BE_UNIQUE="message.ranking.should.be.unique";
     public static final String STAFF_ASSIGN_DATE_CONTAIN_BY_TEAM_DATES="message.staff.assign.date.contain.by.team.dates";
     public static final String MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT = "message.teamservice.team.alreadyexists.in.unit";
     public static final String MESSAGE_TIMESLOT_ID_NOTFOUND = "message.timeslot.id.notfound";

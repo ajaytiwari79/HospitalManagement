@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -37,8 +38,8 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     @Query(value = "{organization:{$exists:true},deleted:false}")
     List<WorkingTimeAgreement> findWTAofOrganization();
 
-    @Query(value = "{employmentId:{$exists:true},deleted:false}")
-    List<WorkingTimeAgreement> findWTAOfEmployments();
+    @Query(value = "{employmentId:{$in:?0},deleted:false}")
+    List<WorkingTimeAgreement> findWTAOfEmployments(Collection<Long> employmentIds);
 
 
 }

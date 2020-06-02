@@ -331,5 +331,9 @@ public class OrganizationServiceService {
         return organizationService;
     }
 
+    public List<OrganizationServiceQueryResult> getAllOrganizationServicesByUnitId(Long unitId){
+        return organizationServiceRepository.getAllOrganizationServicesByUnitId(unitId);
+    }
+
 
 }

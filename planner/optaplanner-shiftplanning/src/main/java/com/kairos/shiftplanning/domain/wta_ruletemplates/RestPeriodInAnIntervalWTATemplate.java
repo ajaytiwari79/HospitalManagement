@@ -45,7 +45,7 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
 
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps) {
         int penality = 0;
-        if(!isDisabled() && isValidForPhase(unit.getPhase().getId(),this.phaseTemplateValues)){
+        if(!isDisabled() && isValidForPhase(unit.getPlanningPeriod().getPhase().getId(),this.phaseTemplateValues)){
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(shiftImp, intervalUnit, intervalLength);
             shiftImps = getShiftsByInterval(dateTimeInterval, shiftImps, null);
             shiftImps.add(shiftImp);

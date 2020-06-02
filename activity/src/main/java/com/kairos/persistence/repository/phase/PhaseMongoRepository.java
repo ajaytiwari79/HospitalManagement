@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.phase;
 
 
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -32,12 +33,14 @@ public interface PhaseMongoRepository extends MongoBaseRepository<Phase, BigInte
 
     List<Phase> findByOrganizationIdAndPhaseTypeAndDeletedFalse(Long unitId, String PhaseType);
 
+    Phase findByOrganizationIdAndPhaseEnumAndDeletedFalse(Long unitId, PhaseDefaultName phaseEnum);
+
     List<Phase> findByOrganizationIdAndDeletedFalse(Long unitId);
 
     /**
-     *@since 8-10-2018
      * @param unitId
      * @return
+     * @since 8-10-2018
      */
     List<PhaseDTO> findByOrganizationIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(Long unitId);
 

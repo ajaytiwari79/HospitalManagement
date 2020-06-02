@@ -76,8 +76,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.CALCULATION_TYPE_NOT_VALID;
 import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_INVALIDREQUEST;
@@ -86,8 +86,8 @@ import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.kpi.CalculationType.*;
 import static com.kairos.enums.kpi.KPIRepresentation.INDIVIDUAL_STAFF;
 import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
-import static com.kairos.enums.wta.WTATemplateType.*;
 import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
+import static com.kairos.enums.wta.WTATemplateType.*;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.getBigIntegerSet;
 import static com.kairos.utils.counter.KPIUtils.*;
@@ -152,6 +152,19 @@ public class KPIBuilderCalculationService implements CounterService {
         }
         return getValueWithDecimalFormat(total);
     }
+
+
+    private double getNumberOfBreakInterrupt(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval,true);
+        ShiftActivityCriteria shiftActivityCriteria = getShiftActivityCriteria(kpiCalculationRelatedInfo);
+        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS, shiftActivityCriteria, false).invoke();
+        long interruptShift = filterShiftActivity.shifts.stream().filter(k -> k.getBreakActivities().stream().anyMatch(ShiftActivityDTO::isBreakInterrupt)).count();
+        if (PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
+            return isCollectionNotEmpty(filterShiftActivity.shifts) ? getValueWithDecimalFormat((interruptShift * 100.0d) / filterShiftActivity.shifts.size()) : 0;
+        } else
+            return interruptShift;
+    }
+
 
     private double getTotalByPlannedTime(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE))) {

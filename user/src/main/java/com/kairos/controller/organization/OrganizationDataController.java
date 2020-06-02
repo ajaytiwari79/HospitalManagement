@@ -78,7 +78,7 @@ public class OrganizationDataController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setUserInfoInOrganization(@Validated @RequestBody UnitManagerDTO unitManagerDTO, @PathVariable long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                companyCreationService.setUserInfoInOrganization(organizationId, null, unitManagerDTO,true,false));
+                companyCreationService.setUserInfoInOrganization(organizationId, null, unitManagerDTO));
     }
 
     @ApiOperation(value = "get address of parent organization")
@@ -115,7 +115,7 @@ public class OrganizationDataController {
     @ApiOperation(value = "update  a child Organization")
     @PutMapping(value = "/parent_organization/{organizationId}/unit/{unitId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateUnit(@Validated @RequestBody OrganizationBasicDTO organizationBasicDTO, @PathVariable long unitId) {
+    public ResponseEntity<Map<String, Object>> updateUnit(@RequestBody @Valid OrganizationBasicDTO organizationBasicDTO, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 companyCreationService.updateUnit(organizationBasicDTO, unitId));
     }

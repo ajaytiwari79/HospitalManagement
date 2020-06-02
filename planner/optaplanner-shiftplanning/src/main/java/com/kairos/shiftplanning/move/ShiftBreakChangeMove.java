@@ -5,7 +5,6 @@ import com.kairos.shiftplanning.domain.shift.ShiftBreak;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.move.helper.ShiftBreakChangeMoveHelper;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
-import org.joda.time.DateTime;
 import org.optaplanner.core.impl.heuristic.move.AbstractMove;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
@@ -54,6 +53,6 @@ public class ShiftBreakChangeMove extends AbstractMove<BreaksIndirectAndActivity
 
     @Override
     public String toString() {
-        return "Shift:"+shiftBreak.getShift().getDate()+"["+shiftBreak.getDuration()+"]"+"{"+shiftBreak.getStartTime()+"}"+"->{"+breakTime+"}";
+        return "Shift:"+shiftBreak.getShift().getStartDate()+"["+shiftBreak.getDuration()+"]"+"{"+shiftBreak.getStartTime()+"}"+"->{"+breakTime+"}";
     }
 }

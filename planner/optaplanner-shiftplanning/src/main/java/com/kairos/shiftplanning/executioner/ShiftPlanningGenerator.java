@@ -14,11 +14,10 @@ import com.kairos.enums.cta.CalculationUnit;
 import com.kairos.enums.employment_type.EmploymentCategory;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
-import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.constraints.activityconstraint.*;
 import com.kairos.shiftplanning.constraints.unitconstraint.DislikeNightShiftsForNonNightWorkers;
 import com.kairos.shiftplanning.constraints.unitconstraint.MaxLengthOfShiftInNightTimeSlot;
@@ -29,8 +28,8 @@ import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.skill.Skill;
-import com.kairos.shiftplanning.domain.staff.*;
 import com.kairos.shiftplanning.domain.staff.Employment;
+import com.kairos.shiftplanning.domain.staff.*;
 import com.kairos.shiftplanning.domain.staffing_level.*;
 import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
@@ -117,7 +116,7 @@ public class ShiftPlanningGenerator {
         List<Employee> employees= generateEmployeeList(planningDays,unit,timeTypes);
         unresolvedSolution.setEmployees(employees);
         unresolvedSolution.setShifts(generateShiftForAssignments( employees));
-        int[] activitiesRank=activities.stream().mapToInt(a->a.getRank()).toArray();
+        int[] activitiesRank=activities.stream().mapToInt(a->a.getActivityPrioritySequence()).toArray();
         unresolvedSolution.setStaffingLevelMatrix(new StaffingLevelMatrix(ShiftPlanningUtility.createStaffingLevelMatrix(unresolvedSolution.getWeekDates(),unresolvedSolution.getActivityLineIntervals(),INTERVAL_MINS,unresolvedSolution.getActivities()), activitiesRank));
         return unresolvedSolution;
     }
@@ -221,12 +220,12 @@ public class ShiftPlanningGenerator {
                 ShiftImp sa = new ShiftImp();
                 sa.setEmployee(emp);
                 sa.setId(idGenerator());
-                sa.setDate(date);
+                sa.setStartDate(date);
                 shiftList.add(sa);
                 sa = new ShiftImp();
                 sa.setEmployee(emp);
                 sa.setId(idGenerator());
-                sa.setDate(date);
+                sa.setStartDate(date);
                 shiftList.add(sa);
             }
         }
@@ -234,16 +233,16 @@ public class ShiftPlanningGenerator {
     }
 
 
-    public Map<ConstraintSubType, Constraint> getActivityContraints(){
+    public Map<ConstraintSubType, ConstraintHandler> getActivityContraints(){
         LongestDuration longestDuration = new LongestDuration(80, SOFT,-5);
         ShortestDuration shortestDuration = new ShortestDuration(60, HARD,-2);
         MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(3, SOFT,-1);//3
         MaxDiffrentActivity maxDiffrentActivity = new MaxDiffrentActivity(3, SOFT,-1);//4
         MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(60, SOFT,-1);//5
         List<DayType> dayTypes = getDayTypes();
-        ActivityDayType activityDayType = new ActivityDayType(dayTypes, SOFT,5);
-        ActivityRequiredTag activityRequiredTag = new ActivityRequiredTag(requiredTagId(), HARD,1);
-        Map<ConstraintSubType, Constraint> constraintMap = new HashMap<>();
+        ActivityDayType activityDayType = new ActivityDayType(SOFT,5);
+        ActivityRequiredTag activityRequiredTag = new ActivityRequiredTag( HARD,1);
+        Map<ConstraintSubType, ConstraintHandler> constraintMap = new HashMap<>();
         TimeSlot timeSlot = new TimeSlot(23,7);
         constraintMap.put(ConstraintSubType.ACTIVITY_LONGEST_DURATION_RELATIVE_TO_SHIFT_LENGTH,longestDuration);
         constraintMap.put(ConstraintSubType.ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH,shortestDuration);
@@ -296,7 +295,7 @@ public class ShiftPlanningGenerator {
         Map<LocalDate,Map<ConstraintSubType, WTABaseRuleTemplate>> wtaTemplateMap = getWTAMap(planningDays);
         Set<Long> functionIds = functionMap.values().stream().map(function -> function.getId()).collect(Collectors.toSet());
         Map<LocalDate,List<CTARuleTemplate>> localDateListMap = getCtaRuletemplateMap(planningDays, functionIds);
-        Activity breakActivity = new Activity(idGenerator(),new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[2], 1,10, null,new HashSet<>());
+        Activity breakActivity = new Activity(idGenerator(),new ArrayList<>(createSkillSet()),"Team A",timeTypes[2], 1,10, null,new HashSet<>());
         BreakSettings breakSettings = BreakSettings.builder().breakDurationInMinute(15l).shiftDurationInMinute(60l).activity(breakActivity).build();
         employee.setWtaRuleTemplateMap(wtaTemplateMap);
         employee.setBreakSettings(breakSettings);
@@ -385,7 +384,7 @@ public class ShiftPlanningGenerator {
     }
 
     private Employee getEmployee(String s, String s2, Employment employment, Set<Tag> tags2, Unit unit) {
-        Employee employee = new Employee(Long.valueOf(s), s2, createSkillSet(),  PaidOutFrequencyEnum.HOURLY);
+        Employee employee = new Employee(Long.valueOf(s), s2, createSkillSet());
         employee.setBaseCost(BigDecimal.valueOf(1.5));
         employee.setEmployment(employment);
         employee.setTags(tags2);
@@ -453,7 +452,7 @@ public class ShiftPlanningGenerator {
 
     private void getAbsenceActivityLine(LocalDate date, DailyActivityLine dailyActivityLine, Activity activity) {
         for(int staffNum=0;staffNum<2;staffNum++){
-            ActivityLineInterval activityLineInterval= new ActivityLineInterval(getAbsenceId(),asZonedDateTime(date),24*60,staffNum==0, activity,staffNum);
+            ActivityLineInterval activityLineInterval= new ActivityLineInterval(idGenerator(),asZonedDateTime(date),24*60,staffNum==0, activity,staffNum);
             dailyActivityLine.getActivityLineIntervals().add(activityLineInterval);
         }
     }
@@ -461,7 +460,7 @@ public class ShiftPlanningGenerator {
     private void getPresenceActivityLine(int intervalMins, LocalDate date, DailyActivityLine dailyActivityLine, Activity activity) {
         for(int staffNum=0;staffNum<5;staffNum++){//first staff is required
             for(int j=46;j<52;j++){//32..80
-                ActivityLineInterval activityLineInterval= new ActivityLineInterval(getId(),asZonedDateTime(date).plusMinutes(j*intervalMins),intervalMins,staffNum<3, activity,staffNum);
+                ActivityLineInterval activityLineInterval= new ActivityLineInterval(idGenerator(),asZonedDateTime(date).plusMinutes(j*intervalMins),intervalMins,staffNum<3, activity,staffNum);
                 dailyActivityLine.getActivityLineIntervals().add(activityLineInterval);
             }
         }
@@ -470,7 +469,7 @@ public class ShiftPlanningGenerator {
     private void getDailyActivityLine(int intervalMins, LocalDate date, DailyActivityLine dailyActivityLine, Activity activity) {
         for(int staffNum=0;staffNum<3;staffNum++){//first staff is required
             for(int j=0;j<96;j++){
-                ActivityLineInterval activityLineInterval= new ActivityLineInterval(getId(),asZonedDateTime(date).plusMinutes(j*intervalMins),intervalMins,false, activity,staffNum);
+                ActivityLineInterval activityLineInterval= new ActivityLineInterval(idGenerator(),asZonedDateTime(date).plusMinutes(j*intervalMins),intervalMins,false, activity,staffNum);
                 dailyActivityLine.getActivityLineIntervals().add(activityLineInterval);
             }
         }
@@ -513,28 +512,28 @@ public class ShiftPlanningGenerator {
         List<Activity> activityPlannerEntities = new ArrayList<>();
         BigInteger id = idGenerator();
         activityIds.add(id);
-        Activity activity = new Activity(id,new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[0], 1,10, null,tags1);
+        Activity activity = new Activity(id,new ArrayList<>(createSkillSet()),"Team A",timeTypes[0], 1,10, null,tags1);
         activity.setMethodForCalculatingTime(ShiftPlanningUtility.ENTERED_TIMES);
         activity.setFixedTimeValue(30l);
         activity.setFullDayCalculationType(TimeCalaculationType.WEEKLY_HOURS_TYPE);
         activity.setConstraints(getActivityContraints());
         id = idGenerator();
         activityIds.add(id);
-        Activity activity2 =new Activity(id,new ArrayList<>(createSkillSet2()),2,"Team B",timeTypes[0], 2,9, null, tags2);
+        Activity activity2 =new Activity(id,new ArrayList<>(createSkillSet2()),"Team B",timeTypes[0], 2,9, null, tags2);
         activity2.setMethodForCalculatingTime(ShiftPlanningUtility.FIXED_TIME);
         activity2.setFixedTimeValue(30l);
         activity2.setFullDayCalculationType(TimeCalaculationType.WEEKLY_HOURS_TYPE);
         activity2.setConstraints(getActivityContraints());
         id = idGenerator();
         activityIds.add(id);
-        Activity activity3 = new Activity(id,new ArrayList<>(createSkillSet2()),2,"Day Off",timeTypes[1], 3,2, null,tags3 );
+        Activity activity3 = new Activity(id,new ArrayList<>(createSkillSet2()),"Day Off",timeTypes[1], 3,2, null,tags3 );
         activity3.setConstraints(getActivityContraints());
         activity3.setFixedTimeValue(30l);
         activity3.setFullDayCalculationType(TimeCalaculationType.WEEKLY_HOURS_TYPE);
         activity3.setMethodForCalculatingTime(ShiftPlanningUtility.WEEKLY_HOURS);
         id = idGenerator();
         activityIds.add(id);
-        Activity activity4 = new Activity(id,new ArrayList<>(createSkillSet2()),2, BLANK_ACTIVITY,timeTypes[3], 4,1, null,tags4);
+        Activity activity4 = new Activity(id,new ArrayList<>(createSkillSet2()), BLANK_ACTIVITY,timeTypes[3], 4,1, null,tags4);
         activity4.setMethodForCalculatingTime(ShiftPlanningUtility.ENTERED_MANUALLY);
         activity4.setFixedTimeValue(30l);
         activity4.setFullDayCalculationType(TimeCalaculationType.WEEKLY_HOURS_TYPE);
@@ -593,7 +592,7 @@ public class ShiftPlanningGenerator {
         ShiftOnWeekend shiftOnWeekend = new ShiftOnWeekend();
         shiftOnWeekend.setLevel(HARD);
         shiftOnWeekend.setWeight(3);
-        Map<ConstraintSubType,Constraint> unitConstraints = new HashMap<>();
+        Map<ConstraintSubType, ConstraintHandler> unitConstraints = new HashMap<>();
         PreferedEmployementType preferedEmployementType = new PreferedEmployementType();
         preferedEmployementType.setPreferedEmploymentTypeIds(newHashSet(123l,145l));
         preferedEmployementType.setLevel(SOFT);
@@ -610,17 +609,18 @@ public class ShiftPlanningGenerator {
         phaseIds.add(phaseId);
         Phase phase = new Phase(phaseId, PhaseDefaultName.CONSTRUCTION, PhaseType.PLANNING);
         PlanningPeriod planningPeriod = new PlanningPeriod(BigInteger.valueOf(12l), planningDays.get(0), planningDays.get(planningDays.size() - 1));
-        Unit unit = Unit.builder().phase(phase).planningPeriod(planningPeriod).dayTypeMap(dayTypeMap).timeSlotMap(timeSlotMap).id(1l).constraints(unitConstraints).build();
+        planningPeriod.setPhase(phase);
+        Unit unit = Unit.builder().planningPeriod(planningPeriod).dayTypeMap(dayTypeMap).timeSlotMap(timeSlotMap).id(1l).constraints(unitConstraints).build();
         unit.setConstraints(unitConstraints);
         BigInteger plannedTimeId = idGenerator();
         plannedTimeIds.add(plannedTimeId);
-        unit.setAbsencePlannedTime(new AbsencePlannedTime(unit.getPhase().getId(),newArrayList(plannedTimeId),false));
+        unit.setAbsencePlannedTime(new AbsencePlannedTime(unit.getPlanningPeriod().getPhase().getId(),newArrayList(plannedTimeId),false));
         plannedTimeId = idGenerator();
         plannedTimeIds.add(plannedTimeId);
-        unit.setPresencePlannedTime(new PresencePlannedTime(unit.getPhase().getId(),newArrayList(plannedTimeId)));
+        unit.setPresencePlannedTime(new PresencePlannedTime(unit.getPlanningPeriod().getPhase().getId(),newArrayList(plannedTimeId)));
         plannedTimeId = idGenerator();
         plannedTimeIds.add(plannedTimeId);
-        unit.setNonWorkingPlannedTime(new NonWorkingPlannedTime(unit.getPhase().getId(),newArrayList(plannedTimeId),false));
+        unit.setNonWorkingPlannedTime(new NonWorkingPlannedTime(unit.getPlanningPeriod().getPhase().getId(),newArrayList(plannedTimeId),false));
         unit.setId(1l);
         return unit;
     }

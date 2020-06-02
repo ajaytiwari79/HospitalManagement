@@ -6,8 +6,6 @@ import org.springframework.core.convert.converter.Converter;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
-import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
-
 /**
  * Created by pradeep
  * Created at 2/7/19

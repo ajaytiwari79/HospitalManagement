@@ -105,4 +105,6 @@ public interface CustomShiftMongoRepository {
 
     void updateValidateDetailsOfShift(BigInteger shiftId, AccessGroupRole accessGroupRole, LocalDate localDate);
 
+
+
 }

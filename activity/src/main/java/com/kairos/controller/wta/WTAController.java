@@ -4,7 +4,6 @@ import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
-import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.wta.WTAOrganizationService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
@@ -43,8 +42,6 @@ public class WTAController {
     private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
     @Inject
     private WTAOrganizationService wtaOrganizationService;
-    @Inject
-    private ActivitySchedulerJobService activitySchedulerJobService;
 
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value =   COUNTRY_URL + "/wta")
@@ -269,14 +266,6 @@ public class WTAController {
     }
 
 
-
-    @ApiOperation(value = "Update Phases in Ruletemplates")
-    @GetMapping(value =  UNIT_URL+ "/update_phases_in_ruletemplate")
-    public ResponseEntity<Map<String, Object>> updatePhasesInRuletemplate(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updatePhasesInRuletemplate());
-    }
-
-
     @ApiOperation(value = "Update Phases in Ruletemplates")
     @GetMapping(value =  UNIT_URL+ "/get_protected_days_off_count")
     public ResponseEntity<Map<String, Object>> getProtectedDaysOffCount(@PathVariable long unitId ,@RequestParam Long staffId,@RequestParam BigInteger activityId) {
@@ -296,6 +285,13 @@ public class WTAController {
                                                                           @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                                                           @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.getWorkTimeAgreement(staffFilterDTO,startDate,endDate));
+    }
+
+    @ApiOperation(value = "update StartDate and EndDate")
+    @PostMapping(value = UNIT_URL+"/update_startDate_endDate")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffNightWorkerDetails(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateDatesInCTAWTA(unitId));
     }
 
 

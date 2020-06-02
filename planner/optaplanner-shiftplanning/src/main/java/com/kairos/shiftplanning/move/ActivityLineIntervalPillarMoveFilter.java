@@ -27,7 +27,7 @@ public class ActivityLineIntervalPillarMoveFilter implements SelectionFilter<Shi
         for (ActivityLineInterval activityLineInterval:activityLineIntervalList) {
                 dates.add(activityLineInterval.getStart().toLocalDate());
             dateTimes.add(activityLineInterval.getStart());
-                if(dates.size()>0 || dateTimes.size()>0 || !activityLineInterval.getStart().toLocalDate().equals(shift.getDate())){
+                if(dates.size()>0 || dateTimes.size()>0 || !activityLineInterval.getStart().toLocalDate().equals(shift.getStartDate())){
                     return false;
                 }
         }

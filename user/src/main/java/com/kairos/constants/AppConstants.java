@@ -148,6 +148,7 @@ public class AppConstants {
     // Default data to import employments from time care
     public static final Integer FULL_TIME_WEEKLY_MINUTES = 2220;
     public static final Integer NUMBER_OF_WORKING_DAYS_IN_WEEK = 5;
+    public static  final Integer MAIN_TEAM_RANKING =1;
 
     // Staff
     public static final String UNIT_MANAGER_EMPLOYMENT_DESCRIPTION = "Working as Unit Manager";

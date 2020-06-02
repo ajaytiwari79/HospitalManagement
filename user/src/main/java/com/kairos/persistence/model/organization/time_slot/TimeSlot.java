@@ -13,7 +13,6 @@ public class TimeSlot extends UserBaseEntity {
     //if value of {systemGeneratedTimeSlots = true},then it will considered
     //as standard time slots
     private boolean systemGeneratedTimeSlots;
-    private Long kmdExternalId; // for importing time slots from KMD
 
     public TimeSlot() {
         //default constructor
@@ -30,16 +29,6 @@ public class TimeSlot extends UserBaseEntity {
     public void setName(String name) {
         this.name = name;
     }
-
-
-    public Long getKmdExternalId() {
-        return kmdExternalId;
-    }
-
-    public void setKmdExternalId(Long kmdExternalId) {
-        this.kmdExternalId = kmdExternalId;
-    }
-
 
     public boolean isSystemGeneratedTimeSlots() {
         return systemGeneratedTimeSlots;

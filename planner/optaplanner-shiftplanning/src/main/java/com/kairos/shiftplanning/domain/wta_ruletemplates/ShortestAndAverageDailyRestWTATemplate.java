@@ -15,7 +15,10 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.enums.wta.MinMaxSetting.MAXIMUM;
@@ -47,7 +50,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
 
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps) {
         int penality = 0;
-        if(!isDisabled() && isValidForPhase(unit.getPhase().getId(),this.phaseTemplateValues)  && CollectionUtils.containsAny(timeTypeIds,shiftImp.getActivitiesTimeTypeIds())){
+        if(!isDisabled() && isValidForPhase(unit.getPlanningPeriod().getPhase().getId(),this.phaseTemplateValues)  && CollectionUtils.containsAny(timeTypeIds,shiftImp.getActivitiesTimeTypeIds())){
             DateTimeInterval interval = getIntervalByRuleTemplate(shiftImp,intervalUnit,intervalLength);
             shiftImps = filterShiftsByPlannedTypeAndTimeTypeIds(shiftImps,timeTypeIds,plannedTimeIds);
             shiftImps = getShiftsByInterval(interval,shiftImps,null);

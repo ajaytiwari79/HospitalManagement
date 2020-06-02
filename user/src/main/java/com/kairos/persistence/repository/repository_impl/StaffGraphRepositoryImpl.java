@@ -31,6 +31,10 @@
 public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffGraphRepositoryImpl.class);
+    public static final String UNIT_ID = "unitId";
+    public static final String EXPERTISE_IDS = "expertiseIds";
+    public static final String EMPLOYMENT_TYPE_IDS = "employmentTypeIds";
+    public static final String TAG_IDS = "tagIds";
     @Inject
     private Session session;
 
@@ -60,10 +64,10 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 " startDate:employment.startDateMillis, endDate:employment.endDateMillis } as data ");
         staffFilterQuery += stringBuilder.toString();
         Map<String, Object> queryParameters = new HashMap<>();
-        queryParameters.put("unitId", unitId);
-        queryParameters.put("expertiseIds", staffIncludeFilterDTO.getExpertiseIds());
+        queryParameters.put(UNIT_ID, unitId);
+        queryParameters.put(EXPERTISE_IDS, staffIncludeFilterDTO.getExpertiseIds());
         queryParameters.put("maxDate", staffIncludeFilterDTO.getMaxOpenShiftDate());
-        queryParameters.put("employmentTypeIds", staffIncludeFilterDTO.getEmploymentTypeIds());
+        queryParameters.put(EMPLOYMENT_TYPE_IDS, staffIncludeFilterDTO.getEmploymentTypeIds());
         List<Map> result=StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , staffFilterQuery, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(result,StaffEmploymentQueryResult.class);
     }
@@ -119,14 +123,14 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         if(isCollectionNotEmpty(tagIds)){
             stringBuilder.append("MATCH (staff)-[:BELONGS_TO_TAGS]-(tag:Tag) WHERE id(tag) IN {tagIds}");
-            queryParameters.put("tagIds",tagIds);
+            queryParameters.put(TAG_IDS,tagIds);
         }
     }
 
     public <T> List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
                                          Map<FilterType, Set<T>> filters, String searchText, String imagePath,Long loggedInStaffId,LocalDate selectedDate) {
         Map<String, Object> queryParameters = new HashMap<>();
-        queryParameters.put("unitId", unitId);
+        queryParameters.put(UNIT_ID, unitId);
         queryParameters.put("parentOrganizationId", parentOrganizationIds);
         searchText = addParams(filters, searchText, imagePath, loggedInStaffId, selectedDate, queryParameters);
         String query = "";
@@ -163,7 +167,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             queryParameters.put("accessGroupIds", convertListOfStringIntoLong(filters.get(FilterType.ACCESS_GROUPS)));
         }
         if (Optional.ofNullable(filters.get(FilterType.TAGS)).isPresent()) {
-            queryParameters.put("tagIds", convertListOfStringIntoLong(filters.get(FilterType.TAGS)));
+            queryParameters.put(TAG_IDS, convertListOfStringIntoLong(filters.get(FilterType.TAGS)));
         }
         if (Optional.ofNullable(filters.get(FilterType.FUNCTIONS)).isPresent()) {
             queryParameters.put("functionIds", convertListOfStringIntoLong(filters.get(FilterType.FUNCTIONS)));
@@ -185,10 +189,10 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
     private <T> void addEmploymentParam(Map<FilterType, Set<T>> filters, Map<String, Object> queryParameters) {
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
-            queryParameters.put("employmentTypeIds", convertListOfStringIntoLong(filters.get(FilterType.EMPLOYMENT_TYPE)));
+            queryParameters.put(EMPLOYMENT_TYPE_IDS, convertListOfStringIntoLong(filters.get(FilterType.EMPLOYMENT_TYPE)));
         }
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()) {
-            queryParameters.put("expertiseIds", convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
+            queryParameters.put(EXPERTISE_IDS, convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
         }
     }
 
@@ -222,18 +226,29 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType,Set<T>> filters,final Long unitId,final LocalDate localDateToday){
         String today = DateUtils.formatLocalDate(localDateToday,"dd-MM-yyyy");
         Map<String,Object> queryParameters = new HashMap<>();
-        queryParameters.put("unitId",unitId);
+        queryParameters.put(UNIT_ID,unitId);
         queryParameters.put("today",today);
         StringBuilder query = new StringBuilder();
         StringBuilder returnData = new StringBuilder();
-
         query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment)-[:IN_UNIT]-(unit:Unit)\n" +
                 "WHERE id(unit)={unitId} AND ( employments.endDate > '{today}' OR employments.endDate is null ) \n");
 
-        returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ")
-                    .append(" id(user) as userId, ")
-                   .append(" collect( distinct employments) as employments ");
+        returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ").append(" id(user) as userId, ").append(" collect( distinct employments) as employments ");
+        addMatchingCriteria(filters, queryParameters, query);
+        query.append(" WITH staff,employments,user MATCH (staff)-[:BELONGS_TO_TAGS]-(selectedTags:Tag) ");
+        returnData.append(" , collect( distinct selectedTags) as tags ").append(" ORDER BY staff.firstName");
+        query.append(returnData);
+            Result staffEmployments =  session.query(query.toString(),queryParameters);
+        LOGGER.info("staff with employments found are {}",staffEmployments.queryResults());
+        List<StaffEmploymentWithTag> staffEmploymentWithTags = new ArrayList<>();
+        Iterator si = staffEmployments.iterator();
+        while (si.hasNext()){
+            staffEmploymentWithTags.add(ObjectMapperUtils.copyPropertiesByMapper(si.next(),StaffEmploymentWithTag.class));
+        }
+        return staffEmploymentWithTags;
+    }
 
+    private <T> void addMatchingCriteria(Map<FilterType, Set<T>> filters, Map<String, Object> queryParameters, StringBuilder query) {
         ageMatcher(query,filters);
         employedSinceMatcher(query,filters);
         birthdayMatcher(query,filters);
@@ -248,20 +263,6 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         employmentTypeMatcher(query,filters,queryParameters);
         accessGroupMatcher(query,filters,queryParameters);
         functionsMatcher(query,filters,queryParameters);
-
-        query.append(" WITH staff,employments,user MATCH (staff)-[:BELONGS_TO_TAGS]-(selectedTags:Tag) ");
-        returnData.append(" , collect( distinct selectedTags) as tags ");
-            returnData.append(" ORDER BY staff.firstName");
-            query.append(returnData);
-
-        Result staffEmployments =  session.query(query.toString(),queryParameters);
-        LOGGER.info("staff with employments found are {}",staffEmployments.queryResults());
-        List<StaffEmploymentWithTag> staffEmploymentWithTags = new ArrayList<>();
-        Iterator si = staffEmployments.iterator();
-        while (si.hasNext()){
-            staffEmploymentWithTags.add(ObjectMapperUtils.copyPropertiesByMapper(si.next(),StaffEmploymentWithTag.class));
-        }
-        return staffEmploymentWithTags;
     }
 
     private <T> StringBuilder addComparisonValuesToQuery(StringBuilder query,String propertyToCompare,Set <Map<String,T>> customQuerySet){
@@ -322,7 +323,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
     private <T> void expertiseMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent() && filters.get(FilterType.EXPERTISE).size()!=0) {
-            queryParameters.put("expertiseIds", convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
+            queryParameters.put(EXPERTISE_IDS, convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
             query.append(" WITH staff,employments,user MATCH (staff)-[:STAFF_HAS_EXPERTISE]->(expertise:Expertise)<-[:HAS_EXPERTISE_IN]-(employments) where id(expertise) in {expertiseIds}");
         }
     }
@@ -335,7 +336,8 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             if( filters.get(FilterType.SENIORITY).size()!=0) {
                 query.append(" WHERE DATE(el.endDate) <= DATE(employments.endDate) ");
                 addComparisonValuesToQuery(query, " sl.to ", customQuerySet);
-            }if(filters.get(FilterType.PAY_GRADE_LEVEL).size()!=0) {
+            }
+            if(filters.get(FilterType.PAY_GRADE_LEVEL).size()!=0) {
                 addComparisonValuesToQuery(query, " pg.payGradeLevel ", customQuerySet);
             }
         }
@@ -354,14 +356,14 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
     private <T> void tagsMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
         if (Optional.ofNullable(filters.get(FilterType.TAGS)).isPresent() && filters.get(FilterType.TAGS).size()!=0) {
-            queryParameters.put("tagIds", convertListOfStringIntoLong(filters.get(FilterType.TAGS)));
+            queryParameters.put(TAG_IDS, convertListOfStringIntoLong(filters.get(FilterType.TAGS)));
             query.append(" WITH staff,employments,user MATCH (staff)-[:BELONGS_TO_TAGS]->(tags:Tag) where id(tags) in {tagIds}");
         }
     }
 
     private <T> void employmentTypeMatcher(final StringBuilder query,final Map<FilterType,Set<T>> filters,final Map<String,Object> queryParameters){
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()  && filters.get(FilterType.EMPLOYMENT_TYPE).size()!=0) {
-            queryParameters.put("employmentTypeIds", convertListOfStringIntoLong(filters.get(FilterType.EMPLOYMENT_TYPE)));
+            queryParameters.put(EMPLOYMENT_TYPE_IDS, convertListOfStringIntoLong(filters.get(FilterType.EMPLOYMENT_TYPE)));
             query.append(" WITH staff,employments,user MATCH (employmentType:EmploymentType)<-[:HAS_EMPLOYMENT_TYPE]-(el:EmploymentLine)<-[:HAS_EMPLOYMENT_LINES]-(employments) WHERE id(employmentType) in {employmentTypeIds}");
         }
     }
@@ -474,7 +476,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         if (StringUtils.isNotBlank(searchText)) {
            matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) +
-                    " (  LOWER(staff.firstName+staff.lastName) CONTAINS LOWER({searchText}) OR user.cprNumber STARTS WITH {searchText} )";
+                    " (  REPLACE(LOWER(staff.firstName+staff.lastName),\" \",\"\") CONTAINS REPLACE(LOWER({searchText}),\" \",\"\") OR user.cprNumber STARTS WITH {searchText} )";
         }
         return matchQueryForStaff;
     }

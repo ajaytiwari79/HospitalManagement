@@ -1,7 +1,7 @@
 package com.kairos.shiftplanning.domain.activity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.cta.AccountType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.shiftplanning.domain.shift.PlannedTime;
@@ -9,13 +9,12 @@ import com.kairos.shiftplanning.domain.staff.CTARuleTemplate;
 import com.kairos.shiftplanning.domain.staff.PayoutDistribution;
 import com.kairos.shiftplanning.domain.staff.TimeBankDistribution;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import com.kairos.shiftplanning.utils.ZonedDateTimeDeserializer;
 import lombok.*;
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 @Getter
@@ -25,8 +24,10 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class ShiftActivity implements Comparable<ShiftActivity>{
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     private ZonedDateTime startDate;
     private Activity activity;
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     private ZonedDateTime endDate;
     private List<PlannedTime> plannedTimes;
     private int scheduledMinutes;
@@ -53,6 +54,10 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     public List<PayoutDistribution> getPayoutDistributions() {
         this.payoutDistributions = isNullOrElse(payoutDistributions,new ArrayList<>());
         return this.payoutDistributions;
+    }
+
+    public boolean isChanged(ShiftActivity shiftActivity){
+        return !this.startDate.equals(shiftActivity.startDate) || !this.endDate.equals(shiftActivity.endDate) || !activity.getId().equals(shiftActivity.getActivity().getId());
     }
 
     public DateTimeInterval getInterval() {

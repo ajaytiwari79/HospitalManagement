@@ -1,6 +1,8 @@
 package com.kairos.shiftplanning.domain.shift;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.shiftplanning.utils.ZonedDateTimeDeserializer;
 import lombok.*;
 
 import java.math.BigInteger;
@@ -15,7 +17,9 @@ import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.getIntervalAsS
 @EqualsAndHashCode
 public class PlannedTime {
     private BigInteger plannedTimeId;
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     private ZonedDateTime startDate;
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     private ZonedDateTime endDate;
 
     public DateTimeInterval getInterval() {

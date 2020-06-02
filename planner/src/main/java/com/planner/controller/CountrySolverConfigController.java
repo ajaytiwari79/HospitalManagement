@@ -1,6 +1,6 @@
 package com.planner.controller;
 
-import com.kairos.dto.planner.solverconfig.country.CountrySolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.solverconfiguration.CountrySolverConfigService;
 import io.swagger.annotations.ApiOperation;
@@ -26,13 +26,13 @@ public class CountrySolverConfigController {
 
     @PostMapping
     @ApiOperation("Create Country Solver Config")
-    public ResponseEntity<Map<String, Object>> createCountrySolverConfig(@PathVariable Long countryId, @RequestBody @Valid CountrySolverConfigDTO countrySolverConfigDTO) {
+    public ResponseEntity<Map<String, Object>> createCountrySolverConfig(@PathVariable Long countryId, @RequestBody @Valid SolverConfigDTO countrySolverConfigDTO) {
         return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK, countrySolverConfigService.createCountrySolverConfig(countryId, countrySolverConfigDTO));
     }
 
     @PostMapping(value = "/copy")
     @ApiOperation("Copy Country Solver Config")
-    public ResponseEntity<Map<String, Object>> copyCountrySolverConfig(@PathVariable Long countryId, @RequestBody @Valid CountrySolverConfigDTO countrySolverConfigDTO) {
+    public ResponseEntity<Map<String, Object>> copyCountrySolverConfig(@PathVariable Long countryId, @RequestBody @Valid SolverConfigDTO countrySolverConfigDTO) {
         return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK, countrySolverConfigService.copyCountrySolverConfig(countryId, countrySolverConfigDTO));
     }
 
@@ -44,7 +44,7 @@ public class CountrySolverConfigController {
 
     @PutMapping(value = "/{solverConfigId}")
     @ApiOperation("Update Country Solver Configration")
-    public ResponseEntity<Map<String, Object>> updateCountrySolverConfig(@PathVariable Long countryId, @RequestBody @Valid CountrySolverConfigDTO countrySolverConfigDTO) {
+    public ResponseEntity<Map<String, Object>> updateCountrySolverConfig(@PathVariable Long countryId, @RequestBody @Valid SolverConfigDTO countrySolverConfigDTO) {
         return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK, countrySolverConfigService.updateCountrySolverConfig(countryId, countrySolverConfigDTO));
     }
 

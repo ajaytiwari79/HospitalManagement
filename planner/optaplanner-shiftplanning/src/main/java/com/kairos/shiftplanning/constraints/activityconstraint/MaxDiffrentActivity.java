@@ -1,7 +1,7 @@
 package com.kairos.shiftplanning.constraints.activityconstraint;
 
 import com.kairos.enums.constraint.ScoreLevel;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
@@ -17,7 +17,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class MaxDiffrentActivity implements Constraint {
+public class MaxDiffrentActivity implements ConstraintHandler {
 
     private int maxDiffrentActivity;
     private ScoreLevel level;

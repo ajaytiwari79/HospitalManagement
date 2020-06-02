@@ -1,7 +1,7 @@
 package com.kairos.shiftplanning.constraints.unitconstraint;
 
 import com.kairos.enums.constraint.ScoreLevel;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import lombok.EqualsAndHashCode;
@@ -15,7 +15,7 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class PreferedEmployementType  implements Constraint {
+public class PreferedEmployementType  implements ConstraintHandler {
     private Set<Long> preferedEmploymentTypeIds;
     private ScoreLevel level;
     private int weight;

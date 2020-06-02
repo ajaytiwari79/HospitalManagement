@@ -16,14 +16,23 @@ public interface StaffTeamRelationshipGraphRepository extends Neo4jBaseRepositor
 
 
     @Query("MATCH(t:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(staff) = {0} AND id(t)={1} return id(rel) as id, rel.leaderType as leaderType," +
-            "rel.teamType as teamType,id(staff) as staffId,id(t) as teamId")
+            "rel.sequence as sequence,rel.teamType as teamType,id(staff) as staffId,id(t) as teamId")
     StaffTeamRelationShipQueryResult findByStaffIdAndTeamId(Long staffId, Long teamId);
 
     @Query("MATCH(t:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(staff) IN {0} AND id(t)={1} return rel")
     List<StaffTeamRelationship> findByStaffIdsAndTeamId(Collection<Long> staffIds, Long teamId);
 
+    @Query("MATCH(team:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(team)={0} return collect(rel) as staffTeamRelationship")
+    List<StaffTeamRelationship> findByStaffTeamId(Long teamId);
+
     @Query("MATCH(t:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(staff) = {0} AND id(t)<>{1} AND rel.teamType='MAIN'" +
             " RETURN COUNT(rel)>0")
     boolean anyMainTeamExists(Long staffId, Long teamId);
+
+    @Query("MATCH(t:Team{deleted:false})-[rel:"+TEAM_HAS_MEMBER+"]-(staff:Staff{deleted:false}) WHERE id(staff) = {0} AND id(t)<>{2} AND rel.sequence = {1} RETURN COUNT(rel)>0 ")
+    boolean sequenceExists(Long staffId, int sequence, Long teamId);
+
+
+
 
 }

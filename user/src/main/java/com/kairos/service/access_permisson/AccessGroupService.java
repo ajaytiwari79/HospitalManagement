@@ -479,6 +479,7 @@ public class AccessGroupService {
         Organization organization = organizationService.fetchParentOrganization(accessPermissionDTO.getUnitId());
         AccessPageQueryResult readAndWritePermissionForAccessGroup = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, accessPermissionDTO.getPageId());
         AccessPageQueryResult customReadAndWritePermissionForAccessGroup = accessPageRepository.getCustomPermissionOfTab(organization.getId(), accessPermissionDTO.getStaffId(), accessPermissionDTO.getUnitId(), accessPermissionDTO.getPageId(), accessGroupId);
+
         Boolean savedReadCheck = readAndWritePermissionForAccessGroup.isRead();
         Boolean savedWriteCheck = readAndWritePermissionForAccessGroup.isWrite();
         if (Optional.ofNullable(customReadAndWritePermissionForAccessGroup).isPresent()) {
@@ -510,6 +511,7 @@ public class AccessGroupService {
     public Boolean updatePermissionsForAccessTabsOfAccessGroup(Long accessGroupId, Long accessPageId, AccessPermissionDTO accessPermissionDTO, Boolean updateChildren) {
 
         AccessPageQueryResult readAndWritePermissionOfAccessPage = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, accessPageId);
+        List<Long> organizationAccessGroupIds = accessGroupRepository.getOrganizationAccessGroupIdsList(accessGroupId);
 
         Boolean write = accessPermissionDTO.isWrite();
         Boolean read = accessPermissionDTO.isRead();
@@ -522,6 +524,12 @@ public class AccessGroupService {
         else if (readAndWritePermissionOfAccessPage.isWrite() != write && write) {
             read = true;
         }
+        if(updateChildren && isCollectionNotEmpty(organizationAccessGroupIds)){
+            for(Long organizationAccessGroupId :organizationAccessGroupIds){
+                accessGroupRepository.updatePermissionsForAccessTabsAndChildrenOfAccessGroup(accessPageId, organizationAccessGroupId, read, write);
+            }
+        }
+
         if (updateChildren) {
             // Update read/write permission of tab and its children
             return accessGroupRepository.updatePermissionsForAccessTabsAndChildrenOfAccessGroup(accessPageId, accessGroupId, read, write);

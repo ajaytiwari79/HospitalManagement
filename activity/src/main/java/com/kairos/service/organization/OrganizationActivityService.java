@@ -7,15 +7,22 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.communication_tab.FrequencySettings;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
+import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
+import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
@@ -23,23 +30,27 @@ import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.organization.SelfRosteringMetaData;
+import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ActivityStateEnum;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.model.activity.TimeType;
-import com.kairos.persistence.model.activity.tabs.ActivityCategory;
-import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
-import com.kairos.persistence.model.activity.tabs.GeneralActivityTab;
-import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
+import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.open_shift.OrderAndActivityDTO;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
+import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
@@ -56,31 +67,45 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.open_shift.OpenShiftRuleTemplateService;
 import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
+import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.shift.ShiftService;
+import com.kairos.service.shift.ShiftTemplateService;
 import com.kairos.service.unit_settings.*;
 import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.activity.ActivityWithSelectedDTO;
+import com.kairos.wrapper.phase.PhaseActivityDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.CommonsExceptionUtil.convertMessage;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
 
 /**
  * Created by vipul on 5/12/17.
@@ -146,6 +171,12 @@ public class OrganizationActivityService extends MongoBaseService {
     private CounterDistService counterDistService;
     @Inject
     private ActivitySchedulerJobService activitySchedulerJobService;
+    @Inject
+    private ShiftTemplateService shiftTemplateService;
+    @Inject
+    private PlanningPeriodService planningPeriodService;
+    @Inject
+    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -322,6 +353,15 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setCountryId(null);
         //TODO Refactor below query or might need to add parent id in activity priority domain while copying from country to organization
         TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+
+//        if (isNotNull(timeType.getActivityPriorityId())) {
+//            ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(timeType.getActivityPriorityId());
+//            ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
+//            if (isNotNull(unitActivityPriority)) {
+//                activityCopied.setActivityPriorityId(unitActivityPriority.getId());
+//            }
+//        }
+
         if (isNotNull(timeType.getActivityPriorityId())) {
             ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(timeType.getActivityPriorityId());
             ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
@@ -564,17 +604,10 @@ public class OrganizationActivityService extends MongoBaseService {
         TimeType timeType = timeTypeMongoRepository.findOneById(parentActivity.getBalanceSettingsActivityTab().getTimeTypeId());
         if (!timeType.isAllowChildActivities()) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_SETTING_ENABLE, parentActivity.getName());
-
         }
         if (activityMongoRepository.existsByActivityIdInChildActivities(parentActivity.getId())) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_CHILD, parentActivity.getName());
         }
-
-//        List<Activity> activityList = activityMongoRepository.findByActivityIdInChildActivities(parentActivity.getId(), activities.stream().map(k -> k.getId()).collect(Collectors.toList()));
-//        if (isCollectionNotEmpty(activityList)) {
-//            List<String> activityNames = activityList.stream().map(Activity::getName).collect(Collectors.toList());
-//            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_BEING_USED_AS_CHILD, activityNames);
-//        }
         activities = activities.stream().filter(k -> isCollectionNotEmpty(k.getChildActivityIds())).collect(Collectors.toList());
         if (isCollectionNotEmpty(activities)) {
             List<String> activityNames = activities.stream().map(ActivityDTO::getName).collect(Collectors.toList());
@@ -595,5 +628,186 @@ public class OrganizationActivityService extends MongoBaseService {
         List<Long> expertiseIds=activityCopied.getExpertises().stream().filter(k->activityDTO.getExpertises().contains(k)).collect(Collectors.toList());
         activityCopied.getSkillActivityTab().setActivitySkills(activitySkills);
         activityCopied.setExpertises(expertiseIds);
+    }
+
+    public GeneralActivityTab addIconInActivity(BigInteger activityId, MultipartFile file) throws IOException {
+        Activity activity =activityService.findActivityById(activityId);
+        byte[] bytes = file.getBytes();
+        String modifiedFileName = System.currentTimeMillis() + file.getOriginalFilename().substring(file.getOriginalFilename().length() - 4);
+        Path path = Paths.get(ACTIVITY_TYPE_IMAGE_PATH + modifiedFileName);
+        Files.write(path, bytes);
+        activity.getGeneralActivityTab().setOriginalIconName(file.getOriginalFilename());
+        activity.getGeneralActivityTab().setModifiedIconName(modifiedFileName);
+        activityMongoRepository.save(activity);
+        return activity.getGeneralActivityTab();
+    }
+
+    public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId) {
+        SelfRosteringMetaData publicHolidayDayTypeWrapper = getSelfRosteringMetaData(unitId);
+        List<DayType> dayTypes = publicHolidayDayTypeWrapper.getDayTypes();
+        LocalDate date = LocalDate.now();
+        int year = date.getYear();
+        TemporalField weekOfWeekBasedYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+        int currentWeek = date.get(weekOfWeekBasedYear);
+        // Set access Role of staff
+        ReasonCodeWrapper reasonCodeWrapper = publicHolidayDayTypeWrapper.getReasonCodeWrapper();
+        List<PhaseDTO> phaseDTOs = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
+        List<PhaseWeeklyDTO> phaseWeeklyDTOS = getPhaseWeeklyDTO(phaseDTOs,currentWeek,year);
+        // Creating dummy next remaining 2 years as PHASE with lowest sequence
+        createDummyPhase(year, currentWeek, phaseDTOs, phaseWeeklyDTOS);
+        return getPhaseActivityDTO(unitId, publicHolidayDayTypeWrapper, dayTypes, reasonCodeWrapper, phaseDTOs, phaseWeeklyDTOS);
+
+    }
+
+    private SelfRosteringMetaData getSelfRosteringMetaData(long unitId) {
+        SelfRosteringMetaData publicHolidayDayTypeWrapper = userIntegrationService.getPublicHolidaysDayTypeAndReasonCodeByUnitId(unitId);
+        if (!Optional.ofNullable(publicHolidayDayTypeWrapper).isPresent()) {
+            exceptionService.internalServerError(MESSAGE_SELFROSTERING_METADATA_NULL);
+        }
+        return publicHolidayDayTypeWrapper;
+    }
+
+    private List<PhaseWeeklyDTO> getPhaseWeeklyDTO(List<PhaseDTO> phaseDTOs,int currentWeek,int year) {
+        ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<>();
+        for (PhaseDTO phaseObj : phaseDTOs) {
+            if (phaseObj.getDurationType().equals(DurationType.WEEKS)) {
+                for (int i = 0; i < phaseObj.getDuration(); i++) {
+                    PhaseWeeklyDTO tempPhaseObj = phaseObj.buildWeekDTO();
+                    tempPhaseObj.setWeekCount(++currentWeek);
+                    tempPhaseObj.setYear(year);
+                    if (currentWeek >= 52) {
+                        year = year + 1;
+                        currentWeek = 0;
+                    }
+                    phaseWeeklyDTOS.add(tempPhaseObj);
+                }
+            }
+        }
+        return phaseWeeklyDTOS;
+    }
+
+    private void createDummyPhase(int year, int currentWeek, List<PhaseDTO> phaseDTOs, List<PhaseWeeklyDTO> phaseWeeklyDTOS) {
+        if (isCollectionNotEmpty(phaseDTOs)) {
+            int indexOfPhaseWithLowestSeq = phaseDTOs.size() - 1;
+            for (int start = phaseWeeklyDTOS.size(); start <= 104; start++) {
+                PhaseWeeklyDTO tempPhaseObj = phaseDTOs.get(indexOfPhaseWithLowestSeq).buildWeekDTO();
+                tempPhaseObj.setWeekCount(++currentWeek);
+                tempPhaseObj.setYear(year);
+                if (currentWeek >= 52) {
+                    year = year + 1;
+                    currentWeek = 0;
+                }
+                phaseWeeklyDTOS.add(tempPhaseObj);
+            }
+        }
+    }
+
+    private PhaseActivityDTO getPhaseActivityDTO(long unitId, SelfRosteringMetaData publicHolidayDayTypeWrapper, List<DayType> dayTypes, ReasonCodeWrapper reasonCodeWrapper, List<PhaseDTO> phaseDTOs, List<PhaseWeeklyDTO> phaseWeeklyDTOS) {
+        List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
+        List<PhaseSettingsActivityTab> phaseSettingsActivityTab = activityMongoRepository.findActivityIdAndStatusByUnitAndAccessGroupIds(unitId, new ArrayList<>(reasonCodeWrapper.getUserAccessRoleDTO().getAccessGroupIds()));
+        List<ShiftTemplateDTO> shiftTemplates = shiftTemplateService.getAllShiftTemplates(unitId);
+        PlanningPeriodDTO planningPeriodDTO = planningPeriodService.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
+        PlanningPeriod firstRequestPlanningPeriod = planningPeriodMongoRepository.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
+        LocalDate firstRequestPhasePlanningPeriodEndDate = isNotNull(firstRequestPlanningPeriod) ? firstRequestPlanningPeriod.getEndDate() : null;
+        List<PresenceTypeDTO> plannedTimes = plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
+        List<ActivityConfiguration> activityConfigurations = activityConfigurationService.findAllByUnitIdAndDeletedFalse(unitId);
+        return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),
+                publicHolidayDayTypeWrapper.getPublicHolidays(), firstRequestPhasePlanningPeriodEndDate, plannedTimes, phaseSettingsActivityTab, copyCollectionPropertiesByMapper(activityConfigurations, ActivityConfigurationDTO.class));
+    }
+
+    public NotesActivityTab addDocumentInNotesTab(BigInteger activityId, MultipartFile file) throws IOException {
+        Activity activity =activityService.findActivityById(activityId);
+        byte[] bytes = file.getBytes();
+        String modifiedFileName = System.currentTimeMillis() + file.getOriginalFilename().substring(file.getOriginalFilename().length() - 4);
+        Path path = Paths.get(ACTIVITY_TYPE_IMAGE_PATH + modifiedFileName);
+        Files.write(path, bytes);
+        activity.getNotesActivityTab().setOriginalDocumentName(file.getOriginalFilename());
+        activity.getNotesActivityTab().setModifiedDocumentName(modifiedFileName);
+        activityMongoRepository.save(activity);
+        return activity.getNotesActivityTab();
+    }
+
+    public ActivityTabsWrapper updateCommunicationTabOfActivity(CommunicationActivityDTO communicationActivityDTO, boolean updateFromOrg) {
+        validateReminderSettings(communicationActivityDTO.getActivityReminderSettings());
+        validateReminderSettings(communicationActivityDTO.getActivityCutoffReminderSettings());
+        CommunicationActivityTab communicationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(communicationActivityDTO,CommunicationActivityTab.class);
+        if(!communicationActivityTab.isAllowActivityCutoffReminder()){
+            communicationActivityTab.setActivityCutoffReminderSettings(new ArrayList<>());
+        }
+        Activity activity = activityService.findActivityById(communicationActivityDTO.getActivityId());
+        activity.setCommunicationActivityTab(communicationActivityTab);
+        activityMongoRepository.save(activity);
+        if(updateFromOrg) {
+            activitySchedulerJobService.registerJobForActivityCutoff(newArrayList(activity));
+        }
+        return new ActivityTabsWrapper(communicationActivityTab);
+    }
+
+    private boolean validateReminderSettings(List<ActivityReminderSettings> activityReminderSettings) {
+        int counter = 0;
+        if (isCollectionNotEmpty(activityReminderSettings)) {
+            for (ActivityReminderSettings currentSettings : activityReminderSettings) {
+                if (currentSettings.getSendReminder().getDurationType() == DurationType.MINUTES &&
+                        (currentSettings.getRepeatReminder().getDurationType() == DurationType.DAYS)) {
+                    exceptionService.actionNotPermittedException(REPEAT_VALUE_CANT_BE, currentSettings.getRepeatReminder().getDurationType());
+                }
+                // if both are same ie days or minute and reminder value id greater than time value
+                if (currentSettings.getSendReminder().getDurationType() == currentSettings.getRepeatReminder().getDurationType() &&
+                        currentSettings.getSendReminder().getTimeValue() < currentSettings.getRepeatReminder().getTimeValue()) {
+                    exceptionService.actionNotPermittedException(REMINDER_VALUE_CANT_BE_GREATER_THAN_REPEAT_VALUE,
+                            currentSettings.getRepeatReminder().getTimeValue(), currentSettings.getRepeatReminder().getDurationType(),
+                            currentSettings.getSendReminder().getTimeValue(), currentSettings.getSendReminder().getDurationType());
+                }
+                validateFrequencyOfReminder(activityReminderSettings, counter, currentSettings);
+                if (currentSettings.getId() == null) {
+                    currentSettings.setId(activityMongoRepository.nextSequence(ActivityReminderSettings.class.getSimpleName()));
+                }
+                counter++;
+            }
+        }
+        return true;
+    }
+
+    private void validateFrequencyOfReminder(List<ActivityReminderSettings> activityReminderSettings, int counter, ActivityReminderSettings currentSettings) {
+        if (counter > 0) {
+            ActivityReminderSettings previousSettings = activityReminderSettings.get(counter - 1);
+            if (previousSettings.isRepeatAllowed()) {
+                validateWithPreviousFrequency(currentSettings, previousSettings.getRepeatReminder());
+            } else {
+                validateWithPreviousFrequency(currentSettings, previousSettings.getSendReminder());
+            }
+        }
+    }
+
+    private void validateWithPreviousFrequency(ActivityReminderSettings currentSettings, FrequencySettings frequencySettings) {
+        // if both are same ie days or minute and reminder value id greater than time value
+        if (currentSettings.getSendReminder().getDurationType() == frequencySettings.getDurationType() &&
+                currentSettings.getSendReminder().getTimeValue() > frequencySettings.getTimeValue()) {
+            exceptionService.actionNotPermittedException(REMINDER_VALUE_CANT_BE_GREATER_THAN_LAST_REPEAT_VALUE,
+                    currentSettings.getSendReminder().getTimeValue(), currentSettings.getSendReminder().getDurationType()
+                    , frequencySettings.getTimeValue(), frequencySettings.getDurationType());
+        }
+        if (frequencySettings.getDurationType() == DurationType.MINUTES
+                && currentSettings.getSendReminder().getDurationType() == DurationType.DAYS) {
+            exceptionService.actionNotPermittedException(NEW_VALUE_CANT_BE_GREATER_THAN_PREVIOUS,
+                    currentSettings.getSendReminder().getTimeValue(), currentSettings.getSendReminder().getDurationType(), frequencySettings.getTimeValue(), frequencySettings.getDurationType());
+        }
+        if (currentSettings.getSendReminder().getDurationType() == DurationType.MINUTES &&
+                (currentSettings.getSendReminder().getDurationType() == DurationType.DAYS)) {
+            exceptionService.actionNotPermittedException(NEW_VALUE_CANT_BE_GREATER_THAN_PREVIOUS,
+                    currentSettings.getSendReminder().getTimeValue(), currentSettings.getSendReminder().getDurationType(), frequencySettings.getTimeValue(), frequencySettings.getDurationType());
+        }
+    }
+
+    public Set<BigInteger> getAllChildren(Set<BigInteger> activityIds) {
+        Set<BigInteger> activityIdsToSet=new HashSet<>();
+        Collection<Activity> activities =  activityMongoRepository.findAllById(activityIds);
+        activities.forEach(activity -> {
+            if(isCollectionNotEmpty(activity.getChildActivityIds()) || activityMongoRepository.existsByActivityIdInChildActivities(activity.getId())){
+                activityIdsToSet.add(activity.getId());
+                activityIdsToSet.addAll(activity.getChildActivityIds());
+            }
+        });
+        return activityIdsToSet;
     }
 }

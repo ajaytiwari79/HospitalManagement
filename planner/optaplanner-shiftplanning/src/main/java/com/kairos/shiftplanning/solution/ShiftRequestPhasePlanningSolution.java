@@ -30,7 +30,6 @@ import java.util.Map;
 @XStreamAlias("ShiftPlanningSolution")
 public class ShiftRequestPhasePlanningSolution {
 	private String id;
-	private Long unitId;
 	@ProblemFactCollectionProperty
     private List<Employee> employees;
     @ProblemFactCollectionProperty
@@ -52,7 +51,6 @@ public class ShiftRequestPhasePlanningSolution {
     private HardMediumSoftLongScore score;
     @ProblemFactProperty
     private StaffingLevelMatrix staffingLevelMatrix;
-
     private Map<String,List<ActivityLineInterval>> activitiesIntervalsGroupedPerDay;
 
 }

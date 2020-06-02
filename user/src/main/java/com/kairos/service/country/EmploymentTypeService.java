@@ -34,7 +34,7 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
-import com.kairos.persistence.model.user.expertise.response.ExpertiseDTO;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseBasicDetails;
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -259,7 +259,7 @@ public class EmploymentTypeService {
     }
     public PriorityGroupDefaultData getExpertiseAndEmployment(long countryId, boolean isDeleted) {
         List<EmploymentTypeDTO> employmentTypes=countryGraphRepository.getEmploymentTypes(countryId,isDeleted);
-        List<ExpertiseDTO> expertise=expertiseGraphRepository.getAllExpertiseByCountryAndDate(countryId);
+        List<ExpertiseBasicDetails> expertise=expertiseGraphRepository.getAllExpertiseByCountryAndDate(countryId);
         List<com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO> employmentTypeDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(employmentTypes, com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO.class);
         List<ExpertiseResponseDTO> expertiseResponseDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise,ExpertiseResponseDTO.class);
         return new PriorityGroupDefaultData(employmentTypeDTOS,expertiseResponseDTOS);
@@ -268,7 +268,7 @@ public class EmploymentTypeService {
     public PriorityGroupDefaultData getExpertiseAndEmploymentForUnit(long unitId, boolean isDeleted) {
         Long countryId=countryGraphRepository.getCountryIdByUnitId(unitId);
         List<EmploymentTypeDTO> employmentTypes=countryGraphRepository.getEmploymentTypes(countryId,isDeleted);
-        List<ExpertiseDTO> expertises=expertiseGraphRepository.getAllExpertiseByCountryAndDate(countryId);
+        List<ExpertiseBasicDetails> expertises=expertiseGraphRepository.getAllExpertiseByCountryAndDate(countryId);
         List<com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO> employmentTypeDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(employmentTypes, com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO.class);
         List<ExpertiseResponseDTO> expertiseResponseDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(expertises,ExpertiseResponseDTO.class);
         return new PriorityGroupDefaultData(employmentTypeDTOS,expertiseResponseDTOS);

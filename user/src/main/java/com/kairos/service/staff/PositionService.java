@@ -63,8 +63,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
@@ -572,19 +571,27 @@ public class PositionService {
         return true;
     }
 
-    public void createPosition(Organization organization, Staff staff, Long accessGroupId, Long employedSince,Long unitId) {
-        Position position = new Position();
-        position.setName("Working as staff");
-        position.setStaff(staff);
-        position.setStartDateMillis(employedSince);
-        createStaffPermission(organization, accessGroupId, position,unitId);
-        positionGraphRepository.save(position);
-        organization.getPositions().add(position);
-        organizationGraphRepository.save(organization);
+    public void createPosition(Organization organization, Staff staff, Long accessGroupId, Long employedSince, Long unitId) {
+        Position staffPosition =positionGraphRepository.findByStaffId(staff.getId());
+        if(isNull(staffPosition)) {
+            Position position = new Position();
+            position.setName("Working as staff");
+            position.setStaff(staff);
+            position.setStartDateMillis(employedSince);
+            createStaffPermission(organization, accessGroupId, position, unitId);
+            positionGraphRepository.save(position);
+            organization.getPositions().add(position);
+            organizationGraphRepository.save(organization);
+        }else{
+            createStaffPermission(organization, accessGroupId, staffPosition, unitId);
+            organization.getPositions().add(staffPosition);
+            organizationGraphRepository.save(organization);
+        }
 
     }
 
-    private void createStaffPermission(Organization organization, Long accessGroupId, Position position,Long unitId) {
+
+    private void createStaffPermission(Organization organization, Long accessGroupId, Position position, Long unitId) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             exceptionService.dataNotFoundByIdException(ERROR_STAFF_ACCESSGROUP_NOTFOUND, accessGroupId);
@@ -592,17 +599,21 @@ public class PositionService {
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
-        UnitPermission unitPermission = new UnitPermission();
-        unitPermission.setOrganization(organization);
-        unitPermission.setAccessGroup(accessGroup);
-        Unit unit=organization.getUnits().stream().filter(k->k.getId().equals(unitId)).findAny().orElse(null);
-        if(unit!=null){
+        boolean isExist =positionGraphRepository.isunitPermissionExist(position.getId(),organization.getId());
+        if(!isExist) {
+            UnitPermission unitPermission = new UnitPermission();
+            unitPermission.setOrganization(organization);
+            unitPermission.setAccessGroup(accessGroup);
+            position.getUnitPermissions().add(unitPermission);
+        }
+        Unit unit = organization.getUnits().stream().filter(k -> k.getId().equals(unitId)).findAny().orElse(null);
+        if (unit != null) {
             UnitPermission permissionForUnit = new UnitPermission();
             permissionForUnit.setUnit(unit);
             permissionForUnit.setAccessGroup(accessGroup);
             position.getUnitPermissions().add(permissionForUnit);
         }
-        position.getUnitPermissions().add(unitPermission);
+
     }
 
     public void endPositionProcess() {
@@ -610,6 +621,7 @@ public class PositionService {
         if (isCollectionNotEmpty(positionIds)) {
             List<ExpiredPositionsQueryResult> expiredPositionsQueryResults = positionGraphRepository.findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(positionIds);
             accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(positionIds);
+            deleteAuthTokenOfUsersByPositionIds(positionIds);
             for (ExpiredPositionsQueryResult expiredPositionsQueryResult : expiredPositionsQueryResults) {
                 for (OrganizationBaseEntity unit : expiredPositionsQueryResult.getUnits()) {
                     createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true);
@@ -617,4 +629,10 @@ public class PositionService {
             }
         }
     }
+
+    private void deleteAuthTokenOfUsersByPositionIds(List<Long> positionIds) {
+        List<String> userNames = positionGraphRepository.getAllUserByPositionIds(positionIds);
+        userNames.forEach(userName -> redisService.invalidateAllTokenOfUser(userName));
+    }
 }
+

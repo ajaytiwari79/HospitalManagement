@@ -16,7 +16,10 @@ import lombok.Setter;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.kairos.enums.wta.MinMaxSetting.MAXIMUM;
 import static com.kairos.shiftplanning.utils.ShiftPlanningUtility.*;
@@ -49,7 +52,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps) {
         int penality = 0;
-        if(!isDisabled() && isValidShift(unit.getPhase().getId(),shiftImp,this.phaseTemplateValues,timeTypeIds,plannedTimeIds)){
+        if(!isDisabled() && isValidShift(unit.getPlanningPeriod().getPhase().getId(),shiftImp,this.phaseTemplateValues,timeTypeIds,plannedTimeIds)){
             TimeInterval[] timeIntervals = getTimeSlotsByPartOfDay(partOfDays,unit.getTimeSlotMap(),shiftImp);
             if(timeIntervals.length>0) {
                 DateTimeInterval[] dateTimeIntervals = getIntervalsByRuleTemplate(shiftImp, intervalUnit, intervalLength);

@@ -42,9 +42,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
@@ -241,31 +239,24 @@ public class CostTimeAgreementService {
     }
 
 
+
     public StaffEmploymentDetails updateCostTimeAgreementForEmployment(Long unitId, Long employmentId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO,Boolean save) {
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>());
-        if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", employmentId);
-        }
-        if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && ctaDTO.getEndDate() != null && ctaDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
-            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, ctaDTO.getEndDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
-        }
-        if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && ctaDTO.getStartDate().isAfter(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
-            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, ctaDTO.getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
-        }
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>(),null);
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
+        validateEmploymentCTAWhileUpdate(ctaDTO,staffAdditionalInfoDTO,oldCTA);
         CTAResponseDTO responseCTA = null;
-        boolean updateSameCTA = !staffAdditionalInfoDTO.getEmployment().isPublished() || ctaDTO.getStartDate().isBefore(oldCTA.getStartDate()) || ctaDTO.getStartDate().equals(oldCTA.getStartDate());
-        if (!updateSameCTA) {
-            updateSameCTA = !isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
+        boolean calculatedValueChanged = isCalculatedValueChanged(oldCTA.getRuleTemplateIds(), ctaDTO.getRuleTemplates());
+        if(calculatedValueChanged && isNull(ctaDTO.getPublishDate())){
+            exceptionService.actionNotPermittedException(ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL,"CTA");
         }
-        if (save) {
+        if (!staffAdditionalInfoDTO.getEmployment().isPublished() || isNull(ctaDTO.getPublishDate())) {
             responseCTA = updateEmploymentCTA(oldCTA, ctaDTO);
-        }
-        else if(!save&&updateSameCTA){
-            exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
-        }
-        else if(!save&&!updateSameCTA){
-            responseCTA = updateEmploymentCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
+        }else {
+            if (!calculatedValueChanged) {
+                exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE,"CTA");
+            } else {
+                responseCTA = updateEmploymentCTAWhenCalculatedValueChanged(oldCTA, ctaDTO);
+            }
         }
         staffAdditionalInfoDTO.getEmployment().setCostTimeAgreement(responseCTA);
         timeBankService.updateDailyTimeBankOnCTAChangeOfEmployment(staffAdditionalInfoDTO, responseCTA);
@@ -273,12 +264,6 @@ public class CostTimeAgreementService {
     }
 
     private CTAResponseDTO updateEmploymentCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO ctaDTO) {
-        if (!ctaDTO.getStartDate().equals(costTimeAgreement.getStartDate())) {
-            boolean ctaExists = costTimeAgreementRepository.ctaExistsByEmploymentIdAndDatesAndNotEqualToId(costTimeAgreement.getId(), costTimeAgreement.getEmploymentId(), asDate(ctaDTO.getStartDate()), isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()) : null);
-            if (ctaExists) {
-                exceptionService.duplicateDataException("error.cta.invalid", ctaDTO.getStartDate(), isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()) : "");
-            }
-        }
         List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyCollectionPropertiesByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
         ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
         if (CollectionUtils.isNotEmpty(ctaRuleTemplates)) {
@@ -297,17 +282,16 @@ public class CostTimeAgreementService {
     }
 
     private CTAResponseDTO updateEmploymentCTAWhenCalculatedValueChanged(CostTimeAgreement oldCTA, CollectiveTimeAgreementDTO ctaDTO) {
-        validateCtaOnUpdateEmploymentCta(oldCTA, ctaDTO);
         ctaDTO.setId(null);
+        LocalDate publishDate = ctaDTO.getPublishDate();
+        ctaDTO.setPublishDate(null);
         CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(ctaDTO, CostTimeAgreement.class);
         List<CTARuleTemplate> ctaRuleTemplates = getCtaRuleTemplates(ctaDTO, costTimeAgreement);
         costTimeAgreement.setId(oldCTA.getId());
         oldCTA.setId(null);
-        oldCTA.setDisabled(true);
-        if (oldCTA.getStartDate().isBefore(ctaDTO.getStartDate()) || (isNotNull(oldCTA.getEndDate()) && oldCTA.getEndDate().equals(ctaDTO.getEndDate()))) {
-            oldCTA.setEndDate(ctaDTO.getStartDate().minusDays(1));
-        }
+        oldCTA.setEndDate(publishDate.equals(oldCTA.getStartDate()) ? oldCTA.getStartDate() : publishDate.minusDays(1));
         costTimeAgreementRepository.save(oldCTA);
+        costTimeAgreement.setStartDate(oldCTA.getEndDate().plusDays(1));
         costTimeAgreement.setParentId(oldCTA.getId());
         costTimeAgreement.setOrganizationParentId(oldCTA.getOrganizationParentId());
         costTimeAgreement.setExpertise(oldCTA.getExpertise());
@@ -331,12 +315,44 @@ public class CostTimeAgreementService {
         return responseCTA;
     }
 
-    private void validateCtaOnUpdateEmploymentCta(CostTimeAgreement oldCTA, CollectiveTimeAgreementDTO ctaDTO) {
-        if (!ctaDTO.getStartDate().equals(oldCTA.getStartDate())) {
-            boolean ctaExists = costTimeAgreementRepository.ctaExistsByEmploymentIdAndDatesAndNotEqualToId(oldCTA.getId(), oldCTA.getEmploymentId(), asDate(ctaDTO.getStartDate()), isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()) : null);
-            if (ctaExists) {
-                exceptionService.duplicateDataException("error.cta.invalid", ctaDTO.getStartDate(), isNotNull(ctaDTO.getEndDate()) ? asDate(ctaDTO.getEndDate()) : "");
+    private void validateEmploymentCTAWhileUpdate(CollectiveTimeAgreementDTO collectiveTimeAgreementDTO,StaffAdditionalInfoDTO staffAdditionalInfoDTO,CostTimeAgreement oldCTA){
+        if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", staffAdditionalInfoDTO.getEmployment().getId());
+        }
+        if ((staffAdditionalInfoDTO.getEmployment().getEndDate() != null && collectiveTimeAgreementDTO.getEndDate() != null && collectiveTimeAgreementDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getEmployment().getEndDate())) || (isNull(oldCTA.getEndDate()) && isNull(staffAdditionalInfoDTO.getEmployment().getEndDate()) && isNotNull(collectiveTimeAgreementDTO.getEndDate()))) {
+            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, collectiveTimeAgreementDTO.getEndDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
+        }
+        if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && collectiveTimeAgreementDTO.getStartDate().isAfter(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
+            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, collectiveTimeAgreementDTO.getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
+        }
+        if(staffAdditionalInfoDTO.getEmployment().isPublished()){
+            if(isNotNull(collectiveTimeAgreementDTO.getPublishDate()) && collectiveTimeAgreementDTO.getPublishDate().isBefore(LocalDate.now())){
+                exceptionService.actionNotPermittedException(PUBLISH_DATE_SHOULD_BE_IN_FUTURE);
             }
+            else if(isNotNull(collectiveTimeAgreementDTO.getPublishDate())){
+                validateCtaOnUpdateEmploymentCta(oldCTA.getEmploymentId(),collectiveTimeAgreementDTO.getPublishDate(),collectiveTimeAgreementDTO.getId());
+            }
+            else if (!oldCTA.getStartDate().equals(collectiveTimeAgreementDTO.getStartDate())){
+                exceptionService.actionNotPermittedException(STARTDATE_CANNOT_CHANGE,"CTA");
+            }
+            else if(isNotNull(oldCTA.getEndDate()) && !oldCTA.getEndDate().equals(collectiveTimeAgreementDTO.getEndDate())){
+                validateCtaOnUpdateEmploymentCta(oldCTA.getEmploymentId(),collectiveTimeAgreementDTO.getEndDate(),collectiveTimeAgreementDTO.getId());
+                validateGapBetweenCTA(collectiveTimeAgreementDTO, oldCTA);
+            }
+        }
+    }
+
+    private void validateGapBetweenCTA(CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, CostTimeAgreement oldCTA) {
+        boolean gapExists = costTimeAgreementRepository.isGapExistsInEmploymentCTA(oldCTA.getEmploymentId(),collectiveTimeAgreementDTO.getEndDate(),collectiveTimeAgreementDTO.getId());
+        if (gapExists){
+            exceptionService.actionNotPermittedException(ERROR_NO_GAP, "CTA");
+        }
+    }
+
+    private void validateCtaOnUpdateEmploymentCta(Long employementId,LocalDate date,BigInteger ctaId) {
+        boolean notValid = costTimeAgreementRepository.isEmploymentCTAExistsOnDate(employementId,date,ctaId);
+        if (notValid) {
+            exceptionService.duplicateDataException("error.cta.invalid", date, "");
         }
     }
 
@@ -593,9 +609,9 @@ public class CostTimeAgreementService {
     public CTATableSettingWrapper getVersionsCTA(Long unitId, List<Long> upIds) {
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTabId(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getParentCTAByUpIds(upIds);
-        Map<Long, List<CTAResponseDTO>> ctaResponseMap = costTimeAgreementRepository.getVersionsCTA(upIds).stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
+        /*Map<Long, List<CTAResponseDTO>> ctaResponseMap = costTimeAgreementRepository.getVersionsCTA(upIds).stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
         ctaResponseDTOS.forEach(c -> c.setVersions(ctaResponseMap.get(c.getEmploymentId())));
-        return new CTATableSettingWrapper(ctaResponseDTOS, tableConfiguration);
+        */return new CTATableSettingWrapper(ctaResponseDTOS, tableConfiguration);
     }
 
     public CTAResponseDTO getDefaultCTA(Long unitId, Long expertiseId) {

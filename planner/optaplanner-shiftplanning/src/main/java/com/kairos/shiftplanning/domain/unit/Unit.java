@@ -1,9 +1,9 @@
 package com.kairos.shiftplanning.domain.unit;
 
-import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
-import com.kairos.shiftplanning.constraints.Constraint;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.constraints.activityconstraint.DayType;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -23,10 +23,9 @@ import java.util.Map;
 @XStreamAlias("Unit")
 public class Unit {
     private Long id;
-    private Map<ConstraintSubType, Constraint> constraints;
+    private Map<ConstraintSubType, ConstraintHandler> constraints;
     private Map<Long, DayType> dayTypeMap;
-    private UserAccessRoleDTO user;
-    private Phase phase;
+    private AccessGroupRole accessGroupRole;
     private PlanningPeriod planningPeriod;
     private PresencePlannedTime presencePlannedTime;
     private AbsencePlannedTime absencePlannedTime;

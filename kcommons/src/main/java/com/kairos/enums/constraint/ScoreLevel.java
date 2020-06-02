@@ -1,8 +1,5 @@
 package com.kairos.enums.constraint;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.kairos.enums.solver_config.PlanningType;
-
 /**
  * @author pradeep
  * @date - 20/6/18
@@ -21,8 +18,8 @@ public enum ScoreLevel {
         return value;
     }
 
-    public static PlanningType getEnumByString(String status) {
-        for (PlanningType is : PlanningType.values()) {
+    public static ScoreLevel getEnumByString(String status) {
+        for (ScoreLevel is : ScoreLevel.values()) {
             if (status.equals(is.toValue()))
                 return is;
         }

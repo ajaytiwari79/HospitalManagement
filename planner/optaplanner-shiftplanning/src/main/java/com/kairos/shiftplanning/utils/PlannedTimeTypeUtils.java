@@ -10,14 +10,17 @@ import com.kairos.shiftplanning.domain.unit.Unit;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isMapNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toMap;
 
 public class PlannedTimeTypeUtils {
 
     public static void addPlannedTimeInShift(ShiftImp shift) {
+        Set<BigInteger> plannedTimeTypeIds = new HashSet<>();
         for (ShiftActivity shiftActivity : shift.getShiftActivities()) {
             BigInteger plannedTimeId = getPlannedTimeIdByTimeType(shift.getEmployee().getUnit(), shiftActivity.getActivity());
             List<PlannedTime> plannedTimes;
@@ -27,7 +30,9 @@ public class PlannedTimeTypeUtils {
                 plannedTimes = filterPlannedTimes(shiftActivity.getStartDate(), shiftActivity.getEndDate(), shift, plannedTimeId);
             }
             shiftActivity.setPlannedTimes(plannedTimes);
+            plannedTimeTypeIds.addAll(plannedTimes.stream().map(plannedTime -> plannedTime.getPlannedTimeId()).collect(Collectors.toSet()));
         }
+        shift.setActivitiesPlannedTimeIds(plannedTimeTypeIds);
     }
 
     private static BigInteger getPlannedTimeIdByTimeType(Unit unit, Activity activity) {

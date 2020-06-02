@@ -22,7 +22,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.kairos.commons.utils.CommonsExceptionUtil.throwException;
-import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.DateUtils.isEqualOrAfter;
+import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.shiftplanning.constants.ShiftPlanningMessageConstants.SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE;
 

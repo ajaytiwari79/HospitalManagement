@@ -13,6 +13,7 @@ import com.kairos.dto.activity.activity.ActivityValidationError;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.StaffingLevelHelper;
 import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
@@ -24,7 +25,9 @@ import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.SkillLevel;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -41,7 +44,9 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
+import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.utils.service_util.StaffingLevelUtil;
+import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -87,6 +92,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
@@ -129,6 +135,7 @@ public class StaffingLevelService  {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private ShiftService shiftService;
+    @Inject private ShiftValidatorService shiftValidatorService;
 
 
     /**
@@ -676,6 +683,10 @@ public class StaffingLevelService  {
             PresenceStaffingLevelDto presenceStaffingLevelDto = new PresenceStaffingLevelDto();
             BeanUtils.copyProperties(staffingLevel, presenceStaffingLevelDto);
             presenceStaffingLevelDto.setUpdatedAt(staffingLevel.getUpdatedAt());
+            presenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
+            List<BigInteger> activityIds =staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().stream().map(staffingLevelActivity -> staffingLevelActivity.getActivityId()).collect(Collectors.toList());
+            Map<BigInteger, Integer> activityRankings = getActivityIdRankingMap(unitId, activityIds);
+            //presenceStaffingLevelDto.getStaffingLevelSetting().setActivitiesRank(activityRankings);
             presenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(presenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), presenceStaffingLevelDto);
         }
         if (!staffingLevel.getAbsenceStaffingLevelInterval().isEmpty()) {
@@ -685,10 +696,19 @@ public class StaffingLevelService  {
             absenceStaffingLevelDto.setMaxNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getMaxNoOfStaff());
             absenceStaffingLevelDto.setAbsentNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getAvailableNoOfStaff());
             absenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
+            List<BigInteger> activityIds =staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().stream().map(staffingLevelActivity -> staffingLevelActivity.getActivityId()).collect(Collectors.toList());
+            Map<BigInteger, Integer> activityRankings = getActivityIdRankingMap(unitId, activityIds);
+            absenceStaffingLevelDto.setStaffingLevelSetting(new StaffingLevelSetting());
+            //absenceStaffingLevelDto.getStaffingLevelSetting().setActivitiesRank(activityRankings);
             absenceStaffingLevelDto.setUpdatedAt(staffingLevel.getUpdatedAt());
             absenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(absenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), absenceStaffingLevelDto);
         }
         return startDate;
+    }
+
+    private Map<BigInteger, Integer> getActivityIdRankingMap(Long unitId, List<BigInteger> activityIds) {
+        List<ActivityDTO> activities = activityMongoRepository.findActivitiesByUnitId(unitId, activityIds);
+        return activities.stream().collect(Collectors.toMap(ActivityDTO::getId, ActivityDTO::getActivitySequence));
     }
 
     private StaffingLevel updateAbsenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel, BigInteger activityId) {
