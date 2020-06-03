@@ -37,6 +37,7 @@ public class ChildCareDaysService {
         ChildCareDays childCareDays = ObjectMapperUtils.copyPropertiesByMapper(careDaysDetails, ChildCareDays.class);
         childCareDays.setExpertise(expertise);
         childCareDaysGraphRepository.save(childCareDays);
+        careDaysDetails.setId(childCareDays.getId());
         return careDaysDetails;
     }
 
