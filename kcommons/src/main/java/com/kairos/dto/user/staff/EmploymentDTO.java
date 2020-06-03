@@ -6,6 +6,7 @@ import com.kairos.enums.EmploymentSubType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -23,11 +24,13 @@ public class EmploymentDTO {
     private Long lastWorkingDateMillis;
     private int totalWeeklyMinutes;
     private int fullTimeWeeklyMinutes;
+    private LocalDate startDate;
 
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyCost;
-
+    private boolean published;
+    private boolean nightWorker;
     private float salary;
     private Long timeCareExternalId;
     private EmploymentSubType employmentSubType;
