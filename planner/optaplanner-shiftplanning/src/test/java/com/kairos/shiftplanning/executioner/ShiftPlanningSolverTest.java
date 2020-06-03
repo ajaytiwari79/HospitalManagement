@@ -1,6 +1,7 @@
+
 package com.kairos.shiftplanning.executioner;
 
-import com.kairos.dto.planner.constarints.ConstraintDTO;
+import com.kairos.dto.planner.solverconfig.ConstraintDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
@@ -28,7 +29,7 @@ public class ShiftPlanningSolverTest {
     public static final String SHORTEST_DURATION_FOR_THIS_ACTIVITY_RELATIVE_TO_SHIFT_LENGTH = "Shortest duration for this activity, relative to shift length";
     public static final String ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH = "Activity must continous for number of Hours, relative to shift length";
 
-    @Test
+   /* @Test
     //@Ignore
     public void test() {
         SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
@@ -36,17 +37,18 @@ public class ShiftPlanningSolverTest {
         Assert.assertEquals(0,0);
     }
 
-/*    @Test
-    @Ignore*/
+    @Test
+    @Ignore
     public void buildBenchmarker() {
         new ShiftPlanningSolver(solverConfigDTO, droolFilePath, configurationFile).buildBenchmarker();
     }
 
     public void runBenchmarker() {
         new ShiftPlanningSolver(solverConfigDTO, droolFilePath, configurationFile).runBenchmarker();
-    }
+    }*/
 
 
+/*
     public SolverConfigDTO getSolverConfigDTO(){
         List<ConstraintDTO> constraintDTOS = new ArrayList<>();
         constraintDTOS.add(new ConstraintDTO(ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH, ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH, ConstraintType.ACTIVITY, ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS, ScoreLevel.HARD, 5, 5l));
@@ -58,13 +60,16 @@ public class ShiftPlanningSolverTest {
         constraintDTOS.add(new ConstraintDTO(PRESENCE_AND_ABSENCE_SHOULD_NOT_BE_AT_SAME_TIME, PRESENCE_AND_ABSENCE_SHOULD_NOT_BE_AT_SAME_TIME,  ConstraintType.UNIT, PRESENCE_AND_ABSENCE_SAME_TIME, ScoreLevel.HARD, 5,5l));
         constraintDTOS.add(new ConstraintDTO(MAX_SHIFT_OF_STAFF, MAX_SHIFT_OF_STAFF,  ConstraintType.ACTIVITY, ConstraintSubType.MAX_SHIFT_OF_STAFF, ScoreLevel.HARD, 5,5l));
         constraintDTOS.add(new ConstraintDTO(AVERAGE_SHEDULED_TIME.name(), AVERAGE_SHEDULED_TIME.name(),  ConstraintType.WTA, AVERAGE_SHEDULED_TIME, ScoreLevel.MEDIUM, 5,5l));
+*/
 /*
         constraintDTOS.add(new ConstraintDTO(FIX_ACTIVITY_SHOULD_NOT_CHANGE, FIX_ACTIVITY_SHOULD_NOT_CHANGE,  ConstraintType.ACTIVITY, ConstraintSubType.FIX_ACTIVITY_SHOULD_NOT_CHANGE, ConstraintLevel.HARD, 5,5l));
-*/
+*//*
+
         constraintDTOS.add(new ConstraintDTO(IF_THIS_ACTIVITY_IS_USED_ON_A_TUESDAY, IF_THIS_ACTIVITY_IS_USED_ON_A_TUESDAY,  ConstraintType.ACTIVITY, ACTIVITY_VALID_DAYTYPE, ScoreLevel.SOFT, 4,5l));
         return new SolverConfigDTO(constraintDTOS);
     }
 
+*/
 
 
 }

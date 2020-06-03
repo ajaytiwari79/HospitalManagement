@@ -295,6 +295,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_STAFF_ACTIVITY_SETTINGS_ABSENT = "message.staff.activity.settings.absent";
     public static final String EMPLOYMENT_TYPE_ABSENT_ACTIVITY = "employment_type.absent.activity";
     public static final String EXPERTISE_ABSENT_ACTIVITY = "expertise.absent.activity";
+    public static final String STAFF_SKILL_DOES_NOT_MATCHED = "activity.skill.not.matched";
     public static final String DEFAULT_ADDED = "default.added";
     public static final String ERROR_EMPTY_STAFF_OR_ACTIVITY_SETTING = "error.empty.staff.or.activity.setting";
     public static final String EMPLOYMENT_ABSENT = "employment.absent";
@@ -391,6 +392,7 @@ public class ActivityMessagesConstants {
     public static final String ACTIVITY_NOT_ASSIGN_IN_PROTECTED_DAYS_OFF_RULE_TEMPLATE = "activity.not.assign.in.protected.days.off.rule.template";
     public static final String STAFF_ALREADY_SICK="staff.already.sick";
     public static final String MESSAGE_CTA_VALUE ="message.cta.value";
+    public static final String ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL = "error.value.changed.publish.date.null";
 
 
 }

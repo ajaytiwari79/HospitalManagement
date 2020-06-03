@@ -12,6 +12,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
+import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.IntervalBalance;
@@ -25,6 +26,7 @@ import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.staff.EmploymentDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.FilterType;
@@ -79,6 +81,7 @@ import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertie
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
+import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.enums.FilterType.CTA_ACCOUNT_TYPE;
 import static com.kairos.enums.FilterType.NIGHT_WORKERS;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
@@ -502,10 +505,10 @@ public class WorkTimeAgreementService{
     }
 
     public List<WTAResponseDTO> getWTAOfEmployment(Long employmentId) {
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
+        /*List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
         List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
-        wtaResponseDTOS.addAll(ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)), WTAResponseDTO.class));
-        return wtaResponseDTOS;
+        wtaResponseDTOS.addAll();*/
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)), WTAResponseDTO.class);
     }
 
 
@@ -584,17 +587,20 @@ public class WorkTimeAgreementService{
         }
         validateEmploymentCTAWhileUpdate(wtadto,oldEmploymentPublished,oldWta.get());
         WTAResponseDTO wtaResponseDTO = null;
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
+        if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
+            wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), false);
+        }
+        boolean calculatedValueChanged = isCalCulatedValueChangedForWTA(oldWta.get(), wtaBaseRuleTemplates);
+        if(calculatedValueChanged && isNull(wtadto.getPublishDate())){
+            exceptionService.actionNotPermittedException(ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL,"WTA");
+        }
         if (!oldEmploymentPublished || isNull(wtadto.getPublishDate())) {
             wtaResponseDTO = updateWTAOfUnpublishedEmployment(oldWta.get(), wtadto, unitId);
             wtaRepository.save(oldWta.get());
         }else {
-            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
-            if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
-                wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), false);
-            }
-            boolean calculatedValueChanged = isCalCulatedValueChangedForWTA(oldWta.get(), wtaBaseRuleTemplates);
             if (!calculatedValueChanged) {
-                exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE);
+                exceptionService.actionNotPermittedException(MESSAGE_CTA_VALUE,"WTA");
             } else {
                 wtaResponseDTO = updateWTAOfPublishedEmployment(oldWta.get(), wtadto, unitId, save);
             }
@@ -626,14 +632,17 @@ public class WorkTimeAgreementService{
     }
 
     private void validateEmploymentCTAWhileUpdate(WTADTO wtadto, Boolean oldEmploymentPublished, WorkingTimeAgreement oldWTA){
-        if (wtadto.getEmploymentEndDate() != null && wtadto.getEndDate() != null && wtadto.getEndDate().isBefore(wtadto.getEmploymentEndDate())) {
-            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, wtadto.getEndDate(), wtadto.getEmploymentEndDate());
+        if ((wtadto.getEmploymentEndDate() != null && wtadto.getEndDate() != null && wtadto.getEndDate().isBefore(wtadto.getEmploymentEndDate())) || (isNull(oldWTA.getEndDate()) && isNull(wtadto.getEmploymentEndDate()) && isNotNull(wtadto.getEndDate()))) {
+            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, "WTA");
+        }
+        if (wtadto.getEmploymentEndDate() != null && wtadto.getStartDate().isAfter(wtadto.getEmploymentEndDate())) {
+            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, "WTA");
         }
         if (wtadto.getEmploymentEndDate() != null && wtadto.getStartDate().isAfter(wtadto.getEmploymentEndDate())) {
             exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, wtadto.getStartDate(), wtadto.getEmploymentEndDate());
         }
         if(oldEmploymentPublished){
-            if(isNotNull(wtadto.getPublishDate()) && !wtadto.getPublishDate().isAfter(LocalDate.now())){
+            if(isNotNull(wtadto.getPublishDate()) && wtadto.getPublishDate().isBefore(LocalDate.now())){
                 exceptionService.actionNotPermittedException(PUBLISH_DATE_SHOULD_BE_IN_FUTURE);
             }
             else if(isNotNull(wtadto.getPublishDate())){
@@ -776,7 +785,6 @@ public class WorkTimeAgreementService{
         newWta.setOrganizationParentId(oldWta.getOrganizationParentId());
         newWta.setStartDate(publishDate);
         newWta.setRuleTemplateIds(null);
-        oldWta.setDisabled(true);
         oldWta.setEndDate(publishDate.equals(oldWta.getStartDate()) ? oldWta.getStartDate() : publishDate.minusDays(1));
         oldWta.setId(null);
         if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
@@ -948,5 +956,103 @@ public class WorkTimeAgreementService{
 
         }
         return filteredStaffIds;
+    }
+
+    public boolean updateDatesInCTAWTA(Long unitId){
+        List<EmploymentWithCtaDetailsDTO> employmentDTOS = userIntegrationService.getAllEmploymentByUnitId(unitId);
+        Set<Long> employmentIds = employmentDTOS.stream().map(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getId()).collect(Collectors.toSet());
+        List<WorkingTimeAgreement> workingTimeAgreements = workingTimeAgreementMongoRepository.findWTAOfEmployments(employmentIds);
+        List<CostTimeAgreement> costTimeAgreements = costTimeAgreementRepository.findCTAOfEmployments(employmentIds);
+        Map<Long,List<WorkingTimeAgreement>> workTimeAgreementMap = workingTimeAgreements.stream().collect(Collectors.groupingBy(WorkingTimeAgreement::getEmploymentId));
+        Map<Long,List<CostTimeAgreement>> costTimeAgreementMap = costTimeAgreements.stream().collect(Collectors.groupingBy(CostTimeAgreement::getEmploymentId));
+        for (EmploymentWithCtaDetailsDTO employmentDTO : employmentDTOS) {
+            List<EmploymentLinesDTO> employmentLinesDTOS = employmentDTO.getEmploymentLines();
+            Collections.sort(employmentLinesDTOS);
+            List<CostTimeAgreement> costTimeAgreements1 = costTimeAgreementMap.getOrDefault(employmentDTO.getId(),new ArrayList<>());
+            Collections.sort(costTimeAgreements1);
+            List<WorkingTimeAgreement> workTimeAgreements1 = workTimeAgreementMap.getOrDefault(employmentDTO.getId(),new ArrayList<>());
+            Collections.sort(workTimeAgreements1);
+            updateDatesOnCTA(costTimeAgreements1);
+            updateDatesOnWTA(workTimeAgreements1);
+            for (EmploymentLinesDTO employmentLinesDTO : employmentLinesDTOS) {
+                updateCTADates(costTimeAgreements1, employmentLinesDTO);
+                updateWTADates(workTimeAgreements1, employmentLinesDTO);
+            }
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentDTO.getId(), new HashSet<>(),null);
+            costTimeAgreementRepository.saveEntities(costTimeAgreements);
+            for (CostTimeAgreement costTimeAgreement : costTimeAgreements) {
+                CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.findCTAById(costTimeAgreement.getId());
+                staffAdditionalInfoDTO.getEmployment().setCostTimeAgreement(ctaResponseDTO);
+                timeBankService.updateDailyTimeBankOnCTAChangeOfEmployment(staffAdditionalInfoDTO, ctaResponseDTO);
+            }
+            workingTimeAgreementMongoRepository.saveEntities(workingTimeAgreements);
+        }
+        return true;
+    }
+
+    private void updateDatesOnCTA(List<CostTimeAgreement> costTimeAgreements1) {
+        for (int i = 1; i < costTimeAgreements1.size(); i++) {
+            CostTimeAgreement first = costTimeAgreements1.get(i-1);
+            CostTimeAgreement second = costTimeAgreements1.get(i);
+            first.setEndDate(second.getStartDate().minusDays(1));
+            if(first.getStartDate().equals(second.getStartDate())){
+                first.setEndDate(first.getStartDate());
+                second.setStartDate(first.getEndDate().plusDays(1));
+            }
+        }
+    }
+
+    private void updateDatesOnWTA(List<WorkingTimeAgreement> workTimeAgreements1) {
+        for (int i = 1; i < workTimeAgreements1.size(); i++) {
+            WorkingTimeAgreement first = workTimeAgreements1.get(i-1);
+            WorkingTimeAgreement second = workTimeAgreements1.get(i);
+            first.setEndDate(second.getStartDate().minusDays(1));
+            if(first.getStartDate().equals(second.getStartDate())){
+                first.setEndDate(first.getStartDate());
+                second.setStartDate(first.getEndDate().plusDays(1));
+            }
+        }
+    }
+
+    private void updateCTADates(List<CostTimeAgreement> costTimeAgreements1, EmploymentLinesDTO employmentLinesDTO) {
+        for (CostTimeAgreement costTimeAgreement : costTimeAgreements1) {
+            if(costTimeAgreement.getStartDate().isAfter(employmentLinesDTO.getStartDate())){
+                costTimeAgreement.setStartDate(employmentLinesDTO.getStartDate());
+            }
+            break;
+        }
+        if(isNull(employmentLinesDTO.getEndDate()) && !costTimeAgreements1.isEmpty()){
+            costTimeAgreements1.get(costTimeAgreements1.size()-1).setEndDate(null);
+        }else {
+            for (CostTimeAgreement costTimeAgreement : costTimeAgreements1) {
+                if(isNull(costTimeAgreement.getEndDate())){
+                    break;
+                }else if(costTimeAgreement.getEndDate().isBefore(employmentLinesDTO.getEndDate())){
+                    costTimeAgreement.setEndDate(employmentLinesDTO.getEndDate());
+                    break;
+                }
+            }
+        }
+    }
+
+    private void updateWTADates(List<WorkingTimeAgreement> workTimeAgreements1, EmploymentLinesDTO employmentLinesDTO) {
+        for (WorkingTimeAgreement workingTimeAgreement : workTimeAgreements1) {
+            if(workingTimeAgreement.getStartDate().isAfter(employmentLinesDTO.getStartDate())){
+                workingTimeAgreement.setStartDate(employmentLinesDTO.getStartDate());
+            }
+            break;
+        }
+        if(isNull(employmentLinesDTO.getEndDate()) && !workTimeAgreements1.isEmpty()){
+            workTimeAgreements1.get(workTimeAgreements1.size()-1).setEndDate(null);
+        }else {
+            for (WorkingTimeAgreement workingTimeAgreement : workTimeAgreements1) {
+                if(isNull(workingTimeAgreement.getEndDate())){
+                    break;
+                }else if(workingTimeAgreement.getEndDate().isBefore(employmentLinesDTO.getEndDate())){
+                    workingTimeAgreement.setEndDate(employmentLinesDTO.getEndDate());
+                    break;
+                }
+            }
+        }
     }
 }

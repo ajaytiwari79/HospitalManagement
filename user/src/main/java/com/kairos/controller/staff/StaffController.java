@@ -602,9 +602,9 @@ public class StaffController {
     @GetMapping(value = "/staff_employment/{employmentId}")
     @ApiOperation("get staff by employmentId")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentDataByEmploymentId( @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "reasonCodeIds", required = false) Set<Long> reasonCodeIds, @PathVariable long unitId,
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentDataByEmploymentId( @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,@RequestParam("activityCutOffEndDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate activityCutOffEndDate, @RequestParam(value = "reasonCodeIds", required = false) Set<Long> reasonCodeIds, @PathVariable long unitId,
                                                                                     @PathVariable Long employmentId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDataByEmploymentId(startDate, employmentId, unitId, reasonCodeIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDataByEmploymentId(startDate, employmentId, unitId, reasonCodeIds,activityCutOffEndDate));
     }
 
     @RequestMapping(value = "/staff_list/chat", method = RequestMethod.GET)

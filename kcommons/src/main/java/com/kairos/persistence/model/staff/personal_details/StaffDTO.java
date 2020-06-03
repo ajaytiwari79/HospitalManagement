@@ -81,6 +81,7 @@ public class StaffDTO {
     private String cardNumber;
     private Integer age;
     private List<SkillLevelDTO> skills;
+    private Set<Long> skillIds;
     private String errorMessage; //This field is used for reporting error message on staff upload via excel sheet
     private LocalDate dateOfBirth;
     private Long staffUserId;

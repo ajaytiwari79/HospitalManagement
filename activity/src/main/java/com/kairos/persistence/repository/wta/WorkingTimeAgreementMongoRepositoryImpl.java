@@ -7,6 +7,7 @@ import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -227,7 +228,8 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     public List<WTAQueryResultDTO> getAllParentWTAByIds(List<Long> employmentIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false)),
-                lookup(WTA_BASE_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES)
+                lookup(WTA_BASE_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES),
+                sort(Sort.Direction.DESC, START_DATE)
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
@@ -273,7 +275,8 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     @Override
     public void setEndDateToWTAOfEmployment(Long employmentId, LocalDate endDate){
         Update update = Update.update(END_DATE, DateUtils.asDate(endDate));
-        mongoTemplate.findAndModify(new Query(Criteria.where(EMPLOYMENT_ID).is(employmentId).and(END_DATE).exists(false)),update,WorkingTimeAgreement.class);
+        Query query = new Query(Criteria.where(EMPLOYMENT_ID).is(employmentId)).with(Sort.by(Sort.Direction.DESC,"startDate")).limit(1);
+        mongoTemplate.findAndModify(query,update,WorkingTimeAgreement.class);
     }
 
     @Override

@@ -13,3 +13,5 @@ db.wtaBaseRuleTemplate.updateMany({},{$set:{"constraintSetting":{}}});
 
 
 db.getCollection('shifts').remove({"staffId":2461,"employmentId":3125});
+
+Server URL/kairos/activity/api/v1/unit/2403/update_startDate_endDate  gPOST

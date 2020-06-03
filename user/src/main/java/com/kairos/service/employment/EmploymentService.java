@@ -378,7 +378,7 @@ public class EmploymentService {
         PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnPositionEnd());
         // Deleting All shifts after position end date
         if (employmentDTO.getEndDate() != null) {
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentId(employmentDTO.getEndDate(), employmentId, employmentDTO.getUnitId(), null);
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentId(employmentDTO.getEndDate(), employmentId, employmentDTO.getUnitId(), null,null);
             activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId, employmentDTO.getEndDate(), employmentDTO.getStaffId(), staffAdditionalInfoDTO);
         }
         setHourlyCost(employmentQueryResult);
@@ -552,8 +552,7 @@ public class EmploymentService {
             ctawtaAndAccumulatedTimebankWrapper.getWta().forEach(wta -> {
                 LocalDate wtaStartDate = wta.getStartDate();
                 LocalDate wtaEndDate = wta.getEndDate();
-                if (employment.getId().equals(wta.getEmploymentId()) && employmentLine.getEndDate() == null && (wtaEndDate == null || wtaEndDate.plusDays(1).isAfter(employmentLine.getStartDate())) ||
-                        employmentLine.getEndDate() != null && (wtaStartDate.isBefore(employmentLine.getEndDate().plusDays(1))) && (wtaEndDate == null || wtaEndDate.isAfter(employmentLine.getStartDate()) || wtaEndDate.equals(employmentLine.getStartDate()))) {
+                if (employment.getId().equals(wta.getEmploymentId()) && employmentLine.isValid(wtaStartDate,wtaEndDate)) {
                     employmentLine.setWorkingTimeAgreement(wta);
                 }
             });
@@ -567,8 +566,7 @@ public class EmploymentService {
     }
 
     private void validateAndSetCTA(EmploymentQueryResult employment, EmploymentLinesQueryResult employmentLine, CTAResponseDTO cta) {
-        if (employment.getId().equals(cta.getEmploymentId()) && employmentLine.getEndDate() == null && (cta.getEndDate() == null || cta.getEndDate().plusDays(1).isAfter(employmentLine.getStartDate())) ||
-                employmentLine.getEndDate() != null && (cta.getStartDate().isBefore(employmentLine.getEndDate().plusDays(1))) && (cta.getEndDate() == null || cta.getEndDate().isAfter(employmentLine.getStartDate()) || cta.getEndDate().equals(employmentLine.getStartDate()))) {
+        if (employment.getId().equals(cta.getEmploymentId()) && employmentLine.isValid(cta.getStartDate(),cta.getEndDate())) {
             employmentLine.setCostTimeAgreement(cta);
         }
     }
@@ -821,7 +819,7 @@ public class EmploymentService {
     public void setEndDateInEmploymentOfExpertise(ExpertiseDTO expertiseDTO) {
         List<Employment> employments = employmentGraphRepository.findAllEmploymentByExpertiseId(expertiseDTO.getId());
         employments.forEach(employment -> {
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentId(employment.getEndDate(), employment.getId(), employment.getUnit().getId(), null);
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentId(employment.getEndDate(), employment.getId(), employment.getUnit().getId(), null,null);
             employment.getEmploymentLines().forEach(employmentLine -> {
                 if (employmentLine.getEndDate() != null && startDateIsEqualsOrBeforeEndDate(employmentLine.getEndDate(), expertiseDTO.getEndDate())) {
                     return;

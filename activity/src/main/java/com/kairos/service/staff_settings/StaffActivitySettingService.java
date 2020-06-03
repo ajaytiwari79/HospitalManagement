@@ -15,7 +15,7 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
-import com.kairos.rule_validator.activity.StaffExpertiseSpecification;
+import com.kairos.rule_validator.activity.StaffActivityAssignmentSpecification;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
@@ -31,6 +31,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
@@ -92,8 +93,6 @@ public class StaffActivitySettingService extends MongoBaseService {
         if(staffAndActivitySettingWrapper.getStaffIds().isEmpty() || staffAndActivitySettingWrapper.getStaffActivitySettings().isEmpty()){
             exceptionService.actionNotPermittedException(ERROR_EMPTY_STAFF_OR_ACTIVITY_SETTING);
         }
-
-
         Set<BigInteger> activityIds=staffAndActivitySettingWrapper.getStaffActivitySettings().stream().map(StaffActivitySettingDTO::getActivityId).collect(Collectors.toSet());
         Set<StaffActivitySetting> staffActivitySettings=staffActivitySettingRepository.findByStaffIdInAndActivityIdInAndDeletedFalse(staffAndActivitySettingWrapper.getStaffIds(),activityIds);
         if(staffActivitySettings==null){
@@ -166,10 +165,10 @@ public class StaffActivitySettingService extends MongoBaseService {
    }
 
 
-    private  String validateActivitySettingsForCurrentStaff(StaffDTO staffDTO, Activity activity){
-        Specification<StaffDTO> staffDTOSpecification=new StaffExpertiseSpecification(activity);
+    private  List<String> validateActivitySettingsForCurrentStaff(StaffDTO staffDTO, Activity activity){
+        Specification<StaffDTO> staffDTOSpecification=new StaffActivityAssignmentSpecification(activity);
         List<String> messages = staffDTOSpecification.isSatisfiedString(staffDTO);
-        return (!messages.isEmpty())?localeService.getMessage(messages.get(0)):null;
+        return !messages.isEmpty() ? messages.stream().map(message-> localeService.getMessage(message)).collect(Collectors.toList()) : null;
     }
 
    private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap, Map<BigInteger,Activity> activityMap, Map<Long, StaffDTO> staffExpertiseWrapperMap, Long staffId,
@@ -180,9 +179,9 @@ public class StaffActivitySettingService extends MongoBaseService {
        Map<BigInteger,StaffActivitySettingDTO> activitySettingDTOMap=new HashMap<>();
        Map<Long,Map<BigInteger,StaffActivitySettingDTO>> staffWiseActivityMap=new HashMap<>();
        staffActivitySettingDTOS.forEach(staffActivitySetting->{
-          String validationMessage= validateActivitySettingsForCurrentStaff(staffExpertiseWrapperMap.get(staffId),activityMap.get(staffActivitySetting.getActivityId()));
-           if(Optional.ofNullable(validationMessage).isPresent()){
-               StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),validationMessage);
+          List<String> validationMessage= validateActivitySettingsForCurrentStaff(staffExpertiseWrapperMap.get(staffId),activityMap.get(staffActivitySetting.getActivityId()));
+           if(isCollectionNotEmpty(validationMessage)){
+               StaffActivityResponse staffActivityResponse = new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),validationMessage);
                error.add(staffActivityResponse);
                return;
            }
@@ -214,7 +213,7 @@ public class StaffActivitySettingService extends MongoBaseService {
                    activitySetting.isEligibleForMove(),activitySetting.getEarliestStartTime(),activitySetting.getLatestStartTime(),activitySetting.getMaximumEndTime(),
                    activityMap.get(activitySetting.getActivityId()).getRulesActivityTab().getDayTypes(), activitySetting.getDefaultStartTime());
            staffActivitySettingSet.add(staffActivitySetting);
-           StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),localeService.getMessage(DEFAULT_ADDED));
+           StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),newArrayList(localeService.getMessage(DEFAULT_ADDED)));
            success.add(staffActivityResponse);
 
        });

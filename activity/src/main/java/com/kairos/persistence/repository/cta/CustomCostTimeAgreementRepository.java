@@ -6,6 +6,7 @@ import com.kairos.persistence.model.cta.CostTimeAgreement;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +41,7 @@ public interface CustomCostTimeAgreementRepository {
 
     CTAResponseDTO getCTAByEmploymentIdAndDate(Long employmentId, Date date);
 
-    List<CTAResponseDTO> getCTAByEmploymentIds(List<Long> employmentIds, Date date);
+    List<CTAResponseDTO> getCTAByEmploymentIds(Collection<Long> employmentIds, Date date);
 
     List<CTAResponseDTO> getCTAByEmploymentIdsAndDate(List<Long> employmentIds, Date startDate, Date endDate);
 
@@ -56,4 +57,5 @@ public interface CustomCostTimeAgreementRepository {
 
     boolean isEmploymentCTAExistsOnDate(Long employmentId,LocalDate localDate,BigInteger ctaId);
     boolean isGapExistsInEmploymentCTA(Long employmentId,LocalDate localDate,BigInteger ctaId);
+    CTAResponseDTO findCTAById(BigInteger ctaId);
 }

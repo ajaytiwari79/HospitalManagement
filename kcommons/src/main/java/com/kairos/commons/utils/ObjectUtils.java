@@ -133,6 +133,9 @@ public class ObjectUtils {
         return new ArrayList<>();
     }
 
+    public static <T>  String getToString(T str) {
+        return str == null ? null : str.toString();
+    }
     public static Object [] removeNull(Collection<Object> objects){
         objects=objects.stream().filter(Objects::nonNull).collect(Collectors.toList());
         return objects.toArray();

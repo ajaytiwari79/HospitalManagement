@@ -4,7 +4,7 @@ import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseLine;
 import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
-import com.kairos.persistence.model.user.expertise.response.ExpertiseDTO;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseBasicDetails;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseLineQueryResult;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseTagDTO;
@@ -106,12 +106,12 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "MATCH(organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService)\n" +
             " MATCH(os)<-[:"+SUPPORTS_SERVICES+"]-(exl:ExpertiseLine)-["+HAS_EXPERTISE_LINES+"]-(expertise:Expertise{deleted:false}) WHERE expertise.published AND  (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE())\n" +
             "RETURN distinct id(expertise) as id,expertise.name as name")
-    List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId);
+    List<ExpertiseBasicDetails> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId);
 
     @Query("MATCH (country:Country) WHERE id(country)={0}  " +
             "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE  (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE()) " +
             "RETURN id(expertise) as id , expertise.name as name")
-    List<ExpertiseDTO> getAllExpertiseByCountryAndDate(long countryId);
+    List<ExpertiseBasicDetails> getAllExpertiseByCountryAndDate(long countryId);
 
     @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE id(country) = {0} AND (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE()))  " +
             "MATCH(expertise)-[:" + BELONGS_TO_SECTOR + "]-(sector:Sector)\n" +

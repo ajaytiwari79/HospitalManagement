@@ -12,7 +12,7 @@ buildscript {
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath("net.saliman:gradle-cobertura-plugin:2.5.1")
+		classpath("net.saliman:gradle-cobertura-plugin:3.0.0")
 	}
 }
 
@@ -32,7 +32,7 @@ version = "$projectVersion-SNAPSHOT"
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
-apply plugin: "net.saliman.cobertura"
+//apply plugin: "net.saliman.cobertura"
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'application'
 applicationDefaultJvmArgs = ["-Xms1024m", "-Xmx1048m"]
