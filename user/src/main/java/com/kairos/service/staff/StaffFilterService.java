@@ -240,6 +240,7 @@ public class StaffFilterService {
 
     private List<FilterSelectionQueryResult> getAllActivity(Long unitId, Long countryId){
        ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = activityIntegrationService.getAllActivitiesAndTimeTypesByUnit(unitId, countryId);
+       Map<BigInteger,String> idnameMap =activityWithTimeTypeDTOS.getActivityDTOS().stream().collect(Collectors.toMap(ActivityDTO::getId,ActivityDTO::getName));
         return activityWithTimeTypeDTOS.getActivityDTOS().stream().map(activityDTO -> new FilterSelectionQueryResult(activityDTO.getId().toString(),activityDTO.getName())).collect(Collectors.toList());
     }
 
@@ -254,7 +255,7 @@ public class StaffFilterService {
     }
 
     private List<FilterSelectionQueryResult> getCTAAccounts() {
-        return Arrays.stream(AccountType.values()).map(accountType -> new FilterSelectionQueryResult(accountType.name(),accountType.toString())).collect(Collectors.toList());
+        return Arrays.stream(AccountType.values()).map(accountType -> new FilterSelectionQueryResult(accountType.name(),accountType.toValue())).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getTAStatus(){
