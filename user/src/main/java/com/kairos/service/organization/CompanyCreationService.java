@@ -314,7 +314,7 @@ public class CompanyCreationService {
         }
         Organization organization = organizationService.fetchParentOrganization(organizationBaseEntity.getId());
         // set all properties
-        User user = userGraphRepository.findUserByCprNumberOrEmail(unitManagerDTO.getCprNumber(), "(?)" + unitManagerDTO.getEmail());
+        User user = userGraphRepository.getUserOfOrganization(organization.getId());
         if(user==null){
             StaffCreationDTO staffCreationDTO=ObjectMapperUtils.copyPropertiesByMapper(unitManagerDTO,StaffCreationDTO.class);
             staffCreationService.createStaff(unitId,staffCreationDTO);
@@ -324,12 +324,12 @@ public class CompanyCreationService {
             if(isNotNull(staff)){
                positionService.createPosition(organization,staff,unitManagerDTO.getAccessGroupId(), DateUtils.getCurrentDateMillis(),unitId);
             }
-            setUserDetails(unitId, unitManagerDTO, organization, user, organizationBaseEntity);
+            setUserDetails(unitId, unitManagerDTO, organization, user);
         }
         return unitManagerDTO;
     }
 
-    private void setUserDetails(Long unitId, UnitManagerDTO unitManagerDTO, Organization organization, User user, OrganizationBaseEntity organizationBaseEntity) {
+    private void setUserDetails(Long unitId, UnitManagerDTO unitManagerDTO, Organization organization, User user) {
         byte anotherUserExistBySameEmailOrCPR = userGraphRepository.validateUserEmailAndCPRExceptCurrentUser("(?)" + unitManagerDTO.getEmail(), unitManagerDTO.getCprNumber(), user.getId());
         if (anotherUserExistBySameEmailOrCPR != 0) {
             exceptionService.duplicateDataException(MESSAGE_CPRNUMBEREMAIL_NOTNULL);
