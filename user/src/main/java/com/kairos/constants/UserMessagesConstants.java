@@ -469,4 +469,5 @@ public class UserMessagesConstants {
     public static  final String ERROR_STAFF_USERNAME_NOTNULL="error.Staff.userName.notnull";
     public static  final String ERROR_STAFF_ACCESSGROUP_NOTNULL="error.staff.accessGroup.id.notnull";
     public static  final String ERROR_TAB_CAN_NOT_BE_HIDE_FOR_HUB="Tab can not be hide for HUB";
+    public static final String STAFF_SKILL_DOES_NOT_MATCHED = "team.skill.not.matched";
 }
