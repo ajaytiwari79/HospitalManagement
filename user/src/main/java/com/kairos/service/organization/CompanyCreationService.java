@@ -314,7 +314,7 @@ public class CompanyCreationService {
         }
         Organization organization = organizationService.fetchParentOrganization(organizationBaseEntity.getId());
         // set all properties
-        User user = userGraphRepository.getUserOfOrganization(unitId);
+        User user = userGraphRepository.getUserOfOrganization(organization.getId());
         if(user==null){
             StaffCreationDTO staffCreationDTO=ObjectMapperUtils.copyPropertiesByMapper(unitManagerDTO,StaffCreationDTO.class);
             staffCreationService.createStaff(unitId,staffCreationDTO);
