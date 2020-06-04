@@ -247,7 +247,7 @@ public class StaffService {
             exceptionService.actionNotPermittedException(MESSAGE_EMPLOY_NOTCONVERT_FICTIVE);
         }
         if(!validTeamDetails(staffDTO.getTeams())){
-            exceptionService.actionNotPermittedException(MESSAGE_INVALID_STAFF_TEAM_DETAIL);
+            exceptionService.actionNotPermittedException(MESSAGE_TEAM_DETAIL_NOT_VALID);
         }
         //todo we might create a job to inactive user from particular date
         if (StaffStatusEnum.INACTIVE.equals(staffDTO.getCurrentStatus())) {
