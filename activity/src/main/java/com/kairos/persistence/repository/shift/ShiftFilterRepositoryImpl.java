@@ -57,6 +57,23 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     @Override
     public <T> List<StaffShiftDetails> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate) {
 
+        List<AggregationOperation> aggregationOperations = prepareOperationsListForCriteria(employmentIds, filterTypes, unitId, startDate, endDate);
+        GroupOperation groupOperation = group(STAFF_ID).addToSet("$$ROOT").as(SHIFTS);
+        aggregationOperations.add(groupOperation);
+        Aggregation aggregations = Aggregation.newAggregation(aggregationOperations);
+        return mongoTemplate.aggregate(aggregations, Shift.class, StaffShiftDetails.class).getMappedResults();
+    }
+
+    @Override
+    public <T> List<StaffShiftDetails> getStaffListFilteredByShiftCriteria(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate) {
+        List<AggregationOperation> aggregationOperations = prepareOperationsListForCriteria(employmentIds, filterTypes, unitId, startDate, endDate);
+        GroupOperation groupOperation = group(STAFF_ID);
+        aggregationOperations.add(groupOperation);
+        Aggregation aggregations = Aggregation.newAggregation(aggregationOperations);
+        return mongoTemplate.aggregate(aggregations, Shift.class, StaffShiftDetails.class).getMappedResults();
+    }
+
+    private <T> List<AggregationOperation> prepareOperationsListForCriteria(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate) {
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         List<Criteria> criteriaArrayList = new ArrayList<>();
 
@@ -132,11 +149,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
             aggregationOperations.add(ctaTemplateLookupOperation);
             aggregationOperations.add(new MatchOperation(ctaDetailsMatchCriteria));
         }
-
-        GroupOperation groupOperation = group(STAFF_ID).addToSet("$$ROOT").as(SHIFTS);
-        aggregationOperations.add(groupOperation);
-        Aggregation aggregations = Aggregation.newAggregation(aggregationOperations);
-        return mongoTemplate.aggregate(aggregations, Shift.class, StaffShiftDetails.class).getMappedResults();
+        return aggregationOperations;
     }
 
     private List<Criteria> prepareMaterializedPath(final Set<String> filterValues) {

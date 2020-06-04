@@ -32,7 +32,7 @@ public class ShiftPlanningController {
     }
 
     @PostMapping(value = "/search/shifts")
-    public List<StaffShiftDetails> shiftsAndPlanningSettingsForAllStaff(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO){
+    public List<StaffShiftDetails> shiftsAndPlanningSettingsForAllStaff(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO) {
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         Long loggedInUserId = currentUserDetails.getId();
         searchDTO.setLoggedInUserId(loggedInUserId);
@@ -42,6 +42,15 @@ public class ShiftPlanningController {
             return shiftPlanningService.getShiftPlanningDetailsForUnit(unitId, searchDTO);
         }
     }
+
+    @PostMapping(value = "/search/shiftFilters/staff")
+    public List<StaffShiftDetails> getStaffListForShiftFilters(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO) {
+        CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
+        Long loggedInUserId = currentUserDetails.getId();
+        searchDTO.setLoggedInUserId(loggedInUserId);
+        return shiftPlanningService.getFilteredStaffForMatchingFilter(unitId, searchDTO);
+    }
+
 
     @PostMapping(value = "/search/staffById")
     public Set<Long> getStaffListForCriteria(@RequestParam Long unitId, @RequestBody Set<String> realtimeStatusList) {
