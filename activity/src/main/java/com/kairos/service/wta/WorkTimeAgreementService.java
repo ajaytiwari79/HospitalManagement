@@ -418,7 +418,7 @@ public class WorkTimeAgreementService{
             exceptionService.dataNotFoundByIdException(MESSAGE_WTA_ID, wtaId);
         }
         if (checked) {
-            List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates = wtaBaseRuleTemplateRepository.findAllByIdIn(wta.getRuleTemplateIds());
+            List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaBaseRuleTemplateRepository.findAllByIdIn(wta.getRuleTemplateIds()),WTABaseRuleTemplateDTO.class);
             WTADTO wtadto = new WTADTO(COPY_OF + wta.getName(), wta.getDescription(), wta.getExpertise().getId(), wta.getStartDate(), wta.getEndDate() == null ? null : wta.getEndDate(), wtaBaseRuleTemplates, wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getId());
             WTAResponseDTO wtaResponseDTO = createWta(wta.getCountryId(), wtadto, true, true);
             map.put("wta", wtaResponseDTO);
