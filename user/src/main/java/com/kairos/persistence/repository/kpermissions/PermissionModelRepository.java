@@ -25,8 +25,8 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
     void createAccessGroupPermissionModelRelationship(Long kpermissionModelId, List<Long> accessGroupIds, Set<FieldLevelPermission> fieldLevelPermissions,Set<Long> expertiseIds,Set<Long> unionIds,Set<Long> teamIds,Set<Long> employmentTypeIds,Set<Long> tagIds,Set<StaffStatusEnum> staffStatuses,Set<FieldLevelPermission> forOtherFieldLevelPermissions);
 
     @Query("MATCH(ag:AccessGroup{deleted:false}) where id(ag) in {0} MATCH (ag)<-[permission:HAS_PERMISSION]-(field:KPermissionField) " +
-            "OPTIONAL MATCH(staff:Staff)<-[:"+BELONGS_TO+"]-(position:Position)-["+HAS_UNIT_PERMISSIONS+"]->(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit) WHERE ID(staff)={1} AND ID(unit)={2} " +
-            "OPTIONAL MATCH(up)-[customRel:"+HAS_CUSTOMIZED_PERMISSION_FOR_FIELD+"]->(model) WHERE customRel.accessGroupId=id(ag) " +
+            "OPTIONAL MATCH(staff:Staff)<-[:"+BELONGS_TO+"]-(position:Position)-["+HAS_UNIT_PERMISSIONS+"]->(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit) WHERE ID(staff)={2} AND ID(unit)={1} " +
+            "OPTIONAL MATCH(up)-[customRel:"+HAS_CUSTOMIZED_PERMISSION_FOR_FIELD+"]->(field) WHERE customRel.accessGroupId=id(ag) " +
             "RETURN CASE WHEN customRel IS NULL THEN  permission.fieldLevelPermissions ELSE customRel.fieldLevelPermissions END AS permissions, \n" +
             "permission.expertiseIds as expertiseIds,\n" +
             "permission.forOtherFieldLevelPermissions as forOtherFieldLevelPermissions,\n" +
