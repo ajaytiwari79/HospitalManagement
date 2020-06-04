@@ -37,8 +37,11 @@ public class ShiftPlanningService {
         staffListWithPersonalDetails.forEach(staffShiftDetails ->
                 employmentIds.addAll(staffShiftDetails.getEmployments().stream().map(EmploymentDTO::getId).collect(Collectors.toList()))
         );
-        List<Date> startAndEndDates = getStartAndEndDates(shiftSearchDTO.getShiftFilterDurationType());
-        List<StaffShiftDetails> shiftWithActivityDTOS = shiftMongoRepository.getFilteredShiftsGroupedByStaff(employmentIds, validMatches, unitId, startAndEndDates.get(0), startAndEndDates.get(1));
+//        List<Date> startAndEndDates = getStartAndEndDates(shiftSearchDTO.getShiftFilterDurationType());
+        if (shiftSearchDTO.getStartDate().equals(shiftSearchDTO.getEndDate())) {
+            shiftSearchDTO.setEndDate(new Date(shiftSearchDTO.getEndDate().getTime() + 86400000));
+        }
+        List<StaffShiftDetails> shiftWithActivityDTOS = shiftMongoRepository.getFilteredShiftsGroupedByStaff(employmentIds, validMatches, unitId, shiftSearchDTO.getStartDate(), shiftSearchDTO.getEndDate());
         return assignShiftsToStaff(staffListWithPersonalDetails, shiftWithActivityDTOS);
     }
 
@@ -68,7 +71,10 @@ public class ShiftPlanningService {
                 employmentIds.addAll(staffShiftDetails.getEmployments().stream().map(EmploymentDTO::getId).collect(Collectors.toList()))
         );
         List<Date> startAndEndDates = getStartAndEndDates(shiftSearchDTO.getShiftFilterDurationType());
-        List<StaffShiftDetails> shiftWithActivityDTOS = shiftMongoRepository.getFilteredShiftsGroupedByStaff(employmentIds, validMatches, unitId, startAndEndDates.get(0), startAndEndDates.get(1));
+        if (shiftSearchDTO.getStartDate().equals(shiftSearchDTO.getEndDate())) {
+            shiftSearchDTO.setEndDate(new Date(shiftSearchDTO.getEndDate().getTime() + 86400000));
+        }
+        List<StaffShiftDetails> shiftWithActivityDTOS = shiftMongoRepository.getStaffListFilteredByShiftCriteria(employmentIds, validMatches, unitId, shiftSearchDTO.getStartDate(), shiftSearchDTO.getEndDate());
         return getStaffListAfterShiftFilterMatches(staffListWithPersonalDetails, shiftWithActivityDTOS);
     }
 
