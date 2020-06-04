@@ -155,7 +155,7 @@ public class TeamService {
             }
             Team team = teamGraphRepository.findByIdAndDeletedFalse(teamId);
             Staff staff = staffGraphRepository.findByStaffId(staffTeamDTO.getStaffId());
-            if(staffSkillMap.containsKey(staff.getId()) && !team.getSkillList().stream().allMatch(skillId->staffSkillMap.get(staff.getId()).contains(skillId))){
+            if(!team.getSkillList().stream().allMatch(skillId->staffSkillMap.getOrDefault(staff.getId(),new HashSet<>()).contains(skillId))){
                 exceptionService.actionNotPermittedException(STAFF_SKILL_DOES_NOT_MATCHED);
             }
             StaffTeamRelationShipQueryResult staffTeamRelationShipQueryResult = staffTeamRelationshipGraphRepository.findByStaffIdAndTeamId(staffTeamDTO.getStaffId(), teamId);
