@@ -15,6 +15,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -245,6 +246,9 @@ public class StaffService {
         if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus()) && StaffStatusEnum.FICTIVE.equals(staffDTO.getCurrentStatus())) {
             exceptionService.actionNotPermittedException(MESSAGE_EMPLOY_NOTCONVERT_FICTIVE);
         }
+        if(!validTeamDetails(staffDTO.getTeams())){
+            exceptionService.actionNotPermittedException(MESSAGE_INVALID_STAFF_TEAM_DETAIL);
+        }
         //todo we might create a job to inactive user from particular date
         if (StaffStatusEnum.INACTIVE.equals(staffDTO.getCurrentStatus())) {
             redisService.invalidateAllTokenOfUser(staffToUpdate.getUser().getUserName());
@@ -280,6 +284,17 @@ public class StaffService {
         staffDTO.setSectorWiseExpertise(copyCollectionPropertiesByMapper(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults), SectorAndStaffExpertiseDTO.class));
         teamService.assignStaffInTeams(staff, staffDTO.getTeams(), unitId);
         return staffRetrievalService.getPersonalInfo(staffId, unitId);
+    }
+
+    private boolean validTeamDetails(List<TeamDTO> teams) {
+        boolean isValidTeam = true;
+        for (TeamDTO team : teams) {
+            if(!team.isTeamMembership() && isNull(team.getLeaderType())){
+                isValidTeam = false;
+                break;
+            }
+        }
+        return isValidTeam;
     }
 
     private User updateUserDetails(long staffId, StaffDTO staffDTO) {
