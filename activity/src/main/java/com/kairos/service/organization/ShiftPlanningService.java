@@ -70,7 +70,7 @@ public class ShiftPlanningService {
         staffListWithPersonalDetails.forEach(staffShiftDetails ->
                 employmentIds.addAll(staffShiftDetails.getEmployments().stream().map(EmploymentDTO::getId).collect(Collectors.toList()))
         );
-        List<Date> startAndEndDates = getStartAndEndDates(shiftSearchDTO.getShiftFilterDurationType());
+//        List<Date> startAndEndDates = getStartAndEndDates(shiftSearchDTO.getShiftFilterDurationType());
         if (shiftSearchDTO.getStartDate().equals(shiftSearchDTO.getEndDate())) {
             shiftSearchDTO.setEndDate(new Date(shiftSearchDTO.getEndDate().getTime() + 86400000));
         }
@@ -105,7 +105,7 @@ public class ShiftPlanningService {
         Map<FilterType, Set<T>> validMatches = FilterUtils.filterOutEmptyQueriesAndPrepareMap(shiftSearchDTO);
         List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId, shiftSearchDTO);
         if (CollectionUtils.isEmpty(staffListWithPersonalDetails)) {
-            return staffListWithPersonalDetails;
+            return Collections.emptyList();
         }
 
         if (validMatches.containsKey(FilterType.REAL_TIME_STATUS)) {
