@@ -153,7 +153,7 @@ public class TeamService {
             if (staffTeamDTO.getLeaderType() != null && !accessGroupService.findStaffAccessRole(unitId, staffTeamDTO.getStaffId()).getManagement()) {
                 exceptionService.actionNotPermittedException(STAFF_CAN_NOT_BE_TEAM_LEADER);
             }
-            Team team = teamGraphRepository.findByIdAndDeletedFalse(teamId);
+            Team team = teamGraphRepository.findOne(teamId);
             Staff staff = staffGraphRepository.findByStaffId(staffTeamDTO.getStaffId());
             if(!team.getSkillList().stream().allMatch(skillId->staffSkillMap.getOrDefault(staff.getId(),new HashSet<>()).contains(skillId))){
                 exceptionService.actionNotPermittedException(STAFF_SKILL_DOES_NOT_MATCHED);
