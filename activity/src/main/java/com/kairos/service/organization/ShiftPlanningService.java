@@ -10,6 +10,7 @@ import com.kairos.enums.shift.ShiftFilterDurationType;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.wrapper.shift.StaffShiftDetails;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -73,6 +74,10 @@ public class ShiftPlanningService {
     public <T> List<StaffShiftDetails> getUnitPlanningAndShiftForSelectedStaff(Long unitId, ShiftSearchDTO shiftSearchDTO) {
         Map<FilterType, Set<T>> validMatches = FilterUtils.filterOutEmptyQueriesAndPrepareMap(shiftSearchDTO);
         List<StaffShiftDetails> staffListWithPersonalDetails = getAllStaffEligibleForPlanning(unitId, shiftSearchDTO);
+        if(CollectionUtils.isEmpty(staffListWithPersonalDetails)){
+            return staffListWithPersonalDetails;
+        }
+
         if (validMatches.containsKey(FilterType.REAL_TIME_STATUS)) {
             Set<Long> staffIds = shiftMongoRepository.getStaffListAsIdForRealtimeCriteria(unitId, (Set<String>) validMatches.get(FilterType.REAL_TIME_STATUS));
             staffListWithPersonalDetails = staffListWithPersonalDetails.stream().filter(spd -> staffIds.contains(spd.getId())).collect(Collectors.toList());
@@ -88,12 +93,14 @@ public class ShiftPlanningService {
             }
         }
 
-        if (i > 0) {
+        if(matchedStaff==null){
+            matchedStaff = staffListWithPersonalDetails.get(0);
+        }else{
             staffListWithPersonalDetails.remove(i);
             staffListWithPersonalDetails.add(0, matchedStaff);
         }
 
-        final Set<Long> employmentIds = Objects.requireNonNull(matchedStaff).getEmployments().stream().map(EmploymentDTO::getId).collect(Collectors.toSet());
+        final Set<Long> employmentIds = matchedStaff.getEmployments().stream().map(EmploymentDTO::getId).collect(Collectors.toSet());
         StaffShiftDetails shiftDetails = findShiftsForSelectedEmploymentsAndDuration(employmentIds, shiftSearchDTO.getShiftFilterDurationType());
         matchedStaff.setShifts(shiftDetails.getShifts());
         return staffListWithPersonalDetails;

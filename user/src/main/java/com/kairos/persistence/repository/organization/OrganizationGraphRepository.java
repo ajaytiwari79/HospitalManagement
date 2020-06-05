@@ -20,9 +20,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     Optional<Organization> findByExternalId(String externalId);
 
-    Organization findByKmdExternalId(String kmdExternalId);
-
-
     @Query("MATCH(o:Organization{isEnable:true,boardingCompleted: true,isKairoHub:true}) RETURN o limit 1")
     Organization findHub();
 

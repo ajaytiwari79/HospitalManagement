@@ -418,7 +418,7 @@ public class WorkTimeAgreementService{
             exceptionService.dataNotFoundByIdException(MESSAGE_WTA_ID, wtaId);
         }
         if (checked) {
-            List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates = wtaBaseRuleTemplateRepository.findAllByIdIn(wta.getRuleTemplateIds());
+            List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaBaseRuleTemplateRepository.findAllByIdIn(wta.getRuleTemplateIds()),WTABaseRuleTemplateDTO.class);
             WTADTO wtadto = new WTADTO(COPY_OF + wta.getName(), wta.getDescription(), wta.getExpertise().getId(), wta.getStartDate(), wta.getEndDate() == null ? null : wta.getEndDate(), wtaBaseRuleTemplates, wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getId());
             WTAResponseDTO wtaResponseDTO = createWta(wta.getCountryId(), wtadto, true, true);
             map.put("wta", wtaResponseDTO);
@@ -633,13 +633,10 @@ public class WorkTimeAgreementService{
 
     private void validateEmploymentCTAWhileUpdate(WTADTO wtadto, Boolean oldEmploymentPublished, WorkingTimeAgreement oldWTA){
         if ((wtadto.getEmploymentEndDate() != null && wtadto.getEndDate() != null && wtadto.getEndDate().isBefore(wtadto.getEmploymentEndDate())) || (isNull(oldWTA.getEndDate()) && isNull(wtadto.getEmploymentEndDate()) && isNotNull(wtadto.getEndDate()))) {
-            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE);
+            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, "WTA");
         }
         if (wtadto.getEmploymentEndDate() != null && wtadto.getStartDate().isAfter(wtadto.getEmploymentEndDate())) {
-            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE);
-        }
-        if (wtadto.getEmploymentEndDate() != null && wtadto.getEndDate() != null && wtadto.getEndDate().isBefore(wtadto.getEmploymentEndDate())) {
-            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, wtadto.getEndDate(), wtadto.getEmploymentEndDate());
+            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, "WTA");
         }
         if (wtadto.getEmploymentEndDate() != null && wtadto.getStartDate().isAfter(wtadto.getEmploymentEndDate())) {
             exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, wtadto.getStartDate(), wtadto.getEmploymentEndDate());

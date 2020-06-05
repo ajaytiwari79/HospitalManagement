@@ -7,8 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO_EXPERTISE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CARE_DAYS;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface SeniorDaysGraphRepository  extends Neo4jBaseRepository<SeniorDays, Long> {
@@ -35,4 +34,10 @@ public interface SeniorDaysGraphRepository  extends Neo4jBaseRepository<SeniorDa
             "WHERE id(expertise)={0} AND seniorDays.startDate <= DATE({1}) AND (seniorDays.endDate IS NULL  OR DATE({1})<=seniorDays.endDate) " +
             " RETURN seniorDays,COLLECT(careDayRel),COLLECT(careDays)")
     SeniorDays findSeniorDaysBySelectedDate(Long expertiseId, String selectedDate);
+
+    @Query("MATCH(seniorDays:SeniorDays{deleted:false,published:false}) WHERE id(seniorDays)={0}" +
+            "OPTIONAL MATCH(seniorDays)-[rel:"+VERSION_OF+"]-(version:SeniorDays) " +
+            "SET seniorDays.deleted=true,version.oneTimeUpdatedAfterPublish=false RETURN count(seniorDays)>0")
+    boolean deleteSeniorDays(Long seniorDaysId);
+
 }

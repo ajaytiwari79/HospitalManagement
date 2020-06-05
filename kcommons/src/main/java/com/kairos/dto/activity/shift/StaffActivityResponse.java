@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,6 +15,6 @@ import java.math.BigInteger;
 public class StaffActivityResponse {
     private Long staffId;
     private BigInteger activityId;
-    private String message;
+    private List<String> messages;
 
 }

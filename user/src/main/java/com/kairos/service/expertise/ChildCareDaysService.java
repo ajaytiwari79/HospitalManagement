@@ -37,6 +37,7 @@ public class ChildCareDaysService {
         ChildCareDays childCareDays = ObjectMapperUtils.copyPropertiesByMapper(careDaysDetails, ChildCareDays.class);
         childCareDays.setExpertise(expertise);
         childCareDaysGraphRepository.save(childCareDays);
+        careDaysDetails.setId(childCareDays.getId());
         return careDaysDetails;
     }
 
@@ -154,6 +155,10 @@ public class ChildCareDaysService {
         childCareDaysGraphRepository.save(childCareDays);
         return ObjectMapperUtils.copyPropertiesByMapper(parentChildCareDays,CareDaysDetails.class);
 
+    }
+
+    public boolean deleteChildCareDays(Long childCareId) {
+        return childCareDaysGraphRepository.deleteChildCareDays(childCareId);
     }
 
 
