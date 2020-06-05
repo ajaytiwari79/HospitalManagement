@@ -8,8 +8,10 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelTemplateDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
@@ -28,6 +30,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
@@ -42,6 +45,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
+    @Inject private StaffingLevelMongoRepository staffingLevelMongoRepository;
 
     /**
      * @param staffingLevelTemplateDTO
@@ -59,12 +63,12 @@ public class StaffingLevelTemplateService extends MongoBaseService {
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
         }
-
-        StaffingLevelTemplate staffingLevelTemplate = new StaffingLevelTemplate();
-        ObjectMapperUtils.copyProperties(staffingLevelTemplateDTO, staffingLevelTemplate);
-        this.save(staffingLevelTemplate);
+        StaffingLevel staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId,asDate(staffingLevelTemplateDTO.getSelectedDate()));
+        StaffingLevelTemplate staffingLevelTemplate = ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplateDTO, StaffingLevelTemplate.class);
+        staffingLevelTemplate.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval());
+        staffingLevelTemplateRepository.save(staffingLevelTemplate);
         BeanUtils.copyProperties(staffingLevelTemplate, staffingLevelTemplateDTO);
-        staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().stream()
+        staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
 
         return staffingLevelTemplateDTO;
