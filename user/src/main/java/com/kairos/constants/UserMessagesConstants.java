@@ -71,6 +71,7 @@ public class UserMessagesConstants {
     public static final String ERROR_CONTACTADDRESS_HOUSENUMBER_NOTNULL = "error.ContactAddress.HouseNumber.notnull";
     public static final String ERROR_TASKDEMAND_PRIORITY_RANGE = "error.TaskDemand.priority.range";
     public static final String ERROR_TASKDEMAND_STAFFCOUNT_MINIMUMONE = "error.TaskDemand.staffCount.minimumOne";
+    public static final String MESSAGE_TEAM_DETAIL_NOT_VALID = "message.staff.team.detail.not.valid";
     public static final String ERROR_STAFF_EMPLOYEDSINCE_NOTNULL = "error.Staff.employedsince.notnull";
     public static final String ERROR_STAFF_EXISTS_SAME_CPRNUMBER = "error.staff.exists.same.cprNumber";
     public static final String ERROR_CITIZENSTATUS_NAME_NOTEMPTY = "error.CitizenStatus.name.notEmpty";
@@ -469,4 +470,5 @@ public class UserMessagesConstants {
     public static  final String ERROR_STAFF_USERNAME_NOTNULL="error.Staff.userName.notnull";
     public static  final String ERROR_STAFF_ACCESSGROUP_NOTNULL="error.staff.accessGroup.id.notnull";
     public static  final String ERROR_TAB_CAN_NOT_BE_HIDE_FOR_HUB="Tab can not be hide for HUB";
+    public static final String STAFF_SKILL_DOES_NOT_MATCHED = "team.skill.not.matched";
 }

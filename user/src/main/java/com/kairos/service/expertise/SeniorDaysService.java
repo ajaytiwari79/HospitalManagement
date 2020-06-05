@@ -155,5 +155,9 @@ public class SeniorDaysService {
 
     }
 
+    public boolean deleteSeniorDays(Long seniorDaysId) {
+        return seniorDaysGraphRepository.deleteSeniorDays(seniorDaysId);
+    }
+
 
 }

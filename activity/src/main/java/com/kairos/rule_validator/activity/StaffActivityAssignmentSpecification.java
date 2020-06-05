@@ -3,19 +3,21 @@ package com.kairos.rule_validator.activity;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.rule_validator.AbstractSpecification;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.EXPERTISE_ABSENT_ACTIVITY;
+import static com.kairos.constants.ActivityMessagesConstants.STAFF_SKILL_DOES_NOT_MATCHED;
 
-public class StaffExpertiseSpecification extends AbstractSpecification<StaffDTO> {
+public class StaffActivityAssignmentSpecification extends AbstractSpecification<StaffDTO> {
     private Activity activity;
 
 
-    public StaffExpertiseSpecification(Activity activity) {
+    public StaffActivityAssignmentSpecification(Activity activity) {
         this.activity = activity;
     }
 
@@ -34,6 +36,9 @@ public class StaffExpertiseSpecification extends AbstractSpecification<StaffDTO>
         List<String> errorMessages = new ArrayList<>();
         if (isNotNull(staffDTO) && !CollectionUtils.containsAny(activity.getExpertises(), staffDTO.getExpertiseIds())) {
             errorMessages.add(EXPERTISE_ABSENT_ACTIVITY);
+        }
+        if(isCollectionNotEmpty(activity.getSkillActivityTab().getActivitySkillIds()) && !activity.getSkillActivityTab().getActivitySkillIds().stream().allMatch(skillId->staffDTO.getSkillIds().contains(skillId))){
+            errorMessages.add(STAFF_SKILL_DOES_NOT_MATCHED);
         }
         return errorMessages;
     }

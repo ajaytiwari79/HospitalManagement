@@ -505,5 +505,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_SKILLS + "]->(skill:Skill) where id(staff) = {0}  AND id(skill) IN {1} detach delete rel")
     void deleteSkill(Long staffId,List<Long> skillIds);
+
+    @Query("MATCH (staff:Staff)-[:STAFF_HAS_SKILLS{isEnabled:true}]->(skills:Skill{isEnabled:true}) where id(staff) in {0} return id(staff) as id,COLLECT(id(skills)) as skillIds")
+    List<StaffPersonalDetailQueryResult> getSkillIdsByStaffIds(Collection<Long> staffIds);
 }
 
