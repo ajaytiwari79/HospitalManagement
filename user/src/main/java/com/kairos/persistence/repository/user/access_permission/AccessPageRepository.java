@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.access_permission;
 
+import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -24,7 +25,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (org)-[:" + HAS_SUB_ORGANIZATION + "*]->(n)\n" +
             "MATCH (n)-[:" + HAS_TEAMS + "]->(team:Team)-[:" + TEAM_HAS_MEMBER + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={1} WITH staff\n" +
             "MATCH (staff)-[:" + STAFF_HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup)-[r:" + ACCESS_GROUP_HAS_ACCESS_TO_PAGE + "{read:false}]->(accessPage:AccessPage{isModule:true}) RETURN DISTINCT accessPage")
-    List<AccessPage> getAccessModulesForUnits(long parentOrganizationId, long userId);
+    List<AccessPage> getAccessModulesForUnits(Long parentOrganizationId, Long userId);
 
     // Fetch access page hierarchy show only selected access page
     @Query("MATCH (ag:AccessGroup) WHERE id(ag)={0} WITH ag \n" +
@@ -47,7 +48,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     @Query("MATCH (accessGroup:AccessGroup),(accessPermission:AccessPermission) WHERE id(accessPermission)={0} AND id(accessGroup)={1}\n" +
             "MATCH (accessGroup)-[r:" + HAS_ACCESS_OF_TABS + "{isEnabled:true}]->(accessPage:AccessPage) WITH accessPage,r,accessPermission\n" +
             "Create unique (accessPermission)-[:" + HAS_ACCESS_PAGE_PERMISSION + "{isEnabled:r.isEnabled,isRead:true,isWrite:false}]->(accessPage) RETURN accessPermission")
-    List<AccessPage> setDefaultPermission(long accessPermissionId, long accessGroupId);
+    List<AccessPage> setDefaultPermission(Long accessPermissionId, Long accessGroupId);
 
 
     @Query("MATCH (accessGroup:AccessGroup{deleted:false})-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(accessPage:AccessPage) WHERE id(accessPage)={1} AND id(accessGroup)={0} RETURN r.read as read, r.write as write")
@@ -60,7 +61,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={2} WITH unitPermission,accessPage\n" +
             "MATCH (unitPermission)-[r:"+HAS_CUSTOMIZED_PERMISSION+"]->(accessPage) WHERE r.accessGroupId={4}\n" +
             "RETURN r.read as read, r.write as write")
-    AccessPageQueryResult getCustomPermissionOfTab(long organizationId, long staffId, long unitId, long accessPageId, long accessGroupId);
+    AccessPageQueryResult getCustomPermissionOfTab(Long organizationId, Long staffId, Long unitId, Long accessPageId, Long accessGroupId);
 
 
 
@@ -92,7 +93,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "RETURN {name:accessPage.name,id:id(accessPage),\n" +
             "read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END, write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,\n" +
             "selected:case when r.isEnabled then true else false end,module:accessPage.isModule,sequence:accessPage.sequence,children:[]} as data")
-    List<Map<String, Object>> getAccessPagePermissionOfStaff(long orgId, long unitId, long staffId, long accessGroupId);
+    List<Map<String, Object>> getAccessPagePermissionOfStaff(Long orgId, Long unitId, Long staffId, Long accessGroupId);
 
     AccessPage findByModuleId(String moduleId);
 
@@ -172,7 +173,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WITH r,customRel,unitPermission,childrenAccessPages,g\n" +
             "RETURN childrenAccessPages.name as name,id(childrenAccessPages) as id, CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read ,\n" +
             "CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END as write ORDER BY id DESC")
-    List<AccessPageQueryResult> getChildTabsAccessPermissionsByStaffAndOrg(long orgId, long unitId, Long staffId, Long tabId, Long accessGroupId);
+    List<AccessPageQueryResult> getChildTabsAccessPermissionsByStaffAndOrg(Long orgId, Long unitId, Long staffId, Long tabId, Long accessGroupId);
 
     @Query("MATCH(ac:AccessGroup) WHERE id(ac)={1} WITH ac " +
             "MATCH(accessGroup:AccessGroup)-[rel:" + HAS_ACCESS_OF_TABS + "]->(accessPage:AccessPage) WHERE id(accessGroup)={0} WITH ac,accessGroup as accessGroup," +
@@ -314,4 +315,6 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH(up)-[r:"+HAS_ACCESS_GROUP+"]->(accessGroup) " +
             "RETURN id(unit) as unitId, CASE WHEN COUNT(r)>0 THEN TRUE ELSE FALSE END AS hasPermission")
     List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, Set<Long> organizationIds);
+
+
 }
