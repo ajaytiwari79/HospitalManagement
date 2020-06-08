@@ -205,7 +205,7 @@ public class ShiftValidatorService {
     public DateTimeInterval getGracePeriodInterval(Phase phase, Date date, boolean forStaff) {
         ZonedDateTime startDate = DateUtils.asZonedDateTime(date);
         ZonedDateTime endDate;
-        if (forStaff) {
+        if (UserContext.getUserDetails().isStaff()) {
             endDate = startDate.plusWeeks(1).with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).plusDays(phase.getGracePeriodByStaff()).plusDays(1);
         } else {
             endDate = startDate.plusWeeks(1).with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).plusDays(phase.getGracePeriodByStaff() + phase.getGracePeriodByManagement()).plusDays(1);
