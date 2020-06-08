@@ -42,8 +42,7 @@ import static com.kairos.commons.utils.CommonsExceptionUtil.convertMessage;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.ONE_HOUR_MINUTES;
-import static com.kairos.constants.AppConstants.TIME_AND_ATTENDANCE;
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.activity.counter.enums.XAxisConfig.PERCENTAGE;
 import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
 
@@ -242,7 +241,7 @@ public class ShiftBreakService implements KPIService {
     public boolean interruptBreak(BigInteger shiftId, BreakAction breakAction) {
         Shift shift = shiftMongoRepository.findById(shiftId).orElseThrow(() -> new DataNotFoundByIdException(convertMessage(MESSAGE_SHIFT_ID, shiftId)));
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
-        if (TIME_AND_ATTENDANCE.equals(phase.getName())) {
+        if (TIME_AND_ATTENDANCE.equals(phase.getName()) || REALTIME.equals(phase.getName())) {
             switch (breakAction) {
                 case INTERRUPT:
                     shift.getBreakActivities().forEach(shiftActivity -> shiftActivity.setBreakInterrupt(true));
@@ -256,7 +255,6 @@ public class ShiftBreakService implements KPIService {
                 default:
                     break;
             }
-
         }
         shiftMongoRepository.save(shift);
         return true;
