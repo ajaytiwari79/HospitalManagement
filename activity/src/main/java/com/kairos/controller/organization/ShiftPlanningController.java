@@ -5,12 +5,17 @@ import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.ShiftFilterDurationType;
 import com.kairos.service.organization.ShiftPlanningService;
+import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.shift.StaffShiftDetails;
 import io.swagger.annotations.Api;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_PLANNING_URL;
@@ -44,11 +49,13 @@ public class ShiftPlanningController {
     }
 
     @PostMapping(value = "/search/shiftFilters/staff")
-    public List<StaffShiftDetails> getStaffListForShiftFilters(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO) {
+    public ResponseEntity<Map<String, Object>> getStaffListForShiftFilters(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO) {
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         Long loggedInUserId = currentUserDetails.getId();
         searchDTO.setLoggedInUserId(loggedInUserId);
-        return shiftPlanningService.getFilteredStaffForMatchingFilter(unitId, searchDTO);
+        Map staffData = new HashMap();
+        staffData.put("staffList",shiftPlanningService.getFilteredStaffForMatchingFilter(unitId, searchDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffData);
     }
 
 
