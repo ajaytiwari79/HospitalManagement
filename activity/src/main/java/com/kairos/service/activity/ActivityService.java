@@ -61,6 +61,7 @@ import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
+import com.kairos.wrapper.activity.ActivityTimeTypeWrapper;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.apache.commons.collections.CollectionUtils;
@@ -354,7 +355,24 @@ public class ActivityService {
         }
         updateBalanceSettingDetails(generalActivityTabDTO, activity, timeType);
         updateActivityCategory(activity, countryId);
+        updateTimeTypePathInActivity(activity);
         return activity.getBalanceSettingsActivityTab();
+    }
+
+    private void updateTimeTypePathInActivity(final Activity activity) {
+        List<ActivityTimeTypeWrapper> activityTimeTypeWrappers = activityMongoRepository.getActivityPath(activity.getId().toString());
+        if (CollectionUtils.isNotEmpty(activityTimeTypeWrappers)) {
+            ActivityTimeTypeWrapper activityTimeTypeWrapper = activityTimeTypeWrappers.get(0);
+            final StringBuilder path = new StringBuilder(",");
+            activityTimeTypeWrapper.getTimeTypeHierarchyList().forEach(timeTypeHierarchy -> {
+                path.append(timeTypeHierarchy.getId()).append(",");
+            });
+            activity.setPath(path.toString());
+        }
+    }
+
+    public Activity saveActivity(Activity activity) {
+        return activityMongoRepository.save(activity);
     }
 
     private void updateBalanceSettingDetails(GeneralActivityTabDTO generalActivityTabDTO, Activity activity, TimeType timeType) {

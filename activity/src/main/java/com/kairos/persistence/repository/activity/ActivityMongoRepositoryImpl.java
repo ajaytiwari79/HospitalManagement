@@ -17,14 +17,15 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.activity.ActivityTagDTO;
+import com.kairos.wrapper.activity.ActivityTimeTypeWrapper;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -43,6 +44,9 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 
 public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepository {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityMongoRepositoryImpl.class);
+
     public static final String ACTIVITY_RULES_ACTIVITY_TAB = "activity.rulesActivityTab";
     public static final String ACTIVITY_INDIVIDUAL_POINTS_ACTIVITY_TAB = "activity.individualPointsActivityTab";
     public static final String UNIT_ID = "unitId";
@@ -852,6 +856,36 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
+    }
+
+    public List<ActivityTimeTypeWrapper> getActivityPath(final String activityId) {
+        Document groupDocument = Document.parse("{\n" +
+                "    \t$group: {  _id : {\"_id\":\"$_id\",\"name\":\"$name\"}, timeTypeHierarchy: { $push: \"$patharray\" } }\n" +
+                "      }");
+        CustomAggregationOperation customGroupAggregationOperation = new CustomAggregationOperation(groupDocument);
+        Document projectionDocument = Document.parse("{\n" +
+                "    \t$project: {\"_id\":\"$_id._id\",\"name\":\"$_id.name\",\"timeTypeHierarchyList\":1}\n" +
+                "      }");
+        CustomAggregationOperation customProjectAggregationOperation = new CustomAggregationOperation(projectionDocument);
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(_ID).is(activityId)),
+                graphLookup("time_Type").
+                        startWith("$balanceSettingsActivityTab.timeTypeId")
+                        .connectFrom("upperLevelTimeTypeId")
+                        .connectTo("_id")
+                        .maxDepth(3)
+                        .depthField("numofchild")
+                        .as("pathArray"),
+                unwind("$patharray"),
+                sort(Sort.Direction.ASC, "patharray._id"),
+                project("_id", "name", "depthField", "patharray._id", "patharray.label", "patharray.upperLevelTimeTypeId", "patharray.timeTypes"),
+                customGroupAggregationOperation,
+                customProjectAggregationOperation
+
+        ).withOptions(new AggregationOptions(true, false, null, null));
+
+        return mongoTemplate.aggregate(aggregation, Activity.class, ActivityTimeTypeWrapper.class).getMappedResults();
     }
 
 }
