@@ -868,6 +868,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 "      }");
         CustomAggregationOperation customProjectAggregationOperation = new CustomAggregationOperation(projectionDocument);
 
+        Document pathArrayProject = Document.parse(" {\n" +
+                "$project : { \"_id\":1,\"name\":1,\"depthField\":1,\"patharray.pathid\":\"$patharray._id\",\"patharray.label\":1,\"patharray.upperLevelTimeTypeId\":1,\"patharray.timeTypes\":1 }\n" +
+                "\n" +
+                "}\n");
+        CustomAggregationOperation pathArrayProjection = new CustomAggregationOperation(pathArrayProject);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(_ID).is(activityId)),
                 graphLookup("time_Type").
@@ -876,10 +881,10 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .connectTo("_id")
                         .maxDepth(3)
                         .depthField("numofchild")
-                        .as("pathArray"),
+                        .as("patharray"),
                 unwind("$patharray"),
                 sort(Sort.Direction.ASC, "patharray._id"),
-                project("_id", "name", "depthField", "patharray._id", "patharray.label", "patharray.upperLevelTimeTypeId", "patharray.timeTypes"),
+                pathArrayProjection,
                 customGroupAggregationOperation,
                 customProjectAggregationOperation
 
