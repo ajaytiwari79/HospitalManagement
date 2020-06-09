@@ -154,6 +154,9 @@ public class EmploymentService {
 
     public PositionWrapper createEmployment(EmploymentDTO employmentDTO, boolean saveAsDraft) throws Exception {
         Unit unit = unitGraphRepository.findOne(employmentDTO.getUnitId());
+        if(isNull(unit)){
+            exceptionService.actionNotPermittedException(ERROR_UNIT_NOTNULL);
+        }
         Organization parentUnit = organizationService.fetchParentOrganization(unit.getId());
         Position position = positionGraphRepository.findByStaffId(employmentDTO.getStaffId());
         EmploymentType employmentType = validateDetails(employmentDTO, parentUnit, position);
