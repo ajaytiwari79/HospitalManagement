@@ -860,18 +860,17 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityTimeTypeWrapper> getActivityPath(final String activityId) {
         Document groupDocument = Document.parse("{\n" +
-                "    \t$group: {  _id : {\"_id\":\"$_id\",\"name\":\"$name\"}, timeTypeHierarchy: { $push: \"$patharray\" } }\n" +
+                "    \t$group: { _id : \"$_id\" , timeTypeHierarchyList: { $push: \"$patharray\" } }\n" +
                 "      }");
         CustomAggregationOperation customGroupAggregationOperation = new CustomAggregationOperation(groupDocument);
         Document projectionDocument = Document.parse("{\n" +
-                "    \t$project: {\"_id\":\"$_id._id\",\"name\":\"$_id.name\",\"timeTypeHierarchyList\":1}\n" +
+                "    \t$project: {\"_id\":\"$_id\",\"name\":\"$_id.name\",\"timeTypeHierarchyList\":1}\n" +
                 "      }");
         CustomAggregationOperation customProjectAggregationOperation = new CustomAggregationOperation(projectionDocument);
 
-        Document pathArrayProject = Document.parse(" {\n" +
-                "$project : { \"_id\":1,\"name\":1,\"depthField\":1,\"patharray.pathid\":\"$patharray._id\",\"patharray.label\":1,\"patharray.upperLevelTimeTypeId\":1,\"patharray.timeTypes\":1 }\n" +
-                "\n" +
-                "}\n");
+        Document pathArrayProject = Document.parse("{\n" +
+                "$project : { \"_id\":1,\"name\":1,\"depthField\":1,\"patharray._id\":1,\"patharray.label\":1,\"patharray.upperLevelTimeTypeId\":1,\"patharray.timeTypes\":1 }\n" +
+                "}");
         CustomAggregationOperation pathArrayProjection = new CustomAggregationOperation(pathArrayProject);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(_ID).is(activityId)),

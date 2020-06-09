@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -14,7 +15,7 @@ final public class ActivityTimeTypeWrapper {
 
     private BigInteger id;
     private String name;
-    private List<TimeTypeHierarchy> timeTypeHierarchyList;
+    private List<TimeTypeHierarchy> timeTypeHierarchyList = new ArrayList<>();
 
 
     @Getter
