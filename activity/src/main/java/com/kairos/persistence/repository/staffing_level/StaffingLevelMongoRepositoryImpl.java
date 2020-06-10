@@ -18,9 +18,6 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public void updateStaffingLevel(Long unitId, Date currentDate, LocalTime from ,LocalTime to){
-       //TODO use custom implementation here
-    }
 
     public List<StaffingLevel> getStaffingLevelsByUnitIdAndDate(Long unitId, Date startDate, Date endDate){
         Query query = new Query(Criteria.where("unitId").is(unitId).and(CURRENT_DATE).gte(startDate).lte(endDate).and("deleted").is(false));
@@ -28,13 +25,5 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
         return mongoTemplate.find(query,StaffingLevel.class);
     }
 
-   public StaffingLevel findByUnitIdAndCurrentDateAndDeletedFalseCustom(Long unitId, Date currentDate) {
-
-        Query query = new Query(Criteria.where("unitId").is(unitId).and(CURRENT_DATE).is(currentDate).and("deleted").is(false));
-        query.limit(1);
-
-        return mongoTemplate.findOne(query,StaffingLevel.class);
-
-    }
 
 }
