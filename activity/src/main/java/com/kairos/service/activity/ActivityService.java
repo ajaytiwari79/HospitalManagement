@@ -61,7 +61,6 @@ import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
-import com.kairos.wrapper.activity.ActivityTimeTypeWrapper;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.apache.commons.collections.CollectionUtils;
@@ -87,6 +86,7 @@ import static com.kairos.service.activity.ActivityUtil.*;
 @Transactional
 @Service
 public class ActivityService {
+
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
@@ -123,6 +123,9 @@ public class ActivityService {
     private StaffingLevelService staffingLevelService;
     @Inject
     private ActivitySchedulerJobService activitySchedulerJobService;
+    @Inject
+    private ActivitySettingsService activitySettingsService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
@@ -355,23 +358,10 @@ public class ActivityService {
         }
         updateBalanceSettingDetails(generalActivityTabDTO, activity, timeType);
         updateActivityCategory(activity, countryId);
-        updateTimeTypePathInActivity(activity);
+        activitySettingsService.updateTimeTypePathInActivity(activity);
         return activity.getBalanceSettingsActivityTab();
     }
 
-    public void updateTimeTypePathInActivity(final Activity activity) {
-        List<ActivityTimeTypeWrapper> activityTimeTypeWrappers = activityMongoRepository.getActivityPath(activity.getId().toString());
-        if (CollectionUtils.isNotEmpty(activityTimeTypeWrappers)) {
-            ActivityTimeTypeWrapper activityTimeTypeWrapper = activityTimeTypeWrappers.get(0);
-            String rootTimeType = activityTimeTypeWrapper.getTimeTypeHierarchyList().size() > 0 ? activityTimeTypeWrapper.getTimeTypeHierarchyList().get(0).getTimeTypes() : "";
-            final StringBuilder path = new StringBuilder(",");
-            path.append(rootTimeType).append(",");
-            activityTimeTypeWrapper.getTimeTypeHierarchyList().forEach(timeTypeHierarchy -> {
-                path.append(timeTypeHierarchy.getId()).append(",");
-            });
-            activity.setPath(path.toString());
-        }
-    }
 
     public Activity saveActivity(Activity activity) {
         return activityMongoRepository.save(activity);

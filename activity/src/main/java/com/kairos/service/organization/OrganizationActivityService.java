@@ -56,10 +56,7 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.activity.ActivityPriorityService;
-import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.PlannedTimeTypeService;
-import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.activity.*;
 import com.kairos.service.counter.CounterDistService;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.service.cta.CostTimeAgreementService;
@@ -113,6 +110,7 @@ import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
 @Service
 @Transactional
 public class OrganizationActivityService extends MongoBaseService {
+
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
@@ -177,6 +175,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private PlanningPeriodService planningPeriodService;
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject
+    private ActivitySettingsService activitySettingsService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -425,7 +425,7 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         activityService.updateBalanceSettingTab(generalDTO, activity);
         activityService.updateNotesTabOfActivity(generalDTO, activity);
-        activityService.updateTimeTypePathInActivity(activity);
+        activitySettingsService.updateTimeTypePathInActivity(activity);
         activityMongoRepository.save(activity);
         generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
