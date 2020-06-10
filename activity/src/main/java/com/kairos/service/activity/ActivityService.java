@@ -86,6 +86,7 @@ import static com.kairos.service.activity.ActivityUtil.*;
 @Transactional
 @Service
 public class ActivityService {
+
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
@@ -122,6 +123,9 @@ public class ActivityService {
     private StaffingLevelService staffingLevelService;
     @Inject
     private ActivitySchedulerJobService activitySchedulerJobService;
+    @Inject
+    private ActivitySettingsService activitySettingsService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
@@ -354,7 +358,13 @@ public class ActivityService {
         }
         updateBalanceSettingDetails(generalActivityTabDTO, activity, timeType);
         updateActivityCategory(activity, countryId);
+        activitySettingsService.updateTimeTypePathInActivity(activity);
         return activity.getBalanceSettingsActivityTab();
+    }
+
+
+    public Activity saveActivity(Activity activity) {
+        return activityMongoRepository.save(activity);
     }
 
     private void updateBalanceSettingDetails(GeneralActivityTabDTO generalActivityTabDTO, Activity activity, TimeType timeType) {

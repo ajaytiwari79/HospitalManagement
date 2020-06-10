@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.List;
 
 @NoArgsConstructor
@@ -16,6 +17,8 @@ public class ShiftSearchDTO {
     private Long loggedInUserId;
     private String searchText;
     private Long selectedStaffId;
+    private Date startDate;
+    private Date endDate;
     private boolean multiStaff;
     private ShiftFilterDurationType shiftFilterDurationType;
     private List<StaffFilterSelectionDTO> staffFilters;

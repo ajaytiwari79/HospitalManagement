@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.enums.EmploymentSubType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -25,7 +26,7 @@ public class EmploymentDTO {
     private int totalWeeklyMinutes;
     private int fullTimeWeeklyMinutes;
     private LocalDate startDate;
-
+    private ExpertiseDTO expertise;
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyCost;
@@ -35,4 +36,14 @@ public class EmploymentDTO {
     private Long timeCareExternalId;
     private EmploymentSubType employmentSubType;
     private List<EmploymentLinesDTO> employmentLinesDTOS;
+
+    @Setter
+    @Getter
+    @NoArgsConstructor
+    class ExpertiseDTO {
+        private Long id;
+        private String name;
+        private String startDate;
+        private String endDate;
+    }
 }
