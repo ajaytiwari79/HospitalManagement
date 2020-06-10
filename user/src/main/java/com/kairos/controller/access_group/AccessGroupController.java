@@ -270,4 +270,12 @@ public class AccessGroupController {
     public ResponseEntity<Map<String, Object>> getAccessGroupDayTypesAndUserId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getAccessGroupWithDayTypesByStaffIdAndUnitId(unitId));
     }
+
+    @ApiOperation("Get unit Access Roles by accessGroupId")
+    @PostMapping(value = UNIT_URL + "/get_access_roles" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAccessRolesByAccessGroupId(@PathVariable Long unitId,@RequestBody Set<Long> accessGroupIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getAccessRoles(accessGroupIds));
+    }
+
 }
