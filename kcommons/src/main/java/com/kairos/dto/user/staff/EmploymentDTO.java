@@ -36,6 +36,7 @@ public class EmploymentDTO {
     private Long timeCareExternalId;
     private EmploymentSubType employmentSubType;
     private List<EmploymentLinesDTO> employmentLinesDTOS;
+    private List<EmploymentLinesDTO> employmentLines;
 
     @Setter
     @Getter
