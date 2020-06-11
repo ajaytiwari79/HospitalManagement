@@ -31,6 +31,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.http.NameValuePair;
@@ -113,9 +114,9 @@ public class ShiftStatusService {
             for (Shift shift : shifts) {
                 List<ShiftActivity> oldActivity = new CopyOnWriteArrayList<>(shift.getActivities());
                 for (ShiftActivity shiftActivity : oldActivity) {
-                    updateStatusOfShiftActivity(shiftPublishDTO, shiftActivitiyIds, shiftActivityResponseDTOS, activityPhaseSettingMap, activityIdAndActivityMap, phaseListByDate, staffAccessGroupDTO, shift, shiftActivity,staffAdditionalInfoMap);
+                    updateStatusOfShiftActivity(unitId,shiftPublishDTO, shiftActivitiyIds, shiftActivityResponseDTOS, activityPhaseSettingMap, activityIdAndActivityMap, phaseListByDate, staffAccessGroupDTO, shift, shiftActivity,staffAdditionalInfoMap);
                     for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
-                        updateStatusOfShiftActivity(shiftPublishDTO, shiftActivitiyIds, shiftActivityResponseDTOS, activityPhaseSettingMap, activityIdAndActivityMap, phaseListByDate, staffAccessGroupDTO, shift, childActivity,staffAdditionalInfoMap);
+                        updateStatusOfShiftActivity(unitId,shiftPublishDTO, shiftActivitiyIds, shiftActivityResponseDTOS, activityPhaseSettingMap, activityIdAndActivityMap, phaseListByDate, staffAccessGroupDTO, shift, childActivity,staffAdditionalInfoMap);
                     }
                 }
                 if (shift.isDeleted()) {
@@ -148,18 +149,20 @@ public class ShiftStatusService {
         return new Object[]{activityPhaseSettingMap,activityIdAndActivityMap,staffIds,employmentIds};
     }
 
-    private void updateStatusOfShiftActivity(ShiftPublishDTO shiftPublishDTO, Set<BigInteger> shiftActivitiyIds, List<ShiftActivityResponseDTO> shiftActivityResponseDTOS, Map<BigInteger, PhaseSettingsActivityTab> activityPhaseSettingMap, Map<BigInteger, Activity> activityIdAndActivityMap, Map<Date, Phase> phaseListByDate, StaffAccessGroupDTO staffAccessGroupDTO, Shift shift, ShiftActivity shiftActivity,Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap) {
+    private void updateStatusOfShiftActivity(Long unitId, ShiftPublishDTO shiftPublishDTO, Set<BigInteger> shiftActivitiyIds, List<ShiftActivityResponseDTO> shiftActivityResponseDTOS, Map<BigInteger, PhaseSettingsActivityTab> activityPhaseSettingMap, Map<BigInteger, Activity> activityIdAndActivityMap, Map<Date, Phase> phaseListByDate, StaffAccessGroupDTO staffAccessGroupDTO, Shift shift, ShiftActivity shiftActivity,Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap) {
        if (shiftActivitiyIds.contains(shiftActivity.getId())) {
             Phase phase = phaseListByDate.get(shift.getActivities().get(0).getStartDate());
             PhaseSettingsActivityTab phaseSettingsActivityTab = activityPhaseSettingMap.get(shiftActivity.getActivityId());
             PhaseTemplateValue phaseTemplateValue = phaseSettingsActivityTab.getPhaseTemplateValues().stream().filter(p -> p.getPhaseId().equals(phase.getId())).findFirst().get();
             ActivityShiftStatusSettings activityShiftStatusSettings = getActivityShiftStatusSettingByStatus(phaseTemplateValue, shiftPublishDTO.getStatus());
-            ShiftActivityResponseDTO shiftActivityResponseDTO = getShiftActivityResponseDTO(shiftPublishDTO, activityIdAndActivityMap, staffAccessGroupDTO, shift, shiftActivity, activityShiftStatusSettings,staffAdditionalInfoMap);
+            ShiftActivityResponseDTO shiftActivityResponseDTO = getShiftActivityResponseDTO(unitId,shiftPublishDTO, activityIdAndActivityMap, staffAccessGroupDTO, shift, shiftActivity, activityShiftStatusSettings,staffAdditionalInfoMap);
             shiftActivityResponseDTOS.add(shiftActivityResponseDTO);
         }
     }
 
-    private ShiftActivityResponseDTO getShiftActivityResponseDTO(ShiftPublishDTO shiftPublishDTO, Map<BigInteger, Activity> activityIdAndActivityMap, StaffAccessGroupDTO staffAccessGroupDTO, Shift shift, ShiftActivity shiftActivity, ActivityShiftStatusSettings activityShiftStatusSettings,Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap) {
+    private ShiftActivityResponseDTO getShiftActivityResponseDTO(Long unitId,ShiftPublishDTO shiftPublishDTO, Map<BigInteger, Activity> activityIdAndActivityMap, StaffAccessGroupDTO staffAccessGroupDTO, Shift shift, ShiftActivity shiftActivity, ActivityShiftStatusSettings activityShiftStatusSettings,Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap) {
+        String staffAccessRole = UserContext.getUserDetails().getUnitWiseAccessRole().get(unitId.toString());
+        Set<String> accessRoles =userIntegrationService.getAccessRolesByAccessGroupIds(unitId,activityShiftStatusSettings.getAccessGroupIds());
         boolean validAccessGroup = shiftValidatorService.validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
         boolean validateShiftActivityStatus = validateShiftActivityStatus(shiftPublishDTO.getStatus(), shiftActivity, activityIdAndActivityMap.get(shiftActivity.getActivityId()));
@@ -168,7 +171,7 @@ public class ShiftStatusService {
             draftShift=shift.isDraft();
             shift.setDraftShift(null);
         }
-        if (validAccessGroup && validateShiftActivityStatus && !draftShift) {
+        if (validAccessGroup && validateShiftActivityStatus && !draftShift && accessRoles.contains(staffAccessRole)) {
             removeOppositeStatus(shift, shiftActivity, shiftPublishDTO.getStatus(),activityIdAndActivityMap,staffAdditionalInfoMap,shiftPublishDTO.getComment());
             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, shiftActivity.getStatus()));
         } else if (validAccessGroup && !validateShiftActivityStatus) {
@@ -251,7 +254,7 @@ public class ShiftStatusService {
                 break;
             case APPROVE:
                 shiftActivity.getStatus().removeAll(Arrays.asList(PENDING, REQUEST));
-                shiftActivity.getStatus().add(APPROVE);
+                    shiftActivity.getStatus().add(APPROVE);
                 //timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,shift.getEmploymentId(),activityIdAndActivityMap,staffAdditionalInfoMap.get(shift.getEmploymentId()));
                 break;
             case DISAPPROVE:
