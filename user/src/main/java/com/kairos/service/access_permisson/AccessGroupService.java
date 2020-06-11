@@ -946,7 +946,7 @@ public class AccessGroupService {
         return accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, orgCategory);
     }
 
-    public List<String> getAccessRoles(Set<Long> accessGroupIds){
+    public Set<String> getAccessRoles(Set<Long> accessGroupIds){
         return accessGroupRepository.getAccessRolesByAccessGroupId(accessGroupIds);
     }
 

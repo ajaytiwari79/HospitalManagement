@@ -962,8 +962,8 @@ public class UserIntegrationService {
         genericRestClient.publishRequest(childActivityIds, null, RestClientUrlType.UNIT,HttpMethod.PUT, "/team/activity/{activityId}/assign_child_activities", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},activityId);
     }
 
-    public List<String> getAccessRolesByAccessGroupIds(Long unitId, Set<Long> accessGroupIds) {
-        return genericRestClient.publishRequest(accessGroupIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_access_roles", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<String>>>() {});
+    public Set<String> getAccessRolesByAccessGroupIds(Long unitId, Set<Long> accessGroupIds) {
+        return genericRestClient.publishRequest(accessGroupIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_access_roles", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<String>>>() {});
     }
 
 
