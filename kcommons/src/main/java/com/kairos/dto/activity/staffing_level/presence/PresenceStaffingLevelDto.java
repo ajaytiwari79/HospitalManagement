@@ -27,6 +27,7 @@ public class PresenceStaffingLevelDto {
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private Date updatedAt;
+    private boolean draft;
 
     public PresenceStaffingLevelDto(BigInteger phaseId, Date currentDate, Integer weekCount,
                                     StaffingLevelSetting staffingLevelSetting) {

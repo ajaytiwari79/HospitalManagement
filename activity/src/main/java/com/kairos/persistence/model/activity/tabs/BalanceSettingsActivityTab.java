@@ -24,6 +24,7 @@ public class BalanceSettingsActivityTab{
     private Boolean negativeDayBalancePresent;
     private PriorityFor priorityFor;
     private TimeTypes timeTypes;
+    private String path;
     public BalanceSettingsActivityTab(boolean onCallTimePresent, Boolean negativeDayBalancePresent) {
         this.onCallTimePresent = onCallTimePresent;
         this.negativeDayBalancePresent = negativeDayBalancePresent;

@@ -28,7 +28,7 @@ import java.util.Set;
  * Created by pawanmandhan on 17/8/17.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"path"})
 @Document(collection = "activities")
 @Getter
 @Setter
@@ -84,12 +84,12 @@ public class Activity extends MongoBaseEntity {
 
     //time care id
     private String externalId;
+    private String path;
 
     public Activity(String name, String description, List<BigInteger> tags) {
         this.name = name;
         this.description = description;
         this.tags = tags;
-
     }
 
 

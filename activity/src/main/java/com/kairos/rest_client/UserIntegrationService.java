@@ -937,13 +937,6 @@ public class UserIntegrationService {
     }
 
 
-
-//    public Long getTotalSumOfPayLevel(Long countryId, List<Long> employmentIds,LocalDate selectedDate) {
-//        List<NameValuePair> queryParamList = new ArrayList<>();
-//        queryParamList.add(new BasicNameValuePair("selectedDate", selectedDate.toString()));
-//        return genericRestClient.publishRequest(employmentIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_total_sum_of_paylevel", queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
-//    }
-
     public <T> FieldPermissionUserData getPermissionData(Set<String> objects){
        return genericRestClient.publishRequest(objects, null, RestClientUrlType.UNIT, HttpMethod.POST, "/fetch_permissions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<FieldPermissionUserData>>() {
         });
@@ -960,6 +953,10 @@ public class UserIntegrationService {
 
     public void assignChildActivitiesInTeam(BigInteger activityId,Set<BigInteger> childActivityIds){
         genericRestClient.publishRequest(childActivityIds, null, RestClientUrlType.UNIT,HttpMethod.PUT, "/team/activity/{activityId}/assign_child_activities", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},activityId);
+    }
+
+    public Set<String> getAccessRolesByAccessGroupIds(Long unitId, Set<Long> accessGroupIds) {
+        return genericRestClient.publishRequest(accessGroupIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_access_roles", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<String>>>() {});
     }
 
 

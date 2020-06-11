@@ -240,7 +240,6 @@ public class StaffFilterService {
 
     private List<FilterSelectionQueryResult> getAllActivity(Long unitId, Long countryId){
        ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = activityIntegrationService.getAllActivitiesAndTimeTypesByUnit(unitId, countryId);
-       Map<BigInteger,String> idnameMap =activityWithTimeTypeDTOS.getActivityDTOS().stream().collect(Collectors.toMap(ActivityDTO::getId,ActivityDTO::getName));
         return activityWithTimeTypeDTOS.getActivityDTOS().stream().map(activityDTO -> new FilterSelectionQueryResult(activityDTO.getId().toString(),activityDTO.getName())).collect(Collectors.toList());
     }
 

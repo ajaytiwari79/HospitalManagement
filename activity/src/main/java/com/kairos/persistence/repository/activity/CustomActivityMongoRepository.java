@@ -11,6 +11,7 @@ import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
+import com.kairos.wrapper.activity.ActivityTimeTypeWrapper;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 
 import java.math.BigInteger;
@@ -101,11 +102,15 @@ public interface CustomActivityMongoRepository {
     ActivityDTO findByIdAndChildActivityEligibleForStaffingLevelTrue(BigInteger activityId);
 
     List<ActivityTagDTO> findAllActivityByUnitIdAndNotPartOfTeam(Long unitId);
+
     TimeTypeEnum findTimeTypeByActivityId(BigInteger activityId);
 
     List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId);
     List<ActivityDTO> getActivityRankWithRankByUnitId(Long unitId);
 
-    List<ActivityDTO> findActivitiesByUnitId(Long unitId,List<BigInteger> activityIds);
-    List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType,Long unitId);
+    List<ActivityDTO> findActivitiesByUnitId(Long unitId, List<BigInteger> activityIds);
+
+    List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType, Long unitId);
+
+    List<ActivityTimeTypeWrapper> getActivityPath(final String activityId);
 }

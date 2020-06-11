@@ -234,13 +234,14 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 "WHERE id(unit)={unitId} AND ( employments.endDate > '{today}' OR employments.endDate is null ) \n");
 
         returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ")
-                  .append(" user.gender as gender, staff.profilePic as profilePic,staff.user_id as user_id,  ")
-                   .append(" staff.currentStatus as currentStatus, ")
-                  .append(" id(user) as userId, ")
-                  .append(" collect( distinct employments) as employments, ")
+                .append(" user.gender as gender, staff.profilePic as profilePic,staff.user_id as user_id,  ")
+                .append(" staff.currentStatus as currentStatus, ")
+                .append(" id(user) as userId, ")
+                .append(" collect(distinct {id:id(employments), employmentSubType: employments.employmentSubType,expertise: {id : id(expertise),name:expertise.name,startDate:employments.startDate,endDate:employments.endDate   }  }) as employments , ")
                   .append(" CASE contactAddress WHEN contactAddress IS NULL THEN '' ELSE contactAddress.province END ");
         addMatchingCriteria(filters, queryParameters, query);
         query.append(" WITH staff,employments,user,contactAddress MATCH (staff)-[:BELONGS_TO_TAGS]-(selectedTags:Tag) ");
+        query.append(" WITH staff,employments,user,contactAddress,selectedTags MATCH (employments)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) ");
         returnData.append(" , collect( distinct selectedTags) as tags ").append(" ORDER BY staff.firstName");
         query.append(returnData);
         LOGGER.debug(query.toString());

@@ -2,6 +2,7 @@ package com.kairos.controller.staffing_level;
 
 import com.kairos.constants.ApiConstants;
 import com.kairos.dto.activity.staffing_level.StaffingLevelFromTemplateDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelPublishDTO;
 import com.kairos.dto.activity.staffing_level.UpdatedStaffingLevelDTO;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
@@ -38,14 +39,13 @@ import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 @Api(value = API_UNIT_URL + "/staffing_level")
 public class StaffingLevelController {
 
-    private Logger logger= LoggerFactory.getLogger(StaffingLevelController.class);
+    private static  final Logger LOGGER= LoggerFactory.getLogger(StaffingLevelController.class);
     @Autowired private StaffingLevelService staffingLevelService;
 
 
     @RequestMapping(value = "/presence", method = RequestMethod.POST)
     @ApiOperation("Create staffing_level for presence")
-    public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto,
-                                                                @PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 staffingLevelService.createStaffingLevel(presenceStaffingLevelDto,unitId));
     }
@@ -60,8 +60,7 @@ public class StaffingLevelController {
     @ApiOperation("getting  staffing_level between date unit wise ")
     public ResponseEntity<Map<String, Object>> getPresenceStaffingLevels(@PathVariable Long unitId
     , @RequestParam("startDate")@DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam("endDate")@DateTimeFormat(pattern="yyyy-MM-dd")Date endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.getPresenceStaffingLevel(unitId,startDate,endDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,staffingLevelService.getPresenceStaffingLevel(unitId,startDate,endDate));
     }
 
 
@@ -73,10 +72,8 @@ public class StaffingLevelController {
      */
     @RequestMapping(value = "/currentDay", method = RequestMethod.GET)
     @ApiOperation("getting  staffing_level for selected day ")
-    public ResponseEntity<Map<String, Object>> getStaffingLevel(@PathVariable Long unitId
-            ,@RequestParam("currentDate")Date currentDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.getPresenceStaffingLevel(unitId,currentDate));
+    public ResponseEntity<Map<String, Object>> getStaffingLevel(@PathVariable Long unitId,@RequestParam("currentDate")Date currentDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.getPresenceStaffingLevel(unitId,currentDate));
     }
 
     /**
@@ -175,5 +172,11 @@ public class StaffingLevelController {
     public ResponseEntity<Map<String, Object>> getStaffingLevelIfUpdated(@PathVariable Long unitId, @RequestBody @Valid @NotNull(message = "message.staffingLevel.currentDate.not.exists") List<UpdatedStaffingLevelDTO> updatedStaffingLevels) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 staffingLevelService.getStaffingLevelIfUpdated(unitId, updatedStaffingLevels));
+    }
+
+    @RequestMapping(value = "/staffing_level/publish", method = RequestMethod.PUT)
+    @ApiOperation("publish staffing_level")
+    public ResponseEntity<Map<String, Object>> publishStaffingLevel(@PathVariable Long unitId, @RequestBody StaffingLevelPublishDTO staffingLevelPublishDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.publishStaffingLevel(unitId,staffingLevelPublishDTO));
     }
 }
