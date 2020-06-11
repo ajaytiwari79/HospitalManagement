@@ -779,6 +779,7 @@ public class TimeBankService implements KPIService {
                 durationMinutes = shiftActivity.getDurationMinutes();
             }
         }
+        shiftActivity.setSecondLevelTimeType(activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType());
         shiftActivity.setBackgroundColor(activityWrapper.getActivity().getGeneralActivityTab().getBackgroundColor());
         shiftActivity.setActivityName(activityWrapper.getActivity().getName());
         return new int[]{scheduledMinutes, durationMinutes};
