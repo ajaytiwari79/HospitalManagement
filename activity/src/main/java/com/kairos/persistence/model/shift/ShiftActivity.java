@@ -3,6 +3,7 @@ package com.kairos.persistence.model.shift;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.PlannedTime;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
@@ -60,6 +61,7 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
     private Set<ShiftStatus> status = new HashSet<>();
     private transient BigInteger plannedTimeId;
     private boolean breakInterrupt;
+    private TimeTypeEnum secondLevelTimeType;
 
 
     @IgnoreLogging
