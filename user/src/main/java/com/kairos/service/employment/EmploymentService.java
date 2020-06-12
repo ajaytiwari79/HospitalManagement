@@ -155,7 +155,7 @@ public class EmploymentService {
     public PositionWrapper createEmployment(EmploymentDTO employmentDTO, boolean saveAsDraft) throws Exception {
         Unit unit = unitGraphRepository.findOne(employmentDTO.getUnitId());
         if(isNull(unit)){
-            exceptionService.actionNotPermittedException(ERROR_UNIT_NOTNULL);
+            exceptionService.actionNotPermittedException(UNIT_IS_MANDATORY);
         }
         Organization parentUnit = organizationService.fetchParentOrganization(unit.getId());
         Position position = positionGraphRepository.findByStaffId(employmentDTO.getStaffId());
@@ -349,7 +349,6 @@ public class EmploymentService {
         }
         else {
             currentEmploymentLine.setEndDate(employmentDTO.getEndDate());
-            oldEmployment.setEndDate(employmentDTO.getEndDate());
             if (saveAsDraft) {
                 currentEmploymentLine.setStartDate(employmentDTO.getStartDate());
                 oldEmployment.setStartDate(employmentDTO.getStartDate());
@@ -464,10 +463,9 @@ public class EmploymentService {
     private void setEndDateToEmployment(Employment employment, EmploymentDTO employmentDTO) {
         if (employmentDTO.getEndDate() == null) {
             employment.setEndDate(null);
-        } else if (employmentDTO.getEndDate() != null && employment.getEndDate() == null) {
-            employment.setEndDate(employmentDTO.getEndDate());
-            setEndDateToCTAWTA(employment.getUnit().getId(), employment.getId(), employmentDTO.getEndDate());
-        } else if (employmentDTO.getEndDate() != null && employment.getEndDate() != null && employment.getEndDate().isBefore(employmentDTO.getEndDate())) {
+            return;
+        }
+        if(!employmentDTO.getEndDate().equals(employment.getEndDate())){
             employment.setEndDate(employmentDTO.getEndDate());
             setEndDateToCTAWTA(employment.getUnit().getId(), employment.getId(), employmentDTO.getEndDate());
         }

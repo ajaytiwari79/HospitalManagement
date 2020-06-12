@@ -6,6 +6,7 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
+import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import org.bson.Document;
 import org.springframework.data.domain.Sort;
@@ -289,5 +290,13 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
         Criteria endDateCriteria = Criteria.where(END_DATE).exists(false).and(START_DATE).lte(startDate);
         Criteria criteria = Criteria.where(DELETED).is(false).and("id").ne(ctaId).and(EMPLOYMENT_ID).is(employmentId).orOperator(Criteria.where(START_DATE).lte(startDate).and(END_DATE).gte(startDate),endDateCriteria);
         return mongoTemplate.exists(new Query(criteria), CostTimeAgreement.class);
+    }
+
+
+
+    @Override
+    public boolean existsOngoingCTAByEmployment(Long employmentId,Date endDate){
+        Criteria criteria = Criteria.where("employmentId").is(employmentId).orOperator(Criteria.where("endDate").exists(false),Criteria.where("startDate").gte(endDate));
+        return mongoTemplate.exists(new Query(criteria), WorkingTimeAgreement.class);
     }
 }

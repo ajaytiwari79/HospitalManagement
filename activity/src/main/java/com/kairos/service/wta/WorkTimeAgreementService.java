@@ -724,9 +724,9 @@ public class WorkTimeAgreementService{
     }
 
     public boolean setEndCTAWTAOfEmployment(Long employmentId, LocalDate endDate) {
-        if(!wtaRepository.existsOngoingWTAByEmployment(employmentId)) {
+        if(!wtaRepository.existsOngoingWTAByEmployment(employmentId,asDate(endDate))) {
             wtaRepository.setEndDateToWTAOfEmployment(employmentId, endDate);
-        }if(!costTimeAgreementRepository.existsOngoingCTAByEmployment(employmentId)) {
+        }if(!costTimeAgreementRepository.existsOngoingCTAByEmployment(employmentId,asDate(endDate))) {
             costTimeAgreementRepository.setEndDateToCTAOfEmployment(employmentId, endDate);
         }
         return true;
