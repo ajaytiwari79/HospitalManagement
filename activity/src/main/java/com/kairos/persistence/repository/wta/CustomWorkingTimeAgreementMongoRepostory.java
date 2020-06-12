@@ -76,6 +76,7 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     boolean isEmploymentWTAExistsOnDate(Long employmentId, LocalDate localDate, BigInteger wtaId);
     boolean isGapExistsInEmploymentWTA(Long employmentId, LocalDate localDate, BigInteger wtaId);
+    boolean existsOngoingWTAByEmployment(Long employmentId, Date endDate);
 
 }
 

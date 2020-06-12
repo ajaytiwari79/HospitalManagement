@@ -390,6 +390,11 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
 
     }
 
+    @Override
+    public boolean existsOngoingWTAByEmployment(Long employmentId, Date endDate){
+        Criteria criteria = Criteria.where("employmentId").is(employmentId).orOperator(Criteria.where("endDate").exists(false),Criteria.where("startDate").gte(endDate));
+        return mongoTemplate.exists(new Query(criteria),WorkingTimeAgreement.class);
+    }
     private String getProjectionWithFilter(WTATemplateType templateType){
        return  "{  \n" +
                 "      \"$project\":{  \n" +

@@ -58,4 +58,5 @@ public interface CustomCostTimeAgreementRepository {
     boolean isEmploymentCTAExistsOnDate(Long employmentId,LocalDate localDate,BigInteger ctaId);
     boolean isGapExistsInEmploymentCTA(Long employmentId,LocalDate localDate,BigInteger ctaId);
     CTAResponseDTO findCTAById(BigInteger ctaId);
+    boolean existsOngoingCTAByEmployment(Long employmentId,Date endDate);
 }
