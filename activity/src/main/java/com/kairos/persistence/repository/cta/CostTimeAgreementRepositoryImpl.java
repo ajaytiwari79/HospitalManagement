@@ -261,10 +261,10 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     }
 
     @Override
-    public CostTimeAgreement getCTABasicByEmploymentAndDate(Long employmentId, Date date) {
-        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).orOperator(Criteria.where(START_DATE).lte(date).and(END_DATE).gte(date),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(date));
+    public List<CostTimeAgreement> getCTAByEmployment(Long employmentId) {
+        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId);
         Query query = new Query(criteria);
-        return mongoTemplate.findOne(query, CostTimeAgreement.class);
+        return mongoTemplate.find(query, CostTimeAgreement.class);
     }
 
     @Override

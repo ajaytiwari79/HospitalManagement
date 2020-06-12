@@ -45,7 +45,7 @@ public interface CustomCostTimeAgreementRepository {
 
     List<CTAResponseDTO> getCTAByEmploymentIdsAndDate(List<Long> employmentIds, Date startDate, Date endDate);
 
-    CostTimeAgreement getCTABasicByEmploymentAndDate(Long employmentId, Date date);
+    List<CostTimeAgreement> getCTAByEmployment(Long employmentId);
 
     void disableOldCta(BigInteger oldctaId, LocalDate endDate);
     void setEndDateToCTAOfEmployment(Long employmentId, LocalDate endDate);

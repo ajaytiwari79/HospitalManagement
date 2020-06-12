@@ -56,7 +56,7 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getProtectedWTAByEmploymentIdsAndDates(List<Long> employmentIds, Date startDate, Date endDate,WTATemplateType templateType);
 
-    WorkingTimeAgreement getWTABasicByEmploymentAndDate(Long employmentId, Date date);
+    List<WorkingTimeAgreement> getWTAByEmployment(Long employmentId);
 
     void disableOldWta(BigInteger oldwtaId, LocalDate endDate);
 
