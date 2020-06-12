@@ -41,5 +41,8 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     @Query(value = "{employmentId:{$in:?0},deleted:false}")
     List<WorkingTimeAgreement> findWTAOfEmployments(Collection<Long> employmentIds);
 
+    @Query(value = "{employmentId:?0,deleted:false,endDate:{$exists:true}}", exists = true)
+    boolean existsOngoingWTAByEmployment(Long employmentId);
+
 
 }

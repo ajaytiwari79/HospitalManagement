@@ -40,4 +40,7 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
     @Query(value = "{employmentId:{$in:?0},deleted:false}")
     List<CostTimeAgreement> findCTAOfEmployments(Collection<Long> employmentIds);
 
+    @Query(value = "{employmentId:?0,deleted:false,endDate:{$exists:true}}", exists = true)
+    boolean existsOngoingCTAByEmployment(Long employmentId);
+
 }

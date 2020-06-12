@@ -303,7 +303,7 @@ public class EmploymentService {
     }
 
     private void setCTAAndWTADetails(EmploymentDTO employmentDTO, CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper, List<NameValuePair> changedParams, EmploymentLineChangeResultDTO changeResultDTO) {
-        if (!employmentDTO.getCtaId().equals(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId())) {
+        if (!ctawtaAndAccumulatedTimebankWrapper.getCtaIds().contains(employmentDTO.getCtaId())) {
             // CTA is changed
             changeResultDTO.setCtaId(employmentDTO.getCtaId());
             changeResultDTO.setOldctaId(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId());
@@ -311,7 +311,7 @@ public class EmploymentService {
             changedParams.add(new BasicNameValuePair("oldctaId", ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId() + ""));
             changeResultDTO.setCalculativeChanged(true);
         }
-        if (!employmentDTO.getWtaId().equals(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId())) {
+        if (!ctawtaAndAccumulatedTimebankWrapper.getWtaIds().contains(employmentDTO.getWtaId())) {
             // wta is changed
             changeResultDTO.setWtaId(employmentDTO.getWtaId());
             changeResultDTO.setOldwtaId(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId());
@@ -471,8 +471,6 @@ public class EmploymentService {
             employment.setEndDate(employmentDTO.getEndDate());
             setEndDateToCTAWTA(employment.getUnit().getId(), employment.getId(), employmentDTO.getEndDate());
         }
-
-
     }
 
     private void setEndDateToCTAWTA(Long unitId, Long employmentId, LocalDate endDate) {
