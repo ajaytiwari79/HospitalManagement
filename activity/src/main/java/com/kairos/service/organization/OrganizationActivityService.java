@@ -727,9 +727,9 @@ public class OrganizationActivityService extends MongoBaseService {
         ZonedDateTime startDate = DateUtils.asZonedDateTime(DateUtils.getMidNightOfDay(DateUtils.getCurrentDate()));
         ZonedDateTime endDate;
         if (UserContext.getUserDetails().isStaff()) {
-            endDate = startDate.plusWeeks(1).with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).plusDays(phase.getGracePeriodByStaff()).plusDays(1);
+            endDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).minusDays(phase.getGracePeriodByStaff()).minusDays(1);
         } else {
-            endDate = startDate.plusWeeks(1).with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).plusDays(phase.getGracePeriodByStaff() + phase.getGracePeriodByManagement()).plusDays(1);
+            endDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).minusDays(phase.getGracePeriodByStaff() + phase.getGracePeriodByManagement()).minusDays(1);
         }
         return endDate.toLocalDate();
     }

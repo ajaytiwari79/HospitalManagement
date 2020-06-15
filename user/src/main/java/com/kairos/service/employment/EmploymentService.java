@@ -200,6 +200,12 @@ public class EmploymentService {
         }
         if(position.getEndDateMillis()!=null){
             employmentDTO.setEndDate(getDateFromEpoch(position.getEndDateMillis()));
+            if(employmentDTO.getAccessGroupId()==null){
+                employmentDTO.setAccessGroupId(position.getAccessGroupIdOnPositionEnd());
+            }
+            if(employmentDTO.getReasonCodeId()==null){
+                employmentDTO.setReasonCodeId(position.getReasonCode().getId());
+            }
         }
         return employmentType;
     }
