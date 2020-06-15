@@ -404,7 +404,7 @@ public class UserIntegrationService {
         if (CollectionUtils.isNotEmpty(reasonCodeIds)) {
             queryParamList.add(new BasicNameValuePair("reasonCodeIds", RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
         }
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO= genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO= genericRestClient.publishRequest(null, UserContext.getUserDetails().getLastSelectedOrganizationId(), RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitEmploymentId);
         UserContext.getUserDetails().setUnitWiseAccessRole(staffAdditionalInfoDTO.getUnitWiseAccessRole());
         return staffAdditionalInfoDTO;
