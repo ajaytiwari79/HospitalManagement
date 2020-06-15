@@ -46,7 +46,7 @@ public class EmploymentController {
     @Inject private UnionService unionService;
     @Inject private InitialTimeBankLogService initialTimeBankLogService;
 
-    @ApiOperation(value = "Create a New Position")
+    @ApiOperation(value = "Create a New Employment")
     @PostMapping(value = "/employment")
     public ResponseEntity<Map<String, Object>> createEmployment(@RequestBody @Valid EmploymentDTO employmentDTO, @RequestParam("saveAsDraft") boolean saveAsDraft) throws Exception {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createEmployment(employmentDTO, saveAsDraft));

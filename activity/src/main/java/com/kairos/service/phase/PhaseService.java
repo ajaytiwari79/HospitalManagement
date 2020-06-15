@@ -371,5 +371,9 @@ public class PhaseService extends MongoBaseService {
         return phaseMongoRepository.findByOrganizationIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(unitId);
     }
 
+    public Phase getPhaseByName(final Long unitId,final String name){
+        return phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId,name);
+    }
+
 
 }

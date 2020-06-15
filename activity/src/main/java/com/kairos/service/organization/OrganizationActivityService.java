@@ -717,13 +717,13 @@ public class OrganizationActivityService extends MongoBaseService {
         LocalDate firstRequestPhasePlanningPeriodEndDate = isNotNull(firstRequestPlanningPeriod) ? firstRequestPlanningPeriod.getEndDate() : null;
         List<PresenceTypeDTO> plannedTimes = plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
         List<ActivityConfiguration> activityConfigurations = activityConfigurationService.findAllByUnitIdAndDeletedFalse(unitId);
-        PhaseDTO timeAndAttendencePhase=phaseDTOs.stream().filter(p->p.getPhaseEnum().equals(TIME_ATTENDANCE)).findAny().get();
-        LocalDate gracePeriodEndDate= getGracePeriodExpireDate(timeAndAttendencePhase);
+        Phase phase=phaseService.getPhaseByName(unitId,TIME_ATTENDANCE.toString());
+        LocalDate gracePeriodEndDate= getGracePeriodExpireDate(phase);
         return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),
                 publicHolidayDayTypeWrapper.getPublicHolidays(), firstRequestPhasePlanningPeriodEndDate, plannedTimes, phaseSettingsActivityTab, copyCollectionPropertiesByMapper(activityConfigurations, ActivityConfigurationDTO.class),gracePeriodEndDate);
     }
 
-    private LocalDate getGracePeriodExpireDate(PhaseDTO phase) {
+    private LocalDate getGracePeriodExpireDate(Phase phase) {
         ZonedDateTime startDate = DateUtils.asZonedDateTime(DateUtils.getMidNightOfDay(DateUtils.getCurrentDate()));
         ZonedDateTime endDate;
         if (UserContext.getUserDetails().isStaff()) {
