@@ -26,7 +26,6 @@ import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
-import com.kairos.dto.user.staff.EmploymentDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.FilterType;
@@ -458,16 +457,16 @@ public class WorkTimeAgreementService{
     }
 
     public CTAWTAAndAccumulatedTimebankWrapper getWTACTAByEmployment(Long employmentId, LocalDate startDate) {
-        WorkingTimeAgreement wta = wtaRepository.getWTABasicByEmploymentAndDate(employmentId, asDate(startDate));
-        CostTimeAgreement cta = costTimeAgreementRepository.getCTABasicByEmploymentAndDate(employmentId, asDate(startDate));
+        List<WorkingTimeAgreement> wtas = wtaRepository.getWTAByEmployment(employmentId);
+        List<CostTimeAgreement> ctas = costTimeAgreementRepository.getCTAByEmployment(employmentId);
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = new CTAWTAAndAccumulatedTimebankWrapper();
-        if (Optional.ofNullable(wta).isPresent()) {
-            WTAResponseDTO wtaResponseDTO = new WTAResponseDTO(wta.getName(), wta.getId(), wta.getParentId());
-            ctawtaAndAccumulatedTimebankWrapper.setWta(Collections.singletonList(wtaResponseDTO));
+        if (isCollectionNotEmpty(wtas)) {
+            List<WTAResponseDTO> wtaResponseDTOS = wtas.stream().map(wta->new WTAResponseDTO(wta.getName(), wta.getId(), wta.getParentId())).collect(Collectors.toList());
+            ctawtaAndAccumulatedTimebankWrapper.setWta(wtaResponseDTOS);
         }
-        if (Optional.ofNullable(cta).isPresent()) {
-            CTAResponseDTO ctaResponseDTO = new CTAResponseDTO(cta.getName(), cta.getId(), cta.getParentId());
-            ctawtaAndAccumulatedTimebankWrapper.setCta(Collections.singletonList(ctaResponseDTO));
+        if (isCollectionNotEmpty(ctas)) {
+            List<CTAResponseDTO> ctaResponseDTOS = ctas.stream().map(cta->new CTAResponseDTO(cta.getName(), cta.getId(), cta.getParentId())).collect(Collectors.toList());
+            ctawtaAndAccumulatedTimebankWrapper.setCta(ctaResponseDTOS);
         }
         return ctawtaAndAccumulatedTimebankWrapper;
     }
@@ -725,8 +724,11 @@ public class WorkTimeAgreementService{
     }
 
     public boolean setEndCTAWTAOfEmployment(Long employmentId, LocalDate endDate) {
-        wtaRepository.setEndDateToWTAOfEmployment(employmentId, endDate);
-        costTimeAgreementRepository.setEndDateToCTAOfEmployment(employmentId, endDate);
+        if(!wtaRepository.existsOngoingWTAByEmployment(employmentId,asDate(endDate))) {
+            wtaRepository.setEndDateToWTAOfEmployment(employmentId, endDate);
+        }if(!costTimeAgreementRepository.existsOngoingCTAByEmployment(employmentId,asDate(endDate))) {
+            costTimeAgreementRepository.setEndDateToCTAOfEmployment(employmentId, endDate);
+        }
         return true;
     }
 

@@ -262,9 +262,9 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     }
 
     @Override
-    public WorkingTimeAgreement getWTABasicByEmploymentAndDate(Long employmentId, Date date) {
-        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).orOperator(Criteria.where(START_DATE).lte(date).and(END_DATE).gte(date), Criteria.where(END_DATE).exists(false).and(START_DATE).lte(date));
-        return mongoTemplate.findOne(new Query(criteria), WorkingTimeAgreement.class);
+    public List<WorkingTimeAgreement> getWTAByEmployment(Long employmentId) {
+        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId);
+        return mongoTemplate.find(new Query(criteria), WorkingTimeAgreement.class);
     }
 
     @Override
@@ -390,6 +390,11 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
 
     }
 
+    @Override
+    public boolean existsOngoingWTAByEmployment(Long employmentId, Date endDate){
+        Criteria criteria = Criteria.where("employmentId").is(employmentId).orOperator(Criteria.where("endDate").exists(false),Criteria.where("startDate").gte(endDate));
+        return mongoTemplate.exists(new Query(criteria),WorkingTimeAgreement.class);
+    }
     private String getProjectionWithFilter(WTATemplateType templateType){
        return  "{  \n" +
                 "      \"$project\":{  \n" +

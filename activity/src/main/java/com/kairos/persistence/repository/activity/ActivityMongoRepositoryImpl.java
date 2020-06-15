@@ -845,6 +845,20 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
+    public List<ActivityDTO> getActivityRankWithRankByUnitId(Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false)),
+                lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, _ID, ACTIVITY_PRIORITY),
+                project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
+                        .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY),
+                project()
+                        .and("activityPriority.sequence").as("activitySequence")
+        );
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
     public List<ActivityDTO> findActivitiesByUnitId(Long unitId,List<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(_ID).in(activityIds)),

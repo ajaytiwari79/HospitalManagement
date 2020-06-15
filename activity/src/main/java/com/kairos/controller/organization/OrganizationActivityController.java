@@ -402,4 +402,11 @@ public class OrganizationActivityController {
     ResponseEntity<Map<String, Object>> getAllChildren(@RequestBody Set<BigInteger> activityIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getAllChildren(activityIds));
     }
+
+    @ApiOperation("Get all activity ranking")
+    @GetMapping(value = "/get_activity_rank")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getActivityRankWithRankByUnitId(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityRankWithRankByUnitId(unitId));
+    }
 }
