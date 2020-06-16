@@ -1,14 +1,18 @@
 package com.kairos.dto.user.employment;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.SeniorityLevelDTO;
 import com.kairos.enums.EmploymentSubType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
@@ -18,6 +22,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
  */
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EmploymentLinesDTO implements Comparable<EmploymentLinesDTO> {
 
     private Long id;
@@ -36,7 +41,8 @@ public class EmploymentLinesDTO implements Comparable<EmploymentLinesDTO> {
     private EmploymentSubType employmentSubType;
     private SeniorityLevelDTO seniorityLevel;
     private Long payGradeLevel;
-
+    private EmploymentTypeDTO employmentType;
+    private List<EmploymentLineFunction> functions;
 
     //This getter is used for Accumulated Timebank calculation
     public LocalDate getEndDateForAccumulatedTimebank() {
@@ -60,4 +66,15 @@ public class EmploymentLinesDTO implements Comparable<EmploymentLinesDTO> {
             }
             return getStartDate().compareTo(employmentLinesDTO.getStartDate());
         }
+
+    @Setter
+    @Getter
+    @NoArgsConstructor
+    class EmploymentLineFunction {
+        private Long id;
+        private String name;
+        private String icon;
+        private String code;
+    }
+
 }

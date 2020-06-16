@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.staff.personal_details;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.staff.EmploymentDTO;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.user.employment.Employment;
@@ -14,13 +16,14 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @QueryResult
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class StaffEmploymentWithTag {
 
     private Long id;
     private Long userId;
     private String firstName;
     private String lastName;
-    private List<Employment> employments;
+    private List<EmploymentDTO> employments;
     private List<Tag> tags;
     private String city;
     private String currentStatus;
