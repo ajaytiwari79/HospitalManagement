@@ -227,7 +227,7 @@ public class UnionService {
 
 
     public UnionDTO createUnion(UnionDTO unionData, long countryId, boolean publish) {
-        Country country = validateDetails(unionData, countryId);
+        Country country = validateDetails(unionData, countryId,publish);
         ContactAddress address = getContactAddress(unionData, publish);
         boolean boardingCompleted = false;
         if (publish) {
@@ -264,7 +264,7 @@ public class UnionService {
         return address;
     }
 
-    private Country validateDetails(UnionDTO unionData, long countryId) {
+    private Country validateDetails(UnionDTO unionData, long countryId,boolean publish) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
@@ -273,6 +273,9 @@ public class UnionService {
         if (organizationGraphRepository.existsByName("(?i)" + unionData.getName(), -1l)) {
             exceptionService.duplicateDataException(MESSAGE_UNION_NAME_EXISTS, unionData.getName());
 
+        }
+        if (publish && isCollectionEmpty(unionData.getLocationIds())) {
+            exceptionService.dataNotFoundByIdException("message.location.notFound");
         }
         return country;
     }
@@ -321,6 +324,9 @@ public class UnionService {
         union.setLocations(unionDataQueryResults.get(0).getLocations());
         if (!publish && union.isBoardingCompleted()) {
             exceptionService.invalidRequestException(MESSAGE_PUBLISH_UNION_UNPUBLISH);
+        }
+        if (publish && isCollectionEmpty(unionDataQueryResults.get(0).getLocations())) {
+            exceptionService.dataNotFoundByIdException("message.location.notFound", unionId);
         }
         List<Long> sectorIDsToBeCreated = new ArrayList<>();
         List<SectorDTO> sectorDTOS = new ArrayList<>();
