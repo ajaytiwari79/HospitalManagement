@@ -1,7 +1,10 @@
 package com.kairos.service.dashboard;
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.EmploymentSubType;
@@ -26,12 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
@@ -66,15 +67,18 @@ public class SickService {
         return userSickDataWrapper;
     }
 
-    public Map<String, Long> markUserAsFine(Long staffId, Long unitId, LocalDate startDate) {
-        Map<String, Long> response = new HashMap<>();
+    public Map<String, Object> markUserAsFine(Long staffId, Long unitId, LocalDate startDate) {
+        Map<String, Object> response = new HashMap<>();
         if (isNull(unitId) || isNull(staffId)) {
             exceptionService.actionNotPermittedException(ERROR_EMPTY_STAFF_OR_UNIT_SETTING);
         }
+        Date endDate = DateUtils.getEndOfDay(DateUtils.plusDays(asDate(startDate),21));
         shiftSickService.disableSicknessShiftsOfStaff(staffId, unitId,startDate);
+        List<ShiftDTO> threeWeeksShift =shiftMongoRepository.findAllShiftsByStaffIdsAndDateAndUnitId(staffId,asDate(startDate),endDate,unitId);
         sickSettingsRepository.markUserAsFine(staffId, unitId);  //set end date of user sick table.
         response.put("unitId", unitId);
         response.put("staffId", staffId);
+        response.put("shifts",threeWeeksShift);
         return response;
     }
 
