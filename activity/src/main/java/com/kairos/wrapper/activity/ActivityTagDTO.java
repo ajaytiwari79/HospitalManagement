@@ -54,8 +54,7 @@ public class ActivityTagDTO {
     private Set<BigInteger> childActivityIds=new HashSet<>();
     // for filter FullDay and Full week activity
     private String methodForCalculatingTime;
-
-    private Map<String, TranslationInfo> translations=new HashMap<>() ;
+    private Map<String, TranslationInfo> translations=new HashMap<>();
 
     public ActivityTagDTO() {
         //default constructor
@@ -70,7 +69,6 @@ public class ActivityTagDTO {
         this.unitId = activity.getUnitId();
         this.tags = tags;
         this.state = activity.getState();
-
         return this;
     }
 }

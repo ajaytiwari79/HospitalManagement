@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.TranslationInfo;
@@ -92,7 +93,10 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -103,6 +107,7 @@ import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertie
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ACTIVITY_TYPE_IMAGE_PATH;
+import static com.kairos.enums.phase.PhaseDefaultName.TIME_ATTENDANCE;
 
 /**
  * Created by vipul on 5/12/17.
@@ -712,8 +717,21 @@ public class OrganizationActivityService extends MongoBaseService {
         LocalDate firstRequestPhasePlanningPeriodEndDate = isNotNull(firstRequestPlanningPeriod) ? firstRequestPlanningPeriod.getEndDate() : null;
         List<PresenceTypeDTO> plannedTimes = plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
         List<ActivityConfiguration> activityConfigurations = activityConfigurationService.findAllByUnitIdAndDeletedFalse(unitId);
+        Phase phase=phaseService.getPhaseByName(unitId,TIME_ATTENDANCE.toString());
+        LocalDate gracePeriodEndDate= getGracePeriodExpireDate(phase);
         return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),
-                publicHolidayDayTypeWrapper.getPublicHolidays(), firstRequestPhasePlanningPeriodEndDate, plannedTimes, phaseSettingsActivityTab, copyCollectionPropertiesByMapper(activityConfigurations, ActivityConfigurationDTO.class));
+                publicHolidayDayTypeWrapper.getPublicHolidays(), firstRequestPhasePlanningPeriodEndDate, plannedTimes, phaseSettingsActivityTab, copyCollectionPropertiesByMapper(activityConfigurations, ActivityConfigurationDTO.class),gracePeriodEndDate);
+    }
+
+    private LocalDate getGracePeriodExpireDate(Phase phase) {
+        ZonedDateTime startDate = DateUtils.asZonedDateTime(DateUtils.getStartOfDay(DateUtils.getCurrentDate()));
+        ZonedDateTime endDate;
+        if (UserContext.getUserDetails().isStaff()) {
+            endDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).minusDays(phase.getGracePeriodByStaff()).minusDays(1);
+        } else {
+            endDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).minusDays(phase.getGracePeriodByStaff() + phase.getGracePeriodByManagement()).minusDays(1);
+        }
+        return endDate.toLocalDate();
     }
 
     public NotesActivityTab addDocumentInNotesTab(BigInteger activityId, MultipartFile file) throws IOException {

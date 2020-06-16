@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import static com.kairos.constants.CommonConstants.DELETED;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
@@ -157,7 +158,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     @Override
     public List<WTAQueryResultDTO> getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId,LocalDate selectedDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId).and("expertise.id").is(expertiseId).and(EMPLOYMENT_ID).exists(false).orOperator(Criteria.where(START_DATE).lte(selectedDate).and(END_DATE).gte(selectedDate), Criteria.where(END_DATE).exists(false).and(START_DATE).lte(selectedDate))),
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and("expertise._id").is(expertiseId).and(DELETED).is(false).and(EMPLOYMENT_ID).exists(false).orOperator(Criteria.where(START_DATE).lte(selectedDate).and(END_DATE).gte(selectedDate), Criteria.where(END_DATE).exists(false).and(START_DATE).lte(selectedDate))),
                 //lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
                 project("name", DESCRIPTION)
         );
@@ -261,9 +262,9 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     }
 
     @Override
-    public WorkingTimeAgreement getWTABasicByEmploymentAndDate(Long employmentId, Date date) {
-        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).orOperator(Criteria.where(START_DATE).lte(date).and(END_DATE).gte(date), Criteria.where(END_DATE).exists(false).and(START_DATE).lte(date));
-        return mongoTemplate.findOne(new Query(criteria), WorkingTimeAgreement.class);
+    public List<WorkingTimeAgreement> getWTAByEmployment(Long employmentId) {
+        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId);
+        return mongoTemplate.find(new Query(criteria), WorkingTimeAgreement.class);
     }
 
     @Override
@@ -389,6 +390,11 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
 
     }
 
+    @Override
+    public boolean existsOngoingWTAByEmployment(Long employmentId, Date endDate){
+        Criteria criteria = Criteria.where("employmentId").is(employmentId).orOperator(Criteria.where("endDate").exists(false),Criteria.where("startDate").gte(endDate));
+        return mongoTemplate.exists(new Query(criteria),WorkingTimeAgreement.class);
+    }
     private String getProjectionWithFilter(WTATemplateType templateType){
        return  "{  \n" +
                 "      \"$project\":{  \n" +

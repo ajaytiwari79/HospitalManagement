@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,5 +31,6 @@ public class StaffingLevelTemplateDTO {
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private boolean disabled;
     private List<ActivityValidationError> errors=new ArrayList<>();
+    private LocalDate selectedDate;
 
 }

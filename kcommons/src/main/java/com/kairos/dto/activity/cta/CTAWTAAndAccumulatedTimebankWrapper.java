@@ -1,11 +1,13 @@
 package com.kairos.dto.activity.cta;
 
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
@@ -13,7 +15,9 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
  * @author pradeep
  * @date - 8/8/18
  */
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class CTAWTAAndAccumulatedTimebankWrapper {
 
     private List<CTAResponseDTO> cta = new ArrayList<>();
@@ -26,27 +30,12 @@ public class CTAWTAAndAccumulatedTimebankWrapper {
         this.wta = wta;
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper() {
+    public Set<BigInteger> getCtaIds() {
+        return cta.stream().map(ctaResponseDTO -> ctaResponseDTO.getId()).collect(Collectors.toSet());
     }
 
-    public List<CTAResponseDTO> getCta() {
-        return cta;
-    }
-
-    public void setCta(List<CTAResponseDTO> cta) {
-        this.cta = cta;
-    }
-
-    public List<WTAResponseDTO> getWta() {
-        return wta;
-    }
-
-    public void setWta(List<WTAResponseDTO> wta) {
-        this.wta = wta;
-    }
-
-    public Map<Long, Map<Long, Long>> getEmploymentLineAndTimebankMinuteMap() {
-        return employmentLineAndTimebankMinuteMap;
+    public Set<BigInteger> getWtaIds() {
+        return wta.stream().map(wtaResponseDTO -> wtaResponseDTO.getId()).collect(Collectors.toSet());
     }
 
     public void setEmploymentLineAndTimebankMinuteMap(Map<Long, Map<Long, Long>> employmentLineAndTimebankMinuteMap) {

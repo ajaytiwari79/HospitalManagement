@@ -1003,4 +1003,8 @@ public class ActivityService {
     public List<Activity>  findAllByUnitIdAndTimeTypeIds(Long unitId, Collection<BigInteger> timeTypeIds){
         return activityMongoRepository.findAllByUnitIdAndTimeTypeIds(unitId, timeTypeIds);
     }
+
+    public Map<BigInteger,Integer> getActivityRankWithRankByUnitId(Long unitId) {
+        return activityMongoRepository.getActivityRankWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v.getActivitySequence()));
+    }
 }

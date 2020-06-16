@@ -152,7 +152,7 @@ public class EmploymentJobService {
         }
         Position position = positionGraphRepository.findByStaffId(staffId);
         position.setEndDateMillis(endDateMillis);
-        positionGraphRepository.deletePositionReasonCodeRelation(staffId);
+        //positionGraphRepository.deletePositionReasonCodeRelation(staffId);
         position.setReasonCode(reasonCode);
         position.setAccessGroupIdOnPositionEnd(positionDTO.getAccessGroupIdOnPositionEnd());
         employmentGraphRepository.saveAll(employments);

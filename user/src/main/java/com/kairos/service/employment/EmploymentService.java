@@ -82,6 +82,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getDateFromEpoch;
 import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApiConstants.*;
@@ -154,6 +155,9 @@ public class EmploymentService {
 
     public PositionWrapper createEmployment(EmploymentDTO employmentDTO, boolean saveAsDraft) throws Exception {
         Unit unit = unitGraphRepository.findOne(employmentDTO.getUnitId());
+        if(isNull(unit)){
+            exceptionService.actionNotPermittedException(UNIT_IS_MANDATORY);
+        }
         Organization parentUnit = organizationService.fetchParentOrganization(unit.getId());
         Position position = positionGraphRepository.findByStaffId(employmentDTO.getStaffId());
         EmploymentType employmentType = validateDetails(employmentDTO, parentUnit, position);
@@ -163,7 +167,6 @@ public class EmploymentService {
         }
         List<FunctionWithAmountQueryResult> functions = employmentDetailsValidatorService.findAndValidateFunction(employmentDTO);
         Employment employment = new Employment(unit, employmentDTO.getStartDate(), employmentDTO.getTimeCareExternalId(), !saveAsDraft, employmentDTO.getTaxDeductionPercentage(), employmentDTO.getAccumulatedTimebankMinutes(), employmentDTO.getAccumulatedTimebankDate());
-
         employmentDetailsValidatorService.prepareAndValidateEmployment(employment, employmentDTO);
         if (EmploymentSubType.MAIN.equals(employmentDTO.getEmploymentSubType()) && positionService.eligibleForMainEmployment(employmentDTO, -1)) {
             employment.setEmploymentSubType(EmploymentSubType.MAIN);
@@ -194,6 +197,15 @@ public class EmploymentService {
         EmploymentType employmentType = unitGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(parentUnit.getId(), employmentDTO.getEmploymentTypeId(), false);
         if (!Optional.ofNullable(employmentType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_POSITION_EMPLOYMENTTYPE_NOTEXIST, employmentDTO.getEmploymentTypeId());
+        }
+        if(position.getEndDateMillis()!=null){
+            employmentDTO.setEndDate(getDateFromEpoch(position.getEndDateMillis()));
+            if(employmentDTO.getAccessGroupId()==null){
+                employmentDTO.setAccessGroupId(position.getAccessGroupIdOnPositionEnd());
+            }
+            if(employmentDTO.getReasonCodeId()==null){
+                employmentDTO.setReasonCodeId(position.getReasonCode().getId());
+            }
         }
         return employmentType;
     }
@@ -300,7 +312,7 @@ public class EmploymentService {
     }
 
     private void setCTAAndWTADetails(EmploymentDTO employmentDTO, CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper, List<NameValuePair> changedParams, EmploymentLineChangeResultDTO changeResultDTO) {
-        if (!employmentDTO.getCtaId().equals(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId())) {
+        if (!ctawtaAndAccumulatedTimebankWrapper.getCtaIds().contains(employmentDTO.getCtaId())) {
             // CTA is changed
             changeResultDTO.setCtaId(employmentDTO.getCtaId());
             changeResultDTO.setOldctaId(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId());
@@ -308,7 +320,7 @@ public class EmploymentService {
             changedParams.add(new BasicNameValuePair("oldctaId", ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId() + ""));
             changeResultDTO.setCalculativeChanged(true);
         }
-        if (!employmentDTO.getWtaId().equals(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId())) {
+        if (!ctawtaAndAccumulatedTimebankWrapper.getWtaIds().contains(employmentDTO.getWtaId())) {
             // wta is changed
             changeResultDTO.setWtaId(employmentDTO.getWtaId());
             changeResultDTO.setOldwtaId(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId());
@@ -346,7 +358,6 @@ public class EmploymentService {
         }
         else {
             currentEmploymentLine.setEndDate(employmentDTO.getEndDate());
-            oldEmployment.setEndDate(employmentDTO.getEndDate());
             if (saveAsDraft) {
                 currentEmploymentLine.setStartDate(employmentDTO.getStartDate());
                 oldEmployment.setStartDate(employmentDTO.getStartDate());
@@ -461,15 +472,12 @@ public class EmploymentService {
     private void setEndDateToEmployment(Employment employment, EmploymentDTO employmentDTO) {
         if (employmentDTO.getEndDate() == null) {
             employment.setEndDate(null);
-        } else if (employmentDTO.getEndDate() != null && employment.getEndDate() == null) {
-            employment.setEndDate(employmentDTO.getEndDate());
-            setEndDateToCTAWTA(employment.getUnit().getId(), employment.getId(), employmentDTO.getEndDate());
-        } else if (employmentDTO.getEndDate() != null && employment.getEndDate() != null && employment.getEndDate().isBefore(employmentDTO.getEndDate())) {
+            return;
+        }
+        if(!employmentDTO.getEndDate().equals(employment.getEndDate())){
             employment.setEndDate(employmentDTO.getEndDate());
             setEndDateToCTAWTA(employment.getUnit().getId(), employment.getId(), employmentDTO.getEndDate());
         }
-
-
     }
 
     private void setEndDateToCTAWTA(Long unitId, Long employmentId, LocalDate endDate) {

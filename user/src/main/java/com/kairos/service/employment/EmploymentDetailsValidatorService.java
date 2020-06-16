@@ -135,7 +135,8 @@ public class EmploymentDetailsValidatorService {
             }
             employment.setLastWorkingDate(employmentDTO.getLastWorkingDate());
         }
-        employment.setEmploymentLines(getEmploymentLines(employmentDTO, employment));
+        List<EmploymentLine> employmentLines=getEmploymentLines(employmentDTO, employment);
+        employment.setEmploymentLines(employmentLines);
 
         return employment;
     }
@@ -188,6 +189,9 @@ public class EmploymentDetailsValidatorService {
             }
         }
         employment.setExpertise(expertise);
+        if(employmentLines.size()==1){
+            employmentLines.get(0).setEndDate(employment.getEndDate());
+        }
         return employmentLines;
     }
 

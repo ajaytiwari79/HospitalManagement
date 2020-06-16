@@ -39,6 +39,7 @@ public class PhaseActivityDTO {
     private List<PresenceTypeDTO> plannedTimes;
     private List<PhaseSettingsActivityTab> phaseSettingsActivityTab;
     private List<ActivityConfigurationDTO> activityConfigurations;
+    private LocalDate gracePeriodExpireDate;
 
     public PhaseActivityDTO() {
         //Default Constructor
@@ -46,7 +47,7 @@ public class PhaseActivityDTO {
 
     public PhaseActivityDTO(List<ActivityWithCompositeDTO> activities,List<PhaseWeeklyDTO> phases, List<DayType> dayTypes,
                             UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases, List<PhaseDTO> actualPhases,List<ReasonCodeDTO> reasonCodes,LocalDate planningPeriodStartDate,LocalDate planningPeriodEndDate,List<Map<String,Object>> publicHolidays,
-                            LocalDate firstRequestPhasePlanningPeriodEndDate,List<PresenceTypeDTO> plannedTimes,List<PhaseSettingsActivityTab> phaseSettingsActivityTab,List<ActivityConfigurationDTO> activityConfigurations) {
+                            LocalDate firstRequestPhasePlanningPeriodEndDate,List<PresenceTypeDTO> plannedTimes,List<PhaseSettingsActivityTab> phaseSettingsActivityTab,List<ActivityConfigurationDTO> activityConfigurations,LocalDate gracePeriodEndDate) {
         this.activities=activities;
         this.phases = phases;
         this.dayTypes = dayTypes;
@@ -62,6 +63,7 @@ public class PhaseActivityDTO {
         this.plannedTimes = plannedTimes;
         this.phaseSettingsActivityTab = phaseSettingsActivityTab;
         this.activityConfigurations = activityConfigurations;
+        this.gracePeriodExpireDate=gracePeriodEndDate;
     }
 }
 

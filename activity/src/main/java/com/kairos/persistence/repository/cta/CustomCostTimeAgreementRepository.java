@@ -45,7 +45,7 @@ public interface CustomCostTimeAgreementRepository {
 
     List<CTAResponseDTO> getCTAByEmploymentIdsAndDate(List<Long> employmentIds, Date startDate, Date endDate);
 
-    CostTimeAgreement getCTABasicByEmploymentAndDate(Long employmentId, Date date);
+    List<CostTimeAgreement> getCTAByEmployment(Long employmentId);
 
     void disableOldCta(BigInteger oldctaId, LocalDate endDate);
     void setEndDateToCTAOfEmployment(Long employmentId, LocalDate endDate);
@@ -58,4 +58,5 @@ public interface CustomCostTimeAgreementRepository {
     boolean isEmploymentCTAExistsOnDate(Long employmentId,LocalDate localDate,BigInteger ctaId);
     boolean isGapExistsInEmploymentCTA(Long employmentId,LocalDate localDate,BigInteger ctaId);
     CTAResponseDTO findCTAById(BigInteger ctaId);
+    boolean existsOngoingCTAByEmployment(Long employmentId,Date endDate);
 }

@@ -92,7 +92,7 @@ public class WTAOrganizationService extends MongoBaseService {
             wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(updateDTO.getRuleTemplates(), false);
         }
         boolean isValueChanged =workTimeAgreementService.isCalCulatedValueChangedForWTA(oldWta,wtaBaseRuleTemplates);
-        if ((isValueChanged && updateDTO.getStartDate().isBefore(LocalDate.now()))) {
+        if ((isValueChanged && !oldWta.getStartDate().equals(updateDTO.getStartDate()) && updateDTO.getStartDate().isBefore(LocalDate.now()))) {
             exceptionService.actionNotPermittedException(MESSAGE_WTA_START_ENDDATE);
         }
         WorkingTimeAgreement agreement = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
@@ -171,20 +171,14 @@ public class WTAOrganizationService extends MongoBaseService {
     public CTAWTAAndAccumulatedTimebankWrapper getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId, LocalDate selectedDate,Long employmentId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS=new ArrayList<>();
         wtaQueryResultDTOS.addAll(workingTimeAgreementMongoRepository.getAllWtaOfOrganizationByExpertise(unitId, expertiseId, selectedDate));
-        if(isNotNull(employmentId)){
-            Map<BigInteger,WTAQueryResultDTO> wtaQueryResultMap=wtaQueryResultDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v));
-            List<WTAQueryResultDTO> wtaQueryResultDTOSByEmployments=workingTimeAgreementMongoRepository.getAllWtaOfEmploymentIdAndDate(employmentId,selectedDate);
-            List<BigInteger> orgnizationParentIds=wtaQueryResultDTOSByEmployments.stream().map(wtaQueryResultDTO -> wtaQueryResultDTO.getOrganizationParentId()).collect(Collectors.toList());
-            List<WTAQueryResultDTO> wtaQueryResultDTOByIds = workingTimeAgreementMongoRepository.getAllWtaByIds(orgnizationParentIds);
-            wtaQueryResultDTOByIds.forEach(wtaQueryResultDTO -> {
-                if(!wtaQueryResultMap.containsKey(wtaQueryResultDTO.getId())){
-                    wtaQueryResultMap.put(wtaQueryResultDTO.getId(),wtaQueryResultDTO);
-                }
-            });
-            wtaQueryResultDTOS=wtaQueryResultMap.values().stream().collect(Collectors.toList());
-        }
         List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getDefaultCTAOfExpertiseAndDate(unitId, expertiseId, selectedDate);
+        if(isNotNull(employmentId)){
+            List<WTAResponseDTO> wtaResponseDTOList =workingTimeAgreementMongoRepository.getWTAByEmployment(employmentId).stream().map(wta -> new WTAResponseDTO(wta.getName(), wta.getId(), wta.getParentId())).collect(Collectors.toList());
+            List<CTAResponseDTO> employmentCtaResponseDTOS = costTimeAgreementRepository.getCTAByEmployment(employmentId).stream().map(cta->new CTAResponseDTO(cta.getName(), cta.getId(), cta.getParentId())).collect(Collectors.toList());
+            wtaResponseDTOS.addAll(wtaResponseDTOList);
+            ctaResponseDTOS.addAll(employmentCtaResponseDTOS);
+        }
         return new CTAWTAAndAccumulatedTimebankWrapper(ctaResponseDTOS, wtaResponseDTOS);
     }
 

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,6 +41,5 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
 
     @Query(value = "{employmentId:{$in:?0},deleted:false}")
     List<WorkingTimeAgreement> findWTAOfEmployments(Collection<Long> employmentIds);
-
 
 }

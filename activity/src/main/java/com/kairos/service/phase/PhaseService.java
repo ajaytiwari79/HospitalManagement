@@ -311,8 +311,7 @@ public class PhaseService extends MongoBaseService {
         for(LocalDateTime requestedDate:dates){
             Phase phase = null;
             if (requestedDate.isAfter(untilTentative)) {
-                Optional<PlanningPeriod> planningPeriodOptional = planningPeriods.stream().filter(startDateFilter -> startDateFilter.getStartDate().minusDays(1).atStartOfDay().isBefore(requestedDate)).
-                        filter(endDateFilter -> endDateFilter.getEndDate().plusDays(1).atStartOfDay().isAfter(requestedDate)).findAny();
+                Optional<PlanningPeriod> planningPeriodOptional = planningPeriods.stream().filter(planningPeriod -> planningPeriod.contains(requestedDate.toLocalDate())).findAny();
                 if(planningPeriodOptional.isPresent()) {
                     phase = phaseAndIdMap.get(planningPeriodOptional.get().getCurrentPhaseId());
                 }
@@ -327,7 +326,6 @@ public class PhaseService extends MongoBaseService {
         }
         return localDatePhaseStatusMap;
     }
-
 
     /**
      *
@@ -371,6 +369,10 @@ public class PhaseService extends MongoBaseService {
      */
     public List<PhaseDTO> getDefaultPhasesByUnit(Long unitId) {
         return phaseMongoRepository.findByOrganizationIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(unitId);
+    }
+
+    public Phase getPhaseByName(final Long unitId,final String name){
+        return phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId,name);
     }
 
 
