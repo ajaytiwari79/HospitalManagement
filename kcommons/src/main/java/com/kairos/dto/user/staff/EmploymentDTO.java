@@ -30,7 +30,6 @@ public class EmploymentDTO {
     private int fullTimeWeeklyMinutes;
     private LocalDate startDate;
     private LocalDate endDate;
-    private ExpertiseDTO expertise;
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyCost;
@@ -43,13 +42,5 @@ public class EmploymentDTO {
     private List<EmploymentLinesDTO> employmentLines;
     private EmploymentTypeDTO employmentType;
 
-    @Setter
-    @Getter
-    @NoArgsConstructor
-    class ExpertiseDTO {
-        private Long id;
-        private String name;
-        private String startDate;
-        private String endDate;
-    }
+
 }

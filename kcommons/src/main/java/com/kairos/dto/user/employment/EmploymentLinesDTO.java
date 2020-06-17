@@ -42,7 +42,6 @@ public class EmploymentLinesDTO implements Comparable<EmploymentLinesDTO> {
     private SeniorityLevelDTO seniorityLevel;
     private Long payGradeLevel;
     private EmploymentTypeDTO employmentType;
-    private List<EmploymentLineFunction> functions;
 
     //This getter is used for Accumulated Timebank calculation
     public LocalDate getEndDateForAccumulatedTimebank() {
@@ -66,15 +65,4 @@ public class EmploymentLinesDTO implements Comparable<EmploymentLinesDTO> {
             }
             return getStartDate().compareTo(employmentLinesDTO.getStartDate());
         }
-
-    @Setter
-    @Getter
-    @NoArgsConstructor
-    class EmploymentLineFunction {
-        private Long id;
-        private String name;
-        private String icon;
-        private String code;
-    }
-
 }
