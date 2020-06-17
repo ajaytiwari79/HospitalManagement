@@ -83,6 +83,7 @@ import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.enums.FilterType.CTA_ACCOUNT_TYPE;
 import static com.kairos.enums.FilterType.NIGHT_WORKERS;
+import static com.kairos.enums.wta.WTATemplateType.*;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
 import static java.util.stream.Collectors.toMap;
 
@@ -732,29 +733,31 @@ public class WorkTimeAgreementService{
         return true;
     }
 
-    private Map<String, BigInteger> getActivityMapWithUnitId(List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS, List<Long> organisationIds) {
+    public <T> Map<String, BigInteger> getActivityMapWithUnitId(List<T> wtaBaseRuleTemplateDTOS, List<Long> organisationIds) {
         Set<BigInteger> activityIds = new HashSet<>();
-        for (WTABaseRuleTemplateDTO ruleTemplate : wtaBaseRuleTemplateDTOS) {
-            switch (ruleTemplate.getWtaTemplateType()) {
+        for (T ruleTemplate : wtaBaseRuleTemplateDTOS) {
+            boolean instanceOfWTABaseTemplate = ruleTemplate instanceof WTABaseRuleTemplate;
+            WTATemplateType wtaTemplateType = ruleTemplate instanceof WTABaseRuleTemplate ?  ((WTABaseRuleTemplate)ruleTemplate).getWtaTemplateType() : ((WTABaseRuleTemplateDTO)ruleTemplate).getWtaTemplateType();
+            switch (wtaTemplateType) {
                 case VETO_AND_STOP_BRICKS:
-                    VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, VetoAndStopBricksWTATemplate.class);
+                    VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = instanceOfWTABaseTemplate ? (VetoAndStopBricksWTATemplate) ruleTemplate :ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, VetoAndStopBricksWTATemplate.class);
                     CollectionUtils.addIgnoreNull(activityIds, vetoAndStopBricksWTATemplate.getStopBrickActivityId());
                     CollectionUtils.addIgnoreNull(activityIds, vetoAndStopBricksWTATemplate.getVetoActivityId());
                     break;
                 case SENIOR_DAYS_PER_YEAR:
-                    SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, SeniorDaysPerYearWTATemplate.class);
+                    SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = instanceOfWTABaseTemplate ? (SeniorDaysPerYearWTATemplate) ruleTemplate: ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, SeniorDaysPerYearWTATemplate.class);
                     activityIds.addAll(seniorDaysPerYearWTATemplate.getActivityIds());
                     break;
                 case CHILD_CARE_DAYS_CHECK:
-                    ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ChildCareDaysCheckWTATemplate.class);
+                    ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = instanceOfWTABaseTemplate ? (ChildCareDaysCheckWTATemplate)ruleTemplate : ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ChildCareDaysCheckWTATemplate.class);
                     activityIds.addAll(childCareDaysCheckWTATemplate.getActivityIds());
                     break;
                 case WTA_FOR_CARE_DAYS:
-                    WTAForCareDays wtaForCareDays = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, WTAForCareDays.class);
+                    WTAForCareDays wtaForCareDays = instanceOfWTABaseTemplate ? (WTAForCareDays) ruleTemplate: ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, WTAForCareDays.class);
                     activityIds.addAll(wtaForCareDays.getCareDayCounts().stream().map(activityCareDayCount -> activityCareDayCount.getActivityId()).collect(Collectors.toSet()));
                     break;
                 case PROTECTED_DAYS_OFF:
-                    ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ProtectedDaysOffWTATemplate.class);
+                    ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = instanceOfWTABaseTemplate ? (ProtectedDaysOffWTATemplate) ruleTemplate : ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ProtectedDaysOffWTATemplate.class);
                     CollectionUtils.addIgnoreNull(activityIds,protectedDaysOffWTATemplate.getActivityId());
                     break;
                 default:
