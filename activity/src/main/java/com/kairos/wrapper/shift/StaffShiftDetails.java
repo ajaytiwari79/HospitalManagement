@@ -3,7 +3,7 @@ package com.kairos.wrapper.shift;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.user.staff.EmploymentDTO;
+import com.kairos.dto.user.employment.PlanningEmploymentDTO;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.tag.Tag;
 import lombok.AllArgsConstructor;
@@ -24,7 +24,7 @@ public class StaffShiftDetails {
     private String firstName;
     private String lastName;
     private Long userId;
-    private List<EmploymentDTO> employments;
+    private List<PlanningEmploymentDTO> employments;
     private List<Tag> tags;
     private List<ShiftWithActivityDTO> shifts;
     private String city;
