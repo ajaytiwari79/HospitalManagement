@@ -20,7 +20,7 @@ public class ShiftSearchDTO {
     private Date startDate;
     private Date endDate;
     private boolean multiStaff;
-    private ShiftFilterDurationType shiftFilterDurationType;
+    private ShiftFilterDurationType shiftFilterDurationType = ShiftFilterDurationType.INDIVIDUAL;
     private List<StaffFilterSelectionDTO> staffFilters;
     private List<FilterSelectionDTO> filtersData;
 
