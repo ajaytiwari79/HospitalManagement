@@ -177,7 +177,7 @@ public class AssetService {
                     subAssetType = saveAssetType(unitId, assetDTO, assetType);
                     assetType.getSubAssetTypes().add(subAssetType);
                 } else {
-                    subAssetType = linkedRiskWithAllAssetTypeAndSubType(assetDTO, assetType, subAssetType);
+                    subAssetType = linkedRiskWithAllAssetTypeAndSubType(unitId, assetDTO, assetType, subAssetType);
                 }
             }
         } else {
@@ -189,7 +189,7 @@ public class AssetService {
             }
         }
         if (isCollectionNotEmpty(assetDTO.getAssetType().getRisks())) {
-            linkRiskWithAssetTypeAndSubType(assetType, assetDTO.getAssetType().getRisks());
+            linkRiskWithAssetTypeAndSubType(unitId, assetType, assetDTO.getAssetType().getRisks());
         }
         assetTypeRepository.save(assetType);
         asset.setAssetType(assetType);
@@ -207,19 +207,19 @@ public class AssetService {
     private AssetType saveAssetType(Long unitId, AssetDTO assetDTO, AssetType assetType) {
         AssetType subAssetType = new AssetType(assetDTO.getSubAssetType().getName(), unitId, true);
         if (isCollectionNotEmpty(assetDTO.getSubAssetType().getRisks())) {
-            linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getSubAssetType().getRisks());
+            linkRiskWithAssetTypeAndSubType(unitId, subAssetType, assetDTO.getSubAssetType().getRisks());
         }
         subAssetType.setAssetType(assetType);
         assetTypeRepository.save(subAssetType);
         return subAssetType;
     }
 
-    private AssetType linkedRiskWithAllAssetTypeAndSubType(AssetDTO assetDTO, AssetType assetType, AssetType subAssetType) {
+    private AssetType linkedRiskWithAllAssetTypeAndSubType(Long unitId, AssetDTO assetDTO, AssetType assetType, AssetType subAssetType) {
         for (AssetType assetSubType : assetType.getSubAssetTypes()) {
             if (assetDTO.getSubAssetType().getId().equals(assetSubType.getId())) {
                 subAssetType = assetSubType;
                 if (isCollectionNotEmpty(assetDTO.getSubAssetType().getRisks())) {
-                    linkRiskWithAssetTypeAndSubType(assetSubType, assetDTO.getSubAssetType().getRisks());
+                    linkRiskWithAssetTypeAndSubType(unitId, assetSubType, assetDTO.getSubAssetType().getRisks());
                 }
                 break;
             }
@@ -227,12 +227,13 @@ public class AssetService {
         return subAssetType;
     }
 
-    private AssetType linkRiskWithAssetTypeAndSubType(AssetType assetType, Set<OrganizationLevelRiskDTO> risks) {
+    private AssetType linkRiskWithAssetTypeAndSubType(Long unitId, AssetType assetType, Set<OrganizationLevelRiskDTO> risks) {
         List<Risk> assetTypeRisks = new ArrayList<>();
         Map<Long, OrganizationLevelRiskDTO> riskIdMap = new HashMap<>();
         risks.forEach(risk -> {
             if (!Optional.ofNullable(risk.getId()).isPresent()) {
                 Risk assetTypeRisk = ObjectMapperUtils.copyPropertiesByMapper(risk, Risk.class);
+                assetTypeRisk.setOrganizationId(unitId);
                 assetTypeRisks.add(assetTypeRisk);
             } else {
                 riskIdMap.put(risk.getId(), risk);
