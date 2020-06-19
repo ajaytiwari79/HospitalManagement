@@ -2,8 +2,10 @@ package com.kairos.controller.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.BreakAction;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftFilterParam;
@@ -63,7 +65,9 @@ public class ShiftController {
     @PostMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createShift( @PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO , @RequestParam(required = false ,value = "shiftActionType") ShiftActionType shiftActionType) {
-
+        if(UserContext.getUserDetails().getUnitWiseAccessRole().containsKey(unitId.toString()) && AccessGroupRole.STAFF.toString().equals(UserContext.getUserDetails().getUnitWiseAccessRole().get(unitId.toString()))){
+            shiftActionType = ShiftActionType.SAVE;
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO ,shiftActionType));
     }
 
@@ -71,7 +75,9 @@ public class ShiftController {
     @PostMapping(value = "/create_shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createShifts( @PathVariable Long unitId, @RequestBody @Valid List<ShiftDTO> shiftDTOS , @RequestParam(required = false ,value = "shiftActionType") ShiftActionType shiftActionType) {
-
+        if(UserContext.getUserDetails().getUnitWiseAccessRole().containsKey(unitId.toString()) && AccessGroupRole.STAFF.toString().equals(UserContext.getUserDetails().getUnitWiseAccessRole().get(unitId.toString()))){
+            shiftActionType = ShiftActionType.SAVE;
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShifts(unitId, shiftDTOS ,shiftActionType));
     }
 

@@ -20,7 +20,6 @@ public class UserContextFilter implements Filter {
 
 
         UserContext.setCorrelationId(  httpServletRequest.getHeader(UserContext.CORRELATION_ID) );
-        UserContext.setUserId( httpServletRequest.getHeader(UserContext.USER_ID) );
         UserContext.setAuthToken( httpServletRequest.getHeader(UserContext.AUTH_TOKEN) );
         long time = System.currentTimeMillis();
         try {
