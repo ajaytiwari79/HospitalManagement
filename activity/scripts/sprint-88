@@ -10,3 +10,11 @@ var timeTypeId = shift.activities.forEach(function(ac){
 
 db.shifts.save(shift);
 });
+
+
+db.getCollection('breakSettings').find({}).forEach(function(breakSetting){
+    if(breakSetting.shiftDurationInMinute<breakSetting.breakDurationInMinute){
+        breakSetting.breakDurationInMinute = NumberLong(30);
+        db.breakSettings.save(breakSetting);
+        }
+    });
