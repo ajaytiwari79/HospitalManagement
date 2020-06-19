@@ -455,6 +455,7 @@ public class StaffFilterService {
             List<Map> loggedInStaffDetails=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId, new HashMap<>(), null, envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),loggedInStaffId,selectedDate);
             staffList.addAll(loggedInStaffDetails);
         }
+
         staffEmploymentTypeWrapper.setStaffList(staffList);
         return staffEmploymentTypeWrapper;
     }

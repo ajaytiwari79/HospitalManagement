@@ -227,7 +227,9 @@ public class ActivityService {
 
     public boolean deleteActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        long activityCount = shiftService.countByActivityId(activityId);
+        Activity activityOfUnit = activityMongoRepository.findByParentIdAndDeletedFalse(activityId);
+        BigInteger activityIds = isNotNull(activityOfUnit)?activityOfUnit.getId():activityId;
+        long activityCount = shiftService.countByActivityId(activityIds);
         if (activityCount > 0) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE, activity.getName());
         }
