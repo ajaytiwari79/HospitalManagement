@@ -23,15 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GEOGRAPHYDATA_NOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_MUNICIPALITY_NOTFOUND;
 
@@ -141,11 +137,11 @@ public class StaffAddressService {
         if (staff == null) {
             return null;
         }
-        ContactAddress staffAddress = staff.getContactAddress();
+        List<ContactAddress> staffAddress = newArrayList(staff.getContactAddress(),staff.getSecondaryContactAddress());
         Map<String, Object> response = new HashMap<>();
         if (countryId != null) {
-            ZipCode zipCode = (staffAddress == null) ? null : staffAddress.getZipCode();
-            response.put("municipalities", (zipCode == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(zipCode.getId())));
+            Set<Long> zipCodeIds = (staffAddress == null) ? null : staffAddress.stream().map(s->s.getZipCode().getId()).collect(Collectors.toSet());
+            response.put("municipalities", (zipCodeIds == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeDataByZipCodeIds(zipCodeIds)));
             response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         }
         return response;
