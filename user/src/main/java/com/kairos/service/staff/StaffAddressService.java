@@ -140,8 +140,8 @@ public class StaffAddressService {
         List<ContactAddress> staffAddress = newArrayList(staff.getContactAddress(),staff.getSecondaryContactAddress());
         Map<String, Object> response = new HashMap<>();
         if (countryId != null) {
-            Set<Long> zipCodeIds = (staffAddress == null) ? null : staffAddress.stream().map(s->s.getZipCode().getId()).collect(Collectors.toSet());
-            response.put("municipalities", (zipCodeIds == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeDataByZipCodeIds(zipCodeIds)));
+            Set<Long> zipCodeIds = isCollectionEmpty(staffAddress) ? null : staffAddress.stream().filter(s->isNotNull(s)).map(s->s.getZipCode().getId()).collect(Collectors.toSet());
+            response.put("municipalities", isCollectionEmpty(zipCodeIds) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeDataByZipCodeIds(zipCodeIds)));
             response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         }
         return response;
