@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -47,5 +48,8 @@ public interface RegionGraphRepository extends Neo4jBaseRepository<Region,Long> 
             "{provinceName:province.name,provinceId:id(province),regionId:id(region),regionName:region.name,countryId:id(country),countryName:country.name} as data")
     Map<String,Object> getGeographicData(long municipalityId);
 
+    @Query("MATCH (zipcode:ZipCode)-[:"+MUNICIPALITY+"]->(municipality:Municipality) where id(zipcode) IN {0}\n" +
+            "Match (municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region)-[:BELONGS_TO]->(country:Country) return {id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}} as result")
+    List<Map<String,Object>> getGeographicTreeDataByZipCodeIds(Set<Long> zipCodeIds);
 
 }
