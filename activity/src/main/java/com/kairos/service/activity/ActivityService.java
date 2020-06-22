@@ -229,13 +229,11 @@ public class ActivityService {
         Activity activity = findActivityById(activityId);
         long activityCount = shiftService.countByActivityId(activityId);
 
-        if (!userIntegrationService.isUnit(UserContext.getUnitId())) {
             List<Long> childUnitIds = userIntegrationService.getAllOrganizationIds(UserContext.getUnitId());
-            if (activityMongoRepository.existsByParentIdAndDeletedFalse(activity.getId(), childUnitIds)) {
+            if (isCollectionNotEmpty(childUnitIds) && activityMongoRepository.existsByParentIdAndDeletedFalse(activity.getId(), childUnitIds)) {
                 exceptionService.actionNotPermittedException(ACTIVITY_USED_AT_UNIT);
             }
-        }
-          else if (activityCount > 0) {
+           else if (activityCount > 0) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE, activity.getName());
         }
         activity.setDeleted(true);
