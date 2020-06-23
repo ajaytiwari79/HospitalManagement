@@ -26,6 +26,7 @@ public class PlanningEmploymentDTO {
     private boolean nightWorker;
     private EmploymentSubType employmentSubType;
     private List<EmploymentLinesDTO> employmentLines;
+    private List<EmploymentTypeDTO> employmentList;
     private EmploymentTypeDTO employmentType;
     private ExpertiseDTO expertise;
 
