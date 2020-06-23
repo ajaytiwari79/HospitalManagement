@@ -38,8 +38,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.service.wta.WTABuilderService.copyRuleTemplatesToDTO;
+import static com.kairos.service.wta.WTABuilderService.mapOrganisationActivity;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -58,8 +60,9 @@ public class RuleTemplateService{
     @Inject
     private WTAOrganizationService wtaOrganizationService;
     @Inject private PhaseMongoRepository phaseMongoRepository;
-
-    @Autowired
+    @Inject
+    private WorkTimeAgreementService workTimeAgreementService;
+    @Inject
     private ExceptionService exceptionService;
 
     public boolean createRuleTemplate(long countryId) {
@@ -318,6 +321,10 @@ public class RuleTemplateService{
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID);
         }
         List<WTABaseRuleTemplate> templateList = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(organization.getCountryId());
+        Map<String, BigInteger> activitiesIdsAndUnitIdsMap = workTimeAgreementService.getActivityMapWithUnitId(templateList, newArrayList(organization.getId()));
+        for (WTABaseRuleTemplate wtaBaseRuleTemplate : templateList) {
+            mapOrganisationActivity(activitiesIdsAndUnitIdsMap,unitId,wtaBaseRuleTemplate);
+        }
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = copyRuleTemplatesToDTO(templateList);
         RuleTemplateWrapper ruleTemplateWrapper = new RuleTemplateWrapper();
         assignCategoryToRuleTemplate(organization.getCountryId(), wtaBaseRuleTemplateDTOS);

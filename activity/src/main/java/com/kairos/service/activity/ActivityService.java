@@ -227,8 +227,12 @@ public class ActivityService {
 
     public boolean deleteActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
+        List<Long> childUnitIds = userIntegrationService.getAllOrganizationIds(UserContext.getUnitId());
+            if(isCollectionNotEmpty(childUnitIds) && activityMongoRepository.existsByParentIdAndDeletedFalse(activity.getId(), childUnitIds)) {
+                exceptionService.actionNotPermittedException(ACTIVITY_USED_AT_UNIT);
+            }
         long activityCount = shiftService.countByActivityId(activityId);
-        if (activityCount > 0) {
+            if(activityCount > 0) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE, activity.getName());
         }
         activity.setDeleted(true);
