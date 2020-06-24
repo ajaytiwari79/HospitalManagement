@@ -1,23 +1,24 @@
 package com.kairos.persistence.repository.shift;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.config.codec.BigIntegerCodec;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftCountDTO;
-import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.shift.StaffShiftDetails;
 import org.apache.commons.collections.CollectionUtils;
+import org.bson.BSON;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -38,6 +39,7 @@ import static com.kairos.commons.utils.DateUtils.getEndOfDay;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
+import static com.mongodb.client.model.Aggregates.addFields;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
@@ -355,6 +357,19 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     @Override
     public List<ShiftWithActivityDTO> findAllShiftBetweenDurationByUnitId(Long unitId, Date startDate, Date endDate) {
         return getShiftWithActivityByCriteria(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(DISABLED).is(false).and(START_DATE).gte(startDate).lte(endDate),false,ShiftWithActivityDTO.class);
+    }
+
+    @Override
+    public List<ShiftActivity> getShiftActivityByUnitIdAndActivityId(Long unitId,Date startDate,Date endDate,Set<BigInteger> activityIds){
+        Set<String> activites = activityIds.stream().map(bigInteger -> bigInteger.toString()).collect(Collectors.toSet());
+        Aggregation aggregation = newAggregation(
+                match(Criteria.where("unitId").is(unitId).and(DELETED).is(false).and(DISABLED).is(false).and("startDate").lt(endDate).and("endDate").gt(startDate)),
+                unwind("activities"),
+                replaceRoot("activities"),
+                match(Criteria.where("startDate").lt(endDate).and("endDate").gt(startDate).and("activityId").in(activites)),
+                project("startDate","endDate","activityId")
+        );
+        return mongoTemplate.aggregate(aggregation,Shift.class, ShiftActivity.class).getMappedResults();
     }
 
     public static Document shiftWithActivityGroup() {

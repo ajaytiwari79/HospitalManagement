@@ -7,7 +7,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -22,6 +24,7 @@ public class StaffingLevelInterval {
     private Set<StaffingLevelActivity> staffingLevelActivities=new LinkedHashSet<>();
     private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
     private TreeSet<StaffingLevelIntervalLog> staffingLevelIntervalLogs=new TreeSet<>();
+    private Set<BigInteger> activityIds=new HashSet<>();
 
 
 
@@ -57,6 +60,10 @@ public class StaffingLevelInterval {
 
         this.getStaffingLevelActivities().addAll(staffLevelActivitys);
 
+    }
+
+    public Set<BigInteger> getActivityIds(){
+        return staffingLevelActivities.stream().map(staffingLevelActivity -> staffingLevelActivity.getActivityId()).collect(Collectors.toSet());
     }
 
 
