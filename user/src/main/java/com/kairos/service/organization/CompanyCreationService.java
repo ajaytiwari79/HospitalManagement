@@ -503,7 +503,6 @@ public class CompanyCreationService {
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
         setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO);
         if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
-            Boolean isUnitUpdated = true;
             setUserInfoInOrganization(unitId, unit, organizationBasicDTO.getUnitManager());
         }
         unitGraphRepository.save(unit);
