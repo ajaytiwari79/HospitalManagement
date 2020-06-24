@@ -25,5 +25,6 @@ public class UnitManagerDTO {
     private String accessGroupName;
     @NotNull(message = "error.Staff.userName.notnull")
     private String userName;
+    private Long id;
 
 }
