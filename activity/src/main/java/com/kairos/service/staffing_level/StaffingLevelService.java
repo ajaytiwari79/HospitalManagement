@@ -10,16 +10,18 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityValidationError;
-import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.StaffingLevelHelper;
 import com.kairos.dto.activity.staffing_level.*;
+import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDetailsByTimeSlotDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.organization.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -78,15 +80,12 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
+import java.time.temporal.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
@@ -1061,5 +1060,99 @@ public class StaffingLevelService  {
             }
         }
         return activityReplaced;
+    }
+
+    public Map<LocalDate,DailyStaffingLevelDetailsDTO> getWeeklyStaffingLevel(Long unitId, LocalDate date, BigInteger activityId) {
+        LocalDate startLocalDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
+        LocalDate endLocalDate = startLocalDate.plusWeeks(3);
+        List<TimeSlotDTO> timeSlots = userIntegrationService.getUnitTimeSlot(unitId);
+        List<PresenceStaffingLevelDto> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDatesAndActivityId(unitId,asDate(startLocalDate),asDate(endLocalDate),activityId);
+        Object[] staffingLevelMapAndActivityIds = getStaffingLevelMapAndActivityIds(staffingLevels);
+        Set<BigInteger> activityIds = (Set<BigInteger>)staffingLevelMapAndActivityIds[0];
+        Map<LocalDate,PresenceStaffingLevelDto> staffingLevelMap = (Map<LocalDate,PresenceStaffingLevelDto>)staffingLevelMapAndActivityIds[1];
+        List<ShiftActivity> shiftActivities = shiftMongoRepository.getShiftActivityByUnitIdAndActivityId(unitId,asDate(startLocalDate),getEndOfDay(asDate(endLocalDate)),activityIds);
+        Map[] mapArray = getMapOfShiftActivities(shiftActivities,activityId);
+        Map<LocalDate, List<ShiftActivity>> dateListMap = mapArray[0];
+        Map<LocalDate, List<ShiftActivity>> activityWiseMap = mapArray[1];
+        Map<LocalDate,DailyStaffingLevelDetailsDTO> localDateDailyStaffingLevelDetailsDTOMap = new HashMap<>();
+        while (!startLocalDate.isAfter(endLocalDate)){
+            PresenceStaffingLevelDto staffingLevel = staffingLevelMap.get(startLocalDate);
+            List<ShiftActivity> currentShiftActivities = activityWiseMap.getOrDefault(startLocalDate,new ArrayList<>());
+            List<StaffingLevelDetailsByTimeSlotDTO> staffingLevelDetailsByTimeSlotDTOS = new ArrayList<>();
+            Integer detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDetailLevelMinutes();
+            for (TimeSlotDTO timeSlot : timeSlots) {
+                ZonedDateTime startZonedDateTime = timeSlot.getStartZoneDateTime(startLocalDate);
+                ZonedDateTime endZonedDateTime = timeSlot.getEndZoneDateTime(startLocalDate);
+                DateTimeInterval timeSlotInterval = new DateTimeInterval(startZonedDateTime,endZonedDateTime);
+                AtomicReference<LocalDate> localDateAtomicReference = new AtomicReference<>(startLocalDate);
+                List<StaffingLevelInterval> staffingLevelIntervals = staffingLevel.getPresenceStaffingLevelInterval().stream().filter(staffingLevelInterval ->
+                     staffingLevelInterval.getStaffingLevelDuration().getInterval(localDateAtomicReference.get()).overlaps(timeSlotInterval) && staffingLevelInterval.getActivityIds().contains(activityId)
+                ).collect(Collectors.toList());
+                int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevelIntervals,currentShiftActivities,startLocalDate, detailLevelMinutes, true);
+                int overStaffing = maxAndMinNoOfStaff[0];
+                int underStaffing = maxAndMinNoOfStaff[1];
+                staffingLevelDetailsByTimeSlotDTOS.add(new StaffingLevelDetailsByTimeSlotDTO(underStaffing,overStaffing,underStaffing * detailLevelMinutes,overStaffing * detailLevelMinutes,timeSlot.getName()));
+            }
+            currentShiftActivities = dateListMap.getOrDefault(startLocalDate,new ArrayList<>());
+            int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevel.getPresenceStaffingLevelInterval(),currentShiftActivities,startLocalDate, detailLevelMinutes, false);
+            int overStaffing = maxAndMinNoOfStaff[0];
+            int underStaffing = maxAndMinNoOfStaff[1];
+            localDateDailyStaffingLevelDetailsDTOMap.put(startLocalDate,new DailyStaffingLevelDetailsDTO(underStaffing,overStaffing,underStaffing * detailLevelMinutes,overStaffing * detailLevelMinutes,staffingLevelDetailsByTimeSlotDTOS));
+            startLocalDate = startLocalDate.plusDays(1);
+        }
+        return localDateDailyStaffingLevelDetailsDTOMap;
+    }
+
+    private int[] getMinAndMaxCount(List<StaffingLevelInterval> staffingLevelIntervals, List<ShiftActivity> shiftActivities, LocalDate localDate, int detailLevelMinutes, boolean calculateActivityWise){
+        int overStaffing = 0;
+        int underStaffing = 0;
+        for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
+            long count = shiftActivities.stream().filter(shiftActivity -> shiftActivity.getInterval().overlapMinutes(staffingLevelInterval.getStaffingLevelDuration().getInterval(localDate))==detailLevelMinutes
+            ).count();
+            if(calculateActivityWise){
+                StaffingLevelActivity staffingLevelActivity = staffingLevelInterval.getStaffingLevelActivities().iterator().next();
+                overStaffing += staffingLevelActivity.getMaxNoOfStaff()<count ? count - staffingLevelActivity.getMaxNoOfStaff() : 0;
+                overStaffing += staffingLevelActivity.getMinNoOfStaff()>count ? count - staffingLevelActivity.getMinNoOfStaff() : 0;
+            }else {
+                overStaffing += staffingLevelInterval.getMaxNoOfStaff()<count ? count - staffingLevelInterval.getMaxNoOfStaff() : 0;
+                overStaffing += staffingLevelInterval.getMinNoOfStaff()>count ? count - staffingLevelInterval.getMinNoOfStaff() : 0;
+            }
+        }
+        return new int[]{overStaffing,underStaffing};
+    }
+
+    private Object[] getStaffingLevelMapAndActivityIds(List<PresenceStaffingLevelDto> staffingLevels) {
+        Map<LocalDate, PresenceStaffingLevelDto> staffingLevelDtoMap = new HashMap<>();
+        Set<BigInteger> activityIds = new HashSet<>();
+        for (PresenceStaffingLevelDto staffingLevel : staffingLevels) {
+            staffingLevelDtoMap.put(asLocalDate(staffingLevel.getCurrentDate()),staffingLevel);
+            activityIds.addAll(staffingLevel.getPresenceStaffingLevelInterval().get(0).getActivityIds());
+        }
+        return new Object[]{activityIds,staffingLevelDtoMap};
+    }
+
+    private Map[] getMapOfShiftActivities(List<ShiftActivity> shiftActivities,BigInteger activityId) {
+        Map<LocalDate, List<ShiftActivity>> dateListMap = new HashMap<>();
+        Map<LocalDate, List<ShiftActivity>> activityWiseMap = new HashMap<>();
+        for (ShiftActivity shiftActivity : shiftActivities) {
+            if(activityId.equals(shiftActivity.getActivityId())){
+                updateDateWiseMap(activityWiseMap, shiftActivity);
+            }
+            updateDateWiseMap(dateListMap, shiftActivity);
+        }
+        return new Map[]{dateListMap,activityWiseMap};
+    }
+
+    private void updateDateWiseMap(Map<LocalDate, List<ShiftActivity>> map, ShiftActivity shiftActivity) {
+        LocalDate startDate = asLocalDate(shiftActivity.getStartDate());
+        LocalDate endDate = asLocalDate(shiftActivity.getEndDate());
+        List<ShiftActivity> shiftActivityList = map.getOrDefault(startDate,new ArrayList<>());
+        shiftActivityList.add(shiftActivity);
+        map.put(startDate,shiftActivityList);
+        if(!startDate.equals(endDate)){
+            shiftActivityList = map.getOrDefault(endDate,new ArrayList<>());
+            shiftActivityList.add(shiftActivity);
+            map.put(endDate,shiftActivityList);
+        }
     }
 }

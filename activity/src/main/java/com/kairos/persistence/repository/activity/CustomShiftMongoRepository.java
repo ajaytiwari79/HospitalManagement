@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.activity;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
@@ -8,6 +9,7 @@ import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.shift.StaffShiftDetails;
@@ -104,6 +106,7 @@ public interface CustomShiftMongoRepository {
     List<ActivityWithCompositeDTO> findMostlyUsedActivityByStaffId(Long staffId);
 
     void updateValidateDetailsOfShift(BigInteger shiftId, AccessGroupRole accessGroupRole, LocalDate localDate);
+    List<ShiftActivity> getShiftActivityByUnitIdAndActivityId(Long unitId, Date startDate,Date endDate, Set<BigInteger> activityIds);
 
 
 

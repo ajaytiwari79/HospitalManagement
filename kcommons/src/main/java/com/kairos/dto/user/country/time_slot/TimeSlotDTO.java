@@ -1,11 +1,15 @@
 package com.kairos.dto.user.country.time_slot;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.DateUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 
 /**
  * Created by prabjot on 23/1/17.
@@ -33,4 +37,14 @@ public class TimeSlotDTO {
         this.endMinute = endMinute;
     }
 
+    public ZonedDateTime getStartZoneDateTime(LocalDate localDate) {
+        return DateUtils.asZonedDateTime(localDate, LocalTime.of(startHour,startMinute));
+    }
+
+    public ZonedDateTime getEndZoneDateTime(LocalDate localDate) {
+        if(endHour>startHour){
+            localDate = localDate.plusDays(1);
+        }
+        return DateUtils.asZonedDateTime(localDate, LocalTime.of(endHour,endMinute));
+    }
 }

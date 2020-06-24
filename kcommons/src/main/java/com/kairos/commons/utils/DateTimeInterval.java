@@ -153,6 +153,14 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
         long end = Math.min(getEndMillis(), interval.getEndMillis());
         return new DateTimeInterval(start, end);
     }
+    public final long overlapMinutes(DateTimeInterval interval) {
+        if (!overlaps(interval)) {
+            return 0;
+        }
+        long start = Math.max(getStartMillis(), interval.getStartMillis());
+        long end = Math.min(getEndMillis(), interval.getEndMillis());
+        return new DateTimeInterval(start, end).getMinutes();
+    }
 
     public final DateTimeInterval addInterval(DateTimeInterval interval) {
         DateTimeInterval dateTimeInterval = null;
