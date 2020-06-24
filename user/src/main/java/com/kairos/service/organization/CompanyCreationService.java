@@ -314,7 +314,7 @@ public class CompanyCreationService {
         }
         Organization organization = organizationService.fetchParentOrganization(organizationBaseEntity.getId());
         // set all properties
-        User user = userGraphRepository.findUserByCprNumberOrEmail(unitManagerDTO.getCprNumber(),unitManagerDTO.getEmail());
+        User user = userGraphRepository.getUserOfOrganization(organization.getId());
         if(user==null){
             StaffCreationDTO staffCreationDTO=ObjectMapperUtils.copyPropertiesByMapper(unitManagerDTO,StaffCreationDTO.class);
             staffCreationService.createStaff(unitId,staffCreationDTO);
@@ -502,9 +502,9 @@ public class CompanyCreationService {
         updateOrganizationDetails(unit, organizationBasicDTO, false);
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
         setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO);
-        if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
-            setUserInfoInOrganization(unitId, unit, organizationBasicDTO.getUnitManager());
-        }
+//        if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
+//            setUserInfoInOrganization(unitId, unit, organizationBasicDTO.getUnitManager());
+//        }
         unitGraphRepository.save(unit);
         return organizationBasicDTO;
 
