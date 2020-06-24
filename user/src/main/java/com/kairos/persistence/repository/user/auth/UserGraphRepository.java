@@ -87,16 +87,16 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     List<StaffPersonalDetailQueryResult> getUnitManagerOfOrganization(List<Long> unitId, Long parentOrganizationId);
 
-    @Query("MATCH (o:Organization)-[:"+HAS_POSITIONS+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) where id(o)={0} AND id(unit)={1}  WITH position"+
+    @Query("MATCH (org) WHERE id(org)={0} " +
+            "OPTIONAL MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH position"+
             " MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "RETURN user LIMIT 1 " )
-    User getUserOfOrganization(Long parentOrgiD, Long unitId);
-
+    User getUserOfOrganization(Long unitId);
 
 
     @Query("MATCH (user:User) WHERE ( user.cprNumber={1} OR user.email=~{0} ) AND id(user)<>{2} RETURN count(user) ")
-
     byte validateUserEmailAndCPRExceptCurrentUser(String email, String cprNumber, Long userId);
+
     @Query("MATCH (user:User) WHERE ( user.cprNumber={0} OR user.email=~{1} ) RETURN user")
     User findUserByCprNumberOrEmail(String cprNumber, String email);
 
