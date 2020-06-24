@@ -146,6 +146,7 @@ public class ExpertiseService {
         });
         validateSeniorityLevels(ObjectMapperUtils.copyCollectionPropertiesByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
         ExpertiseLine expertiseLine = createExpertiseLine(expertiseDTO);
+        addSeniorityLevelsInExpertise(expertiseLine, expertiseDTO);
         Expertise expertise = new Expertise(expertiseDTO.getName(), expertiseDTO.getDescription(), expertiseDTO.getStartDate(), expertiseDTO.getEndDate(), country, expertiseDTO.isPublished(), Collections.singletonList(expertiseLine),expertiseDTO.getBreakPaymentSetting());
         expertiseGraphRepository.save(expertise);
         setBasicDetails(expertiseDTO, expertise);
@@ -153,8 +154,8 @@ public class ExpertiseService {
         TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
         ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, 0,
                 DurationType.WEEKS, 0, 0, XAxisConfig.HOURS, countryId, expertise.getId());
-        genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
-                "/expertise/" + expertise.getId() + "/night_worker_setting", null);
+//        genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
+//                "/expertise/" + expertise.getId() + "/night_worker_setting", null);
         return updatedExpertiseData(expertise);
     }
 
@@ -455,7 +456,7 @@ public class ExpertiseService {
             });
             expertiseEmploymentTypeRelationshipGraphRepository.saveAll(expertiseEmploymentList);
         }
-        functionalPaymentGraphRepository.linkFunctionalPaymentInExpertise(sourceExpertiseId, targetExpertiseId);
+        //functionalPaymentGraphRepository.linkFunctionalPaymentInExpertise(sourceExpertiseId, targetExpertiseId);
 
 
     }
@@ -572,7 +573,9 @@ public class ExpertiseService {
     public ExpertiseQueryResult copyExpertise(Long expertiseId, ExpertiseDTO expertiseDTO) {
         Expertise expertise = expertiseGraphRepository.findById(expertiseId, 2).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage("Data not found")));
         ExpertiseLine expertiseLine = (expertise.getExpertiseLines().get(expertise.getExpertiseLines().size() - 1));
-        expertiseDTO.setUnion(ObjectMapperUtils.copyPropertiesByMapper(expertise.getUnion(), UnionIDNameDTO.class));
+        if(expertiseDTO.getUnion()==null){
+            expertiseDTO.setUnion(ObjectMapperUtils.copyPropertiesByMapper(expertise.getUnion(), UnionIDNameDTO.class));
+        }
         List<SeniorityLevel> seniorityLevels = seniorityLevelGraphRepository.findAllById(expertiseLine.getSeniorityLevel().stream().map(SeniorityLevel::getId).collect(Collectors.toList()));
         Map<Long, Long> seniorityLevelAndPayGradeIdMap = seniorityLevels.stream().collect(Collectors.toMap(SeniorityLevel::getId, v -> v.getPayGrade().getId()));
         expertiseDTO.setSeniorityLevels(ObjectMapperUtils.copyCollectionPropertiesByMapper(expertiseLine.getSeniorityLevel(), SeniorityLevelDTO.class));
@@ -580,9 +583,13 @@ public class ExpertiseService {
             s.setPayGradeId(seniorityLevelAndPayGradeIdMap.get(s.getId()));
             s.setId(null);
         });
-        expertiseDTO.setOrganizationLevelId(isNull(expertise.getOrganizationLevel()) ? null : expertise.getOrganizationLevel().getId());
+        if(expertiseDTO.getOrganizationLevelId()==null){
+            expertiseDTO.setOrganizationLevelId(isNull(expertise.getOrganizationLevel()) ? null : expertise.getOrganizationLevel().getId());
+        }
+        if(expertiseDTO.getSector()==null){
+            expertiseDTO.setSector(ObjectMapperUtils.copyPropertiesByMapper(expertise.getSector(), SectorDTO.class));
+        }
         expertiseDTO.setOrganizationServiceIds(isCollectionEmpty(expertiseLine.getOrganizationServices()) ? null : expertiseLine.getOrganizationServices().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
-        expertiseDTO.setSector(ObjectMapperUtils.copyPropertiesByMapper(expertise.getSector(), SectorDTO.class));
         expertiseDTO.setBreakPaymentSetting(expertise.getBreakPaymentSetting());
         expertiseDTO.setNumberOfWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
         expertiseDTO.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
