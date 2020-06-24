@@ -154,8 +154,8 @@ public class ExpertiseService {
         TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
         ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, 0,
                 DurationType.WEEKS, 0, 0, XAxisConfig.HOURS, countryId, expertise.getId());
-//        genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
-//                "/expertise/" + expertise.getId() + "/night_worker_setting", null);
+        genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
+                "/expertise/" + expertise.getId() + "/night_worker_setting", null);
         return updatedExpertiseData(expertise);
     }
 
