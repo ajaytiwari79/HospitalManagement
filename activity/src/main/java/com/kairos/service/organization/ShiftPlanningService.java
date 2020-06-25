@@ -201,15 +201,18 @@ public class ShiftPlanningService {
         StaffShiftDetails loggedInStaff = null;
         Set<Long> filteredShiftStaff = shiftData.stream().map(StaffShiftDetails::getId).collect(Collectors.toSet());
 
-        if(staffShiftPersonalDetailsList.get(0).getUserId().equals(loggedInUserId) ){
+        if (staffShiftPersonalDetailsList.get(0).getUserId().equals(loggedInUserId)) {
             staffToAdd = true;
             loggedInStaff = staffShiftPersonalDetailsList.get(0);
         }
         staffShiftPersonalDetailsList = staffShiftPersonalDetailsList.stream().filter(spl -> filteredShiftStaff.contains(spl.getId())).collect(Collectors.toList());
 
-        if(staffToAdd && !staffShiftPersonalDetailsList.get(0).getUserId().equals(loggedInUserId)){
+        if (CollectionUtils.isEmpty(staffShiftPersonalDetailsList)) {
+            staffShiftPersonalDetailsList.add(loggedInStaff);
+        } else if (CollectionUtils.isNotEmpty(staffShiftPersonalDetailsList) && staffToAdd && !staffShiftPersonalDetailsList.get(0).getUserId().equals(loggedInUserId)) {
             staffShiftPersonalDetailsList.add(0, loggedInStaff);
         }
+
         return staffShiftPersonalDetailsList;
     }
 
