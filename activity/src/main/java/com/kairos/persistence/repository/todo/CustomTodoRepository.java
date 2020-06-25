@@ -9,4 +9,6 @@ import java.util.List;
 public interface CustomTodoRepository {
 
     List<TodoDTO> findAllByKpiFilter(Long unit, Date startDate, Date endDate, List<Long> staffIds, Collection<String> statuses);
+
+    List<TodoDTO> findAllTodoByStaffId(final Long staffId);
 }

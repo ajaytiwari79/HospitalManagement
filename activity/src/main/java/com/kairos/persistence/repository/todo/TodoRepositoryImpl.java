@@ -4,11 +4,14 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoType;
+import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.todo.Todo;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -42,5 +45,12 @@ public class TodoRepositoryImpl implements CustomTodoRepository {
         AggregationResults<TodoDTO> result = mongoTemplate.aggregate(aggregation, Todo.class, TodoDTO.class);
         return result.getMappedResults();
 
+    }
+
+    @Override
+    public List<TodoDTO> findAllTodoByStaffId(Long staffId) {
+        Query query = new Query(Criteria.where("deleted").is(false).and("id").is(staffId));
+        query.with(new Sort(Sort.DEFAULT_DIRECTION))
+        return mongoTemplate.find(query, TodoDTO.class);
     }
 }
