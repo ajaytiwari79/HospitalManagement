@@ -43,5 +43,5 @@ public class Function extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     private Country country;
     private String icon;
-    private int code;
+    private String code;
 }

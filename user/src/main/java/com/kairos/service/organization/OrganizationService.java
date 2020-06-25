@@ -757,24 +757,6 @@ public class OrganizationService {
         return unit.getTimeZone();
     }
 
-    public OrganizationCategory getOrganizationCategory(CompanyType companyType) {
-        OrganizationCategory organizationCategory;
-        switch (companyType) {
-            case HUB: {
-                organizationCategory = OrganizationCategory.HUB;
-                break;
-            }
-            case UNION: {
-                organizationCategory = OrganizationCategory.UNION;
-                break;
-            }
-            default: {
-                organizationCategory = OrganizationCategory.ORGANIZATION;
-            }
-        }
-        return organizationCategory;
-    }
-
     public OrderDefaultDataWrapper getDefaultDataForOrder(long unitId) {
         Long countryId = UserContext.getUserDetails().getCountryId();
         OrderAndActivityDTO orderAndActivityDTO = activityIntegrationService.getAllOrderAndActivitiesByUnit(unitId);
@@ -854,15 +836,13 @@ public class OrganizationService {
         }
         units = units.stream().filter(unit -> unit.isWorkcentre()).collect(Collectors.toList());
         if (Optional.ofNullable(organizationSubType).isPresent()) {
-            OrganizationTypeDTO organizationSubTypeDTO = new OrganizationTypeDTO();
-            BeanUtils.copyProperties(organizationSubType, organizationSubTypeDTO);
+            OrganizationTypeDTO organizationSubTypeDTO = ObjectMapperUtils.copyPropertiesByMapper(organizationSubType, OrganizationTypeDTO.class);
             ctaBasicDetailsDTO.setOrganizationSubType(organizationSubTypeDTO);
         }
         if (CollectionUtils.isNotEmpty(units)) {
             List<OrganizationBasicDTO> organizationBasicDTOS = new ArrayList<>();
             units.forEach(organization -> {
-                OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();
-                ObjectMapperUtils.copyProperties(organization, organizationBasicDTO);
+                OrganizationBasicDTO organizationBasicDTO = ObjectMapperUtils.copyPropertiesByMapper(organization, OrganizationBasicDTO.class);
                 organizationBasicDTOS.add(organizationBasicDTO);
             });
             ctaBasicDetailsDTO.setOrganizations(organizationBasicDTOS);
