@@ -35,10 +35,10 @@ public class FunctionDTO {
     private String icon;
     private List<LocalDate> appliedDates;
     private Long employmentId;
-    private int code;
+    private String code;
 
 
-    public FunctionDTO(Long id, String name, String description, LocalDate startDate, LocalDate endDate, List<Organization> unions, List<Level> organizationLevels, String icon,int code) {
+    public FunctionDTO(Long id, String name, String description, LocalDate startDate, LocalDate endDate, List<Organization> unions, List<Level> organizationLevels, String icon,String code) {
         this.id = id;
         this.name = name;
         this.description = description;

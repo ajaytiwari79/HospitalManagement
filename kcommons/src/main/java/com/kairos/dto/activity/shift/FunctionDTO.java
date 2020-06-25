@@ -31,7 +31,7 @@ public class FunctionDTO {
     private String icon;
     private List<LocalDate> appliedDates;
     private Long employmentId;
-    private int code;
+    private String code;
 
     public FunctionDTO(Long id, String name, String icon) {
         this.id = id;this.name = name;
