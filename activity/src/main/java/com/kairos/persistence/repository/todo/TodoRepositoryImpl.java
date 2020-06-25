@@ -46,11 +46,4 @@ public class TodoRepositoryImpl implements CustomTodoRepository {
         return result.getMappedResults();
 
     }
-
-    @Override
-    public List<TodoDTO> findAllTodoByStaffId(Long staffId) {
-        Query query = new Query(Criteria.where("deleted").is(false).and("id").is(staffId));
-        query.with(new Sort(Sort.DEFAULT_DIRECTION))
-        return mongoTemplate.find(query, TodoDTO.class);
-    }
 }

@@ -5,6 +5,7 @@ import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -48,7 +49,7 @@ public interface TodoRepository extends MongoBaseRepository<Todo, BigInteger>,Cu
 
 
     @Query(value = "{staffId:?0,deleted:false}")
-    List<TodoDTO> findAllTodoByStaffId(Long staffId);
+    List<TodoDTO> findAllTodoByStaffId(Long staffId, Sort sort);
 
 //    @Query(value = "{unitId:?0,shiftDate:{$gte:?1,$lte:?2}},staffId:{$in:?3},status:{$in:?4}}")
 //    List<TodoDTO> findAllByKpiFilter(Long unit, Date startDate, Date endDate, List<Long> staffIds, Collection<String> statuses);

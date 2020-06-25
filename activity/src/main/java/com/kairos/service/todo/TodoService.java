@@ -28,6 +28,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.RequestAbsenceService;
 import com.kairos.service.shift.ShiftStatusService;
 import com.kairos.service.time_bank.TimeBankService;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -294,8 +295,8 @@ public class TodoService {
 
     //
     public List<TodoDTO> getAllTodoOfStaff(Long staffId) {
-        List<TodoDTO> todoDTOS = todoRepository.findAllTodoByStaffId(staffId);
-        return todoDTOS;
+        Sort sort = new Sort(Sort.Direction.ASC, "shiftDate");
+        return todoRepository.findAllTodoByStaffId(staffId,sort);
     }
 
     public void updateRemark(List<Todo> todoList, Shift shift) {
