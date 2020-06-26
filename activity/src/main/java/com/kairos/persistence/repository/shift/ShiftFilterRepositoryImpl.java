@@ -55,9 +55,9 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     private PhaseMongoRepository phaseMongoRepository;
 
     @Override
-    public <T> List<StaffShiftDetails> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate) {
+    public <T> List<StaffShiftDetails> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate,boolean includeDateComparison) {
 
-        List<AggregationOperation> aggregationOperations = prepareOperationsListForCriteria(employmentIds, filterTypes, unitId, startDate, endDate);
+        List<AggregationOperation> aggregationOperations = prepareOperationsListForCriteria(employmentIds, filterTypes, unitId, startDate, endDate,includeDateComparison);
         GroupOperation groupOperation = group(STAFF_ID).addToSet("$$ROOT").as(SHIFTS);
         aggregationOperations.add(groupOperation);
         Aggregation aggregations = Aggregation.newAggregation(aggregationOperations);
@@ -65,23 +65,24 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     }
 
     @Override
-    public <T> List<StaffShiftDetails> getStaffListFilteredByShiftCriteria(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate) {
-        List<AggregationOperation> aggregationOperations = prepareOperationsListForCriteria(employmentIds, filterTypes, unitId, startDate, endDate);
+    public <T> List<StaffShiftDetails> getStaffListFilteredByShiftCriteria(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate,boolean includeDateComparison) {
+        List<AggregationOperation> aggregationOperations = prepareOperationsListForCriteria(employmentIds, filterTypes, unitId, startDate, endDate,includeDateComparison);
         GroupOperation groupOperation = group(STAFF_ID);
         aggregationOperations.add(groupOperation);
         Aggregation aggregations = Aggregation.newAggregation(aggregationOperations);
         return mongoTemplate.aggregate(aggregations, Shift.class, StaffShiftDetails.class).getMappedResults();
     }
 
-    private <T> List<AggregationOperation> prepareOperationsListForCriteria(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate) {
+    private <T> List<AggregationOperation> prepareOperationsListForCriteria(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate,boolean includeDateComparison) {
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         List<Criteria> criteriaArrayList = new ArrayList<>();
 
         Criteria criteria = new Criteria();
         criteria.and(UNIT_ID).is(unitId);
         criteria.and(EMPLOYMENT_ID).in(employmentIds);
-        criteria.and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
-
+        if(includeDateComparison) {
+            criteria.and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
+        }
         Set<String> activityIds = new HashSet<>();
         LookupOperation activityTimeTypeLookupOperation = null;
         LookupOperation ctaLookupOperation = null;

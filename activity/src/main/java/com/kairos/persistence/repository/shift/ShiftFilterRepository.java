@@ -12,9 +12,9 @@ import java.util.Set;
 @Repository
 public interface ShiftFilterRepository {
 
-    <T> List<StaffShiftDetails> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> values, Long unitId, Date startDate, Date endDate);
+    <T> List<StaffShiftDetails> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> values, Long unitId, Date startDate, Date endDate,boolean includeDateComparison);
 
     Set<Long> getStaffListAsIdForRealtimeCriteria(Long unitId, Set<String> statuses);
 
-    <T> List<StaffShiftDetails> getStaffListFilteredByShiftCriteria(Set<Long> employmentIds, Map<FilterType, Set<T>> values, Long unitId, Date startDate, Date endDate);
+    <T> List<StaffShiftDetails> getStaffListFilteredByShiftCriteria(Set<Long> employmentIds, Map<FilterType, Set<T>> values, Long unitId, Date startDate, Date endDate,boolean includeDateComparison);
 }

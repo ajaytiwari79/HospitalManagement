@@ -850,19 +850,33 @@ public class StaffRetrievalService {
                 .build();
     }
 
-    public <T> List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId,StaffFilterDTO staffFilterDetails){
+    public <T> List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(final Long loggedInUserId, long unitId, StaffFilterDTO staffFilterDetails) {
 
-        LOGGER.info("filters received are {} ",staffFilterDetails.getFiltersData());
+        LOGGER.info("filters received are {} ", staffFilterDetails.getFiltersData());
         LocalDate dateToday = LocalDate.now();
+        final Map<FilterType, Set<T>> filterTypeSetMap = staffFilterService.getMapOfFiltersToBeAppliedWithValue(staffFilterDetails.getModuleId(), staffFilterDetails.getFiltersData());
 
-
-        final Map<FilterType,Set<T>> filterTypeSetMap = staffFilterService.getMapOfFiltersToBeAppliedWithValue(staffFilterDetails.getModuleId(),staffFilterDetails.getFiltersData());
-
-        if(Optional.ofNullable(filterTypeSetMap.get(FilterType.GROUPS)).isPresent() && filterTypeSetMap.get(FilterType.GROUPS).size()!=0){
-            updateFilterTypeCriteriaListByGroups(unitId,filterTypeSetMap);
+        if (Optional.ofNullable(filterTypeSetMap.get(FilterType.GROUPS)).isPresent() && filterTypeSetMap.get(FilterType.GROUPS).size() != 0) {
+            updateFilterTypeCriteriaListByGroups(unitId, filterTypeSetMap);
         }
 
-        return staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap,unitId,dateToday);
+        List<StaffEmploymentWithTag> staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday);
+        int i = -1;
+        StaffEmploymentWithTag matchedStaff = null;
+        for (StaffEmploymentWithTag staffDetails : staffEmploymentWithTags) {
+            i++;
+            if (loggedInUserId.equals(staffDetails.getUserId())) {
+                matchedStaff = staffDetails;
+                break;
+            }
+        }
+
+        if (matchedStaff != null) {
+            staffEmploymentWithTags.remove(i);
+            staffEmploymentWithTags.add(0, matchedStaff);
+        }
+
+        return staffEmploymentWithTags;
     }
 
     private <T>  Map<FilterType,T> updateFilterTypeCriteriaListByGroups(final Long unitId,final  Map<FilterType,T> filterTypeSetMap){

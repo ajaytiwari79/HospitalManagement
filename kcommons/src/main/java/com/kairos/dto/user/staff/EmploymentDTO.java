@@ -1,6 +1,8 @@
 package com.kairos.dto.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.enums.EmploymentSubType;
 import lombok.Getter;
@@ -14,6 +16,7 @@ import java.util.List;
  * Created by vipul on 5/3/18.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 public class EmploymentDTO {
@@ -26,7 +29,7 @@ public class EmploymentDTO {
     private int totalWeeklyMinutes;
     private int fullTimeWeeklyMinutes;
     private LocalDate startDate;
-    private ExpertiseDTO expertise;
+    private LocalDate endDate;
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyCost;
@@ -36,14 +39,8 @@ public class EmploymentDTO {
     private Long timeCareExternalId;
     private EmploymentSubType employmentSubType;
     private List<EmploymentLinesDTO> employmentLinesDTOS;
+    private List<EmploymentLinesDTO> employmentLines;
+    private EmploymentTypeDTO employmentType;
 
-    @Setter
-    @Getter
-    @NoArgsConstructor
-    class ExpertiseDTO {
-        private Long id;
-        private String name;
-        private String startDate;
-        private String endDate;
-    }
+
 }

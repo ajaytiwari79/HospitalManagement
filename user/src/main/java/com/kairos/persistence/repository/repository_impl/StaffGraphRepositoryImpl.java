@@ -237,20 +237,24 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 .append(" user.gender as gender, staff.profilePic as profilePic,staff.user_id as user_id,  ")
                 .append(" staff.currentStatus as currentStatus, ")
                 .append(" id(user) as userId, ")
-                .append(" collect(distinct {id:id(employments), employmentSubType: employments.employmentSubType,expertise: {id : id(expertise),name:expertise.name,startDate:employments.startDate,endDate:employments.endDate   }  }) as employments , ")
-                  .append(" CASE contactAddress WHEN contactAddress IS NULL THEN '' ELSE contactAddress.province END ");
+                .append(" collect(distinct {id:id(employments),startDate:employments.startDate,endDate:employments.endDate, employmentType: { id: id(empType),name:empType.name } , employmentSubType: employments.employmentSubType,expertise: {id : id(expertise),name:expertise.name,startDate:employments.startDate,endDate:employments.endDate   },employmentLines:employmentLines  }) as employments, ")
+                .append(" CASE contactAddress WHEN contactAddress IS NULL THEN '' ELSE contactAddress.province END ");
         addMatchingCriteria(filters, queryParameters, query);
         query.append(" WITH staff,employments,user,contactAddress MATCH (staff)-[:BELONGS_TO_TAGS]-(selectedTags:Tag) ");
         query.append(" WITH staff,employments,user,contactAddress,selectedTags MATCH (employments)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) ");
-        returnData.append(" , collect( distinct selectedTags) as tags ").append(" ORDER BY staff.firstName");
+        query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise MATCH (employments)-[empL:HAS_EMPLOYMENT_LINES]->(employmentLines:EmploymentLine)-[het:HAS_EMPLOYMENT_TYPE]->(empType:EmploymentType) ");
+        query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise,empType,employmentLines OPTIONAL MATCH (employmentLines)-[:APPLICABLE_FUNCTION]-(applicableFunctions:Function) ");
+        query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise,empType,applicableFunctions, ");
+        query.append(" collect({id: id(employmentLines), startDate:employmentLines.startDate,endDate:employmentLines.endDate,totalWeeklyMinutes:employmentLines.totalWeeklyMinutes,fullTimeWeeklyMinutes:employmentLines.fullTimeWeeklyMinutes,avgDailyWorkingHours:employmentLines.avgDailyWorkingHours,workingDaysInWeek:employmentLines.workingDaysInWeek,hourlyCost:employmentLines.hourlyCost, employmentType: { id: id(empType),name:empType.name } }) as employmentLines");
+        returnData.append(" , collect( distinct selectedTags) as tags , collect( distinct { id : id(empType),name: empType.name}) as employmentList ").append(" ORDER BY staff.firstName");
         query.append(returnData);
         LOGGER.debug(query.toString());
-            Result staffEmployments =  session.query(query.toString(),queryParameters);
-        LOGGER.info("staff with employments found are {}",staffEmployments.queryResults());
+        Result staffEmployments = session.query(query.toString(), queryParameters);
+        LOGGER.info("staff with employments found are {}", staffEmployments.queryResults());
         List<StaffEmploymentWithTag> staffEmploymentWithTags = new ArrayList<>();
         Iterator si = staffEmployments.iterator();
-        while (si.hasNext()){
-            staffEmploymentWithTags.add(ObjectMapperUtils.copyPropertiesByMapper(si.next(),StaffEmploymentWithTag.class));
+        while (si.hasNext()) {
+            staffEmploymentWithTags.add(ObjectMapperUtils.copyPropertiesByMapper(si.next(), StaffEmploymentWithTag.class));
         }
         return staffEmploymentWithTags;
     }
