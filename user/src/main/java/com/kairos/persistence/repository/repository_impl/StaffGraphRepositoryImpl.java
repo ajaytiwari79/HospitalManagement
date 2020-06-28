@@ -224,14 +224,14 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     }
 
     public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType,Set<T>> filters,final Long unitId,final LocalDate localDateToday){
-        String today = DateUtils.formatLocalDate(localDateToday,"dd-MM-yyyy");
+        String today = DateUtils.formatLocalDate(localDateToday,"yyyy-MM-dd");
         Map<String,Object> queryParameters = new HashMap<>();
         queryParameters.put(UNIT_ID,unitId);
         queryParameters.put("today",today);
         StringBuilder query = new StringBuilder();
         StringBuilder returnData = new StringBuilder();
         query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment)-[:IN_UNIT]-(unit:Unit)\n" +
-                "WHERE id(unit)={unitId} AND ( employments.endDate > '{today}' OR employments.endDate is null ) \n");
+                "WHERE id(unit)={unitId} AND ( employments.endDate is null OR Date(employments.endDate) > Date({today})) \n");
 
         returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ")
                 .append(" user.gender as gender, staff.profilePic as profilePic,staff.user_id as user_id,  ")
