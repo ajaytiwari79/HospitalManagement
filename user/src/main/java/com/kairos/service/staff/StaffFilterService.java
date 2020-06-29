@@ -322,7 +322,7 @@ public class StaffFilterService {
     private FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId) {
         FilterQueryResult tempFilterDTO = new FilterQueryResult();
         tempFilterDTO.setName(filterType.name());
-        tempFilterDTO.setTitle(filterType.value);
+        tempFilterDTO.setTitle(filterType.getValue());
         tempFilterDTO.setFilterData(getFilterDetailsByFilterType(filterType, countryId, unitId));
         return tempFilterDTO;
     }

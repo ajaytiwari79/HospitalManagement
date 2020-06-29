@@ -860,7 +860,7 @@ public class StaffRetrievalService {
             updateFilterTypeCriteriaListByGroups(unitId, filterTypeSetMap);
         }
 
-        List<StaffEmploymentWithTag> staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday);
+        List<StaffEmploymentWithTag> staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday, staffFilterDetails.getSearchText(), loggedInUserId);
         int i = -1;
         StaffEmploymentWithTag matchedStaff = null;
         for (StaffEmploymentWithTag staffDetails : staffEmploymentWithTags) {
