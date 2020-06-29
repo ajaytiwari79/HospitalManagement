@@ -6,6 +6,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.dto.gdpr.assessment.*;
+import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
@@ -41,6 +42,7 @@ import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.rest_client.GDPRGenericRestClient;
+import com.kairos.rest_client.GDPRToUserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.AssetTypeService;
 import org.apache.commons.collections.CollectionUtils;
@@ -101,6 +103,8 @@ public class AssessmentService {
     private AssetTypeRepository assetTypeRepository;
     @Inject
     private AssetTypeService assetTypeService;
+    @Inject
+    private GDPRToUserIntegrationService gdprToUserIntegrationService;
 
 
     private static final List<AssessmentStatus> assessmentStatusList = Arrays.asList(AssessmentStatus.NEW, AssessmentStatus.IN_PROGRESS);
@@ -507,7 +511,8 @@ public class AssessmentService {
             exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.IN_PROGRESS.value);
         }
 
-        UserVO currentUser = new UserVO(UserContext.getUserDetails().getId(), UserContext.getUserDetails().getUserName(), UserContext.getUserDetails().getEmail(), UserContext.getUserDetails().getFirstName(), UserContext.getUserDetails().getLastName());
+        CurrentUserDetails currentUserDetails = gdprToUserIntegrationService.getCurrentUser();
+        UserVO currentUser = new UserVO(currentUserDetails.getId(), currentUserDetails.getUserName(), currentUserDetails.getFirstName(), currentUserDetails.getLastName(), currentUserDetails.getEmail());
         if ((AssessmentStatus.IN_PROGRESS.equals(status) && AssessmentStatus.IN_PROGRESS.equals(assessment.getAssessmentStatus())) && !currentUser.equals(assessment.getAssessmentLastAssistBy())) {
             exceptionService.invalidRequestException(MESSAGE_NOTAUTHORIZED_TOCHANGE_ASSESSMENT_STATUS);
         }
@@ -569,7 +574,8 @@ public class AssessmentService {
 
     public boolean updateAssessmentStatus(Long unitId, Long assessmentId, AssessmentStatus assessmentStatus) {
         Assessment assessment = assessmentRepository.findByOrganizationIdAndId(unitId, assessmentId);
-        UserVO currentUser = new UserVO(UserContext.getUserDetails().getId(), UserContext.getUserDetails().getUserName(), UserContext.getUserDetails().getEmail(), UserContext.getUserDetails().getFirstName(), UserContext.getUserDetails().getLastName());
+        CurrentUserDetails currentUserDetails = gdprToUserIntegrationService.getCurrentUser();
+        UserVO currentUser = new UserVO(currentUserDetails.getId(), currentUserDetails.getUserName(), currentUserDetails.getFirstName(), currentUserDetails.getLastName(), currentUserDetails.getEmail());
         switch (assessmentStatus) {
             case IN_PROGRESS:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
