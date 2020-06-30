@@ -245,7 +245,7 @@ public class PositionService {
 
     public void setUnitWiseAccessRole(Long unitId, Long staffId) {
         boolean onlyStaff = unitPermissionGraphRepository.isOnlyStaff(unitId, staffId);
-        User user = userGraphRepository.findOne(UserContext.getUserDetails().getId(), 0);
+        User user = userGraphRepository.getUserByStaffId(staffId);
         user.getUnitWiseAccessRole().put(unitId.toString(), !onlyStaff ? MANAGEMENT.name() : AccessGroupRole.STAFF.name());
         userGraphRepository.save(user);
 
