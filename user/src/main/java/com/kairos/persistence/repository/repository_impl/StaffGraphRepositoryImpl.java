@@ -223,16 +223,22 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
     }
 
-    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType,Set<T>> filters,final Long unitId,final LocalDate localDateToday){
-        String today = DateUtils.formatLocalDate(localDateToday,"yyyy-MM-dd");
-        Map<String,Object> queryParameters = new HashMap<>();
-        queryParameters.put(UNIT_ID,unitId);
-        queryParameters.put("today",today);
+    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType, Set<T>> filters, final Long unitId, final LocalDate localDateToday, final String searchText, final Long loggedInUserId) {
+        String today = DateUtils.formatLocalDate(localDateToday, "yyyy-MM-dd");
+        Map<String, Object> queryParameters = new HashMap<>();
+        queryParameters.put(UNIT_ID, unitId);
+        queryParameters.put("today", today);
+        queryParameters.put("loggedInUserId", loggedInUserId);
         StringBuilder query = new StringBuilder();
         StringBuilder returnData = new StringBuilder();
         query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment)-[:IN_UNIT]-(unit:Unit)\n" +
-                "WHERE id(unit)={unitId} AND ( employments.endDate is null OR Date(employments.endDate) > Date({today})) \n");
-
+                "WHERE id(unit)={unitId} AND employments.startDate IS NOT null  \n");
+        if (searchText != null && searchText.trim() != "") {
+            String qText = "(?i)" + searchText + ".*";
+            queryParameters.put("searchText", qText);
+            query.append(" AND (staff.firstName=~ {searchText} OR staff.lastName=~ {searchText} OR user.cprNumber=~ {searchText} ) ");
+        }
+        query.append(" OR id(user)={loggedInUserId} ");
         returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ")
                 .append(" user.gender as gender, staff.profilePic as profilePic,staff.user_id as user_id,  ")
                 .append(" staff.currentStatus as currentStatus, ")
@@ -246,7 +252,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise,empType,employmentLines OPTIONAL MATCH (employmentLines)-[:APPLICABLE_FUNCTION]-(applicableFunctions:Function) ");
         query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise,empType,applicableFunctions, ");
         query.append(" collect({id: id(employmentLines), startDate:employmentLines.startDate,endDate:employmentLines.endDate,totalWeeklyMinutes:employmentLines.totalWeeklyMinutes,fullTimeWeeklyMinutes:employmentLines.fullTimeWeeklyMinutes,avgDailyWorkingHours:employmentLines.avgDailyWorkingHours,workingDaysInWeek:employmentLines.workingDaysInWeek,hourlyCost:employmentLines.hourlyCost, employmentType: { id: id(empType),name:empType.name } }) as employmentLines");
-        returnData.append(" , collect( distinct selectedTags) as tags , collect( distinct { id : id(empType),name: empType.name}) as employmentList ").append(" ORDER BY staff.firstName");
+        returnData.append(" , collect( distinct selectedTags) as tags , collect( distinct { id : id(empType),name: empType.name}) as employmentList ").append(" ORDER BY staff.currentStatus, staff.firstName");
         query.append(returnData);
         LOGGER.debug(query.toString());
         Result staffEmployments = session.query(query.toString(), queryParameters);

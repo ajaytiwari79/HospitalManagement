@@ -15,9 +15,12 @@ import java.util.Set;
 public interface CustomStaffGraphRepository {
 
     List<StaffEmploymentQueryResult> getStaffByPriorityGroupStaffIncludeFilter(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId);
+
     List<StaffKpiFilterQueryResult> getStaffsByFilter(Long organizationId, List<Long> unitId, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds, boolean parentOrganization, List<Long> tagIds);
+
     <T> List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
-                                      Map<FilterType, Set<T>> filters, String searchText, String imagePath,Long loggedInStaffId,LocalDate selectedDate);
-   <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(Map<FilterType,Set<T>> filters, Long unitId, LocalDate today);
+                                      Map<FilterType, Set<T>> filters, String searchText, String imagePath, Long loggedInStaffId, LocalDate selectedDate);
+
+    <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(Map<FilterType, Set<T>> filters, Long unitId, LocalDate today, String searchText, Long loggedInUserId);
 
 }
