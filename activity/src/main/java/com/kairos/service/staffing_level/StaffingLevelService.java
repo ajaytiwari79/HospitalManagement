@@ -1112,10 +1112,10 @@ public class StaffingLevelService  {
             if(calculateActivityWise){
                 StaffingLevelActivity staffingLevelActivity = staffingLevelInterval.getStaffingLevelActivities().iterator().next();
                 overStaffing += staffingLevelActivity.getMaxNoOfStaff()<count ? count - staffingLevelActivity.getMaxNoOfStaff() : 0;
-                overStaffing += staffingLevelActivity.getMinNoOfStaff()>count ? count - staffingLevelActivity.getMinNoOfStaff() : 0;
+                underStaffing += staffingLevelActivity.getMinNoOfStaff()>count ? count - staffingLevelActivity.getMinNoOfStaff() : 0;
             }else {
                 overStaffing += staffingLevelInterval.getMaxNoOfStaff()<count ? count - staffingLevelInterval.getMaxNoOfStaff() : 0;
-                overStaffing += staffingLevelInterval.getMinNoOfStaff()>count ? count - staffingLevelInterval.getMinNoOfStaff() : 0;
+                underStaffing += staffingLevelInterval.getMinNoOfStaff()>count ? count - staffingLevelInterval.getMinNoOfStaff() : 0;
             }
         }
         return new int[]{overStaffing,underStaffing};
