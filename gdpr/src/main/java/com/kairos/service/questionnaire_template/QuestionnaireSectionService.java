@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.GdprMessagesConstants.MESSAGE_CANNOT_UPDATE_QUESTIONNIARETEMPLATE_INPROGRESS_ASSESSMENT_LINKED;
+
 
 @Service
 public class QuestionnaireSectionService {
@@ -64,7 +66,7 @@ public class QuestionnaireSectionService {
         if (isOrganization) {
             List<String> assessmentNames = assessmentRepository.findAllNamesByUnitIdQuestionnaireTemplateIdAndStatus(referenceId, templateId, AssessmentStatus.IN_PROGRESS);
             if (CollectionUtils.isNotEmpty(assessmentNames)) {
-                exceptionService.invalidRequestException("message.cannot.update.questionnaireTemplate.inProgress.assessment.linked", StringUtils.join(assessmentNames, ","));
+                exceptionService.invalidRequestException(MESSAGE_CANNOT_UPDATE_QUESTIONNIARETEMPLATE_INPROGRESS_ASSESSMENT_LINKED, StringUtils.join(assessmentNames, ","));
             }
         }
         QuestionnaireTemplate questionnaireTemplate = isOrganization ? questionnaireTemplateRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : questionnaireTemplateRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
@@ -175,7 +177,7 @@ public class QuestionnaireSectionService {
         if (isOrganizationId) {
             List<String> assessmentNames = assessmentRepository.findAllNamesByUnitIdQuestionnaireTemplateIdAndStatus(referenceId, templateId, AssessmentStatus.IN_PROGRESS);
             if (CollectionUtils.isNotEmpty(assessmentNames)) {
-                exceptionService.invalidRequestException("message.cannot.update.questionnaireTemplate.inProgress.assessment.linked", StringUtils.join(assessmentNames, ","));
+                exceptionService.invalidRequestException(MESSAGE_CANNOT_UPDATE_QUESTIONNIARETEMPLATE_INPROGRESS_ASSESSMENT_LINKED, StringUtils.join(assessmentNames, ","));
             }
         }
         QuestionnaireSection questionnaireSection = questionnaireSectionRepository.findByIdAndDeletedFalse(questionnaireSectionId);
