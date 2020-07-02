@@ -22,6 +22,7 @@ import com.kairos.persistence.model.country.default_data.account_type.AccountTyp
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.model.user.region.Municipality;
@@ -317,7 +318,8 @@ public class CompanyCreationService {
         User user = isNotNull(unitManagerDTO.getId())?userGraphRepository.findOne(unitManagerDTO.getId()):null;
         if(user==null){
             StaffCreationDTO staffCreationDTO=ObjectMapperUtils.copyPropertiesByMapper(unitManagerDTO,StaffCreationDTO.class);
-            staffCreationService.createStaff(unitId,staffCreationDTO);
+            StaffDTO staffDTO =staffCreationService.createStaff(unitId,staffCreationDTO);
+            unitManagerDTO.setId(staffDTO.getStaffUserId());
         }
         else {
             Staff staff = staffGraphRepository.getStaffByUnitIdAndUserId(organization.getId(), user.getId());
@@ -344,6 +346,7 @@ public class CompanyCreationService {
         user.setLastSelectedOrganizationId(isNotNull(unitId) ? unitId : organization.getId());
         user.setUserType(UserType.USER_ACCOUNT);
         userGraphRepository.save(user);
+        unitManagerDTO.setId(user.getId());
 //        if(unitManagerDTO.getAccessGroupId() != null) {
 //            //setAccessGroupInUserAccount(user, organizationBaseEntity.getId(), unitManagerDTO.getAccessGroupId());
 //        }
