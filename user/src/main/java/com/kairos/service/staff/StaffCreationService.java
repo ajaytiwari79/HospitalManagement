@@ -224,6 +224,7 @@ public class StaffCreationService {
         StaffDTO staffDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffDTO.class);
         staffDTO.setGender(user.getGender());
         staffDTO.setAge(user.getAge());
+        staffDTO.setStaffUserId(user.getId());
         return staffDTO;
     }
 
