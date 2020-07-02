@@ -118,11 +118,11 @@ public class ProcessingActivityService {
 
     private List<RelatedDataSubject> createRelatedDataProcessingActivity(List<RelatedDataSubjectDTO> relatedDataSubjects) {
         List<RelatedDataSubject> dataSubjects = relatedDataSubjects.stream().map(dataSubjectDTO ->
-                new RelatedDataSubject(dataSubjectDTO.getId(), dataSubjectDTO.getName(),
+                new RelatedDataSubject(null, dataSubjectDTO.getName(),
                         dataSubjectDTO.getDataCategories().stream().map(dataCategoryDTO ->
-                                new RelatedDataCategory(dataCategoryDTO.getId(), dataCategoryDTO.getName(),
+                                new RelatedDataCategory(null, dataCategoryDTO.getName(),
                                         dataCategoryDTO.getDataElements().stream().map(relatedDataElementsDTO ->
-                                                new RelatedDataElements(relatedDataElementsDTO.getId(), relatedDataElementsDTO.getName(), relatedDataElementsDTO.getRelativeDeadlineDuration(), relatedDataElementsDTO.getRelativeDeadlineType())).collect(Collectors.toList()
+                                                new RelatedDataElements(null, relatedDataElementsDTO.getName(), relatedDataElementsDTO.getRelativeDeadlineDuration(), relatedDataElementsDTO.getRelativeDeadlineType())).collect(Collectors.toList()
                                         ))
                         ).collect(Collectors.toList()))
         ).collect(Collectors.toList());
