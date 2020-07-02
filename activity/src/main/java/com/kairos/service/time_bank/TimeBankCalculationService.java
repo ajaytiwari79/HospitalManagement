@@ -712,7 +712,7 @@ public class TimeBankCalculationService {
     }
 
     private long getTotalTimeBankBeforeAndUpdateTimebankInterval(String query,long totalTimeBankBefore, List<TimeTypeDTO> timeTypeDTOS, Interval interval, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, TimeBankIntervalDTO timeBankIntervalDTO, long timeBankOfInterval, Long approvePayOut, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS, long plannedMinutesOfTimebank, long scheduledMinutesOfTimebank, BigDecimal plannedTimebankCost, long timeBankOffMinutes, long plannedMinutesOfPayout, long scheduledMinutesOfPayout, long protectedDaysOffMinutes, BigDecimal plannedPayoutCost) {
-        timeBankIntervalDTO.setTitle(getTitle(query, interval));
+        timeBankIntervalDTO.setTitle(getTitle(query, interval,false));
         timeBankIntervalDTO.setTotalTimeBankBeforeCtaMin(totalTimeBankBefore);
         totalTimeBankBefore += timeBankOfInterval;
         timeBankIntervalDTO.setProtectedDaysOffMinutes(protectedDaysOffMinutes);
@@ -735,7 +735,7 @@ public class TimeBankCalculationService {
         timeBankIntervalDTO.setTotalTimeBankBeforeCtaMin(totalTimeBankBefore + timeBankOfInterval);
         timeBankIntervalDTO.setTotalTimeBankMin(timeBankOfInterval + approvePayOut);
         timeBankIntervalDTO.setTotalTimeBankDiff(timeBankOfInterval + approvePayOut);
-        timeBankIntervalDTO.setTitle(getTitle(query, interval));
+        timeBankIntervalDTO.setTitle(getTitle(query, interval,false));
         timeBankIntervalDTO.setTimeBankDistribution(getDistributionOfTimeBank(new HashMap<>(), ctaRuleTemplateDTOS, 0,new HashMap<>()));
         timeBankIntervalDTO.setWorkingTimeType(isNotNull(timeTypeDTOS) ? getWorkingTimeType(interval, shifts, timeTypeDTOS) : null);
     }
@@ -757,7 +757,7 @@ public class TimeBankCalculationService {
             if (query.equals(DAILY)) {
                 return DayOfWeek.of(interval.getStart().getDayOfWeek()).toString();
             } else {
-                return getTitle(query, interval);
+                return getTitle(query, interval,true);
             }
         }
         return null;
@@ -781,18 +781,18 @@ public class TimeBankCalculationService {
         return new TimeBankCTADistributionDTO(scheduledCTADistributions, new CTARuletemplateBonus(timeBankCTADistributionDTOS, ctaBonusMinutes), plannedMinutesOfTimebank);
     }
 
-    private String getTitle(String query, Interval interval) {
+    private String getTitle(String query, Interval interval,boolean isHeader) {
         switch (query) {
             case DAILY:
                 return interval.getStart().toLocalDate().toString();
             case WEEKLY:
-                return StringUtils.capitalize(WEEKLY) + " " + interval.getStart().getWeekOfWeekyear();
+                return StringUtils.capitalize(WEEKLY) + " " + interval.getStart().getWeekOfWeekyear()+(isHeader ? "" : " - "+interval.getStart().getYear());
             case MONTHLY:
-                return interval.getStart().monthOfYear().getAsText();
+                return interval.getStart().monthOfYear().getAsText()+(isHeader ? "" : " - "+interval.getStart().getYear());
             case ANNUALLY:
                 return StringUtils.capitalize(AppConstants.YEAR) + " " + interval.getStart().getYear();
             case QUATERLY:
-                return StringUtils.capitalize(AppConstants.QUARTER) + " " + getQuaterNumberByDate(interval.getStart());
+                return StringUtils.capitalize(AppConstants.QUARTER) + (isHeader ? "" : " - "+interval.getStart().getYear());
             default:
                 break;
 
