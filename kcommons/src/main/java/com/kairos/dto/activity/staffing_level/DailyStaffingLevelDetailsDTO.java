@@ -19,5 +19,9 @@ public class DailyStaffingLevelDetailsDTO {
     private int totalUnderStaffingMinutes;
     private int totalOverStaffingMinutes;
     private List<StaffingLevelDetailsByTimeSlotDTO> timeSlotsWiseData;
+    int totalMinNoOfStaff;
+    int totalMaxNoOfStaff;
+    int totalMinimumMinutes;
+    int totalMaximumMinutes;
 
 }
