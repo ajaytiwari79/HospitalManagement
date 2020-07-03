@@ -843,7 +843,7 @@ public class TimeBankService implements KPIService {
 
         private void updateDataForTimebankView() {
             shiftQueryResultWithActivities = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(null,employmentId, startDate, endDate,null);
-            endDate = asDate(DateUtils.asLocalDate(endDate).plusDays(1));
+            endDate = getEndOfDay(asDate(DateUtils.asLocalDate(endDate)));
             EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = updateCostTimeAgreementDetails(employmentId, startDate, endDate);
             employmentDetails = newArrayList(employmentWithCtaDetailsDTO);
             timeTypeDTOS = timeTypeService.getAllTimeTypeByCountryId(employmentWithCtaDetailsDTO.getCountryId());
