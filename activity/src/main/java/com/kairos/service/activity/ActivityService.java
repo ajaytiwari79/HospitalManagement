@@ -1012,7 +1012,7 @@ public class ActivityService {
         return activityMongoRepository.getActivityRankWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v.getActivitySequence()));
     }
 
-    public List<ActivityDTO> getActivityDetailsWithRankByUnitId(Long unitId) {
-        return activityMongoRepository.getActivityDetailsWithRankByUnitId(unitId);
+    public Map<BigInteger,ActivityDTO> getActivityDetailsWithRankByUnitId(Long unitId) {
+        return activityMongoRepository.getActivityDetailsWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v));
     }
 }
