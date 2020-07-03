@@ -113,4 +113,6 @@ public interface CustomActivityMongoRepository {
     List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType, Long unitId);
 
     List<ActivityTimeTypeWrapper> getActivityPath(final String activityId);
+
+    List<ActivityDTO> getActivityDetailsWithRankByUnitId(Long unitId);
 }

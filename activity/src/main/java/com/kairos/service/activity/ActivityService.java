@@ -1011,4 +1011,8 @@ public class ActivityService {
     public Map<BigInteger,Integer> getActivityRankWithRankByUnitId(Long unitId) {
         return activityMongoRepository.getActivityRankWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v.getActivitySequence()));
     }
+
+    public Map<BigInteger,ActivityDTO> getActivityDetailsWithRankByUnitId(Long unitId) {
+        return activityMongoRepository.getActivityDetailsWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v));
+    }
 }

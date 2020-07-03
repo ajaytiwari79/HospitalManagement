@@ -409,4 +409,13 @@ public class OrganizationActivityController {
     public ResponseEntity<Map<String, Object>> getActivityRankWithRankByUnitId(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityRankWithRankByUnitId(unitId));
     }
+
+    @ApiOperation("Get all activity details with priority")
+    @GetMapping(value = "/get_activity_details_with_priority")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getActivityDetailsWithRankByUnitId(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityDetailsWithRankByUnitId(unitId));
+    }
+
+
 }
