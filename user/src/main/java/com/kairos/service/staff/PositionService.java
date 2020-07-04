@@ -598,10 +598,17 @@ public class PositionService {
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
+        Long oldAccessGroupId = positionGraphRepository.findAccessGroupIdByPositionId(position.getId());
+        boolean isExist =positionGraphRepository.isunitPermissionExist(position.getId(),organization.getId());
+        if(!isExist) {
             UnitPermission unitPermission = new UnitPermission();
             unitPermission.setOrganization(organization);
             unitPermission.setAccessGroup(accessGroup);
             position.getUnitPermissions().add(unitPermission);
+        }
+        if(accessGroupId != oldAccessGroupId){
+           positionGraphRepository.updateAccessGroup(accessGroupId,organization.getId(),position.getId());
+        }
 
         Unit unit = organization.getUnits().stream().filter(k -> k.getId().equals(unitId)).findAny().orElse(null);
         if (unit != null) {
