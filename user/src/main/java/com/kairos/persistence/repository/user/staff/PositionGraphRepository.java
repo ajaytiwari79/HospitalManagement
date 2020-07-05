@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.staff;
 
+import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.position.ExpiredPositionsQueryResult;
 import com.kairos.persistence.model.staff.position.Position;
@@ -82,5 +83,17 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
 
     @Query("MATCH (p:Position)-[r:HAS_UNIT_PERMISSIONS]-(u:UnitPermission)-[:APPLICABLE_IN_UNIT]-(o:Organization) WHERE id(p)={0} AND id(o)={1}   RETURN Count(r)>0")
     boolean isunitPermissionExist(Long positionId,Long organizationId);
+
+    @Query("MATCH (p:Position)-[r:HAS_UNIT_PERMISSIONS]-(u:UnitPermission)-[:HAS_ACCESS_GROUP]-(a:AccessGroup) WHERE id(p)={0} RETURN id(a) as accessGroupId")
+    Long findAccessGroupIdByPositionId(Long positionId);
+
+    @Query("Match(a:AccessGroup) where id(a)={0}\n" +
+            "Match(o:Organization) where id(o)={1}\n" +
+            "Match(p:Position)-[r:HAS_UNIT_PERMISSIONS]-(u:UnitPermission)-[r1:HAS_ACCESS_GROUP]-(ap:AccessGroup) where id(p)={2} detach delete r1\n" +
+            "CREATE (u)-[:HAS_ACCESS_GROUP]->(a)<-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(o)")
+    void updateAccessGroup(Long accessGroupId,Long organizationId,Long positionId);
+
+
+
 }
 
