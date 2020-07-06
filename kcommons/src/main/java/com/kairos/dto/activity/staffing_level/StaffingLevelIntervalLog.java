@@ -19,6 +19,8 @@ public class StaffingLevelIntervalLog implements Comparable<StaffingLevelInterva
     private Date updatedAt;
     private Set<StaffingLevelActivity> staffingLevelActivities=new LinkedHashSet<>();
     private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
+    private Set<ActivityRemoveLog> activityRemoveLogs=new HashSet<>();
+    private Set<SkillRemoveLog> skillRemoveLogs=new HashSet<>();
 
 
     public StaffingLevelIntervalLog(UserInfo userInfo, Date updatedAt, Set<StaffingLevelActivity> staffingLevelActivities, Set<StaffingLevelSkill> staffingLevelSkills) {

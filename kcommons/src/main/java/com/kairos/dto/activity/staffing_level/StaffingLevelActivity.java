@@ -7,6 +7,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.Objects;
 
 @Getter
@@ -20,6 +21,8 @@ public class StaffingLevelActivity {
     private int minNoOfStaff;
     private int maxNoOfStaff;
     private int availableNoOfStaff;
+    private Date minUpdatedAt;
+    private Date maxUpdatedAt;
 
 
     public StaffingLevelActivity(String name, int minNoOfStaff, int maxNoOfStaff) {
