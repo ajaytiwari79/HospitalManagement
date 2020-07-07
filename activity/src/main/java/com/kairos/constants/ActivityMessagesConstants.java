@@ -393,6 +393,7 @@ public class ActivityMessagesConstants {
     public static final String STAFF_ALREADY_SICK="staff.already.sick";
     public static final String MESSAGE_CTA_VALUE ="message.cta.value";
     public static final String ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL = "error.value.changed.publish.date.null";
+    public static final String MESSAGE_FULLWEEK_STARTDAY_NOTFOUND = "message.fullWeek.startDay.notFound";
 
 
 }
