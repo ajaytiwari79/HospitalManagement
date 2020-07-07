@@ -77,12 +77,12 @@ public class StaffingLevelUtil {
             if(isEmpty(staffingLevelActivityMapOfLogs) || staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMaxNoOfStaff()!=staffingLevelActivity.getMaxNoOfStaff()){
                 staffingLevelActivityNew.setMaxUpdatedAt(getCurrentDate());
             }else {
-                staffingLevelActivityNew.setMaxUpdatedAt(staffingLevelActivity.getMaxUpdatedAt());
+                staffingLevelActivityNew.setMaxUpdatedAt(staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMaxUpdatedAt());
             }
             if(isEmpty(staffingLevelActivityMapOfLogs) || staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMinNoOfStaff()!=staffingLevelActivity.getMinNoOfStaff()){
                 staffingLevelActivityNew.setMinUpdatedAt(getCurrentDate());
             }else {
-                staffingLevelActivityNew.setMinUpdatedAt(staffingLevelActivity.getMinUpdatedAt());
+                staffingLevelActivityNew.setMinUpdatedAt(staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMinUpdatedAt());
             }
             staffingLevelActivities.add(staffingLevelActivityNew);
 
