@@ -76,9 +76,13 @@ public class StaffingLevelUtil {
             }
             if(isEmpty(staffingLevelActivityMapOfLogs) || staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMaxNoOfStaff()!=staffingLevelActivity.getMaxNoOfStaff()){
                 staffingLevelActivityNew.setMaxUpdatedAt(getCurrentDate());
+            }else {
+                staffingLevelActivityNew.setMaxUpdatedAt(staffingLevelActivity.getMaxUpdatedAt());
             }
             if(isEmpty(staffingLevelActivityMapOfLogs) || staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMinNoOfStaff()!=staffingLevelActivity.getMinNoOfStaff()){
                 staffingLevelActivityNew.setMinUpdatedAt(getCurrentDate());
+            }else {
+                staffingLevelActivityNew.setMinUpdatedAt(staffingLevelActivity.getMinUpdatedAt());
             }
             staffingLevelActivities.add(staffingLevelActivityNew);
 
