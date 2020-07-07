@@ -238,7 +238,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             queryParameters.put("searchText", qText);
             query.append(" AND (staff.firstName=~ {searchText} OR staff.lastName=~ {searchText} OR user.cprNumber=~ {searchText} ) ");
         }
-        query.append(" OR id(user)={loggedInUserId} ");
+//        query.append(" OR id(user)={loggedInUserId} ");
         returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ")
                 .append(" user.gender as gender, staff.profilePic as profilePic,staff.user_id as user_id,  ")
                 .append(" staff.currentStatus as currentStatus, ")
