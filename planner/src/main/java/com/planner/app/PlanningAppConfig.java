@@ -17,7 +17,6 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -35,18 +34,12 @@ import java.time.LocalDate;
 @SpringBootApplication
 @EnableEurekaClient
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@EnableNeo4jRepositories(basePackages ={"com.planner.repository"})
 @EnableMongoRepositories(basePackages ={"com.planner.repository"},repositoryBaseClass = MongoBaseRepositoryImpl.class)
 public class PlanningAppConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(PlanningAppConfig.class);
 
     public static void main(String[] args) {
-        //ch.qos.logback.classic.turbo.TurboFilter tf=null;
-        //ClassPathResource cps= new ClassPathResource("droolsFile");
-
-        //logger.info("drool files path "+new File(AppConstants.DROOL_FILES_PATH).exists());
-
         SpringApplication.run(PlanningAppConfig.class, args);
     }
 

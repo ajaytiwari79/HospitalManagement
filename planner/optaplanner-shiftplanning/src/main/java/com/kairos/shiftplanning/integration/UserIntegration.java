@@ -15,19 +15,6 @@ public class UserIntegration {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(UserIntegration.class);
 
-    public void updateDataOfShiftForPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
-        try {
-            ResponseDTO responseDTO = publishRequest(shiftPlanningProblemSubmitDTO.getStaffIds(),"/kairos/user/api/v1/unit/2403/staff/get_all_staff_for_planning",HttpMethod.POST,new HashMap<>());
-            ShiftPlanningProblemSubmitDTO submitDTO = ObjectMapperUtils.copyPropertiesByMapper(responseDTO.getData(), ShiftPlanningProblemSubmitDTO.class);
-            shiftPlanningProblemSubmitDTO.setStaffs(submitDTO.getStaffs());
-            shiftPlanningProblemSubmitDTO.setExpertiseNightWorkerSettingMap(submitDTO.getExpertiseNightWorkerSettingMap());
-            shiftPlanningProblemSubmitDTO.setDayTypeMap(submitDTO.getDayTypeMap());
-            shiftPlanningProblemSubmitDTO.setTimeSlotMap(submitDTO.getTimeSlotMap());
-            shiftPlanningProblemSubmitDTO.setExpertiseNightWorkerSettingMap(submitDTO.getExpertiseNightWorkerSettingMap());
-            shiftPlanningProblemSubmitDTO.setBreakSettingMap(submitDTO.getBreakSettingMap());
-        } catch (Exception e) {
-            throw new RuntimeException("There is some problem in fetching staff from userservice");
-        }
-    }
+
 
 }

@@ -36,6 +36,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @AllArgsConstructor
 public class ShiftPlanningProblemSubmitDTO {
 
+
     private BigInteger planningProblemId;
     private SolverConfigDTO solverConfig;
     private BigInteger solverConfigId;

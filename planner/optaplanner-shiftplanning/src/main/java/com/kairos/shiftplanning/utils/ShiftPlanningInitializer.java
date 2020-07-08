@@ -53,15 +53,12 @@ import static com.kairos.shiftplanning.executioner.ShiftPlanningGenerator.INTERV
 public class ShiftPlanningInitializer {
 
     private BigInteger id = BigInteger.valueOf(1);
-    private UserIntegration userIntegration = new UserIntegration();
-    private ActivityIntegration actvitiyIntegration = new ActivityIntegration();
+
 
     public ShiftRequestPhasePlanningSolution initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
-        Long unitId = shiftPlanningProblemSubmitDTO.getUnitId();
-        userIntegration.updateDataOfShiftForPlanning(shiftPlanningProblemSubmitDTO);
-        actvitiyIntegration.updateDataOfShiftForPlanning(shiftPlanningProblemSubmitDTO);
+
         ShiftRequestPhasePlanningSolution shiftRequestPhasePlanningSolution = new ShiftRequestPhasePlanningSolution();
-        updateUnit(unitId, shiftPlanningProblemSubmitDTO,shiftRequestPhasePlanningSolution);
+        updateUnit(shiftPlanningProblemSubmitDTO.getUnitId(), shiftPlanningProblemSubmitDTO,shiftRequestPhasePlanningSolution);
         updateEmployees(shiftPlanningProblemSubmitDTO, shiftRequestPhasePlanningSolution);
         updateActivityRelatedDetails(shiftPlanningProblemSubmitDTO, shiftRequestPhasePlanningSolution);
         List<ShiftImp> shiftImp = getShiftRequestPhase(shiftPlanningProblemSubmitDTO, shiftRequestPhasePlanningSolution);
