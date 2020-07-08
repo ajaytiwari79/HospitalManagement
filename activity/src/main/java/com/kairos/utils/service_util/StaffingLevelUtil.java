@@ -174,10 +174,8 @@ public class StaffingLevelUtil {
             } else {
                 StaffingLevelIntervalLog staffingLevelIntervalLog = isCollectionEmpty(staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelIntervalLogs())?null:staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelIntervalLogs().last();
                 StaffingLevelInterval interval = isNull(staffingLevelIntervalLog) ? staffingLevel.getPresenceStaffingLevelInterval().get(i) : ObjectMapperUtils.copyPropertiesByMapper(staffingLevelIntervalLog, StaffingLevelInterval.class);
-                if (presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().size() > staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelActivities().size()) {
-                    interval.getStaffingLevelActivities().addAll(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
-                }
-                else if (presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().size() < staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelActivities().size()) {
+                interval.getStaffingLevelActivities().addAll(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
+                 if (presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().size() < staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelActivities().size()) {
                     for(Iterator<StaffingLevelActivity> iterator=interval.getStaffingLevelActivities().iterator();iterator.hasNext();){
                         StaffingLevelActivity staffingLevelActivity=iterator.next();
                         if(!presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().contains(staffingLevelActivity)){
@@ -186,10 +184,8 @@ public class StaffingLevelUtil {
                         }
                     }
                 }
-                if (presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().size() > staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelSkills().size()) {
-                    interval.getStaffingLevelSkills().addAll(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills());
-                }
-                else if (presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().size() < staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelSkills().size()) {
+                 interval.getStaffingLevelSkills().addAll(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills());
+                 if (presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().size() < staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelSkills().size()) {
                    // interval.getStaffingLevelSkills().removeIf(k -> !presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().contains(k));
                     for(Iterator<StaffingLevelSkill> iterator=interval.getStaffingLevelSkills().iterator();iterator.hasNext();){
                         StaffingLevelSkill staffingLevelSkill=iterator.next();
@@ -202,6 +198,8 @@ public class StaffingLevelUtil {
                 }
                 staffingLevelIntervals.add(interval);
             }
+            staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelActivities().addAll(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
+            staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelSkills().addAll(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills());
         }
         presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(staffingLevelIntervals);
 
