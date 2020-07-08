@@ -174,17 +174,12 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         return new ShiftPlanningGenerator().loadUnsolvedBreakAndIndirectActivityPlanningSolution(solution);
     }
 
-    public ShiftRequestPhasePlanningSolution runSolverOnRequest(ShiftRequestPhasePlanningSolution unSolvedsolution) {
-        try {
-            Object[] solvedSolution = getSolution(unSolvedsolution);
-            printSolvedSolution((ShiftRequestPhasePlanningSolution) solvedSolution[0]);
-            printIndictment((Map<Object, Indictment>) solvedSolution[1]);
-            sendSolutionToKairos((ShiftRequestPhasePlanningSolution) solvedSolution[0]);
-            return (ShiftRequestPhasePlanningSolution) solvedSolution[0];
-        } catch (Exception e) {
-            log.error(ERROR, e.getMessage());
-            return null;
-        }
+    public ShiftRequestPhasePlanningSolution runSolverOnRequest(ShiftRequestPhasePlanningSolution unSolvedsolution) throws Exception{
+        Object[] solvedSolution = getSolution(unSolvedsolution);
+        printSolvedSolution((ShiftRequestPhasePlanningSolution) solvedSolution[0]);
+        printIndictment((Map<Object, Indictment>) solvedSolution[1]);
+        sendSolutionToKairos((ShiftRequestPhasePlanningSolution) solvedSolution[0]);
+        return (ShiftRequestPhasePlanningSolution) solvedSolution[0];
     }
 
     private void printIndictment(Map<Object, Indictment> indictmentMap) {
@@ -389,20 +384,38 @@ public class ShiftPlanningSolver implements QuarkusApplication {
     }
 
     @Override
-    public int run(String... args) throws Exception {
-        StringBuilder stringBuilder = new StringBuilder();
-        new BufferedReader(new FileReader(new File(System.getProperty("user.home")+"/problem.json"))).lines().forEach(s -> stringBuilder.append(s));
-        ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO = ObjectMapperUtils.jsonStringToObject(stringBuilder.toString(), ShiftPlanningProblemSubmitDTO.class);
-        SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
-        List<File> droolFiles = getDroolFiles(solverConfigDTO);
-        File configurationFile = getFile("/com/kairos/shiftplanning/configuration/", "ShiftPlanning_Request_ActivityLine.solver.xml");
-        ShiftPlanningSolver shiftPlanningSolver = new ShiftPlanningSolver(droolFiles, configurationFile);
-        ShiftRequestPhasePlanningSolution unSolvedsolution = new ShiftPlanningInitializer().initializeShiftPlanning(shiftPlanningProblemSubmitDTO);
-        shiftPlanningSolver.runSolverOnRequest(unSolvedsolution);
+    public int run(String... args) throws Exception{
+        try {
+            StringBuilder stringBuilder = new StringBuilder();
+            new BufferedReader(new FileReader(new File(System.getProperty("user.home")+"/problem.json"))).lines().forEach(s -> stringBuilder.append(s));
+            ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO = ObjectMapperUtils.jsonStringToObject(stringBuilder.toString(), ShiftPlanningProblemSubmitDTO.class);
+            SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
+            List<File> droolFiles = getDroolFiles(solverConfigDTO);
+            File configurationFile = getFile("/com/kairos/shiftplanning/configuration/", "ShiftPlanning_Request_ActivityLine.solver.xml");
+            ShiftPlanningSolver shiftPlanningSolver = new ShiftPlanningSolver(droolFiles, configurationFile);
+            ShiftRequestPhasePlanningSolution unSolvedsolution = new ShiftPlanningInitializer().initializeShiftPlanning(shiftPlanningProblemSubmitDTO);
+            unSolvedsolution = shiftPlanningSolver.runSolverOnRequest(unSolvedsolution);
+            writeSolutionToFile(unSolvedsolution);
+        }catch (Exception e){
+            File file = new File(System.getProperty("user.home") + "/" + "exception.text");
+            if(!file.exists()){
+                file.createNewFile();
+            }
+            writeStringToFile(e.getMessage(), file);
+        }
         return 0;
     }
 
-    private List<File> getDroolFiles(SolverConfigDTO solverConfigDTO) {
+    private void writeSolutionToFile(ShiftRequestPhasePlanningSolution unSolvedsolution) throws IOException {
+        String objectString = ObjectMapperUtils.objectToJsonString(unSolvedsolution);
+        File file = new File(System.getProperty("user.home") + "/" + "solution.json");
+        if(!file.exists()){
+            file.createNewFile();
+        }
+        writeStringToFile(objectString,file);
+    }
+
+    private List<File> getDroolFiles(SolverConfigDTO solverConfigDTO) throws IOException{
         List<File> files = new ArrayList<>();
         files.add(getFile(DROOLS_FILE_SHIFT_PLANNING, "SHIFTPLANNING_BASE.drl"));
         for (ConstraintDTO constraint : solverConfigDTO.getConstraints()) {
@@ -414,26 +427,26 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         return files;
     }
 
-    private File getFile(String filePath, String fileName) {
+    private File getFile(String filePath, String fileName) throws IOException{
         InputStream inputStream = getClass().getResourceAsStream(filePath + fileName);
         StringBuffer sb = new StringBuffer();    //constructs a string buffer with no characters
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
-            br.lines().forEach(s -> {
-                sb.append(s);
-                sb.append("\n");
-            });
-            filePath = System.getProperty("user.home") + "/" + fileName;
-            File file = new File(filePath);
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            PrintWriter printWriter = new PrintWriter(filePath);
-            printWriter.write(sb.toString());
-            printWriter.close();
-            return file;
-        } catch (IOException e) {
-            e.printStackTrace();
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        br.lines().forEach(s -> {
+            sb.append(s);
+            sb.append("\n");
+        });
+        filePath = System.getProperty("user.home") + "/" + fileName;
+        File file = new File(filePath);
+        if (!file.exists()) {
+            file.createNewFile();
         }
-        return null;
+        writeStringToFile(sb.toString(), file);
+        return file;
+    }
+
+    private void writeStringToFile(String string, File file) throws FileNotFoundException {
+        PrintWriter printWriter = new PrintWriter(file);
+        printWriter.write(string);
+        printWriter.close();
     }
 }

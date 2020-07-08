@@ -22,10 +22,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -290,14 +287,14 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
     @Override
     public ShiftPlanningProblemSubmitDTO findDataForAutoPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO){
-        Set<BigInteger> breakActivityIds = shiftPlanningProblemSubmitDTO.getBreakSettingMap().values().stream().map(BreakSettingsDTO::getActivityId).collect(Collectors.toSet());
+        String breakActivityIdString = getBreakActivityIdsString(shiftPlanningProblemSubmitDTO.getBreakSettingMap().values().iterator());
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("_id").is(shiftPlanningProblemSubmitDTO.getPlanningPeriodId())),
                 getlookupOperationOfShiftsForPlanning(shiftPlanningProblemSubmitDTO.getStaffIds()),
                 getStaffingLevelLookupForPlanning(),
                 new CustomAggregationOperation(Document.parse("{$addFields: { activityIds:\"$staffingLevels.presenceStaffingLevelInterval.staffingLevelActivities.activityId\"}}")),
-                getProjectionWithReduceForPlanning(new HashSet<>()),
-                getProjectionWithReduceForPlanning(breakActivityIds),
+                getProjectionWithReduceForPlanning("[]"),
+                getProjectionWithReduceForPlanning(breakActivityIdString),
                 getActivitiesLookupForPlanning(),
                 getActivityConfigurationLookupForPlanning(),
                 new CustomAggregationOperation(Document.parse("{ $addFields: { activityConfiguration: { $mergeObjects: \"$activityConfiguration\" } } }")),
@@ -313,6 +310,25 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
             shiftPlanningProblemSubmitDTO.setShifts(shiftPlanningProblemSubmitDTOS.get(0).getShifts());
         }
         return shiftPlanningProblemSubmitDTO;
+    }
+
+    public String getBreakActivityIdsString(Iterator<BreakSettingsDTO> iterator) {
+        if (!iterator.hasNext()) {
+            return "[]";
+        } else {
+            StringBuilder var2 = new StringBuilder();
+            var2.append("['");
+
+            while(true) {
+                BigInteger var3 = iterator.next().getActivityId();
+                var2.append(var3);
+                if (!iterator.hasNext()) {
+                    return var2.append("']").toString();
+                }
+
+                var2.append("','").append(' ');
+            }
+        }
     }
 
     private CustomAggregationOperation getProjectionForPlanning() {
@@ -411,8 +427,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 "        }"));
     }
 
-    private CustomAggregationOperation getProjectionWithReduceForPlanning(Set<BigInteger> breakActivityIds) {
-        String breakDetails = breakActivityIds.toString();
+    private CustomAggregationOperation getProjectionWithReduceForPlanning(String breakActivityIds) {
         return new CustomAggregationOperation(Document.parse("{\n" +
                 "      $project: {\n" +
                 "          \"startDate\":1,\n" +
@@ -424,7 +439,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 "        \"activityIds\": {\n" +
                 "          $reduce: {\n" +
                 "            input: \"$activityIds\",\n" +
-                "            initialValue:"+breakDetails+
+                "            initialValue:"+breakActivityIds+
                 "            in: { $concatArrays: [ \"$$value\", \"$$this\" ] }\n" +
                 "          }\n" +
                 "        }\n" +

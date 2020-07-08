@@ -84,11 +84,12 @@ public class Activity {
     }
 
     public int checkConstraints(ShiftImp shift, ConstraintSubType constraintSubType) {
-        if(shift.isLocked()) return 0;
+        if(shift.isLocked() || !constraints.containsKey(constraintSubType)) return 0;
         return constraints.get(constraintSubType).checkConstraints(this,shift);
     }
 
     public int checkConstraints(List<ShiftImp> shifts, ConstraintSubType constraintSubType) {
+        if(!constraints.containsKey(constraintSubType)) return 0;
         return constraints.get(constraintSubType).checkConstraints(shifts);
     }
 

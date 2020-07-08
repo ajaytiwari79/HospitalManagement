@@ -12,6 +12,7 @@ import com.kairos.shiftplanning.constraints.activityconstraint.DayType;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.PlannedTime;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.staff.BreakSettings;
 import com.kairos.shiftplanning.domain.staff.CTARuleTemplate;
 import com.kairos.shiftplanning.domain.staff.Employment;
 import com.kairos.shiftplanning.domain.staff.EmploymentLine;
@@ -69,7 +70,7 @@ public class UpdateTimeAndPayoutDetails {
         }
 
         private boolean calculateBonusOrScheduledMinutesByShiftActivity(boolean ruleTemplateValid, CTARuleTemplate ruleTemplate, ShiftImp shift) {
-            List<ShiftActivity> shiftActivities = getShiftActivityByBreak(shift.getShiftActivities(), shift.getBreakActivities());
+            List<ShiftActivity> shiftActivities = getShiftActivityByBreak(shift.getShiftActivities(), shift.getBreakActivities(),shift.getEmployee().getBreakSettings());
             for (ShiftActivity shiftActivityForCalculation : shiftActivities) {
                 ShiftActivity shiftActivity = getShiftActivityDTO(shift, shiftActivityForCalculation);
                 if(isNotNull(shiftActivity)){
@@ -112,7 +113,7 @@ public class UpdateTimeAndPayoutDetails {
             return shiftActivity;
         }
 
-        public List<ShiftActivity> getShiftActivityByBreak(List<ShiftActivity> shiftActivities, List<ShiftActivity> breakActivities) {
+        public List<ShiftActivity> getShiftActivityByBreak(List<ShiftActivity> shiftActivities, List<ShiftActivity> breakActivities, BreakSettings breakSettings) {
             List<ShiftActivity> updatedShiftActivities = new ArrayList<>();
             if(isCollectionNotEmpty(breakActivities)){
                 for (ShiftActivity shiftActivity : shiftActivities) {
@@ -120,7 +121,7 @@ public class UpdateTimeAndPayoutDetails {
                     boolean anybreakFallOnShiftActivity = breakActivities.stream().anyMatch(breakActivity -> shiftActivity.getInterval().overlaps(breakActivity.getInterval()) && shiftActivity.getInterval().overlap(breakActivity.getInterval()).getMinutes() == breakActivity.getInterval().getMinutes() && !breakActivity.isBreakNotHeld());
                     if(anybreakFallOnShiftActivity){
                         for (ShiftActivity breakActivity : breakActivities) {
-                            scheduledHourAdded = getShiftActivityByBreakInterval(updatedShiftActivities, shiftActivity, scheduledHourAdded, breakActivity);
+                            scheduledHourAdded = getShiftActivityByBreakInterval(updatedShiftActivities, shiftActivity, scheduledHourAdded, breakActivity,breakSettings);
                         }
                     }else {
                         updatedShiftActivities.add(shiftActivity);
@@ -134,7 +135,7 @@ public class UpdateTimeAndPayoutDetails {
             return updatedShiftActivities;
         }
 
-        private boolean getShiftActivityByBreakInterval(List<ShiftActivity> updatedShiftActivities, ShiftActivity shiftActivity, boolean scheduledHourAdded, ShiftActivity breakActivity) {
+        private boolean getShiftActivityByBreakInterval(List<ShiftActivity> updatedShiftActivities, ShiftActivity shiftActivity, boolean scheduledHourAdded, ShiftActivity breakActivity, BreakSettings breakSettings) {
             List<DateTimeInterval> dateTimeIntervals = shiftActivity.getInterval().minusInterval(breakActivity.getInterval());
             scheduledHourAdded = updateShiftActivityByBreakInterval(updatedShiftActivities, shiftActivity, dateTimeIntervals, scheduledHourAdded);
             List<PlannedTime> plannedTimes = new ArrayList<>();
@@ -147,6 +148,7 @@ public class UpdateTimeAndPayoutDetails {
                     plannedTimes.add(breakPlannedTime);
                 }
             }
+            breakActivity.setActivity(breakSettings.getActivity());
             breakActivity.setPlannedTimes(plannedTimes);
             breakActivity.setStatus(shiftActivity.getStatus());
             updatedShiftActivities.add(breakActivity);
