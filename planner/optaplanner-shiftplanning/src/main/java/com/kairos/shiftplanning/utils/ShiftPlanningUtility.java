@@ -538,7 +538,7 @@ public class ShiftPlanningUtility {
         return new int[]{};
     }
 
-    public static String solvedShiftPlanningProblem(List<ShiftDTO> shiftDTOS, Long unitId) {
+    public static String solvedShiftPlanningProblem(List<ShiftDTO> shiftDTOS, Long unitId) throws IOException {
         final String baseUrl = "http://192.168.6.211:5555/kairos/activity/api/v1/organization/71/unit/" + unitId + "/sub-shifts";
 
         HttpClient client = HttpClientBuilder.create().build();
@@ -546,9 +546,8 @@ public class ShiftPlanningUtility {
         header.put("Authorization", "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJ1bHJpa0BrYWlyb3MuY29tIiwic2NvcGUiOlsid2ViY2xpZW50Il0sImRldGFpbHMiOnsiaWQiOjY3LCJ1c2VyTmFtZSI6InVscmlrQGthaXJvcy5jb20iLCJuaWNrTmFtZSI6IlVscmlrIiwiZmlyc3ROYW1lIjoiVWxyaWsiLCJsYXN0TmFtZSI6IlJhc211c3NlbiIsImVtYWlsIjoidWxyaWtAa2Fpcm9zLmNvbSIsInBhc3N3b3JkVXBkYXRlZCI6dHJ1ZSwiYWdlIjo2NiwiY291bnRyeUlkIjpudWxsLCJodWJNZW1iZXIiOmZhbHNlfSwiZXhwIjoxNTIwNDA1NDk3LCJhdXRob3JpdGllcyI6WyI3MV90YWJfNjciLCI3MV90YWJfNjgiLCI3MV90YWJfNjkiLCI3MV90YWJfNjMiLCI3MV90YWJfNjQiLCI3MV90YWJfNjUiLCI3MV90YWJfNjYiLCI3MV90YWJfNjAiLCI3MV90YWJfNjEiLCI3MV90YWJfNjIiLCI3MV90YWJfNTYiLCI3MV90YWJfNTciLCI3MV90YWJfNTgiLCI3MV90YWJfNTkiLCI3MV90YWJfMTA4IiwiNzFfdGFiXzEwOSIsIjcxX3RhYl8xMDYiLCI3MV90YWJfMTA3IiwiNzFfdGFiXzUyIiwiNzFfdGFiXzEwMCIsIjcxX3RhYl8xMDEiLCI3MV90YWJfNTMiLCI3MV90YWJfNTQiLCI3MV90YWJfNTUiLCI3MV90YWJfMTA0IiwiNzFfdGFiXzEwNSIsIjcxX3RhYl81MCIsIjcxX3RhYl8xMDIiLCI3MV90YWJfNTEiLCI3MV90YWJfMTAzIiwiNzFfdGFiXzg5IiwiNzFfdGFiXzgwIiwiNzFfdGFiXzg1IiwiNzFfdGFiXzg2IiwiNzFfdGFiXzg3IiwiNzFfdGFiXzg4IiwiNzFfdGFiXzgxIiwiNzFfdGFiXzgyIiwiNzFfdGFiXzgzIiwiNzFfdGFiXzg0IiwiNzFfdGFiXzc4IiwiNzFfdGFiXzc5IiwiNzFfbW9kdWxlXzEiLCI3MV90YWJfOSIsIjcxX21vZHVsZV80IiwiNzFfbW9kdWxlXzUiLCI3MV90YWJfNyIsIjcxX21vZHVsZV8yIiwiNzFfbW9kdWxlXzMiLCI3MV90YWJfOCIsIjcxX3RhYl81IiwiNzFfbW9kdWxlXzgiLCI3MV90YWJfNzQiLCI3MV90YWJfNzUiLCI3MV90YWJfNiIsIjcxX3RhYl83NiIsIjcxX3RhYl8zIiwiNzFfbW9kdWxlXzYiLCI3MV90YWJfNCIsIjcxX3RhYl83NyIsIjcxX21vZHVsZV83IiwiNzFfdGFiXzEiLCI3MV90YWJfNzAiLCI3MV90YWJfMiIsIjcxX3RhYl83MSIsIjcxX3RhYl83MiIsIjcxX3RhYl83MyIsIjcxX3RhYl8yNyIsIjcxX3RhYl8yOCIsIjcxX3RhYl8yOSIsIjcxX3RhYl8yMyIsIjcxX3RhYl8yNCIsIjcxX3RhYl8yNSIsIjcxX3RhYl8yNiIsIjcxX3RhYl8yMCIsIjcxX3RhYl8yMSIsIjcxX3RhYl8yMiIsIjcxX3RhYl8xNiIsIjcxX3RhYl8xNyIsIjcxX3RhYl8xOCIsIjcxX3RhYl8xOSIsIjcxX3RhYl8xMiIsIjcxX3RhYl8xMyIsIjcxX3RhYl8xNCIsIjcxX3RhYl8xNSIsIjcxX3RhYl85MCIsIjcxX3RhYl85MSIsIjcxX3RhYl85NiIsIjcxX3RhYl85NyIsIjcxX3RhYl8xMCIsIjcxX3RhYl85OCIsIjcxX3RhYl85OSIsIjcxX3RhYl8xMSIsIjcxX3RhYl85MiIsIjcxX3RhYl85MyIsIjcxX3RhYl85NCIsIjcxX3RhYl85NSIsIjcxX3RhYl80NSIsIjcxX3RhYl80NiIsIjcxX3RhYl80NyIsIjcxX3RhYl80OCIsIjcxX3RhYl8xMTEiLCI3MV90YWJfNDEiLCI3MV90YWJfNDIiLCI3MV90YWJfMTEyIiwiNzFfdGFiXzQzIiwiNzFfdGFiXzQ0IiwiNzFfdGFiXzExMCIsIjcxX3RhYl8xMTMiLCI3MV90YWJfNDAiLCI3MV90YWJfMzgiLCI3MV90YWJfMzkiLCI3MV90YWJfMzQiLCI3MV90YWJfMzUiLCI3MV90YWJfMzYiLCI3MV90YWJfMzciLCI3MV90YWJfMzAiLCI3MV90YWJfMzEiLCI3MV90YWJfMzIiLCI3MV90YWJfMzMiXSwianRpIjoiMzcyZTgzMjQtOGRhMS00YTYxLWE4YTctZjA4Mjg5ZjE0MGM1IiwiY2xpZW50X2lkIjoia2Fpcm9zIn0.PrgK1fGis9iyk5mfhY_f_tEb6o_Qkdp4VV86Pr38l4Q");
         HttpUriRequest request = getPutRequest(shiftDTOS, null, null, baseUrl);
         StringBuilder result = new StringBuilder();
-        try {
-            HttpResponse response = client.execute(request);
-            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+        HttpResponse response = client.execute(request);
+        try (BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))){
             String line = "";
             log.info("status {}" , response.getStatusLine());
             while ((line = rd.readLine()) != null) {
