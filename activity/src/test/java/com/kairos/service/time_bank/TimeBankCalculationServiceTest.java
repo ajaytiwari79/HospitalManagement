@@ -242,10 +242,9 @@ public class TimeBankCalculationServiceTest {
     public void updateMessageProperties() {
         File file = new File("/media/pradeep/bak/kairos/kairos-user/planner/src/main/resources/messages/messages.properties");
         File file2 = new File("/media/pradeep/bak/test.txt");
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(file2);
+        try(FileOutputStream fileOutputStream = new FileOutputStream(file2);
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));) {
             bufferedReader.lines().forEach(string->{
                 if(!string.contains("#") && !string.isEmpty()){
                     String key = string.substring(0,string.indexOf("="));

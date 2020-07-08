@@ -543,9 +543,13 @@ public class StaffingLevelService  {
 
         HttpUriRequest request = createPostRequest(postBody, null, null, baseUrl);
         StringBuilder result = new StringBuilder();
+        HttpResponse response = null;
         try {
-            HttpResponse response = client.execute(request);
-            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            response = client.execute(request);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try(BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));) {
             String line = "";
             while ((line = rd.readLine()) != null) {
                 result.append(line);

@@ -57,7 +57,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_H
 public class ClientExtendedService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
     @Inject
     private ClientGraphRepository clientGraphRepository;
     @Inject
