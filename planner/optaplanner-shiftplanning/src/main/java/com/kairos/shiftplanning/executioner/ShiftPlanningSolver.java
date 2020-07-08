@@ -316,7 +316,11 @@ public class ShiftPlanningSolver implements QuarkusApplication {
 
     public void sendSolutionToKairos(ShiftRequestPhasePlanningSolution solvedSolution) {
         List<ShiftDTO> shiftDTOS = getShift(solvedSolution.getShifts());
-        ShiftPlanningUtility.solvedShiftPlanningProblem(shiftDTOS, solvedSolution.getUnit().getId());
+        try {
+            ShiftPlanningUtility.solvedShiftPlanningProblem(shiftDTOS, solvedSolution.getUnit().getId());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private List<ShiftDTO> getShift(List<ShiftImp> shiftImp) {
