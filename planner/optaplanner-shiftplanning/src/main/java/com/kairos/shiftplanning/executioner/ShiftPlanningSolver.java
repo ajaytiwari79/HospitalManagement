@@ -385,9 +385,9 @@ public class ShiftPlanningSolver implements QuarkusApplication {
 
     @Override
     public int run(String... args) throws Exception{
-        try {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(System.getProperty("user.home")+"/problem.json")))){
             StringBuilder stringBuilder = new StringBuilder();
-            new BufferedReader(new FileReader(new File(System.getProperty("user.home")+"/problem.json"))).lines().forEach(s -> stringBuilder.append(s));
+            bufferedReader.lines().forEach(s -> stringBuilder.append(s));
             ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO = ObjectMapperUtils.jsonStringToObject(stringBuilder.toString(), ShiftPlanningProblemSubmitDTO.class);
             SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
             List<File> droolFiles = getDroolFiles(solverConfigDTO);
