@@ -4,10 +4,12 @@ import com.kairos.enums.SkillLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -25,5 +27,23 @@ public class StaffingLevelSkill {
         return new ToStringBuilder(this)
                 .append("skillId", skillId)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof StaffingLevelSkill)) return false;
+
+        StaffingLevelSkill that = (StaffingLevelSkill) o;
+
+        return new EqualsBuilder()
+                .append(skillId, that.skillId)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(skillId);
     }
 }
