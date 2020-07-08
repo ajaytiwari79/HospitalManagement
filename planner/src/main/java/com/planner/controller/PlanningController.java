@@ -33,12 +33,6 @@ public class PlanningController {
 
 
 
-	@RequestMapping(value = SHIFTPLANNING+"/start", method = RequestMethod.POST)
-    	ResponseEntity<Map<String, Object>> startShiftPlanningSolver(@RequestBody PlanningSubmissionDTO planningSubmissionDTO, @PathVariable Long unitId) {
-        plannerService.submitShiftPlanningProblem(unitId,planningSubmissionDTO);
-		return ResponseHandler.generateResponse("saveEntity Data sucessFully", HttpStatus.OK);
-	}
-
 	@PostMapping(value = "/submitVRPPlanning")
 	ResponseEntity<Map<String, Object>> submitVRPPlanning(@RequestBody VrpTaskPlanningDTO vrpTaskPlanningDTO) {
 		 plannerService.submitVRPPlanning(vrpTaskPlanningDTO);

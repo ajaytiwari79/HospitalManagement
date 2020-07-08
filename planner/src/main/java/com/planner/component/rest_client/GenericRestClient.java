@@ -38,11 +38,10 @@ public class GenericRestClient {
     @Inject
     private ExceptionService exceptionService;
 
-    @Value("${gateway.userservice.url}")
-    private String userServiceUrl;
-
-    @Value("${gateway.activityservice.url}")
-    private String activityServiceUrl;
+    //@Value("${gateway.userservice.url}")
+    private String userServiceUrl = "http://dev.kairosplanning.com/kairos/user/api/v1";
+    //@Value("${gateway.activityservice.url}")
+    private String activityServiceUrl = "http://dev.kairosplanning.com/kairos/activity/api/v1";
 
 
     /**
@@ -75,10 +74,11 @@ public class GenericRestClient {
                 exceptionService.dataNotFoundByIdException(response.getMessage());
             }
             responseData = response.getData();
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            /*logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(), ResponseEnvelope.class).getMessage());
+            throw new RuntimeException(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(), ResponseEnvelope.class).getMessage());*/
         }
         return responseData;
     }

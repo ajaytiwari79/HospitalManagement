@@ -56,47 +56,4 @@ public class SolverConfigDTO {
     public void setConstraints(List<ConstraintDTO> constraints) {
         this.constraints = isNullOrElse(constraints,new ArrayList<>());
     }
-
-
-    public SolverConfigDTO setNameBuilder(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public SolverConfigDTO setDescriptionBuilder(String description) {
-        this.description = description;
-        return this;
-    }
-
-
-    public SolverConfigDTO setPhaseIdBuilder(Long phaseId) {
-        this.phaseId = phaseId;
-        return this;
-    }
-
-    public SolverConfigDTO setPlanningPeriodIdBuilder(Long planningPeriodId) {
-        this.planningPeriodId = planningPeriodId;
-        return this;
-    }
-
-    public SolverConfigDTO setThreadCountBuilder(byte threadCount) {
-        this.threadCount = threadCount;
-        return this;
-    }
-
-    public SolverConfigDTO setTerminationTimeInMinutesBuilder(short terminationTimeInMinutes) {
-        this.terminationTimeInMinutes = terminationTimeInMinutes;
-        return this;
-    }
-
-    public SolverConfigDTO setPlanningProblemIdBuilder(Long planningProblemId) {
-        this.planningProblemId = planningProblemId;
-        return this;
-    }
-
-    public SolverConfigDTO setConstraintIdsBuilder(List<BigInteger> constraintIds) {
-        this.constraintIds = constraintIds;
-        return this;
-    }
-
 }

@@ -11,7 +11,6 @@ import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.planner.component.exception.ExceptionService;
-import com.planner.domain.query_results.organization_service.OrganizationServiceQueryResult;
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.planning_problem.PlanningProblemRepository;
 import com.planner.repository.solver_config.SolverConfigRepository;
@@ -173,15 +172,6 @@ public class CountrySolverConfigService {
         constraintTypeSetMap.put(WTA, wtaConstraints);
         constraintTypeSetMap.put(SHIFT,new HashSet<>());
         return constraintTypeSetMap;
-    }
-
-    private List<OrganizationServiceDTO> getOrganizationServicesAndItsSubServices(Long countryId) {
-        List<OrganizationServiceQueryResult> organizationServiceQueryResults = null;//userNeo4jRepo.getAllOrganizationServices(countryId);
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
-    }
-
-    private List<PhaseDTO> getAllPhases(Long countryId) {
-        return null;//activityMongoRepository.getAllPhasesByCountryId(countryId);
     }
 
     private boolean preValidateCountrySolverConfigDTO(SolverConfigDTO countrySolverConfigDTO) {

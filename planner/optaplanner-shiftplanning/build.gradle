@@ -17,32 +17,6 @@ plugins {
 group 'optaplanner-shiftplanning'
 version '0.0.2'
 
-
-
-//apply plugin: 'java'
-
-/*
-apply plugin: 'eclipse'
-apply plugin: 'application'
-
-version = '1.0'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-mainClassName = 'com.kairos.shiftplanning.executioner.ShiftPlanningSolver'
-jar {
-    baseName = 'shiftplanning'
-    version = '0.0.1-SNAPSHOT'
-    manifest {
-        attributes(
-                'Main-Class': 'com.kairos.shiftplanning.executioner.ShiftPlanningSolver'
-        )
-    }
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
-*/
-
 repositories {
     mavenCentral()
     jcenter()
@@ -51,8 +25,6 @@ repositories {
 
 
 dependencies {
-    implementation 'io.quarkus:quarkus-core:1.4.2.Final'
-
     // https://mvnrepository.com/artifact/io.quarkus/quarkus-arc
     compile group: 'io.quarkus', name: 'quarkus-arc', version: '1.4.2.Final'
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
@@ -69,4 +41,5 @@ dependencies {
     compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+    implementation 'io.quarkus:quarkus-core:1.4.2.Final'
 }
