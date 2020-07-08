@@ -846,22 +846,6 @@ public class ShiftService extends MongoBaseService {
         return shiftMongoRepository.findShiftBetweenDurationByEmploymentId(employmentId, asDate(startDate), asDate(endDate));
     }
 
-    public ViolatedRulesDTO validateRule(Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        shiftValidatorService.validateStatusOfShiftActivity(shift);
-        Set<BigInteger> activityIds = new HashSet<>();
-        for (ShiftActivity activity : shift.getActivities()) {
-            activityIds.add(activity.getActivityId());
-            activityIds.addAll(activity.getChildActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet()));
-        }
-        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
-        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate());
-        staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-        setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-
-        return shiftValidatorService.validateRuleOnShiftDelete(activityWrapperMap, shift, staffAdditionalInfoDTO);
-    }
-
     private ShiftDTO deleteShift(Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ShiftDTO shiftDTO = new ShiftDTO();
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
