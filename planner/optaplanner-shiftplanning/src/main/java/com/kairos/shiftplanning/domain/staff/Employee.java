@@ -66,6 +66,7 @@ public class Employee {
 
 
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps,ConstraintSubType constraintSubType) {
+        if(!this.wtaRuleTemplateMap.containsKey(constraintSubType)) return 0;
         return this.wtaRuleTemplateMap.get(shiftImp.getStartDate()).get(constraintSubType).checkConstraints(unit,shiftImp,shiftImps);
     }
 

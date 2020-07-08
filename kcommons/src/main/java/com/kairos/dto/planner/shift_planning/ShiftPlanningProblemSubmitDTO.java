@@ -58,10 +58,10 @@ public class ShiftPlanningProblemSubmitDTO {
     private Map<BigInteger,Integer> activityOrderMap;
     private Map<Long, List<CTAResponseDTO>> employmentIdAndCTAResponseMap;
     private Map<Long, List<WTAResponseDTO>> employmentIdAndWTAResponseMap;
-    Map<Long, ExpertiseNightWorkerSettingDTO> expertiseNightWorkerSettingMap;
-    Map<Long, BreakSettingsDTO> breakSettingMap;
-    Map<Long, Boolean> nightWorkerDetails;
-    Map<BigInteger, TimeTypeDTO> timeTypeMap;
+    private Map<Long, ExpertiseNightWorkerSettingDTO> expertiseNightWorkerSettingMap;
+    private Map<Long, BreakSettingsDTO> breakSettingMap;
+    private Map<Long, Boolean> nightWorkerDetails;
+    private Map<BigInteger, TimeTypeDTO> timeTypeMap;
 
     @JsonIgnore
     public Map<BigInteger,Integer> getActivityOrderMap(){

@@ -42,11 +42,11 @@ public class ShiftPlanningInitializationService {
         integrationService.updateDataOfShiftForPlanningFromUserService(shiftPlanningProblemSubmitDTO);
         integrationService.updateDataOfShiftForPlanningFromActivityService(shiftPlanningProblemSubmitDTO);
         String objectString = ObjectMapperUtils.objectToJsonString(shiftPlanningProblemSubmitDTO);
-        writeProblemToTheFile(objectString,shiftPlanningProblemSubmitDTO.getPlanningProblemId());
-        try (PrintWriter printWriter = new PrintWriter(new File(System.getProperty("user.home")+"/problem.json"))){
-            printWriter.write(objectString);
-            printWriter.close();
-        } catch (FileNotFoundException e) {
+        new Thread(()->writeProblemToTheFile(objectString,shiftPlanningProblemSubmitDTO.getPlanningProblemId().toString())).start();
+        writeProblemToTheFile(objectString,"problem.json");
+        try {
+            new ShiftPlanningSolver().run(null);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -60,23 +60,19 @@ public class ShiftPlanningInitializationService {
         return new SolverConfigDTO(constraintDTOS);
     }
 
-    void writeProblemToTheFile(String objectString, BigInteger planningProblemId){
-        new Thread(()->{
-
-            try {
-                String filePath = System.getProperty("user.home") + "/" + planningProblemId;
-                File file = new File(filePath);
-                if(!file.exists()){
-                    file.createNewFile();
-                }
-                PrintWriter printWriter = new PrintWriter(filePath);
-                printWriter.write(objectString);
-                printWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+    void writeProblemToTheFile(String objectString, String fileName){
+        try {
+            String filePath = System.getProperty("user.home") + "/" + fileName;
+            File file = new File(filePath);
+            if (!file.exists()) {
+                file.createNewFile();
             }
-        }).start();
-
+            PrintWriter printWriter = new PrintWriter(filePath);
+            printWriter.write(objectString);
+            printWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

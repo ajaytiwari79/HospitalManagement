@@ -12,6 +12,7 @@ import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.kairos.shiftplanning.utils.ZonedDateTimeDeserializer;
 import lombok.*;
 
+import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -27,6 +28,7 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     private ZonedDateTime startDate;
     private Activity activity;
+    private BigInteger activityId;
     @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     private ZonedDateTime endDate;
     private List<PlannedTime> plannedTimes;
