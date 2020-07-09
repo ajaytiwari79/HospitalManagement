@@ -763,6 +763,12 @@ public class ShiftService extends MongoBaseService {
         }
         shifts = updateDraftShiftToShift(shifts, userAccessRoleDTO);
         shifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts);
+        for(ShiftDTO shift :shifts){
+            if(isNotNull(shift.getShiftViolatedRules())) {
+                shift.setEscalationReasons(shift.getShiftViolatedRules().getEscalationReasons());
+                shift.setEscalationResolved(shift.getShiftViolatedRules().isEscalationResolved());
+            }
+        }
         Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
         shiftDetailsService.setLayerInShifts(shiftsMap);
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);

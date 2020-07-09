@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.enums.TimeTypeEnum;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,6 +31,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
+@Data
 public class ShiftWithActivityDTO extends ShiftDTO{
     private PhaseDTO phase;
     private String timeType;
