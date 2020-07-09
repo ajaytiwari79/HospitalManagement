@@ -23,4 +23,6 @@ public interface CustomStaffGraphRepository {
 
     <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(Map<FilterType, Set<T>> filters, Long unitId, LocalDate today, String searchText, Long loggedInUserId);
 
+    StaffEmploymentWithTag getLoggedInStaffDetails(final Long unitId, final Long loggedInUserId);
+
 }
