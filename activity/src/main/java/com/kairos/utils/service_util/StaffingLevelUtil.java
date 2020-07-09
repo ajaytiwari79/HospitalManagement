@@ -181,10 +181,10 @@ public class StaffingLevelUtil {
                         if(!presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().contains(staffingLevelActivity)){
                             iterator.remove();
                             activityRemoveLogs.add(new ActivityRemoveLog(staffingLevelActivity.getActivityId(),new Date(),UserContext.getUserDetails().getFirstName()));
-                            if(isNotNull(staffingLevelIntervalLog)) activityRemoveLogs.addAll(staffingLevelIntervalLog.getActivityRemoveLogs());
                         }
                     }
                 }
+                if(isNotNull(staffingLevelIntervalLog)) activityRemoveLogs.addAll(staffingLevelIntervalLog.getActivityRemoveLogs());
                  interval.getStaffingLevelSkills().addAll(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills());
                  if (presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().size() < staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelSkills().size()) {
                     for(Iterator<StaffingLevelSkill> iterator=interval.getStaffingLevelSkills().iterator();iterator.hasNext();){
@@ -192,11 +192,10 @@ public class StaffingLevelUtil {
                         if(!presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().contains(staffingLevelSkill)){
                             iterator.remove();
                             skillRemoveLogs.add(new SkillRemoveLog(staffingLevelSkill.getSkillId(),new Date(),UserContext.getUserDetails().getFirstName()));
-                            if(isNotNull(staffingLevelIntervalLog)) skillRemoveLogs.addAll(staffingLevelIntervalLog.getSkillRemoveLogs());
                         }
                     }
-
                 }
+                if(isNotNull(staffingLevelIntervalLog)) skillRemoveLogs.addAll(staffingLevelIntervalLog.getSkillRemoveLogs());
                 staffingLevelIntervals.add(interval);
             }
             updateAddedSkillAndActivity(staffingLevel, presenceStaffingLevelDTO, i,activityRemoveLogs,skillRemoveLogs);
