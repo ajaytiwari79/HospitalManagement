@@ -289,13 +289,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 .append(" CASE contactAddress WHEN contactAddress IS NULL THEN '' ELSE contactAddress.province END ")
                 .append(" , collect( distinct selectedTags) as tags , collect( distinct { id : id(empType),name: empType.name}) as employmentList ");
         query.append(returnData);
-
-        Result staffEmploymentDetails = session.query(query.toString(), queryParameters);
-        Iterator si = staffEmploymentDetails.iterator();
-        StaffEmploymentWithTag staffEmploymentWithTag = null;
-        while (si.hasNext()) {
-            staffEmploymentWithTag = ObjectMapperUtils.copyPropertiesByMapper(si.next(), StaffEmploymentWithTag.class);
-        }
+        StaffEmploymentWithTag staffEmploymentWithTag = session.queryForObject(StaffEmploymentWithTag.class, query.toString(), queryParameters);
         return staffEmploymentWithTag;
     }
 
