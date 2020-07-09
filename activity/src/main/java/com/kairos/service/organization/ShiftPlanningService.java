@@ -57,10 +57,20 @@ public class ShiftPlanningService {
             return Collections.emptyList();
         }
 
+        StaffShiftDetails loggedInStaff = null;
+        if (staffListWithPersonalDetails.get(0).getUserId().equals(shiftSearchDTO.getLoggedInUserId())) {
+            loggedInStaff = staffListWithPersonalDetails.get(0);
+        }
+
         if (validMatches.containsKey(FilterType.REAL_TIME_STATUS)) {
             Set<Long> staffIds = shiftMongoRepository.getStaffListAsIdForRealtimeCriteria(unitId, (Set<String>) validMatches.get(FilterType.REAL_TIME_STATUS));
             staffListWithPersonalDetails = staffListWithPersonalDetails.stream().filter(spd -> staffIds.contains(spd.getId())).collect(Collectors.toList());
         }
+
+        if (!staffListWithPersonalDetails.contains(loggedInStaff) && loggedInStaff != null) {
+            staffListWithPersonalDetails.add(0, loggedInStaff);
+        }
+
         return staffListWithPersonalDetails;
     }
 
