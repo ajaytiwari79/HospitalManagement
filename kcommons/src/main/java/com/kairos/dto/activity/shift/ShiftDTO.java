@@ -89,6 +89,7 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     private boolean sickShift;
     protected UserInfo createdBy;
     private boolean disabled;
+    private ViolatedRulesDTO shiftViolatedRules;
 
 
     public ShiftDTO() {
