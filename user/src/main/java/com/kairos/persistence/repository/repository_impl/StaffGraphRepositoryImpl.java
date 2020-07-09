@@ -232,7 +232,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         StringBuilder query = new StringBuilder();
         StringBuilder returnData = new StringBuilder();
         query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment)-[:IN_UNIT]-(unit:Unit)\n" +
-                "WHERE id(unit)={unitId} AND employments.startDate IS NOT null  \n");
+                "WHERE id(unit)={unitId}  \n");
         if (searchText != null && searchText.trim() != "") {
             String qText = "(?i)" + searchText + ".*";
             queryParameters.put("searchText", qText);
@@ -289,7 +289,12 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 .append(" CASE contactAddress WHEN contactAddress IS NULL THEN '' ELSE contactAddress.province END ")
                 .append(" , collect( distinct selectedTags) as tags , collect( distinct { id : id(empType),name: empType.name}) as employmentList ");
         query.append(returnData);
-        StaffEmploymentWithTag staffEmploymentWithTag = session.queryForObject(StaffEmploymentWithTag.class, query.toString(), queryParameters);
+        Result staffEmploymentDetails = session.query(query.toString(), queryParameters);
+        Iterator si = staffEmploymentDetails.iterator();
+        StaffEmploymentWithTag staffEmploymentWithTag = null;
+        while (si.hasNext()) {
+            staffEmploymentWithTag = ObjectMapperUtils.copyPropertiesByMapper(si.next(), StaffEmploymentWithTag.class);
+        }
         return staffEmploymentWithTag;
     }
 
