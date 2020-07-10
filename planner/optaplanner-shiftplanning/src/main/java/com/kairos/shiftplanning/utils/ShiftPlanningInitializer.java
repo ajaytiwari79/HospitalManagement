@@ -19,7 +19,11 @@ import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.shiftplanning.constraints.ConstraintHandler;
-import com.kairos.shiftplanning.constraints.activityconstraint.DayType;
+import com.kairos.shiftplanning.constraints.activityconstraint.*;
+import com.kairos.shiftplanning.constraints.unitconstraint.DislikeNightShiftsForNonNightWorkers;
+import com.kairos.shiftplanning.constraints.unitconstraint.MaxLengthOfShiftInNightTimeSlot;
+import com.kairos.shiftplanning.constraints.unitconstraint.PreferedEmployementType;
+import com.kairos.shiftplanning.constraints.unitconstraint.ShiftOnWeekend;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
@@ -37,6 +41,7 @@ import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -48,6 +53,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.enums.constraint.ScoreLevel.HARD;
+import static com.kairos.enums.constraint.ScoreLevel.SOFT;
 import static com.kairos.shiftplanning.executioner.ShiftPlanningGenerator.INTERVAL_MINS;
 
 public class ShiftPlanningInitializer {
@@ -179,12 +186,22 @@ public class ShiftPlanningInitializer {
         Set<LocalDate> localDates = new HashSet<>();
         Map<BigInteger,Activity> activityMap = shiftPlanningProblemSubmitDTO.getActivities().stream().collect(Collectors.toMap(k->k.getId(),v->getActivity(v,shiftPlanningProblemSubmitDTO.getActivityOrderMap(),shiftPlanningProblemSubmitDTO.getTimeTypeMap())));
         Map<String, List<ActivityLineInterval>> activityLineIntervalMap = new HashMap<>();
+        Map<LocalDate,List<Activity>> activitiesPerDay = new HashMap<>();
+        Map<LocalDate,Set<BigInteger>> activitiesIdsPerDay = new HashMap<>();
         for (Map.Entry<LocalDate, List<StaffingLevelInterval>> localDateListEntry : localDateStaffingLevelTimeSlotMap.entrySet()) {
             localDates.add(localDateListEntry.getKey());
             for (StaffingLevelInterval staffingLevelInterval : localDateListEntry.getValue()) {
                 for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
                     if (activityMap.containsKey(staffingLevelActivity.getActivityId())) {
                         Activity activity = activityMap.get(staffingLevelActivity.getActivityId());
+                        Set<BigInteger> activitiesIdsPerDayOrDefault = activitiesIdsPerDay.getOrDefault(localDateListEntry.getKey(), new HashSet<>());
+                        if(!activitiesIdsPerDayOrDefault.contains(activity.getId())){
+                            List<Activity> activities = activitiesPerDay.getOrDefault(localDateListEntry.getKey(),new ArrayList<>());
+                            activities.add(activity);
+                            activitiesPerDay.put(localDateListEntry.getKey(),activities);
+                            activitiesIdsPerDayOrDefault.add(activity.getId());
+                            activitiesIdsPerDay.put(localDateListEntry.getKey(),activitiesIdsPerDayOrDefault);
+                        }
                         Set<Activity> activityList = dateActivityMap.getOrDefault(localDateListEntry.getKey(), new HashSet<>());
                         activityList.add(activity);
                         dateActivityMap.put(localDateListEntry.getKey(), activityList);
@@ -200,7 +217,6 @@ public class ShiftPlanningInitializer {
         shiftRequestPhasePlanningSolution.setActivities(dateActivityMap.values().stream().flatMap(activities -> activities.stream()).distinct().sorted(Comparator.comparing(Activity::getActivityPrioritySequence)).collect(Collectors.toList()));
         shiftRequestPhasePlanningSolution.setWeekDates(new ArrayList<>(localDates));
         shiftRequestPhasePlanningSolution.setActivitiesIntervalsGroupedPerDay(activityLineIntervalMap);
-        Map<LocalDate,List<Activity>> activitiesPerDay = dateActivityMap.entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), v -> new ArrayList(v.getValue())));
         shiftRequestPhasePlanningSolution.setActivitiesPerDay(activitiesPerDay);
         return activityMap;
     }
@@ -220,6 +236,7 @@ public class ShiftPlanningInitializer {
                 .methodForCalculatingTime(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime())
                 .multiplyWithValue(activityDTO.getTimeCalculationActivityTab().getMultiplyWithValue())
                 .name(activityDTO.getName())
+                .validDayTypeIds(isNull(activityDTO.getRulesActivityTab().getDayTypes()) ? new HashSet<>() : new HashSet<>(activityDTO.getRulesActivityTab().getDayTypes()))
                 .skills(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getSkillActivityTab().getActivitySkills(), Skill.class))
             //    .tags(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getTags(), Tag.class))
                 .timeType(timeType).teamId(activityDTO.getTeamId()).constraints(getActivityConstrainsts(activityDTO)).order(activityOrderMap.get(activityDTO.getId())).activityPrioritySequence(activityDTO.getActivitySequence()).build();
@@ -237,16 +254,15 @@ public class ShiftPlanningInitializer {
     }
 
     private Map<ConstraintSubType, ConstraintHandler> getActivityConstrainsts(ActivityDTO activityDTO) {
-        //validateActivityTimeRules(activityDTO);
+        validateActivityTimeRules(activityDTO);
         Map<ConstraintSubType, ConstraintHandler> constraintMap = new HashMap<>();
-        /*LongestDuration longestDuration = new LongestDuration(activityDTO.getRulesActivityTab().getLongestTime(), SOFT,-5);
+        LongestDuration longestDuration = new LongestDuration(activityDTO.getRulesActivityTab().getLongestTime(), SOFT,-5);
         ShortestDuration shortestDuration = new ShortestDuration(activityDTO.getRulesActivityTab().getShortestTime(), HARD,-2);
         MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(activityDTO.getRulesActivityTab().getRecurrenceTimes(), SOFT,-1);//3
         MaxDiffrentActivity maxDiffrentActivity = new MaxDiffrentActivity(3, SOFT,-1);//4
         MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(activityDTO.getRulesActivityTab().getShortestTime(), SOFT,-1);//5
         ActivityDayType activityDayType = new ActivityDayType(SOFT,5);
         ActivityRequiredTag activityRequiredTag = new ActivityRequiredTag(HARD,1);
-
         constraintMap.put(ConstraintSubType.ACTIVITY_LONGEST_DURATION_RELATIVE_TO_SHIFT_LENGTH,longestDuration);
         constraintMap.put(ConstraintSubType.ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH,shortestDuration);
         constraintMap.put(ConstraintSubType.MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF,maxAllocationPerShift);
@@ -259,7 +275,7 @@ public class ShiftPlanningInitializer {
         constraintMap.put(ConstraintSubType.PREFER_PERMANENT_EMPLOYEE,new PreferedEmployementType(newHashSet(123l), SOFT,-4));
         constraintMap.put(ConstraintSubType.MINIMIZE_SHIFT_ON_WEEKENDS,new ShiftOnWeekend(SOFT,-4,newHashSet(DayOfWeek.SATURDAY,DayOfWeek.SUNDAY)));
         constraintMap.put(ConstraintSubType.MAX_LENGTH_OF_SHIFT_IN_NIGHT_TIMESLOT,new MaxLengthOfShiftInNightTimeSlot(SOFT,-4,null,5));
-        constraintMap.put(ConstraintSubType.DISLIKE_NIGHT_SHIFS_FOR_NON_NIGHT_WORKERS,new DislikeNightShiftsForNonNightWorkers(SOFT,-4,null));*/
+        constraintMap.put(ConstraintSubType.DISLIKE_NIGHT_SHIFS_FOR_NON_NIGHT_WORKERS,new DislikeNightShiftsForNonNightWorkers(SOFT,-4,null));
         return constraintMap;
     }
 

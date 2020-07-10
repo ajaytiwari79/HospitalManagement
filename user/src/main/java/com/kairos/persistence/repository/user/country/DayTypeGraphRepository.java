@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.country;
 
+import com.kairos.persistence.model.access_permission.query_result.DayTypeCountryHolidayCalenderQueryResult;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -37,4 +38,9 @@ public interface DayTypeGraphRepository extends Neo4jBaseRepository<DayType,Long
 
     @Query("MATCH (organization) where id(organization)={0} with organization MATCH (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region MATCH (region)-[:"+BELONGS_TO+"]->(country:Country)-[:"+ BELONGS_TO +"]-(dt:DayType {isEnabled:true}) return dt")
     List<DayType> getDayTypeByOrganizationById(Long organizationId);
+
+    @Query("MATCH(d:DayType{deleted:false})\n" +
+            "optional match (d)<-[:DAY_TYPE]-(chc:CountryHolidayCalender{deleted:false})\n" +
+            "return id(d) as id,d.name as name,d.code as code ,d.description as description,d.colorCode as colorCode,d.validDays as validDays,d.holidayType as holidayType,d.isEnabled as isEnabled,d.allowTimeSettings as allowTimeSettings,case when chc is null then [] else COLLECT(chc) end as countryHolidayCalenders")
+    List<DayTypeCountryHolidayCalenderQueryResult> getDayTypesWithCountryHolidayCalender();
 }

@@ -17,7 +17,7 @@
       <scoreDrl>com/kairos/shiftplanning/rules/activityConstraintsRule.drl</scoreDrl>-->
       <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
   </scoreDirectorFactory>
-    <constructionHeuristic>
+    <!--<constructionHeuristic>
         <queuedEntityPlacer>
             <entitySelector id="activityLineIntervalSelector">
                 <entityClass>com.kairos.shiftplanning.domain.activity.ActivityLineInterval</entityClass>
@@ -42,7 +42,7 @@
                 </valueSelector>
             </changeMoveSelector>
         </queuedEntityPlacer>
-    </constructionHeuristic>
+    </constructionHeuristic>-->
     <localSearch>
     <unionMoveSelector>
         <moveIteratorFactory>
@@ -85,6 +85,6 @@
         </termination>
     </localSearch>-->
     <termination>
-        <secondsSpentLimit>300</secondsSpentLimit>
+        <secondsSpentLimit>900</secondsSpentLimit>
     </termination>
 </solver>

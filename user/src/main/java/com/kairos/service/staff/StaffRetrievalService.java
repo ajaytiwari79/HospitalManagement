@@ -828,7 +828,7 @@ public class StaffRetrievalService {
             staffDTO.getEmployments().add(employmentDTO);
             staffDTOMap.put(employment.getStaff().getId(), staffDTO);
         }
-        List<DayType> dayTypes = dayTypeGraphRepository.getDayTypeByOrganizationById(unitId);
+        List<DayTypeCountryHolidayCalenderQueryResult> dayTypes = dayTypeGraphRepository.getDayTypesWithCountryHolidayCalender();
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unitId, TimeSlotMode.STANDARD);
         Collection<TimeSlotDTO> timelots = copyCollectionPropertiesByMapper(timeSlotWrappers, TimeSlotDTO.class);
         Map<String, TimeSlotDTO> timeSlotMap = timelots.stream().collect(Collectors.toMap(k->k.getName(), v->v));
