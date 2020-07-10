@@ -28,7 +28,9 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 import org.optaplanner.core.api.score.constraint.Indictment;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.api.solver.SolverManager;
 import org.optaplanner.core.config.solver.SolverConfig;
+import org.optaplanner.core.config.solver.SolverManagerConfig;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreXStreamConverter;
 import org.slf4j.Logger;
@@ -175,10 +177,11 @@ public class ShiftPlanningSolver implements QuarkusApplication {
     }
 
     public ShiftRequestPhasePlanningSolution runSolverOnRequest(ShiftRequestPhasePlanningSolution unSolvedsolution) throws Exception{
+        //solver.addEventListener(()->{}); Todo Add Listner for BestSolution changeIndictment End
         Object[] solvedSolution = getSolution(unSolvedsolution);
         printSolvedSolution((ShiftRequestPhasePlanningSolution) solvedSolution[0]);
         printIndictment((Map<Object, Indictment>) solvedSolution[1]);
-        sendSolutionToKairos((ShiftRequestPhasePlanningSolution) solvedSolution[0]);
+        //sendSolutionToKairos((ShiftRequestPhasePlanningSolution) solvedSolution[0]);
         return (ShiftRequestPhasePlanningSolution) solvedSolution[0];
     }
 
@@ -389,6 +392,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
 
     @Override
     public int run(String... args) throws Exception{
+        long startTime = new Date().getTime();
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(System.getProperty("user.home")+"/problem.json")))){
             StringBuilder stringBuilder = new StringBuilder();
             bufferedReader.lines().forEach(s -> stringBuilder.append(s));
@@ -398,9 +402,11 @@ public class ShiftPlanningSolver implements QuarkusApplication {
             File configurationFile = getFile("/com/kairos/shiftplanning/configuration/", "ShiftPlanning_Request_ActivityLine.solver.xml");
             ShiftPlanningSolver shiftPlanningSolver = new ShiftPlanningSolver(droolFiles, configurationFile);
             ShiftRequestPhasePlanningSolution unSolvedsolution = new ShiftPlanningInitializer().initializeShiftPlanning(shiftPlanningProblemSubmitDTO);
+            System.out.println("total starting time "+(new Date().getTime() - startTime));
             unSolvedsolution = shiftPlanningSolver.runSolverOnRequest(unSolvedsolution);
-            writeSolutionToFile(unSolvedsolution);
+            //writeSolutionToFile(unSolvedsolution);
         }catch (Exception e){
+            e.printStackTrace();
             File file = new File(System.getProperty("user.home") + "/" + "exception.text");
             if(!file.exists()){
                 file.createNewFile();

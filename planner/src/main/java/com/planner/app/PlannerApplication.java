@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.kairos.dto.user_context.UserContextInterceptor;
 import com.planner.repository.common.MongoBaseRepositoryImpl;
 import org.slf4j.Logger;
@@ -23,6 +25,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+
+import static com.kairos.commons.utils.ObjectMapperUtils.LOCALTIME_FORMATTER;
 
 //import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
@@ -35,12 +40,12 @@ import java.time.LocalDate;
 @EnableEurekaClient
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableMongoRepositories(basePackages ={"com.planner.repository"},repositoryBaseClass = MongoBaseRepositoryImpl.class)
-public class PlanningAppConfig {
+public class PlannerApplication {
 
-    private static final Logger logger = LoggerFactory.getLogger(PlanningAppConfig.class);
+    private static final Logger logger = LoggerFactory.getLogger(PlannerApplication.class);
 
     public static void main(String[] args) {
-        SpringApplication.run(PlanningAppConfig.class, args);
+        SpringApplication.run(PlannerApplication.class, args);
     }
 
     static{
@@ -78,6 +83,8 @@ public class PlanningAppConfig {
         JavaTimeModule javaTimeModule = new JavaTimeModule();
         javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer());
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer());
+        javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(LOCALTIME_FORMATTER));
+        javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(LOCALTIME_FORMATTER));
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.registerModule(javaTimeModule);

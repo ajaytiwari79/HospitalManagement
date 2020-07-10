@@ -43,7 +43,7 @@ jar {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-mainClassName = 'com.planner.app.PlanningAppConfig'
+mainClassName = 'com.planner.app.PlannerApplication'
 
 repositories {
 	mavenCentral()
