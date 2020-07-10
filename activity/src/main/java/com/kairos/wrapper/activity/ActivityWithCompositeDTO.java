@@ -65,5 +65,5 @@ public class ActivityWithCompositeDTO {
     private int activityPriority;
     private TimeTypeEnum secondLevelTimtype;
     private int mostlyUsedCount;
-
+    private BigInteger activityPriorityId;
 }

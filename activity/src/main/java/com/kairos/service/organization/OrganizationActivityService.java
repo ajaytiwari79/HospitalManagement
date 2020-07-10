@@ -625,7 +625,7 @@ public class OrganizationActivityService extends MongoBaseService {
     public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId, Long staffId, List<ActivityWithCompositeDTO> staffPersonalizedActivities) {
         Set<BigInteger> activityList = userIntegrationService.getTeamActivitiesOfStaff(unitId, staffId);
         activityList.addAll(staffPersonalizedActivities.stream().map(ActivityWithCompositeDTO::getActivityId).collect(Collectors.toSet()));
-        return activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(new ArrayList<>(activityList));
+        return activityMongoRepository.findAllActivityWithCompositeDTOByIds(activityList);
     }
 
     private void updateSkills(Activity activityCopied){
