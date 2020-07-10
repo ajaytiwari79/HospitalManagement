@@ -5,9 +5,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
@@ -16,8 +14,6 @@ public class StaffingLevelPublishDTO {
     Date startDate;
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private Date endDate;
-    private List<BigInteger> activityIds=new ArrayList<>();
-    private List<Long> skillIds=new ArrayList<>();
-    private List<Long> skillIdsToRemove=new ArrayList<>();
-    private List<Long> activityIdsToRemove=new ArrayList<>();
+    private Set<BigInteger> activityIds=new HashSet<>();
+    private Set<Long> skillIds=new HashSet<>();
 }
