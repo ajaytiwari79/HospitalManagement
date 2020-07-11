@@ -989,7 +989,7 @@ public class StaffingLevelService  {
     }
 
     public PresenceStaffingLevelDto publishStaffingLevel(Long unitId,StaffingLevelPublishDTO staffingLevelPublishDTO){
-            List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, staffingLevelPublishDTO.getStartDate(), staffingLevelPublishDTO.getEndDate());
+            List<StaffingLevel> staffingLevels =isCollectionNotEmpty(staffingLevelPublishDTO.getWeekDates())?staffingLevelMongoRepository.findByUnitIdAndDates(unitId,staffingLevelPublishDTO.getWeekDates()): staffingLevelMongoRepository.findByUnitIdAndDates(unitId, staffingLevelPublishDTO.getStartDate(), staffingLevelPublishDTO.getEndDate());
             for (StaffingLevel staffingLevel : staffingLevels) {
                 StaffingLevelUtil.updateStaffingLevelToPublish(staffingLevelPublishDTO, staffingLevel);
             }

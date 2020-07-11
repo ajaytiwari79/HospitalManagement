@@ -143,7 +143,9 @@ public class StaffingLevelUtil {
     public static void setUserWiseLogs(StaffingLevel staffingLevel, PresenceStaffingLevelDto presenceStaffingLevelDTO) {
         Set<ActivityRemoveLog> activityRemoveLogs = new HashSet<>();
         Set<SkillRemoveLog> skillRemoveLogs = new HashSet<>();
-        prepareIntervals(staffingLevel, presenceStaffingLevelDTO, activityRemoveLogs, skillRemoveLogs);
+        Set<BigInteger> newlyAddedActivities=new HashSet<>();
+        Set<Long> newlyAddedSkills=new HashSet<>();
+        prepareIntervals(staffingLevel, presenceStaffingLevelDTO, activityRemoveLogs, skillRemoveLogs,newlyAddedActivities,newlyAddedSkills);
         staffingLevel.setStaffingLevelSetting(presenceStaffingLevelDTO.getStaffingLevelSetting());
         staffingLevel.setPhaseId(presenceStaffingLevelDTO.getPhaseId());
         List<StaffingLevelInterval> staffingLevelIntervals = presenceStaffingLevelDTO.getPresenceStaffingLevelInterval();
@@ -162,11 +164,13 @@ public class StaffingLevelUtil {
             staffingLevelIntervalLog.setUpdatedAt(getCurrentDate());
             staffingLevelIntervalLog.setActivityRemoveLogs(activityRemoveLogs);
             staffingLevelIntervalLog.setSkillRemoveLogs(skillRemoveLogs);
+            staffingLevelIntervalLog.setNewlyAddedActivityIds(newlyAddedActivities);
+            staffingLevelIntervalLog.setNewlyAddedSkillIds(newlyAddedSkills);
             staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelIntervalLogs().add(staffingLevelIntervalLog);
         }
     }
 
-    private static void prepareIntervals(StaffingLevel staffingLevel, PresenceStaffingLevelDto presenceStaffingLevelDTO, Set<ActivityRemoveLog> activityRemoveLogs, Set<SkillRemoveLog> skillRemoveLogs) {
+    private static void prepareIntervals(StaffingLevel staffingLevel, PresenceStaffingLevelDto presenceStaffingLevelDTO, Set<ActivityRemoveLog> activityRemoveLogs, Set<SkillRemoveLog> skillRemoveLogs, Set<BigInteger> newlyAddedActivities, Set<Long> newlyAddedSkills) {
         List<StaffingLevelInterval> staffingLevelIntervals = new ArrayList<>();
         for (int i = 0; i < 96; i++) {
             StaffingLevelIntervalLog staffingLevelIntervalLog = isCollectionEmpty(staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelIntervalLogs()) ? null : staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelIntervalLogs().last();
@@ -183,8 +187,11 @@ public class StaffingLevelUtil {
                         }
                     }
                 }
-                if (isNotNull(staffingLevelIntervalLog))
+                if (isNotNull(staffingLevelIntervalLog)){
+                    newlyAddedActivities.addAll(staffingLevelIntervalLog.getNewlyAddedActivityIds());
                     activityRemoveLogs.addAll(staffingLevelIntervalLog.getActivityRemoveLogs());
+                }
+
                 if (presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().size() < interval.getStaffingLevelSkills().size()) {
                     for (Iterator<StaffingLevelSkill> iterator = interval.getStaffingLevelSkills().iterator(); iterator.hasNext(); ) {
                         StaffingLevelSkill staffingLevelSkill = iterator.next();
@@ -194,21 +201,25 @@ public class StaffingLevelUtil {
                         }
                     }
                 }
-                if (isNotNull(staffingLevelIntervalLog))
+                if (isNotNull(staffingLevelIntervalLog)){
+                    newlyAddedSkills.addAll(staffingLevelIntervalLog.getNewlyAddedSkillIds());
                     skillRemoveLogs.addAll(staffingLevelIntervalLog.getSkillRemoveLogs());
+                }
+
                 staffingLevelIntervals.add(interval);
             }
-            updateAddedSkillAndActivity(staffingLevel, presenceStaffingLevelDTO, i, activityRemoveLogs, skillRemoveLogs,interval);
+            updateAddedSkillAndActivity(staffingLevel, presenceStaffingLevelDTO, i, activityRemoveLogs, skillRemoveLogs,interval,newlyAddedActivities,newlyAddedSkills);
         }
         presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(staffingLevelIntervals);
     }
 
-    private static void updateAddedSkillAndActivity(StaffingLevel staffingLevel, PresenceStaffingLevelDto presenceStaffingLevelDTO, int i, Set<ActivityRemoveLog> activityRemoveLogs, Set<SkillRemoveLog> skillRemoveLogs,StaffingLevelInterval interval) {
+    private static void updateAddedSkillAndActivity(StaffingLevel staffingLevel, PresenceStaffingLevelDto presenceStaffingLevelDTO, int i, Set<ActivityRemoveLog> activityRemoveLogs, Set<SkillRemoveLog> skillRemoveLogs, StaffingLevelInterval interval, Set<BigInteger> newlyAddedActivities, Set<Long> newlyAddedSkills) {
         if (presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().size() > interval.getStaffingLevelActivities().size()) {
             Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMap = staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelActivities().stream().collect(Collectors.toMap(StaffingLevelActivity::getActivityId, v -> v));
             for (StaffingLevelActivity staffingLevelActivity : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities()) {
                 if (!staffingLevelActivityMap.containsKey(staffingLevelActivity.getActivityId())) {
                     staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelActivities().add(staffingLevelActivity);
+                    newlyAddedActivities.add(staffingLevelActivity.getActivityId());
                 }
                 activityRemoveLogs.removeIf(k -> k.getActivityId().equals(staffingLevelActivity.getActivityId()));
                 interval.getStaffingLevelActivities().add(staffingLevelActivity);
@@ -219,6 +230,7 @@ public class StaffingLevelUtil {
             for (StaffingLevelSkill staffingLevelSkill : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills()) {
                 if (!staffingLevelSkillMap.containsKey(staffingLevelSkill.getSkillId())) {
                     staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelSkills().add(staffingLevelSkill);
+                    newlyAddedSkills.add(staffingLevelSkill.getSkillId());
                 }
                 skillRemoveLogs.removeIf(k -> k.getSkillId().equals(staffingLevelSkill.getSkillId()));
                 interval.getStaffingLevelSkills().add(staffingLevelSkill);
@@ -242,17 +254,21 @@ public class StaffingLevelUtil {
 
     public static void updateStaffingLevelToPublish(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevel staffingLevel) {
         List<StaffingLevelInterval> staffingLevelIntervals = staffingLevel.getPresenceStaffingLevelInterval();
-        for (int i = 0; i < staffingLevelIntervals.size(); i++) {
-            updateActivities(staffingLevelPublishDTO, staffingLevelIntervals.get(i));
-        }
-        for (int i = 0; i < staffingLevel.getAbsenceStaffingLevelInterval().size(); i++) {
-            updateActivities(staffingLevelPublishDTO, staffingLevelIntervals.get(i));
+        if(!staffingLevelPublishDTO.isPublishAbsence()){
+            for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
+                updateActivities(staffingLevelPublishDTO, staffingLevelInterval);
+            }
+        }else {
+            for (int i = 0; i < staffingLevel.getAbsenceStaffingLevelInterval().size(); i++) {
+                updateActivities(staffingLevelPublishDTO, staffingLevelIntervals.get(i));
+            }
         }
     }
 
     private static void updateActivities(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevelInterval staffingLevelInterval) {
         StaffingLevelIntervalLog staffingLevelIntervalLog = staffingLevelInterval.getStaffingLevelIntervalLogs().last();
-        Set<StaffingLevelActivity> staffingLevelActivities = staffingLevelIntervalLog.getStaffingLevelActivities().stream().filter(k -> staffingLevelPublishDTO.getActivityIds().contains(k.getActivityId())).collect(Collectors.toSet());
+        Set<StaffingLevelActivity> staffingLevelActivities =isCollectionEmpty(staffingLevelPublishDTO.getWeekDates()) && staffingLevelPublishDTO.getStartDate().equals(staffingLevelPublishDTO.getEndDate())? staffingLevelIntervalLog.getStaffingLevelActivities():staffingLevelIntervalLog.getStaffingLevelActivities().stream().filter(k -> staffingLevelPublishDTO.getActivityIds().contains(k.getActivityId())).collect(Collectors.toSet());
+        staffingLevelPublishDTO.setActivityIds(staffingLevelActivities.stream().map(k->k.getActivityId()).collect(Collectors.toSet()));
         Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMap = staffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.toMap(k -> k.getActivityId(), v -> v));
         staffingLevelActivities.forEach(k -> {
             if (staffingLevelActivityMap.containsKey(k.getActivityId())) {
@@ -262,7 +278,8 @@ public class StaffingLevelUtil {
         });
         staffingLevelInterval.setMaxNoOfStaff(staffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMaxNoOfStaff())));
         staffingLevelInterval.setMinNoOfStaff(staffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMinNoOfStaff())));
-        Set<StaffingLevelSkill> staffingLevelSkills = staffingLevelIntervalLog.getStaffingLevelSkills().stream().filter(k -> staffingLevelPublishDTO.getSkillIds().contains(k.getSkillId())).collect(Collectors.toSet());
+        Set<StaffingLevelSkill> staffingLevelSkills  =isCollectionEmpty(staffingLevelPublishDTO.getWeekDates()) && staffingLevelPublishDTO.getStartDate().equals(staffingLevelPublishDTO.getEndDate())? staffingLevelIntervalLog.getStaffingLevelSkills():staffingLevelIntervalLog.getStaffingLevelSkills().stream().filter(k -> staffingLevelPublishDTO.getSkillIds().contains(k.getSkillId())).collect(Collectors.toSet());
+        staffingLevelPublishDTO.setSkillIds(staffingLevelSkills.stream().map(StaffingLevelSkill::getSkillId).collect(Collectors.toSet()));
         staffingLevelInterval.setStaffingLevelSkills(staffingLevelSkills);
         removeActivityAndSkills(staffingLevelInterval, staffingLevelIntervalLog,staffingLevelPublishDTO);
         //resetIntervalLogs(staffingLevelIntervalLog, staffingLevelActivities, staffingLevelSkills);
@@ -293,6 +310,8 @@ public class StaffingLevelUtil {
         }
         staffingLevelIntervalLog.getActivityRemoveLogs().removeIf(k->staffingLevelPublishDTO.getActivityIds().contains(k.getActivityId()));
         staffingLevelIntervalLog.getSkillRemoveLogs().removeIf(k->staffingLevelPublishDTO.getSkillIds().contains(k.getSkillId()));
+        staffingLevelIntervalLog.getNewlyAddedActivityIds().removeIf(k->staffingLevelPublishDTO.getActivityIds().contains(k));
+        staffingLevelIntervalLog.getNewlyAddedSkillIds().removeIf(k->staffingLevelPublishDTO.getSkillIds().contains(k));
     }
 
     public static void initializeUserWiseLogs(StaffingLevelInterval staffingLevelInterval) {

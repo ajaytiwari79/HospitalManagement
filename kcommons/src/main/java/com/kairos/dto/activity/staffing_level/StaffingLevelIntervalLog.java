@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.util.*;
 
 @Getter
@@ -21,6 +22,8 @@ public class StaffingLevelIntervalLog implements Comparable<StaffingLevelInterva
     private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
     private Set<ActivityRemoveLog> activityRemoveLogs=new HashSet<>();
     private Set<SkillRemoveLog> skillRemoveLogs=new HashSet<>();
+    private Set<BigInteger> newlyAddedActivityIds=new HashSet<>();
+    private Set<Long> newlyAddedSkillIds=new HashSet<>();
 
 
     public StaffingLevelIntervalLog(UserInfo userInfo, Date updatedAt, Set<StaffingLevelActivity> staffingLevelActivities, Set<StaffingLevelSkill> staffingLevelSkills) {
