@@ -209,8 +209,8 @@ public class StaffingLevelUtil {
             for (StaffingLevelActivity staffingLevelActivity : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities()) {
                 if (!staffingLevelActivityMap.containsKey(staffingLevelActivity.getActivityId())) {
                     staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelActivities().add(staffingLevelActivity);
-                    activityRemoveLogs.removeIf(k -> k.getActivityId().equals(staffingLevelActivity.getActivityId()));
                 }
+                activityRemoveLogs.removeIf(k -> k.getActivityId().equals(staffingLevelActivity.getActivityId()));
                 interval.getStaffingLevelActivities().add(staffingLevelActivity);
             }
         }
@@ -219,8 +219,8 @@ public class StaffingLevelUtil {
             for (StaffingLevelSkill staffingLevelSkill : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills()) {
                 if (!staffingLevelSkillMap.containsKey(staffingLevelSkill.getSkillId())) {
                     staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelSkills().add(staffingLevelSkill);
-                    skillRemoveLogs.removeIf(k -> k.getSkillId().equals(staffingLevelSkill.getSkillId()));
                 }
+                skillRemoveLogs.removeIf(k -> k.getSkillId().equals(staffingLevelSkill.getSkillId()));
                 interval.getStaffingLevelSkills().add(staffingLevelSkill);
             }
         }
