@@ -14,7 +14,7 @@ import java.math.BigInteger;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document
-public class StaffActivityMostlyUse extends MongoBaseEntity {
+public class StaffActivityDetails extends MongoBaseEntity {
     private Long staffId;
     private BigInteger activityId;
     private int useActivityCount;

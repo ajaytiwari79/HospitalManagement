@@ -103,7 +103,7 @@ public class ActivityService {
     @Inject private StaffingLevelService staffingLevelService;
     @Inject private ActivitySchedulerJobService activitySchedulerJobService;
     @Inject private ActivitySettingsService activitySettingsService;
-    @Inject private StaffActivityMostlyUseService staffActivityMostlyUseService;
+    @Inject private StaffActivityDetailsService staffActivityDetailsService;
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
         if (activityDTO.getEndDate() != null && activityDTO.getEndDate().isBefore(activityDTO.getStartDate())) {

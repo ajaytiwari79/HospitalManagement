@@ -57,7 +57,7 @@ import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMo
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.StaffActivityMostlyUseService;
+import com.kairos.service.activity.StaffActivityDetailsService;
 import com.kairos.service.dashboard.SickService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutService;
@@ -179,7 +179,7 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private SickService sickService;
     @Inject private ShiftFunctionService shiftFunctionService;
-    @Inject private StaffActivityMostlyUseService staffActivityMostlyUseService;
+    @Inject private StaffActivityDetailsService staffActivityDetailsService;
 
     public List<ShiftWithViolatedInfoDTO> createShifts(Long unitId, List<ShiftDTO> shiftDTOS, ShiftActionType shiftActionType) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>(shiftDTOS.size());
@@ -294,7 +294,7 @@ public class ShiftService extends MongoBaseService {
         todoService.updateStatusOfShiftActivityIfApprovalRequired(activityWrapperMap, shift, updateShift,shiftAction,phase,planningPeriod,staffAdditionalInfoDTO);
         payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
-        staffActivityMostlyUseService.updateStaffActivityCount(shift.getStaffId(), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()), (isNull(shift.getId()) || isNull(oldShift) || isCollectionEmpty(oldShift.getActivities())) ? null : oldShift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        staffActivityDetailsService.updateStaffActivityDetails(shift.getStaffId(), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()), (isNull(shift.getId()) || isNull(oldShift) || isCollectionEmpty(oldShift.getActivities())) ? null : oldShift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
         shiftMongoRepository.save(shift);
         shiftStateService.createShiftStateByPhase(Arrays.asList(shift), phase);
         return shift;
@@ -874,7 +874,7 @@ public class ShiftService extends MongoBaseService {
         payOutService.deletePayOut(shift.getId());
         List<BigInteger> jobIds = shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
         shiftReminderService.deleteReminderTrigger(jobIds, shift.getUnitId());
-        staffActivityMostlyUseService.decreaseActivityCount(shift.getStaffId(), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        staffActivityDetailsService.decreaseActivityCount(shift.getStaffId(), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
         return shiftDTO;
     }
 

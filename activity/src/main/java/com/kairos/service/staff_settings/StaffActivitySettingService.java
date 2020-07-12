@@ -8,7 +8,7 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffAndActivitySettingWrapper;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.StaffActivityMostlyUse;
+import com.kairos.persistence.model.activity.StaffActivityDetails;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -19,7 +19,7 @@ import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.StaffActivityAssignmentSpecification;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.StaffActivityMostlyUseService;
+import com.kairos.service.activity.StaffActivityDetailsService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
@@ -50,7 +50,7 @@ public class StaffActivitySettingService extends MongoBaseService {
     @Inject private OrganizationActivityService organizationActivityService;
     @Inject private ShiftMongoRepository shiftMongoRepository;
     @Inject private TimeTypeService timeTypeService;
-    @Inject private StaffActivityMostlyUseService staffActivityMostlyUseService;
+    @Inject private StaffActivityDetailsService staffActivityDetailsService;
 
     public StaffActivitySettingDTO createStaffActivitySetting(Long unitId,StaffActivitySettingDTO staffActivitySettingDTO){
         activityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
@@ -114,7 +114,7 @@ public class StaffActivitySettingService extends MongoBaseService {
 
     public List<ActivityWithCompositeDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId,boolean includeTeamActivity){
         List<ActivityWithCompositeDTO> staffPersonalizedActivities= staffActivitySettingRepository.findAllByUnitIdAndStaffIdAndDeletedFalse(unitId,staffId);
-        Map<BigInteger, StaffActivityMostlyUse> mostlyUsedActivityData = staffActivityMostlyUseService.getMapOfActivityAndStaffActivityUseCount(staffId);
+        Map<BigInteger, StaffActivityDetails> mostlyUsedActivityData = staffActivityDetailsService.getMapOfActivityAndStaffActivityUseCount(staffId);
         if(includeTeamActivity) {
             List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId, staffPersonalizedActivities);
             Map<BigInteger, ActivityWithCompositeDTO> activityMap = activityList.stream().collect(Collectors.toMap(ActivityWithCompositeDTO::getId, Function.identity()));
@@ -138,7 +138,7 @@ public class StaffActivitySettingService extends MongoBaseService {
         }
     }
 
-    private void updateActivityPriorityAndMostlyUsedCountAndTimeType(Map<BigInteger, StaffActivityMostlyUse> mostlyUsedActivityData, ActivityWithCompositeDTO staffPersonalizedActivity) {
+    private void updateActivityPriorityAndMostlyUsedCountAndTimeType(Map<BigInteger, StaffActivityDetails> mostlyUsedActivityData, ActivityWithCompositeDTO staffPersonalizedActivity) {
         if(mostlyUsedActivityData.containsKey(staffPersonalizedActivity.getActivityId())){
             staffPersonalizedActivity.setMostlyUsedCount(mostlyUsedActivityData.get(staffPersonalizedActivity.getActivityId()).getUseActivityCount());
         }
