@@ -7,6 +7,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.enums.FilterType.ACTIVITY_TIMECALCULATION_TYPE;
 
 /**
@@ -31,7 +32,11 @@ public class ActivityTimeCalculationTypeFilter <G> implements ShiftFilter {
                 Set<String> methodForCalulation = new HashSet<>();
                 shiftDTO.getActivities().forEach(shiftActivityDTO -> {
                     methodForCalulation.add(shiftActivityDTO.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime());
-                    shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> methodForCalulation.add(childActivityDTO.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()));
+                    shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> {
+                        if(isNotNull(childActivityDTO.getActivity())) {
+                            methodForCalulation.add(childActivityDTO.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime());
+                        }
+                    });
                 });
                 if (CollectionUtils.containsAny(filterCriteriaMap.get(ACTIVITY_TIMECALCULATION_TYPE), methodForCalulation)) {
                     filteredShifts.add((T)shiftDTO);
