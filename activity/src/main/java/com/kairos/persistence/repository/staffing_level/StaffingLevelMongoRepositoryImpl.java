@@ -98,7 +98,8 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
                         "    }")),
                 Aggregation.project().and("activities").arrayElementAt(0).as("activity"),
                 Aggregation.replaceRoot("activity"),
-                Aggregation.group("timeType").addToSet("$$ROOT").as("activities")
+                Aggregation.group("timeType").addToSet("$$ROOT").as("activities"),
+                Aggregation.project("activities").and("_id").as("timeType")
         );
         return mongoTemplate.aggregate(aggregation,StaffingLevel.class, HashMap.class).getMappedResults();
     }
