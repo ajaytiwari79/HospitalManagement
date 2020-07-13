@@ -27,6 +27,7 @@ import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.SkillLevel;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -1163,5 +1164,13 @@ public class StaffingLevelService  {
             shiftActivityList.add(shiftActivity);
             map.put(endDate,shiftActivityList);
         }
+    }
+
+    public List<HashMap> getStaffingLevelActivities(Long unitId, LocalDate startDate, LocalDate endDate) {
+        return staffingLevelMongoRepository.getStaffingLevelActivities(unitId,startDate,endDate).stream().map(hashMap -> {
+            hashMap.put("timeType",hashMap.get("_id"));
+            hashMap.remove("_id");
+            return hashMap;
+        }).collect(Collectors.toList());
     }
 }
