@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.enums.FilterType.TIME_TYPE;
 
 /**
@@ -36,8 +37,13 @@ public class TimeTypeFilter <G> implements ShiftFilter{
                 List<BigInteger> timeTypeIds = new ArrayList<>();
                 shiftDTO.getActivities().forEach(shiftActivityDTO -> {
                     timeTypeIds.add(shiftActivityDTO.getActivity().getTimeType().getId());
-                    shiftActivityDTO.getChildActivities().forEach(childActivityDTO ->  timeTypeIds.add(childActivityDTO.getActivity().getTimeType().getId()));
-                });
+                    if(isCollectionNotEmpty(shiftActivityDTO.getChildActivities())){
+                    shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> {
+                        if(isNotNull(childActivityDTO.getActivity())) {
+                            timeTypeIds.add(childActivityDTO.getActivity().getTimeType().getId());
+                        }
+                    });
+                }});
                 if(CollectionUtils.containsAny(selectedTimeTypes,timeTypeIds)){
                     filteredShifts.add((T)shiftDTO);
                 }
