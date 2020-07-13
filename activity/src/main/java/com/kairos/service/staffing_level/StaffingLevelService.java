@@ -31,6 +31,7 @@ import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -45,6 +46,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
+import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftValidatorService;
@@ -136,6 +138,7 @@ public class StaffingLevelService  {
     @Inject
     private ShiftService shiftService;
     @Inject private ShiftValidatorService shiftValidatorService;
+    @Inject private PlanningPeriodService planningPeriodService;
 
 
     /**
@@ -1170,11 +1173,20 @@ public class StaffingLevelService  {
         }
     }
 
-    public List<HashMap> getStaffingLevelActivities(Long unitId, LocalDate startDate, LocalDate endDate) {
-        return staffingLevelMongoRepository.getStaffingLevelActivities(unitId,startDate,endDate).stream().map(hashMap -> {
-            hashMap.put("timeType",hashMap.get("_id"));
-            hashMap.remove("_id");
-            return hashMap;
-        }).collect(Collectors.toList());
+    public List<HashMap> getStaffingLevelActivities(Long unitId, LocalDate startDate, String query) {
+        LocalDate endDate;
+        switch (query){
+            case PLANNING_PERIOD:
+                PlanningPeriod planningPeriod = planningPeriodService.getPlanningPeriodContainsDate(unitId,startDate);
+                endDate = planningPeriod.getEndDate();
+                break;
+            case WEEK:
+                startDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                endDate = startDate.plusWeeks(1);
+                break;
+            default:endDate = startDate;
+            break;
+        }
+        return staffingLevelMongoRepository.getStaffingLevelActivities(unitId,startDate,endDate);
     }
 }
