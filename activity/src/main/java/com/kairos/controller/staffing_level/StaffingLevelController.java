@@ -143,8 +143,7 @@ public class StaffingLevelController {
     @ApiOperation("update and create staffing_level")
     public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos,
                                                                    @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.updateAbsenceStaffingLevel(unitId,absenceStaffingLevelDtos));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.updateAbsenceStaffingLevel(unitId,absenceStaffingLevelDtos));
     }
 
     /**
