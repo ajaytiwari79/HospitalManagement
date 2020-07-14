@@ -127,8 +127,8 @@ public class RuletemplateUtils {
         return interval;
     }
 
-    public static TimeInterval getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
-        TimeInterval timeInterval = null;
+    public static List<TimeInterval> getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
+        List<TimeInterval> timeIntervals = new ArrayList<>();
         for (PartOfDay partOfDay : partOfDays) {
             if (timeSlotWrapperMap.containsKey(partOfDay.getValue())) {
                 TimeSlotWrapper timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
@@ -136,15 +136,19 @@ public class RuletemplateUtils {
                     int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
                     int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
                     TimeInterval interval = new TimeInterval(startMinutesOfInterval, endMinutesOfInterval);
-                    int minuteOfTheDay = DateUtils.asZonedDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
-                    if (minuteOfTheDay == (int) interval.getStartFrom() || interval.contains(minuteOfTheDay)) {
-                        timeInterval = interval;
-                        break;
+                    if(isNotNull(shift)) {
+                        int minuteOfTheDay = DateUtils.asZonedDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
+                        if (minuteOfTheDay == (int) interval.getStartFrom() || interval.contains(minuteOfTheDay)) {
+                            timeIntervals.add(interval);
+                            break;
+                        }
+                    }else {
+                        timeIntervals.add(interval);
                     }
                 }
             }
         }
-        return timeInterval;
+        return timeIntervals;
     }
 
     public static TimeInterval[] getTimeSlotsByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
@@ -210,14 +214,18 @@ public class RuletemplateUtils {
         return interval;
     }
 
-    public static List<ShiftWithActivityDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, TimeInterval timeInterval) {
+    public static List<ShiftWithActivityDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, List<TimeInterval> timeIntervals) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         shifts.forEach(s -> {
-            if ((dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.getEndLocalDate().equals(s.getEndLocalDate())) && (timeInterval == null || timeInterval.contains(DateUtils.asZonedDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
+            if ((dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.getEndLocalDate().equals(s.getEndLocalDate())) && isTimeIntervalValid(timeIntervals, s)) {
                 updatedShifts.add(s);
             }
         });
         return updatedShifts;
+    }
+
+    private static boolean isTimeIntervalValid(List<TimeInterval> timeIntervals, ShiftWithActivityDTO s) {
+        return timeIntervals == null || timeIntervals.stream().anyMatch(timeInterval->timeInterval.contains(DateUtils.asZonedDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)));
     }
 
     public static Set<BigInteger> getShiftIdsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, TimeInterval[] timeIntervals) {
