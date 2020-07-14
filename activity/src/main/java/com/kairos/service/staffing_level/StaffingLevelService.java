@@ -1175,19 +1175,27 @@ public class StaffingLevelService  {
 
     public UnityStaffingLevelRelatedDetails getStaffingLevelActivities(Long unitId, LocalDate startDate, String query) {
         LocalDate endDate;
+        UnityStaffingLevelRelatedDetails unityStaffingLevelRelatedDetails = new UnityStaffingLevelRelatedDetails();
         switch (query){
             case PLANNING_PERIOD:
                 PlanningPeriod planningPeriod = planningPeriodService.getPlanningPeriodContainsDate(unitId,startDate);
                 endDate = planningPeriod.getEndDate();
+                unityStaffingLevelRelatedDetails.setPlanningPeriodStartDate(planningPeriod.getStartDate());
+                unityStaffingLevelRelatedDetails.setPlanningPeriodEndDate(planningPeriod.getEndDate());
                 break;
             case WEEK:
                 startDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
                 endDate = startDate.plusWeeks(1);
+                unityStaffingLevelRelatedDetails.setWeekStartDate(startDate);
+                unityStaffingLevelRelatedDetails.setWeekEndDate(endDate);
                 break;
-            default:endDate = startDate;
+            default:
+                endDate = startDate;
+                unityStaffingLevelRelatedDetails.setStartDate(startDate);
+                unityStaffingLevelRelatedDetails.setEndDate(endDate);
             break;
         }
-        List<HashMap> activities = staffingLevelMongoRepository.getStaffingLevelActivities(unitId,startDate,endDate);
-        return new UnityStaffingLevelRelatedDetails(activities,startDate,endDate);
+        unityStaffingLevelRelatedDetails.setActivities(staffingLevelMongoRepository.getStaffingLevelActivities(unitId,startDate,endDate));
+        return unityStaffingLevelRelatedDetails;
     }
 }
