@@ -1174,25 +1174,26 @@ public class StaffingLevelService  {
     }
 
     public UnityStaffingLevelRelatedDetails getStaffingLevelActivities(Long unitId, LocalDate startDate, String query) {
-        LocalDate endDate;
         UnityStaffingLevelRelatedDetails unityStaffingLevelRelatedDetails = new UnityStaffingLevelRelatedDetails();
+        PlanningPeriod planningPeriod = planningPeriodService.getPlanningPeriodContainsDate(unitId,startDate);
+        unityStaffingLevelRelatedDetails.setPlanningPeriodStartDate(planningPeriod.getStartDate());
+        unityStaffingLevelRelatedDetails.setPlanningPeriodEndDate(planningPeriod.getEndDate());
+        unityStaffingLevelRelatedDetails.setWeekStartDate(startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
+        unityStaffingLevelRelatedDetails.setWeekEndDate(startDate.plusWeeks(1));
+        unityStaffingLevelRelatedDetails.setStartDate(startDate);
+        unityStaffingLevelRelatedDetails.setEndDate(startDate);
+        LocalDate endDate;
         switch (query){
             case PLANNING_PERIOD:
-                PlanningPeriod planningPeriod = planningPeriodService.getPlanningPeriodContainsDate(unitId,startDate);
+                startDate = planningPeriod.getStartDate();
                 endDate = planningPeriod.getEndDate();
-                unityStaffingLevelRelatedDetails.setPlanningPeriodStartDate(planningPeriod.getStartDate());
-                unityStaffingLevelRelatedDetails.setPlanningPeriodEndDate(planningPeriod.getEndDate());
                 break;
             case WEEK:
                 startDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
                 endDate = startDate.plusWeeks(1);
-                unityStaffingLevelRelatedDetails.setWeekStartDate(startDate);
-                unityStaffingLevelRelatedDetails.setWeekEndDate(endDate);
                 break;
             default:
                 endDate = startDate;
-                unityStaffingLevelRelatedDetails.setStartDate(startDate);
-                unityStaffingLevelRelatedDetails.setEndDate(endDate);
             break;
         }
         unityStaffingLevelRelatedDetails.setActivities(staffingLevelMongoRepository.getStaffingLevelActivities(unitId,startDate,endDate));
