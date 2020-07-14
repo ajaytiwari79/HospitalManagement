@@ -207,7 +207,7 @@ public class CostTimeAgreementController {
     public ResponseEntity<Map<String, Object>> createCopyOfUnitCTA(@PathVariable Long unitId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO )  {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
-                countryCTAService.createCostTimeAgreementInOrganization(unitId,collectiveTimeAgreementDTO));
+                costTimeAgreementService.createCopyOfUnitCTA(unitId,collectiveTimeAgreementDTO));
     }
 
     /**

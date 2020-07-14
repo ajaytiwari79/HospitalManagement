@@ -35,7 +35,7 @@ public class CPRUtil {
 
     //Method for getting the DateOfBirth From CPR Number
     public static LocalDate getDateOfBirthFromCPR(String cprNumber) {
-        if (cprNumber == null) {
+        if (StringUtils.isEmpty(cprNumber)) {
             return null;
         }
         if (cprNumber.length() == 9) {
