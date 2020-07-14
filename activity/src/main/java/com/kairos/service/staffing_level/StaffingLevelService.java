@@ -1173,7 +1173,7 @@ public class StaffingLevelService  {
         }
     }
 
-    public List<HashMap> getStaffingLevelActivities(Long unitId, LocalDate startDate, String query) {
+    public UnityStaffingLevelRelatedDetails getStaffingLevelActivities(Long unitId, LocalDate startDate, String query) {
         LocalDate endDate;
         switch (query){
             case PLANNING_PERIOD:
@@ -1187,6 +1187,7 @@ public class StaffingLevelService  {
             default:endDate = startDate;
             break;
         }
-        return staffingLevelMongoRepository.getStaffingLevelActivities(unitId,startDate,endDate);
+        List<HashMap> activities = staffingLevelMongoRepository.getStaffingLevelActivities(unitId,startDate,endDate);
+        return new UnityStaffingLevelRelatedDetails(activities,startDate,endDate);
     }
 }
