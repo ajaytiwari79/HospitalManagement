@@ -5,6 +5,7 @@ import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
+import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -52,6 +53,9 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Collection<BigInteger> activityIds);
+
+    @Query("{_id:{$in:?0}, deleted:false}")
+    List<ActivityWithCompositeDTO> findAllActivityWithCompositeDTOByIds(Collection<BigInteger> activityIds);
 
     @Query(value = "{childActivityIds:?0, deleted:false}")
     Activity findByChildActivityId(BigInteger childActivityId);

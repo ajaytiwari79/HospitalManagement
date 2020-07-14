@@ -15,8 +15,7 @@ public class FileReaderUtil {
 
     public static String getFileDataAsString(String fileName){
         String json = null;
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(DEFAULT_JSON_FILE_PATH+fileName)));
+        try(BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(DEFAULT_JSON_FILE_PATH+fileName)));) {
             StringBuffer stringBuffer = new StringBuffer();
             bufferedReader.lines().forEach(line->stringBuffer.append(line));
             json = stringBuffer.toString();

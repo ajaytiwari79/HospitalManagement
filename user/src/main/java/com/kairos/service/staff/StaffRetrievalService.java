@@ -871,9 +871,14 @@ public class StaffRetrievalService {
             }
         }
 
-        if (matchedStaff != null) {
+        if (matchedStaff != null && i != 0) {
             staffEmploymentWithTags.remove(i);
             staffEmploymentWithTags.add(0, matchedStaff);
+        } else if (matchedStaff == null) {
+            matchedStaff = staffGraphRepository.getLoggedInStaffDetails(unitId, loggedInUserId);
+            if (matchedStaff != null) {
+                staffEmploymentWithTags.add(0, matchedStaff);
+            }
         }
 
         return staffEmploymentWithTags;

@@ -232,13 +232,13 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         StringBuilder query = new StringBuilder();
         StringBuilder returnData = new StringBuilder();
         query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment)-[:IN_UNIT]-(unit:Unit)\n" +
-                "WHERE id(unit)={unitId} AND employments.startDate IS NOT null  \n");
+                "WHERE id(unit)={unitId}  \n");
         if (searchText != null && searchText.trim() != "") {
             String qText = "(?i)" + searchText + ".*";
             queryParameters.put("searchText", qText);
             query.append(" AND (staff.firstName=~ {searchText} OR staff.lastName=~ {searchText} OR user.cprNumber=~ {searchText} ) ");
         }
-        query.append(" OR id(user)={loggedInUserId} ");
+//        query.append(" OR id(user)={loggedInUserId} ");
         returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ")
                 .append(" user.gender as gender, staff.profilePic as profilePic,staff.user_id as user_id,  ")
                 .append(" staff.currentStatus as currentStatus, ")
@@ -265,15 +265,49 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         return staffEmploymentWithTags;
     }
 
+    public StaffEmploymentWithTag getLoggedInStaffDetails(final Long unitId, final Long loggedInUserId) {
+        StringBuilder query = new StringBuilder();
+        Map<String, Object> queryParameters = new HashMap<>();
+        queryParameters.put(UNIT_ID, unitId);
+        queryParameters.put("loggedInUserId", loggedInUserId);
+        query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment)-[:IN_UNIT]-(unit:Unit)\n" +
+                "WHERE id(unit)={unitId} AND employments.startDate IS NOT null AND id(user)={loggedInUserId}  \n");
+        query.append(" WITH staff,employments,user MATCH (staff)-[:HAS_CONTACT_ADDRESS]-(contactAddress:ContactAddress) ");
+        query.append(" WITH staff,employments,user,contactAddress MATCH (staff)-[:BELONGS_TO_TAGS]-(selectedTags:Tag) ");
+        query.append(" WITH staff,employments,user,contactAddress,selectedTags MATCH (employments)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) ");
+        query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise MATCH (employments)-[empL:HAS_EMPLOYMENT_LINES]->(employmentLines:EmploymentLine)-[het:HAS_EMPLOYMENT_TYPE]->(empType:EmploymentType) ");
+        query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise,empType,employmentLines OPTIONAL MATCH (employmentLines)-[:APPLICABLE_FUNCTION]-(applicableFunctions:Function) ");
+        query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise,empType,applicableFunctions, ");
+        query.append(" collect({id: id(employmentLines), startDate:employmentLines.startDate,endDate:employmentLines.endDate,totalWeeklyMinutes:employmentLines.totalWeeklyMinutes,fullTimeWeeklyMinutes:employmentLines.fullTimeWeeklyMinutes,avgDailyWorkingHours:employmentLines.avgDailyWorkingHours,workingDaysInWeek:employmentLines.workingDaysInWeek,hourlyCost:employmentLines.hourlyCost, employmentType: { id: id(empType),name:empType.name } }) as employmentLines");
+
+        StringBuilder returnData = new StringBuilder();
+        returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ")
+                .append(" user.gender as gender, staff.profilePic as profilePic,staff.user_id as user_id,  ")
+                .append(" staff.currentStatus as currentStatus, ")
+                .append(" id(user) as userId, ")
+                .append(" collect(distinct {id:id(employments),startDate:employments.startDate,endDate:employments.endDate, employmentType: { id: id(empType),name:empType.name } , employmentSubType: employments.employmentSubType,expertise: {id : id(expertise),name:expertise.name,startDate:employments.startDate,endDate:employments.endDate   },employmentLines:employmentLines  }) as employments, ")
+                .append(" CASE contactAddress WHEN contactAddress IS NULL THEN '' ELSE contactAddress.province END ")
+                .append(" , collect( distinct selectedTags) as tags , collect( distinct { id : id(empType),name: empType.name}) as employmentList ");
+        query.append(returnData);
+        Result staffEmploymentDetails = session.query(query.toString(), queryParameters);
+        Iterator si = staffEmploymentDetails.iterator();
+        StaffEmploymentWithTag staffEmploymentWithTag = null;
+        while (si.hasNext()) {
+            staffEmploymentWithTag = ObjectMapperUtils.copyPropertiesByMapper(si.next(), StaffEmploymentWithTag.class);
+        }
+        return staffEmploymentWithTag;
+    }
+
+
     private <T> void addMatchingCriteria(Map<FilterType, Set<T>> filters, Map<String, Object> queryParameters, StringBuilder query) {
-        ageMatcher(query,filters);
-        employedSinceMatcher(query,filters);
-        birthdayMatcher(query,filters);
+        ageMatcher(query, filters);
+        employedSinceMatcher(query, filters);
+        birthdayMatcher(query, filters);
 //        organizationalExperienceMatcher(query,filters);
-        staffStatusMatcher(query,filters,queryParameters);
-        genderMatcher(query,filters,queryParameters);
-        teamMatcher(query,filters,queryParameters);
-        expertiseMatcher(query,filters,queryParameters);
+        staffStatusMatcher(query, filters, queryParameters);
+        genderMatcher(query, filters, queryParameters);
+        teamMatcher(query, filters, queryParameters);
+        expertiseMatcher(query, filters, queryParameters);
         seniorityAndPaygradeMatcher(query,filters,queryParameters);
         skillMatcher(query,filters,queryParameters);
         tagsMatcher(query,filters,queryParameters);

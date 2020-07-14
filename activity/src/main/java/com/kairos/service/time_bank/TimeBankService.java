@@ -772,7 +772,7 @@ public class TimeBankService implements KPIService {
         shiftActivity.setTimeType(activityWrapper.getTimeType());
         if (CollectionUtils.isNotEmpty(staffAdditionalInfoDTO.getDayTypes())) {
             Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
-            Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, activityWrapper.getActivity().getTimeCalculationActivityTab().getDayTypes());
+            Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, activityWrapper.getActivity().getTimeCalculationActivityTab().getDayTypes(), asLocalDate(shiftActivity.getStartDate()));
             if (activityDayTypes.contains(DateUtils.asLocalDate(shiftActivity.getStartDate()).getDayOfWeek())) {
                 timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activityWrapper.getActivity(), staffAdditionalInfoDTO.getEmployment(), false);
                 scheduledMinutes = shiftActivity.getScheduledMinutes();

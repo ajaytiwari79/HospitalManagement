@@ -11,6 +11,7 @@ import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.expertise.CareDaysDTO;
@@ -371,17 +372,29 @@ public class RuletemplateUtils {
     }
 
 
-    public static Set<DayOfWeek> getValidDays(Map<Long, DayTypeDTO> dayTypeMap, List<Long> dayTypeIds) {
+    public static Set<DayOfWeek> getValidDays(Map<Long, DayTypeDTO> dayTypeMap, List<Long> dayTypeIds, LocalDate startDate) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        List<Day> days = dayTypeIds.stream().filter(s -> dayTypeMap.containsKey(s)).flatMap(dayTypeId -> dayTypeMap.get(dayTypeId).getValidDays().stream()).collect(Collectors.toList());
+        List<Day> days = new ArrayList<>();
+        for (Long dayTypeId : dayTypeIds) {
+            if(dayTypeMap.containsKey(dayTypeId)){
+                DayTypeDTO dayTypeDTO = dayTypeMap.get(dayTypeId);
+                if(dayTypeDTO.getValidDays().contains(Day.EVERYDAY)){
+                    List<LocalDate> holidayList = dayTypeDTO.getCountryHolidayCalenderData().stream().map(CountryHolidayCalenderDTO::getHolidayDate).collect(Collectors.toList());
+                    if(holidayList.contains(startDate)){
+                        days.addAll(dayTypeDTO.getValidDays());
+                    }
+                }else{
+                    days.addAll(dayTypeDTO.getValidDays());
+                }
+            }
+        }
         days.forEach(day -> {
             if (!day.equals(Day.EVERYDAY)) {
                 dayOfWeeks.add(DayOfWeek.valueOf(day.name()));
-            } else if (day.equals(Day.EVERYDAY)) {
+            } else {
                 dayOfWeeks.addAll(Arrays.asList(DayOfWeek.values()));
             }
         });
-
         return new HashSet<>(dayOfWeeks);
     }
 
@@ -597,7 +610,7 @@ public class RuletemplateUtils {
 
     public static boolean isValidForDay(List<Long> dayTypeIds, RuleTemplateSpecificInfo infoWrapper) {
         DayOfWeek shiftDay = DateUtils.asLocalDate(infoWrapper.getShift().getStartDate()).getDayOfWeek();
-        return getValidDays(infoWrapper.getDayTypeMap(), dayTypeIds).stream().anyMatch(day -> day.equals(shiftDay));
+        return getValidDays(infoWrapper.getDayTypeMap(), dayTypeIds, asLocalDate(infoWrapper.getShift().getStartDate())).stream().anyMatch(day -> day.equals(shiftDay));
     }
 
     public static boolean validateVetoAndStopBrickRules(float totalBlockingPoints, int totalVeto, int totalStopBricks) {

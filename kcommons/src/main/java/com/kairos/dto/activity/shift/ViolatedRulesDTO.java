@@ -1,12 +1,10 @@
 package com.kairos.dto.activity.shift;
 
+import com.kairos.enums.shift.ShiftEscalationReason;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
@@ -21,6 +19,8 @@ public class ViolatedRulesDTO {
 
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements = new ArrayList<>();
     private List<ActivityRuleViolation> activities = new ArrayList<>();
+    private Set<ShiftEscalationReason> escalationReasons;
+    private boolean escalationResolved;
 
     public List<WorkTimeAgreementRuleViolation> getWorkTimeAgreements() {
         workTimeAgreements=Optional.ofNullable(workTimeAgreements).orElse(new ArrayList<>());
