@@ -27,7 +27,7 @@ public class CPRUtil {
     }
 
     public static Gender getGenderFromCPRNumber(String cprNumber) {
-        if (cprNumber == null) {
+        if (StringUtils.isEmpty(cprNumber)) {
             return null;
         }
         return Integer.parseInt(cprNumber.substring(cprNumber.length() - 1)) % 2 == 0 ? Gender.FEMALE : Gender.MALE;
@@ -35,7 +35,7 @@ public class CPRUtil {
 
     //Method for getting the DateOfBirth From CPR Number
     public static LocalDate getDateOfBirthFromCPR(String cprNumber) {
-        if (cprNumber == null) {
+        if (StringUtils.isEmpty(cprNumber)) {
             return null;
         }
         if (cprNumber.length() == 9) {
