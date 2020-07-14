@@ -330,8 +330,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff) WITH position,kPermissionTab,accessGroup\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,kPermissionTab,accessGroup\n" +
             "MERGE (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_FIELD +"{accessGroupId:{2}}]->(kPermissionTab)\n" +
-            "ON CREATE SET r.fieldLevelPermissions={4}, r.expertiseIds={3},r.unionIds={4},r.teamIds={5},r.employmentTypeIds={6},r.tagIds={7},r.staffStatuses={8},r.forOtherFieldLevelPermissions={9}\n" +
-            "ON MATCH SET r.fieldLevelPermissions={4}, r.expertiseIds={3},r.unionIds={4},r.teamIds={5},r.employmentTypeIds={6},r.tagIds={7},r.staffStatuses={8},r.forOtherFieldLevelPermissions={9} RETURN distinct true")
+            "ON CREATE SET r.fieldLevelPermissions={4}\n" +
+            "ON MATCH SET r.fieldLevelPermissions={4} RETURN distinct true")
     void setCustomPermissionForSubModelAndFields(Long staffId, Long unitId, Long accessGroupId, Set<Long> kPermissionTabIds, Set<FieldLevelPermission> permissions);
 
 
