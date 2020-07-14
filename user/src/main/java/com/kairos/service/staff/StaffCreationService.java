@@ -208,7 +208,7 @@ public class StaffCreationService {
         if (StaffStatusEnum.ACTIVE.equals(payload.getCurrentStatus())) {
             validateRequireFieldOfStaff(unitId, payload, organization);
         }
-        User user = payload.getCurrentStatus().equals(StaffStatusEnum.ACTIVE)?Optional.ofNullable(userGraphRepository.findUserByCprNumberOrEmail(payload.getCprNumber(),payload.getPrivateEmail())).orElse(getNewUser(payload)):getNewUser(payload);
+        User user = StaffStatusEnum.ACTIVE.equals(payload.getCurrentStatus())?Optional.ofNullable(userGraphRepository.findUserByCprNumberOrEmail(payload.getCprNumber(),payload.getPrivateEmail())).orElse(getNewUser(payload)):getNewUser(payload);
         updateUserDetails(payload, user, organization);
         staff = updateStaffDetailsOnCreationOfStaff(organization, payload);
         staff.setUser(user);
