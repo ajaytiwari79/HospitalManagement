@@ -14,9 +14,11 @@ import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.night_worker.NightWorkerService;
@@ -52,6 +54,8 @@ public class ShiftFilterService {
     private ShiftValidatorService shiftValidatorService;
     @Inject
     private TimeBankService timeBankService;
+    @Inject
+    private ShiftMongoRepository shiftMongoRepository;
 
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO,List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
@@ -99,8 +103,8 @@ public class ShiftFilterService {
     private <G> ShiftFilter getEscalationFilter(List<BigInteger> shiftIds, Map<FilterType, Set<G>> filterTypeMap){
         Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = new HashMap<>();
         if(filterTypeMap.containsKey(ESCALATION_CAUSED_BY) && isCollectionNotEmpty(filterTypeMap.get(ESCALATION_CAUSED_BY))) {
-            List<ShiftViolatedRules> shiftViolatedRules = shiftValidatorService.findAllViolatedRulesByShiftIds(shiftIds, false);
-            shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
+            List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftIds);
+            shiftViolatedRulesMap = shifts.stream().filter(s-> isNotNull(s.getShiftViolatedRules())).collect(Collectors.toMap(k -> k.getId(), v -> v.getShiftViolatedRules()));
         }
         return new EscalationFilter(shiftViolatedRulesMap, filterTypeMap);
     }

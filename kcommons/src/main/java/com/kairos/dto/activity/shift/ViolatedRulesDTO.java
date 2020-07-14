@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.shift;
 
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,8 @@ public class ViolatedRulesDTO {
     private List<ActivityRuleViolation> activities = new ArrayList<>();
     private Set<ShiftEscalationReason> escalationReasons;
     private boolean escalationResolved;
+    private AccessGroupRole escalationCausedBy;
+    private boolean draft;
 
     public List<WorkTimeAgreementRuleViolation> getWorkTimeAgreements() {
         workTimeAgreements=Optional.ofNullable(workTimeAgreements).orElse(new ArrayList<>());
