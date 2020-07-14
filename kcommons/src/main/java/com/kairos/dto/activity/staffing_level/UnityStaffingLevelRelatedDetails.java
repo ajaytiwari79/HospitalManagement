@@ -18,4 +18,8 @@ public class UnityStaffingLevelRelatedDetails {
     private List<HashMap> activities;
     private LocalDate startDate;
     private LocalDate endDate;
+    private LocalDate planningPeriodStartDate;
+    private LocalDate planningPeriodEndDate;
+    private LocalDate weekStartDate;
+    private LocalDate weekEndDate;
 }
