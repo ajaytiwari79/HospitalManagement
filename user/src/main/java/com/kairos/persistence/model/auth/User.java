@@ -185,7 +185,7 @@ public class User extends UserBaseEntity {
 
     public int getAge() {
         int age = 0;
-        if(cprNumber == null) {
+        if(StringUtils.isEmpty(cprNumber)) {
             return this.age;
 
         }
