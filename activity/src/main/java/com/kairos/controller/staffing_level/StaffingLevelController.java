@@ -173,7 +173,7 @@ public class StaffingLevelController {
                 staffingLevelService.getStaffingLevelIfUpdated(unitId, updatedStaffingLevels));
     }
 
-    @RequestMapping(value = "/staffing_level/publish", method = RequestMethod.PUT)
+    @RequestMapping(value = "/publish", method = RequestMethod.PUT)
     @ApiOperation("publish staffing_level")
     public ResponseEntity<Map<String, Object>> publishStaffingLevel(@PathVariable Long unitId, @RequestBody StaffingLevelPublishDTO staffingLevelPublishDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.publishStaffingLevel(unitId,staffingLevelPublishDTO));

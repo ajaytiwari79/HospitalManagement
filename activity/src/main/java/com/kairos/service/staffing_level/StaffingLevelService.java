@@ -1179,7 +1179,7 @@ public class StaffingLevelService  {
         unityStaffingLevelRelatedDetails.setPlanningPeriodStartDate(planningPeriod.getStartDate());
         unityStaffingLevelRelatedDetails.setPlanningPeriodEndDate(planningPeriod.getEndDate());
         unityStaffingLevelRelatedDetails.setWeekStartDate(startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
-        unityStaffingLevelRelatedDetails.setWeekEndDate(startDate.plusWeeks(1));
+        unityStaffingLevelRelatedDetails.setWeekEndDate(startDate.plusWeeks(1).minusDays(1));
         unityStaffingLevelRelatedDetails.setStartDate(startDate);
         unityStaffingLevelRelatedDetails.setEndDate(startDate);
         LocalDate endDate;
