@@ -590,6 +590,7 @@ public class PermissionService {
     public void assignPermission(Long unitId,Long accessGroupId, CustomPermissionDTO customPermissionDTO) {
         Set<Long> kPermissionModelIds=permissionModelRepository.kPermissionModelIds(customPermissionDTO.getId());
         OtherPermissionDTO forOtherPermissions=customPermissionDTO.getForOtherPermissions();
+        LOGGER.info("other permissions are {}",customPermissionDTO.getForOtherPermissions().toString());
         accessGroupRepository.setCustomPermissionForSubModelAndFields(customPermissionDTO.getStaffId(), unitId, accessGroupId,kPermissionModelIds, customPermissionDTO.getPermissions(),forOtherPermissions.getExpertiseIds(),forOtherPermissions.getUnionIds(),forOtherPermissions.getTeamIds(),
                 forOtherPermissions.getEmploymentTypeIds(),forOtherPermissions.getTagIds(),forOtherPermissions.getStaffStatuses(),forOtherPermissions.getPermissions());
     }
