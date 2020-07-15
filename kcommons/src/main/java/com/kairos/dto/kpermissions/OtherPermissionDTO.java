@@ -41,4 +41,17 @@ public class OtherPermissionDTO {
         return expertiseValid && unionValid && teamValid && employmentTypeValid && tagValid && staffStatusesValid;
     }
 
+    @Override
+    public String toString() {
+        return "OtherPermissionDTO{" +
+                "expertiseIds=" + expertiseIds +
+                ", unionIds=" + unionIds +
+                ", teamIds=" + teamIds +
+                ", employmentTypeIds=" + employmentTypeIds +
+                ", tagIds=" + tagIds +
+                ", staffStatuses=" + staffStatuses +
+                ", permissions=" + permissions +
+                ", staffId=" + staffId +
+                '}';
+    }
 }
