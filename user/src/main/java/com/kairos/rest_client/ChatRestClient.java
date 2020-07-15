@@ -40,7 +40,7 @@ public class ChatRestClient {
             restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
             ResponseEntity<StaffChatDetails> restExchange =
                     restTemplate.exchange(
-                            "http://localhost/_matrix/client/r0/register?kind=user",
+                            "http://127.0.0.1:8008/_matrix/client/r0/register?kind=user",
                             HttpMethod.POST,
                             requestEntity, StaffChatDetails.class);
 
