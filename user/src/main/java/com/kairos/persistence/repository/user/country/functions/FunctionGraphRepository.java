@@ -92,7 +92,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "RETURN appliedDates")
     List<LocalDate> findAllDateByFunctionIds(Long unitId, List<Long> functionIds);
 
-    @Query("MATCH(function:Function)-[rel:" + HAS_ORGANIZATION_LEVEL + "]->(level:Level) where id(function)={0} " +
+    @Query("MATCH(function:Function)-[rel:" + HAS_ORGANIZATION_LEVEL + "]->(level:Level) where id(function)={0} AND NOT id(level) IN {1} " +
             "DETACH DELETE rel")
-    void removeOrganizationLevelRelation(Long functionId);
+    void removeOrganizationLevelRelation(Long functionId, List<Long> levelIds);
 }

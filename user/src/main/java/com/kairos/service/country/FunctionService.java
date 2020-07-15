@@ -96,7 +96,7 @@ public class FunctionService {
         if (!functionDTO.getUnionIds().isEmpty()) {
             unions = unitGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
-        functionGraphRepository.removeOrganizationLevelRelation(functionDTO.getId());
+        functionGraphRepository.removeOrganizationLevelRelation(functionDTO.getId(),functionDTO.getOrganizationLevelIds());
         function.setName(functionDTO.getName());
         function.setDescription(functionDTO.getDescription());
         function.setStartDate(functionDTO.getStartDate());
