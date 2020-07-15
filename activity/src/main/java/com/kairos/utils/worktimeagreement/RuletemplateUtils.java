@@ -329,10 +329,12 @@ public class RuletemplateUtils {
         int max = 0;
         int l = 1;
         while (l < localDates.size()) {
-            if (localDates.get(l - 1).equals(localDates.get(l).minusDays(1))) {
+            LocalDate previousDay = localDates.get(l - 1);
+            LocalDate nextDay = localDates.get(l);
+            if (previousDay.equals(nextDay.minusDays(1))) {
                 count++;
             } else {
-                count = 0;
+                count = 1;
             }
             if (count > max) {
                 max = count;
