@@ -78,14 +78,7 @@ public class PlanningPeriodController {
     public ResponseEntity<Map<String, Object>> updatePlanningPeriodPhaseToNext(@PathVariable BigInteger periodId, @PathVariable Long unitId , @RequestBody(required=false) Set<Long> employmentTypeIds, @RequestParam PlanningPeriodAction planningPeriodAction) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setPlanningPeriodPhaseToPublishOrFlip(unitId, periodId ,employmentTypeIds,planningPeriodAction));
     }
-//test api
-//    @ApiOperation(value = "update period's flipping Date")
-//    @PutMapping(value = "/period/{periodId}/flip_phase/{schedulerPanelId}")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> updateFlippingDates(@PathVariable BigInteger periodId, @PathVariable Long unitId, @PathVariable BigInteger schedulerPanelId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updateFlippingDate(periodId, unitId, schedulerPanelId));
-//
-//    }
+
     @ApiOperation(value = "restore shift base planning period and phase id")
     @PutMapping(value = "/period/{periodId}/reset_phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -93,14 +86,7 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.restoreShiftToPreviousPhase(periodId,unitId));
     }
 
-    //TODO currently not use
-//    @ApiOperation(value = "restore shift data based on shiftIds and phase")
-//    @PutMapping(value = "/phase/{phaseId}/restore_shifts")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> restoreShiftsDataByShiftIds(@RequestBody List<BigInteger> shiftIds, @PathVariable Long unitId,@PathVariable BigInteger phaseId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialDataOfShiftIds(shiftIds,phaseId,unitId));
-//
-//    }
+
 
     @ApiOperation(value = "Migrate Planning Period")
     @PostMapping(value="/migrate_planning_period")
