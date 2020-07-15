@@ -28,13 +28,13 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "OPTIONAL MATCH(staff:Staff)<-[:"+BELONGS_TO+"]-(position:Position)-["+HAS_UNIT_PERMISSIONS+"]->(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit) WHERE ID(staff)={2} AND ID(unit)={1} " +
             "OPTIONAL MATCH(up)-[customRel:"+HAS_CUSTOMIZED_PERMISSION_FOR_FIELD+"]->(field) WHERE customRel.accessGroupId=id(ag) " +
             "RETURN CASE WHEN customRel IS NULL THEN  permission.fieldLevelPermissions ELSE customRel.fieldLevelPermissions END AS permissions, \n" +
-            "permission.expertiseIds as expertiseIds,\n" +
-            "permission.forOtherFieldLevelPermissions as forOtherFieldLevelPermissions,\n" +
-            "permission.staffStatuses as staffStatuses,\n" +
-            "permission.tagIds as tagIds,\n" +
-            "permission.teamIds as teamIds,\n" +
-            "permission.employmentTypeIds as employmentTypeIds,\n" +
-            "permission.unionIds as unionIds,id(field) as id,field.fieldName as fieldName")
+            "CASE WHEN customRel IS NULL THEN permission.expertiseIds ELSE customRel.expertiseIds END as expertiseIds,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.forOtherFieldLevelPermissions ELSE customRel.forOtherFieldLevelPermissions END as forOtherFieldLevelPermissions,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.staffStatuses ELSE customRel.staffStatuses END as staffStatuses,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.tagIds ELSE customRel.tagIds END as tagIds,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.teamIds ELSE customRel.teamIds END as teamIds,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.employmentTypeIds ELSE customRel.employmentTypeIds END as employmentTypeIds,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.unionIds ELSE customRel.unionIds END as unionIds,id(field) as id,field.fieldName as fieldName")
     List<FieldPermissionQueryResult> getAllFieldPermission(Collection<Long> accessGroupIds, Long lastSelectedOrganizationId, Long staffId);
 
     @Query("MATCH(model:KPermissionModel) where model.modelName={0} MATCH(model)-[unitRel:HAS_FIELD]->(field:KPermissionField) where field.fieldName IN {1}\n" +
@@ -49,13 +49,13 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "OPTIONAL MATCH(staff:Staff)<-[:"+BELONGS_TO+"]-(position:Position)-["+HAS_UNIT_PERMISSIONS+"]->(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit) WHERE ID(staff)={2} AND ID(unit)={1} " +
             "OPTIONAL MATCH(up)-[customRel:"+HAS_CUSTOMIZED_PERMISSION_FOR_FIELD+"]->(model) WHERE customRel.accessGroupId=id(ag)" +
             "RETURN CASE WHEN customRel IS NULL THEN  permission.fieldLevelPermissions ELSE customRel.fieldLevelPermissions END AS permissions,\n" +
-            "permission.expertiseIds as expertiseIds,\n" +
-            "permission.forOtherFieldLevelPermissions as forOtherFieldLevelPermissions,\n" +
-            "permission.staffStatuses as staffStatuses,\n" +
-            "permission.tagIds as tagIds,\n" +
-            "permission.teamIds as teamIds,\n" +
-            "permission.employmentTypeIds as employmentTypeIds,\n" +
-            "permission.unionIds as unionIds,id(model) as id,model.modelName as modelName")
+            "CASE WHEN customRel IS NULL THEN permission.expertiseIds ELSE customRel.expertiseIds END as expertiseIds,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.forOtherFieldLevelPermissions ELSE customRel.forOtherFieldLevelPermissions END as forOtherFieldLevelPermissions,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.staffStatuses ELSE customRel.staffStatuses END as staffStatuses,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.tagIds ELSE customRel.tagIds END as tagIds,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.teamIds ELSE customRel.teamIds END as teamIds,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.employmentTypeIds ELSE customRel.employmentTypeIds END as employmentTypeIds,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.unionIds ELSE customRel.unionIds END as unionIds,id(model) as id,model.modelName as modelName")
     List<ModelPermissionQueryResult> getAllModelPermission(Collection<Long> accessGroupIds, Long unitId, Long staffId);
 
     @Query("MATCH(model:KPermissionModel{deleted:false})  OPTIONAL MATCH(model)-[orgRel:HAS_SUB_MODEL*]->(subModel:KPermissionModel)  OPTIONAL MATCH(model)-[unitRel:HAS_FIELD]->(field:KPermissionField)  OPTIONAL MATCH(subModel)-[orgUnitRel:HAS_FIELD]->(fieldn:KPermissionField) where model.modelName in {0} \n" +

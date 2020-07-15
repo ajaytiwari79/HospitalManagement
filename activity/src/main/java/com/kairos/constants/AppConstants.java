@@ -259,6 +259,7 @@ public class AppConstants {
 
     public static final String PLANNING_PERIOD_NAME="PP_";
     public static final int NOT_VALID_VALUE = -1;
+    public static final String PLANNING_PERIOD="Planning_Period";
 
 
 }

@@ -11,6 +11,7 @@ import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.expertise.CareDaysDTO;
@@ -127,8 +128,8 @@ public class RuletemplateUtils {
         return interval;
     }
 
-    public static TimeInterval getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
-        TimeInterval timeInterval = null;
+    public static List<TimeInterval> getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
+        List<TimeInterval> timeIntervals = new ArrayList<>();
         for (PartOfDay partOfDay : partOfDays) {
             if (timeSlotWrapperMap.containsKey(partOfDay.getValue())) {
                 TimeSlotWrapper timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
@@ -136,15 +137,19 @@ public class RuletemplateUtils {
                     int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
                     int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
                     TimeInterval interval = new TimeInterval(startMinutesOfInterval, endMinutesOfInterval);
-                    int minuteOfTheDay = DateUtils.asZonedDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
-                    if (minuteOfTheDay == (int) interval.getStartFrom() || interval.contains(minuteOfTheDay)) {
-                        timeInterval = interval;
-                        break;
+                    if(isNotNull(shift)) {
+                        int minuteOfTheDay = DateUtils.asZonedDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY);
+                        if (minuteOfTheDay == (int) interval.getStartFrom() || interval.contains(minuteOfTheDay)) {
+                            timeIntervals.add(interval);
+                            break;
+                        }
+                    }else {
+                        timeIntervals.add(interval);
                     }
                 }
             }
         }
-        return timeInterval;
+        return timeIntervals;
     }
 
     public static TimeInterval[] getTimeSlotsByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
@@ -210,14 +215,18 @@ public class RuletemplateUtils {
         return interval;
     }
 
-    public static List<ShiftWithActivityDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, TimeInterval timeInterval) {
+    public static List<ShiftWithActivityDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, List<TimeInterval> timeIntervals) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         shifts.forEach(s -> {
-            if ((dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.getEndLocalDate().equals(s.getEndLocalDate())) && (timeInterval == null || timeInterval.contains(DateUtils.asZonedDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
+            if ((dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.getEndLocalDate().equals(s.getEndLocalDate())) && isTimeIntervalValid(timeIntervals, s)) {
                 updatedShifts.add(s);
             }
         });
         return updatedShifts;
+    }
+
+    private static boolean isTimeIntervalValid(List<TimeInterval> timeIntervals, ShiftWithActivityDTO s) {
+        return timeIntervals == null || timeIntervals.stream().anyMatch(timeInterval->timeInterval.contains(DateUtils.asZonedDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)));
     }
 
     public static Set<BigInteger> getShiftIdsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, TimeInterval[] timeIntervals) {
@@ -320,10 +329,12 @@ public class RuletemplateUtils {
         int max = 0;
         int l = 1;
         while (l < localDates.size()) {
-            if (localDates.get(l - 1).equals(localDates.get(l).minusDays(1))) {
+            LocalDate previousDay = localDates.get(l - 1);
+            LocalDate nextDay = localDates.get(l);
+            if (previousDay.equals(nextDay.minusDays(1))) {
                 count++;
             } else {
-                count = 0;
+                count = 1;
             }
             if (count > max) {
                 max = count;
@@ -363,17 +374,29 @@ public class RuletemplateUtils {
     }
 
 
-    public static Set<DayOfWeek> getValidDays(Map<Long, DayTypeDTO> dayTypeMap, List<Long> dayTypeIds) {
+    public static Set<DayOfWeek> getValidDays(Map<Long, DayTypeDTO> dayTypeMap, List<Long> dayTypeIds, LocalDate startDate) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        List<Day> days = dayTypeIds.stream().filter(s -> dayTypeMap.containsKey(s)).flatMap(dayTypeId -> dayTypeMap.get(dayTypeId).getValidDays().stream()).collect(Collectors.toList());
+        List<Day> days = new ArrayList<>();
+        for (Long dayTypeId : dayTypeIds) {
+            if(dayTypeMap.containsKey(dayTypeId)){
+                DayTypeDTO dayTypeDTO = dayTypeMap.get(dayTypeId);
+                if(dayTypeDTO.getValidDays().contains(Day.EVERYDAY)){
+                    List<LocalDate> holidayList = dayTypeDTO.getCountryHolidayCalenderData().stream().map(CountryHolidayCalenderDTO::getHolidayDate).collect(Collectors.toList());
+                    if(holidayList.contains(startDate)){
+                        days.addAll(dayTypeDTO.getValidDays());
+                    }
+                }else{
+                    days.addAll(dayTypeDTO.getValidDays());
+                }
+            }
+        }
         days.forEach(day -> {
             if (!day.equals(Day.EVERYDAY)) {
                 dayOfWeeks.add(DayOfWeek.valueOf(day.name()));
-            } else if (day.equals(Day.EVERYDAY)) {
+            } else {
                 dayOfWeeks.addAll(Arrays.asList(DayOfWeek.values()));
             }
         });
-
         return new HashSet<>(dayOfWeeks);
     }
 
@@ -589,7 +612,7 @@ public class RuletemplateUtils {
 
     public static boolean isValidForDay(List<Long> dayTypeIds, RuleTemplateSpecificInfo infoWrapper) {
         DayOfWeek shiftDay = DateUtils.asLocalDate(infoWrapper.getShift().getStartDate()).getDayOfWeek();
-        return getValidDays(infoWrapper.getDayTypeMap(), dayTypeIds).stream().anyMatch(day -> day.equals(shiftDay));
+        return getValidDays(infoWrapper.getDayTypeMap(), dayTypeIds, asLocalDate(infoWrapper.getShift().getStartDate())).stream().anyMatch(day -> day.equals(shiftDay));
     }
 
     public static boolean validateVetoAndStopBrickRules(float totalBlockingPoints, int totalVeto, int totalStopBricks) {

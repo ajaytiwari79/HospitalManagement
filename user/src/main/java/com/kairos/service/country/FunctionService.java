@@ -96,7 +96,7 @@ public class FunctionService {
         if (!functionDTO.getUnionIds().isEmpty()) {
             unions = unitGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
-
+        functionGraphRepository.removeOrganizationLevelRelation(functionDTO.getId(),functionDTO.getOrganizationLevelIds());
         function.setName(functionDTO.getName());
         function.setDescription(functionDTO.getDescription());
         function.setStartDate(functionDTO.getStartDate());
@@ -106,7 +106,6 @@ public class FunctionService {
         function.setIcon(functionDTO.getIcon());
         function.setCode(functionDTO.getCode());
         functionGraphRepository.save(function);
-
         return new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
                 function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon(),function.getCode());
     }

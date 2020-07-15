@@ -143,8 +143,7 @@ public class StaffingLevelController {
     @ApiOperation("update and create staffing_level")
     public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos,
                                                                    @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.updateAbsenceStaffingLevel(unitId,absenceStaffingLevelDtos));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.updateAbsenceStaffingLevel(unitId,absenceStaffingLevelDtos));
     }
 
     /**
@@ -174,7 +173,7 @@ public class StaffingLevelController {
                 staffingLevelService.getStaffingLevelIfUpdated(unitId, updatedStaffingLevels));
     }
 
-    @RequestMapping(value = "/staffing_level/publish", method = RequestMethod.PUT)
+    @RequestMapping(value = "/publish", method = RequestMethod.PUT)
     @ApiOperation("publish staffing_level")
     public ResponseEntity<Map<String, Object>> publishStaffingLevel(@PathVariable Long unitId, @RequestBody StaffingLevelPublishDTO staffingLevelPublishDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.publishStaffingLevel(unitId,staffingLevelPublishDTO));
@@ -184,5 +183,11 @@ public class StaffingLevelController {
     @ApiOperation("weekly staffing Level")
     public ResponseEntity<Map<String, Object>> getWeeklyStaffingLevel(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date,@RequestParam BigInteger activityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.getWeeklyStaffingLevel(unitId,date,activityId));
+    }
+
+    @GetMapping(value = "/get_staffing_level_activities")
+    @ApiOperation("weekly staffing Level")
+    public ResponseEntity<Map<String, Object>> getStaffingLevelActivities(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam String query) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.getStaffingLevelActivities(unitId,startDate,query));
     }
 }
