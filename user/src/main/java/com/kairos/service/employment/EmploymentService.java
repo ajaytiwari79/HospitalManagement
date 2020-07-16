@@ -959,7 +959,9 @@ public class EmploymentService {
 
     private void setDetailsInEmploymentLine(Employment employment, EmploymentLine employmentLine, int fullTimeWeeklyMinutes, ExpertiseLine o, Long id, int workingDaysInWeek) {
         employmentLine.setFullTimeWeeklyMinutes(fullTimeWeeklyMinutes);
-        employmentLine.setSeniorityLevel(seniorityLevelService.getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), o, id));
+        if(isNotNull(o)) {
+            employmentLine.setSeniorityLevel(seniorityLevelService.getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), o, id));
+        }
         employmentLine.setWorkingDaysInWeek(workingDaysInWeek);
     }
 }
