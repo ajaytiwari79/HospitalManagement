@@ -33,7 +33,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
 
     private static final String ACTIVITY_STATUS = "activities.status";
     private static final String ACTIVITY_IDS = "activities.activityId";
-    private static final String PLANNED_TIME_IDS = "activities.plannedTimeId";
+    private static final String PLANNED_TIME_IDS = "activities.plannedTimes.plannedTimeId";
     private static final String VALIDATED_BY_ROLES = "accessGroupRole";
     private static final String UNIT_ID = "unitId";
     private static final String EMPLOYMENT_ID = "employmentId";
