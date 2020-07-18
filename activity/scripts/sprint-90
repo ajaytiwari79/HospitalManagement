@@ -1,3 +1,6 @@
+
+
+//ACTIVITIES
 db.activities.updateMany( {}, { $rename: { 'generalActivityTab': 'activityGeneralSettings'} } );
 db.activities.updateMany({},{$rename:{'balanceSettingsActivityTab':'activityBalanceSettings'}});
 db.activities.updateMany({},{$rename:{'individualPointsActivityTab':'activityIndividualPointsSettings'}});
@@ -10,3 +13,21 @@ db.activities.updateMany({},{$rename:{'phaseSettingsActivityTab':'activityPhaseS
 db.activities.updateMany({},{$rename:{'optaPlannerSettingActivityTab':'activityOptaPlannerSettings'}});
 db.activities.updateMany({},{$rename:{'ctaAndWtaSettingsActivityTab':'activityCTAAndWTASettings'}});
 db.activities.updateMany({},{$rename:{'locationActivityTab':'activityLocationSettings'}});
+
+
+
+
+
+//TIME TYPES
+db.time_Type.updateMany( {}, { $rename: { 'generalActivityTab': 'activityGeneralSettings'} } );
+db.time_Type.updateMany({},{$rename:{'balanceSettingsActivityTab':'activityBalanceSettings'}});
+db.time_Type.updateMany({},{$rename:{'individualPointsActivityTab':'activityIndividualPointsSettings'}});
+db.time_Type.updateMany({},{$rename:{'notesActivityTab':'activityNotesSettings'}});
+db.time_Type.updateMany({},{$rename:{'communicationActivityTab':'activityCommunicationSettings'}});
+db.time_Type.updateMany({},{$rename:{'rulesActivityTab':'activityRulesSettings'}});
+db.time_Type.updateMany({},{$rename:{'timeCalculationActivityTab':'activityTimeCalculationSettings'}});
+db.time_Type.updateMany({},{$rename:{'skillActivityTab':'activitySkillSettings'}});
+db.time_Type.updateMany({},{$rename:{'phaseSettingsActivityTab':'activityPhaseSettings'}});
+db.time_Type.updateMany({},{$rename:{'optaPlannerSettingActivityTab':'activityOptaPlannerSettings'}});
+db.time_Type.updateMany({},{$rename:{'ctaAndWtaSettingsActivityTab':'activityCTAAndWTASettings'}});
+db.time_Type.updateMany({},{$rename:{'locationActivityTab':'activityLocationSettings'}});
