@@ -313,10 +313,11 @@ public class ActivityService {
             activity.setActivitySkillSettings(timeType.getActivitySkillSettings());
             activity.setRegions(timeType.getRegions());
             activity.setLevels(timeType.getLevels());
+            activity.getActivityRulesSettings().setSicknessSettingValid(timeType.isSicknessSettingValid());
+            activity.getActivityRulesSettings().setSicknessSetting(timeType.getActivityRulesSettings().getSicknessSetting());
+            activity.getActivityGeneralSettings().setBackgroundColor(timeType.getBackgroundColor());
         }
-        activity.getActivityRulesSettings().setSicknessSettingValid(timeType.isSicknessSettingValid());
-        activity.getActivityRulesSettings().setSicknessSetting(timeType.getActivityRulesSettings().getSicknessSetting());
-        activity.getActivityGeneralSettings().setBackgroundColor(timeType.getBackgroundColor());
+
         activity.getActivityGeneralSettings().setColorPresent(true);
         Long countryId = activity.getCountryId();
         if (countryId == null) {
