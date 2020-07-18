@@ -14,7 +14,7 @@ import java.math.BigInteger;
 public class ActivityTypeDTO {
     private Long id;
     private String name;
-    private CTAAndWTASettingsActivityTabDTO ctaAndWtaSettingsActivityTab;
+    private ActivityCTAAndWTASettingsDTO ctaAndWtaSettingsActivityTab;
     private BigInteger categoryId;
 
 }

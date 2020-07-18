@@ -54,12 +54,12 @@ public class RealTimeStatusFilter <G> implements ShiftFilter {
     }
 
     private boolean isOnLeave(ShiftDTO shiftDTO){
-        return filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_LEAVE.toString()) && ShiftType.ABSENCE.equals(shiftDTO.getShiftType()) && (CommonConstants.FULL_WEEK.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()));
+        return filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_LEAVE.toString()) && ShiftType.ABSENCE.equals(shiftDTO.getShiftType()) && (CommonConstants.FULL_WEEK.equals(shiftDTO.getActivities().get(0).getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(shiftDTO.getActivities().get(0).getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()));
     }
 
     private boolean isResting(ShiftDTO shiftDTO){
         Date currentDate = getDate();
-        return filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.RESTING.toString()) && !(ShiftType.ABSENCE.equals(shiftDTO.getShiftType()) && (CommonConstants.FULL_WEEK.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) && (shiftDTO.getStartDate().after(currentDate) || shiftDTO.getEndDate().before(currentDate));
+        return filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.RESTING.toString()) && !(ShiftType.ABSENCE.equals(shiftDTO.getShiftType()) && (CommonConstants.FULL_WEEK.equals(shiftDTO.getActivities().get(0).getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(shiftDTO.getActivities().get(0).getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()))) && (shiftDTO.getStartDate().after(currentDate) || shiftDTO.getEndDate().before(currentDate));
     }
 
     private boolean isUpcoming(ShiftDTO shiftDTO){

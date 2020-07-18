@@ -88,7 +88,7 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
                         "              },\n" +
                         "              { $project: { \n" +
                         "                  \"name\":1, \n" +
-                        "                 \"timeType\":\"$balanceSettingsActivityTab.timeType\"\n" +
+                        "                 \"timeType\":\"$activityBalanceSettings.timeType\"\n" +
                         "                  } \n" +
                         "               }\n" +
                         "               \n" +

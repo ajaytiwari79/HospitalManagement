@@ -419,7 +419,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 "                 }\n" +
                 "           \n" +
                 "              },{\n" +
-                "                  \"$project\":{\"name\":1,\"balanceSettingsActivityTab\":1,\"rulesActivityTab\":1,\"timeCalculationActivityTab\":1,\"skillActivityTab\":1,\"tags\":1,\"employmentTypes\":1}\n" +
+                "                  \"$project\":{\"name\":1,\"activityBalanceSettings\":1,\"activityRulesSettings\":1,\"activityTimeCalculationSettings\":1,\"activitySkillSettings\":1,\"tags\":1,\"employmentTypes\":1}\n" +
                 "                  }\n" +
                 "           ],\n" +
                 "            as: \"activities\"\n" +

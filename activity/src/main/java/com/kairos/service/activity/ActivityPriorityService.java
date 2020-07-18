@@ -220,10 +220,10 @@ public class ActivityPriorityService {
         return activityPriorityMongoRepository.findOne(activityPriorityId);
     }
     public boolean isPriorityIdExists(Activity activity, BigInteger activityPriorityId) {
-        if (PriorityFor.NONE.equals(activity.getBalanceSettingsActivityTab().getPriorityFor())) {
+        if (PriorityFor.NONE.equals(activity.getActivityBalanceSettings().getPriorityFor())) {
             exceptionService.dataNotFoundException(MESSAGE_ACTIVITY_PRIORITY_ID_NOT_SET, activityPriorityId);
         }
-        boolean isExist = activityMongoRepository.isActivityPriorityIdIsExistOrNot(activity.getBalanceSettingsActivityTab().getPriorityFor(), activityPriorityId,activity.getId());
+        boolean isExist = activityMongoRepository.isActivityPriorityIdIsExistOrNot(activity.getActivityBalanceSettings().getPriorityFor(), activityPriorityId,activity.getId());
         if (isExist) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DUPLICATE_ACTIVITY_PRIORITY_ID, activityPriorityId);
         }

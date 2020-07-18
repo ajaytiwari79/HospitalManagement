@@ -92,7 +92,7 @@ db.getCollection('time_Type').updateMany({},{$set:{"expertises" : [
         NumberLong(14046),
         NumberLong(20604)
     ],
-    "rulesActivityTab" : {
+    "activityRulesSettings" : {
         "eligibleForFinalSchedule" : false,
         "eligibleForDraftSchedule" : false,
         "eligibleForRequest" : false,
@@ -131,7 +131,7 @@ db.getCollection('time_Type').updateMany({},{$set:{"expertises" : [
         "pqlSettings" : {},
         "reasonCodeRequired" : false
     },
-    "timeCalculationActivityTab" : {
+    "activityTimeCalculationSettings" : {
         "methodForCalculatingTime" : "WEEKLY_HOURS",
         "fullDayCalculationType" : "FULL_TIME_WEEKLY_HOURS_TYPE",
         "fullWeekCalculationType" : "FULL_TIME_WEEKLY_HOURS_TYPE",
@@ -152,9 +152,9 @@ db.getCollection('time_Type').updateMany({},{$set:{"expertises" : [
             NumberLong(13984)
         ]
     },
-"skillActivityTab" : {
+"activitySkillSettings" : {
         "activitySkills" : []
-    },"phaseSettingsActivityTab" : {
+    },"activityPhaseSettings" : {
         "activityId" : "13",
         "phaseTemplateValues" : [
             {

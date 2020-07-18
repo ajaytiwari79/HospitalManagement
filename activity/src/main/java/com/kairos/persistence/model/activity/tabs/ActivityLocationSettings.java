@@ -16,7 +16,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocationActivityTab  {
+public class ActivityLocationSettings {
     private Set<ActivityGlideTimeDetails> glideTimeForCheckIn;
     private Set<ActivityGlideTimeDetails> glideTimeForCheckOut;
 

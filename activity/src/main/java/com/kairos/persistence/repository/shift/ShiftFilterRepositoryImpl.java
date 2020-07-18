@@ -188,7 +188,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         if (lookupActivityMatchCriteria == null) {
             lookupActivityMatchCriteria = new Criteria();
         }
-        lookupActivityMatchCriteria.and("matchedActivities.timeCalculationActivityTab.methodForCalculatingTime").in(values);
+        lookupActivityMatchCriteria.and("matchedActivities.activityTimeCalculationSettings.methodForCalculatingTime").in(values);
         return lookupActivityMatchCriteria;
     }
 
@@ -285,7 +285,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         statusMatch.and(START_DATE).is(date).and(UNIT_ID).is(unitId);
         aggregationOperations.add(new MatchOperation(statusMatch));
         aggregationOperations.add(getActivityLookupOperation(null));
-        aggregationOperations.add(match(Criteria.where("matchedActivities.rulesActivityTab.sicknessSettingValid").is(true)));
+        aggregationOperations.add(match(Criteria.where("matchedActivities.activityRulesSettings.sicknessSettingValid").is(true)));
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
         List<Map> staffIdDocuments = mongoTemplate.aggregate(aggregation, Shift.class, Map.class).getMappedResults();
         return staffIdDocuments.stream().map(d -> (Long) d.get(STAFF_ID)).collect(Collectors.toSet());

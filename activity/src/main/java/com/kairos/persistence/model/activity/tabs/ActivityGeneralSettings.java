@@ -20,7 +20,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GeneralActivityTab  {
+public class ActivityGeneralSettings {
     @KPermissionField
     private String name;
     @KPermissionField
@@ -48,7 +48,7 @@ public class GeneralActivityTab  {
 
     private List<BigInteger> tags = new ArrayList<>();
 
-    public GeneralActivityTab(String name, String description, String ultraShortName) {
+    public ActivityGeneralSettings(String name, String description, String ultraShortName) {
         this.name = name;
         this.description = description;
         this.ultraShortName = ultraShortName;

@@ -14,16 +14,16 @@ import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
-import com.kairos.persistence.model.activity.tabs.SkillActivityTab;
-import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.activity.tabs.ActivitySkillSettings;
+import com.kairos.persistence.model.activity.tabs.ActivityTimeCalculationSettings;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.wrapper.activity.ActivityTabsWrapper;
+import com.kairos.wrapper.activity.ActivitySettingsWrapper;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -440,32 +440,32 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public TimeCalculationActivityDTO updateTimeCalculationTabOfTimeType(TimeCalculationActivityDTO timeCalculationActivityDTO, BigInteger timeTypeId) {
-        TimeCalculationActivityTab timeCalculationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(timeCalculationActivityDTO, TimeCalculationActivityTab.class);
+        ActivityTimeCalculationSettings activityTimeCalculationSettings = ObjectMapperUtils.copyPropertiesByMapper(timeCalculationActivityDTO, ActivityTimeCalculationSettings.class);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
         }
         if (!timeCalculationActivityDTO.isAvailableAllowActivity()) {
-            timeType.setTimeCalculationActivityTab(timeCalculationActivityTab);
-            if (!timeCalculationActivityTab.getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
-                timeCalculationActivityTab.setDayTypes(timeType.getRulesActivityTab().getDayTypes());
+            timeType.setActivityTimeCalculationSettings(activityTimeCalculationSettings);
+            if (!activityTimeCalculationSettings.getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
+                activityTimeCalculationSettings.setDayTypes(timeType.getActivityRulesSettings().getDayTypes());
             }
             timeTypeMongoRepository.save(timeType);
         }
         return timeCalculationActivityDTO;
     }
 
-    public ActivityTabsWrapper getTimeCalculationTabOfTimeType(BigInteger timeTypeId, Long countryId) {
+    public ActivitySettingsWrapper getTimeCalculationTabOfTimeType(BigInteger timeTypeId, Long countryId) {
         List<DayType> dayTypes = userIntegrationService.getDayTypesByCountryId(countryId);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
-        TimeCalculationActivityTab timeCalculationActivityTab = timeType.getTimeCalculationActivityTab();
-        List<Long> rulesTabDayTypes = timeType.getRulesActivityTab().getDayTypes();
-        return new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes, rulesTabDayTypes);
+        ActivityTimeCalculationSettings activityTimeCalculationSettings = timeType.getActivityTimeCalculationSettings();
+        List<Long> rulesTabDayTypes = timeType.getActivityRulesSettings().getDayTypes();
+        return new ActivitySettingsWrapper(activityTimeCalculationSettings, dayTypes, rulesTabDayTypes);
     }
 
-    public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO,BigInteger timeTypeId) {
+    public ActivitySettingsWrapper updateRulesTab(ActivityRulesSettingsDTO rulesActivityDTO, BigInteger timeTypeId) {
         activityService.validateActivityTimeRules(rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
-        RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
+        ActivityRulesSettings activityRulesSettings = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, ActivityRulesSettings.class);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
@@ -475,19 +475,19 @@ public class TimeTypeService extends MongoBaseService {
                 exceptionService.invalidRequestException(ERROR_DAYVALUE_ZERO);
             }
             List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(), rulesActivityDTO.getCutOffIntervalUnit(), rulesActivityDTO.getCutOffdayValue());
-            rulesActivityTab.setCutOffIntervals(cutOffIntervals);
+            activityRulesSettings.setCutOffIntervals(cutOffIntervals);
             rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
         }
-        timeType.setRulesActivityTab(rulesActivityTab);
-        if (!timeType.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
-            timeType.getTimeCalculationActivityTab().setDayTypes(timeType.getRulesActivityTab().getDayTypes());
+        timeType.setActivityRulesSettings(activityRulesSettings);
+        if (!timeType.getActivityTimeCalculationSettings().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
+            timeType.getActivityTimeCalculationSettings().setDayTypes(timeType.getActivityRulesSettings().getDayTypes());
         }
         activityService.updateColorInActivity(new TimeTypeDTO(timeType.getBackgroundColor(),rulesActivityDTO.isSicknessSettingValid(),rulesActivityDTO),timeTypeId);
         timeTypeMongoRepository.save(timeType);
-        return new ActivityTabsWrapper(rulesActivityTab);
+        return new ActivitySettingsWrapper(activityRulesSettings);
     }
 
-    public ActivityTabsWrapper getPhaseSettingTabOfTimeType(BigInteger timeTypeId, Long countryId) {
+    public ActivitySettingsWrapper getPhaseSettingTabOfTimeType(BigInteger timeTypeId, Long countryId) {
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
@@ -496,44 +496,44 @@ public class TimeTypeService extends MongoBaseService {
         List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
-        PhaseSettingsActivityTab phaseSettingsActivityTab = timeType.getPhaseSettingsActivityTab();
-        return new ActivityTabsWrapper(roles, phaseSettingsActivityTab, dayTypes, employmentTypeDTOS);
+        ActivityPhaseSettings activityPhaseSettings = timeType.getActivityPhaseSettings();
+        return new ActivitySettingsWrapper(roles, activityPhaseSettings, dayTypes, employmentTypeDTOS);
     }
 
-    public PhaseSettingsActivityTab updatePhaseSettingTab(PhaseSettingsActivityTab phaseSettingsActivityTab,BigInteger timeTypeId) {
+    public ActivityPhaseSettings updatePhaseSettingTab(ActivityPhaseSettings activityPhaseSettings, BigInteger timeTypeId) {
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, phaseSettingsActivityTab.getActivityId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, activityPhaseSettings.getActivityId());
         }
-        timeType.setPhaseSettingsActivityTab(phaseSettingsActivityTab);
+        timeType.setActivityPhaseSettings(activityPhaseSettings);
         timeTypeMongoRepository.save(timeType);
-        return phaseSettingsActivityTab;
+        return activityPhaseSettings;
     }
 
-    public ActivityTabsWrapper getRulesTabOfTimeType(BigInteger timeTypeId, Long countryId) {
+    public ActivitySettingsWrapper getRulesTabOfTimeType(BigInteger timeTypeId, Long countryId) {
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
         List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
-        RulesActivityTab rulesActivityTab = timeType.getRulesActivityTab();
-        return new ActivityTabsWrapper(rulesActivityTab, dayTypes, employmentTypeDTOS);
+        ActivityRulesSettings activityRulesSettings = timeType.getActivityRulesSettings();
+        return new ActivitySettingsWrapper(activityRulesSettings, dayTypes, employmentTypeDTOS);
     }
 
 
-    public ActivityTabsWrapper updateSkillTabOfTimeType(SkillActivityDTO skillActivityDTO,BigInteger timeTypeId) {
+    public ActivitySettingsWrapper updateSkillTabOfTimeType(SkillActivityDTO skillActivityDTO, BigInteger timeTypeId) {
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, skillActivityDTO.getActivityId());
         }
-        SkillActivityTab skillActivityTab = new SkillActivityTab(skillActivityDTO.getActivitySkills());
-        timeType.setSkillActivityTab(skillActivityTab);
+        ActivitySkillSettings activitySkillSettings = new ActivitySkillSettings(skillActivityDTO.getActivitySkills());
+        timeType.setActivitySkillSettings(activitySkillSettings);
         timeTypeMongoRepository.save(timeType);
-        return new ActivityTabsWrapper(skillActivityTab);
+        return new ActivitySettingsWrapper(activitySkillSettings);
     }
 
-    public ActivityTabsWrapper getSkillTabOfTimeType(BigInteger timeTypeId) {
+    public ActivitySettingsWrapper getSkillTabOfTimeType(BigInteger timeTypeId) {
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
-        return new ActivityTabsWrapper(timeType.getSkillActivityTab());
+        return new ActivitySettingsWrapper(timeType.getActivitySkillSettings());
     }
 
     public void updateOrgMappingDetailOfActivity(OrganizationMappingDTO organizationMappingDTO, BigInteger timeTypeId) {

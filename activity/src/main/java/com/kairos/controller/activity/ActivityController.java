@@ -4,7 +4,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
-import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
+import com.kairos.persistence.model.activity.tabs.ActivityOptaPlannerSetting;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.utils.response.ResponseHandler;
@@ -77,10 +77,10 @@ public class ActivityController {
     }
 
 
-    @ApiOperation("Update GeneralActivityTab Tab of Activity")
+    @ApiOperation("Update ActivityGeneralSettings Tab of Activity")
     @PutMapping(value = "/activity/general")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateGeneralTab(@PathVariable Long countryId, @RequestBody GeneralActivityTabDTO generalDTO) {
+    ResponseEntity<Map<String, Object>> updateGeneralTab(@PathVariable Long countryId, @RequestBody ActivityGeneralSettingsDTO generalDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateGeneralTab(countryId, generalDTO));
     }
 
@@ -126,7 +126,7 @@ public class ActivityController {
   /*  @ApiOperation("Update Balance Settings Tab of Activity")
     @PutMapping(value = "/activity/balanceSettings")
         //  @PreAuthorize("@S.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateBalanceSettingsTab(@RequestBody BalanceSettingActivityTabDTO balanceDTO) {
+    ResponseEntity<Map<String, Object>> updateBalanceSettingsTab(@RequestBody ActivityBalanceSettingDTO balanceDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateBalanceTab(balanceDTO));
     }
 */
@@ -134,7 +134,7 @@ public class ActivityController {
     @ApiOperation("Update IndividualPoints Tab of Activity")
     @PutMapping(value = "/activity/individualPoints")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateIndividualPointsTab(@RequestBody IndividualPointsActivityTabDTO individualPointsDTO) {
+    ResponseEntity<Map<String, Object>> updateIndividualPointsTab(@RequestBody ActivityIndividualPointsSettingsDTO individualPointsDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateIndividualPointsTab(individualPointsDTO));
     }
 
@@ -164,7 +164,7 @@ public class ActivityController {
     @ApiOperation("Update Rules Tab of Activity")
     @PutMapping(value = "/activity/rules")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody RulesActivityTabDTO rulesDTO) {
+    ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody ActivityRulesSettingsDTO rulesDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateRulesTab(rulesDTO,false));
     }
 
@@ -180,8 +180,8 @@ public class ActivityController {
     @ApiOperation("Update Phase setting Tab of Activity")
     @PutMapping(value = "/activity/phase_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updatePhaseSettingTab(@RequestBody PhaseSettingsActivityTab phaseSettingsActivityTab) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatePhaseSettingTab(phaseSettingsActivityTab));
+    ResponseEntity<Map<String, Object>> updatePhaseSettingTab(@RequestBody ActivityPhaseSettings activityPhaseSettings) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatePhaseSettingTab(activityPhaseSettings));
     }
 
 
@@ -310,8 +310,8 @@ public class ActivityController {
     @ApiOperation("update Opta PlannerSetting  details  of activity Type")
     @PutMapping(value = "/activity/{activityId}/opta_planner_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@PathVariable BigInteger activityId,@RequestBody OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateOptaPlannerSettingsTabOfActivity(activityId,optaPlannerSettingActivityTab));
+    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@PathVariable BigInteger activityId,@RequestBody ActivityOptaPlannerSetting activityOptaPlannerSetting) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateOptaPlannerSettingsTabOfActivity(activityId, activityOptaPlannerSetting));
     }
 
     // cta_wta_settings
@@ -325,8 +325,8 @@ public class ActivityController {
     @ApiOperation("update cta_response and wta settings  of activity Type")
     @PutMapping(value = "/activity/cta_wta_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateCtaAndWtaSettingsTabOfActivity(@RequestBody CTAAndWTASettingsActivityTabDTO ctaAndWtaSettingsActivityTabDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateCtaAndWtaSettingsTabOfActivity(ctaAndWtaSettingsActivityTabDTO));
+    ResponseEntity<Map<String, Object>> updateCtaAndWtaSettingsTabOfActivity(@RequestBody ActivityCTAAndWTASettingsDTO activityCTAAndWTASettingsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateCtaAndWtaSettingsTabOfActivity(activityCTAAndWTASettingsDTO));
     }
 
 
@@ -372,8 +372,8 @@ public class ActivityController {
     @ApiOperation("update location settings of activity ")
     @PutMapping(value = "/activity/location_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateLocationsTabOfActivity(@RequestBody LocationActivityTabDTO locationActivityTabDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(locationActivityTabDTO));
+    ResponseEntity<Map<String, Object>> updateLocationsTabOfActivity(@RequestBody ActivityLocationSettingsDTO activityLocationSettingsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(activityLocationSettingsDTO));
     }
 
     @ApiOperation("Update language wise details of activity ")

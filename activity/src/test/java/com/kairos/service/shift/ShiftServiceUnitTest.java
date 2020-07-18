@@ -456,7 +456,7 @@ public class ShiftServiceUnitTest {
                 "      \"state\":\"DRAFT\",\n" +
                 "      \"unitId\":1172,\n" +
                 "      \"parentId\":770,\n" +
-                "      \"generalActivityTab\":{\n" +
+                "      \"activityGeneralSettings\":{\n" +
                 "         \"name\":\"Er tilgængelig\",\n" +
                 "         \"categoryId\":20,\n" +
                 "         \"colorPresent\":true,\n" +
@@ -468,14 +468,14 @@ public class ShiftServiceUnitTest {
                 "         ],\n" +
                 "         \"active\":true\n" +
                 "      },\n" +
-                "      \"balanceSettingsActivityTab\":{\n" +
+                "      \"activityBalanceSettings\":{\n" +
                 "         \"addTimeTo\":null,\n" +
                 "         \"timeTypeId\":9,\n" +
                 "         \"timeType\":null,\n" +
                 "         \"onCallTimePresent\":false,\n" +
                 "         \"negativeDayBalancePresent\":false\n" +
                 "      },\n" +
-                "      \"rulesActivityTab\":{\n" +
+                "      \"activityRulesSettings\":{\n" +
                 "         \"eligibleForFinalSchedule\":false,\n" +
                 "         \"eligibleForDraftSchedule\":false,\n" +
                 "         \"eligibleForRequest\":false,\n" +
@@ -539,11 +539,11 @@ public class ShiftServiceUnitTest {
                 "         \"reasonCodeRequired\":false,\n" +
                 "         \"reasonCodeRequiredState\":null\n" +
                 "      },\n" +
-                "      \"individualPointsActivityTab\":{\n" +
+                "      \"activityIndividualPointsSettings\":{\n" +
                 "         \"individualPointsCalculationMethod\":\"addHourValues\",\n" +
                 "         \"numberOfFixedPoints\":0.0\n" +
                 "      },\n" +
-                "      \"timeCalculationActivityTab\":{\n" +
+                "      \"activityTimeCalculationSettings\":{\n" +
                 "         \"methodForCalculatingTime\":\"ENTERED_TIMES\",\n" +
                 "         \"fixedTimeValue\":0,\n" +
                 "         \"multiplyWith\":true,\n" +
@@ -571,17 +571,17 @@ public class ShiftServiceUnitTest {
                 "      \"childActivityIds\":[\n" +
                 "\n" +
                 "      ],\n" +
-                "      \"notesActivityTab\":{\n" +
+                "      \"activityNotesSettings\":{\n" +
                 "         \"content\":null,\n" +
                 "         \"originalDocumentName\":null,\n" +
                 "         \"modifiedDocumentName\":null\n" +
                 "      },\n" +
-                "      \"communicationActivityTab\":{\n" +
+                "      \"activityCommunicationSettings\":{\n" +
                 "         \"allowCommunicationReminder\":false,\n" +
                 "         \"notifyAfterDeleteActivity\":false,\n" +
                 "         \"activityReminderSettings\":null\n" +
                 "      },\n" +
-                "      \"skillActivityTab\":{\n" +
+                "      \"activitySkillSettings\":{\n" +
                 "         \"activitySkills\":[\n" +
                 "\n" +
                 "         ],\n" +
@@ -589,15 +589,15 @@ public class ShiftServiceUnitTest {
                 "\n" +
                 "         ]\n" +
                 "      },\n" +
-                "      \"optaPlannerSettingActivityTab\":{\n" +
+                "      \"activityOptaPlannerSetting\":{\n" +
                 "         \"maxThisActivityPerShift\":10,\n" +
                 "         \"minLength\":0,\n" +
                 "         \"eligibleForMove\":true\n" +
                 "      },\n" +
-                "      \"ctaAndWtaSettingsActivityTab\":{\n" +
+                "      \"activityCTAAndWTASettings\":{\n" +
                 "         \"eligibleForCostCalculation\":false\n" +
                 "      },\n" +
-                "      \"locationActivityTab\":{\n" +
+                "      \"activityLocationSettings\":{\n" +
                 "         \"glideTimeForCheckIn\":[\n" +
                 "            {\n" +
                 "               \"location\":\"OFFICE\",\n" +
@@ -651,7 +651,7 @@ public class ShiftServiceUnitTest {
                 "            }\n" +
                 "         ]\n" +
                 "      },\n" +
-                "      \"phaseSettingsActivityTab\":{\n" +
+                "      \"activityPhaseSettings\":{\n" +
                 "         \"activityId\":823,\n" +
                 "         \"phaseTemplateValues\":[\n" +
                 "            {\n" +

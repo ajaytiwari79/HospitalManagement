@@ -35,8 +35,8 @@ public class ShiftStartTimeLessThan extends AbstractActivitySpecification<ShiftW
 
     private void validateShiftActivityStartTime(ShiftActivityDTO shiftActivityDTO) {
         Duration duration = Duration.between(DateUtils.getLocalDateTime(), DateUtils.asLocalDateTime(shiftActivityDTO.getStartDate()));
-        int calculatedValue = DurationType.DAYS.equals(shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getType()) ? (int)duration.toDays() : (int)duration.toHours();
-        if (shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getValue()!=null && calculatedValue < shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getValue()) {
+        int calculatedValue = DurationType.DAYS.equals(shiftActivityDTO.getActivity().getActivityRulesSettings().getPqlSettings().getApprovalTimeInAdvance().getType()) ? (int)duration.toDays() : (int)duration.toHours();
+        if (shiftActivityDTO.getActivity().getActivityRulesSettings().getPqlSettings().getApprovalTimeInAdvance().getValue()!=null && calculatedValue < shiftActivityDTO.getActivity().getActivityRulesSettings().getPqlSettings().getApprovalTimeInAdvance().getValue()) {
             ShiftValidatorService.throwException(MESSAGE_SHIFT_PLANNEDTIME_LESS);
         }
     }
@@ -46,8 +46,8 @@ public class ShiftStartTimeLessThan extends AbstractActivitySpecification<ShiftW
         List<String> messages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             Duration duration = Duration.between(DateUtils.getLocalDateTime(), DateUtils.asLocalDateTime(shiftActivityDTO.getStartDate()));
-            int calculatedValue = shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getType().equals(DurationType.DAYS) ? (int)duration.toDays() : (int)duration.toHours();
-            if (calculatedValue < shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getValue()) {
+            int calculatedValue = shiftActivityDTO.getActivity().getActivityRulesSettings().getPqlSettings().getApprovalTimeInAdvance().getType().equals(DurationType.DAYS) ? (int)duration.toDays() : (int)duration.toHours();
+            if (calculatedValue < shiftActivityDTO.getActivity().getActivityRulesSettings().getPqlSettings().getApprovalTimeInAdvance().getValue()) {
                 messages = Collections.singletonList(MESSAGE_SHIFT_PLANNEDTIME_LESS);
             }
         }
