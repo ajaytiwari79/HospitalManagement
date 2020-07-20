@@ -181,8 +181,8 @@ public class StaffingLevelController {
 
     @GetMapping(value = "/weekly")
     @ApiOperation("weekly staffing Level")
-    public ResponseEntity<Map<String, Object>> getWeeklyStaffingLevel(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date,@RequestParam BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.getWeeklyStaffingLevel(unitId,date,activityId));
+    public ResponseEntity<Map<String, Object>> getWeeklyStaffingLevel(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date,@RequestParam BigInteger activityId,@RequestParam(required = false) boolean unpublishedChanges) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.getWeeklyStaffingLevel(unitId,date,activityId,unpublishedChanges));
     }
 
     @GetMapping(value = "/get_staffing_level_activities")
