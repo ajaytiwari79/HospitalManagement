@@ -155,7 +155,7 @@ public class TeamService {
             }
             Team team = teamGraphRepository.findOne(teamId);
             Staff staff = staffGraphRepository.findByStaffId(staffTeamDTO.getStaffId());
-            if(!team.getSkillList().stream().allMatch(skillId->staffSkillMap.getOrDefault(staff.getId(),new HashSet<>()).contains(skillId))){
+            if(!team.getSkillList().stream().anyMatch(skill->staffSkillMap.getOrDefault(staff.getId(),new HashSet<>()).contains(skill.getId()))){
                 exceptionService.actionNotPermittedException(STAFF_SKILL_DOES_NOT_MATCHED);
             }
             StaffTeamRelationShipQueryResult staffTeamRelationShipQueryResult = staffTeamRelationshipGraphRepository.findByStaffIdAndTeamId(staffTeamDTO.getStaffId(), teamId);
@@ -276,10 +276,9 @@ public class TeamService {
     }
 
     public boolean addTeamSelectedSkills(Long teamId, Set<Long> skillIds) {
+        teamGraphRepository.removeAllSkillsFromTeam(teamId,skillIds);
         if (isCollectionNotEmpty(skillIds)) {
             teamGraphRepository.saveSkill(teamId, skillIds);
-        } else {
-            teamGraphRepository.removeAllSkillsFromTeam(teamId);
         }
         return true;
     }

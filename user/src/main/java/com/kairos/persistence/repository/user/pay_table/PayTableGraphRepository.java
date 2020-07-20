@@ -29,7 +29,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     Boolean checkPayTableNameAlreadyExitsByName(Long countryId, Long currentPayTableId, String payTableName);
 
     @Query("MATCH (c:Country) where id(c)={0} \n" +
-            "MATCH(c)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true})\n" +
+            "MATCH(c)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true,deleted:false})\n" +
             "OPTIONAL MATCH (level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false})\n" +
             "with level,count(payTable) as totalPayTable \n" +
             "OPTIONAL MATCH  (level:Level)-[:"+IN_LEVEL+"]-(payGroupArea:PayGroupArea{deleted:false})\n" +

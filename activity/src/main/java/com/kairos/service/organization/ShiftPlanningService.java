@@ -2,13 +2,18 @@ package com.kairos.service.organization;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.filter_utils.FilterUtils;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.shift.ShiftSearchDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.employment.PlanningEmploymentDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.shift.ShiftFilterDurationType;
+import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.wrapper.shift.StaffShiftDetails;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -20,12 +25,19 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.enums.FilterType.CTA_ACCOUNT_TYPE;
+
 @Service
 public class ShiftPlanningService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShiftPlanningService.class);
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private WorkTimeAgreementService workTimeAgreementService;
+    @Inject
+    private CostTimeAgreementRepository costTimeAgreementRepository;
 
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
@@ -60,6 +72,12 @@ public class ShiftPlanningService {
         StaffShiftDetails loggedInStaff = null;
         if (staffListWithPersonalDetails.get(0).getUserId().equals(shiftSearchDTO.getLoggedInUserId())) {
             loggedInStaff = staffListWithPersonalDetails.get(0);
+        }
+
+        if(validMatches.containsKey(CTA_ACCOUNT_TYPE)){
+            Set<Long> staffIds =staffListWithPersonalDetails.stream().map(s -> s.getId()).collect(Collectors.toSet());
+            Set<Long> filterStaffIds = filterStaffByCTATemplateAccountType(staffListWithPersonalDetails,staffIds,validMatches);
+            staffListWithPersonalDetails = staffListWithPersonalDetails.stream().filter(spd -> filterStaffIds.contains(spd.getId())).collect(Collectors.toList());
         }
 
         if (validMatches.containsKey(FilterType.REAL_TIME_STATUS)) {
@@ -158,6 +176,8 @@ public class ShiftPlanningService {
         return staffListWithPersonalDetails;
     }
 
+
+
     private StaffShiftDetails findShiftsForSelectedEmploymentsAndDuration(Set<Long> employmentIds, ShiftFilterDurationType shiftFilterDurationType) {
 
         LOGGER.debug("employment ids are {}", employmentIds);
@@ -237,5 +257,43 @@ public class ShiftPlanningService {
         return shiftMongoRepository.getStaffListAsIdForRealtimeCriteria(unitId, statuses);
     }
 
+    private <T> Set<Long>  filterStaffByCTATemplateAccountType(List<StaffShiftDetails> staffShiftDetails, Set<Long> staffIds, Map<FilterType, Set<T>> filterTypeMap) {
+        Set<Long> filteredStaffIds = staffIds;
+        Map<Long,List<PlanningEmploymentDTO>> staffEmploymentMap =staffShiftDetails.stream().collect(Collectors.toMap(staffShiftDetails1 -> staffShiftDetails1.getId(),staffShiftDetails1 -> staffShiftDetails1.getEmployments()));
+        Map<Long,List<Long>> staffEmplymentIdMap =getStaffEmploymentMap(staffEmploymentMap);
+        if(filterTypeMap.containsKey(CTA_ACCOUNT_TYPE)){
+            List<CTAResponseDTO> allCTAs = costTimeAgreementRepository.getParentCTAByUpIds(staffEmplymentIdMap.values().stream().flatMap(longs -> longs.stream()).filter(longs -> isNotNull(longs)).collect(Collectors.toList()));
+            Map<Long,List<CTAResponseDTO>>  ctagroup = allCTAs.stream().collect(Collectors.groupingBy(ctaResponseDTO -> ctaResponseDTO.getEmploymentId(),Collectors.toList()));
+            Set<Long> staffFilterDTOList = new HashSet<>();
+            for(Long staffId:staffIds) {
+                List<Long> employmentIDs=staffEmplymentIdMap.get(staffId);
+                for(Long employmentID:employmentIDs) {
+                    List<CTAResponseDTO> CTAs=ctagroup.getOrDefault(employmentID,new ArrayList<>());
+                    for(CTAResponseDTO ctaResponseDTO:CTAs) {
+                        for(CTARuleTemplateDTO CTARule:ctaResponseDTO.getRuleTemplates()) {
+                            if(filterTypeMap.get(CTA_ACCOUNT_TYPE).contains(CTARule.getPlannedTimeWithFactor().getAccountType().toString())){
+                                staffFilterDTOList.add(staffId);
+                            }
 
-}
+                        }
+                    }
+                }
+            }
+            filteredStaffIds = staffFilterDTOList;
+
+        }
+        return filteredStaffIds;
+    }
+
+    private Map<Long,List<Long>> getStaffEmploymentMap(Map<Long,List<PlanningEmploymentDTO>> staffEmploymentMap){
+        Map<Long,List<Long>> staffIdAndEmploymentIdsMap = new HashMap<>();
+        List<Long> employmentIds ;
+        for(Map.Entry<Long,List<PlanningEmploymentDTO>> entry :staffEmploymentMap.entrySet()){
+            employmentIds =entry.getValue().stream().map(v-> v.getId()).collect(Collectors.toList());
+            staffIdAndEmploymentIdsMap.put(entry.getKey(),employmentIds);
+         }
+       return staffIdAndEmploymentIdsMap;
+    }
+
+
+    }
