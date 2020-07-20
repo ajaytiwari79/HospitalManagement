@@ -1099,7 +1099,11 @@ public class StaffingLevelService  {
                 int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevelIntervals,currentShiftActivities,startLocalDate, detailLevelMinutes, true);
                 int overStaffing = maxAndMinNoOfStaff[0];
                 int underStaffing = maxAndMinNoOfStaff[1];
-                staffingLevelDetailsByTimeSlotDTOS.add(new StaffingLevelDetailsByTimeSlotDTO(underStaffing,overStaffing,underStaffing * detailLevelMinutes,overStaffing * detailLevelMinutes,timeSlot.getName()));
+                int totalMinNoOfStaff = maxAndMinNoOfStaff[2];
+                int totalMaxNoOfStaff = maxAndMinNoOfStaff[3];
+                int totalMinimumMinutes = totalMinNoOfStaff * detailLevelMinutes;
+                int totalMaximumMinutes = totalMaxNoOfStaff * detailLevelMinutes;
+                staffingLevelDetailsByTimeSlotDTOS.add(new StaffingLevelDetailsByTimeSlotDTO(underStaffing,overStaffing,underStaffing * detailLevelMinutes,overStaffing * detailLevelMinutes,timeSlot.getName(),totalMinNoOfStaff, totalMaxNoOfStaff, totalMinimumMinutes, totalMaximumMinutes));
             }
             currentShiftActivities = dateListMap.getOrDefault(startLocalDate,new ArrayList<>());
             int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevel.getPresenceStaffingLevelInterval(),currentShiftActivities,startLocalDate, detailLevelMinutes, false);
@@ -1128,6 +1132,8 @@ public class StaffingLevelService  {
                 StaffingLevelActivity staffingLevelActivity = staffingLevelInterval.getStaffingLevelActivities().iterator().next();
                 overStaffing += staffingLevelActivity.getMaxNoOfStaff()<count ? count - staffingLevelActivity.getMaxNoOfStaff() : 0;
                 underStaffing += staffingLevelActivity.getMinNoOfStaff()>count ? staffingLevelActivity.getMinNoOfStaff() - count : 0;
+                totalMinNoOfStaff += staffingLevelInterval.getMinNoOfStaff();
+                totalMaxNoOfStaff += staffingLevelInterval.getMaxNoOfStaff();
             }else {
                 overStaffing += staffingLevelInterval.getMaxNoOfStaff()<count ? count - staffingLevelInterval.getMaxNoOfStaff() : 0;
                 underStaffing += staffingLevelInterval.getMinNoOfStaff()>count ? staffingLevelInterval.getMinNoOfStaff() - count  : 0;

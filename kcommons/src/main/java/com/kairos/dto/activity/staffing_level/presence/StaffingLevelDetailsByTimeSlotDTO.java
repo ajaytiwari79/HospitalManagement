@@ -15,5 +15,9 @@ public class StaffingLevelDetailsByTimeSlotDTO {
     private int totalUnderStaffingMinutes;
     private int totalOverStaffingMinutes;
     private String timeSlot;
+    int totalMinNoOfStaff;
+    int totalMaxNoOfStaff;
+    int totalMinimumMinutes;
+    int totalMaximumMinutes;
 
 }
