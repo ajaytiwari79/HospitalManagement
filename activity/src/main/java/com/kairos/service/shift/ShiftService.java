@@ -449,7 +449,7 @@ public class ShiftService extends MongoBaseService {
                     todoRepository.save(todo);
                 }
                 activitySchedulerJobService.updateJobForShiftReminder(activityWrapperMap, shift);
-                if (updateShiftState) {
+                if (updateShiftState && shiftDTO.getId()!=null) {
                     shiftDTO = shiftStateService.updateShiftStateAfterValidatingWtaRule(shiftDTO, shiftDTO.getId(), shiftDTO.getShiftStatePhaseId());
                 } else if (isNotNull(validatedByStaff)) {
                     Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
