@@ -1,0 +1,13 @@
+db.shiftViolatedRules.find({"deleted" : false}).forEach(function(shiftViolatedRule){
+var shiftId = shiftViolatedRule.shiftId
+print(shiftId);
+if(shiftId){
+var shift = db.shifts.findOne({"deleted":false,"_id":shiftId})
+print(shift._id);
+if(shift){
+shift.shiftViolatedRules =shiftViolatedRule;
+db.shifts.save(shift);
+}
+}
+}
+);

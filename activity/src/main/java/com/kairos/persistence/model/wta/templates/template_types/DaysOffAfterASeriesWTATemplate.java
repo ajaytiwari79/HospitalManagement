@@ -53,22 +53,20 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
             List<ShiftWithActivityDTO> nightShifts = getNightMinutesOrCount(infoWrapper.getExpertiseNightWorkerSetting(),shiftWithActivityDTOS,dateTimeInterval);
             Set<LocalDate> shiftDates = getSortedAndUniqueDates(nightShifts);
             LocalDate shiftDate = asLocalDate(infoWrapper.getShift().getActivities().get(0).getStartDate());
-            boolean currentNightShift = shiftDates.removeIf(date -> date.equals(shiftDate));
+            boolean currentNightShift = shiftDates.contains(shiftDate);
             int consecutiveNightDays = getConsecutiveDaysInDate(new ArrayList<>(shiftDates));
-            if(currentNightShift){
-                shiftDates.add(shiftDate);
-            }
-            int daysOffCount = 0;
             Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
-            boolean isValid = true;
-            isValid = validate(shiftDates, shiftDate, currentNightShift, consecutiveNightDays, daysOffCount, isValid);
+            boolean isValid = validate(shiftDates, shiftDate, currentNightShift, consecutiveNightDays);
             brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
-                    limitAndCounter[2], DurationType.DAYS.toValue(),String.valueOf(restingTime));
+                    limitAndCounter[2], DurationType.DAYS.toValue(),String.valueOf(nightShiftSequence));
         }
     }
 
-    private boolean validate(Set<LocalDate> shiftDates, LocalDate shiftDate, boolean currentNightShift, int consecutiveNightDays, int daysOffCount, boolean isValid) {
-        if(currentNightShift && consecutiveNightDays>=nightShiftSequence){
+    private boolean validate(Set<LocalDate> shiftDates, LocalDate shiftDate, boolean currentNightShift, int consecutiveNightDays) {
+        boolean isValid = true;
+        if(currentNightShift && consecutiveNightDays>nightShiftSequence){
+            restingTime = Math.max(restingTime,1);
+            int daysOffCount = 0;
             LocalDate daysOffDate = shiftDate.minusDays(restingTime);
             while (!daysOffDate.isAfter(shiftDate)){
                 if(!shiftDates.contains(daysOffDate)){
@@ -77,16 +75,6 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
                 daysOffDate = daysOffDate.plusDays(1);
             }
             isValid = isValid(MinMaxSetting.MINIMUM, restingTime, daysOffCount);
-            if(isValid){
-                daysOffDate = shiftDate.plusDays(restingTime);
-                while (!daysOffDate.isBefore(shiftDate)){
-                    if(!shiftDates.contains(daysOffDate)){
-                        daysOffCount++;
-                    }
-                    daysOffDate = daysOffDate.minusDays(1);
-                }
-                isValid = isValid(MinMaxSetting.MINIMUM, restingTime, daysOffCount);
-            }
         }
         return isValid;
     }

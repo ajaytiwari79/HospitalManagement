@@ -40,19 +40,14 @@ public class StaffActivityDetailsService {
         }
     }
 
-    @Async
-    public void increaseActivityCount(Long staffId, List<BigInteger> activityIds){
+
+    private void increaseActivityCount(Long staffId, List<BigInteger> activityIds){
         List<StaffActivityDetails> staffActivityDetails = staffActivityDetailsMongoRepository.findByDeletedFalseAndStaffIdAndActivityIdIn(staffId, activityIds);
         Map<BigInteger, StaffActivityDetails> activityUseCountMap = staffActivityDetails.stream().collect(Collectors.toMap(StaffActivityDetails::getActivityId, v->v));
         List<StaffActivityDetails> updatedStaffActivityDetails = new ArrayList<>();
         for (BigInteger activityId : activityIds) {
-            StaffActivityDetails staffActivityDetail;
-            if(activityUseCountMap.containsKey(activityId)){
-                staffActivityDetail = activityUseCountMap.get(activityId);
-                staffActivityDetail.setUseActivityCount(staffActivityDetail.getUseActivityCount() + 1);
-            }else{
-                staffActivityDetail = new StaffActivityDetails(staffId, activityId, 1);
-            }
+            StaffActivityDetails staffActivityDetail = activityUseCountMap.getOrDefault(activityId, new StaffActivityDetails(staffId, activityId, 0));
+            staffActivityDetail.setUseActivityCount(staffActivityDetail.getUseActivityCount() + 1);
             updatedStaffActivityDetails.add(staffActivityDetail);
         }
         if(isCollectionNotEmpty(updatedStaffActivityDetails)) {
