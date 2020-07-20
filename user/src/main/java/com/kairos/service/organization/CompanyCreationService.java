@@ -514,12 +514,12 @@ public class CompanyCreationService {
     }
 
     private void prepareAddress(ContactAddress contactAddress, AddressDTO addressDTO) {
-        if (addressDTO.getZipCode() != null) {
+        if (addressDTO.getZipCode().getId() != null) {
             ZipCode zipCode = zipCodeGraphRepository.findById(addressDTO.getZipCode().getId(), 0).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ZIPCODE_NOTFOUND)));
             contactAddress.setCity(zipCode.getName());
             contactAddress.setZipCode(zipCode);
         }
-        if (addressDTO.getMunicipality() != null) {
+        if (addressDTO.getMunicipality().getId() != null) {
             if (isNull(addressDTO.getMunicipality().getId())) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
             }
