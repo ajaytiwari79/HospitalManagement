@@ -275,11 +275,10 @@ public class TeamService {
 
     }
 
-    public boolean addTeamSelectedSkills(Long teamId, Set<Long> selectedSkillIds,Boolean selected,Set<Long> removeSkillIds) {
-        if (isCollectionNotEmpty(selectedSkillIds) && selected ) {
-            teamGraphRepository.saveSkill(teamId, selectedSkillIds);
-        } else {
-            teamGraphRepository.removeAllSkillsFromTeam(teamId,removeSkillIds);
+    public boolean addTeamSelectedSkills(Long teamId, Set<Long> skillIds) {
+        teamGraphRepository.removeAllSkillsFromTeam(teamId,skillIds);
+        if (isCollectionNotEmpty(skillIds)) {
+            teamGraphRepository.saveSkill(teamId, skillIds);
         }
         return true;
     }

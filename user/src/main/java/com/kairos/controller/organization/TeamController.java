@@ -1,6 +1,5 @@
     package com.kairos.controller.organization;
 
-    import com.kairos.dto.user.skill.SkillDTO;
     import com.kairos.persistence.model.organization.team.TeamDTO;
     import com.kairos.persistence.model.staff.StaffTeamDTO;
     import com.kairos.service.organization.TeamService;
@@ -94,8 +93,8 @@
         @ApiOperation(value = "Add Skill to Team")
         @PutMapping(value = "/team/{teamId}/update_skills")
         //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> addTeamSkills(@PathVariable Long teamId, @RequestBody SkillDTO skillDTO) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.addTeamSelectedSkills(teamId, skillDTO.getSelectedSkillIds(),skillDTO.getSelected(),skillDTO.getRemoveSkillIds()));
+        public ResponseEntity<Map<String, Object>> addTeamSkills(@PathVariable Long teamId, @RequestBody Set<Long> skillIds) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.addTeamSelectedSkills(teamId, skillIds));
         }
 
         @ApiOperation(value = "Get Team Selected Service")
