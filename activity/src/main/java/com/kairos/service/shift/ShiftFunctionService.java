@@ -46,7 +46,7 @@ public class ShiftFunctionService {
 
     public void updateAppliedFunctionDetail(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, Long functionId) {
         if (isNotNull(functionId)) {
-            if (activityWrapperMap.values().stream().anyMatch(k -> TimeTypeEnum.PRESENCE.equals(k.getActivity().getBalanceSettingsActivityTab().getTimeType()))) {
+            if (activityWrapperMap.values().stream().anyMatch(k -> TimeTypeEnum.PRESENCE.equals(k.getActivity().getActivityBalanceSettings().getTimeType()))) {
                 Map<LocalDate, Long> dateAndFunctionIdMap = new HashMap<>();
                 dateAndFunctionIdMap.put(asLocalDate(shift.getStartDate()), functionId);
                 userIntegrationService.applyFunction(shift.getUnitId(), shift.getEmploymentId(), dateAndFunctionIdMap, HttpMethod.POST, null);

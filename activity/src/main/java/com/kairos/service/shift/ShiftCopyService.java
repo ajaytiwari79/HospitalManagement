@@ -294,14 +294,14 @@ public class ShiftCopyService extends MongoBaseService {
             ActivityWrapper currentActivityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
             if (CollectionUtils.isNotEmpty(dataWrapper.getDayTypes())) {
                 Map<Long, DayTypeDTO> dayTypeDTOMap = dataWrapper.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
-                Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, currentActivityWrapper.getActivity().getTimeCalculationActivityTab().getDayTypes(),asLocalDate(shiftActivity.getStartDate()));
+                Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, currentActivityWrapper.getActivity().getActivityTimeCalculationSettings().getDayTypes(),asLocalDate(shiftActivity.getStartDate()));
                 if (activityDayTypes.contains(asLocalDate(shiftActivity.getStartDate()).getDayOfWeek())) {
                     timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, currentActivityWrapper.getActivity(), staffEmployment,false);
                     scheduledMinutes += shiftActivity.getScheduledMinutes();
                     durationMinutes += shiftActivity.getDurationMinutes();
                 }
             }
-            shiftActivity.setBackgroundColor(currentActivityWrapper.getActivity().getGeneralActivityTab().getBackgroundColor());
+            shiftActivity.setBackgroundColor(currentActivityWrapper.getActivity().getActivityGeneralSettings().getBackgroundColor());
             shiftActivity.setActivityName(currentActivityWrapper.getActivity().getName());
             shiftActivity.setTimeType(currentActivityWrapper.getTimeType());
         }

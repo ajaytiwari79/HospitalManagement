@@ -38,7 +38,7 @@ public class PayOutPerShiftCalculationServiceUnitTest {
 
     @Before
     public void getMockShifts(){
-//        activity = new Activity(new BalanceSettingsActivityTab(new BigInteger("123")));
+//        activity = new Activity(new ActivityBalanceSettings(new BigInteger("123")));
 //        activity.setId(new BigInteger("125"));
 //        activity.setName("Activity1");
 //        activity.setParentId(new BigInteger("12"));

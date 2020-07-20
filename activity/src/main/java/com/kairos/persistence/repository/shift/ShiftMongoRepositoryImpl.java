@@ -1,8 +1,6 @@
 package com.kairos.persistence.repository.shift;
 
-import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.config.codec.BigIntegerCodec;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -18,7 +16,6 @@ import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.shift.StaffShiftDetails;
 import org.apache.commons.collections.CollectionUtils;
-import org.bson.BSON;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -78,7 +75,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         List<Criteria> dynamicCriteria = new ArrayList<>();
         sickSettings.forEach(currentSickSettings -> dynamicCriteria.add(new Criteria().and(STAFF_ID).is(currentSickSettings.getStaffId())
                     .and(START_DATE).gte(currentLocalDate)
-                    .lte(DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activityMap.get(currentSickSettings.getActivityId()).getRulesActivityTab().getRecurrenceDays() - 1))));
+                    .lte(DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activityMap.get(currentSickSettings.getActivityId()).getActivityRulesSettings().getRecurrenceDays() - 1))));
 
         criteria.orOperator(dynamicCriteria.toArray(new Criteria[dynamicCriteria.size()]));
         Query query = new Query(criteria);
@@ -432,7 +429,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         if (CollectionUtils.isNotEmpty(timeTypeIds)) {
             aggregationOperation.add(lookup(ACTIVITIES, ACTIVITIES_ACTIVITY_ID, "_id", ACTIVITY));
             aggregationOperation.add(unwind(ACTIVITY));
-            aggregationOperation.add(match(where("activity.balanceSettingsActivityTab.timeTypeId").in(timeTypeIds)));
+            aggregationOperation.add(match(where("activity.activityBalanceSettings.timeTypeId").in(timeTypeIds)));
         }
         aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityGroup()));
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperation);
@@ -516,7 +513,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.startDate' : 1,\n" +
                 "        'activities.endDate' : 1,\n" +
                 "        'activities.description':{ '$arrayElemAt':['$activityObject.description',0] }\n" +
-                "        'activities.backgroundColor':{'$arrayElemAt':[ '$activity.generalActivityTab.backgroundColor',0]}\n";
+                "        'activities.backgroundColor':{'$arrayElemAt':[ '$activity.activityGeneralSettings.backgroundColor',0]}\n";
 
     }
 
@@ -571,7 +568,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup(ACTIVITIES, ACTIVITIES_ACTIVITY_ID, "_id", ACTIVITY),
-                match(new Criteria().orOperator(where("activity.timeCalculationActivityTab.methodForCalculatingTime").is(FULL_DAY_CALCULATION), where("activity.timeCalculationActivityTab.methodForCalculatingTime").is(FULL_WEEK))));
+                match(new Criteria().orOperator(where("activity.activityTimeCalculationSettings.methodForCalculatingTime").is(FULL_DAY_CALCULATION), where("activity.activityTimeCalculationSettings.methodForCalculatingTime").is(FULL_WEEK))));
         return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();
     }
 
@@ -658,8 +655,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     private Map<BigInteger, ActivityDTO> getActivityDTOMap(Set<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and("_id").in(activityIds).and(DISABLED).is(false)),
-                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", TIME_TYPE)
-                ,project("name","description","countryId","expertises","organizationTypes","organizationSubTypes","regions","levels","employmentTypes","tags","state", UNIT_ID,"parentId","isParentActivity","generalActivityTab","balanceSettingsActivityTab","rulesActivityTab","individualPointsActivityTab","timeCalculationActivityTab","notesActivityTab","communicationActivityTab","bonusActivityTab","skillActivityTab","optaPlannerSettingActivityTab","ctaAndWtaSettingsActivityTab","locationActivityTab","phaseSettingsActivityTab")
+                lookup("time_Type", "activityBalanceSettings.timeTypeId", "_id", TIME_TYPE)
+                ,project("name","description","countryId","expertises","organizationTypes","organizationSubTypes","regions","levels","employmentTypes","tags","state", UNIT_ID,"parentId","isParentActivity","activityGeneralSettings","activityBalanceSettings","activityRulesSettings","activityIndividualPointsSettings","activityTimeCalculationSettings","activityNotesSettings","activityCommunicationSettings","activityBonusSettings","activitySkillSettings","activityOptaPlannerSetting","activityCTAAndWTASettings","activityLocationSettings","activityPhaseSettings")
                         .and(TIME_TYPE).arrayElementAt(0).as(TIME_TYPE));
         List<ActivityDTO> activityDTOS = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class).getMappedResults();
         return activityDTOS.stream().collect(Collectors.toMap(ActivityDTO::getId, v->v));
@@ -694,7 +691,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                unwind(ACTIVITIES),
                group(ACTIVITIES_ACTIVITY_ID).count().as(MOSTLY_USED_COUNT),
                 lookup(ACTIVITIES, "_id", "_id", ACTIVITY)
-                ,project("_id", MOSTLY_USED_COUNT).and("activity.activityPriorityId").arrayElementAt(0).as("activityPriorityId").and("activity.balanceSettingsActivityTab.timeType").arrayElementAt(0).as("secondLevelTimtype"),
+                ,project("_id", MOSTLY_USED_COUNT).and("activity.activityPriorityId").arrayElementAt(0).as("activityPriorityId").and("activity.activityBalanceSettings.timeType").arrayElementAt(0).as("secondLevelTimtype"),
                 lookup(ACTIVITY_PRIORITY, "activityPriorityId", "_id", ACTIVITY_PRIORITY),
                 project("_id", MOSTLY_USED_COUNT,"secondLevelTimtype").and("activityPriority.sequence").arrayElementAt(0).as(ACTIVITY_PRIORITY)
         );

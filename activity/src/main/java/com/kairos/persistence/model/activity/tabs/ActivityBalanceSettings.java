@@ -15,7 +15,7 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BalanceSettingsActivityTab{
+public class ActivityBalanceSettings {
 
     private Integer addTimeTo;
     private BigInteger timeTypeId;
@@ -25,7 +25,7 @@ public class BalanceSettingsActivityTab{
     private PriorityFor priorityFor;
     private TimeTypes timeTypes;
     private String path;
-    public BalanceSettingsActivityTab(boolean onCallTimePresent, Boolean negativeDayBalancePresent) {
+    public ActivityBalanceSettings(boolean onCallTimePresent, Boolean negativeDayBalancePresent) {
         this.onCallTimePresent = onCallTimePresent;
         this.negativeDayBalancePresent = negativeDayBalancePresent;
     }

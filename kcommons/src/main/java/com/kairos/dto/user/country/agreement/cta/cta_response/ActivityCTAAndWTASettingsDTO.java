@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class CTAAndWTASettingsActivityTabDTO {
+public class ActivityCTAAndWTASettingsDTO {
     private  boolean eligibleForCostCalculation;
 
 }

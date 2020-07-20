@@ -100,8 +100,8 @@ public class ActivitySchedulerJobService extends MongoBaseService {
     public void updateJobForShiftReminder(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
         List<SchedulerPanelDTO> scheduledJobs = new ArrayList<>(shift.getActivities().size());
         shift.getActivities().forEach(currentShift -> {
-            if (activityWrapperMap.get(currentShift.getActivityId()).getActivity().getCommunicationActivityTab().isAllowCommunicationReminder()
-                    && !activityWrapperMap.get(currentShift.getActivityId()).getActivity().getCommunicationActivityTab().getActivityReminderSettings().isEmpty()) {
+            if (activityWrapperMap.get(currentShift.getActivityId()).getActivity().getActivityCommunicationSettings().isAllowCommunicationReminder()
+                    && !activityWrapperMap.get(currentShift.getActivityId()).getActivity().getActivityCommunicationSettings().getActivityReminderSettings().isEmpty()) {
                 LocalDateTime firstReminderDateTime = shiftReminderService.calculateTriggerTime(activityWrapperMap.get(currentShift.getActivityId()).getActivity(), shift.getStartDate(), DateUtils.getCurrentLocalDateTime());
                 if (firstReminderDateTime != null) {
                     scheduledJobs.add(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, currentShift.getId(), firstReminderDateTime, true, currentShift.getActivityId().toString()));
@@ -123,7 +123,7 @@ public class ActivitySchedulerJobService extends MongoBaseService {
             BasicNameValuePair jobSubType = new BasicNameValuePair("jobSubType", JobSubType.ACTIVITY_REMINDER.toString());
             schedulerRestClient.publishRequest(null, activity.getUnitId(), true, IntegrationOperation.DELETE, "/scheduler_panel/entity/{entityId}/delete_job", newArrayList(jobSubType), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Boolean>>>() {}, activity.getId());
             List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
-            if(activity.getCommunicationActivityTab().isAllowActivityCutoffReminder()) {
+            if(activity.getActivityCommunicationSettings().isAllowActivityCutoffReminder()) {
                 calculateTriggerDateTimeList(activity).forEach(reminderDateTime ->
                         schedulerPanelDTOS.add(new SchedulerPanelDTO(activity.getUnitId(), JobType.SYSTEM, JobSubType.ACTIVITY_REMINDER, activity.getId(), reminderDateTime, true, null))
                 );
@@ -136,8 +136,8 @@ public class ActivitySchedulerJobService extends MongoBaseService {
 
     private Set<LocalDateTime> calculateTriggerDateTimeList(Activity activity) {
         Set<LocalDateTime> reminderDateTimes = new HashSet<>();
-        for (ActivityReminderSettings activityCutoffReminderSetting : activity.getCommunicationActivityTab().getActivityCutoffReminderSettings()) {
-            for (CutOffInterval cutOffInterval : activity.getRulesActivityTab().getCutOffIntervals()) {
+        for (ActivityReminderSettings activityCutoffReminderSetting : activity.getActivityCommunicationSettings().getActivityCutoffReminderSettings()) {
+            for (CutOffInterval cutOffInterval : activity.getActivityRulesSettings().getCutOffIntervals()) {
                 LocalDateTime reminderDateTime = substractDurationInLocalDateTime(asLocalDateTime(asDate(cutOffInterval.getEndDate())), activityCutoffReminderSetting.getSendReminder().getTimeValue(), activityCutoffReminderSetting.getSendReminder().getDurationType());
                 if(!reminderDateTime.isBefore(getCurrentLocalDateTime().minusDays(1))){
                     reminderDateTimes.add(reminderDateTime);

@@ -56,7 +56,7 @@ public class RuletemplateUtils {
     public static List<ShiftWithActivityDTO> getShiftsByIntervalAndActivityIds(Activity activity, Date shiftStartDate, List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds, Map<Long, DayTypeDTO> dayTypeMap) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         LocalDate shiftStartLocalDate = DateUtils.asLocalDate(shiftStartDate);
-        Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate)) && (interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getEndDate().isEqual(shiftStartLocalDate)))).findAny();
+        Optional<CutOffInterval> cutOffIntervalOptional = activity.getActivityRulesSettings().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate)) && (interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getEndDate().isEqual(shiftStartLocalDate)))).findAny();
         if (cutOffIntervalOptional.isPresent()) {
             getShiftsByCutOff(shifts, activitieIds, updatedShifts, cutOffIntervalOptional);
         }
@@ -64,7 +64,7 @@ public class RuletemplateUtils {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = new ArrayList<>();
         for(ShiftWithActivityDTO shiftWithActivityDTO :updatedShifts){
             for(ShiftActivityDTO shiftActivityDTO :shiftWithActivityDTO.getActivities()) {
-                isDayTypeExist =isDayTypeValid(shiftActivityDTO.getStartDate(), activity.getTimeCalculationActivityTab().getDayTypes(),dayTypeMap);
+                isDayTypeExist =isDayTypeValid(shiftActivityDTO.getStartDate(), activity.getActivityTimeCalculationSettings().getDayTypes(),dayTypeMap);
                 if (isDayTypeExist) {
                     shiftWithActivityDTOS.add(shiftWithActivityDTO);
                 }
@@ -556,7 +556,7 @@ public class RuletemplateUtils {
         DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             if (careDayCountMap.containsKey(shiftActivityDTO.getActivityId())) {
-                dateTimeInterval = getCutoffInterval(shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffStartFrom(), shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffIntervalUnit(), shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffdayValue(),shift.getStartDate());
+                dateTimeInterval = getCutoffInterval(shiftActivityDTO.getActivity().getActivityRulesSettings().getCutOffStartFrom(), shiftActivityDTO.getActivity().getActivityRulesSettings().getCutOffIntervalUnit(), shiftActivityDTO.getActivity().getActivityRulesSettings().getCutOffdayValue(),shift.getStartDate());
             }
         }
         return dateTimeInterval;
@@ -568,7 +568,7 @@ public class RuletemplateUtils {
         for (BigInteger activityId : activityIds) {
             if (activityWrapperMap.containsKey(activityId)) {
                 Activity activity = activityWrapperMap.get(activityId).getActivity();
-                dateTimeInterval = getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(), activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue(),shiftStartDate);
+                dateTimeInterval = getCutoffInterval(activity.getActivityRulesSettings().getCutOffStartFrom(), activity.getActivityRulesSettings().getCutOffIntervalUnit(), activity.getActivityRulesSettings().getCutOffdayValue(),shiftStartDate);
             }
         }
         return dateTimeInterval;

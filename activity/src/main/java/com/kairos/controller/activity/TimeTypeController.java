@@ -106,7 +106,7 @@ public class TimeTypeController {
     @ApiOperation("Update Rules Tab of timeType")
     @PutMapping(value = "/time_type/{timeTypeId}/rules")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody RulesActivityTabDTO rulesDTO, @PathVariable BigInteger timeTypeId) {
+    ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody ActivityRulesSettingsDTO rulesDTO, @PathVariable BigInteger timeTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updateRulesTab(rulesDTO,timeTypeId));
     }
 
@@ -122,8 +122,8 @@ public class TimeTypeController {
     @ApiOperation("Update Phase setting Tab of timeType")
     @PutMapping(value = "/time_type/{timeTypeId}/phase_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updatePhaseSettingTab(@RequestBody PhaseSettingsActivityTab phaseSettingsActivityTab, @PathVariable BigInteger timeTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updatePhaseSettingTab(phaseSettingsActivityTab,timeTypeId));
+    ResponseEntity<Map<String, Object>> updatePhaseSettingTab(@RequestBody ActivityPhaseSettings activityPhaseSettings, @PathVariable BigInteger timeTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updatePhaseSettingTab(activityPhaseSettings,timeTypeId));
     }
 
 

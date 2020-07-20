@@ -21,7 +21,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
-public class GeneralActivityTabWithTagDTO {
+public class GeneralActivityWithTagDTO {
 
     private String name;
     private String code;

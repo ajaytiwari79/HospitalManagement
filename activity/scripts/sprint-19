@@ -1,4 +1,4 @@
-db.activities.updateMany({"timeCalculationActivityTab.methodForCalculatingTime":"FIXED_TIME"}, {$set: { "timeCalculationActivityTab.fixedTimeValue" : NumberLong(0) }},{ upsert: false } )
+db.activities.updateMany({"activityTimeCalculationSettings.methodForCalculatingTime":"FIXED_TIME"}, {$set: { "activityTimeCalculationSettings.fixedTimeValue" : NumberLong(0) }},{ upsert: false } )
 
 
-db.activities.updateMany({"timeCalculationActivityTab.methodForCalculatingTime":{"$exists":true}}, {$set: { "timeCalculationActivityTab.multiplyWith" : true , "timeCalculationActivityTab.multiplyWithValue" : 1.0 }},{ upsert: false } )
+db.activities.updateMany({"activityTimeCalculationSettings.methodForCalculatingTime":{"$exists":true}}, {$set: { "activityTimeCalculationSettings.multiplyWith" : true , "activityTimeCalculationSettings.multiplyWithValue" : 1.0 }},{ upsert: false } )

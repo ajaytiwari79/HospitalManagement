@@ -37,7 +37,7 @@ public class StaffActivityAssignmentSpecification extends AbstractSpecification<
         if (isNotNull(staffDTO) && !CollectionUtils.containsAny(activity.getExpertises(), staffDTO.getExpertiseIds())) {
             errorMessages.add(EXPERTISE_ABSENT_ACTIVITY);
         }
-        if(isCollectionNotEmpty(activity.getSkillActivityTab().getActivitySkillIds()) && !activity.getSkillActivityTab().getActivitySkillIds().stream().allMatch(skillId->staffDTO.getSkillIds().contains(skillId))){
+        if(isCollectionNotEmpty(activity.getActivitySkillSettings().getActivitySkillIds()) && !activity.getActivitySkillSettings().getActivitySkillIds().stream().allMatch(skillId->staffDTO.getSkillIds().contains(skillId))){
             errorMessages.add(STAFF_SKILL_DOES_NOT_MATCHED);
         }
         return errorMessages;
