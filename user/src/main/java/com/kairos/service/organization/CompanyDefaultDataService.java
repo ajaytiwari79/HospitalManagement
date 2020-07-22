@@ -66,7 +66,7 @@ public class CompanyDefaultDataService {
             vrpClientService.createDefaultPreferredTimeWindow(unit);
             activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId());
             reasonCodeService.createReasonCodeForUnit(unit, parentId);
-            //gdprIntegrationService.createDefaultDataForOrganization(countryId, unit.getId());
+            gdprIntegrationService.createDefaultDataForOrganization(countryId, unit.getId());
 
         });
     }
