@@ -43,7 +43,6 @@ public class StaffingLevelIntervalLog implements Comparable<StaffingLevelInterva
 
     @Override
     public int hashCode() {
-
         return Objects.hash(updatedAt);
     }
 

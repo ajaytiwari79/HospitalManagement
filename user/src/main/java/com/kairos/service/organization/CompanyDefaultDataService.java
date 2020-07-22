@@ -80,6 +80,6 @@ public class CompanyDefaultDataService {
             timeSlotService.createDefaultTimeSlots(organization, timeSlots);
             organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
             organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
-            //gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());
+            gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());
     }
 }
