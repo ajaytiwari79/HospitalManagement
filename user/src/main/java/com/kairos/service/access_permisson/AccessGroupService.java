@@ -263,10 +263,10 @@ public class AccessGroupService {
             counter.addAndGet(1);
         });
         if (company) {
-            ((Organization) organization).setAccessGroups(newAccessGroupList);
+            organization.setAccessGroups(newAccessGroupList);
             organizationGraphRepository.save(((Organization) organization));
         } else {
-            ((Unit) organization).setAccessGroups(newAccessGroupList);
+            organization.setAccessGroups(newAccessGroupList);
             unitGraphRepository.save((Unit) organization);
         }
         return countryAndOrgAccessGroupIdsMap;

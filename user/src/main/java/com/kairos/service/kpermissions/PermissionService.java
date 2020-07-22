@@ -421,8 +421,9 @@ public class PermissionService {
         List<Organization> unions;
         OrganizationDTO organizationDTO = null;
         if(ConfLevel.ORGANIZATION.equals(confLevel)){
+            Organization organization=organizationService.fetchParentOrganization(refrenceId);
             organizationDTO = organizationService.getOrganizationWithCountryId(refrenceId);
-            unions = organizationService.getAllUnionsByOrganizationOrCountryId(refrenceId, DEFAULT_ID);
+            unions = organizationService.getAllUnionsByOrganizationOrCountryId(organization.getId(), DEFAULT_ID);
         }else {
             unions = organizationService.getAllUnionsByOrganizationOrCountryId(DEFAULT_ID, refrenceId);
         }
