@@ -69,6 +69,6 @@ public class EmploymentLinesQueryResult {
     public boolean isValid(LocalDate startDate, LocalDate endDate){
         DateTimeInterval employmentLineInterval = new DateTimeInterval(this.startDate,isNotNull(this.endDate) ? this.endDate : isNotNull(endDate) ? endDate : LocalDate.now());
         DateTimeInterval interval = new DateTimeInterval(startDate,isNotNull(endDate) ? endDate : isNotNull(this.endDate) ? this.endDate : LocalDate.now());
-        return employmentLineInterval.contains(startDate) || interval.contains(this.startDate) || employmentLineInterval.overlaps(interval) || employmentLineInterval.abuts(interval);
+        return employmentLineInterval.getStart().toLocalDate().equals((startDate))|| employmentLineInterval.contains(startDate) || interval.contains(this.startDate) || interval.getStart().toLocalDate().equals(this.startDate) || employmentLineInterval.overlaps(interval) || employmentLineInterval.abuts(interval);
     }
 }
