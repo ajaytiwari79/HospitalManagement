@@ -31,6 +31,7 @@ public class ActivityGeneralSettings {
     private BigInteger categoryId;
     @KPermissionField
     private Boolean colorPresent;
+    @KPermissionField
     private String backgroundColor;
     @KPermissionField
     private String description;
@@ -42,10 +43,12 @@ public class ActivityGeneralSettings {
     private String modifiedIconName;
     @KPermissionField
     private String ultraShortName;
+    @KPermissionField
     private LocalDate startDate;
+    @KPermissionField
     private LocalDate endDate;
 
-
+    @KPermissionField
     private List<BigInteger> tags = new ArrayList<>();
 
     public ActivityGeneralSettings(String name, String description, String ultraShortName) {
