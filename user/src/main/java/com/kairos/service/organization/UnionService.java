@@ -283,23 +283,21 @@ public class UnionService {
 
     private List<Sector> createSectors(Long countryId, List<SectorDTO> sectorDTOS) {
         List<Sector> sectors = new ArrayList<>();
-        List<Sector> existSectors = null;
         if (CollectionUtils.isNotEmpty(sectorDTOS)) {
             Country country = countryGraphRepository.findCountryById(countryId);
             if (!Optional.ofNullable(country).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
             }
-            existSectors = sectorGraphRepository.getAllSectorsByNames(sectorDTOS.stream().map(SectorDTO::getName).collect(Collectors.toList()));
-            Map<String,Sector> mapOfNameAndSector = existSectors.stream().collect(Collectors.toMap(k->k.getName().toLowerCase(),v->v));
+            List<String> sectorsNames = new ArrayList<>();
             for (SectorDTO sectorDTO : sectorDTOS) {
-                Sector sector = mapOfNameAndSector.getOrDefault(sectorDTO.getName().toLowerCase(),new Sector(sectorDTO.getName()));
+                Sector sector = new Sector(sectorDTO.getName());
+                sectorsNames.add(sectorDTO.getName().toLowerCase());
                 sector.setCountry(country);
-                if(isNull(sector.getId())){
-                    sectors.add(sector);
-                }
+                sectors.add(sector);
             }
-            if(isCollectionNotEmpty(existSectors)){
-                sectors.addAll(existSectors);
+            sectorsNames = sectorGraphRepository.existsByNames(sectorsNames);
+            if (CollectionUtils.isNotEmpty(sectorsNames)) {
+                exceptionService.duplicateDataException(MESSAGE_SECTOR_ALREADYEXISTS, StringUtils.join(sectorsNames, ","));
             }
             sectorGraphRepository.saveAll(sectors);
         }
