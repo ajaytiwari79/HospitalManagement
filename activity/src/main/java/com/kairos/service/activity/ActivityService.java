@@ -340,17 +340,7 @@ public class ActivityService {
             if (activity.getState().equals(ActivityStateEnum.PUBLISHED)) {
                 exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED, activity.getId());
             }
-            activity.setPhaseSettingsActivityTab(timeType.getPhaseSettingsActivityTab());
-            activity.setRulesActivityTab(timeType.getRulesActivityTab());
-            activity.setTimeCalculationActivityTab(timeType.getTimeCalculationActivityTab());
-            activity.setEmploymentTypes(timeType.getEmploymentTypes());
-            activity.setExpertises(timeType.getExpertises());
-            activity.setOrganizationSubTypes(timeType.getOrganizationSubTypes());
-            activity.setOrganizationTypes(timeType.getOrganizationTypes());
-            activity.setSkillActivityTab(timeType.getSkillActivityTab());
-            activity.setRegions(timeType.getRegions());
-            activity.setLevels(timeType.getLevels());
-//            activity.setActivityPriorityId(timeType.getActivityPriorityId());
+            setTimeTypeDataInActivity(activity, timeType);
         }
         activity.getRulesActivityTab().setSicknessSettingValid(timeType.isSicknessSettingValid());
         activity.getRulesActivityTab().setSicknessSetting(timeType.getRulesActivityTab().getSicknessSetting());
@@ -364,6 +354,20 @@ public class ActivityService {
         updateActivityCategory(activity, countryId);
         activitySettingsService.updateTimeTypePathInActivity(activity);
         return activity.getBalanceSettingsActivityTab();
+    }
+
+    private void setTimeTypeDataInActivity(Activity activity, TimeType timeType) {
+        activity.setPhaseSettingsActivityTab(timeType.getPhaseSettingsActivityTab());
+        activity.setRulesActivityTab(timeType.getRulesActivityTab());
+        activity.setTimeCalculationActivityTab(timeType.getTimeCalculationActivityTab());
+        activity.setEmploymentTypes(timeType.getEmploymentTypes());
+        activity.setExpertises(timeType.getExpertises());
+        activity.setOrganizationSubTypes(timeType.getOrganizationSubTypes());
+        activity.setOrganizationTypes(timeType.getOrganizationTypes());
+        activity.setSkillActivityTab(timeType.getSkillActivityTab());
+        activity.setRegions(timeType.getRegions());
+        activity.setLevels(timeType.getLevels());
+//            activity.setActivityPriorityId(timeType.getActivityPriorityId());
     }
 
 
