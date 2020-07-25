@@ -9,7 +9,7 @@ import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.LocationEnum;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.tabs.LocationActivityTab;
+import com.kairos.persistence.model.activity.tabs.ActivityLocationSettings;
 import com.kairos.persistence.model.attendence_setting.TimeAndAttendance;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.shift.Shift;
@@ -42,7 +42,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
-//Todo we have to refactor this service 
+//Todo we have to refactor this service
 public class TimeAndAttendanceService extends MongoBaseService {
 
     @Inject
@@ -89,8 +89,8 @@ public class TimeAndAttendanceService extends MongoBaseService {
         Shift shift = null;
         List<Shift> shifts = shiftMongoRepository.findShiftsForCheckIn(staffIds, Date.from(ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()), Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant()));
         Map<Long, List<ReasonCodeDTO>> unitAndReasonCode = staffAndOrganizationIds.stream().collect(Collectors.toMap(StaffResultDTO::getUnitId, StaffResultDTO::getReasonCodes));
-        Map<BigInteger, LocationActivityTab> activityIdAndLocationActivityTabMap = new HashMap<>();
-        timeAndAttendanceDTO = updateTimeAttendanceDetails(shifts,activityIdAndLocationActivityTabMap,unitAndReasonCode, checkIn, reasonCodeId, timeAndAttendanceDTO, shift,unitIdAndStaffResultMap,organizationAndReasonCodeDTOS);
+        Map<BigInteger, ActivityLocationSettings> activityIdAndLocationActivityMap = new HashMap<>();
+        timeAndAttendanceDTO = updateTimeAttendanceDetails(shifts,activityIdAndLocationActivityMap,unitAndReasonCode, checkIn, reasonCodeId, timeAndAttendanceDTO, shift,unitIdAndStaffResultMap,organizationAndReasonCodeDTOS);
         if (checkIn) {
             timeAndAttendance = checkInWithoutShift(unitId, reasonCodeId, employmentId, staffAndOrganizationIds);
             if (timeAndAttendance == null) {
@@ -99,18 +99,18 @@ public class TimeAndAttendanceService extends MongoBaseService {
         }
 
         //If shift exist of User
-        UpdateTimeAttendanceIfShiftExists updateTimeAttendanceIfShiftExists = new UpdateTimeAttendanceIfShiftExists(reasonCodeId, checkIn, timeAndAttendanceDTO, timeAndAttendance, staffAndOrganizationIds, unitIdAndStaffResultMap, shift, unitAndReasonCode, activityIdAndLocationActivityTabMap).invoke();
+        UpdateTimeAttendanceIfShiftExists updateTimeAttendanceIfShiftExists = new UpdateTimeAttendanceIfShiftExists(reasonCodeId, checkIn, timeAndAttendanceDTO, timeAndAttendance, staffAndOrganizationIds, unitIdAndStaffResultMap, shift, unitAndReasonCode, activityIdAndLocationActivityMap).invoke();
         timeAndAttendanceDTO = updateTimeAttendanceIfShiftExists.getTimeAndAttendanceDTO();
         timeAndAttendance = updateTimeAttendanceIfShiftExists.getTimeAndAttendance();
-        return getTimeAndAttendanceDTO(checkIn, timeAndAttendanceDTO, timeAndAttendance, unitIdAndStaffResultMap, shift, activityIdAndLocationActivityTabMap);
+        return getTimeAndAttendanceDTO(checkIn, timeAndAttendanceDTO, timeAndAttendance, unitIdAndStaffResultMap, shift, activityIdAndLocationActivityMap);
     }
 
-    private TimeAndAttendanceDTO updateTimeAttendanceDetails(List<Shift> shifts, Map<BigInteger, LocationActivityTab> activityIdAndLocationActivityTabMap, Map<Long, List<ReasonCodeDTO>> unitAndReasonCode, boolean checkIn, Long reasonCodeId, TimeAndAttendanceDTO timeAndAttendanceDTO, Shift shift,Map<Long, StaffResultDTO> unitIdAndStaffResultMap,List<OrganizationAndReasonCodeDTO> organizationAndReasonCodeDTOS) {
-        activityIdAndLocationActivityTabMap = getBigIntegerLocationActivityTabMap(shifts, activityIdAndLocationActivityTabMap);
+    private TimeAndAttendanceDTO updateTimeAttendanceDetails(List<Shift> shifts, Map<BigInteger, ActivityLocationSettings> activityIdAndLocationActivityMap, Map<Long, List<ReasonCodeDTO>> unitAndReasonCode, boolean checkIn, Long reasonCodeId, TimeAndAttendanceDTO timeAndAttendanceDTO, Shift shift, Map<Long, StaffResultDTO> unitIdAndStaffResultMap, List<OrganizationAndReasonCodeDTO> organizationAndReasonCodeDTOS) {
+        activityIdAndLocationActivityMap = getBigIntegerLocationActivityMap(shifts, activityIdAndLocationActivityMap);
         for (Shift checkInshift : shifts) {
             boolean result;
-            if (activityIdAndLocationActivityTabMap.containsKey(checkInshift.getActivities().get(0).getActivityId())) {
-                result = checkIn ? validateGlideTimeWhileCheckIn(checkInshift, unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone(), activityIdAndLocationActivityTabMap) : validateGlideTimeWhileCheckOut(checkInshift, unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone(), activityIdAndLocationActivityTabMap);
+            if (activityIdAndLocationActivityMap.containsKey(checkInshift.getActivities().get(0).getActivityId())) {
+                result = checkIn ? validateGlideTimeWhileCheckIn(checkInshift, unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone(), activityIdAndLocationActivityMap) : validateGlideTimeWhileCheckOut(checkInshift, unitIdAndStaffResultMap.get(checkInshift.getUnitId()).getTimeZone(), activityIdAndLocationActivityMap);
                 DateTimeInterval interval = new DateTimeInterval(checkInshift.getStartDate(), checkInshift.getEndDate());
                 timeAndAttendanceDTO = updateAttendanceDetailsOnTheBasisOfInterval(interval,result,checkInshift,checkIn,reasonCodeId,unitIdAndStaffResultMap,unitAndReasonCode,organizationAndReasonCodeDTOS);
                 if (result) {
@@ -137,22 +137,22 @@ public class TimeAndAttendanceService extends MongoBaseService {
         return timeAndAttendanceDTO;
     }
 
-    private Map<BigInteger, LocationActivityTab> getBigIntegerLocationActivityTabMap(List<Shift> shifts, Map<BigInteger, LocationActivityTab> activityIdAndLocationActivityTabMap) {
+    private Map<BigInteger, ActivityLocationSettings> getBigIntegerLocationActivityMap(List<Shift> shifts, Map<BigInteger, ActivityLocationSettings> activityIdAndLocationActivityMap) {
         if (!shifts.isEmpty()) {
             Set<BigInteger> activityIds = shifts.stream().flatMap(shift1 -> shift1.getActivities().stream()).map(ShiftActivity::getActivityId).collect(Collectors.toSet());
             List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
-            activityIdAndLocationActivityTabMap = activities.stream().collect(Collectors.toMap(MongoBaseEntity::getId, Activity::getLocationActivityTab));
+            activityIdAndLocationActivityMap = activities.stream().collect(Collectors.toMap(MongoBaseEntity::getId, Activity::getActivityLocationSettings));
         }
-        return activityIdAndLocationActivityTabMap;
+        return activityIdAndLocationActivityMap;
     }
 
-    private TimeAndAttendanceDTO getTimeAndAttendanceDTO(boolean checkIn, TimeAndAttendanceDTO timeAndAttendanceDTO, TimeAndAttendance timeAndAttendance, Map<Long, StaffResultDTO> unitIdAndStaffResultMap, Shift shift, Map<BigInteger, LocationActivityTab> activityIdAndLocationActivityTabMap) {
+    private TimeAndAttendanceDTO getTimeAndAttendanceDTO(boolean checkIn, TimeAndAttendanceDTO timeAndAttendanceDTO, TimeAndAttendance timeAndAttendance, Map<Long, StaffResultDTO> unitIdAndStaffResultMap, Shift shift, Map<BigInteger, ActivityLocationSettings> activityIdAndLocationActivityMap) {
         Long unitId;
         if (isNotNull(timeAndAttendance)) {
             timeAndAttendanceRepository.save(timeAndAttendance);
             if (isNotNull(shift)) {
                 unitId = shift.getUnitId();
-                checkIn = (!checkIn) ? !validateGlideTimeWhileCheckOut(shift, unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone(), activityIdAndLocationActivityTabMap) : true;
+                checkIn = (!checkIn) ? !validateGlideTimeWhileCheckOut(shift, unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone(), activityIdAndLocationActivityMap) : true;
                 shiftStateService.createShiftState(Arrays.asList(shift), checkIn, unitId);
             }
             timeAndAttendanceDTO = new TimeAndAttendanceDTO(getAttendanceDTOObject(timeAndAttendance.getAttendanceTimeSlot()), null);
@@ -195,8 +195,8 @@ public class TimeAndAttendanceService extends MongoBaseService {
         return attendanceDurationDTO;
     }
 
-    private boolean validateGlideTimeWhileCheckOut(Shift checkInshift, String timeZone, Map<BigInteger, LocationActivityTab> activityIdAndLocationActivityTabMap) {
-        ActivityGlideTimeDetails glideTimeDetails = activityIdAndLocationActivityTabMap.get(checkInshift.getActivities().get(checkInshift.getActivities().size() - 1).getActivityId()).getCheckOutGlideTime(LocationEnum.OFFICE);
+    private boolean validateGlideTimeWhileCheckOut(Shift checkInshift, String timeZone, Map<BigInteger, ActivityLocationSettings> activityIdAndLocationActivityMap) {
+        ActivityGlideTimeDetails glideTimeDetails = activityIdAndLocationActivityMap.get(checkInshift.getActivities().get(checkInshift.getActivities().size() - 1).getActivityId()).getCheckOutGlideTime(LocationEnum.OFFICE);
         if (!Optional.ofNullable(glideTimeDetails).isPresent()) {
             exceptionService.dataNotFoundException(ERROR_GLIDETIME_NOTFOUND, checkInshift.getActivities().get(checkInshift.getActivities().size() - 1).getActivityName());
         }
@@ -206,8 +206,8 @@ public class TimeAndAttendanceService extends MongoBaseService {
         return glidTimeInterval.contains(DateUtils.getCurrentMillistByTimeZone(timeZone));
     }
 
-    private boolean validateGlideTimeWhileCheckIn(Shift checkInshift, String timeZone, Map<BigInteger, LocationActivityTab> activityIdAndLocationActivityTabMap) {
-        ActivityGlideTimeDetails glideTimeDetails = activityIdAndLocationActivityTabMap.get(checkInshift.getActivities().get(0).getActivityId()).getCheckInGlideTime(LocationEnum.OFFICE);
+    private boolean validateGlideTimeWhileCheckIn(Shift checkInshift, String timeZone, Map<BigInteger, ActivityLocationSettings> activityIdAndLocationActivityMap) {
+        ActivityGlideTimeDetails glideTimeDetails = activityIdAndLocationActivityMap.get(checkInshift.getActivities().get(0).getActivityId()).getCheckInGlideTime(LocationEnum.OFFICE);
         if (!Optional.ofNullable(glideTimeDetails).isPresent()) {
             exceptionService.dataNotFoundException(ERROR_GLIDETIME_NOTFOUND, checkInshift.getActivities().get(0).getActivityName());
         }
@@ -236,9 +236,9 @@ public class TimeAndAttendanceService extends MongoBaseService {
         private Map<Long, StaffResultDTO> unitIdAndStaffResultMap;
         private Shift shift;
         private Map<Long, List<ReasonCodeDTO>> unitAndReasonCode;
-        private Map<BigInteger, LocationActivityTab> activityIdAndLocationActivityTabMap;
+        private Map<BigInteger, ActivityLocationSettings> activityIdAndLocationActivityMap;
 
-        public UpdateTimeAttendanceIfShiftExists(Long reasonCodeId, boolean checkIn, TimeAndAttendanceDTO timeAndAttendanceDTO, TimeAndAttendance timeAndAttendance, List<StaffResultDTO> staffAndOrganizationIds, Map<Long, StaffResultDTO> unitIdAndStaffResultMap, Shift shift, Map<Long, List<ReasonCodeDTO>> unitAndReasonCode, Map<BigInteger, LocationActivityTab> activityIdAndLocationActivityTabMap) {
+        public UpdateTimeAttendanceIfShiftExists(Long reasonCodeId, boolean checkIn, TimeAndAttendanceDTO timeAndAttendanceDTO, TimeAndAttendance timeAndAttendance, List<StaffResultDTO> staffAndOrganizationIds, Map<Long, StaffResultDTO> unitIdAndStaffResultMap, Shift shift, Map<Long, List<ReasonCodeDTO>> unitAndReasonCode, Map<BigInteger, ActivityLocationSettings> activityIdAndLocationActivityMap) {
             this.reasonCodeId = reasonCodeId;
             this.checkIn = checkIn;
             this.timeAndAttendanceDTO = timeAndAttendanceDTO;
@@ -247,7 +247,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
             this.unitIdAndStaffResultMap = unitIdAndStaffResultMap;
             this.shift = shift;
             this.unitAndReasonCode = unitAndReasonCode;
-            this.activityIdAndLocationActivityTabMap = activityIdAndLocationActivityTabMap;
+            this.activityIdAndLocationActivityMap = activityIdAndLocationActivityMap;
         }
 
         public TimeAndAttendanceDTO getTimeAndAttendanceDTO() {
@@ -266,7 +266,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
                 }
             } else if (!checkIn) {
                 TimeAndAttendance oldTimeAndAttendance = timeAndAttendanceRepository.findMaxAttendanceCheckOut(staffAndOrganizationIds.stream().map(StaffResultDTO::getStaffId).collect(Collectors.toList()), LocalDate.now().minusDays(1));
-                if (!(isNotNull(shift) && Optional.ofNullable(oldTimeAndAttendance.getAttendanceTimeSlot().get(oldTimeAndAttendance.getAttendanceTimeSlot().size() - 1).getShiftId()).isPresent() && validateGlideTimeWhileCheckOut(shift, unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone(), activityIdAndLocationActivityTabMap)) && !Optional.ofNullable(reasonCodeId).isPresent()) {
+                if (!(isNotNull(shift) && Optional.ofNullable(oldTimeAndAttendance.getAttendanceTimeSlot().get(oldTimeAndAttendance.getAttendanceTimeSlot().size() - 1).getShiftId()).isPresent() && validateGlideTimeWhileCheckOut(shift, unitIdAndStaffResultMap.get(shift.getUnitId()).getTimeZone(), activityIdAndLocationActivityMap)) && !Optional.ofNullable(reasonCodeId).isPresent()) {
                     timeAndAttendanceDTO = new TimeAndAttendanceDTO(new ArrayList<>(), unitAndReasonCode.get(oldTimeAndAttendance.getAttendanceTimeSlot().get(oldTimeAndAttendance.getAttendanceTimeSlot().size() - 1).getUnitId()));
                 } else {
                     timeAndAttendance = checkOut(staffAndOrganizationIds, oldTimeAndAttendance, reasonCodeId);

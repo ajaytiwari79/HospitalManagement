@@ -35,8 +35,6 @@ import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.domain.unit.*;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.WTABaseRuleTemplate;
-import com.kairos.shiftplanning.integration.ActivityIntegration;
-import com.kairos.shiftplanning.integration.UserIntegration;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 
@@ -224,29 +222,29 @@ public class ShiftPlanningInitializer {
     private Activity getActivity(ActivityDTO activityDTO, Map<BigInteger,Integer> activityOrderMap, Map<BigInteger, TimeTypeDTO> timeTypeMap) {
         TimeType timeType = getTimeType(activityDTO, timeTypeMap);
         return Activity.builder()
-                .breakAllowed(activityDTO.getRulesActivityTab().isBreakAllowed())
-                .cutOffdayValue(activityDTO.getRulesActivityTab().getCutOffdayValue())
-                .cutOffIntervalUnit(activityDTO.getRulesActivityTab().getCutOffIntervalUnit())
-                .cutOffStartFrom(activityDTO.getRulesActivityTab().getCutOffStartFrom())
+                .breakAllowed(activityDTO.getActivityRulesSettings().isBreakAllowed())
+                .cutOffdayValue(activityDTO.getActivityRulesSettings().getCutOffdayValue())
+                .cutOffIntervalUnit(activityDTO.getActivityRulesSettings().getCutOffIntervalUnit())
+                .cutOffStartFrom(activityDTO.getActivityRulesSettings().getCutOffStartFrom())
                 .expertises(activityDTO.getExpertises())
-                .fixedTimeValue(activityDTO.getTimeCalculationActivityTab().getFixedTimeValue())
+                .fixedTimeValue(activityDTO.getActivityTimeCalculationSettings().getFixedTimeValue())
                 .id(activityDTO.getId())
-                .fullDayCalculationType(activityDTO.getTimeCalculationActivityTab().getFullDayCalculationType())
-                .fullWeekCalculationType(activityDTO.getTimeCalculationActivityTab().getFullWeekCalculationType())
-                .methodForCalculatingTime(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime())
-                .multiplyWithValue(activityDTO.getTimeCalculationActivityTab().getMultiplyWithValue())
+                .fullDayCalculationType(activityDTO.getActivityTimeCalculationSettings().getFullDayCalculationType())
+                .fullWeekCalculationType(activityDTO.getActivityTimeCalculationSettings().getFullWeekCalculationType())
+                .methodForCalculatingTime(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime())
+                .multiplyWithValue(activityDTO.getActivityTimeCalculationSettings().getMultiplyWithValue())
                 .name(activityDTO.getName())
-                .validDayTypeIds(isNull(activityDTO.getRulesActivityTab().getDayTypes()) ? new HashSet<>() : new HashSet<>(activityDTO.getRulesActivityTab().getDayTypes()))
-                .skills(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getSkillActivityTab().getActivitySkills(), Skill.class))
+                .validDayTypeIds(isNull(activityDTO.getActivityRulesSettings().getDayTypes()) ? new HashSet<>() : new HashSet<>(activityDTO.getActivityRulesSettings().getDayTypes()))
+                .skills(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getActivitySkillSettings().getActivitySkills(), Skill.class))
             //    .tags(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getTags(), Tag.class))
                 .timeType(timeType).teamId(activityDTO.getTeamId()).constraints(getActivityConstrainsts(activityDTO)).order(activityOrderMap.get(activityDTO.getId())).activityPrioritySequence(activityDTO.getActivitySequence()).build();
     }
 
     private TimeType getTimeType(ActivityDTO activityDTO, Map<BigInteger, TimeTypeDTO> timeTypeMap) {
-        TimeTypeDTO timeTypeDTO = timeTypeMap.get(activityDTO.getBalanceSettingsActivityTab().getTimeTypeId());
+        TimeTypeDTO timeTypeDTO = timeTypeMap.get(activityDTO.getActivityBalanceSettings().getTimeTypeId());
         return TimeType.builder()
-                .timeTypeEnum(activityDTO.getBalanceSettingsActivityTab().getTimeType())
-                .timeTypes(activityDTO.getBalanceSettingsActivityTab().getTimeTypes())
+                .timeTypeEnum(activityDTO.getActivityBalanceSettings().getTimeType())
+                .timeTypes(activityDTO.getActivityBalanceSettings().getTimeTypes())
                 .breakNotHeldValid(timeTypeDTO.isBreakNotHeldValid())
                 .id(timeTypeDTO.getId())
                 .name(timeTypeDTO.getLabel())
@@ -256,11 +254,11 @@ public class ShiftPlanningInitializer {
     private Map<ConstraintSubType, ConstraintHandler> getActivityConstrainsts(ActivityDTO activityDTO) {
         validateActivityTimeRules(activityDTO);
         Map<ConstraintSubType, ConstraintHandler> constraintMap = new HashMap<>();
-        LongestDuration longestDuration = new LongestDuration(activityDTO.getRulesActivityTab().getLongestTime(), SOFT,-5);
-        ShortestDuration shortestDuration = new ShortestDuration(activityDTO.getRulesActivityTab().getShortestTime(), HARD,-2);
-        MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(activityDTO.getRulesActivityTab().getRecurrenceTimes(), SOFT,-1);//3
+        LongestDuration longestDuration = new LongestDuration(activityDTO.getActivityRulesSettings().getLongestTime(), SOFT,-5);
+        ShortestDuration shortestDuration = new ShortestDuration(activityDTO.getActivityRulesSettings().getShortestTime(), HARD,-2);
+        MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(activityDTO.getActivityRulesSettings().getRecurrenceTimes(), SOFT,-1);//3
         MaxDiffrentActivity maxDiffrentActivity = new MaxDiffrentActivity(3, SOFT,-1);//4
-        MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(activityDTO.getRulesActivityTab().getShortestTime(), SOFT,-1);//5
+        MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(activityDTO.getActivityRulesSettings().getShortestTime(), SOFT,-1);//5
         ActivityDayType activityDayType = new ActivityDayType(SOFT,5);
         ActivityRequiredTag activityRequiredTag = new ActivityRequiredTag(HARD,1);
         constraintMap.put(ConstraintSubType.ACTIVITY_LONGEST_DURATION_RELATIVE_TO_SHIFT_LENGTH,longestDuration);
@@ -280,16 +278,16 @@ public class ShiftPlanningInitializer {
     }
 
     public void validateActivityTimeRules(ActivityDTO activityDTO) {
-        if(isNull(activityDTO.getRulesActivityTab().getShortestTime())){
+        if(isNull(activityDTO.getActivityRulesSettings().getShortestTime())){
             throw new ActionNotPermittedException("Shortest Time configuration is missing in "+activityDTO.getName());
         }
-        if(isNull(activityDTO.getRulesActivityTab().getRecurrenceTimes())){
+        if(isNull(activityDTO.getActivityRulesSettings().getRecurrenceTimes())){
             throw new ActionNotPermittedException("Recurrence Times configuration is missing in "+activityDTO.getName());
         }
-        if(isNull(activityDTO.getRulesActivityTab().getLongestTime())){
+        if(isNull(activityDTO.getActivityRulesSettings().getLongestTime())){
             throw new ActionNotPermittedException("Longest Time configuration is missing in "+activityDTO.getName());
         }
-        if (activityDTO.getRulesActivityTab().getShortestTime() > activityDTO.getRulesActivityTab().getLongestTime()) {
+        if (activityDTO.getActivityRulesSettings().getShortestTime() > activityDTO.getActivityRulesSettings().getLongestTime()) {
             throw new ActionNotPermittedException("Shortest Time can't be Greater than longest time"+activityDTO.getName());
         }
     }

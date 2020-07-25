@@ -178,9 +178,6 @@ public class RuleTemplateCategoryService extends MongoBaseService {
                 excpExceptionService.duplicateDataException(MESSAGE_RULETEMPLATECATEGORY_NAME_ALREADYEXIST, ruleTemplateCategoryDTO.getName());
             }
         }
-        if (ruleTemplateCategoryObj.getName().equals("NONE") || ruleTemplateCategoryDTO.getName().equals("NONE")) {
-            excpExceptionService.actionNotPermittedException(MESSAGE_RULETEMPLATECATEGORY_NAME_UPDATE);
-        }
         ruleTemplateCategoryObj.setName(ruleTemplateCategoryDTO.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategoryDTO.getDescription());
         ruleTemplateCategoryObj.setTags(ruleTemplateCategoryDTO.getTags());

@@ -97,7 +97,7 @@ public class ShiftSickService extends MongoBaseService {
         if(alreadySickReported){
             exceptionService.actionNotPermittedException(STAFF_ALREADY_SICK);
         }
-        byte shiftNeedsToAddForDays = activityWrapper.getActivity().getRulesActivityTab().isAllowedAutoAbsence() ? activityWrapper.getActivity().getRulesActivityTab().getRecurrenceDays() : 0;
+        byte shiftNeedsToAddForDays = activityWrapper.getActivity().getActivityRulesSettings().isAllowedAutoAbsence() ? activityWrapper.getActivity().getActivityRulesSettings().getRecurrenceDays() : 0;
         if(shiftNeedsToAddForDays==0){
             shiftNeedsToAddForDays = 1;
         }
@@ -171,7 +171,7 @@ public class ShiftSickService extends MongoBaseService {
         if(activityOptional.isPresent()){
             Activity activity = activityOptional.get();
             List<ActivityWrapper> protectDaysOffActivity = null;
-            if(PROTECTED_DAYS_OFF.equals(activity.getRulesActivityTab().getSicknessSetting().getReplaceSickShift())){
+            if(PROTECTED_DAYS_OFF.equals(activity.getActivityRulesSettings().getSicknessSetting().getReplaceSickShift())){
                 protectDaysOffActivity = activityRepository.getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF.toString(),unitId);
                 if(isCollectionEmpty(protectDaysOffActivity)){
                     exceptionService.dataNotFoundException(MESSAGE_PROTECTEDDAYSOFF_ACTIVITY_NOT_FOUND);
@@ -190,7 +190,7 @@ public class ShiftSickService extends MongoBaseService {
             Shift shift=shifts.stream().filter(k->k.getShiftType().equals(ShiftType.SICK)).findAny().orElse(null);
             if(shift!=null && autoAbsence.get()) {
                 shift.setDeleted(true);
-                switch (activity.getRulesActivityTab().getSicknessSetting().getReplaceSickShift()) {
+                switch (activity.getActivityRulesSettings().getSicknessSetting().getReplaceSickShift()) {
                     case PROTECTED_DAYS_OFF:
                         List<ActivityWrapper> protectDaysOffActivity = activityRepository.getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF.toString(),activity.getUnitId());
                         if(isCollectionEmpty(protectDaysOffActivity)){
@@ -214,7 +214,7 @@ public class ShiftSickService extends MongoBaseService {
                     default:
                         break;
                 }
-                autoAbsence.getAndSet(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getActivity().getRulesActivityTab().isAllowedAutoAbsence());
+                autoAbsence.getAndSet(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getActivity().getActivityRulesSettings().isAllowedAutoAbsence());
                 allShiftsToDelete.addAll(shifts);
             }
 
@@ -238,7 +238,7 @@ public class ShiftSickService extends MongoBaseService {
     public ActivityRuleViolation validateAndUpdateSicknessShift(Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ActivityWrapper activityWrapper = activityWrapperMap.get(shift.getActivities().get(0).getActivityId());
         List<String> errorMessages = new ArrayList<>();
-        if (activityWrapper.getActivity().getRulesActivityTab().isSicknessSettingValid() && !activityWrapper.getActivity().getRulesActivityTab().isAllowedAutoAbsence()) {
+        if (activityWrapper.getActivity().getActivityRulesSettings().isSicknessSettingValid() && !activityWrapper.getActivity().getActivityRulesSettings().isAllowedAutoAbsence()) {
             List<Shift> shifts = shiftMongoRepository.findAllShiftByIntervalAndEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), getStartOfDay(shift.getStartDate()), DateUtils.getEndOfDay(shift.getEndDate()));
             List<Activity> protectedDaysOffActivities = activityRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, newHashSet(shift.getUnitId()));
             validateSicknessShift(shift, staffAdditionalInfoDTO, activityWrapper, shifts, protectedDaysOffActivities);
@@ -256,7 +256,7 @@ public class ShiftSickService extends MongoBaseService {
 
     public void validateSicknessShift(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<Shift> shifts, List<Activity> activities) {
         List<String> errorMessages = new ArrayList<>();
-        SicknessSetting sicknessSetting = activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting();
+        SicknessSetting sicknessSetting = activityWrapper.getActivity().getActivityRulesSettings().getSicknessSetting();
         sickService.validateSickSettings(staffAdditionalInfoDTO, activityWrapper, shifts, errorMessages, sicknessSetting);
         if (sicknessSetting.isUsedOnProtecedDaysOff()) {
             Set<BigInteger> activityIds = activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());

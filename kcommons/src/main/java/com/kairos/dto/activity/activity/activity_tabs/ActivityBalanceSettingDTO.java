@@ -18,7 +18,7 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @AllArgsConstructor
-public class BalanceSettingActivityTabDTO {
+public class ActivityBalanceSettingDTO {
 
 
     private Long activityId;
@@ -29,10 +29,10 @@ public class BalanceSettingActivityTabDTO {
     private Boolean negativeDayBalancePresent;
     private TimeTypes timeTypes;
 
-    public BalanceSettingActivityTabDTO() {
+    public ActivityBalanceSettingDTO() {
     }
 
-    public BalanceSettingActivityTabDTO(BigInteger timeTypeId) {
+    public ActivityBalanceSettingDTO(BigInteger timeTypeId) {
         this.timeTypeId = timeTypeId;
     }
 

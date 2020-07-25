@@ -22,7 +22,7 @@ import java.util.Optional;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RulesActivityTabDTO {
+public class ActivityRulesSettingsDTO {
 
     private BigInteger activityId;
     private boolean eligibleForFinalSchedule;

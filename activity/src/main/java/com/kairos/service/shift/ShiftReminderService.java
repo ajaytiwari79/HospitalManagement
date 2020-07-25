@@ -113,7 +113,7 @@ public class ShiftReminderService{
 
     private LocalDateTime calculateNextTrigger(Activity activity, LocalDateTime lastTriggerDateTime, DurationType durationType, LocalDateTime shiftDateTime, long remainingUnit) {
         LocalDateTime nextTriggerDateTime = null;
-        for (ActivityReminderSettings current : activity.getCommunicationActivityTab().getActivityReminderSettings()) {
+        for (ActivityReminderSettings current : activity.getActivityCommunicationSettings().getActivityReminderSettings()) {
 
             if (current.getSendReminder().getDurationType().equals(durationType)) {
                 /**

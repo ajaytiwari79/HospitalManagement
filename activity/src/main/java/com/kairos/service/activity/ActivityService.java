@@ -35,7 +35,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
@@ -59,7 +59,7 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
-import com.kairos.wrapper.activity.ActivityTabsWrapper;
+import com.kairos.wrapper.activity.ActivitySettingsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
@@ -110,35 +110,35 @@ public class ActivityService {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ENDDATE_GREATERTHAN_STARTDATE);
         }
         Activity activity = activityMongoRepository.findByNameIgnoreCaseAndCountryIdAndByDate(activityDTO.getName().trim(), countryId, activityDTO.getStartDate(), activityDTO.getEndDate());
-        if (Optional.ofNullable(activity).isPresent() && activityDTO.getStartDate().isBefore(activity.getGeneralActivityTab().getStartDate())) {
+        if (Optional.ofNullable(activity).isPresent() && activityDTO.getStartDate().isBefore(activity.getActivityGeneralSettings().getStartDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_OVERLAPING);
         }
         if (Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
+            exceptionService.dataNotFoundException(activity.getActivityGeneralSettings().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
         }
         activity = buildActivity(activityDTO);
-        initializeActivityTabs(activity, countryId, activityDTO);
+        initializeActivitySettings(activity, countryId, activityDTO);
         activityMongoRepository.save(activity);
         List<TagDTO> tags = tagMongoRepository.getTagsById(activityDTO.getTags());
         ActivityTagDTO activityTagDTO = new ActivityTagDTO();
         activityTagDTO.buildActivityTagDTO(activity, tags);
         return activityTagDTO;
     }
-    private void initializeActivityTabs(Activity activity, Long countryId, ActivityDTO activityDTO) {
-        GeneralActivityTab generalActivityTab = new GeneralActivityTab(activity.getName(), activity.getDescription(), "");
-        generalActivityTab.setColorPresent(false);
-        generalActivityTab.setStartDate(activityDTO.getStartDate());
-        generalActivityTab.setEndDate(activityDTO.getEndDate());
+    private void initializeActivitySettings(Activity activity, Long countryId, ActivityDTO activityDTO) {
+        ActivityGeneralSettings activityGeneralSettings = new ActivityGeneralSettings(activity.getName(), activity.getDescription(), "");
+        activityGeneralSettings.setColorPresent(false);
+        activityGeneralSettings.setStartDate(activityDTO.getStartDate());
+        activityGeneralSettings.setEndDate(activityDTO.getEndDate());
         activity.setCountryId(countryId);
         ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE", countryId, false);
         if (activityCategory != null) {
-            generalActivityTab.setCategoryId(activityCategory.getId());
+            activityGeneralSettings.setCategoryId(activityCategory.getId());
         } else {
             ActivityCategory category = new ActivityCategory("NONE", "", countryId, null);
             activityCategoryRepository.save(category);
-            generalActivityTab.setCategoryId(category.getId());
+            activityGeneralSettings.setCategoryId(category.getId());
         }
-        activity.setGeneralActivityTab(generalActivityTab);
+        activity.setActivityGeneralSettings(activityGeneralSettings);
         List<PhaseDTO> phases = phaseService.getPhasesByCountryId(countryId);
         if (CollectionUtils.isEmpty(phases)) {
             exceptionService.actionNotPermittedException(MESSAGE_COUNTRY_PHASE_NOTFOUND);
@@ -148,7 +148,7 @@ public class ActivityService {
         if (!Optional.ofNullable(glideTimeSettingsDTO).isPresent()) {
             exceptionService.actionNotPermittedException(ERROR_GLIDETIME_NOTFOUND_COUNTRY);
         }
-        ActivityUtil.initializeActivityTabs(activity, phaseTemplateValues, glideTimeSettingsDTO);
+        ActivityUtil.initializeActivitySettings(activity, phaseTemplateValues, glideTimeSettingsDTO);
     }
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
@@ -208,137 +208,138 @@ public class ActivityService {
         activityMongoRepository.save(activity);
         return true;
     }
-    public ActivityTabsWrapper updateGeneralTab(Long countryId, GeneralActivityTabDTO generalDTO) {
+    public ActivitySettingsWrapper updateGeneralTab(Long countryId, ActivityGeneralSettingsDTO generalDTO) {
         validateActivityDetails(countryId, generalDTO);
         Activity activity = findActivityById(generalDTO.getActivityId());
-        generalDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
-        GeneralActivityTab generalTab = ObjectMapperUtils.copyPropertiesByMapper(generalDTO,GeneralActivityTab.class);
-        if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
-            generalTab.setModifiedIconName(activity.getGeneralActivityTab().getModifiedIconName());
+        generalDTO.setBackgroundColor(activity.getActivityGeneralSettings().getBackgroundColor());
+        ActivityGeneralSettings generalTab = ObjectMapperUtils.copyPropertiesByMapper(generalDTO, ActivityGeneralSettings.class);
+        if (Optional.ofNullable(activity.getActivityGeneralSettings().getModifiedIconName()).isPresent()) {
+            generalTab.setModifiedIconName(activity.getActivityGeneralSettings().getModifiedIconName());
         }
-        if (Optional.ofNullable(activity.getGeneralActivityTab().getOriginalIconName()).isPresent()) {
-            generalTab.setOriginalIconName(activity.getGeneralActivityTab().getOriginalIconName());
+        if (Optional.ofNullable(activity.getActivityGeneralSettings().getOriginalIconName()).isPresent()) {
+            generalTab.setOriginalIconName(activity.getActivityGeneralSettings().getOriginalIconName());
         }
-        activity.setGeneralActivityTab(generalTab);
+        activity.setActivityGeneralSettings(generalTab);
         activity.setName(generalTab.getName());
         activity.setTags(generalDTO.getTags());
         activity.setDescription(generalTab.getDescription());
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         generalTab.setTags(null);
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
-        generalActivityTabWithTagDTO.setTags(null);
+        GeneralActivityWithTagDTO generalActivityWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityWithTagDTO.class);
+        generalActivityWithTagDTO.setTags(null);
         if (!activity.getTags().isEmpty()) {
-            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+            generalActivityWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
             generalTab.setTags(activity.getTags());
         }
         updateBalanceSettingTab(generalDTO, activity);
         updateNotesTabOfActivity(generalDTO, activity);
         activityMongoRepository.save(activity);
-        return getActivityTabsWrapper(activity, activityCategories, generalActivityTabWithTagDTO);
+        return getActivitySettingsWrapper(activity, activityCategories, generalActivityWithTagDTO);
     }
-    private void validateActivityDetails(Long countryId, GeneralActivityTabDTO generalDTO) {
+    private void validateActivityDetails(Long countryId, ActivityGeneralSettingsDTO generalDTO) {
         if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ENDDATE_GREATERTHAN_STARTDATE);
         }
         Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountryAndDate(generalDTO.getName().trim(), generalDTO.getActivityId(), countryId, generalDTO.getStartDate(), generalDTO.getEndDate());
-        if (Optional.ofNullable(isActivityAlreadyExists).isPresent() && generalDTO.getStartDate().isBefore(isActivityAlreadyExists.getGeneralActivityTab().getStartDate())) {
+        if (Optional.ofNullable(isActivityAlreadyExists).isPresent() && generalDTO.getStartDate().isBefore(isActivityAlreadyExists.getActivityGeneralSettings().getStartDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_OVERLAPING);
         }
         if (Optional.ofNullable(isActivityAlreadyExists).isPresent()) {
-            exceptionService.dataNotFoundException(isActivityAlreadyExists.getGeneralActivityTab().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
+            exceptionService.dataNotFoundException(isActivityAlreadyExists.getActivityGeneralSettings().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
         }
         ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
         if (activityCategory == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_CATEGORY_NOTEXIST);
         }
     }
-    private ActivityTabsWrapper getActivityTabsWrapper(Activity activity, List<ActivityCategory> activityCategories, GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO) {
-        generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
-        generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
-        generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().isOnCallTimePresent());
-        generalActivityTabWithTagDTO.setNegativeDayBalancePresent(activity.getBalanceSettingsActivityTab().getNegativeDayBalancePresent());
-        generalActivityTabWithTagDTO.setTimeType(activity.getBalanceSettingsActivityTab().getTimeType());
-        generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
-        generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
-        generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
-        generalActivityTabWithTagDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
-        return new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityCategories);
+    private ActivitySettingsWrapper getActivitySettingsWrapper(Activity activity, List<ActivityCategory> activityCategories, GeneralActivityWithTagDTO generalActivityWithTagDTO) {
+        generalActivityWithTagDTO.setAddTimeTo(activity.getActivityBalanceSettings().getAddTimeTo());
+        generalActivityWithTagDTO.setTimeTypeId(activity.getActivityBalanceSettings().getTimeTypeId());
+        generalActivityWithTagDTO.setOnCallTimePresent(activity.getActivityBalanceSettings().isOnCallTimePresent());
+        generalActivityWithTagDTO.setNegativeDayBalancePresent(activity.getActivityBalanceSettings().getNegativeDayBalancePresent());
+        generalActivityWithTagDTO.setTimeType(activity.getActivityBalanceSettings().getTimeType());
+        generalActivityWithTagDTO.setContent(activity.getActivityNotesSettings().getContent());
+        generalActivityWithTagDTO.setOriginalDocumentName(activity.getActivityNotesSettings().getOriginalDocumentName());
+        generalActivityWithTagDTO.setModifiedDocumentName(activity.getActivityNotesSettings().getModifiedDocumentName());
+        generalActivityWithTagDTO.setBackgroundColor(activity.getActivityGeneralSettings().getBackgroundColor());
+        return new ActivitySettingsWrapper(generalActivityWithTagDTO, activityCategories);
     }
-    public ActivityTabsWrapper getGeneralTabOfActivity(Long countryId, BigInteger activityId) {
+    public ActivitySettingsWrapper getGeneralTabOfActivity(Long countryId, BigInteger activityId) {
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         Activity activity = findActivityById(activityId);
-        GeneralActivityTab generalTab = activity.getGeneralActivityTab();
+        ActivityGeneralSettings generalTab = activity.getActivityGeneralSettings();
         generalTab.setTags(null);
-        GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
-        generalActivityTabWithTagDTO.setTags(null);
+        GeneralActivityWithTagDTO generalActivityWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityWithTagDTO.class);
+        generalActivityWithTagDTO.setTags(null);
         if (!activity.getTags().isEmpty())
         {
-            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+            generalActivityWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
         }
-        generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
-        generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
-        generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().isOnCallTimePresent());
-        generalActivityTabWithTagDTO.setNegativeDayBalancePresent(activity.getBalanceSettingsActivityTab().getNegativeDayBalancePresent());
-        generalActivityTabWithTagDTO.setTimeType(activity.getBalanceSettingsActivityTab().getTimeType());
-        generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
-        generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
-        generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityCategories);
+        generalActivityWithTagDTO.setAddTimeTo(activity.getActivityBalanceSettings().getAddTimeTo());
+        generalActivityWithTagDTO.setTimeTypeId(activity.getActivityBalanceSettings().getTimeTypeId());
+        generalActivityWithTagDTO.setOnCallTimePresent(activity.getActivityBalanceSettings().isOnCallTimePresent());
+        generalActivityWithTagDTO.setNegativeDayBalancePresent(activity.getActivityBalanceSettings().getNegativeDayBalancePresent());
+        generalActivityWithTagDTO.setTimeType(activity.getActivityBalanceSettings().getTimeType());
+        generalActivityWithTagDTO.setContent(activity.getActivityNotesSettings().getContent());
+        generalActivityWithTagDTO.setOriginalDocumentName(activity.getActivityNotesSettings().getOriginalDocumentName());
+        generalActivityWithTagDTO.setModifiedDocumentName(activity.getActivityNotesSettings().getModifiedDocumentName());
+        ActivitySettingsWrapper activitySettingsWrapper = new ActivitySettingsWrapper(generalActivityWithTagDTO, activityCategories);
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
         PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
-        activityTabsWrapper.setPresenceTypeWithTimeType(presenceType);
-        activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(activity.getBalanceSettingsActivityTab().getTimeTypeId(), countryId));
-        return activityTabsWrapper;
+        activitySettingsWrapper.setPresenceTypeWithTimeType(presenceType);
+        activitySettingsWrapper.setTimeTypes(timeTypeService.getAllTimeType(activity.getActivityBalanceSettings().getTimeTypeId(), countryId));
+        return activitySettingsWrapper;
     }
     private List<ActivityCategory> checkCountryAndFindActivityCategory(Long countryId) {
         return activityCategoryRepository.findByCountryId(countryId);
     }
-    public BalanceSettingsActivityTab updateBalanceSettingTab(GeneralActivityTabDTO generalActivityTabDTO, Activity activity) {
-        TimeType timeType = timeTypeMongoRepository.findOneById(generalActivityTabDTO.getTimeTypeId());
+    public ActivityBalanceSettings updateBalanceSettingTab(ActivityGeneralSettingsDTO activityGeneralSettingsDTO, Activity activity) {
+        TimeType timeType = timeTypeMongoRepository.findOneById(activityGeneralSettingsDTO.getTimeTypeId());
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
         }
         updateBackgroundColorInActivityAndShift(activity, timeType);
-        if(isNotNull(generalActivityTabDTO.getTimeTypeId()) && !generalActivityTabDTO.getTimeTypeId().equals(activity.getBalanceSettingsActivityTab().getTimeTypeId())){
+        if(isNotNull(activityGeneralSettingsDTO.getTimeTypeId()) && !activityGeneralSettingsDTO.getTimeTypeId().equals(activity.getActivityBalanceSettings().getTimeTypeId())){
             if (activity.getState().equals(ActivityStateEnum.PUBLISHED)) {
                 exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED, activity.getId());
             }
-            activity.setPhaseSettingsActivityTab(timeType.getPhaseSettingsActivityTab());
-            activity.setRulesActivityTab(timeType.getRulesActivityTab());
-            activity.setTimeCalculationActivityTab(timeType.getTimeCalculationActivityTab());
+            activity.setActivityPhaseSettings(timeType.getActivityPhaseSettings());
+            activity.setActivityRulesSettings(timeType.getActivityRulesSettings());
+            activity.setActivityTimeCalculationSettings(timeType.getActivityTimeCalculationSettings());
             activity.setEmploymentTypes(timeType.getEmploymentTypes());
             activity.setExpertises(timeType.getExpertises());
             activity.setOrganizationSubTypes(timeType.getOrganizationSubTypes());
             activity.setOrganizationTypes(timeType.getOrganizationTypes());
-            activity.setSkillActivityTab(timeType.getSkillActivityTab());
+            activity.setActivitySkillSettings(timeType.getActivitySkillSettings());
             activity.setRegions(timeType.getRegions());
             activity.setLevels(timeType.getLevels());
+            activity.getActivityRulesSettings().setSicknessSettingValid(timeType.isSicknessSettingValid());
+            activity.getActivityRulesSettings().setSicknessSetting(timeType.getActivityRulesSettings().getSicknessSetting());
+            activity.getActivityGeneralSettings().setBackgroundColor(timeType.getBackgroundColor());
         }
-        activity.getRulesActivityTab().setSicknessSettingValid(timeType.isSicknessSettingValid());
-        activity.getRulesActivityTab().setSicknessSetting(timeType.getRulesActivityTab().getSicknessSetting());
-        activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
-        activity.getGeneralActivityTab().setColorPresent(true);
+
+        activity.getActivityGeneralSettings().setColorPresent(true);
         Long countryId = activity.getCountryId();
         if (countryId == null) {
             countryId = userIntegrationService.getCountryIdOfOrganization(activity.getUnitId());
         }
-        updateBalanceSettingDetails(generalActivityTabDTO, activity, timeType);
+        updateBalanceSettingDetails(activityGeneralSettingsDTO, activity, timeType);
         updateActivityCategory(activity, countryId);
         activitySettingsService.updateTimeTypePathInActivity(activity);
-        return activity.getBalanceSettingsActivityTab();
+        return activity.getActivityBalanceSettings();
     }
-    private void updateBalanceSettingDetails(GeneralActivityTabDTO generalActivityTabDTO, Activity activity, TimeType timeType) {
-        activity.getBalanceSettingsActivityTab().setTimeTypeId(generalActivityTabDTO.getTimeTypeId());
-        activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
-        activity.getBalanceSettingsActivityTab().setTimeTypes(timeType.getTimeTypes());
-        activity.getBalanceSettingsActivityTab().setAddTimeTo(generalActivityTabDTO.getAddTimeTo());
-        activity.getBalanceSettingsActivityTab().setOnCallTimePresent(generalActivityTabDTO.isOnCallTimePresent());
-        activity.getBalanceSettingsActivityTab().setNegativeDayBalancePresent(generalActivityTabDTO.getNegativeDayBalancePresent());
-        activity.getBalanceSettingsActivityTab().setPriorityFor(timeType.getPriorityFor());
+    private void updateBalanceSettingDetails(ActivityGeneralSettingsDTO activityGeneralSettingsDTO, Activity activity, TimeType timeType) {
+        activity.getActivityBalanceSettings().setTimeTypeId(activityGeneralSettingsDTO.getTimeTypeId());
+        activity.getActivityBalanceSettings().setTimeType(timeType.getSecondLevelType());
+        activity.getActivityBalanceSettings().setTimeTypes(timeType.getTimeTypes());
+        activity.getActivityBalanceSettings().setAddTimeTo(activityGeneralSettingsDTO.getAddTimeTo());
+        activity.getActivityBalanceSettings().setOnCallTimePresent(activityGeneralSettingsDTO.isOnCallTimePresent());
+        activity.getActivityBalanceSettings().setNegativeDayBalancePresent(activityGeneralSettingsDTO.getNegativeDayBalancePresent());
+        activity.getActivityBalanceSettings().setPriorityFor(timeType.getPriorityFor());
         updateActivityCategory(activity, UserContext.getUserDetails().getCountryId());
     }
     private void updateBackgroundColorInActivityAndShift(Activity activity, TimeType timeType) {
-        if (!timeType.getBackgroundColor().equals(activity.getGeneralActivityTab().getBackgroundColor())) {
+        if (!timeType.getBackgroundColor().equals(activity.getActivityGeneralSettings().getBackgroundColor())) {
             List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()), null, null, null);
             updateShiftActivityBackGroundColor(activity, timeType, shifts);
             if (isCollectionNotEmpty(shifts)) {
@@ -359,28 +360,28 @@ public class ActivityService {
         }));
     }
     public void updateActivityCategory(Activity activity, Long countryId) {
-        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId(), countryId);
+        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getActivityBalanceSettings().getTimeTypeId(), countryId);
         if (isNull(timeType))
             exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND);
-        ActivityCategory category = activityCategoryRepository.getCategoryByTimeType(countryId, activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        ActivityCategory category = activityCategoryRepository.getCategoryByTimeType(countryId, activity.getActivityBalanceSettings().getTimeTypeId());
         if (category == null) {
             category = new ActivityCategory(timeType.getLabel(), "", countryId, timeType.getId());
             activityCategoryRepository.save(category);
         }
-        activity.getGeneralActivityTab().setCategoryId(category.getId());
+        activity.getActivityGeneralSettings().setCategoryId(category.getId());
         activityMongoRepository.save(activity);
     }
     public TimeCalculationActivityDTO updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO, boolean availableAllowActivity) {
         if(CommonConstants.FULL_WEEK.equals(timeCalculationActivityDTO.getMethodForCalculatingTime()) && isNull(timeCalculationActivityDTO.getFullWeekStart())){
             exceptionService.dataNotFoundException(MESSAGE_FULLWEEK_STARTDAY_NOTFOUND);
         }
-        TimeCalculationActivityTab timeCalculationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(timeCalculationActivityDTO,TimeCalculationActivityTab.class);
+        ActivityTimeCalculationSettings activityTimeCalculationSettings = ObjectMapperUtils.copyPropertiesByMapper(timeCalculationActivityDTO, ActivityTimeCalculationSettings.class);
         Activity activity = findActivityById(new BigInteger(String.valueOf(timeCalculationActivityDTO.getActivityId())));
         verifyAndDeleteCompositeActivity(timeCalculationActivityDTO, availableAllowActivity);
         if (!timeCalculationActivityDTO.isAvailableAllowActivity()) {
-            activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
-            if (!timeCalculationActivityTab.getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
-                timeCalculationActivityTab.setDayTypes(activity.getRulesActivityTab().getDayTypes());
+            activity.setActivityTimeCalculationSettings(activityTimeCalculationSettings);
+            if (!activityTimeCalculationSettings.getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
+                activityTimeCalculationSettings.setDayTypes(activity.getActivityRulesSettings().getDayTypes());
             }
             activityMongoRepository.save(activity);
         }
@@ -412,12 +413,12 @@ public class ActivityService {
     private void assignChildActivitiesInTeam(BigInteger activityId,Set<BigInteger> childActivityIds) {
         userIntegrationService.assignChildActivitiesInTeam(activityId,childActivityIds);
     }
-    public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
+    public ActivitySettingsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
         List<DayType> dayTypes = userIntegrationService.getDayTypesByCountryId(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
-        TimeCalculationActivityTab timeCalculationActivityTab = activity.getTimeCalculationActivityTab();
-        List<Long> rulesTabDayTypes = activity.getRulesActivityTab().getDayTypes();
-        return new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes, rulesTabDayTypes);
+        ActivityTimeCalculationSettings activityTimeCalculationSettings = activity.getActivityTimeCalculationSettings();
+        List<Long> rulesTabDayTypes = activity.getActivityRulesSettings().getDayTypes();
+        return new ActivitySettingsWrapper(activityTimeCalculationSettings, dayTypes, rulesTabDayTypes);
     }
     public ActivityWithCompositeDTO getCompositeAndChildActivityOfCountryActivity(BigInteger activityId, Long countryId) {
         ActivityWithCompositeDTO activity = getCompositeShiftTabOfActivity(activityId);
@@ -438,53 +439,53 @@ public class ActivityService {
         }
         return activity;
     }
-    public ActivityTabsWrapper updateIndividualPointsTab(IndividualPointsActivityTabDTO individualPointsDTO) {
-        IndividualPointsActivityTab individualPointsActivityTab = ObjectMapperUtils.copyPropertiesByMapper(individualPointsDTO,IndividualPointsActivityTab.class);
+    public ActivitySettingsWrapper updateIndividualPointsTab(ActivityIndividualPointsSettingsDTO individualPointsDTO) {
+        ActivityIndividualPointsSettings activityIndividualPointsSettings = ObjectMapperUtils.copyPropertiesByMapper(individualPointsDTO, ActivityIndividualPointsSettings.class);
         Activity activity = findActivityById(new BigInteger(String.valueOf(individualPointsDTO.getActivityId())));
-        activity.setIndividualPointsActivityTab(individualPointsActivityTab);
+        activity.setActivityIndividualPointsSettings(activityIndividualPointsSettings);
         activityMongoRepository.save(activity);
-        return new ActivityTabsWrapper(individualPointsActivityTab);
+        return new ActivitySettingsWrapper(activityIndividualPointsSettings);
     }
-    public IndividualPointsActivityTab getIndividualPointsTabOfActivity(BigInteger activityId) {
+    public ActivityIndividualPointsSettings getIndividualPointsTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        return activity.getIndividualPointsActivityTab();
+        return activity.getActivityIndividualPointsSettings();
     }
-    public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO,boolean updateFromOrg) {
+    public ActivitySettingsWrapper updateRulesTab(ActivityRulesSettingsDTO rulesActivityDTO, boolean updateFromOrg) {
         validateActivityTimeRules( rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
-        RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
+        ActivityRulesSettings activityRulesSettings = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, ActivityRulesSettings.class);
         Activity activity = findActivityById(rulesActivityDTO.getActivityId());
         checkEligibleStaffLevelDetails(rulesActivityDTO, activity);
-        updateCutoffDetails(rulesActivityDTO, rulesActivityTab);
-        rulesActivityTab.setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO.getSicknessSetting(),SicknessSetting.class));
-        if(activity.getRulesActivityTab().isEligibleForStaffingLevel() != rulesActivityTab.isEligibleForStaffingLevel() && !rulesActivityTab.isEligibleForStaffingLevel()){
+        updateCutoffDetails(rulesActivityDTO, activityRulesSettings);
+        activityRulesSettings.setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO.getSicknessSetting(),SicknessSetting.class));
+        if(activity.getActivityRulesSettings().isEligibleForStaffingLevel() != activityRulesSettings.isEligibleForStaffingLevel() && !activityRulesSettings.isEligibleForStaffingLevel()){
             removedActivityFromStaffingLevelOfChildActivity(activity.getChildActivityIds());
-            staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()));
+            staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getActivityBalanceSettings().getTimeType()));
         }
-        rulesActivityTab.setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO.getSicknessSetting(),SicknessSetting.class));
-        activity.setRulesActivityTab(rulesActivityTab);
-        if (!activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
-            activity.getTimeCalculationActivityTab().setDayTypes(activity.getRulesActivityTab().getDayTypes());
+        activityRulesSettings.setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO.getSicknessSetting(),SicknessSetting.class));
+        activity.setActivityRulesSettings(activityRulesSettings);
+        if (!activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
+            activity.getActivityTimeCalculationSettings().setDayTypes(activity.getActivityRulesSettings().getDayTypes());
         }
         activityMongoRepository.save(activity);
         if(updateFromOrg) {
             activitySchedulerJobService.registerJobForActivityCutoff(newArrayList(activity));
         }
-        return new ActivityTabsWrapper(rulesActivityTab);
+        return new ActivitySettingsWrapper(activityRulesSettings);
     }
-    private void updateCutoffDetails(RulesActivityTabDTO rulesActivityDTO, RulesActivityTab rulesActivityTab) {
+    private void updateCutoffDetails(ActivityRulesSettingsDTO rulesActivityDTO, ActivityRulesSettings activityRulesSettings) {
         if (rulesActivityDTO.getCutOffIntervalUnit() != null && rulesActivityDTO.getCutOffStartFrom() != null) {
             if (CutOffIntervalUnit.DAYS.equals(rulesActivityDTO.getCutOffIntervalUnit()) && rulesActivityDTO.getCutOffdayValue() == 0) {
                 exceptionService.invalidRequestException(ERROR_DAYVALUE_ZERO);
             }
             List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(), rulesActivityDTO.getCutOffIntervalUnit(), rulesActivityDTO.getCutOffdayValue());
-            rulesActivityTab.setCutOffIntervals(cutOffIntervals);
+            activityRulesSettings.setCutOffIntervals(cutOffIntervals);
             rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
         }
     }
-    private void checkEligibleStaffLevelDetails(RulesActivityTabDTO rulesActivityDTO, Activity activity) {
-        if(rulesActivityDTO.isEligibleForStaffingLevel() && !activity.getRulesActivityTab().isEligibleForStaffingLevel()){
+    private void checkEligibleStaffLevelDetails(ActivityRulesSettingsDTO rulesActivityDTO, Activity activity) {
+        if(rulesActivityDTO.isEligibleForStaffingLevel() && !activity.getActivityRulesSettings().isEligibleForStaffingLevel()){
             Activity parentActivity = activityMongoRepository.findByChildActivityId(rulesActivityDTO.getActivityId());
-            if(isNotNull(parentActivity) && !parentActivity.getRulesActivityTab().isEligibleForStaffingLevel()){
+            if(isNotNull(parentActivity) && !parentActivity.getActivityRulesSettings().isEligibleForStaffingLevel()){
                 exceptionService.actionNotPermittedException(MESSAGE_PARENT_SETTING_FALSE);
             }
         }
@@ -493,80 +494,80 @@ public class ActivityService {
         if(isCollectionNotEmpty(childActivityIds)) {
             List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(childActivityIds);
             for (Activity activity : activities) {
-                if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
-                    staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()));
-                    activity.getRulesActivityTab().setEligibleForStaffingLevel(false);
+                if (activity.getActivityRulesSettings().isEligibleForStaffingLevel()) {
+                    staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getActivityBalanceSettings().getTimeType()));
+                    activity.getActivityRulesSettings().setEligibleForStaffingLevel(false);
                 }
             }
             activityMongoRepository.saveAll(activities);
         }
     }
-    public ActivityTabsWrapper getPhaseSettingTabOfActivity(BigInteger activityId, Long countryId) {
+    public ActivitySettingsWrapper getPhaseSettingTabOfActivity(BigInteger activityId, Long countryId) {
         Activity activity = findActivityById(activityId);
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
         List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
-        PhaseSettingsActivityTab phaseSettingsActivityTab = activity.getPhaseSettingsActivityTab();
-        return new ActivityTabsWrapper(roles, phaseSettingsActivityTab, dayTypes, employmentTypeDTOS);
+        ActivityPhaseSettings activityPhaseSettings = activity.getActivityPhaseSettings();
+        return new ActivitySettingsWrapper(roles, activityPhaseSettings, dayTypes, employmentTypeDTOS);
     }
-    public PhaseSettingsActivityTab updatePhaseSettingTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
-        Activity activity = findActivityById(phaseSettingsActivityTab.getActivityId());
-        activity.setPhaseSettingsActivityTab(phaseSettingsActivityTab);
+    public ActivityPhaseSettings updatePhaseSettingTab(ActivityPhaseSettings activityPhaseSettings) {
+        Activity activity = findActivityById(activityPhaseSettings.getActivityId());
+        activity.setActivityPhaseSettings(activityPhaseSettings);
         activityMongoRepository.save(activity);
-        return phaseSettingsActivityTab;
+        return activityPhaseSettings;
     }
-    public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long countryId) {
+    public ActivitySettingsWrapper getRulesTabOfActivity(BigInteger activityId, Long countryId) {
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
         List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Activity activity = activityMongoRepository.findOne(activityId);
-        RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
-        return new ActivityTabsWrapper(rulesActivityTab, dayTypes, employmentTypeDTOS);
+        ActivityRulesSettings activityRulesSettings = activity.getActivityRulesSettings();
+        return new ActivitySettingsWrapper(activityRulesSettings, dayTypes, employmentTypeDTOS);
     }
-    public NotesActivityTab updateNotesTabOfActivity(GeneralActivityTabDTO generalActivityTabDTO, Activity activity) {
-        if (Optional.ofNullable(activity.getNotesActivityTab().getModifiedDocumentName()).isPresent()) {
-            activity.getNotesActivityTab().setModifiedDocumentName(generalActivityTabDTO.getModifiedDocumentName());
+    public ActivityNotesSettings updateNotesTabOfActivity(ActivityGeneralSettingsDTO activityGeneralSettingsDTO, Activity activity) {
+        if (Optional.ofNullable(activity.getActivityNotesSettings().getModifiedDocumentName()).isPresent()) {
+            activity.getActivityNotesSettings().setModifiedDocumentName(activityGeneralSettingsDTO.getModifiedDocumentName());
         }
-        if (Optional.ofNullable(activity.getNotesActivityTab().getOriginalDocumentName()).isPresent()) {
-            activity.getNotesActivityTab().setOriginalDocumentName(generalActivityTabDTO.getOriginalDocumentName());
+        if (Optional.ofNullable(activity.getActivityNotesSettings().getOriginalDocumentName()).isPresent()) {
+            activity.getActivityNotesSettings().setOriginalDocumentName(activityGeneralSettingsDTO.getOriginalDocumentName());
         }
-        activity.getNotesActivityTab().setContent(generalActivityTabDTO.getContent());
-        return activity.getNotesActivityTab();
+        activity.getActivityNotesSettings().setContent(activityGeneralSettingsDTO.getContent());
+        return activity.getActivityNotesSettings();
     }
-    public ActivityTabsWrapper getNotesTabOfActivity(BigInteger activityId) {
+    public ActivitySettingsWrapper getNotesTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        return new ActivityTabsWrapper(activity.getNotesActivityTab());
+        return new ActivitySettingsWrapper(activity.getActivityNotesSettings());
     }
     public List<CutOffInterval> getCutOffInterValOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        return ActivityUtil.getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(),activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue());
+        return ActivityUtil.getCutoffInterval(activity.getActivityRulesSettings().getCutOffStartFrom(),activity.getActivityRulesSettings().getCutOffIntervalUnit(), activity.getActivityRulesSettings().getCutOffdayValue());
     }
-    public ActivityTabsWrapper getCommunicationTabOfActivity(BigInteger activityId) {
+    public ActivitySettingsWrapper getCommunicationTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        return new ActivityTabsWrapper(activity.getCommunicationActivityTab());
+        return new ActivitySettingsWrapper(activity.getActivityCommunicationSettings());
     }
-    public ActivityTabsWrapper updateBonusTabOfActivity(BonusActivityDTO bonusActivityDTO) {
+    public ActivitySettingsWrapper updateBonusTabOfActivity(BonusActivityDTO bonusActivityDTO) {
         Activity activity = findActivityById(bonusActivityDTO.getActivityId());
-        BonusActivityTab bonusActivityTab = new BonusActivityTab(bonusActivityDTO.getBonusHoursType(), bonusActivityDTO.isOverRuleCtaWta());
-        activity.setBonusActivityTab(bonusActivityTab);
+        ActivityBonusSettings activityBonusSettings = new ActivityBonusSettings(bonusActivityDTO.getBonusHoursType(), bonusActivityDTO.isOverRuleCtaWta());
+        activity.setActivityBonusSettings(activityBonusSettings);
         activityMongoRepository.save(activity);
-        return new ActivityTabsWrapper(bonusActivityTab);
+        return new ActivitySettingsWrapper(activityBonusSettings);
     }
-    public ActivityTabsWrapper getBonusTabOfActivity(BigInteger activityId) {
+    public ActivitySettingsWrapper getBonusTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        return new ActivityTabsWrapper(activity.getBonusActivityTab());
+        return new ActivitySettingsWrapper(activity.getActivityBonusSettings());
     }
-    public ActivityTabsWrapper updateSkillTabOfActivity(SkillActivityDTO skillActivityDTO) {
+    public ActivitySettingsWrapper updateSkillTabOfActivity(SkillActivityDTO skillActivityDTO) {
         Activity activity = findActivityById(skillActivityDTO.getActivityId());
-        SkillActivityTab skillActivityTab = new SkillActivityTab(skillActivityDTO.getActivitySkills());
-        activity.setSkillActivityTab(skillActivityTab);
+        ActivitySkillSettings activitySkillSettings = new ActivitySkillSettings(skillActivityDTO.getActivitySkills());
+        activity.setActivitySkillSettings(activitySkillSettings);
         activityMongoRepository.save(activity);
-        return new ActivityTabsWrapper(skillActivityTab);
+        return new ActivitySettingsWrapper(activitySkillSettings);
     }
-    public ActivityTabsWrapper getSkillTabOfActivity(BigInteger activityId) {
+    public ActivitySettingsWrapper getSkillTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        return new ActivityTabsWrapper(activity.getSkillActivityTab());
+        return new ActivitySettingsWrapper(activity.getActivitySkillSettings());
     }
     public void updateOrgMappingDetailOfActivity(OrganizationMappingDTO organizationMappingDTO, BigInteger activityId) {
         Activity activity = findActivityById(activityId);
@@ -616,26 +617,26 @@ public class ActivityService {
             return activityWithUnitIdDTO;
         }
     }
-    public ActivityTabsWrapper updateOptaPlannerSettingsTabOfActivity(BigInteger activityId, OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
+    public ActivitySettingsWrapper updateOptaPlannerSettingsTabOfActivity(BigInteger activityId, ActivityOptaPlannerSetting activityOptaPlannerSetting) {
         Activity activity = findActivityById(activityId);
-        activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
+        activity.setActivityOptaPlannerSetting(activityOptaPlannerSetting);
         activityMongoRepository.save(activity);
-        return new ActivityTabsWrapper(optaPlannerSettingActivityTab);
+        return new ActivitySettingsWrapper(activityOptaPlannerSetting);
     }
-    public ActivityTabsWrapper getOptaPlannerSettingsTabOfActivity(BigInteger activityId) {
+    public ActivitySettingsWrapper getOptaPlannerSettingsTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        return new ActivityTabsWrapper(activity.getOptaPlannerSettingActivityTab());
+        return new ActivitySettingsWrapper(activity.getActivityOptaPlannerSetting());
     }
-    public ActivityTabsWrapper getCtaAndWtaSettingsTabOfActivity(BigInteger activityId) {
+    public ActivitySettingsWrapper getCtaAndWtaSettingsTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
-        return new ActivityTabsWrapper(activity.getCtaAndWtaSettingsActivityTab());
+        return new ActivitySettingsWrapper(activity.getActivityCTAAndWTASettings());
     }
-    public ActivityTabsWrapper updateCtaAndWtaSettingsTabOfActivity(CTAAndWTASettingsActivityTabDTO ctaAndWtaSettingsActivityTabDTO) {
-        Activity activity =findActivityById(new BigInteger(String.valueOf(ctaAndWtaSettingsActivityTabDTO.getActivityId())));
-        CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = new CTAAndWTASettingsActivityTab(ctaAndWtaSettingsActivityTabDTO.isEligibleForCostCalculation());
-        activity.setCtaAndWtaSettingsActivityTab(ctaAndWtaSettingsActivityTab);
+    public ActivitySettingsWrapper updateCtaAndWtaSettingsTabOfActivity(ActivityCTAAndWTASettingsDTO activityCTAAndWTASettingsDTO) {
+        Activity activity =findActivityById(new BigInteger(String.valueOf(activityCTAAndWTASettingsDTO.getActivityId())));
+        ActivityCTAAndWTASettings activityCTAAndWTASettings = new ActivityCTAAndWTASettings(activityCTAAndWTASettingsDTO.isEligibleForCostCalculation());
+        activity.setActivityCTAAndWTASettings(activityCTAAndWTASettings);
         activityMongoRepository.save(activity);
-        return new ActivityTabsWrapper(ctaAndWtaSettingsActivityTab);
+        return new ActivitySettingsWrapper(activityCTAAndWTASettings);
     }
     public boolean deleteCountryActivity(BigInteger activityId) {
         Activity activity =findActivityById(activityId);
@@ -679,13 +680,13 @@ public class ActivityService {
         for (TimeCareActivity timeCareActivity : timeCareActivities) {
             Activity activity = initializeTimeCareActivities(timeCareActivity, orgType, orgSubTypes, countryId,
                     glideTimeSettingsDTO, phases, activitiesByExternalIds, activityCategory, skills, presenceTimeTypeId, absenceTimeTypeId);
-            TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+            TimeType timeType = timeTypeMongoRepository.findOneById(activity.getActivityBalanceSettings().getTimeTypeId());
             if (!Optional.ofNullable(timeType).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
             }
-            activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
-            activity.getBalanceSettingsActivityTab().setPriorityFor(timeType.getPriorityFor());
-            activity.getBalanceSettingsActivityTab().setTimeTypes(timeType.getTimeTypes());
+            activity.getActivityBalanceSettings().setTimeType(timeType.getSecondLevelType());
+            activity.getActivityBalanceSettings().setPriorityFor(timeType.getPriorityFor());
+            activity.getActivityBalanceSettings().setTimeTypes(timeType.getTimeTypes());
             activities.add(activity);
         }
         return activities;
@@ -720,7 +721,7 @@ public class ActivityService {
         if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PUBLISHED, activityId);
         }
-        if (activity.getBalanceSettingsActivityTab().getTimeTypeId() == null) {
+        if (activity.getActivityBalanceSettings().getTimeTypeId() == null) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_ABSENT, activity.getName());
         }
         activity.setState(ActivityStateEnum.PUBLISHED);
@@ -729,11 +730,11 @@ public class ActivityService {
     }
     public ActivityDTO copyActivityDetails(Long countryId, BigInteger activityId, ActivityDTO activityDTO) {
         Activity activity = activityMongoRepository.findByNameIgnoreCaseAndCountryIdAndByDate(activityDTO.getName().trim(), countryId, activityDTO.getStartDate(), activityDTO.getEndDate());
-        if (Optional.ofNullable(activity).isPresent() && activityDTO.getStartDate().isBefore(activity.getGeneralActivityTab().getStartDate())) {
+        if (Optional.ofNullable(activity).isPresent() && activityDTO.getStartDate().isBefore(activity.getActivityGeneralSettings().getStartDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_OVERLAPING);
         }
         if (Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
+            exceptionService.dataNotFoundException(activity.getActivityGeneralSettings().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
         }
         Activity activityFromDatabase = activityMongoRepository.findOne(activityId);
         if (isNull(activityFromDatabase) || activityFromDatabase.isDeleted() || !countryId.equals(activityFromDatabase.getCountryId())) {
@@ -743,25 +744,25 @@ public class ActivityService {
         activityCopied.setId(null);
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.setCountryParentId(activityFromDatabase.getCountryParentId() == null ? activityFromDatabase.getId() : activityFromDatabase.getCountryParentId());
-        activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
-        activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
+        activityCopied.getActivityGeneralSettings().setName(activityDTO.getName().trim());
+        activityCopied.getActivityGeneralSettings().setStartDate(activityDTO.getStartDate());
         activityCopied.setState(ActivityStateEnum.DRAFT);
-        activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
+        activityCopied.getActivityGeneralSettings().setEndDate(activityDTO.getEndDate());
         activityMongoRepository.save(activityCopied);
         activityDTO.setId(activityCopied.getId());
         activityDTO.setActivityCanBeCopied(true);
         return activityDTO;
     }
-    public ActivityTabsWrapper getLocationsTabOfActivity(BigInteger activityId) {
+    public ActivitySettingsWrapper getLocationsTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        return new ActivityTabsWrapper(activity.getLocationActivityTab());
+        return new ActivitySettingsWrapper(activity.getActivityLocationSettings());
     }
-    public ActivityTabsWrapper updateLocationsTabOfActivity(LocationActivityTabDTO locationActivityTabDTO) {
-        Activity activity =findActivityById(locationActivityTabDTO.getActivityId());
-        LocationActivityTab locationActivityTab = new LocationActivityTab(locationActivityTabDTO.getGlideTimeForCheckIn(), locationActivityTabDTO.getGlideTimeForCheckOut());
-        activity.setLocationActivityTab(locationActivityTab);
+    public ActivitySettingsWrapper updateLocationsTabOfActivity(ActivityLocationSettingsDTO activityLocationSettingsDTO) {
+        Activity activity =findActivityById(activityLocationSettingsDTO.getActivityId());
+        ActivityLocationSettings activityLocationSettings = new ActivityLocationSettings(activityLocationSettingsDTO.getGlideTimeForCheckIn(), activityLocationSettingsDTO.getGlideTimeForCheckOut());
+        activity.setActivityLocationSettings(activityLocationSettings);
         activityMongoRepository.save(activity);
-        return new ActivityTabsWrapper(locationActivityTab);
+        return new ActivitySettingsWrapper(activityLocationSettings);
     }
     public Map<String, TranslationInfo> updateTranslationData(BigInteger activityId, Map<String, TranslationInfo> activityTranslationDTO){
         Activity activity = activityMongoRepository.findActivityByIdAndEnabled(activityId);
@@ -801,10 +802,10 @@ public class ActivityService {
         List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
         if (isCollectionNotEmpty(activities)) {
             activities.forEach(activity -> {
-                activity.getGeneralActivityTab().setBackgroundColor(timeTypeDTO.getBackgroundColor());
-                activity.getRulesActivityTab().setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
-                if(isNotNull(timeTypeDTO.getRulesActivityTab())){
-                    activity.getRulesActivityTab().setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(timeTypeDTO.getRulesActivityTab().getSicknessSetting(), SicknessSetting.class));
+                activity.getActivityGeneralSettings().setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                activity.getActivityRulesSettings().setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
+                if(isNotNull(timeTypeDTO.getActivityRulesSettings())){
+                    activity.getActivityRulesSettings().setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(timeTypeDTO.getActivityRulesSettings().getSicknessSetting(), SicknessSetting.class));
                 }
             });
             activityMongoRepository.saveEntities(activities);
@@ -844,11 +845,11 @@ public class ActivityService {
     public boolean removeAttachementsFromActivity(BigInteger activityId, boolean removeNotes) {
         Activity activity = findActivityById(activityId);
         if (removeNotes) {
-            activity.getNotesActivityTab().setOriginalDocumentName(null);
-            activity.getNotesActivityTab().setModifiedDocumentName(null);
+            activity.getActivityNotesSettings().setOriginalDocumentName(null);
+            activity.getActivityNotesSettings().setModifiedDocumentName(null);
         } else {
-            activity.getGeneralActivityTab().setOriginalIconName(null);
-            activity.getGeneralActivityTab().setModifiedIconName(null);
+            activity.getActivityGeneralSettings().setOriginalIconName(null);
+            activity.getActivityGeneralSettings().setModifiedIconName(null);
         }
         activityMongoRepository.save(activity);
         return true;

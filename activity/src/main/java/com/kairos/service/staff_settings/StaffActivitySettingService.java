@@ -121,10 +121,10 @@ public class StaffActivitySettingService extends MongoBaseService {
             staffPersonalizedActivities.forEach(activity -> {
                 if (activityMap.containsKey(activity.getActivityId())) {
                     ActivityWithCompositeDTO teamActivity = activityMap.get(activity.getActivityId());
-                    teamActivity.getRulesActivityTab().setEarliestStartTime(activity.getEarliestStartTime());
-                    teamActivity.getRulesActivityTab().setLatestStartTime(activity.getLatestStartTime());
-                    teamActivity.getRulesActivityTab().setShortestTime(activity.getShortestTime());
-                    teamActivity.getRulesActivityTab().setLongestTime(activity.getLongestTime());
+                    teamActivity.getActivityRulesSettings().setEarliestStartTime(activity.getEarliestStartTime());
+                    teamActivity.getActivityRulesSettings().setLatestStartTime(activity.getLatestStartTime());
+                    teamActivity.getActivityRulesSettings().setShortestTime(activity.getShortestTime());
+                    teamActivity.getActivityRulesSettings().setLongestTime(activity.getLongestTime());
                     updateActivityPriorityAndMostlyUsedCountAndTimeType(mostlyUsedActivityData, teamActivity);
                 }
             });
@@ -142,7 +142,7 @@ public class StaffActivitySettingService extends MongoBaseService {
         if(mostlyUsedActivityData.containsKey(staffPersonalizedActivity.getActivityId())){
             staffPersonalizedActivity.setMostlyUsedCount(mostlyUsedActivityData.get(staffPersonalizedActivity.getActivityId()).getUseActivityCount());
         }
-        staffPersonalizedActivity.setSecondLevelTimtype(staffPersonalizedActivity.getBalanceSettingsActivityTab().getTimeType());
+        staffPersonalizedActivity.setSecondLevelTimtype(staffPersonalizedActivity.getActivityBalanceSettings().getTimeType());
     }
 
 
@@ -212,7 +212,7 @@ public class StaffActivitySettingService extends MongoBaseService {
            StaffActivitySetting staffActivitySetting=new StaffActivitySetting(staffId,activitySetting.getActivityId(),activitySetting.getEmploymentId(),
                    unitId,activitySetting.getShortestTime(),activitySetting.getLongestTime(),activitySetting.getMinLength(),activitySetting.getMaxThisActivityPerShift(),
                    activitySetting.isEligibleForMove(),activitySetting.getEarliestStartTime(),activitySetting.getLatestStartTime(),activitySetting.getMaximumEndTime(),
-                   activityMap.get(activitySetting.getActivityId()).getRulesActivityTab().getDayTypes(), activitySetting.getDefaultStartTime());
+                   activityMap.get(activitySetting.getActivityId()).getActivityRulesSettings().getDayTypes(), activitySetting.getDefaultStartTime());
            staffActivitySettingSet.add(staffActivitySetting);
            StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),newArrayList(localeService.getMessage(DEFAULT_ADDED)));
            success.add(staffActivityResponse);

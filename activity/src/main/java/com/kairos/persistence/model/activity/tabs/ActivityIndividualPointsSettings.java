@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IndividualPointsActivityTab {
+public class ActivityIndividualPointsSettings {
 
     //method for calculating individual points
     @KPermissionField

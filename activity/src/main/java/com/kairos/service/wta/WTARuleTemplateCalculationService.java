@@ -96,7 +96,7 @@ public class WTARuleTemplateCalculationService {
             }
             Set<BigInteger> activityIds = shifts.stream().flatMap(shiftDTO -> shiftDTO.getActivities().stream()).map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toSet());
             List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
-            Map<BigInteger,BigInteger> activityIdAndTimetypeIdMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->v.getBalanceSettingsActivityTab().getTimeTypeId()));
+            Map<BigInteger,BigInteger> activityIdAndTimetypeIdMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->v.getActivityBalanceSettings().getTimeTypeId()));
             shifts.sort(comparing(ShiftDTO::getStartDate));
             Date startDate = getStartOfDay(shifts.get(0).getStartDate());
             Date endDate = getStartOfDay(plusDays(shifts.get(shifts.size() - 1).getEndDate(), 1));

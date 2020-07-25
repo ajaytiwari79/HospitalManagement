@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class NotesActivityTab {
+public class ActivityNotesSettings {
     @KPermissionField
     private String content;
     private String originalDocumentName;

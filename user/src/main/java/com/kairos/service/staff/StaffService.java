@@ -50,6 +50,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.persistence.repository.user.client.ContactDetailsGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
@@ -172,6 +173,8 @@ public class StaffService {
     private TagGraphRepository tagGraphRepository;
     @Inject
     private ExpertiseService expertiseService;
+    @Inject
+    private ContactDetailsGraphRepository contactDetailsGraphRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffService.class);
 
@@ -268,6 +271,7 @@ public class StaffService {
         staffDTO.setPregnant(user.isPregnant());
         //saving addresses of staff
         staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffDTO.getContactAddress(), staffDTO.getSecondaryContactAddress()));
+        contactDetailsGraphRepository.save(staffToUpdate.getContactDetail());
         assignTags(staffId, staffDTO, staffToUpdate);
         staffGraphRepository.unlinkStaffChilds(staffId);
         staffToUpdate.getStaffChildDetails().forEach(staffChildDetail -> staffChildDetail.setId(null));
@@ -964,7 +968,9 @@ public class StaffService {
         staffToUpdate.setCapacity(staffDTO.getCapacity());
         staffToUpdate.setCareOfName(staffDTO.getCareOfName());
         staffToUpdate.setSignature(staffDTO.getSignature());
+        Long contactId = staffToUpdate.getContactDetail().getId();
         staffToUpdate.setContactDetail(ObjectMapperUtils.copyPropertiesByMapper(staffDTO.getContactDetail(), ContactDetail.class));
+        staffToUpdate.getContactDetail().setId(contactId);
         staffToUpdate.getUser().setFirstName(staffDTO.getFirstName());
         staffToUpdate.getUser().setLastName(staffDTO.getLastName());
         staffDTO.setExpertiseIds(staffDTO.getExpertiseWithExperience().stream().map(StaffExpertiseDTO::getExpertiseId).collect(Collectors.toList()));

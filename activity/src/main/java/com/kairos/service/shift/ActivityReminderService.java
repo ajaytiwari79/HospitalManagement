@@ -88,7 +88,7 @@ public class ActivityReminderService {
             templateParam.put("receiverImage",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ staffDTO.getProfilePic());
         }
         //sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, ACTIVITY_REMINDER,staffPersonalDetail.getPrivateEmail());
-        kMailService.sendMail(null, ACTIVITY_REMINDER,templateParam.get(DESCRIPTION).toString(),templateParam.get(DESCRIPTION).toString(),templateParam,DEFAULT_EMAIL_TEMPLATE, staffDTO.getPrivateEmail());
+        kMailService.sendMail(null, ACTIVITY_REMINDER,templateParam.get(DESCRIPTION).toString(),templateParam,DEFAULT_EMAIL_TEMPLATE, staffDTO.getPrivateEmail());
         LOGGER.info("Mail Send {}", staffDTO.getPrivateEmail());
     }
 }

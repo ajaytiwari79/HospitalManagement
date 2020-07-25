@@ -46,19 +46,19 @@ public class ActivityDTO  {
     private List<Long> employmentTypes;
     @Builder.Default
     private boolean isParentActivity = true;
-    private GeneralActivityTabDTO generalActivityTab;
+    private ActivityGeneralSettingsDTO activityGeneralSettings;
     private TimeTypeDTO timeType;
-    private TimeCalculationActivityDTO timeCalculationActivityTab;
-    private RulesActivityTabDTO rulesActivityTab;
+    private TimeCalculationActivityDTO activityTimeCalculationSettings;
+    private ActivityRulesSettingsDTO activityRulesSettings;
     private List<ActivityDTO> childActivities;
-    private BalanceSettingActivityTabDTO balanceSettingsActivityTab;
+    private ActivityBalanceSettingDTO activityBalanceSettings;
     private Long countryActivityId;
     private LocalDate startDate;
     private LocalDate endDate;
     private BigInteger parentId;
-    private PhaseSettingsActivityTab phaseSettingsActivityTab;
+    private ActivityPhaseSettings activityPhaseSettings;
     private List<Long> skills;
-    private SkillActivityDTO skillActivityTab;
+    private SkillActivityDTO activitySkillSettings;
     @Builder.Default
     private Boolean activityCanBeCopied=false;
     private ActivityPriorityDTO activityPriority;
@@ -95,14 +95,14 @@ public class ActivityDTO  {
     }
 
     public ActivityDTO(BigInteger timeTypeId){
-        this.balanceSettingsActivityTab = new BalanceSettingActivityTabDTO(timeTypeId);
+        this.activityBalanceSettings = new ActivityBalanceSettingDTO(timeTypeId);
     }
     public void setActivityCanBeCopied(Boolean activityCanBeCopied) {
         this.activityCanBeCopied = activityCanBeCopied==null?false:activityCanBeCopied;
     }
 
     public boolean isFullDayOrFullWeekActivity() {
-        return isNotNull(this.getTimeCalculationActivityTab()) && ((CommonConstants.FULL_WEEK).equals(this.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(this.getTimeCalculationActivityTab().getMethodForCalculatingTime())); }
+        return isNotNull(this.getActivityTimeCalculationSettings()) && ((CommonConstants.FULL_WEEK).equals(this.getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(this.getActivityTimeCalculationSettings().getMethodForCalculatingTime())); }
 
 
 

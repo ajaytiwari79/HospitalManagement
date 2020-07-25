@@ -1,7 +1,6 @@
 package com.kairos.service.dashboard;
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
 import com.kairos.dto.activity.shift.ShiftDTO;
@@ -88,7 +87,7 @@ public class SickService {
 //            Set<BigInteger> activityIds = sickSettings.stream().map(SickSettings::getActivityId).collect(Collectors.toSet());
 //            List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
 //            Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(MongoBaseEntity::getId, Function.identity()));
-//            short maximumDayDifference = activities.stream().max(Comparator.comparingInt(aa -> aa.getRulesActivityTab().getRecurrenceDays())).get().getRulesActivityTab().getRecurrenceDays();
+//            short maximumDayDifference = activities.stream().max(Comparator.comparingInt(aa -> aa.getActivityRulesSettings().getRecurrenceDays())).get().getActivityRulesSettings().getRecurrenceDays();
 //            List<PeriodDTO> planningPeriods = planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId, DateUtils.getCurrentLocalDate(), DateUtils.getLocalDateAfterDays(maximumDayDifference));
 //            List<Shift> shifts = shiftMongoRepository.findAllShiftByDynamicQuery(sickSettings, activityMap);
 //            Set<Long> staffIds = sickSettings.stream().map(SickSettings::getStaffId).collect(Collectors.toSet());
@@ -103,13 +102,13 @@ public class SickService {
 //                Activity activity = activityMap.get(currentSickSettings.getActivityId());
 //                int differenceOfDaysFromCurrentDateToLastSickDate = DateUtils.getDifferenceBetweenDatesInDays(currentSickSettings.getStartDate(), DateUtils.getCurrentLocalDate(),DurationType.DAYS);
 //                List<Integer> validRepetitionDays = new ArrayList<>();
-//                if (!activity.getRulesActivityTab().isAllowedAutoAbsence() || differenceOfDaysFromCurrentDateToLastSickDate < 0) {
-//                    logger.info("either activity is not allowed for break  {} or days is in -ve {}", activity.getRulesActivityTab().isAllowedAutoAbsence(), differenceOfDaysFromCurrentDateToLastSickDate);
+//                if (!activity.getActivityRulesSettings().isAllowedAutoAbsence() || differenceOfDaysFromCurrentDateToLastSickDate < 0) {
+//                    logger.info("either activity is not allowed for break  {} or days is in -ve {}", activity.getActivityRulesSettings().isAllowedAutoAbsence(), differenceOfDaysFromCurrentDateToLastSickDate);
 //                    return;
 //                }
 //
-//                for (byte recurrenceTimes = activity.getRulesActivityTab().getRecurrenceTimes(); recurrenceTimes > 0; recurrenceTimes--) {
-//                    validRepetitionDays.add((recurrenceTimes * activity.getRulesActivityTab().getRecurrenceDays()) - 1);
+//                for (byte recurrenceTimes = activity.getActivityRulesSettings().getRecurrenceTimes(); recurrenceTimes > 0; recurrenceTimes--) {
+//                    validRepetitionDays.add((recurrenceTimes * activity.getActivityRulesSettings().getRecurrenceDays()) - 1);
 //                }
 //                if (validRepetitionDays.contains(differenceOfDaysFromCurrentDateToLastSickDate)) {
 //                    logger.info("The current user is still sick so we need to add more shifts {}", differenceOfDaysFromCurrentDateToLastSickDate);
@@ -127,9 +126,9 @@ public class SickService {
         if (!(sicknessSetting.isCanOnlyUsedOnMainEmployment() && EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType()))) {
             errorMessages.add(exceptionService.convertMessage(MESSAGE_STAFF_MAIN_EMPLOYMENT_NOT_FOUND));
         }
-        if (isCollectionNotEmpty(activityWrapper.getActivity().getRulesActivityTab().getStaffTagIds())) {
+        if (isCollectionNotEmpty(activityWrapper.getActivity().getActivityRulesSettings().getStaffTagIds())) {
             Set<BigInteger> tadIds = staffAdditionalInfoDTO.getTags().stream().map(TagDTO::getId).collect(Collectors.toSet());
-            if (CollectionUtils.containsAny(tadIds, activityWrapper.getActivity().getRulesActivityTab().getStaffTagIds())) {
+            if (CollectionUtils.containsAny(tadIds, activityWrapper.getActivity().getActivityRulesSettings().getStaffTagIds())) {
                 errorMessages.add(exceptionService.convertMessage(STAFF_NOT_ALLOWED_ON_TAG));
             }
 

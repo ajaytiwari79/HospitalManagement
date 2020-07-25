@@ -1,4 +1,4 @@
-db.activities.update({},{$set: { "generalActivityTab.startDate" : new ISODate("2018-01-21T03:34:54Z") } }, true, true);
+db.activities.update({},{$set: { "activityGeneralSettings.startDate" : new ISODate("2018-01-21T03:34:54Z") } }, true, true);
 
 // To update phases type as Planning Phases
 

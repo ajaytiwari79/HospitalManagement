@@ -34,7 +34,7 @@ public class ShiftAllowedToDelete extends AbstractSpecification<Shift> {
     public void validateRules(Shift shift) {
         PhaseTemplateValue currentPhase = null;
         for (ShiftActivity shiftActivity : shift.getActivities()) {
-            for (PhaseTemplateValue phaseTemplateValue : activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()) {
+            for (PhaseTemplateValue phaseTemplateValue : activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityPhaseSettings().getPhaseTemplateValues()) {
                 if (phaseId.equals(phaseTemplateValue.getPhaseId())) {
                     currentPhase = phaseTemplateValue;
                     break;

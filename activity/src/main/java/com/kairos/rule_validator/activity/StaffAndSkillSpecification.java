@@ -36,8 +36,8 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
 
     @Override
     public boolean isSatisfied(ShiftWithActivityDTO shift) {
-//        if (!shift.getActivity().getSkillActivityTab().getActivitySkills().isEmpty()) {
-//            shift.getActivity().getSkillActivityTab().getActivitySkills().forEach(
+//        if (!shift.getActivity().getActivitySkillSettings().getActivitySkills().isEmpty()) {
+//            shift.getActivity().getActivitySkillSettings().getActivitySkills().forEach(
 //                    activityTypeSkill -> activitySkills.add(activityTypeSkill.getSkillId()));
 //            if( !activitySkills.containsAll(this.staffSkills)){
 //                exceptionService.actionNotPermittedException("message.activity.skills-match");
@@ -61,8 +61,8 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
 
     private void validateStaffSkills(List<String> errorMessages, ShiftActivityDTO shiftActivityDTO) {
         ActivityRuleViolation activityRuleViolation;
-        if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds()) &&
-                (CollectionUtils.isEmpty(skillLevelDTOS) || !isSkillSatisfied(shiftActivityDTO.getActivity().getSkillActivityTab()))) {
+        if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getActivitySkillSettings().getActivitySkillIds()) &&
+                (CollectionUtils.isEmpty(skillLevelDTOS) || !isSkillSatisfied(shiftActivityDTO.getActivity().getActivitySkillSettings()))) {
             errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_SKILL_MATCH, shiftActivityDTO.getActivity().getName()));
             activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
             if(activityRuleViolation==null){

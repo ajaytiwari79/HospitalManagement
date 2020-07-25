@@ -12,7 +12,7 @@ import java.util.List;
  * Created by pawanmandhan on 22/8/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GeneralActivityTabDTO {
+public class ActivityGeneralSettingsDTO {
 
     private BigInteger activityId;
     private String name;
@@ -41,7 +41,7 @@ public class GeneralActivityTabDTO {
     private String originalDocumentName;
     private String modifiedDocumentName;
 
-    public GeneralActivityTabDTO() {
+    public ActivityGeneralSettingsDTO() {
         // dc
     }
 
@@ -261,7 +261,7 @@ public class GeneralActivityTabDTO {
 
     @Override
     public String toString() {
-        return "GeneralActivityTabDTO{" +
+        return "ActivityGeneralSettingsDTO{" +
                 "activityId=" + activityId +
                 ", name='" + name + '\'' +
                 ", code='" + code + '\'' +

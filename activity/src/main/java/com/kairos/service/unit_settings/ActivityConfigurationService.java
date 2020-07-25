@@ -241,7 +241,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     public List<BigInteger> addPlannedTimeInShift(Long unitId, BigInteger phaseId, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         boolean managementPerson = UserContext.getUserDetails().isManagement();
         List<BigInteger> plannedTimes;
-        switch (activity.getBalanceSettingsActivityTab().getTimeType()){
+        switch (activity.getActivityBalanceSettings().getTimeType()){
             case ABSENCE :
                 plannedTimes = getAbsencePlannedTime(unitId, phaseId, activity);
                 break;
@@ -262,7 +262,7 @@ public class ActivityConfigurationService extends MongoBaseService {
             if (!Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
                 exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
             }
-            if (activityConfiguration.getAbsencePlannedTime().isException() && activity.getBalanceSettingsActivityTab().getTimeTypeId().equals(activityConfiguration.getAbsencePlannedTime().getTimeTypeId())) {
+            if (activityConfiguration.getAbsencePlannedTime().isException() && activity.getActivityBalanceSettings().getTimeTypeId().equals(activityConfiguration.getAbsencePlannedTime().getTimeTypeId())) {
                 plannedTimeIds = activityConfiguration.getAbsencePlannedTime().getPlannedTimeIds();
                 break;
             } else {

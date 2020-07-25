@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class RulesActivityTab  {
+public class ActivityRulesSettings {
 
 
     private boolean eligibleForFinalSchedule;

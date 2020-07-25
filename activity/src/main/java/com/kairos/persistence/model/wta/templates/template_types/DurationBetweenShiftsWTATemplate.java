@@ -93,11 +93,11 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
         int restingHours = NOT_VALID_VALUE;
         for (ShiftWithActivityDTO shiftWithActivityDTO : shifts) {
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
-                if(checkBefore && !activity.getEndDate().after(date) && timeTypeEnums.contains(activity.getActivity().getBalanceSettingsActivityTab().getTimeType())){
+                if(checkBefore && !activity.getEndDate().after(date) && timeTypeEnums.contains(activity.getActivity().getActivityBalanceSettings().getTimeType())){
                     int duration = (int)new DateTimeInterval(activity.getEndDate(),date).getMinutes();
                     restingHours = restingHours > duration || restingHours==NOT_VALID_VALUE ? duration : restingHours;
                 }
-                if(!checkBefore && !activity.getStartDate().before(date) && timeTypeEnums.contains(activity.getActivity().getBalanceSettingsActivityTab().getTimeType())){
+                if(!checkBefore && !activity.getStartDate().before(date) && timeTypeEnums.contains(activity.getActivity().getActivityBalanceSettings().getTimeType())){
                     int duration = (int)new DateTimeInterval(date,activity.getStartDate()).getMinutes();
                     restingHours = restingHours > duration || restingHours==NOT_VALID_VALUE ? duration : restingHours;
                 }
@@ -107,6 +107,6 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
     public TimeTypeEnum getTimeTypeEnum(ShiftActivityDTO shiftActivityDTO){
-        return shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType();
+        return shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeType();
     }
 }

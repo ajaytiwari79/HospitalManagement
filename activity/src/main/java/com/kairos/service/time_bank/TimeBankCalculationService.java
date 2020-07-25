@@ -268,31 +268,31 @@ public class TimeBankCalculationService {
         int scheduledMinutes = 0;
         int duration = 0;
         int weeklyMinutes;
-        switch (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) {
+        switch (activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime()) {
             case ENTERED_MANUALLY:
                 duration = shiftActivity.getDurationMinutes();
-                scheduledMinutes = Double.valueOf(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 break;
             case FIXED_TIME:
-                duration = activity.getTimeCalculationActivityTab().getFixedTimeValue().intValue();
-                scheduledMinutes = Double.valueOf(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                duration = activity.getActivityTimeCalculationSettings().getFixedTimeValue().intValue();
+                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 break;
             case ENTERED_TIMES:
                 duration = (int) new Interval(shiftActivity.getStartDate().getTime(), shiftActivity.getEndDate().getTime()).toDuration().getStandardMinutes();
-                scheduledMinutes = Double.valueOf(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 break;
             case CommonConstants.FULL_DAY_CALCULATION:
-                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullDayCalculationType())) ? staffEmploymentDetails.getFullTimeWeeklyMinutes() : staffEmploymentDetails.getTotalWeeklyMinutes();
-                duration = Double.valueOf(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullDayCalculationType())) ? staffEmploymentDetails.getFullTimeWeeklyMinutes() : staffEmploymentDetails.getTotalWeeklyMinutes();
+                duration = Double.valueOf(weeklyMinutes * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
             case AppConstants.WEEKLY_HOURS:
-                duration = Double.valueOf(staffEmploymentDetails.getTotalWeeklyMinutes() * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                duration = Double.valueOf(staffEmploymentDetails.getTotalWeeklyMinutes() * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
             case CommonConstants.FULL_WEEK:
-                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullWeekCalculationType())) ? staffEmploymentDetails.getFullTimeWeeklyMinutes() : staffEmploymentDetails.getTotalWeeklyMinutes();
-                duration = Double.valueOf(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullWeekCalculationType())) ? staffEmploymentDetails.getFullTimeWeeklyMinutes() : staffEmploymentDetails.getTotalWeeklyMinutes();
+                duration = Double.valueOf(weeklyMinutes * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
             default:
@@ -579,7 +579,7 @@ public class TimeBankCalculationService {
 
     private long getScheduledMinOfActivityByTimeType(List<TimeType> timeTypes, List<ShiftWithActivityDTO> shifts) {
         Map<BigInteger, TimeType> timeTypeMap = timeTypes.stream().collect(Collectors.toMap(MongoBaseEntity::getId, v -> v));
-        return shifts.stream().flatMap(s -> s.getActivities().stream()).filter(s -> timeTypeMap.containsKey(s.getActivity().getBalanceSettingsActivityTab().getTimeTypeId())).mapToLong(ShiftActivityDTO::getScheduledMinutes).sum();
+        return shifts.stream().flatMap(s -> s.getActivities().stream()).filter(s -> timeTypeMap.containsKey(s.getActivity().getActivityBalanceSettings().getTimeTypeId())).mapToLong(ShiftActivityDTO::getScheduledMinutes).sum();
     }
 
     private List<ScheduledActivitiesDTO> getScheduledActivities(List<ShiftWithActivityDTO> shifts) {
@@ -835,7 +835,7 @@ public class TimeBankCalculationService {
         if (isCollectionNotEmpty(shifts)) {
             for (ShiftWithActivityDTO shift : shifts) {
                 for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
-                    if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
+                    if (timeType.getId().equals(shiftActivity.getActivity().getActivityBalanceSettings().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
                         totalScheduledMin += shiftActivity.getScheduledMinutes();
                     }
                 }
@@ -869,7 +869,7 @@ public class TimeBankCalculationService {
         if (isCollectionNotEmpty(shifts)) {
             for (ShiftWithActivityDTO shift : shifts) {
                 for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
-                    if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
+                    if (timeType.getId().equals(shiftActivity.getActivity().getActivityBalanceSettings().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
                         totalScheduledMin += shiftActivity.getScheduledMinutes();
                     }
                 }
@@ -968,31 +968,31 @@ public class TimeBankCalculationService {
         int scheduledMinutes = 0;
         int duration;
         int weeklyMinutes;
-        switch (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) {
+        switch (activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime()) {
             case ENTERED_MANUALLY:
                 duration = (int) MINUTES.between(DateUtils.asLocalTime(openShift.getStartDate()), DateUtils.asLocalTime(openShift.getStartDate()));
-                scheduledMinutes = Double.valueOf(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 break;
             case FIXED_TIME:
-                duration = activity.getTimeCalculationActivityTab().getFixedTimeValue().intValue();
-                scheduledMinutes = Double.valueOf(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                duration = activity.getActivityTimeCalculationSettings().getFixedTimeValue().intValue();
+                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 break;
             case ENTERED_TIMES:
                 duration = (int) new Interval(openShift.getStartDate().getTime(), openShift.getEndDate().getTime()).toDuration().getStandardMinutes();
-                scheduledMinutes = Double.valueOf(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 break;
             case CommonConstants.FULL_DAY_CALCULATION:
-                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullDayCalculationType())) ? employmentWithCtaDetailsDTO.getFullTimeWeeklyMinutes() : employmentWithCtaDetailsDTO.getTotalWeeklyMinutes();
-                duration = Double.valueOf(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullDayCalculationType())) ? employmentWithCtaDetailsDTO.getFullTimeWeeklyMinutes() : employmentWithCtaDetailsDTO.getTotalWeeklyMinutes();
+                duration = Double.valueOf(weeklyMinutes * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
             case AppConstants.WEEKLY_HOURS:
-                duration = Double.valueOf(employmentWithCtaDetailsDTO.getTotalWeeklyMinutes() * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                duration = Double.valueOf(employmentWithCtaDetailsDTO.getTotalWeeklyMinutes() * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
             case CommonConstants.FULL_WEEK:
-                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getTimeCalculationActivityTab().getFullWeekCalculationType())) ? employmentWithCtaDetailsDTO.getFullTimeWeeklyMinutes() : employmentWithCtaDetailsDTO.getTotalWeeklyMinutes();
-                duration = Double.valueOf(weeklyMinutes * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullWeekCalculationType())) ? employmentWithCtaDetailsDTO.getFullTimeWeeklyMinutes() : employmentWithCtaDetailsDTO.getTotalWeeklyMinutes();
+                duration = Double.valueOf(weeklyMinutes * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
             default:
@@ -1223,7 +1223,7 @@ public class TimeBankCalculationService {
             for (ShiftActivityDTO shiftActivity : shiftActivities) {
                 ShiftActivityDTO shiftActivityDTO = getShiftActivityDTO(shift, shiftActivity);
                 if(isNotNull(shiftActivityDTO)){
-                    ruleTemplateValid = validateCTARuleTemplate(ruleTemplate, staffAdditionalInfoDTO.getEmployment(), shift.getPhaseId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivity.getPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
+                    ruleTemplateValid = validateCTARuleTemplate(ruleTemplate, staffAdditionalInfoDTO.getEmployment(), shift.getPhaseId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getActivityBalanceSettings().getTimeTypeId(), shiftActivity.getPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
                     LOGGER.debug("rule template : {} valid {}", ruleTemplate.getId(), ruleTemplateValid);
                     if (ruleTemplateValid) {
                         updateScheduledAndBonusMinutes(ruleTemplate, shift, shiftActivity, shiftActivityDTO);
@@ -1449,7 +1449,7 @@ public class TimeBankCalculationService {
             DailyTimeBankEntry dailyTimeBankEntry = null;
             PayOutPerShift payOutPerShift = null;
             Activity activity = (unitIdAndActivityMap.get(unitId));
-            DateTimeInterval dateTimeInterval = getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(), activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue(), asDate(getLocalDate()), getLocalDate());
+            DateTimeInterval dateTimeInterval = getCutoffInterval(activity.getActivityRulesSettings().getCutOffStartFrom(), activity.getActivityRulesSettings().getCutOffIntervalUnit(), activity.getActivityRulesSettings().getCutOffdayValue(), asDate(getLocalDate()), getLocalDate());
             if (dateTimeInterval.getStartLocalDate().isBefore(employmentDetails.getStartDate())) {
                 dateTimeInterval = new DateTimeInterval(employmentDetails.getStartDate(), dateTimeInterval.getEndLocalDate());
             }
@@ -1469,7 +1469,7 @@ public class TimeBankCalculationService {
             DateTimeInterval activityDateTimeInterval = activityIdDateTimeIntervalMap.get(unitIdAndActivityMap.get(unitId).getId());
             List<ProtectedDaysOffSetting> protectedDaysOffSettings = new ArrayList<>();
             for (ProtectedDaysOffSetting protectedDaysOffSetting : employmentDetails.getProtectedDaysOffSettings()) {
-                DateTimeInterval dateTimeInterval = getCutoffInterval(protectedDaysOffSetting.getPublicHolidayDate().plusDays(1), activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue(), asDate(getLocalDate().minusDays(1)), protectedDaysOffSetting.getPublicHolidayDate().plusDays(1));
+                DateTimeInterval dateTimeInterval = getCutoffInterval(protectedDaysOffSetting.getPublicHolidayDate().plusDays(1), activity.getActivityRulesSettings().getCutOffIntervalUnit(), activity.getActivityRulesSettings().getCutOffdayValue(), asDate(getLocalDate().minusDays(1)), protectedDaysOffSetting.getPublicHolidayDate().plusDays(1));
                 if (isNotNull(dateTimeInterval) && dateTimeInterval.getEndLocalDate().isEqual(getLocalDate()) && protectedDaysOffSetting.isProtectedDaysOff() && protectedDaysOffSetting.getPublicHolidayDate().isBefore(getLocalDate())) {
                     protectedDaysOffSettings.add(protectedDaysOffSetting);
                 }
@@ -1562,7 +1562,7 @@ public class TimeBankCalculationService {
             Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap = new HashMap<>();
             for (Map.Entry<BigInteger, Activity> bigIntegerActivityEntry : activityWrapperMap.entrySet()) {
                 Activity activityWrapper = bigIntegerActivityEntry.getValue();
-                DateTimeInterval dateTimeInterval= getCutoffInterval(activityWrapper.getRulesActivityTab().getCutOffStartFrom(), activityWrapper.getRulesActivityTab().getCutOffIntervalUnit(), activityWrapper.getRulesActivityTab().getCutOffdayValue(), asDate(getLocalDate().minusDays(1)), getLocalDate());
+                DateTimeInterval dateTimeInterval= getCutoffInterval(activityWrapper.getActivityRulesSettings().getCutOffStartFrom(), activityWrapper.getActivityRulesSettings().getCutOffIntervalUnit(), activityWrapper.getActivityRulesSettings().getCutOffdayValue(), asDate(getLocalDate().minusDays(1)), getLocalDate());
                 if(isNotNull(dateTimeInterval)) {
                     activityIdDateTimeIntervalMap.putIfAbsent(bigIntegerActivityEntry.getKey(),dateTimeInterval);
                 }

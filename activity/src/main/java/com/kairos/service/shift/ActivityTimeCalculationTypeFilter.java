@@ -31,10 +31,10 @@ public class ActivityTimeCalculationTypeFilter <G> implements ShiftFilter {
             for (ShiftDTO shiftDTO : shiftDTOS) {
                 Set<String> methodForCalulation = new HashSet<>();
                 shiftDTO.getActivities().forEach(shiftActivityDTO -> {
-                    methodForCalulation.add(shiftActivityDTO.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime());
+                    methodForCalulation.add(shiftActivityDTO.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime());
                     shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> {
                         if(isNotNull(childActivityDTO.getActivity())) {
-                            methodForCalulation.add(childActivityDTO.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime());
+                            methodForCalulation.add(childActivityDTO.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime());
                         }
                     });
                 });

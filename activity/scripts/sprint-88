@@ -2,8 +2,8 @@ db.getCollection('shifts').find({"deleted":false}).forEach( function (shift) {
 var timeTypeId = shift.activities.forEach(function(ac){
     if(ac.activityId){
     var activity = db.activities.findOne({"_id":ac.activityId});
-    if(activity.balanceSettingsActivityTab.timeType){
-        ac.secondLevelTimeType = activity.balanceSettingsActivityTab.timeType
+    if(activity.activityBalanceSettings.timeType){
+        ac.secondLevelTimeType = activity.activityBalanceSettings.timeType
         }
 }
     });

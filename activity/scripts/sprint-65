@@ -28,7 +28,7 @@ db.time_Type.insert({
     "partOfTeam" : false,
     "allowChildActivities" : false,
     "allowedConflicts" : false,
-    "rulesActivityTab" : {
+    "activityRulesSettings" : {
         "eligibleForFinalSchedule" : false,
         "eligibleForDraftSchedule" : false,
         "eligibleForRequest" : false,
@@ -68,7 +68,7 @@ db.time_Type.insert({
         "reasonCodeRequired" : false,
         "reasonCodeRequiredState" : "OPTIONAL"
     },
-    "timeCalculationActivityTab" : {
+    "activityTimeCalculationSettings" : {
         "methodForCalculatingTime" : "WEEKLY_HOURS",
         "fullDayCalculationType" : "FULL_TIME_WEEKLY_HOURS_TYPE",
         "fullWeekCalculationType" : "FULL_TIME_WEEKLY_HOURS_TYPE",
@@ -89,10 +89,10 @@ db.time_Type.insert({
             NumberLong(13984)
         ]
     },
-    "skillActivityTab" : {
+    "activitySkillSettings" : {
         "activitySkills" : []
     },
-    "phaseSettingsActivityTab" : {
+    "activityPhaseSettings" : {
         "activityId" : "13",
         "phaseTemplateValues" : [
             {

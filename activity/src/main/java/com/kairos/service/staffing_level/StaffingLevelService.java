@@ -7,6 +7,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityValidationError;
@@ -27,7 +28,6 @@ import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.SkillLevel;
-import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -743,7 +743,7 @@ public class StaffingLevelService  {
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
                 Activity activity = activityMap.get(shiftActivity.getActivityId());
-                if(isNotNull(activity) && (FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))){
+                if(isNotNull(activity) && (FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime()))){
                     updateAbsenceStaffingLevelAvailableStaffCount(staffingLevel, activity.getId());
                 }else {
                     int durationMinutes = staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes();
@@ -1070,7 +1070,7 @@ public class StaffingLevelService  {
         return activityReplaced;
     }
 
-    public Map<LocalDate,DailyStaffingLevelDetailsDTO> getWeeklyStaffingLevel(Long unitId, LocalDate date, BigInteger activityId) {
+    public Map<LocalDate,DailyStaffingLevelDetailsDTO> getWeeklyStaffingLevel(Long unitId, LocalDate date, BigInteger activityId,boolean unpublishedChanges) {
         LocalDate startLocalDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
         LocalDate endLocalDate = startLocalDate.plusWeeks(3);
         List<TimeSlotDTO> timeSlots = userIntegrationService.getUnitTimeSlot(unitId);
@@ -1093,16 +1093,18 @@ public class StaffingLevelService  {
                 ZonedDateTime endZonedDateTime = timeSlot.getEndZoneDateTime(startLocalDate);
                 DateTimeInterval timeSlotInterval = new DateTimeInterval(startZonedDateTime,endZonedDateTime);
                 AtomicReference<LocalDate> localDateAtomicReference = new AtomicReference<>(startLocalDate);
-                List<StaffingLevelInterval> staffingLevelIntervals = staffingLevel.getPresenceStaffingLevelInterval().stream().filter(staffingLevelInterval ->
-                     staffingLevelInterval.getStaffingLevelDuration().getInterval(localDateAtomicReference.get()).overlaps(timeSlotInterval) && staffingLevelInterval.getActivityIds().contains(activityId)
-                ).collect(Collectors.toList());
-                int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevelIntervals,currentShiftActivities,startLocalDate, detailLevelMinutes, true);
+                List<StaffingLevelInterval> staffingLevelIntervals = getStaffingLevelInterval(activityId, unpublishedChanges, staffingLevel, timeSlotInterval, localDateAtomicReference);
+                int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevelIntervals,currentShiftActivities,startLocalDate, detailLevelMinutes, true,unpublishedChanges,activityId);
                 int overStaffing = maxAndMinNoOfStaff[0];
                 int underStaffing = maxAndMinNoOfStaff[1];
-                staffingLevelDetailsByTimeSlotDTOS.add(new StaffingLevelDetailsByTimeSlotDTO(underStaffing,overStaffing,underStaffing * detailLevelMinutes,overStaffing * detailLevelMinutes,timeSlot.getName()));
+                int totalMinNoOfStaff = maxAndMinNoOfStaff[2];
+                int totalMaxNoOfStaff = maxAndMinNoOfStaff[3];
+                int totalMinimumMinutes = totalMinNoOfStaff * detailLevelMinutes;
+                int totalMaximumMinutes = totalMaxNoOfStaff * detailLevelMinutes;
+                staffingLevelDetailsByTimeSlotDTOS.add(new StaffingLevelDetailsByTimeSlotDTO(underStaffing,overStaffing,underStaffing * detailLevelMinutes,overStaffing * detailLevelMinutes,timeSlot.getName(),totalMinNoOfStaff, totalMaxNoOfStaff, totalMinimumMinutes, totalMaximumMinutes));
             }
             currentShiftActivities = dateListMap.getOrDefault(startLocalDate,new ArrayList<>());
-            int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevel.getPresenceStaffingLevelInterval(),currentShiftActivities,startLocalDate, detailLevelMinutes, false);
+            int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevel.getPresenceStaffingLevelInterval(),currentShiftActivities,startLocalDate, detailLevelMinutes, false,unpublishedChanges,null);
             int overStaffing = maxAndMinNoOfStaff[0];
             int underStaffing = maxAndMinNoOfStaff[1];
             int totalMinNoOfStaff = maxAndMinNoOfStaff[2];
@@ -1116,7 +1118,17 @@ public class StaffingLevelService  {
         return localDateDailyStaffingLevelDetailsDTOMap;
     }
 
-    private int[] getMinAndMaxCount(List<StaffingLevelInterval> staffingLevelIntervals, List<ShiftActivity> shiftActivities, LocalDate localDate, int detailLevelMinutes, boolean calculateActivityWise){
+    private List<StaffingLevelInterval> getStaffingLevelInterval(BigInteger activityId, boolean unpublishedChanges, PresenceStaffingLevelDto staffingLevel, DateTimeInterval timeSlotInterval, AtomicReference<LocalDate> localDateAtomicReference) {
+        return staffingLevel.getPresenceStaffingLevelInterval().stream().filter(staffingLevelInterval -> {
+            if (!unpublishedChanges || isCollectionEmpty(staffingLevelInterval.getStaffingLevelIntervalLogs())) {
+                return staffingLevelInterval.getStaffingLevelDuration().getInterval(localDateAtomicReference.get()).overlaps(timeSlotInterval) && staffingLevelInterval.getActivityIds().contains(activityId);
+            }else {
+                return staffingLevelInterval.getStaffingLevelDuration().getInterval(localDateAtomicReference.get()).overlaps(timeSlotInterval) && staffingLevelInterval.getStaffingLevelIntervalLogs().last().getActivityIds().contains(activityId);
+            }
+        }).collect(Collectors.toList());
+    }
+
+    private int[] getMinAndMaxCount(List<StaffingLevelInterval> staffingLevelIntervals, List<ShiftActivity> shiftActivities, LocalDate localDate, int detailLevelMinutes, boolean calculateActivityWise,boolean unpublishedChanges,BigInteger activityId){
         int overStaffing = 0;
         int underStaffing = 0;
         int totalMinNoOfStaff = 0;
@@ -1125,9 +1137,11 @@ public class StaffingLevelService  {
             long count = shiftActivities.stream().filter(shiftActivity -> shiftActivity.getInterval().overlapMinutes(staffingLevelInterval.getStaffingLevelDuration().getInterval(localDate))==detailLevelMinutes
             ).count();
             if(calculateActivityWise){
-                StaffingLevelActivity staffingLevelActivity = staffingLevelInterval.getStaffingLevelActivities().iterator().next();
+                StaffingLevelActivity staffingLevelActivity = !unpublishedChanges || isCollectionEmpty(staffingLevelInterval.getStaffingLevelIntervalLogs()) ? staffingLevelInterval.getStaffingLevelActivities().iterator().next() : staffingLevelInterval.getStaffingLevelIntervalLogs().last().getStaffingLevelActivities().stream().filter(staffingLevelActivity1 -> staffingLevelActivity1.getActivityId().equals(activityId)).findFirst().orElseThrow(()->new InvalidRequestException(convertMessage(MESSAGE_STAFFINGLEVEL_ACTIVITY)));
                 overStaffing += staffingLevelActivity.getMaxNoOfStaff()<count ? count - staffingLevelActivity.getMaxNoOfStaff() : 0;
                 underStaffing += staffingLevelActivity.getMinNoOfStaff()>count ? staffingLevelActivity.getMinNoOfStaff() - count : 0;
+                totalMinNoOfStaff += staffingLevelInterval.getMinNoOfStaff();
+                totalMaxNoOfStaff += staffingLevelInterval.getMaxNoOfStaff();
             }else {
                 overStaffing += staffingLevelInterval.getMaxNoOfStaff()<count ? count - staffingLevelInterval.getMaxNoOfStaff() : 0;
                 underStaffing += staffingLevelInterval.getMinNoOfStaff()>count ? staffingLevelInterval.getMinNoOfStaff() - count  : 0;
