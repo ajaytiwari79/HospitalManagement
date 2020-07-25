@@ -1,9 +1,9 @@
 db.activities.find({}).forEach( function (activity) {
-var timeTypeId = activity.balanceSettingsActivityTab.timeTypeId
+var timeTypeId = activity.activityBalanceSettings.timeTypeId
 if(timeTypeId){
 print("_id "+timeTypeId);
 var timeType = db.time_Type.findOne({"_id":timeTypeId});
-activity.balanceSettingsActivityTab.timeTypes = timeType.timeTypes;
+activity.activityBalanceSettings.timeTypes = timeType.timeTypes;
 db.activities.save(activity);
 }
 });

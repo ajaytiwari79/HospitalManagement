@@ -197,7 +197,7 @@ public class TagService extends MongoBaseService {
     public boolean unlinkTagFromActivity(BigInteger tagId){
         List<Activity> activities = activityMongoRepository.findActivitiesByTagId(tagId);
         for (Activity activity : activities) {
-            activity.getGeneralActivityTab().setTags(activity.getGeneralActivityTab().getTags().stream().filter(t->!t.equals(tagId)).collect(Collectors.toList()));
+            activity.getActivityGeneralSettings().setTags(activity.getActivityGeneralSettings().getTags().stream().filter(t->!t.equals(tagId)).collect(Collectors.toList()));
             activity.setTags(activity.getTags().stream().filter(t->!t.equals(tagId)).collect(Collectors.toList()));
         }
         activityMongoRepository.saveAll(activities);

@@ -80,12 +80,12 @@ public class AbsenceShiftService {
     public List<ShiftWithViolatedInfoDTO> createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean shiftOverlappedWithNonWorkingType, ShiftActionType shiftActionType) {
         List<ShiftWithViolatedInfoDTO>  shiftWithViolatedInfoDTOS = new ArrayList<>();
         Long absenceReasonCodeId = shiftDTO.getActivities().get(0).getAbsenceReasonCodeId();
-        if (activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
+        if (activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
             Date endDate = DateUtils.toJodaDateTime(shiftDTO.getShiftDate()).plusDays(1).withTimeAtStartOfDay().toDate();
-            Date startDate = DateUtils.toJodaDateTime(shiftDTO.getShiftDate()).minusWeeks(activityWrapper.getActivity().getTimeCalculationActivityTab().getHistoryDuration()).withTimeAtStartOfDay().toDate();
+            Date startDate = DateUtils.toJodaDateTime(shiftDTO.getShiftDate()).minusWeeks(activityWrapper.getActivity().getActivityTimeCalculationSettings().getHistoryDuration()).withTimeAtStartOfDay().toDate();
             List<ShiftDTO> shifts = shiftMongoRepository.findAllShiftBetweenDuration(staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate);
             ShiftDTO newShiftDTO;
-            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getFullDayCalculationType())) {
+            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getFullDayCalculationType())) {
                 shiftDTO.setStartDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MIN)));
                 shiftDTO.getActivities().get(0).setStartDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MIN)));
                 shiftDTO.getActivities().get(0).setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1).atTime(LocalTime.MIN)));
@@ -109,17 +109,17 @@ public class AbsenceShiftService {
     private List<ShiftWithViolatedInfoDTO> getAverageOfShiftByActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity, ShiftDTO shiftDTO, Long absenceReasonCodeId, ShiftActionType shiftActionType) {
         Date fromDate = asDate(shiftDTO.getShiftDate());
         Date endDate = new DateTime(fromDate).withTimeAtStartOfDay().plusDays(8).toDate();
-        Date startDate = new DateTime(fromDate).minusWeeks(activity.getTimeCalculationActivityTab().getHistoryDuration()).toDate();
+        Date startDate = new DateTime(fromDate).minusWeeks(activity.getActivityTimeCalculationSettings().getHistoryDuration()).toDate();
         List<ShiftDTO> shiftQueryResultsInInterval = shiftMongoRepository.findAllShiftBetweenDuration(staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate);
         List<ShiftDTO> shiftDTOS = new ArrayList<>(7);
         //As we support create Fullweek Shift from Monday to sunday
-        if (!shiftDTO.getShiftDate().getDayOfWeek().equals(activity.getTimeCalculationActivityTab().getFullWeekStart())) {
-            exceptionService.actionNotPermittedException("error.activity.fullweek.start", StringUtils.capitalize(activity.getTimeCalculationActivityTab().getFullWeekStart().toString().toLowerCase()));
+        if (!shiftDTO.getShiftDate().getDayOfWeek().equals(activity.getActivityTimeCalculationSettings().getFullWeekStart())) {
+            exceptionService.actionNotPermittedException("error.activity.fullweek.start", StringUtils.capitalize(activity.getActivityTimeCalculationSettings().getFullWeekStart().toString().toLowerCase()));
         }
         for (int day = 0; day < 7; day++) {
             ShiftDTO newShiftDTO;
             LocalDate shiftDate = shiftDTO.getShiftDate().plusDays(day);
-            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals(activity.getTimeCalculationActivityTab().getFullWeekCalculationType())) {
+            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullWeekCalculationType())) {
                 startDate = asDate(shiftDate.atTime(LocalTime.MIN));
                 endDate = asDate(shiftDate.plusDays(1).atTime(LocalTime.MIN));
                 shiftDTO.setStartDate(startDate);
@@ -154,12 +154,12 @@ public class AbsenceShiftService {
         shiftActivity.setRemarks(shiftActivityDTO.getRemarks());
         Integer startAverageMin = null;
         Date fromDate = asDate(shiftDate);
-        if (shifts != null && !shifts.isEmpty() && activity.getTimeCalculationActivityTab().getHistoryDuration() != 0) {
+        if (shifts != null && !shifts.isEmpty() && activity.getActivityTimeCalculationSettings().getHistoryDuration() != 0) {
             startAverageMin = getStartAverage(new DateTime(fromDate).getDayOfWeek(), shifts);
 
         }
         StaffActivitySettingDTO staffActivitySetting = staffActivitySettingService.getStaffActivitySettingsByActivityId(activity.getUnitId(), activity.getId(),staffAdditionalInfoDTO.getId());
-        LocalTime defaultStartTime = isNotNull(staffActivitySetting) && isNotNull(staffActivitySetting.getDefaultStartTime()) ? staffActivitySetting.getDefaultStartTime() : activity.getTimeCalculationActivityTab().getDefaultStartTime();
+        LocalTime defaultStartTime = isNotNull(staffActivitySetting) && isNotNull(staffActivitySetting.getDefaultStartTime()) ? staffActivitySetting.getDefaultStartTime() : activity.getActivityTimeCalculationSettings().getDefaultStartTime();
         DateTime startDateTime = (startAverageMin != null) ?
                 new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes(startAverageMin) :
                 new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes((defaultStartTime.getHour() * 60) + defaultStartTime.getMinute());
@@ -202,7 +202,7 @@ public class AbsenceShiftService {
         if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
             exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
         }
-        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getActivityBalanceSettings().getTimeTypeId());
         Map<BigInteger, ActivityWrapper> activityWrapperMap = new HashMap<>();
         activityWrapperMap.put(activity.getId(), new ActivityWrapper(activity, timeType.getTimeTypes().toValue(),timeType));
         List<ShiftWithViolatedInfoDTO>  shiftWithViolatedInfoDTOS = new ArrayList<>();

@@ -73,7 +73,7 @@ public class PayOutCalculationService {
             for (ShiftActivityDTO shiftActivity : shiftActivities) {
                 ShiftActivityDTO shiftActivityDTO = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getShiftActivityDTO(shift,shiftActivity);
                 Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
-                ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, staffEmploymentDetails, shift.getPhaseId(), activity.getId(), activity.getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivity.getPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT);
+                ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, staffEmploymentDetails, shift.getPhaseId(), activity.getId(), activity.getActivityBalanceSettings().getTimeTypeId(), shiftActivity.getPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT);
                 if (ruleTemplateValid) {
                     if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && timeBankCalculationService.isDayTypeValid(shiftActivity.getStartDate(),ruleTemplate,dayTypeDTOMap)) {
                         scheduledMinutesOfPayout += shiftActivity.getScheduledMinutes();

@@ -12,7 +12,7 @@ db.phases.find({"countryId":NumberLong(4)});
 
 //To Update the Phases of Rules Tab in Activity
 //TODO phaseId should be replaced by the resulted id of above Query
-db.activities.updateMany({"countryId":NumberLong(4)},{$set:{"rulesActivityTab.eligibleForSchedules" : [
+db.activities.updateMany({"countryId":NumberLong(4)},{$set:{"activityRulesSettings.eligibleForSchedules" : [
          {
 				"phaseId" : "1",
 				"name" : "REQUEST",

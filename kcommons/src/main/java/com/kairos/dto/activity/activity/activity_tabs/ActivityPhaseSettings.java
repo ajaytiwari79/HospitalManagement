@@ -9,20 +9,20 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PhaseSettingsActivityTab {
+public class ActivityPhaseSettings {
 
     private BigInteger activityId;
     private List<PhaseTemplateValue> phaseTemplateValues;
 
-    public PhaseSettingsActivityTab() {
+    public ActivityPhaseSettings() {
         //Default Constructor
     }
 
-    public PhaseSettingsActivityTab(List<PhaseTemplateValue> phaseTemplateValues) {
+    public ActivityPhaseSettings(List<PhaseTemplateValue> phaseTemplateValues) {
         this.phaseTemplateValues = phaseTemplateValues;
     }
 
-    public PhaseSettingsActivityTab(BigInteger activityId, List<PhaseTemplateValue> phaseTemplateValues) {
+    public ActivityPhaseSettings(BigInteger activityId, List<PhaseTemplateValue> phaseTemplateValues) {
         this.activityId = activityId;
         this.phaseTemplateValues = phaseTemplateValues;
     }

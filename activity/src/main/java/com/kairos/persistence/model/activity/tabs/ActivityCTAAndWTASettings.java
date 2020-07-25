@@ -12,6 +12,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CTAAndWTASettingsActivityTab{
+public class ActivityCTAAndWTASettings {
     private  boolean eligibleForCostCalculation;
 }

@@ -4,7 +4,6 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
-import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
@@ -976,7 +975,7 @@ public class PlanningPeriodService extends MongoBaseService {
         List<Long> employmentIds = submitDTO.getStaffs().stream().flatMap(staffDTO -> staffDTO.getEmployments().stream()).map(employmentDTO -> employmentDTO.getId()).collect(Collectors.toList());
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(employmentIds, asDate(submitDTO.getPlanningPeriod().getStartDate()),asDate(submitDTO.getPlanningPeriod().getEndDate()));
         List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(workingTimeAgreementMongoRepository.getAllWTAByEmploymentIds(employmentIds),WTAResponseDTO.class);
-        Set<BigInteger> activityTimeTypeIds = submitDTO.getActivities().stream().map(activityDTO -> activityDTO.getBalanceSettingsActivityTab().getTimeTypeId()).collect(Collectors.toSet());
+        Set<BigInteger> activityTimeTypeIds = submitDTO.getActivities().stream().map(activityDTO -> activityDTO.getActivityBalanceSettings().getTimeTypeId()).collect(Collectors.toSet());
         Map<BigInteger,TimeTypeDTO> timeTypeMap = timeTypeMongoRepository.findAllByTimeTypeIds(activityTimeTypeIds).stream().collect(Collectors.toMap(k->k.getId(),v->ObjectMapperUtils.copyPropertiesByMapper(v, TimeTypeDTO.class)));
         Map<Long,List<CTAResponseDTO>> ctaResponse = ctaResponseDTOS.stream().collect(Collectors.groupingBy(k->k.getEmploymentId()));
         Map<Long,List<WTAResponseDTO>> wtaResponse = wtaResponseDTOS.stream().collect(Collectors.groupingBy(k->k.getEmploymentId()));

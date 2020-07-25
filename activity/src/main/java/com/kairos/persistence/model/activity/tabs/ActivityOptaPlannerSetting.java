@@ -16,7 +16,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OptaPlannerSettingActivityTab  {
+public class ActivityOptaPlannerSetting {
 
     private int maxThisActivityPerShift;
     private int minLength;
@@ -27,7 +27,7 @@ public class OptaPlannerSettingActivityTab  {
     private ConstraintSetting shortestDurationConstraint;
     private ConstraintSetting longestDurationConstraint;
 
-    public OptaPlannerSettingActivityTab(int maxThisActivityPerShift, int minLength, boolean eligibleForMove) {
+    public ActivityOptaPlannerSetting(int maxThisActivityPerShift, int minLength, boolean eligibleForMove) {
         this.maxThisActivityPerShift = maxThisActivityPerShift;
         this.minLength = minLength;
         this.eligibleForMove = eligibleForMove;

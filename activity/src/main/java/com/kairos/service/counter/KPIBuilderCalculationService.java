@@ -437,7 +437,7 @@ public class KPIBuilderCalculationService implements CounterService {
                     for (Map.Entry<BigInteger, Activity> activityEntry : kpiCalculationRelatedInfo.getActivityMap().entrySet()) {
                         kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria().setActivityIds(newHashSet(activityEntry.getKey()));
                         Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
-                        subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(activityEntry.getValue().getName(), activityEntry.getValue().getGeneralActivityTab().getBackgroundColor(), value));
+                        subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(activityEntry.getValue().getName(), activityEntry.getValue().getActivityGeneralSettings().getBackgroundColor(), value));
                     }
                 }
             }
@@ -456,7 +456,7 @@ public class KPIBuilderCalculationService implements CounterService {
             if (kpiCalculationRelatedInfo.getActivityMap().containsKey(activityId)) {
                 Activity activity = kpiCalculationRelatedInfo.getActivityMap().get(activityId);
                 List<TodoDTO> todoDTOS = new CopyOnWriteArrayList(kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.activityIdAndTodoListMap.get(activityId)));
-                ClusteredBarChartKpiDataUnit clusteredBarChartKpiDataUnit = new ClusteredBarChartKpiDataUnit(activity.getName(), activity.getGeneralActivityTab().getBackgroundColor(), todoDTOS.size());
+                ClusteredBarChartKpiDataUnit clusteredBarChartKpiDataUnit = new ClusteredBarChartKpiDataUnit(activity.getName(), activity.getActivityGeneralSettings().getBackgroundColor(), todoDTOS.size());
                 subClusteredBarValue.addAll(getPQlOfTodo(activity, todoDTOS, kpiCalculationRelatedInfo));
                 clusteredBarChartKpiDataUnit.setSubValues(subClusteredBarValue);
                 activitySubClusteredBarValue.add(clusteredBarChartKpiDataUnit);
@@ -469,7 +469,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
     private List<ClusteredBarChartKpiDataUnit> getPQlOfTodo(Activity activity, List<TodoDTO> todoDTOS, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits = new ArrayList<>();
-        PQLSettings pqlSettings = activity.getRulesActivityTab().getPqlSettings();
+        PQLSettings pqlSettings = activity.getActivityRulesSettings().getPqlSettings();
         List<ApprovalCriteria> approvalCriterias = newArrayList(pqlSettings.getAppreciable(), pqlSettings.getAcceptable(), pqlSettings.getCritical());
         if (isNotNull(pqlSettings)) {
             for (ApprovalCriteria approvalCriteria : approvalCriterias) {
@@ -654,7 +654,7 @@ public class KPIBuilderCalculationService implements CounterService {
         }
 
         private boolean isShiftActivityValid(ShiftActivityDTO shiftActivityDTO) {
-            boolean validTimeType = isCollectionEmpty(this.shiftActivityCriteria.getTimeTypeIds()) || this.shiftActivityCriteria.getTimeTypeIds().contains(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId());
+            boolean validTimeType = isCollectionEmpty(this.shiftActivityCriteria.getTimeTypeIds()) || this.shiftActivityCriteria.getTimeTypeIds().contains(shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeTypeId());
             boolean validActivity = isCollectionEmpty(this.shiftActivityCriteria.getActivityIds()) || this.shiftActivityCriteria.getActivityIds().contains(shiftActivityDTO.getActivityId());
             boolean validReasonCode = isCollectionEmpty(this.shiftActivityCriteria.getReasonCodeIds()) || this.shiftActivityCriteria.getReasonCodeIds().contains(shiftActivityDTO.getAbsenceReasonCodeId());
             boolean validPlannedTime = isCollectionEmpty(this.shiftActivityCriteria.getPlannedTimeIds()) || CollectionUtils.containsAny(this.shiftActivityCriteria.getPlannedTimeIds(), shiftActivityDTO.getPlannedTimes().stream().map(PlannedTime::getPlannedTimeId).collect(Collectors.toSet()));

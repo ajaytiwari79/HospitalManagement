@@ -56,6 +56,6 @@ public class PlannerSyncService {
     }
 
     public ActivityNoTabsDTO createActivityDTO(Activity activity) {
-        return new ActivityNoTabsDTO(activity.getId(), activity.getName(), activity.getExpertises(), activity.getDescription(), activity.getSkillActivityTab() == null ? new ArrayList<>() : activity.getSkillActivityTab().getActivitySkillIds(), activity.getEmploymentTypes(), 0l, 0l, 0l);
+        return new ActivityNoTabsDTO(activity.getId(), activity.getName(), activity.getExpertises(), activity.getDescription(), activity.getActivitySkillSettings() == null ? new ArrayList<>() : activity.getActivitySkillSettings().getActivitySkillIds(), activity.getEmploymentTypes(), 0l, 0l, 0l);
     }
 }

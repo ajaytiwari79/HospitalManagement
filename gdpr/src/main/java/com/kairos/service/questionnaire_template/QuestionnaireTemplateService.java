@@ -126,14 +126,12 @@ public class QuestionnaireTemplateService {
         questionnaireTemplate.setAssetType(assetType);
         if (CollectionUtils.isEmpty(assetType.getSubAssetTypes())) {
             getQuestionnaireTemplate(referenceId, isOrganization, questionnaireTemplate, templateDto, assetType);
+        } else if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(templateDto.getSubAssetType()).isPresent())) {
+            exceptionService.invalidRequestException(MESSAGE_SUBASSETTYPE_NOT_SELECTED);
         } else {
-            if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(templateDto.getSubAssetType()).isPresent())) {
-                exceptionService.invalidRequestException(MESSAGE_SUBASSETTYPE_NOT_SELECTED);
-            } else {
-                getQuestionnaireTemplate(referenceId, isOrganization, questionnaireTemplate, templateDto, assetType);
-                AssetType subAssetType = isOrganization ? assetTypeRepository.findByIdAndOrganizationIdAndAssetTypeAndDeleted(templateDto.getSubAssetType(), templateDto.getAssetType(), referenceId) : assetTypeRepository.findByIdAndCountryIdAndAssetTypeAndDeleted(templateDto.getSubAssetType(), templateDto.getAssetType(), referenceId);
-                questionnaireTemplate.setSubAssetType(subAssetType);
-            }
+            getQuestionnaireTemplate(referenceId, isOrganization, questionnaireTemplate, templateDto, assetType);
+            AssetType subAssetType = isOrganization ? assetTypeRepository.findByIdAndOrganizationIdAndAssetTypeAndDeleted(templateDto.getSubAssetType(), templateDto.getAssetType(), referenceId) : assetTypeRepository.findByIdAndCountryIdAndAssetTypeAndDeleted(templateDto.getSubAssetType(), templateDto.getAssetType(), referenceId);
+            questionnaireTemplate.setSubAssetType(subAssetType);
         }
     }
 

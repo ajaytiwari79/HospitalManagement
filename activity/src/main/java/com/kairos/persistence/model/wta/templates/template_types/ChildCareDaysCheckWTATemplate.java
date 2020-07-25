@@ -81,7 +81,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     private boolean validateRulesChildCareDayCheck(Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         for(BigInteger activityId : activityWrapperMap.keySet()){
-            if(!TimeTypeEnum.PAID_BREAK.equals(activityWrapperMap.get(activityId).getTimeTypeInfo().getSecondLevelType()) && isNotNull(activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getCutOffIntervalUnit())){
+            if(!TimeTypeEnum.PAID_BREAK.equals(activityWrapperMap.get(activityId).getTimeTypeInfo().getSecondLevelType()) && isNotNull(activityWrapperMap.get(activityId).getActivity().getActivityRulesSettings().getCutOffIntervalUnit())){
                 return true;
             }
         }

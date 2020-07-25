@@ -8,11 +8,11 @@ import java.math.BigInteger;
  * Created by vipul on 30/11/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CTAAndWTASettingsActivityTabDTO {
+public class ActivityCTAAndWTASettingsDTO {
     private BigInteger activityId;
     private  boolean eligibleForCostCalculation;
 
-    public CTAAndWTASettingsActivityTabDTO(boolean eligibleForCostCalculation) {
+    public ActivityCTAAndWTASettingsDTO(boolean eligibleForCostCalculation) {
         this.eligibleForCostCalculation = eligibleForCostCalculation;
     }
 
@@ -32,7 +32,7 @@ public class CTAAndWTASettingsActivityTabDTO {
         this.eligibleForCostCalculation = eligibleForCostCalculation;
     }
 
-    public CTAAndWTASettingsActivityTabDTO() {
+    public ActivityCTAAndWTASettingsDTO() {
     }
 
 

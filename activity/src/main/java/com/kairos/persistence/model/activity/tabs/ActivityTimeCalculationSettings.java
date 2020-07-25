@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TimeCalculationActivityTab  {
+public class ActivityTimeCalculationSettings {
 
     @KPermissionField
     private String methodForCalculatingTime;
@@ -40,7 +40,7 @@ public class TimeCalculationActivityTab  {
     private boolean replaceWithPublishedShiftTime;
     private boolean replaceWithUnapprovedAbsenceRequest;
 
-    public TimeCalculationActivityTab(String methodForCalculatingTime, Long fixedTimeValue, Boolean multiplyWith, LocalTime defaultStartTime,Double multiplyWithValue) {
+    public ActivityTimeCalculationSettings(String methodForCalculatingTime, Long fixedTimeValue, Boolean multiplyWith, LocalTime defaultStartTime, Double multiplyWithValue) {
         this.methodForCalculatingTime = methodForCalculatingTime;
         this.fixedTimeValue = fixedTimeValue;
         this.multiplyWith = multiplyWith;

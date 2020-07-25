@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.annotations.KPermissionField;
 import com.kairos.annotations.KPermissionModel;
 import com.kairos.annotations.KPermissionSubModel;
-import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.tabs.*;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,26 +57,26 @@ public class Activity extends MongoBaseEntity {
     @JsonIgnore
     private boolean isParentActivity = true;
     @KPermissionSubModel
-    private GeneralActivityTab generalActivityTab;
-    private BalanceSettingsActivityTab balanceSettingsActivityTab;
+    private ActivityGeneralSettings activityGeneralSettings;
+    private ActivityBalanceSettings activityBalanceSettings;
     @KPermissionSubModel
-    private IndividualPointsActivityTab individualPointsActivityTab;
+    private ActivityIndividualPointsSettings activityIndividualPointsSettings;
     private Set<BigInteger> childActivityIds=new HashSet<>();
     @KPermissionSubModel
-    private NotesActivityTab notesActivityTab;
-    private CommunicationActivityTab communicationActivityTab;
+    private ActivityNotesSettings activityNotesSettings;
+    private ActivityCommunicationSettings activityCommunicationSettings;
     @KPermissionSubModel
-    private BonusActivityTab bonusActivityTab;
+    private ActivityBonusSettings activityBonusSettings;
     @KPermissionSubModel
-    private RulesActivityTab rulesActivityTab;
+    private ActivityRulesSettings activityRulesSettings;
     @KPermissionSubModel
-    private TimeCalculationActivityTab timeCalculationActivityTab;
+    private ActivityTimeCalculationSettings activityTimeCalculationSettings;
     @KPermissionSubModel
-    private SkillActivityTab skillActivityTab;
-    private PhaseSettingsActivityTab phaseSettingsActivityTab;
-    private OptaPlannerSettingActivityTab optaPlannerSettingActivityTab;
-    private CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab;
-    private LocationActivityTab locationActivityTab;
+    private ActivitySkillSettings activitySkillSettings;
+    private ActivityPhaseSettings activityPhaseSettings;
+    private ActivityOptaPlannerSetting activityOptaPlannerSetting;
+    private ActivityCTAAndWTASettings activityCTAAndWTASettings;
+    private ActivityLocationSettings activityLocationSettings;
     private BigInteger countryParentId;
     @JsonIgnore
     private boolean disabled;
@@ -95,8 +95,8 @@ public class Activity extends MongoBaseEntity {
 
 
 
-    public Activity(BalanceSettingsActivityTab balanceSettingsActivityTab) {
-        this.balanceSettingsActivityTab = balanceSettingsActivityTab;
+    public Activity(ActivityBalanceSettings activityBalanceSettings) {
+        this.activityBalanceSettings = activityBalanceSettings;
     }
 
 

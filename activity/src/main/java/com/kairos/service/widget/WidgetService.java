@@ -156,7 +156,7 @@ public class WidgetService {
         Map<BigInteger, TimeTypeDTO> timeTypeDTOMap = timeTypeDTOS.stream().collect(Collectors.toMap(TimeTypeDTO::getId, v -> v));
         for (ShiftWithActivityDTO shiftDTO : shiftDTOs) {
             ShiftActivityDTO shiftActivityDTO = shiftDTO.getActivities().get(0);
-            BigInteger timeTypeId = shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId();
+            BigInteger timeTypeId = shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeTypeId();
             TimeTypeDTO timeType = timeTypeDTOMap.get(timeTypeId);
             shiftActivityDTO.setSecondLevelType(timeType.getSecondLevelType());
             if (timeType.getParent().size() == 2) {
