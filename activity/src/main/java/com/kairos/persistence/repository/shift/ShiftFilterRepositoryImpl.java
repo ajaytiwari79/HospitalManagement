@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
+import static com.kairos.constants.AppConstants.DELETED;
 import static com.kairos.enums.FilterType.ABSENCE_ACTIVITY;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -79,6 +80,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
 
         Criteria criteria = new Criteria();
         criteria.and(UNIT_ID).is(unitId);
+        criteria.and(DELETED).is(false);
         criteria.and(EMPLOYMENT_ID).in(employmentIds);
         if(includeDateComparison) {
             criteria.and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
