@@ -50,7 +50,7 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(),this.intervalUnit,this.intervalLength);
             List<ShiftWithActivityDTO> shiftWithActivityDTOS = infoWrapper.getShifts();
             shiftWithActivityDTOS.add(infoWrapper.getShift());
-            List<ShiftWithActivityDTO> nightShifts = getNightMinutesOrCount(infoWrapper.getExpertiseNightWorkerSetting(),shiftWithActivityDTOS,dateTimeInterval);
+            List<ShiftWithActivityDTO> nightShifts = getNightShifts(infoWrapper.getExpertiseNightWorkerSetting(),shiftWithActivityDTOS,dateTimeInterval);
             Set<LocalDate> shiftDates = getSortedAndUniqueDates(nightShifts);
             LocalDate shiftDate = asLocalDate(infoWrapper.getShift().getActivities().get(0).getStartDate());
             boolean currentNightShift = shiftDates.contains(shiftDate);
@@ -89,7 +89,7 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType=WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
     }
 
-    private List<ShiftWithActivityDTO> getNightMinutesOrCount(ExpertiseNightWorkerSetting expertiseNightWorkerSetting, List<ShiftWithActivityDTO> shiftWithActivityDTOS,DateTimeInterval dateTimeInterval) {
+    private List<ShiftWithActivityDTO> getNightShifts(ExpertiseNightWorkerSetting expertiseNightWorkerSetting, List<ShiftWithActivityDTO> shiftWithActivityDTOS, DateTimeInterval dateTimeInterval) {
         List<ShiftWithActivityDTO> nightShifts = new ArrayList<>();
         for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
             if (dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())) {

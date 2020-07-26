@@ -2,11 +2,14 @@ package com.kairos.controller.staffing_level;
 
 import com.kairos.constants.ApiConstants;
 import com.kairos.dto.activity.staffing_level.StaffingLevelFromTemplateDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelGraphConfigurationDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelPublishDTO;
 import com.kairos.dto.activity.staffing_level.UpdatedStaffingLevelDTO;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
+import com.kairos.service.staffing_level.StaffingLevelGraphConfigurationService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.utils.Message;
 import com.kairos.utils.response.ResponseHandler;
@@ -24,6 +27,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -40,7 +44,8 @@ import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 public class StaffingLevelController {
 
     private static  final Logger LOGGER= LoggerFactory.getLogger(StaffingLevelController.class);
-    @Autowired private StaffingLevelService staffingLevelService;
+    @Inject private StaffingLevelService staffingLevelService;
+    @Inject private StaffingLevelGraphConfigurationService staffingLevelGraphConfigurationService;
 
 
     @RequestMapping(value = "/presence", method = RequestMethod.POST)
@@ -181,13 +186,25 @@ public class StaffingLevelController {
 
     @GetMapping(value = "/weekly")
     @ApiOperation("weekly staffing Level")
-    public ResponseEntity<Map<String, Object>> getWeeklyStaffingLevel(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date,@RequestParam BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.getWeeklyStaffingLevel(unitId,date,activityId));
+    public ResponseEntity<Map<String, Object>> getWeeklyStaffingLevel(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date,@RequestParam BigInteger activityId,@RequestParam(required = false) boolean unpublishedChanges) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.getWeeklyStaffingLevel(unitId,date,activityId,unpublishedChanges));
     }
 
     @GetMapping(value = "/get_staffing_level_activities")
     @ApiOperation("weekly staffing Level")
     public ResponseEntity<Map<String, Object>> getStaffingLevelActivities(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam String query) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.getStaffingLevelActivities(unitId,startDate,query));
+    }
+
+    @GetMapping(value = "/graph/configuration")
+    @ApiOperation("Get staffing level graph configuration")
+    public ResponseEntity<Map<String, Object>> getStaffingLevelGraphConfiguration(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelGraphConfigurationService.getStaffingLevelGraphConfiguration(unitId, UserContext.getUserDetails().getId()));
+    }
+
+    @PutMapping(value = "/graph/configuration")
+    @ApiOperation("update staffing level graph configuration")
+    public ResponseEntity<Map<String, Object>> updateOrCreateStaffingLevelConfiguration(@PathVariable Long unitId, @RequestBody @Valid StaffingLevelGraphConfigurationDTO staffingLevelGraphConfigurationDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelGraphConfigurationService.updateOrCreateStaffingLevelConfiguration(unitId, UserContext.getUserDetails().getId(),staffingLevelGraphConfigurationDTO));
     }
 }

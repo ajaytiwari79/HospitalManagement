@@ -1,5 +1,4 @@
 
-
 //ACTIVITIES
 db.activities.updateMany( {}, { $rename: { 'generalActivityTab': 'activityGeneralSettings'} } );
 db.activities.updateMany({},{$rename:{'balanceSettingsActivityTab':'activityBalanceSettings'}});
@@ -34,7 +33,6 @@ db.time_Type.updateMany({},{$rename:{'locationActivityTab':'activityLocationSett
 
 
 
-=======
 db.shiftViolatedRules.find({"deleted" : false}).forEach(function(shiftViolatedRule){
 var shiftId = shiftViolatedRule.shiftId
 print(shiftId);
