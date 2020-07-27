@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.activity.tabs;
 
+import com.kairos.annotations.KPermissionField;
 import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
@@ -16,8 +17,8 @@ import java.math.BigInteger;
 @Setter
 @NoArgsConstructor
 public class ActivityBalanceSettings {
-
     private Integer addTimeTo;
+    @KPermissionField
     private BigInteger timeTypeId;
     private TimeTypeEnum timeType; // This is used to verify the activity is of  paid break or unpaid break
     private boolean onCallTimePresent ;

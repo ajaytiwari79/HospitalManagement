@@ -71,6 +71,7 @@ public class StaffAddressService {
         for (AddressDTO addressDTO : addressDTOS) {
             ContactAddress contactAddress = contactAddressMap.getOrDefault(addressDTO.getId(), new ContactAddress());
             contactAddress.setPrimary(addressDTO.isPrimary());
+            contactAddress.setAddressProtected(addressDTO.isAddressProtected());
             // Verify Address here
                 LOGGER.info("Google Map verified address received ");
 

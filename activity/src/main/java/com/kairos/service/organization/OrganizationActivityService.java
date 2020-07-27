@@ -226,12 +226,6 @@ public class OrganizationActivityService extends MongoBaseService {
             activity.getActivityPhaseSettings().setPhaseTemplateValues(phaseTemplateValues);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
         } else {
-            if (!userIntegrationService.isUnit(unitId)) {
-                List<Long> childUnitIds = userIntegrationService.getAllOrganizationIds(unitId);
-                if (activityMongoRepository.existsByParentIdAndDeletedFalse(activityId, childUnitIds)) {
-                    exceptionService.actionNotPermittedException(ACTIVITY_USED_AT_UNIT);
-                }
-            }
             activityCopied = Optional.ofNullable(activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId)).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_ACTIVITY_ID, activityId)));
             if (!userIntegrationService.isUnit(unitId)) {
                 List<Long> childUnitIds = userIntegrationService.getAllOrganizationIds(unitId);
