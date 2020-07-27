@@ -331,9 +331,18 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff) WITH position,kPermissionTab,accessGroup\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,kPermissionTab,accessGroup\n" +
             "MERGE (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_FIELD +"{accessGroupId:{2}}]->(kPermissionTab)\n" +
-            "ON CREATE SET r.fieldLevelPermissions={4},r.expertiseIds={5},r.unionIds={6},r.teamIds={7},r.employmentTypeIds={8},r.tagIds={9},r.staffStatuses={10},r.forOtherFieldLevelPermissions={11}\n" +
-            "ON MATCH SET r.fieldLevelPermissions={4} ,r.expertiseIds={5},r.unionIds={6},r.teamIds={7},r.employmentTypeIds={8},r.tagIds={9},r.staffStatuses={10},r.forOtherFieldLevelPermissions={11} RETURN distinct true")
-    void setCustomPermissionForSubModelAndFields(Long staffId, Long unitId, Long accessGroupId, Set<Long> kPermissionTabIds, Set<FieldLevelPermission> permissions, Set<Long> expertiseIds, Set<Long> unionIds, Set<Long> teamIds, Set<Long> employmentTypeIds, Set<Long> tagIds, Set<StaffStatusEnum> staffStatuses, Set<FieldLevelPermission> forOtherFieldLevelPermissions);
+            "ON CREATE SET r.expertiseIds={4},r.unionIds={5},r.teamIds={6},r.employmentTypeIds={7},r.tagIds={8},r.staffStatuses={9},r.forOtherFieldLevelPermissions={10}\n" +
+            "ON MATCH SET r.expertiseIds={4},r.unionIds={5},r.teamIds={6},r.employmentTypeIds={7},r.tagIds={8},r.staffStatuses={9},r.forOtherFieldLevelPermissions={10} RETURN distinct true")
+    void setCustomPermissionForSubModelAndFieldsForOtherStaffs(Long staffId, Long unitId, Long accessGroupId, Set<Long> kPermissionTabIds, Set<Long> expertiseIds, Set<Long> unionIds, Set<Long> teamIds, Set<Long> employmentTypeIds, Set<Long> tagIds, Set<StaffStatusEnum> staffStatuses, Set<FieldLevelPermission> forOtherFieldLevelPermissions);
+
+    @Query("MATCH (kPermissionTab),(accessGroup:AccessGroup) WHERE id(kPermissionTab) IN {3} AND id(accessGroup)={2} WITH kPermissionTab,accessGroup\n" +
+            "MATCH (staff:Staff) WHERE  id(staff)={0} WITH staff,kPermissionTab,accessGroup\n" +
+            "MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff) WITH position,kPermissionTab,accessGroup\n" +
+            "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,kPermissionTab,accessGroup\n" +
+            "MERGE (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_FIELD +"{accessGroupId:{2}}]->(kPermissionTab)\n" +
+            "ON CREATE SET r.fieldLevelPermissions={4} \n" +
+            "ON MATCH SET r.fieldLevelPermissions={4}  RETURN distinct true")
+    void setCustomPermissionForSubModelAndFields(Long staffId, Long unitId, Long accessGroupId, Set<Long> kPermissionTabIds, Set<FieldLevelPermission> permissions);
 
 
     @Query("MATCH(o:Organization)-[r:ORGANIZATION_HAS_ACCESS_GROUPS]->(a:AccessGroup)-[r1:HAS_PARENT_ACCESS_GROUP]->(accessGroup:AccessGroup) where id(accessGroup)={1} and id(o)={0} return id(a)")

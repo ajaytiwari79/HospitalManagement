@@ -16,7 +16,6 @@ import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.kpermissions.*;
 import com.kairos.persistence.model.organization.Organization;
@@ -592,9 +591,14 @@ public class PermissionService {
         Set<Long> kPermissionModelIds=permissionModelRepository.kPermissionModelIds(customPermissionDTO.getId());
         OtherPermissionDTO forOtherPermissions=customPermissionDTO.getForOtherPermissions();
         LOGGER.info("other permissions are {}",customPermissionDTO.getForOtherPermissions().toString());
-        LOGGER.info("Childrens are  {}",kPermissionModelIds.toString());
-        accessGroupRepository.setCustomPermissionForSubModelAndFields(customPermissionDTO.getStaffId(), unitId, accessGroupId,kPermissionModelIds, customPermissionDTO.getPermissions(),forOtherPermissions.getExpertiseIds(),forOtherPermissions.getUnionIds(),forOtherPermissions.getTeamIds(),
-                forOtherPermissions.getEmploymentTypeIds(),forOtherPermissions.getTagIds(),forOtherPermissions.getStaffStatuses(),forOtherPermissions.getPermissions());
+        LOGGER.info("Children are  {}",kPermissionModelIds.toString());
+        if(customPermissionDTO.isForOtherStaff()){
+            accessGroupRepository.setCustomPermissionForSubModelAndFieldsForOtherStaffs(customPermissionDTO.getStaffId(), unitId, accessGroupId,kPermissionModelIds,forOtherPermissions.getExpertiseIds(),forOtherPermissions.getUnionIds(),forOtherPermissions.getTeamIds(),
+                    forOtherPermissions.getEmploymentTypeIds(),forOtherPermissions.getTagIds(),forOtherPermissions.getStaffStatuses(),forOtherPermissions.getPermissions());
+        }else {
+            accessGroupRepository.setCustomPermissionForSubModelAndFields(customPermissionDTO.getStaffId(), unitId, accessGroupId,kPermissionModelIds, customPermissionDTO.getPermissions());
+        }
+
     }
 
 }
