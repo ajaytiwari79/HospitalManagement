@@ -58,12 +58,14 @@ public class Activity extends MongoBaseEntity {
     private boolean isParentActivity = true;
     @KPermissionSubModel
     private ActivityGeneralSettings activityGeneralSettings;
+    @KPermissionSubModel
     private ActivityBalanceSettings activityBalanceSettings;
     @KPermissionSubModel
     private ActivityIndividualPointsSettings activityIndividualPointsSettings;
     private Set<BigInteger> childActivityIds=new HashSet<>();
     @KPermissionSubModel
     private ActivityNotesSettings activityNotesSettings;
+    @KPermissionSubModel
     private ActivityCommunicationSettings activityCommunicationSettings;
     @KPermissionSubModel
     private ActivityBonusSettings activityBonusSettings;
