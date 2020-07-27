@@ -1,7 +1,7 @@
 package com.kairos.aspects;
 
 import com.kairos.enums.kpermissions.FieldLevelPermission;
-import com.kairos.service.kpermissions.PermissionService;
+import com.kairos.service.kpermissions.ActivityPermissionService;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
@@ -19,10 +19,10 @@ import static com.kairos.utils.PermissionMapperUtils.checkAndReturnValidModel;
 public class ReadPermissionAspect {
 
 
-    private static PermissionService permissionService;
+    private static ActivityPermissionService activityPermissionService;
     @Inject
-    public void setPermissionService(PermissionService permissionService) {
-        ReadPermissionAspect.permissionService = permissionService;
+    public void setPermissionService(ActivityPermissionService activityPermissionService) {
+        ReadPermissionAspect.activityPermissionService = activityPermissionService;
     }
 
 
@@ -32,7 +32,7 @@ public class ReadPermissionAspect {
         Object[] objectArray = removeNull(objectCollection);
         List<T> objects = checkAndReturnValidModel(objectArray);
         if(isCollectionNotEmpty(objects)) {
-            permissionService.updateModelBasisOfPermission(objects, newHashSet(FieldLevelPermission.READ));
+            activityPermissionService.updateModelBasisOfPermission(objects, newHashSet(FieldLevelPermission.READ));
         }
     }
 }

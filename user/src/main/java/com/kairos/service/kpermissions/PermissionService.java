@@ -592,17 +592,9 @@ public class PermissionService {
         Set<Long> kPermissionModelIds=permissionModelRepository.kPermissionModelIds(customPermissionDTO.getId());
         OtherPermissionDTO forOtherPermissions=customPermissionDTO.getForOtherPermissions();
         LOGGER.info("other permissions are {}",customPermissionDTO.getForOtherPermissions().toString());
+        LOGGER.info("Childrens are  {}",kPermissionModelIds.toString());
         accessGroupRepository.setCustomPermissionForSubModelAndFields(customPermissionDTO.getStaffId(), unitId, accessGroupId,kPermissionModelIds, customPermissionDTO.getPermissions(),forOtherPermissions.getExpertiseIds(),forOtherPermissions.getUnionIds(),forOtherPermissions.getTeamIds(),
                 forOtherPermissions.getEmploymentTypeIds(),forOtherPermissions.getTagIds(),forOtherPermissions.getStaffStatuses(),forOtherPermissions.getPermissions());
-    }
-
-    private Set<Long> getAllIdsToSetPermissions(KPermissionModel kPermissionModel,Set<Long> kPermissionModelIds) {
-        kPermissionModelIds.add(kPermissionModel.getId());
-        kPermissionModelIds.addAll(kPermissionModel.getFieldPermissions().stream().map(UserBaseEntity::getId).collect(Collectors.toSet()));
-        kPermissionModel.getSubModelPermissions().forEach(subModel->{
-            getAllIdsToSetPermissions(subModel,kPermissionModelIds);
-        });
-        return kPermissionModelIds;
     }
 
 }
