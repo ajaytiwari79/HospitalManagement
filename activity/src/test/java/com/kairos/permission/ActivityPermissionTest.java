@@ -3,7 +3,7 @@ package com.kairos.permission;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.service.kpermissions.PermissionService;
+import com.kairos.service.kpermissions.ActivityPermissionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,8 +18,8 @@ import java.util.List;
 public class ActivityPermissionTest {
     private Long unitId;
     @InjectMocks
-    private PermissionService permissionService;
-    private PermissionService.FieldPermissionHelperDTO fieldPermissionHelperDTO;
+    private ActivityPermissionService activityPermissionService;
+    private ActivityPermissionService.FieldPermissionHelperDTO fieldPermissionHelperDTO;
 
     private FieldPermissionUserData fieldPermissionUserData=new FieldPermissionUserData();
 
@@ -40,7 +40,7 @@ public class ActivityPermissionTest {
 
 
         unitId = 2403L;
-        fieldPermissionHelperDTO=null;//new PermissionService.FieldPermissionHelperDTO(activityDTOS,newHashSet(FieldLevelPermission.READ),fieldPermissionUserData);
+        fieldPermissionHelperDTO=null;//new ActivityPermissionService.FieldPermissionHelperDTO(activityDTOS,newHashSet(FieldLevelPermission.READ),fieldPermissionUserData);
 
     }
 
@@ -53,7 +53,7 @@ public class ActivityPermissionTest {
         activityDTOS.add(activityDTO);
         activityDTOS.add(activityDTO1);
 
-        //permissionService.updateObjectsPropertiesBeforeSend(fieldPermissionHelperDTO,newHashSet(FieldLevelPermission.READ));
+        //activityPermissionService.updateObjectsPropertiesBeforeSend(fieldPermissionHelperDTO,newHashSet(FieldLevelPermission.READ));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class ActivityPermissionTest {
         ActivityDTO activityDTO1=new ActivityDTO(new BigInteger("15"),"team B Changed",null);
         activityDTOS.add(activityDTO);
         activityDTOS.add(activityDTO1);
-        //permissionService.updateObjectsPropertiesBeforeSave(fieldPermissionHelperDTO,newHashSet(FieldLevelPermission.WRITE));
+        //activityPermissionService.updateObjectsPropertiesBeforeSave(fieldPermissionHelperDTO,newHashSet(FieldLevelPermission.WRITE));
     }
 
 }
