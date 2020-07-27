@@ -502,10 +502,12 @@ public class PositionService {
         return saveEmploymentEndDate(organization, employmentEndDate, staffId, null, null, null);
     }
 
-    public Position updatePositionEndDate(Organization organization, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) throws Exception {
+    public Position updatePositionEndDate(Organization organization, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId,Boolean saveAsDraft) throws Exception {
         Long employmentEndDate = null;
-        if (Optional.ofNullable(endDateMillis).isPresent()) {
+        if (Optional.ofNullable(endDateMillis).isPresent() && !saveAsDraft) {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
+        }else {
+            employmentEndDate=endDateMillis;
         }
         return saveEmploymentEndDate(organization, employmentEndDate, staffId, reasonCodeId, endDateMillis, accessGroupId);
     }
@@ -543,7 +545,9 @@ public class PositionService {
             position.setReasonCode(reasonCode);
         } else if (Optional.ofNullable(employmentEndDate).isPresent() && Objects.equals(employmentEndDate, endDateMillis)) {
             positionGraphRepository.deletePositionReasonCodeRelation(staffId);
-            reasonCode = reasonCodeGraphRepository.findById(reasonCodeId).get();
+            if(isNotNull(reasonCodeId)) {
+                reasonCode = reasonCodeGraphRepository.findById(reasonCodeId).get();
+            }
             position.setReasonCode(reasonCode);
         }
         if (Optional.ofNullable(accessGroupId).isPresent()) {
