@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.enums.FilterType.CTA_ACCOUNT_TYPE;
 

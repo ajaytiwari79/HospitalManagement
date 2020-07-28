@@ -898,7 +898,7 @@ public class OrganizationService {
     }
 
         public List<Long> getOrganizationIds(Long unitId) {
-        List<Long> organizationIds = null;
+        List<Long> organizationIds = new ArrayList<>();
         if (isNull(unitId)) {
             organizationIds = unitGraphRepository.findAllUnitIds();
         } else {

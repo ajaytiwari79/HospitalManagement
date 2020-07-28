@@ -176,7 +176,7 @@ public class EmploymentService {
         employmentGraphRepository.save(employment);
         initialTimeBankLogService.saveInitialTimeBankLog(employment.getId(), employment.getAccumulatedTimebankMinutes());
         assignCTAAndWTAToEmployment(employment, employmentDTO);
-        Long reasonCodeId = updateEmploymentEndDate(parentUnit, employmentDTO, position);
+        Long reasonCodeId = updateEmploymentEndDate(parentUnit, employmentDTO, position,saveAsDraft);
         List<EmploymentLineEmploymentTypeRelationShip> employmentLineEmploymentTypeRelationShips = new ArrayList<>();
         employment.getEmploymentLines().forEach(line -> employmentLineEmploymentTypeRelationShips.add(new EmploymentLineEmploymentTypeRelationShip(line, employmentType, employmentDTO.getEmploymentTypeCategory())));
         employmentAndEmploymentTypeRelationShipGraphRepository.saveAll(employmentLineEmploymentTypeRelationShips);
@@ -208,7 +208,9 @@ public class EmploymentService {
                 employmentDTO.setAccessGroupId(position.getAccessGroupIdOnPositionEnd());
             }
             if(employmentDTO.getReasonCodeId()==null){
-                employmentDTO.setReasonCodeId(position.getReasonCode().getId());
+                if(isNotNull(position.getReasonCode())) {
+                    employmentDTO.setReasonCodeId(position.getReasonCode().getId());
+                }
             }
         }
         return employmentType;
@@ -235,8 +237,9 @@ public class EmploymentService {
         }
     }
 
-    private Long updateEmploymentEndDate(Organization organization, EmploymentDTO employmentDTO, Position position) throws Exception {
-        Position position1 = positionService.updatePositionEndDate(organization, employmentDTO.getStaffId(), employmentDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(employmentDTO.getEndDate()) : null, employmentDTO.getReasonCodeId(), employmentDTO.getAccessGroupId());
+    private Long updateEmploymentEndDate(Organization organization, EmploymentDTO employmentDTO, Position position,Boolean saveAsDraft) throws Exception {
+        Long endDateMillis = saveAsDraft?position.getEndDateMillis():employmentDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(employmentDTO.getEndDate()) : null;
+        Position position1 = positionService.updatePositionEndDate(organization, employmentDTO.getStaffId(), endDateMillis, employmentDTO.getReasonCodeId(), employmentDTO.getAccessGroupId(),saveAsDraft);
         return Optional.ofNullable(position.getReasonCode()).isPresent() ? position1.getReasonCode().getId() : null;
 
     }
@@ -388,7 +391,7 @@ public class EmploymentService {
         Organization organization = organizationService.fetchParentOrganization(unitId);
         initialTimeBankLogService.saveInitialTimeBankLog(oldEmployment.getId(), oldEmployment.getAccumulatedTimebankMinutes());
         Position position = positionService.updatePositionEndDate(organization, employmentDTO.getStaffId(),
-                employmentDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(employmentDTO.getEndDate()) : null, employmentDTO.getReasonCodeId(), employmentDTO.getAccessGroupId());
+                employmentDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(employmentDTO.getEndDate()) : null, employmentDTO.getReasonCodeId(), employmentDTO.getAccessGroupId(),false);
         Long reasonCodeId = Optional.ofNullable(position.getReasonCode()).isPresent() ? position.getReasonCode().getId() : null;
         PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnPositionEnd());
         // Deleting All shifts after position end date
