@@ -75,6 +75,7 @@ public class Activity extends MongoBaseEntity {
     private ActivityTimeCalculationSettings activityTimeCalculationSettings;
     @KPermissionSubModel
     private ActivitySkillSettings activitySkillSettings;
+    @KPermissionField
     private ActivityPhaseSettings activityPhaseSettings;
     private ActivityOptaPlannerSetting activityOptaPlannerSetting;
     private ActivityCTAAndWTASettings activityCTAAndWTASettings;

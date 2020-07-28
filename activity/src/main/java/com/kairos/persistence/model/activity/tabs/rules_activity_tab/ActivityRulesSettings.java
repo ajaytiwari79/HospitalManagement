@@ -4,7 +4,6 @@ import com.kairos.annotations.KPermissionField;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
-import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import lombok.Getter;
 import lombok.Setter;
@@ -62,8 +61,6 @@ public class ActivityRulesSettings {
     @KPermissionField
     private Short longestTime;
     private boolean eligibleForCopy;
-    @KPermissionField
-    private DurationField plannedTimeInAdvance;
     @KPermissionField
     private LocalTime maximumEndTime;// shift can't be extend this time
     //remove after integration
