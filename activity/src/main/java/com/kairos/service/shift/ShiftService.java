@@ -549,8 +549,8 @@ public class ShiftService extends MongoBaseService {
         List<ShiftViolatedRules> saveShiftViolatedRules = new ArrayList<>();
         List<ShiftViolatedRules> deleteShiftViolatedRules = new ArrayList<>();
         for (Shift draftShift : draftShifts) {
-            if(isNotNull(draftShift.getDraftShift())){
-                Shift shift = draftShift.getDraftShift();
+            if(isNotNull(draftShift.getDraftShift())||draftShift.isDraft()){
+                Shift shift = isNotNull(draftShift.getDraftShift())?draftShift.getDraftShift():draftShift;
                 shift.setDraftShift(null);
                 shift.setId(draftShift.getId());
                 shift.setDraft(false);
