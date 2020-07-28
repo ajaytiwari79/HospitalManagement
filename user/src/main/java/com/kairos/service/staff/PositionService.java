@@ -502,7 +502,7 @@ public class PositionService {
         return saveEmploymentEndDate(organization, employmentEndDate, staffId, null, null, null);
     }
 
-    public Position updatePositionEndDate(Organization organization, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId,Boolean saveAsDraft) throws Exception {
+    public Position updatePositionEndDate(Organization organization, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId,boolean saveAsDraft) throws Exception {
         Long employmentEndDate = null;
         if (Optional.ofNullable(endDateMillis).isPresent() && !saveAsDraft) {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
