@@ -1,11 +1,9 @@
 package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 
 import com.kairos.annotations.KPermissionField;
-import com.kairos.annotations.KPermissionSubModel;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
-import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,8 +19,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class 
-ActivityRulesSettings {
+public class ActivityRulesSettings {
 
 
     private boolean eligibleForFinalSchedule;
