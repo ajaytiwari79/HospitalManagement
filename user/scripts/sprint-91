@@ -1,0 +1,12 @@
+//Update tab details
+MATCH (accessPage:AccessPage) WHERE accessPage.moduleId="module_1"
+SET accessPage.editable = true
+RETURN accessPage
+
+MATCH (accessPage:AccessPage) WHERE accessPage.moduleId="tab_413"
+SET accessPage.active=false,accessPage.deleted=true
+RETURN accessPage
+
+MATCH (accessPage:AccessPage) WHERE accessPage.moduleId="tab_412"
+SET accessPage.name="Staffing Levels"
+RETURN accessPage
