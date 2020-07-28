@@ -78,6 +78,7 @@ public class Activity extends MongoBaseEntity {
     @KPermissionField
     private ActivityPhaseSettings activityPhaseSettings;
     private ActivityOptaPlannerSetting activityOptaPlannerSetting;
+    @KPermissionSubModel
     private ActivityCTAAndWTASettings activityCTAAndWTASettings;
     private ActivityLocationSettings activityLocationSettings;
     private BigInteger countryParentId;
