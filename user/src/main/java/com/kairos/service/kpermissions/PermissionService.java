@@ -598,7 +598,6 @@ public class PermissionService {
         }else {
             accessGroupRepository.setCustomPermissionForSubModelAndFields(customPermissionDTO.getStaffId(), unitId, accessGroupId,kPermissionModelIds, customPermissionDTO.getPermissions());
         }
-
     }
 
 }
