@@ -1094,6 +1094,7 @@ public class ShiftService extends MongoBaseService {
 
     //Description this method will fetch all shifts / open shifts and shift states based on the above request param
     public Object getAllShiftAndStates(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, ViewType viewType, ShiftFilterParam shiftFilterParam, Long expertiseId, StaffFilterDTO staffFilterDTO) {
+
         Object object = null;
         if (endDate != null) {
             endDate = endDate.plusDays(1);

@@ -118,7 +118,7 @@ public class ShiftPlanningService {
         if (shiftFilterCount > 0) {
             shiftWithActivityDTOS = shiftMongoRepository.getStaffListFilteredByShiftCriteria(employmentIds, validMatches, unitId, shiftSearchDTO.getStartDate(), shiftSearchDTO.getEndDate(), includeDateComparison);
         }
-        return getStaffListAfterShiftFilterMatches(staffListWithPersonalDetails, shiftWithActivityDTOS, shiftSearchDTO.getLoggedInUserId(),shiftSearchDTO);
+        return getStaffListAfterShiftFilterMatches(staffListWithPersonalDetails, shiftWithActivityDTOS, shiftSearchDTO.getLoggedInUserId(),shiftSearchDTO,shiftFilterCount);
     }
 
     public StaffShiftDetails getShiftPlanningDetailsForOneStaff(Long unitId, ShiftSearchDTO shiftSearchDTO) {
@@ -233,7 +233,7 @@ public class ShiftPlanningService {
     }
 
 
-    private List<StaffShiftDetails> getStaffListAfterShiftFilterMatches(List<StaffShiftDetails> staffShiftPersonalDetailsList, List<StaffShiftDetails> shiftData,final Long loggedInUserId,ShiftSearchDTO shiftSearchDTO) {
+    private List<StaffShiftDetails> getStaffListAfterShiftFilterMatches(List<StaffShiftDetails> staffShiftPersonalDetailsList, List<StaffShiftDetails> shiftData,final Long loggedInUserId,ShiftSearchDTO shiftSearchDTO,long shiftFilterCount) {
         boolean staffToAdd = false;
         StaffShiftDetails loggedInStaff = null;
         if (staffShiftPersonalDetailsList.get(0).getUserId().equals(loggedInUserId)) {
@@ -241,7 +241,7 @@ public class ShiftPlanningService {
             loggedInStaff = staffShiftPersonalDetailsList.get(0);
         }
 
-        if (CollectionUtils.isNotEmpty(shiftData)||isCollectionNotEmpty(shiftSearchDTO.getFiltersData())) {
+        if (CollectionUtils.isNotEmpty(shiftData)||(isCollectionNotEmpty(shiftSearchDTO.getFiltersData())&&shiftFilterCount>0)) {
             Set<Long> filteredShiftStaff = shiftData.stream().map(StaffShiftDetails::getId).collect(Collectors.toSet());
             staffShiftPersonalDetailsList = staffShiftPersonalDetailsList.stream().filter(spl -> filteredShiftStaff.contains(spl.getId())).collect(Collectors.toList());
         }
