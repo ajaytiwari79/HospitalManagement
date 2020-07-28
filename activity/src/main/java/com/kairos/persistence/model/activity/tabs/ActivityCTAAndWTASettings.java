@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.activity.tabs;
 
+import com.kairos.annotations.KPermissionField;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,5 +14,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ActivityCTAAndWTASettings {
+    @KPermissionField
     private  boolean eligibleForCostCalculation;
 }
