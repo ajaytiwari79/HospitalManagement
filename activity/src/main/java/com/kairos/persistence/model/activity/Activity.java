@@ -41,6 +41,7 @@ public class Activity extends MongoBaseEntity {
     @KPermissionField
     private String description;
     private Long countryId;
+    @KPermissionField
     private List<Long> expertises;
     private List<Long> organizationTypes;
     private List<Long> organizationSubTypes;
