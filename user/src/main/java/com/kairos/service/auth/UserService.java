@@ -394,6 +394,7 @@ public class UserService {
     public Map<String, AccessPageQueryResult> prepareUnitPermissions(List<AccessPageQueryResult> accessPageQueryResults, boolean parentOrganization) {
         List<AccessPage> accessPagesDetails = accessPageRepository.findAllById(accessPageQueryResults.stream().map(accessPageQueryResult -> accessPageQueryResult.getId()).collect(Collectors.toList()));
         Map<Long,List<Long>> accessPageIdAndChildrenId = accessPagesDetails.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getSubPages().stream().map(accessPage -> accessPage.getId()).collect(Collectors.toList())));
+        Map<Long,AccessPage> accessPageIdAndAccessPageMap = accessPagesDetails.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         Map<String, AccessPageQueryResult> unitPermissionMap = new HashMap<>();
         for (AccessPageQueryResult permission : accessPageQueryResults) {
             if (unitPermissionMap.containsKey(permission.getModuleId()) && parentOrganization) {
@@ -406,9 +407,7 @@ public class UserService {
                 permission.setRead(isAccessPageRead(permission, accessPageQueryResults, accessPageIdAndChildrenId));
                 permission.setWrite(isAccessPageWrite(permission, accessPageQueryResults, accessPageIdAndChildrenId));
                 permission.setActive(permission.isRead() || permission.isWrite());
-                if(isNotNull(permission.getAccessPage())){
-                    permission.setTranslatedNames(permission.getAccessPage().getTranslatedNames());
-                }
+                permission.setTranslatedNames(accessPageIdAndAccessPageMap.get(permission.getId()).getTranslatedNames());
                 unitPermissionMap.put(permission.getModuleId(), permission);
             }
         }
