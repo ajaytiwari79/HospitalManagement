@@ -406,7 +406,9 @@ public class UserService {
                 permission.setRead(isAccessPageRead(permission, accessPageQueryResults, accessPageIdAndChildrenId));
                 permission.setWrite(isAccessPageWrite(permission, accessPageQueryResults, accessPageIdAndChildrenId));
                 permission.setActive(permission.isRead() || permission.isWrite());
-                permission.setTranslatedNames(permission.getAccessPage().getTranslatedNames());
+                if(isNotNull(permission.getAccessPage())){
+                    permission.setTranslatedNames(permission.getAccessPage().getTranslatedNames());
+                }
                 unitPermissionMap.put(permission.getModuleId(), permission);
             }
         }
