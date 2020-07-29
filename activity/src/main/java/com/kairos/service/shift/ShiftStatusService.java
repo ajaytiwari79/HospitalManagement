@@ -224,8 +224,14 @@ public class ShiftStatusService {
 
     private void removeOppositeStatus(Shift shift, ShiftActivity shiftActivity, ShiftStatus shiftStatus,Map<BigInteger, Activity> activityIdAndActivityMap,Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap, String comment) {
         Todo todo = null;
-        if(newHashSet(APPROVE,DISAPPROVE).contains(shiftStatus)){
-            TodoStatus todoStatus = shiftStatus.equals(APPROVE) ? TodoStatus.APPROVE: TodoStatus.DISAPPROVE;
+
+        if(newHashSet(PENDING,APPROVE,DISAPPROVE).contains(shiftStatus)){
+            TodoStatus todoStatus =null;
+            if(shiftStatus.equals(PENDING)){
+                todoStatus =TodoStatus.PENDING;
+            }else {
+                todoStatus = shiftStatus.equals(APPROVE) ? TodoStatus.APPROVE : TodoStatus.DISAPPROVE;
+            }
             todo = todoRepository.findAllByEntityIdAndSubEntityAndTypeAndStatus(shift.getId(), TodoType.APPROVAL_REQUIRED,newHashSet(TodoStatus.PENDING,TodoStatus.VIEWED,TodoStatus.REQUESTED),shiftActivity.getActivityId());
             if(isNotNull(todo)) {
                 todo.setStatus(todoStatus);
@@ -234,6 +240,8 @@ public class ShiftStatusService {
                     todo.setApprovedOn(getDate());
                 }else if(TodoStatus.DISAPPROVE.equals(todo.getStatus())){
                     todo.setDisApproveOn(getDate());
+                }else if(TodoStatus.PENDING.equals(todo.getStatus())){
+                    todo.setPendingOn(getDate());
                 }
                 todoRepository.save(todo);
             }
