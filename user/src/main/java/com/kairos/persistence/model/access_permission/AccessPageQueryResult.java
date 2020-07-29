@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.access_permission;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.enums.OrganizationCategory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,8 +29,15 @@ public class AccessPageQueryResult {
     private String moduleId;
     private Long parentId;
     private int sequence;
+    private Boolean editable;
+    private boolean accessibleForHub;
+    private boolean accessibleForUnion;
+    private boolean accessibleForOrganization;
     private List<AccessPageQueryResult> children = new ArrayList<>();
+    private List<OrganizationCategory> accessibleFor = new ArrayList<>();
+    private boolean hasSubTabs;
     private Map<String,String> translatedNames;
+
     @JsonIgnore
     private AccessPage accessPage;
 
