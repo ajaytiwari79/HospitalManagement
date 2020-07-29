@@ -4,9 +4,9 @@ SET accessPage.editable = true
 RETURN accessPage
 
 MATCH (accessPage:AccessPage) WHERE accessPage.moduleId="tab_413"
-SET accessPage.active=false,accessPage.deleted=true
+SET accessPage.active=true,accessPage.deleted=false,accessPage.name="Unity Graph"
 RETURN accessPage
 
 MATCH (accessPage:AccessPage) WHERE accessPage.moduleId="tab_412"
-SET accessPage.name="Staffing Levels"
+SET accessPage.active=true,accessPage.deleted=false,accessPage.name="Staffing Levels"
 RETURN accessPage

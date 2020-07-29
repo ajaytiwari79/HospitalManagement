@@ -34,7 +34,6 @@ public class AccessPage extends UserBaseEntity {
     private boolean kpiEnabled;
     private String moduleId;
     private boolean active;
-    //this value is "false" only in case of "moduleId" : "module_1"
     private Boolean editable;
 
 
