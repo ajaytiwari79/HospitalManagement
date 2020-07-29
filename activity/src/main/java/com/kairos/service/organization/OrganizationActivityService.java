@@ -818,10 +818,8 @@ public class OrganizationActivityService extends MongoBaseService {
         Set<BigInteger> activityIdsToSet=new HashSet<>();
         Collection<Activity> activities =  activityMongoRepository.findAllById(activityIds);
         activities.forEach(activity -> {
-            if(isCollectionNotEmpty(activity.getChildActivityIds()) || activityMongoRepository.existsByActivityIdInChildActivities(activity.getId())){
                 activityIdsToSet.add(activity.getId());
                 activityIdsToSet.addAll(activity.getChildActivityIds());
-            }
         });
         return activityIdsToSet;
     }
