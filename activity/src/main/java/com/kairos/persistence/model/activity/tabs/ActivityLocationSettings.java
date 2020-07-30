@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.activity.tabs;
 
+import com.kairos.annotations.KPermissionField;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
 import com.kairos.enums.LocationEnum;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ActivityLocationSettings {
+    @KPermissionField
     private Set<ActivityGlideTimeDetails> glideTimeForCheckIn;
+    @KPermissionField
     private Set<ActivityGlideTimeDetails> glideTimeForCheckOut;
 
     public ActivityGlideTimeDetails getCheckInGlideTime(LocationEnum locationEnum){

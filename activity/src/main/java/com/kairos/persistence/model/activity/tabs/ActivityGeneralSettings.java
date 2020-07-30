@@ -35,7 +35,8 @@ public class ActivityGeneralSettings {
     private String backgroundColor;
     @KPermissionField
     private String description;
-    private boolean isActive = true;
+    @KPermissionField
+    private boolean active = true;
     @KPermissionField
     private String shortName;
     private boolean eligibleForUse = true;
