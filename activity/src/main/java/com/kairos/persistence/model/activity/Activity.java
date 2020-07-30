@@ -81,6 +81,7 @@ public class Activity extends MongoBaseEntity {
     private ActivityOptaPlannerSetting activityOptaPlannerSetting;
     @KPermissionSubModel
     private ActivityCTAAndWTASettings activityCTAAndWTASettings;
+    @KPermissionSubModel
     private ActivityLocationSettings activityLocationSettings;
     private BigInteger countryParentId;
     @JsonIgnore
