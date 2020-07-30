@@ -223,7 +223,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (module:AccessPage)<-[modulePermission:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(accessGroup) WITH module,modulePermission,unitPermission,accessGroup\n" +
             "OPTIONAL MATCH (unitPermission)-[moduleCustomRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(module) WHERE moduleCustomRel.accessGroupId=id(accessGroup) \n" +
             "WITH module,modulePermission,unitPermission,moduleCustomRel,accessGroup\n" +
-            "RETURN module.name as name,id(module) as id,module.moduleId as moduleId,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.read ELSE moduleCustomRel.read END as read,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.write ELSE moduleCustomRel.write END as write,module.isModule as module,module.sequence as sequence,module as accessPage")
+            "RETURN module.name as name,id(module) as id,module.moduleId as moduleId,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.read ELSE moduleCustomRel.read END as read,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.write ELSE moduleCustomRel.write END as write,module.isModule as module,module.sequence as sequence")
     List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId, List<Long> accessGroupIds);
 
     @Query("MATCH (u:User) WHERE id(u)={0} \n" +
