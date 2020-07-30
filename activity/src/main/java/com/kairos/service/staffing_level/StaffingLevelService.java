@@ -1001,7 +1001,7 @@ public class StaffingLevelService  {
             return ObjectMapperUtils.copyPropertiesByMapper(staffingLevels.get(0), PresenceStaffingLevelDto.class);
         }
 
-    public void validateStaffingLevel(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, Shift oldStateShift) {
+    public boolean validateStaffingLevel(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, Shift oldStateShift) {
         ShiftType oldStateShiftType = oldStateShift.getShiftType();
         ShiftType shiftType = shift.getShiftType();
         boolean activityReplaced = activityReplaced(oldStateShift, shift);
@@ -1052,6 +1052,7 @@ public class StaffingLevelService  {
                 }
             }
         }
+        return activityReplaced;
     }
 
     private boolean activityReplaced(Shift dbShift, Shift shift) {
