@@ -1026,20 +1026,17 @@ public class StaffingLevelService  {
                         String staffingLevelState = null;
                         if (UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld()) && OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
                             exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, OVERSTAFFING);
-                        }
-                        if (BALANCED.equals(staffingLevelHelper.getStaffingLevelForNew()) && UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld())) {
+                        } else if (UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld())) {
                             if (!(rankOfNew < rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
                                 allowedForReplace = false;
                                 staffingLevelState = UNDERSTAFFING;
                             }
-                        }
-                        if (BALANCED.equals(staffingLevelHelper.getStaffingLevelForOld()) && OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
+                        } else if (OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
                             if (!(rankOfNew < rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
                                 allowedForReplace = false;
                                 staffingLevelState = OVERSTAFFING;
                             }
                         }
-
                         if (!allowedForReplace) {
                             exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, staffingLevelState);
                         }
