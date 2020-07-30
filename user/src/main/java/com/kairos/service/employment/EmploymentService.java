@@ -386,8 +386,6 @@ public class EmploymentService {
     }
 
     private PositionQueryResult updateEmploymentData(long employmentId, EmploymentDTO employmentDTO, Long unitId, Employment oldEmployment, EmploymentQueryResult employmentQueryResult,CTAWTAAndAccumulatedTimebankWrapper existingCtaWtaAndAccumulatedTimebankWrapper) throws Exception {
-        employmentQueryResult.getEmploymentLines().get(0).setWorkingTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getWta().get(0));
-        employmentQueryResult.getEmploymentLines().get(0).setCostTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getCta().get(0));
         Organization organization = organizationService.fetchParentOrganization(unitId);
         initialTimeBankLogService.saveInitialTimeBankLog(oldEmployment.getId(), oldEmployment.getAccumulatedTimebankMinutes());
         Position position = positionService.updatePositionEndDate(organization, employmentDTO.getStaffId(),
@@ -459,12 +457,12 @@ public class EmploymentService {
         if (changeResultDTO.getWtaId() != null) {
             employmentQueryResult.getEmploymentLines().get(0).setWorkingTimeAgreement(newCTAWTAAndAccumulatedTimebankWrapper.getWta().get(0));
         } else {
-            employmentQueryResult.getEmploymentLines().get(0).setWorkingTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getWta().get(0));
+            employmentQueryResult.getEmploymentLines().get(0).setWorkingTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getWta().get(existingCtaWtaAndAccumulatedTimebankWrapper.getWta().size()-1));
         }
         if (changeResultDTO.getCtaId() != null) {
             employmentQueryResult.getEmploymentLines().get(0).setCostTimeAgreement(newCTAWTAAndAccumulatedTimebankWrapper.getCta().get(0));
         } else {
-            employmentQueryResult.getEmploymentLines().get(0).setCostTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getCta().get(0));
+            employmentQueryResult.getEmploymentLines().get(0).setCostTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getCta().get(existingCtaWtaAndAccumulatedTimebankWrapper.getCta().size()-1));
         }
         if (newCTAWTAAndAccumulatedTimebankWrapper != null && isCollectionNotEmpty(newCTAWTAAndAccumulatedTimebankWrapper.getCta())) {
             updateTimeBank(newCTAWTAAndAccumulatedTimebankWrapper.getCta().get(0).getId(), employmentId, employmentQueryResult.getEmploymentLines().get(0).getStartDate(), employmentQueryResult.getEmploymentLines().get(0).getEndDate(), unitId);
@@ -624,7 +622,7 @@ public class EmploymentService {
 
     private Map<String, Object> setEmploymentTypeDetails(EmploymentType employmentType, EmploymentDTO employmentDTO, EmploymentLineEmploymentTypeRelationShip relationShip) {
         Map<String, Object> employmentTypes = new HashMap();
-        employmentTypes.put("name", relationShip.getEmploymentType().getName());
+        employmentTypes.put("name", employmentType.getName());
         employmentTypes.put("id", employmentDTO.getEmploymentTypeId());
         employmentTypes.put("employmentTypeCategory", employmentDTO.getEmploymentTypeCategory());
         employmentTypes.put("editableAtEmployment", employmentType.isEditableAtEmployment());
