@@ -10,3 +10,8 @@ RETURN accessPage
 MATCH (accessPage:AccessPage) WHERE accessPage.moduleId="tab_412"
 SET accessPage.active=true,accessPage.deleted=false,accessPage.name="Staffing Levels"
 RETURN accessPage
+
+//set english name
+MATCH(accessPage:AccessPage)
+SET accessPage.`translatedNames.english` = accessPage.name
+
