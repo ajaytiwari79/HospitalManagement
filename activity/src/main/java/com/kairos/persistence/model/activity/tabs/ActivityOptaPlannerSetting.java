@@ -2,6 +2,7 @@ package com.kairos.persistence.model.activity.tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.KPermissionField;
 import com.kairos.commons.planning_setting.ConstraintSetting;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,13 +19,21 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @AllArgsConstructor
 public class ActivityOptaPlannerSetting {
 
+    @KPermissionField
     private int maxThisActivityPerShift;
+    @KPermissionField
     private int minLength;
+    @KPermissionField
     private boolean eligibleForMove;
+    @KPermissionField
     private ConstraintSetting maxThisActivityPerShiftConstraint;
+    @KPermissionField
     private ConstraintSetting activityCanHappenOnDaysConstraint;
+    @KPermissionField
     private ConstraintSetting minimumLengthOfActivityConstraint;
+    @KPermissionField
     private ConstraintSetting shortestDurationConstraint;
+    @KPermissionField
     private ConstraintSetting longestDurationConstraint;
 
     public ActivityOptaPlannerSetting(int maxThisActivityPerShift, int minLength, boolean eligibleForMove) {
