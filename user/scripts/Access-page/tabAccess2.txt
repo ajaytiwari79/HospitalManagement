@@ -354,6 +354,8 @@ Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(acces
 
 Match(ap:AccessPage) where ap.moduleId="tab_310" set ap.name="Activity Configuration" return ap;
 
+Match(ap:AccessPage) where ap.moduleId="tab_82" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Open Shift Interval",isModule:false,moduleId:"tab_446",active:true,`translatedNames.english`:"Open Shift Interval"});
+
 
 
 

@@ -15,3 +15,6 @@ RETURN accessPage
 MATCH(accessPage:AccessPage)
 SET accessPage.`translatedNames.english` = accessPage.name
 
+//new tab
+Match(ap:AccessPage) where ap.moduleId="tab_82" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Open Shift Interval",isModule:false,moduleId:"tab_446",active:true,`translatedNames.english`:"Open Shift Interval"});
+
