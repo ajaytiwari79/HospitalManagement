@@ -311,6 +311,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_PAYGROUP_DATERANGE_OVERLAPOLD = "message.paygroup.daterange.overlapold";
     public static final String MESSAGE_PAYGROUP_LEVEL_NOTFOUND = "message.paygroup.level.notfound";
     public static final String MESSAGE_PAYGROUPAREA_EXISTS = "message.payGroupArea.exists";
+    public static final String MESSAGE_PAYGROUPAREA_GAP_NOT_CREATE = "message.payGroupArea.gap.not.create";
     public static final String MESSAGE_PAYTABLE_LEVEL_NOTFOUND = "message.paytable.level.notfound";
     public static final String MESSAGE_PAYTABLE_NAME_ALREADYEXIST = "message.payTable.name.alreadyExist";
     public static final String MESSAGE_STARTDATE_ALLOWED = "message.startdate.allowed";
