@@ -19,6 +19,7 @@ import com.kairos.enums.LocationEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.PQLSettings;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -234,8 +235,7 @@ public class ActivityUtil {
     public  static void initializeActivitySettings(Activity activity, List<PhaseTemplateValue> phaseTemplateValues, GlideTimeSettingsDTO glideTimeSettingsDTO){
 
         ActivityRulesSettings activityRulesSettings = new ActivityRulesSettings();
-        PQLSettings pqlSettings=new PQLSettings();
-        activityRulesSettings.setPqlSettings(pqlSettings);
+        activityRulesSettings.setPqlSettings(new PQLSettings());
         activityRulesSettings.setCutOffBalances(CutOffIntervalUnit.CutOffBalances.EXPIRE);
         activity.setActivityRulesSettings(activityRulesSettings);
 
