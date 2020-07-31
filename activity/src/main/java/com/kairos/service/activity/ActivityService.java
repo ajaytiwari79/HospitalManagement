@@ -430,6 +430,7 @@ public class ActivityService {
         ActivityWithCompositeDTO activity = getCompositeShiftTabOfActivity(activityId);
         List<ActivityTagDTO> activityTagDTO = activityMongoRepository.findAllowChildActivityByUnitIdAndDeleted(unitId, false);
         activity.setAvailableChildActivityIds(checkActivityAllowForChildActivities(activityTagDTO, activity));
+        activity.getAvailableChildActivityIds().removeAll(activity.getChildActivityIds());
         return activity;
     }
     public ActivityWithCompositeDTO getCompositeShiftTabOfActivity(BigInteger activityId) {
