@@ -114,7 +114,6 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query("MATCH(employmentLine:EmploymentLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)  where id(employmentLine)={0} return employmentLine,employmentRel,employmentType")
     EmploymentLineEmploymentTypeRelationShip findEmploymentTypeByEmploymentId(Long employmentId);
 
-
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment{deleted:false}) where id(staff)={0} AND ( employment.endDate IS NULL OR DATE(employment.endDate) > DATE({1}))  return employment")
     List<Employment> getEmploymentsFromEmploymentEndDate(Long staffId, String endDate);
 
