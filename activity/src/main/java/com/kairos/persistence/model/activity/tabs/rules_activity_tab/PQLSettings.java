@@ -1,19 +1,28 @@
-package com.kairos.dto.activity.activity.activity_tabs;
+package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 /*
  *Created By Pavan on 4/9/18
  *Used for Planning Quality level of planner
  */
 
+import com.kairos.annotations.KPermissionField;
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.activity.activity.activity_tabs.ApprovalCriteria;
 import com.kairos.dto.activity.open_shift.DurationField;
 
 import java.util.Optional;
+
 public class PQLSettings {
+    @KPermissionField
     private DurationField approvalTimeInAdvance; // TODO need to rename
+    @KPermissionField
     private Float approvalPercentageWithoutMovement;
+    @KPermissionField
     private ApprovalCriteria approvalWithMovement;
+    @KPermissionField
     private ApprovalCriteria appreciable; // Planning is very good
+    @KPermissionField
     private ApprovalCriteria acceptable;  // Planning is fine
+    @KPermissionField
     private ApprovalCriteria critical;    // Planning is not good/critical
 
     public PQLSettings() {

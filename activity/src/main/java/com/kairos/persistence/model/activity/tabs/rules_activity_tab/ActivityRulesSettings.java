@@ -1,9 +1,9 @@
 package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 
 import com.kairos.annotations.KPermissionField;
+import com.kairos.annotations.KPermissionSubModel;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
-import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import lombok.Getter;
 import lombok.Setter;
@@ -68,6 +68,7 @@ public class ActivityRulesSettings {
     private boolean allowedAutoAbsence;
     private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --   -128 to 127
     private byte recurrenceTimes;// -- the  shift of that staff will be entered.     -128 to 127
+    @KPermissionSubModel
     private PQLSettings pqlSettings=new PQLSettings();
     @KPermissionField
     private ReasonCodeRequiredState reasonCodeRequiredState;
