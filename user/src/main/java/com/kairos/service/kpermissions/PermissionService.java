@@ -580,10 +580,10 @@ public class PermissionService {
     public <T> FieldPermissionUserData fetchPermissions(Set<String> modelNames, Long unitId){
         List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
         boolean hubMember = UserContext.getUserDetails().isHubMember();
-        List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember,null);
-        List<ModelDTO> modelDTOS = copyCollectionPropertiesByMapper(modelPermissionQueryResults,ModelDTO.class);
         Organization parentOrganisation=organizationService.fetchParentOrganization(unitId);
         Long currentUserStaffId = staffService.getStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganisation.getId());
+        List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember,currentUserStaffId);
+        List<ModelDTO> modelDTOS = copyCollectionPropertiesByMapper(modelPermissionQueryResults,ModelDTO.class);
         return new FieldPermissionUserData(modelDTOS,currentUserStaffId);
     }
 
