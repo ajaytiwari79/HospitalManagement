@@ -98,9 +98,9 @@ public class PermissionService {
 
     public List<ModelDTO> createPermissionSchema(List<ModelDTO> modelDTOS){
         LOGGER.info("creating model permission");
-        Map<String,KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll(2).spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k->k.getModelName().toLowerCase(),v->v));
+        Map<String,KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll(3).spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k->k.getModelName().toLowerCase(),v->v));
         List<KPermissionModel> kPermissionModels = buildPermissionModelData(modelDTOS, modelNameAndModelMap, false);
-        permissionModelRepository.save(kPermissionModels,2);
+        permissionModelRepository.save(kPermissionModels,3);
         return modelDTOS;
     }
 
