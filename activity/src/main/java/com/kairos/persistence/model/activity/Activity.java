@@ -63,6 +63,7 @@ public class Activity extends MongoBaseEntity {
     private ActivityBalanceSettings activityBalanceSettings;
     @KPermissionSubModel
     private ActivityIndividualPointsSettings activityIndividualPointsSettings;
+    @KPermissionField
     private Set<BigInteger> childActivityIds=new HashSet<>();
     @KPermissionSubModel
     private ActivityNotesSettings activityNotesSettings;
