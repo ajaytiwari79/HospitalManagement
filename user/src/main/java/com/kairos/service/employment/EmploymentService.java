@@ -196,6 +196,11 @@ public class EmploymentService {
                 exceptionService.actionNotPermittedException(MESSAGE_STAFF_DATA_EMPLOYMENTDATE_LESSTHAN);
             }
         }
+        if(position.getEndDateMillis() !=null){
+            if (employmentDTO.getStartDate().isAfter(DateUtils.getDateFromEpoch(position.getEndDateMillis()))) {
+                exceptionService.actionNotPermittedException(MESSAGE_STAFF_DATA_EMPLOYMENTDATE_GREATERTHAN);
+            }
+        }
         EmploymentType employmentType = unitGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(parentUnit.getId(), employmentDTO.getEmploymentTypeId(), false);
         if (!Optional.ofNullable(employmentType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_POSITION_EMPLOYMENTTYPE_NOTEXIST, employmentDTO.getEmploymentTypeId());
@@ -371,8 +376,8 @@ public class EmploymentService {
             }
             setEndDateToEmployment(oldEmployment, employmentDTO);
             oldEmployment.setLastWorkingDate(employmentDTO.getLastWorkingDate());
-            employmentGraphRepository.save(oldEmployment);
             employmentQueryResult = getBasicDetails(employmentType, employmentDTO, oldEmployment, employmentLineEmploymentTypeRelationShip, unit.getId(), null, currentEmploymentLine);
+            employmentGraphRepository.save(oldEmployment);
         }
         PositionQueryResult positionQueryResult = updateEmploymentData(employmentId, employmentDTO, unitId, oldEmployment, employmentQueryResult,existingCtaWtaAndAccumulatedTimebankWrapper);
         return new PositionWrapper(employmentQueryResult, positionQueryResult);
@@ -603,6 +608,11 @@ public class EmploymentService {
         EmploymentLinesQueryResult employmentLinesQueryResult = new EmploymentLinesQueryResult(employmentLine.getId(), employmentLine.getStartDate(), employmentLine.getEndDate()
                 , employmentLine.getWorkingDaysInWeek(), employmentLine.getTotalWeeklyMinutes() / 60, employmentLine.getAvgDailyWorkingHours(), employmentLine.getFullTimeWeeklyMinutes(), 0D,
                 employmentLine.getTotalWeeklyMinutes() % 60, employmentLine.getHourlyCost(), employmentTypes, seniorityLevel, employment.getId(), employment.getAccumulatedTimebankMinutes());
+        Expertise expertise =expertiseGraphRepository.findOne(employmentDTO.getExpertiseId());
+        if(!employment.getExpertise().getId().equals(expertise.getId())) {
+           expertiseGraphRepository.updateExpertiseByExpertiseIdAndEmploymentId(employmentDTO.getExpertiseId(),employment.getId());
+           employment.setExpertise(expertise);
+        }
         ExpertiseDTO expertiseDTO = ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), ExpertiseDTO.class);
         ExpertiseLine expertiseLine = expertiseGraphRepository.getCurrentlyActiveExpertiseLineByDate(expertiseDTO.getId(), employment.getStartDate().toString());
         expertiseDTO.setNumberOfWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());

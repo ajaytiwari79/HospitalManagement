@@ -161,4 +161,9 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {0}\n" +
             "RETURN id(expertise) ")
     List<Long> getExpertiseIdsByServices(Set<Long> organizationServicesIds);
+
+    @Query("Match(expertise:Expertise) where id(expertise)={0}\n" +
+            "Match(employment:Employment)-[r:HAS_EXPERTISE_IN]-(et:Expertise) where id(employment)={1} Detach delete r\n" +
+            "CREATE UNIQUE(employment)-[r1:HAS_EXPERTISE_IN]->(expertise)")
+    void updateExpertiseByExpertiseIdAndEmploymentId(Long expertiseId,Long employmentId);
  }

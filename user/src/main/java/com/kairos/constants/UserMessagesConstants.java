@@ -371,6 +371,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_DATE_SOMETHINGWRONG = "message.date.somethingwrong";
     public static final String MESSAGE_CITIZEN_STAFF_ALREADYEXIST = "message.citizen.staff.alreadyexist";
     public static final String MESSAGE_STAFF_DATA_EMPLOYMENTDATE_LESSTHAN = "message.staff.data.employmentdate.lessthan";
+    public static final String MESSAGE_STAFF_DATA_EMPLOYMENTDATE_GREATERTHAN = "message.staff.data.employmentdate.greaterthan";
     public static final String MESSAGE_POSITION_EMPLOYMENTTYPE_NOTEXIST = "message.position.employmenttype.notexist";
     public static final String MESSAGE_WTA_ID = "message.wta.id";
     public static final String MESSAGE_CTA_ID = "message.cta.id";
