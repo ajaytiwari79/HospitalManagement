@@ -54,7 +54,9 @@ public class ShiftPlanningController {
         Long loggedInUserId = currentUserDetails.getId();
         searchDTO.setLoggedInUserId(loggedInUserId);
         Map staffData = new HashMap();
-        staffData.put("staffList",shiftPlanningService.getFilteredStaffForMatchingFilter(unitId, searchDTO));
+        List<StaffShiftDetails> staffShiftDetails =shiftPlanningService.getFilteredStaffForMatchingFilter(unitId, searchDTO);
+        staffData.put("staffList",staffShiftDetails);
+        staffData.put("employmentTypes",shiftPlanningService.getEmploymentTypes(unitId));
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffData);
     }
 

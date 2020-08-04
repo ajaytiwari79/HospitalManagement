@@ -136,4 +136,10 @@ public class CountryEmploymentTypeController {
     public ResponseEntity<Map<String, Object>> getKpiAllDefaultData(@RequestBody StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getKpiAllDefaultData(staffEmploymentTypeDTO));
     }
+    @RequestMapping(value = UNIT_URL+"/employment_types", method = RequestMethod.GET)
+    @ApiOperation("Get all employment type of the unit")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getEmploymentTypes(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getEmploymentTypes(unitId));
+    }
 }
