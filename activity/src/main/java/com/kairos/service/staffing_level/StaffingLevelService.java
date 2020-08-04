@@ -1022,37 +1022,35 @@ public class StaffingLevelService  {
                         int rankOfNew = activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
                         long durationMinutesOfOld = oldStateShift.getActivities().get(i).getInterval().getMinutes();
                         long durationMinutesOfNew = shift.getActivities().get(i).getInterval().getMinutes();
-                        boolean allowedForReplace = true;
-                        String staffingLevelState = null;
-                        if (UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld()) && OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
-                            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, OVERSTAFFING);
-                        } else if (UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld())) {
-                            if (!(rankOfNew < rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
-                                allowedForReplace = false;
-                                staffingLevelState = UNDERSTAFFING;
-                            }
-                        } else if (OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
-                            if (!(rankOfNew < rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
-                                allowedForReplace = false;
-                                staffingLevelState = OVERSTAFFING;
-                            }
-                        }
-                        if (!allowedForReplace) {
-                            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, staffingLevelState);
-                        }
+                        validateRankOfActivity(staffingLevelHelper, rankOfOld, rankOfNew, durationMinutesOfOld, durationMinutesOfNew);
                     }
-                    //else {
-//                        shift.setShiftType(oldStateShiftType);
-//                        shiftValidatorService.validateStaffingLevel(phase, oldStateShift, activityWrapperMap, false, oldStateShift.getActivities().get(i), ruleTemplateSpecificInfo,new StaffingLevelHelper());
-//                        shift.setShiftType(shiftType);
-//                        shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shift.getActivities().get(i), ruleTemplateSpecificInfo,new StaffingLevelHelper());
-//                    }
                 } catch (IndexOutOfBoundsException e) {
                     //Intentionally left blank
                 }
             }
         }
         return activityReplaced;
+    }
+
+    private void validateRankOfActivity(final StaffingLevelHelper staffingLevelHelper, final int rankOfOld, final int rankOfNew, final long durationMinutesOfOld, final long durationMinutesOfNew) {
+        boolean allowedForReplace = true;
+        String shiftNotMoveCauses = null;
+        if (UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld()) && OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
+            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, OVERSTAFFING);
+        }
+        if(rankOfNew > rankOfOld){
+            allowedForReplace = false;
+            shiftNotMoveCauses = LOW_ACTIVITY_RANK;
+        } else if(OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
+            allowedForReplace = false;
+            shiftNotMoveCauses = OVERSTAFFING;
+        } else if(rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld && UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld())){
+            allowedForReplace = false;
+            shiftNotMoveCauses = UNDERSTAFFING;
+        }
+        if (!allowedForReplace) {
+            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, shiftNotMoveCauses);
+        }
     }
 
     private boolean activityReplaced(Shift dbShift, Shift shift) {
