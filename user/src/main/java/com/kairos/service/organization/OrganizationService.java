@@ -34,6 +34,7 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.*;
@@ -676,6 +677,8 @@ public class OrganizationService {
         organizationMappingDTO.setExpertise(ObjectMapperUtils.copyCollectionPropertiesByMapper(staffRetrievalService.getExpertisesOfUnitByCountryId(countryId, unitId), Expertise.class));
         return organizationMappingDTO;
     }
+
+
 
     public WTABasicDetailsDTO getWTARelatedInfo(Long countryId, Long organizationId, Long organizationSubTypeId, Long expertiseId, List<Long> unitIds) {
         WTABasicDetailsDTO wtaBasicDetailsDTO = new WTABasicDetailsDTO();
