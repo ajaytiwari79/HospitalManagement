@@ -1012,9 +1012,9 @@ public class StaffingLevelService  {
                 try {
                     if (activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor().equals(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor())) {
                         shift.setShiftType(oldStateShiftType);
-                        shiftValidatorService.validateStaffingLevel(phase, oldStateShift, activityWrapperMap, false, oldStateShift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper);
+                        boolean isOldShiftVerifyStaffingLevel = shiftValidatorService.validateStaffingLevel(phase, oldStateShift, activityWrapperMap, false, oldStateShift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper);
                         shift.setShiftType(shiftType);
-                        shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper);
+                        boolean isNewShiftVerifyStaffingLevel = shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper);
                         if (isNull(activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority()) || isNull(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority())) {
                             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
                         }
@@ -1022,7 +1022,9 @@ public class StaffingLevelService  {
                         int rankOfNew = activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
                         long durationMinutesOfOld = oldStateShift.getActivities().get(i).getInterval().getMinutes();
                         long durationMinutesOfNew = shift.getActivities().get(i).getInterval().getMinutes();
-                        validateRankOfActivity(staffingLevelHelper, rankOfOld, rankOfNew, durationMinutesOfOld, durationMinutesOfNew);
+                        if(isNewShiftVerifyStaffingLevel || isOldShiftVerifyStaffingLevel){
+                            validateRankOfActivity(staffingLevelHelper, rankOfOld, rankOfNew, durationMinutesOfOld, durationMinutesOfNew);
+                        }
                     }
                 } catch (IndexOutOfBoundsException e) {
                     //Intentionally left blank
