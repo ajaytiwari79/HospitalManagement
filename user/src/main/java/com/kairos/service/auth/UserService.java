@@ -222,6 +222,7 @@ public class UserService {
         map.put("email", currentUser.getEmail());
         map.put("userNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
+        map.put("userName", currentUser.getUserName());
         return map;
     }
 
@@ -381,11 +382,15 @@ public class UserService {
         if (user == null) {
             LOGGER.error("User not found belongs to this email {}" , firstTimePasswordUpdateDTO.getEmail());
             exceptionService.dataNotFoundByIdException(MESSAGE_USER_EMAIL_NOTFOUND, firstTimePasswordUpdateDTO.getEmail());
-
+        }
+        if(userGraphRepository.existByUserName("(?i)" + firstTimePasswordUpdateDTO.getUserName(),"(?i)" + firstTimePasswordUpdateDTO.getEmail())){
+            exceptionService.actionNotPermittedException(MESSAGE_USER_USERNAME_ALREADY_USE);
         }
         CharSequence password = CharBuffer.wrap(firstTimePasswordUpdateDTO.getRepeatPassword());
         user.setPassword(new BCryptPasswordEncoder().encode(password));
         user.setPasswordUpdated(true);
+        user.setUserName(firstTimePasswordUpdateDTO.getUserName());
+        user.setUserNameUpdated(true);
         userGraphRepository.save(user);
         return true;
     }

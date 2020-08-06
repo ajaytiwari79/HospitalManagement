@@ -163,13 +163,14 @@ public class UserMessagesConstants {
     public static final String MESSAGE_CATEGORY_NOTEXIST = "message.category.notExist";
     public static final String MESSAGE_COUNTRY_ID_NOTEXIST = "message.country.id.notExist";
     public static final String MESSAGE_USER_USERNAME_NOTFOUND = "message.user.userName.notFound";
+    public static final String ERROR_USERNAME_BLANK = "error.userName.notnull";
     public static final String MESSAGE_USER_MOBILENUMBER_NOTFOUND = "message.user.mobileNumber.notFound";
     public static final String MESSAGE_ORGANISATION_NOTFOUND = "message.organisation.notFound";
     public static final String MESSAGE_USER_EMAIL_NOTFOUND = "message.user.email.notFound";
     public static final String MESSAGE_USER_TOKEN_NOTFOUND = "message.user.token.notFound";
     public static final String MESSAGE_USER_TOKEN_EXPIRED = "message.user.token.expired";
     public static final String MESSAGE_USER_MAIL_INVALID = "message.user.mail.invalid";
-    public static final String MESSAGE_USER_USERNAME_ALREADY_USE  = "message.user.userName.already.use ";
+    public static final String MESSAGE_USER_USERNAME_ALREADY_USE  = "message.user.userName.already.use";
     public static final String MESSAGE_USER_USERNAME_OR_EMAIL_NOTFOUND  = "message.user.userName.or.email.notFound ";
     public static final String ERROR_ACCESSTOLOCATION_NULL = "error.accessToLocation.null";
     public static final String ERROR_XSSFSHEET_NOMOREROW = "error.xssfsheet.noMoreRow";
