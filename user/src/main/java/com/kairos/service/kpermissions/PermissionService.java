@@ -319,10 +319,6 @@ public class PermissionService {
         return modelPermissionQueryResults;
     }
 
-    private boolean isValidOrganizationCategory(OrganizationCategory organizationCategory, boolean hubMember, Set<OrganizationCategory> organizationCategories) {
-        return hubMember ? hubMember : organizationCategories.contains(organizationCategory);
-    }
-
     private List<FieldPermissionQueryResult> getFieldLevelPermissionQueryResult(Map<Long,FieldPermissionQueryResult> fieldLevelPermissionMap,List<KPermissionField> fields,boolean hubMember){
         List<FieldPermissionQueryResult> fieldPermissionQueryResults = new ArrayList<>();
         for (KPermissionField field : fields) {
