@@ -22,7 +22,7 @@ public class StaffingLevelGraphConfigurationService {
 
     public StaffingLevelGraphConfigurationDTO updateOrCreateStaffingLevelConfiguration(Long unitId,Long userId,StaffingLevelGraphConfigurationDTO staffingLevelGraphConfigurationDTO){
         StaffingLevelGraphConfiguration staffingLevelGraphConfiguration = Optional.ofNullable(staffingLevelGraphConfigurationMongoRepository.findOneByUnitIdAndUserId(unitId,userId)).orElse(getDefaultConfiguration(unitId,userId));
-        if(isNull(staffingLevelGraphConfigurationDTO.getDailyGraphConfiguration())){
+        if(isNotNull(staffingLevelGraphConfigurationDTO.getDailyGraphConfiguration())){
             staffingLevelGraphConfiguration.setDailyGraphConfiguration(staffingLevelGraphConfigurationDTO.getDailyGraphConfiguration());
         }if (isNotNull(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration())){
             staffingLevelGraphConfiguration.setWeeklyGraphConfiguration(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration());
