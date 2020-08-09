@@ -136,7 +136,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
     Boolean teamExistInOrganizationByName(Long organizationId, Long teamId, String teamName);
 
-    @Query("MATCH(staff:Staff)-[:TEAM_HAS_MEMBER]-(team:Team) WHERE id(staff)={0} \n" +
+    @Query("MATCH(staff:Staff)-[:TEAM_HAS_MEMBER]-(team:Team{isEnabled:true}) WHERE id(staff)={0} \n" +
             "WITH team.activityIds AS activityIds\n" +
             "UNWIND activityIds AS activities\n" +
             "RETURN DISTINCT activities")

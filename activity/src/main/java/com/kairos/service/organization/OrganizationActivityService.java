@@ -618,6 +618,8 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId, Long staffId, List<ActivityWithCompositeDTO> staffPersonalizedActivities) {
         Set<BigInteger> activityList = userIntegrationService.getTeamActivitiesOfStaff(unitId, staffId);
+//        List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityList);
+//        Set<BigInteger> activityIds = activities.stream().filter(activity -> isCollectionNotEmpty(activity.getChildActivityIds())).map(activity -> activity.getId()).collect(Collectors.toSet());
         activityList.addAll(staffPersonalizedActivities.stream().map(ActivityWithCompositeDTO::getActivityId).collect(Collectors.toSet()));
         return activityMongoRepository.findAllActivityWithCompositeDTOByIds(activityList);
     }
