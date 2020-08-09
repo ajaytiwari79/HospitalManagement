@@ -279,9 +279,9 @@ public class EmploymentService {
     }
 
 
-    private EmploymentLineChangeResultDTO calculativeValueChanged(EmploymentDTO employmentDTO, EmploymentLineEmploymentTypeRelationShip oldEmploymentLineEmploymentTypeRelationShip, EmploymentLine employmentLine, CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper, List<NameValuePair> changedParams) {
+    private EmploymentLineChangeResultDTO calculativeValueChanged(EmploymentDTO employmentDTO, EmploymentLineEmploymentTypeRelationShip oldEmploymentLineEmploymentTypeRelationShip, EmploymentLine employmentLine, CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper, List<NameValuePair> changedParams,Boolean saveAsDraft) {
         EmploymentLineChangeResultDTO changeResultDTO = new EmploymentLineChangeResultDTO(false);
-        setCTAAndWTADetails(employmentDTO, ctawtaAndAccumulatedTimebankWrapper, changedParams, changeResultDTO);
+        setCTAAndWTADetails(employmentDTO, ctawtaAndAccumulatedTimebankWrapper, changedParams, changeResultDTO,saveAsDraft);
         checkWorkingHoursIfChnaged(employmentDTO, employmentLine, changeResultDTO);
         checkEmploymentTypeIfChanged(employmentDTO, oldEmploymentLineEmploymentTypeRelationShip, changeResultDTO);
         List<FunctionWithAmountQueryResult> newAppliedFunctions = employmentDetailsValidatorService.findAndValidateFunction(employmentDTO);
@@ -323,8 +323,8 @@ public class EmploymentService {
         }
     }
 
-    private void setCTAAndWTADetails(EmploymentDTO employmentDTO, CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper, List<NameValuePair> changedParams, EmploymentLineChangeResultDTO changeResultDTO) {
-        if (!ctawtaAndAccumulatedTimebankWrapper.getCtaIds().contains(employmentDTO.getCtaId())) {
+    private void setCTAAndWTADetails(EmploymentDTO employmentDTO, CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper, List<NameValuePair> changedParams, EmploymentLineChangeResultDTO changeResultDTO,Boolean saveAsDraft) {
+        if (!ctawtaAndAccumulatedTimebankWrapper.getCtaIds().contains(employmentDTO.getCtaId()) ||saveAsDraft ) {
             // CTA is changed
             changeResultDTO.setCtaId(employmentDTO.getCtaId());
             changeResultDTO.setOldctaId(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId());
@@ -332,7 +332,7 @@ public class EmploymentService {
             changedParams.add(new BasicNameValuePair("oldctaId", ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId() + ""));
             changeResultDTO.setCalculativeChanged(true);
         }
-        if (!ctawtaAndAccumulatedTimebankWrapper.getWtaIds().contains(employmentDTO.getWtaId())) {
+        if (!ctawtaAndAccumulatedTimebankWrapper.getWtaIds().contains(employmentDTO.getWtaId())|| saveAsDraft) {
             // wta is changed
             changeResultDTO.setWtaId(employmentDTO.getWtaId());
             changeResultDTO.setOldwtaId(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId());
@@ -364,7 +364,7 @@ public class EmploymentService {
         EmploymentQueryResult employmentQueryResult;
         List<NameValuePair> changedParams = new ArrayList<>();
         setDataInExistingEmployment(employmentDTO, saveAsDraft, oldEmployment);
-        EmploymentLineChangeResultDTO changeResultDTO = calculativeValueChanged(employmentDTO, employmentLineEmploymentTypeRelationShip, currentEmploymentLine, existingCtaWtaAndAccumulatedTimebankWrapper, changedParams);
+        EmploymentLineChangeResultDTO changeResultDTO = calculativeValueChanged(employmentDTO, employmentLineEmploymentTypeRelationShip, currentEmploymentLine, existingCtaWtaAndAccumulatedTimebankWrapper, changedParams,saveAsDraft);
         if (changeResultDTO.isCalculativeChanged()) {
             employmentQueryResult = getEmploymentQueryResult(employmentId, employmentDTO, unitId, unit, oldEmployment, currentEmploymentLine, existingCtaWtaAndAccumulatedTimebankWrapper, employmentType, employmentLineEmploymentTypeRelationShip, changedParams, changeResultDTO);
         }
