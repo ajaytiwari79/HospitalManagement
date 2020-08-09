@@ -31,7 +31,6 @@ public class ActivityGeneralSettings {
     private BigInteger categoryId;
     @KPermissionField
     private Boolean colorPresent;
-    @KPermissionField
     private String backgroundColor;
     @KPermissionField
     private String description;
