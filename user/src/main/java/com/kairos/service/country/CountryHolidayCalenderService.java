@@ -63,9 +63,6 @@ public class CountryHolidayCalenderService {
         DayType dayType = dayTypeGraphRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
         if (calender!=null){
             if (dayType!=null){
-                if (dayType.isHolidayType() && isNotNull(countryHolidayCalenderDTO.getStartTime()) && isNotNull(countryHolidayCalenderDTO.getEndTime()) && !LocalTime.MIN.equals(countryHolidayCalenderDTO.getEndTime()) && countryHolidayCalenderDTO.getEndTime().isBefore(countryHolidayCalenderDTO.getStartTime())) {
-                    exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
-                }
                 countryHolidayCalenderGraphRepository.unlinkDayType(calender.getId());
                 dayType.setColorCode(countryHolidayCalenderDTO.getColorCode());
                 calender.setHolidayDate(countryHolidayCalenderDTO.getHolidayDate());
@@ -121,9 +118,6 @@ public class CountryHolidayCalenderService {
             if (countryHolidayCalenderDTO != null) {
                 DayType dayType = dayTypeGraphRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
                 if(dayType!=null){
-                    if (dayType.isHolidayType() && isNotNull(countryHolidayCalenderDTO.getStartTime()) && isNotNull(countryHolidayCalenderDTO.getEndTime()) && !LocalTime.MIN.equals(countryHolidayCalenderDTO.getEndTime()) && countryHolidayCalenderDTO.getEndTime().isBefore(countryHolidayCalenderDTO.getStartTime())) {
-                        exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
-                    }
                     countryHolidayCalender.setHolidayDate(countryHolidayCalenderDTO.getHolidayDate());
                     countryHolidayCalender.setDescription(countryHolidayCalenderDTO.getDescription());
                     countryHolidayCalender.setHolidayTitle(countryHolidayCalenderDTO.getHolidayTitle());
