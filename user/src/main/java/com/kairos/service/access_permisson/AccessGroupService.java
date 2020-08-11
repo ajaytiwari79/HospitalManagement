@@ -889,6 +889,9 @@ public class AccessGroupService {
 
     public List<AccessGroup> validAccessGroupByDate(Long unitId,Date date){
         AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
+        if(!UserContext.getUserDetails().isHubMember() && isNull(accessGroupStaffQueryResult)){
+            exceptionService.actionNotPermittedException(ERROR_POSITION_ACCESSGROUP_NOTFOUND);
+        }
         List<AccessGroup> accessGroups = new ArrayList<>();
         List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
         for (AccessGroupDayTypesQueryResult accessGroupDayTypesQueryResult : accessGroupDayTypesQueryResults) {
