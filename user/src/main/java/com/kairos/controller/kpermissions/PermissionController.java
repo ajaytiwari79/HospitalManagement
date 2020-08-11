@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
 
@@ -83,7 +84,5 @@ public class PermissionController {
     @GetMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/field_level_permission")
     public ResponseEntity<Map<String, Object>> getAccessPageByAccessGroup(@RequestParam("staffId") Long staffId, @PathVariable Long accessGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(Arrays.asList(accessGroupId),staffId));
-
     }
-
 }

@@ -890,14 +890,17 @@ public class AccessGroupService {
     public List<AccessGroup> validAccessGroupByDate(Long unitId,Date date){
         AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
         List<AccessGroup> accessGroups = new ArrayList<>();
-        List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
-        for (AccessGroupDayTypesQueryResult accessGroupDayTypesQueryResult : accessGroupDayTypesQueryResults) {
-            if(isNotNull(accessGroupDayTypesQueryResult.getAccessGroup())){
-                if(!accessGroupDayTypesQueryResult.getAccessGroup().isAllowedDayTypes() && isDayTypeValid(date,accessGroupDayTypesQueryResult.getDayTypes()));{
-                    accessGroups.add(accessGroupDayTypesQueryResult.getAccessGroup());
+        if(!UserContext.getUserDetails().isHubMember()){
+            List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
+            for (AccessGroupDayTypesQueryResult accessGroupDayTypesQueryResult : accessGroupDayTypesQueryResults) {
+                if(isNotNull(accessGroupDayTypesQueryResult.getAccessGroup())){
+                    if(!accessGroupDayTypesQueryResult.getAccessGroup().isAllowedDayTypes() && isDayTypeValid(date,accessGroupDayTypesQueryResult.getDayTypes()));{
+                        accessGroups.add(accessGroupDayTypesQueryResult.getAccessGroup());
+                    }
                 }
             }
         }
+
         return accessGroups;
     }
 
