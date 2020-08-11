@@ -11,6 +11,7 @@ import com.kairos.dto.activity.attendance.TimeAndAttendanceDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -19,6 +20,7 @@ import com.kairos.dto.user.staff.staff.StaffAccessRoleDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.enums.shift.*;
@@ -754,11 +756,7 @@ public class ShiftService extends MongoBaseService {
         }
         shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO, new ArrayList<>());
         addReasonCode(shifts, reasonCodeDTOS);
-        for (ShiftDTO shift : shifts) {
-            for (ShiftActivityDTO activity : shift.getActivities()) {
-                activity.setReasonCode(reasonCodeMap.get(activity.getAbsenceReasonCodeId()));
-            }
-        }
+        updateReasonCodeAndNameInActivities(reasonCodeMap, shifts);
         UserAccessRoleDTO userAccessRoleDTO;
         if (isNotNull(staffAdditionalInfoDTO)) {
             //shifts = timeBankService.updateTimebankDetailsInShiftDTO(shifts);
@@ -777,6 +775,21 @@ public class ShiftService extends MongoBaseService {
         Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
         shiftDetailsService.setLayerInShifts(shiftsMap);
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
+    }
+
+    private void updateReasonCodeAndNameInActivities(Map<Long, ReasonCodeDTO> reasonCodeMap, List<ShiftDTO> shifts) {
+        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
+        Map<String, Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
+        activityService.prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
+        for (ShiftDTO shift : shifts) {
+            for (ShiftActivityDTO activity : shift.getActivities()) {
+                if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
+                    activity.setActivityName("XXXXX");
+                    activity.getChildActivities().forEach(k->k.setActivityName("XXXXX"));
+                }
+                activity.setReasonCode(reasonCodeMap.get(activity.getAbsenceReasonCodeId()));
+            }
+        }
     }
 
 
