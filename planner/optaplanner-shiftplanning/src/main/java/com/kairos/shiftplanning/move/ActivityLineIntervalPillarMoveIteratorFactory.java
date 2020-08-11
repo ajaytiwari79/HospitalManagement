@@ -5,7 +5,7 @@ import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.move.helper.ActivityLineIntervalWrapper;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import org.optaplanner.core.impl.heuristic.move.Move;
 import org.optaplanner.core.impl.heuristic.selector.move.factory.MoveIteratorFactory;
@@ -22,17 +22,17 @@ import java.util.stream.Collectors;
 /**
  * Generates pillar for a random date with all activities/shifts for that day.
  */
-public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIteratorFactory<ShiftRequestPhasePlanningSolution> {
+public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIteratorFactory<ShiftPlanningSolution> {
     private static Logger log= LoggerFactory.getLogger(ActivityLineIntervalPillarMoveIteratorFactory.class);
 
     @Override
-    public long getSize(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
-        ShiftRequestPhasePlanningSolution solution = scoreDirector.getWorkingSolution();
+    public long getSize(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
+        ShiftPlanningSolution solution = scoreDirector.getWorkingSolution();
         return (long) solution.getWeekDates().size() * solution.getActivities().size();
     }
     @Override
-    public Iterator<? extends Move<ShiftRequestPhasePlanningSolution>> createOriginalMoveIterator(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
-        return (Iterator<? extends Move<ShiftRequestPhasePlanningSolution>>) new UnsupportedOperationException();
+    public Iterator<? extends Move<ShiftPlanningSolution>> createOriginalMoveIterator(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
+        return (Iterator<? extends Move<ShiftPlanningSolution>>) new UnsupportedOperationException();
     }
 
     /**
@@ -42,8 +42,8 @@ public class ActivityLineIntervalPillarMoveIteratorFactory implements MoveIterat
      * @return
      */
     @Override
-    public ActivityLineIntervalPillarMoveIterator<? extends Move<ShiftRequestPhasePlanningSolution>> createRandomMoveIterator(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector, Random workingRandom) {
-        ShiftRequestPhasePlanningSolution solution = scoreDirector.getWorkingSolution();
+    public ActivityLineIntervalPillarMoveIterator<? extends Move<ShiftPlanningSolution>> createRandomMoveIterator(ScoreDirector<ShiftPlanningSolution> scoreDirector, Random workingRandom) {
+        ShiftPlanningSolution solution = scoreDirector.getWorkingSolution();
         List<List<ActivityLineIntervalWrapper>> possibleActivityLineIntervalWrappersList= new ArrayList<>();
         LocalDate date=solution.getWeekDates().get(workingRandom.nextInt(solution.getWeekDates().size()));
         List<ShiftImp> shifts= solution.getShifts().stream().filter(s->s.getStartDate().equals(date)).collect(Collectors.toList());

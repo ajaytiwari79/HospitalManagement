@@ -16,7 +16,7 @@ import com.kairos.shiftplanning.domain.staff.Employee;
 import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import com.kairos.shiftplanning.utils.*;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
@@ -28,9 +28,7 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 import org.optaplanner.core.api.score.constraint.Indictment;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
-import org.optaplanner.core.api.solver.SolverManager;
 import org.optaplanner.core.config.solver.SolverConfig;
-import org.optaplanner.core.config.solver.SolverManagerConfig;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreXStreamConverter;
 import org.slf4j.Logger;
@@ -64,8 +62,8 @@ public class ShiftPlanningSolver implements QuarkusApplication {
     boolean enableSecondarySolver = false;
     public static final String BENCH_MARKER_CONFIG = "com/kairos/shiftplanning/configuration/ShiftPlanningBenchmark.solver.xml";
     private static Logger log = LoggerFactory.getLogger(ShiftPlanningSolver.class);
-    Solver<ShiftRequestPhasePlanningSolution> solver;
-    SolverFactory<ShiftRequestPhasePlanningSolution> solverFactory;
+    Solver<ShiftPlanningSolution> solver;
+    SolverFactory<ShiftPlanningSolution> solverFactory;
     Solver<BreaksIndirectAndActivityPlanningSolution> solverBreaks;
     SolverFactory<BreaksIndirectAndActivityPlanningSolution> solverFactoryBreaks;
     public static String serverAddress;
@@ -85,7 +83,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, ConstraintSubType.ACTIVITY_REQUIRED_TAG, ScoreLevel.HARD, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.UNIT, PRESENCE_AND_ABSENCE_SAME_TIME, ScoreLevel.HARD, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, ConstraintSubType.MAX_SHIFT_OF_STAFF, ScoreLevel.HARD, 5));
-        constraintDTOS.add(new ConstraintDTO(ConstraintType.WTA, AVERAGE_SHEDULED_TIME, ScoreLevel.MEDIUM, 5));
+        //constraintDTOS.add(new ConstraintDTO(ConstraintType.WTA, AVERAGE_SHEDULED_TIME, ScoreLevel.MEDIUM, 5));
         constraintDTOS.add(new ConstraintDTO(ConstraintType.ACTIVITY, ACTIVITY_VALID_DAYTYPE, ScoreLevel.SOFT, 4));
         return new SolverConfigDTO(constraintDTOS);
     }
@@ -108,6 +106,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
 
     private SolverFactory getSolverFactory(List<File> droolsFiles, File solverConfigFile) {
         SolverConfig solverConfig = createFromXmlFile(solverConfigFile);
+        solverConfig.setMoveThreadCount(String.valueOf(8));
         solverConfig.getScoreDirectorFactoryConfig().setScoreDrlFileList(droolsFiles);
         SolverFactory<Object> solverFactory = SolverFactory.create(solverConfig);
         director = solverFactory.getScoreDirectorFactory().buildScoreDirector();
@@ -120,21 +119,21 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         solver = solverFactory.buildSolver();
     }
 
-    public ShiftRequestPhasePlanningSolution runSolver() {
+    public ShiftPlanningSolution runSolver() {
         Object[] solvedSolution = getSolution(null);
-        printSolvedSolution((ShiftRequestPhasePlanningSolution) solvedSolution[0]);
+        printSolvedSolution((ShiftPlanningSolution) solvedSolution[0]);
         printIndictment((Map<Object, Indictment>) solvedSolution[1]);
-        return (ShiftRequestPhasePlanningSolution) solvedSolution[0];
+        return (ShiftPlanningSolution) solvedSolution[0];
     }
 
-    public Object[] getSolution(ShiftRequestPhasePlanningSolution unsolvedSolution) {
+    public Object[] getSolution(ShiftPlanningSolution unsolvedSolution) {
         if (unsolvedSolution == null) {
             unsolvedSolution = getUnsolvedSolution(readFromFile);
         }
         if (!readFromFile)
             toXml(unsolvedSolution, "shift_problem");
         long start = System.currentTimeMillis();
-        ShiftRequestPhasePlanningSolution solution = disablePrimarySolver ? unsolvedSolution : solver.solve(unsolvedSolution);
+        ShiftPlanningSolution solution = disablePrimarySolver ? unsolvedSolution : solver.solve(unsolvedSolution);
         ShiftPlanningUtility.printStaffingLevelMatrix(ShiftPlanningUtility.reduceStaffingLevelMatrix
                 (solution.getStaffingLevelMatrix().getStaffingLevelMatrix(), solution.getShifts(), null, null, 15), null);
         log.info("Solver took: {}", (System.currentTimeMillis() - start) / 1000);
@@ -170,19 +169,19 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         log.info(INFO, sb);
     }
 
-    private BreaksIndirectAndActivityPlanningSolution runAndGetBreaksSolution(ShiftRequestPhasePlanningSolution solution) {
+    private BreaksIndirectAndActivityPlanningSolution runAndGetBreaksSolution(ShiftPlanningSolution solution) {
         if (solution == null)
             return new ShiftPlanningGenerator().loadUnsolvedBreakAndIndirectActivityPlanningSolution(BASE_SRC + "shift_solution_secondary.xml");
         return new ShiftPlanningGenerator().loadUnsolvedBreakAndIndirectActivityPlanningSolution(solution);
     }
 
-    public ShiftRequestPhasePlanningSolution runSolverOnRequest(ShiftRequestPhasePlanningSolution unSolvedsolution) throws Exception{
+    public ShiftPlanningSolution runSolverOnRequest(ShiftPlanningSolution unSolvedsolution) throws Exception{
         //solver.addEventListener(()->{}); Todo Add Listner for BestSolution changeIndictment End
         Object[] solvedSolution = getSolution(unSolvedsolution);
-        printSolvedSolution((ShiftRequestPhasePlanningSolution) solvedSolution[0]);
+        printSolvedSolution((ShiftPlanningSolution) solvedSolution[0]);
         printIndictment((Map<Object, Indictment>) solvedSolution[1]);
         //sendSolutionToKairos((ShiftRequestPhasePlanningSolution) solvedSolution[0]);
-        return (ShiftRequestPhasePlanningSolution) solvedSolution[0];
+        return (ShiftPlanningSolution) solvedSolution[0];
     }
 
     private void printIndictment(Map<Object, Indictment> indictmentMap) {
@@ -281,7 +280,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         return "" + shift.getStart().format(DateTimeFormatter.ofPattern("dd/MM-HH:mm")) + "--" + shift.getEnd().format(DateTimeFormatter.ofPattern("dd/MM-HH:mm"));
     }
 
-    private void printSolvedSolution(ShiftRequestPhasePlanningSolution solution) {
+    private void printSolvedSolution(ShiftPlanningSolution solution) {
         log.info("-------Printing solution:-------");
         log.info("total intervals: {}", solution.getActivityLineIntervals().stream().count());
         log.info("total assigned intervals: {}", solution.getActivityLineIntervals().stream().filter(i -> i.getShift() != null).count());
@@ -306,8 +305,8 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         log.info("-------Printing solution Finished:-------");
     }
 
-    private ShiftRequestPhasePlanningSolution getUnsolvedSolution(boolean loadFromFile) {
-        ShiftRequestPhasePlanningSolution unsolvedSolution = null;
+    private ShiftPlanningSolution getUnsolvedSolution(boolean loadFromFile) {
+        ShiftPlanningSolution unsolvedSolution = null;
         if (loadFromFile) {
             unsolvedSolution = new ShiftPlanningGenerator().loadUnsolvedSolutionFromXML(BASE_SRC + "shift_solution.xml");
         } else {
@@ -317,7 +316,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
     }
 
 
-    public void sendSolutionToKairos(ShiftRequestPhasePlanningSolution solvedSolution) {
+    public void sendSolutionToKairos(ShiftPlanningSolution solvedSolution) {
         List<ShiftDTO> shiftDTOS = getShift(solvedSolution.getShifts());
         try {
             ShiftPlanningUtility.solvedShiftPlanningProblem(shiftDTOS, solvedSolution.getUnit().getId());
@@ -401,7 +400,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
             List<File> droolFiles = getDroolFiles(solverConfigDTO);
             File configurationFile = getFile("/com/kairos/shiftplanning/configuration/", "ShiftPlanning_Request_ActivityLine.solver.xml");
             ShiftPlanningSolver shiftPlanningSolver = new ShiftPlanningSolver(droolFiles, configurationFile);
-            ShiftRequestPhasePlanningSolution unSolvedsolution = new ShiftPlanningInitializer().initializeShiftPlanning(shiftPlanningProblemSubmitDTO);
+            ShiftPlanningSolution unSolvedsolution = new ShiftPlanningInitializer().initializeShiftPlanning(shiftPlanningProblemSubmitDTO);
             System.out.println("total starting time "+(new Date().getTime() - startTime));
             unSolvedsolution = shiftPlanningSolver.runSolverOnRequest(unSolvedsolution);
             //writeSolutionToFile(unSolvedsolution);
@@ -416,7 +415,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         return 0;
     }
 
-    private void writeSolutionToFile(ShiftRequestPhasePlanningSolution unSolvedsolution) throws IOException {
+    private void writeSolutionToFile(ShiftPlanningSolution unSolvedsolution) throws IOException {
         String objectString = ObjectMapperUtils.objectToJsonString(unSolvedsolution);
         File file = new File(System.getProperty("user.home") + "/" + "solution.json");
         if(!file.exists()){
@@ -428,6 +427,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
     private List<File> getDroolFiles(SolverConfigDTO solverConfigDTO) throws IOException{
         List<File> files = new ArrayList<>();
         files.add(getFile(DROOLS_FILE_SHIFT_PLANNING, "SHIFTPLANNING_BASE.drl"));
+        //files.add(new File(System.getProperty("user.home") + "/" +"COMMON_WTA.drl"));
         for (ConstraintDTO constraint : solverConfigDTO.getConstraints()) {
             File file = getFile(DROOLS_FILE_SHIFT_PLANNING, constraint.getConstraintSubType() + ".drl");
             if (file != null) {

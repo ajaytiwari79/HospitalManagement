@@ -227,7 +227,7 @@ public class KPISetService {
                     }
                 }
             }catch (Exception e){
-            LOGGER.error(e.getMessage());
+            e.printStackTrace();
             }
         }
         return kpiResponseDTOMap.values().stream().collect(Collectors.toList());

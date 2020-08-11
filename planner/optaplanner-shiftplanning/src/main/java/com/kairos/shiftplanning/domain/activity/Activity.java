@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain.activity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypeEnum;
@@ -40,6 +41,7 @@ public class Activity {
     private BigInteger id;
     private List<Skill> skills;
     private String name;
+    @JsonIgnore
     private Map<ConstraintSubType, ConstraintHandler> constraints;
     private Set<Long> validDayTypeIds;
     private TimeType timeType;

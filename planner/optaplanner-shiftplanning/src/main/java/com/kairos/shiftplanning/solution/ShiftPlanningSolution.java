@@ -28,7 +28,7 @@ import java.util.Map;
 @Getter
 @Setter
 @XStreamAlias("ShiftPlanningSolution")
-public class ShiftRequestPhasePlanningSolution {
+public class ShiftPlanningSolution {
 	private String id;
 	@ProblemFactCollectionProperty
     private List<Employee> employees;

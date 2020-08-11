@@ -5,14 +5,14 @@
 
     <inheritedSolverBenchmark>
         <!--<problemBenchmarks>
-            <xStreamAnnotatedClass>com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution</xStreamAnnotatedClass>
+            <xStreamAnnotatedClass>com.kairos.shiftplanning.solution.ShiftPlanningSolution</xStreamAnnotatedClass>
             <inputSolutionFile>src/main/resources/data/shift_problem.xml</inputSolutionFile>
             <problemStatisticType>BEST_SCORE</problemStatisticType>
         </problemBenchmarks>-->
 
         <solver>
         <!--<environmentMode>FULL_ASSERT</environmentMode>-->
-            <solutionClass>com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution</solutionClass>
+            <solutionClass>com.kairos.shiftplanning.solution.ShiftPlanningSolution</solutionClass>
             <entityClass>com.kairos.shiftplanning.domain.activity.ActivityLineInterval</entityClass>
             <entityClass>com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval</entityClass>
             <entityClass>com.kairos.shiftplanning.domain.shift.ShiftImp</entityClass>

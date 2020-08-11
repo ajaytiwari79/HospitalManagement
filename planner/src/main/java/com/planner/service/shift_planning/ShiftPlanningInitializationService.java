@@ -7,20 +7,14 @@ import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
-import com.kairos.shiftplanning.integration.ActivityIntegration;
-import com.kairos.shiftplanning.integration.UserIntegration;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
-import com.kairos.shiftplanning.utils.ShiftPlanningInitializer;
-import com.planner.component.rest_client.GenericRestClient;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import com.planner.component.rest_client.IntegrationService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +30,7 @@ public class ShiftPlanningInitializationService {
     /**
      * ShiftRequestPhasePlanningSolution(Opta-planner planning Solution)
      */
-    public ShiftRequestPhasePlanningSolution initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
+    public ShiftPlanningSolution initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
         shiftPlanningProblemSubmitDTO.setSolverConfig(getSolverConfigDTO());
         Long unitId = shiftPlanningProblemSubmitDTO.getUnitId();
         integrationService.updateDataOfShiftForPlanningFromUserService(shiftPlanningProblemSubmitDTO);
