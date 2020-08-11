@@ -130,7 +130,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
              " seniorDays,childCareDays,sector,organizationLevel,union  order by expertise.name")
     List<ExpertiseQueryResult> findExpertiseByOrganizationServicesForUnit(Long countryId, Set<Long> organizationServicesIds);
 
-    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false})  WHERE id(expertise)={0}" +
+    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false})  WHERE id(expertise)={0}" +
             " RETURN location as name ORDER BY location.name ASC" )
     List<Location> findAllLocationsOfUnionInExpertise(Long expertiseId);
 
