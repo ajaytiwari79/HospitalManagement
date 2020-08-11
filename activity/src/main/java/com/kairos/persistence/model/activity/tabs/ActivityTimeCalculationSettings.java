@@ -47,7 +47,6 @@ public class ActivityTimeCalculationSettings {
     private LocalTime defaultStartTime;
     @KPermissionField
     private List<Long> dayTypes = new ArrayList<>();
-    @KPermissionField
     private boolean replaceWithPublishedShiftTime;
     private boolean replaceWithUnapprovedAbsenceRequest;
 
