@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface KPermissionField {
 
+     String name() default "";
      boolean enabled() default true;
     //public String value();
 

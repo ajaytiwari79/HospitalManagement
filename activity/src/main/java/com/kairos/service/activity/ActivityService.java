@@ -18,6 +18,8 @@ import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.kpermissions.FieldPermissionUserData;
+import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
@@ -31,6 +33,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
@@ -907,6 +910,24 @@ public class ActivityService {
         return activityMongoRepository.getActivityRankWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v.getActivitySequence()));
     }
     public Map<BigInteger,ActivityDTO> getActivityDetailsWithRankByUnitId(Long unitId) {
-        return activityMongoRepository.getActivityDetailsWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
+        Map<String,Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
+        prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
+        Map<BigInteger,ActivityDTO> activityDTOMap= activityMongoRepository.getActivityDetailsWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        activityDTOMap.forEach((k,v)->{
+            if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
+                v.setName("XXXXX");
+            } if(fieldPermissionMap.get("ultraShortName").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("ultraShortName").isEmpty()){
+                v.getActivityGeneralSettings().setUltraShortName("XXXXX");
+            }
+        });
+        return activityDTOMap;
+    }
+
+    private void prepareFLPMap(List<ModelDTO> modelDTOS, Map<String, Set<FieldLevelPermission>> fieldPermissionMap) {
+            modelDTOS.forEach(model->{
+            model.getFieldPermissions().forEach(field-> fieldPermissionMap.putIfAbsent(field.getFieldName(),field.getPermissions()));
+            prepareFLPMap(model.getSubModelPermissions(),fieldPermissionMap);
+        });
     }
 }
