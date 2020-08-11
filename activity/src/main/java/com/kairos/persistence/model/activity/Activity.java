@@ -74,7 +74,7 @@ public class Activity extends MongoBaseEntity {
     private ActivityRulesSettings activityRulesSettings;
     @KPermissionSubModel
     private ActivityTimeCalculationSettings activityTimeCalculationSettings;
-    @KPermissionSubModel
+    @KPermissionField
     private ActivitySkillSettings activitySkillSettings;
     @KPermissionField
     private ActivityPhaseSettings activityPhaseSettings;

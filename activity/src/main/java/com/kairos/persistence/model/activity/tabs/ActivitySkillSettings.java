@@ -16,7 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 public class ActivitySkillSettings {
 
-    @KPermissionField
     private List<ActivitySkill> activitySkills = new ArrayList<>();
 
     public List<Long> getActivitySkillIds() {
