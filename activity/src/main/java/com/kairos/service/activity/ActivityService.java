@@ -925,7 +925,7 @@ public class ActivityService {
         return activityDTOMap;
     }
 
-    private void prepareFLPMap(List<ModelDTO> modelDTOS, Map<String, Set<FieldLevelPermission>> fieldPermissionMap) {
+    public void prepareFLPMap(List<ModelDTO> modelDTOS, Map<String, Set<FieldLevelPermission>> fieldPermissionMap) {
             modelDTOS.forEach(model->{
             model.getFieldPermissions().forEach(field-> fieldPermissionMap.putIfAbsent(field.getFieldName(),field.getPermissions()));
             prepareFLPMap(model.getSubModelPermissions(),fieldPermissionMap);
