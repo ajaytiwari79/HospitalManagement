@@ -48,7 +48,6 @@ public class Activity extends MongoBaseEntity {
     private List<Long> regions;
     private List<Long> levels;
     private List<Long> employmentTypes;
-    @KPermissionField
     private List<BigInteger> tags = new ArrayList<>();
     private ActivityStateEnum state = ActivityStateEnum.DRAFT;
 
