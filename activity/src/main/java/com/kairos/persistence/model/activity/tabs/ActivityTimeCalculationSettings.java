@@ -41,13 +41,13 @@ public class ActivityTimeCalculationSettings {
     @KPermissionField
     private DayOfWeek fullWeekEnd;
     private String breakTemplates;
-    @KPermissionField(name = "pastWeekToCalculate")
+    @KPermissionField
     private int historyDuration;
     @KPermissionField
     private LocalTime defaultStartTime;
     @KPermissionField
     private List<Long> dayTypes = new ArrayList<>();
-    @KPermissionField(name = "kako")
+    @KPermissionField
     private boolean replaceWithPublishedShiftTime;
     private boolean replaceWithUnapprovedAbsenceRequest;
 
