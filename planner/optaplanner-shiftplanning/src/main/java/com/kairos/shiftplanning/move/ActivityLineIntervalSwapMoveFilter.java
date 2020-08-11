@@ -2,7 +2,7 @@ package com.kairos.shiftplanning.move;
 
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionFilter;
 import org.optaplanner.core.impl.heuristic.selector.move.generic.SwapMove;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
@@ -11,11 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public class ActivityLineIntervalSwapMoveFilter implements SelectionFilter<ShiftRequestPhasePlanningSolution,SwapMove> {
+public class ActivityLineIntervalSwapMoveFilter implements SelectionFilter<ShiftPlanningSolution,SwapMove> {
     private static Logger log= LoggerFactory.getLogger(ActivityLineIntervalChangeMoveFilter.class);
 
     @Override
-    public boolean accept(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector, SwapMove selection) {
+    public boolean accept(ScoreDirector<ShiftPlanningSolution> scoreDirector, SwapMove selection) {
         ActivityLineInterval activityLineInterval1 = (ActivityLineInterval) selection.getLeftEntity();
         ActivityLineInterval activityLineInterval2 = (ActivityLineInterval) selection.getRightEntity();
         if(activityLineInterval1.getActivity().isTypeAbsence()!=activityLineInterval2.getActivity().isTypeAbsence()){

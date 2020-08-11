@@ -3,8 +3,9 @@ package com.kairos.shiftplanning.move;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.move.helper.ActivityLineIntervalChangeMoveHelper;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import org.optaplanner.core.impl.heuristic.move.AbstractMove;
+import org.optaplanner.core.impl.heuristic.selector.move.generic.ChangeMove;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class ActivityLineIntervalChangeMove  extends AbstractMove<ShiftRequestPhasePlanningSolution> {
+public class ActivityLineIntervalChangeMove  extends AbstractMove<ShiftPlanningSolution> {
     private ActivityLineInterval activityLineInterval;
     private ShiftImp toShift;
     private List<ActivityLineInterval> exActivityLineIntervalsForThisShift;
@@ -28,17 +29,17 @@ public class ActivityLineIntervalChangeMove  extends AbstractMove<ShiftRequestPh
         this.shiftForExIntervals=shiftForExIntervals;
     }
     @Override
-    protected AbstractMove<ShiftRequestPhasePlanningSolution> createUndoMove(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    protected AbstractMove<ShiftPlanningSolution> createUndoMove(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         return new ActivityLineIntervalChangeMove(activityLineInterval,activityLineInterval.getShift(), exActivityLineIntervalsForThisShift,toShift);
     }
 
     @Override
-    protected void doMoveOnGenuineVariables(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    protected void doMoveOnGenuineVariables(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         ActivityLineIntervalChangeMoveHelper.assignActivityIntervalToShift(scoreDirector,activityLineInterval,toShift,exActivityLineIntervalsForThisShift,shiftForExIntervals);
     }
 
     @Override
-    public boolean isMoveDoable(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    public boolean isMoveDoable(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
 
         return !Objects.equals(activityLineInterval.getShift(), toShift);// && !ShiftPlanningUtility.intervalOverlapsBreak(toShift,activityLineInterval.getStart());
     }
@@ -51,6 +52,11 @@ public class ActivityLineIntervalChangeMove  extends AbstractMove<ShiftRequestPh
     @Override
     public Collection<?> getPlanningValues() {
         return Collections.singletonList(toShift);
+    }
+
+    @Override
+    public ActivityLineIntervalChangeMove rebase(ScoreDirector<ShiftPlanningSolution> destinationScoreDirector) {
+        return new ActivityLineIntervalChangeMove(destinationScoreDirector.lookUpWorkingObject(activityLineInterval),destinationScoreDirector.lookUpWorkingObject(toShift),rebaseList(exActivityLineIntervalsForThisShift,destinationScoreDirector),destinationScoreDirector.lookUpWorkingObject(shiftForExIntervals));
     }
 
     @Override

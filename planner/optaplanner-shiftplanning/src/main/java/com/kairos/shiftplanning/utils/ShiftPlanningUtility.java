@@ -47,6 +47,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,13 +62,13 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.kairos.commons.utils.CommonsExceptionUtil.throwException;
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.shiftplanning.constants.ShiftPlanningMessageConstants.MESSAGE_RULETEMPLATE_INTERVAL_NOTNULL;
 
@@ -85,6 +86,19 @@ public class ShiftPlanningUtility {
     public static final String WEEKLY_HOURS = "WEEKLY_HOURS";
     public static final String FIXED_TIME = "FIXED_TIME";
     public static final String ENTERED_MANUALLY = "ENTERED_MANUALLY";
+
+    private static ExecutorService executorService;
+
+    public static ExecutorService getExecutorService() {
+        if (isNull(executorService)) {
+            executorService = new ThreadPoolExecutor(4, 8, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+        }
+        return executorService;
+    }
+
+    public static <T> List<Future<T>> executeAsynchronously(Collection<? extends Callable<T>> tasks) throws InterruptedException {
+        return getExecutorService().invokeAll(tasks);
+    }
 
     public static Integer getStaffingLevelSatisfaction(StaffingLevelPlannerEntity staffingLevel) {
         int[] invalidShiftIntervals = new int[1];

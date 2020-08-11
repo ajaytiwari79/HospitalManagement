@@ -4,7 +4,7 @@ import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.move.helper.ActivityLineIntervalWrapper;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import org.optaplanner.core.impl.heuristic.move.Move;
 import org.optaplanner.core.impl.heuristic.selector.move.factory.MoveIteratorFactory;
@@ -12,17 +12,17 @@ import org.optaplanner.core.impl.score.director.ScoreDirector;
 
 import java.util.*;
 
-public class ActivityLineIntervalChangeMoveIteratorFactory implements MoveIteratorFactory<ShiftRequestPhasePlanningSolution> {
+public class ActivityLineIntervalChangeMoveIteratorFactory implements MoveIteratorFactory<ShiftPlanningSolution> {
 
     @Override
-    public long getSize(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
-        ShiftRequestPhasePlanningSolution solution = scoreDirector.getWorkingSolution();
+    public long getSize(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
+        ShiftPlanningSolution solution = scoreDirector.getWorkingSolution();
         int size = solution.getActivityLineIntervals().size();
         return solution.getShifts().size() * size;
     }
 
     @Override
-    public Iterator<? extends Move<ShiftRequestPhasePlanningSolution>> createOriginalMoveIterator(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    public Iterator<? extends Move<ShiftPlanningSolution>> createOriginalMoveIterator(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         /*ShiftRequestPhasePlanningSolution solution = scoreDirector.getWorkingSolution();
         List<ActivityLineInterval> activityLineIntervals= solution.getActivityLineIntervals();
         List<ActivityLineIntervalWrapper> possibleActivityLineIntervals= new ArrayList<>(),nullActivityLineIntervals= new ArrayList<>();
@@ -56,8 +56,8 @@ public class ActivityLineIntervalChangeMoveIteratorFactory implements MoveIterat
     }
 
     @Override
-    public ActivityLineIntervalChangeMoveIterator<? extends Move<ShiftRequestPhasePlanningSolution>> createRandomMoveIterator(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector, Random workingRandom) {
-        ShiftRequestPhasePlanningSolution solution = scoreDirector.getWorkingSolution();
+    public ActivityLineIntervalChangeMoveIterator<? extends Move<ShiftPlanningSolution>> createRandomMoveIterator(ScoreDirector<ShiftPlanningSolution> scoreDirector, Random workingRandom) {
+        ShiftPlanningSolution solution = scoreDirector.getWorkingSolution();
         List<ActivityLineInterval> activityLineIntervals= solution.getActivityLineIntervals();
         List<ActivityLineIntervalWrapper> possibleActivityLineIntervals= new ArrayList<>(),nullActivityLineIntervals= new ArrayList<>();
         List<ShiftImp> workingShifts= solution.getShifts();

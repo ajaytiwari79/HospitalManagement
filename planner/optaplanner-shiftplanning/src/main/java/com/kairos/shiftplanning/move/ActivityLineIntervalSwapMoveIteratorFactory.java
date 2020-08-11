@@ -1,7 +1,7 @@
 package com.kairos.shiftplanning.move;
 
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import org.optaplanner.core.impl.heuristic.move.Move;
 import org.optaplanner.core.impl.heuristic.selector.move.factory.MoveIteratorFactory;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
@@ -12,23 +12,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class ActivityLineIntervalSwapMoveIteratorFactory implements MoveIteratorFactory<ShiftRequestPhasePlanningSolution> {
+public class ActivityLineIntervalSwapMoveIteratorFactory implements MoveIteratorFactory<ShiftPlanningSolution> {
 
     @Override
-    public long getSize(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
-        ShiftRequestPhasePlanningSolution solution = scoreDirector.getWorkingSolution();
+    public long getSize(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
+        ShiftPlanningSolution solution = scoreDirector.getWorkingSolution();
         int size = solution.getActivityLineIntervals().size();
         return solution.getShifts().size() * size;
     }
 
     @Override
-    public Iterator<? extends Move<ShiftRequestPhasePlanningSolution>> createOriginalMoveIterator(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    public Iterator<? extends Move<ShiftPlanningSolution>> createOriginalMoveIterator(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ActivityLineIntervalSwapMoveIterator<? extends Move<ShiftRequestPhasePlanningSolution>> createRandomMoveIterator(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector, Random workingRandom) {
-        ShiftRequestPhasePlanningSolution solution = scoreDirector.getWorkingSolution();
+    public ActivityLineIntervalSwapMoveIterator<? extends Move<ShiftPlanningSolution>> createRandomMoveIterator(ScoreDirector<ShiftPlanningSolution> scoreDirector, Random workingRandom) {
+        ShiftPlanningSolution solution = scoreDirector.getWorkingSolution();
         List<ActivityLineInterval> activityLineIntervals= solution.getActivityLineIntervals();
         List<ActivityLineInterval> possibleActivityLineIntervals= new ArrayList<>();
         LocalDate date=solution.getWeekDates().get(workingRandom.nextInt(solution.getWeekDates().size()));

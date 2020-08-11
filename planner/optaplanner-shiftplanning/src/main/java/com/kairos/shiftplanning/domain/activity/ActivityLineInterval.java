@@ -9,6 +9,7 @@ import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.lookup.PlanningId;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
 
     private static Logger log = LoggerFactory.getLogger(ActivityLineInterval.class);
 
+    @PlanningId
     private BigInteger id;
     private ZonedDateTime start;
     private boolean required;
