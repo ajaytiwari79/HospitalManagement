@@ -1195,6 +1195,10 @@ public class ShiftService extends MongoBaseService {
         return shiftList;
     }
 
+    public List<Shift> findShiftBetweenDurationByStaffId(Long staffId, Date startDate, Date endDate){
+        return shiftMongoRepository.findShiftBetweenDurationByStaffId(staffId, startDate, endDate);
+    }
+
     @Getter
     public class ShiftHelper {
         private Map<Long, StaffAdditionalInfoDTO> employmentIdAndstaffAdditionalInfoMap = new HashMap<>();
