@@ -439,5 +439,14 @@ public class ProcessingActivityService {
     }
 
 
+    public ProcessingActivityRiskResponseDTO updateRiskDetail(Long unitId, Long id, ProcessingActivityRiskResponseDTO processingActivityRiskResponseDTO) {
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
+        if (!processingActivity.isActive()) {
+            exceptionService.invalidRequestException("message.processing.activity.inactive");
+        }
+        processingActivity.setRisks(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivityRiskResponseDTO.getRisks(), Risk.class));
+        processingActivityRepository.save(processingActivity);
+        return processingActivityRiskResponseDTO;
+    }
 }
 
