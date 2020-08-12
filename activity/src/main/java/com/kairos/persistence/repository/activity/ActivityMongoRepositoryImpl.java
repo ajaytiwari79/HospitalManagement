@@ -625,6 +625,18 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
+    public List<Activity> findAllBreakActivitiesByOrganizationId(Long unitId) {
+        List<TimeTypeEnum> breakTypes = new ArrayList<>();
+        breakTypes.add(PAID_BREAK);
+        breakTypes.add(UNPAID_BREAK);
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).and("activityBalanceSettings.timeType").in(breakTypes)),
+                project("id")
+                );
+        AggregationResults<Activity> result = mongoTemplate.aggregate(aggregation, Activity.class, Activity.class);
+        return result.getMappedResults();
+    }
+
+    @Override
     public List<ActivityWrapper> findActivityAndTimeTypeByActivityIdsAndNotFullDayAndFullWeek(Set<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ID).in(activityIds).and(DELETED).is(false).and(TIME_CALCULATION_ACTIVITY_TAB_METHOD_FOR_CALCULATING_TIME).nin(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK)),
