@@ -21,6 +21,7 @@ public class ShiftWithViolatedInfoDTO {
     @Valid
     private List<ShiftDTO> shifts;
     private ViolatedRulesDTO violatedRules = new ViolatedRulesDTO();
+    private String actionPerformed;
 
     public ShiftWithViolatedInfoDTO(ViolatedRulesDTO violatedRules) {
         this.violatedRules = violatedRules;
