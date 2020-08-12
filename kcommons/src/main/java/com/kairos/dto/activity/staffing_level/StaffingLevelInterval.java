@@ -66,6 +66,10 @@ public class StaffingLevelInterval {
         return staffingLevelActivities.stream().map(staffingLevelActivity -> staffingLevelActivity.getActivityId()).collect(Collectors.toSet());
     }
 
+    public StaffingLevelActivity getStaffingLevelActivity(BigInteger activityId){
+        return staffingLevelActivities.stream().filter(staffingLevelActivity -> staffingLevelActivity.getActivityId().equals(activityId)).findAny().orElse(null);
+    }
+
 
 
     public void addStaffLevelSkill(Set<StaffingLevelSkill> staffLevelSkills) {
