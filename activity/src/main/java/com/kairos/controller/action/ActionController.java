@@ -67,14 +67,14 @@ public class ActionController {
     @ApiOperation("Get availability unavailability before after shift")
     @GetMapping("/staff/{staffId}/availability_unavailability_before_after_shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAvailabilityUnavailabilityBeforeAfterShift(@PathVariable Long staffId,@RequestBody Date date) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.getAvailabilityUnavailabilityBeforeAfterShift(staffId, date));
+    public ResponseEntity<Map<String, Object>> getAvailabilityUnavailabilityBeforeAfterShift(@PathVariable Long staffId,@RequestParam("shift_date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date ShiftDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.getAvailabilityUnavailabilityBeforeAfterShift(staffId, ShiftDate));
     }
 
     @ApiOperation("Remove availability unavailability before after shift")
     @DeleteMapping("/staff/{staffId}/availability_unavailability_before_after_shift")
-    ResponseEntity<Map<String, Object>> removeAvailabilityUnavailabilityBeforeAfterShift(@PathVariable Long staffId,@RequestParam boolean isAvailability,@RequestParam boolean isBefore,@RequestBody Date date){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.removeAvailabilityUnavailabilityBeforeAfterShift(staffId, isAvailability, isBefore, date));
+    ResponseEntity<Map<String, Object>> removeAvailabilityUnavailabilityBeforeAfterShift(@PathVariable Long staffId,@RequestParam boolean isAvailability,@RequestParam boolean isBefore,@RequestParam("shift_date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date ShiftDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.removeAvailabilityUnavailabilityBeforeAfterShift(staffId, isAvailability, isBefore, ShiftDate));
     }
 
 }

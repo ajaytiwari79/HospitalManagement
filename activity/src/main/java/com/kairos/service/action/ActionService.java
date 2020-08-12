@@ -38,6 +38,8 @@ public class ActionService {
     private static final String UNAVAILABILITY = "UNAVAILABILITY";
     private static final String BEFORE = "BEFORE";
     private static final String AFTER = "AFTER";
+    private static final String DELETE = "DELETE";
+    private static final String UPDATE = "UPDATE";
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -79,24 +81,16 @@ public class ActionService {
         return actionRepository.saveAll(actions);
     }
 
-    public Map<String,Object> getAvailabilityUnavailabilityBeforeAfterShift(Long staffId, Date date) {
+    public Map<String,Object> getAvailabilityUnavailabilityBeforeAfterShift(Long staffId, Date ShiftDate) {
         Map<String,Boolean> beforeMap = new HashMap<String,Boolean>(){{put(AVAILABILITY,false);put(UNAVAILABILITY,false);}};
         Map<String,Boolean> afterMap = new HashMap<>(beforeMap);
-        List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId,getStartOfDay(date),getEndOfDay(date));
+        List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId,getStartOfDay(ShiftDate),getEndOfDay(ShiftDate));
         shifts.forEach(shift -> {
             List<TimeTypeEnum> timeTypeEnums = shift.getActivities().stream().map(ShiftActivity::getSecondLevelTimeType).collect(Collectors.toList());
-            if(shift.getStartDate().before(date)){
-                if(timeTypeEnums.contains(TimeTypeEnum.AVAILABLE_TIME)){
-                    beforeMap.put(AVAILABILITY,true);
-                } else if(timeTypeEnums.contains(TimeTypeEnum.UNAVAILABLE_TIME)){
-                    beforeMap.put(UNAVAILABILITY,true);
-                }
+            if(shift.getStartDate().before(ShiftDate)){
+                updateMap(beforeMap, timeTypeEnums);
             } else {
-                if(timeTypeEnums.contains(TimeTypeEnum.AVAILABLE_TIME)){
-                    afterMap.put(AVAILABILITY,true);
-                } else if(timeTypeEnums.contains(TimeTypeEnum.UNAVAILABLE_TIME)){
-                    afterMap.put(UNAVAILABILITY,true);
-                }
+                updateMap(afterMap, timeTypeEnums);
             }
         });
         Map<String,Object> response = new HashMap<>();
@@ -105,11 +99,19 @@ public class ActionService {
         return response;
     }
 
-    public List<ShiftWithViolatedInfoDTO> removeAvailabilityUnavailabilityBeforeAfterShift(Long staffId, boolean isAvailability, boolean isBefore, Date date) {
+    private void updateMap(Map<String, Boolean> beforeMap, List<TimeTypeEnum> timeTypeEnums) {
+        if (timeTypeEnums.contains(TimeTypeEnum.AVAILABLE_TIME)) {
+            beforeMap.put(AVAILABILITY, true);
+        } else if (timeTypeEnums.contains(TimeTypeEnum.UNAVAILABLE_TIME)) {
+            beforeMap.put(UNAVAILABILITY, true);
+        }
+    }
+
+    public List<ShiftWithViolatedInfoDTO> removeAvailabilityUnavailabilityBeforeAfterShift(Long staffId, boolean isAvailability, boolean isBefore, Date ShiftDate) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
-        List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId, isBefore ? getStartOfDay(date) : date, isBefore ? date : getEndOfDay(date));
+        List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId, isBefore ? getStartOfDay(ShiftDate) : ShiftDate, isBefore ? ShiftDate : getEndOfDay(ShiftDate));
         for (Shift shift : shifts) {
-            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS1 = deleteAvailabilityUnavailabilityShift(shift, isAvailability ? TimeTypeEnum.AVAILABLE_TIME : TimeTypeEnum.UNAVAILABLE_TIME);
+            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS1 = deleteOrUpdateAvailabilityUnavailabilityShift(shift, isAvailability ? TimeTypeEnum.AVAILABLE_TIME : TimeTypeEnum.UNAVAILABLE_TIME);
             if(isCollectionNotEmpty(shiftWithViolatedInfoDTOS1)){
                 shiftWithViolatedInfoDTOS.addAll(shiftWithViolatedInfoDTOS1);
             }
@@ -117,15 +119,19 @@ public class ActionService {
         return shiftWithViolatedInfoDTOS;
     }
 
-    private List<ShiftWithViolatedInfoDTO> deleteAvailabilityUnavailabilityShift(Shift shift, TimeTypeEnum timeTypeEnum) {
+    private List<ShiftWithViolatedInfoDTO> deleteOrUpdateAvailabilityUnavailabilityShift(Shift shift, TimeTypeEnum timeTypeEnum) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         List<ShiftActivity> shiftActivities = shift.getActivities().stream().filter(shiftActivity -> !shiftActivity.getSecondLevelTimeType().equals(timeTypeEnum)).collect(Collectors.toList());
         if(isCollectionEmpty(shiftActivities)){
-            shiftWithViolatedInfoDTOS.add(shiftService.deleteAllLinkedShifts(shift.getId()));
+            ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.deleteAllLinkedShifts(shift.getId());
+            shiftWithViolatedInfoDTO.setActionPerformed(DELETE);
+            shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
         } else if(shiftActivities.size() != shift.getActivities().size()){
             ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
             shiftDTO.setActivities(ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftActivities, ShiftActivityDTO.class));
-            shiftWithViolatedInfoDTOS.addAll(shiftService.updateShift(shiftDTO, false, false, ShiftActionType.SAVE));
+            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOList = shiftService.updateShift(shiftDTO, false, false, ShiftActionType.SAVE);
+            shiftWithViolatedInfoDTOList.forEach(shiftWithViolatedInfoDTO -> shiftWithViolatedInfoDTO.setActionPerformed(UPDATE));
+            shiftWithViolatedInfoDTOS.addAll(shiftWithViolatedInfoDTOList);
         }
         return shiftWithViolatedInfoDTOS;
     }
