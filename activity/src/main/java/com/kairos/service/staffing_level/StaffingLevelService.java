@@ -1086,7 +1086,6 @@ public class StaffingLevelService  {
             List<ShiftActivity> currentShiftActivities = activityWiseMap.getOrDefault(startLocalDate,new ArrayList<>());
             List<StaffingLevelDetailsByTimeSlotDTO> staffingLevelDetailsByTimeSlotDTOS = new ArrayList<>();
             Integer detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDetailLevelMinutes();
-            System.out.println("date "+startLocalDate);
             for (TimeSlotDTO timeSlot : timeSlots) {
                 List<DateTimeInterval> timeSlotIntervals = getTimeSlotInterval(startLocalDate, timeSlot);
                 AtomicReference<LocalDate> localDateAtomicReference = new AtomicReference<>(startLocalDate);
@@ -1099,7 +1098,6 @@ public class StaffingLevelService  {
                 int totalMinimumMinutes = totalMinNoOfStaff * detailLevelMinutes;
                 int totalMaximumMinutes = totalMaxNoOfStaff * detailLevelMinutes;
                 staffingLevelDetailsByTimeSlotDTOS.add(new StaffingLevelDetailsByTimeSlotDTO(underStaffing,overStaffing,underStaffing * detailLevelMinutes,overStaffing * detailLevelMinutes,timeSlot.getName(),totalMinNoOfStaff, totalMaxNoOfStaff, totalMinimumMinutes, totalMaximumMinutes));
-                System.out.println("timeslot "+timeSlot.getName());
             }
             currentShiftActivities = dateListMap.getOrDefault(startLocalDate,new ArrayList<>());
             int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevel.getPresenceStaffingLevelInterval(),currentShiftActivities,startLocalDate, detailLevelMinutes, false,unpublishedChanges,null);
