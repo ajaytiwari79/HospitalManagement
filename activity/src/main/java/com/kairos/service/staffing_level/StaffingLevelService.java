@@ -1086,12 +1086,11 @@ public class StaffingLevelService  {
             List<ShiftActivity> currentShiftActivities = activityWiseMap.getOrDefault(startLocalDate,new ArrayList<>());
             List<StaffingLevelDetailsByTimeSlotDTO> staffingLevelDetailsByTimeSlotDTOS = new ArrayList<>();
             Integer detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDetailLevelMinutes();
+            System.out.println("date "+startLocalDate);
             for (TimeSlotDTO timeSlot : timeSlots) {
-                ZonedDateTime startZonedDateTime = timeSlot.getStartZoneDateTime(startLocalDate);
-                ZonedDateTime endZonedDateTime = timeSlot.getEndZoneDateTime(startLocalDate);
-                DateTimeInterval timeSlotInterval = new DateTimeInterval(startZonedDateTime,endZonedDateTime);
+                List<DateTimeInterval> timeSlotIntervals = getTimeSlotInterval(startLocalDate, timeSlot);
                 AtomicReference<LocalDate> localDateAtomicReference = new AtomicReference<>(startLocalDate);
-                List<StaffingLevelInterval> staffingLevelIntervals = getStaffingLevelInterval(activityId, unpublishedChanges, staffingLevel, timeSlotInterval, localDateAtomicReference);
+                List<StaffingLevelInterval> staffingLevelIntervals = getStaffingLevelInterval(activityId, unpublishedChanges, staffingLevel, timeSlotIntervals, localDateAtomicReference);
                 int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevelIntervals,currentShiftActivities,startLocalDate, detailLevelMinutes, true,unpublishedChanges,activityId);
                 int overStaffing = maxAndMinNoOfStaff[0];
                 int underStaffing = maxAndMinNoOfStaff[1];
@@ -1100,6 +1099,7 @@ public class StaffingLevelService  {
                 int totalMinimumMinutes = totalMinNoOfStaff * detailLevelMinutes;
                 int totalMaximumMinutes = totalMaxNoOfStaff * detailLevelMinutes;
                 staffingLevelDetailsByTimeSlotDTOS.add(new StaffingLevelDetailsByTimeSlotDTO(underStaffing,overStaffing,underStaffing * detailLevelMinutes,overStaffing * detailLevelMinutes,timeSlot.getName(),totalMinNoOfStaff, totalMaxNoOfStaff, totalMinimumMinutes, totalMaximumMinutes));
+                System.out.println("timeslot "+timeSlot.getName());
             }
             currentShiftActivities = dateListMap.getOrDefault(startLocalDate,new ArrayList<>());
             int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevel.getPresenceStaffingLevelInterval(),currentShiftActivities,startLocalDate, detailLevelMinutes, false,unpublishedChanges,null);
@@ -1116,14 +1116,33 @@ public class StaffingLevelService  {
         return localDateDailyStaffingLevelDetailsDTOMap;
     }
 
-    private List<StaffingLevelInterval> getStaffingLevelInterval(BigInteger activityId, boolean unpublishedChanges, PresenceStaffingLevelDto staffingLevel, DateTimeInterval timeSlotInterval, AtomicReference<LocalDate> localDateAtomicReference) {
-        return staffingLevel.getPresenceStaffingLevelInterval().stream().filter(staffingLevelInterval -> {
-            if (!unpublishedChanges || isCollectionEmpty(staffingLevelInterval.getStaffingLevelIntervalLogs())) {
-                return staffingLevelInterval.getStaffingLevelDuration().getInterval(localDateAtomicReference.get()).overlaps(timeSlotInterval) && staffingLevelInterval.getActivityIds().contains(activityId);
-            }else {
-                return staffingLevelInterval.getStaffingLevelDuration().getInterval(localDateAtomicReference.get()).overlaps(timeSlotInterval) && staffingLevelInterval.getStaffingLevelIntervalLogs().last().getActivityIds().contains(activityId);
+    private List<DateTimeInterval> getTimeSlotInterval(LocalDate startLocalDate, TimeSlotDTO timeSlot) {
+        ZonedDateTime startZonedDateTime = timeSlot.getStartZoneDateTime(startLocalDate);
+        ZonedDateTime endZonedDateTime = timeSlot.getEndZoneDateTime(startLocalDate);
+        List<DateTimeInterval> timeIntervals = new ArrayList<>();
+        timeIntervals.add(new DateTimeInterval(startZonedDateTime,endZonedDateTime));
+        if(timeSlot.getStartHour()>timeSlot.getEndHour()){
+            startZonedDateTime = asZonedDateTime(startLocalDate,LocalTime.MIN);
+            endZonedDateTime = timeSlot.getEndZoneDateTimeWithoutConsiderStartHours(startLocalDate);
+            timeIntervals.add(new DateTimeInterval(startZonedDateTime,endZonedDateTime));
+        }
+        return timeIntervals;
+    }
+
+    private List<StaffingLevelInterval> getStaffingLevelInterval(BigInteger activityId, boolean unpublishedChanges, PresenceStaffingLevelDto staffingLevel, List<DateTimeInterval> timeSlotIntervals, AtomicReference<LocalDate> localDateAtomicReference) {
+        List<StaffingLevelInterval> updatedIntervals = new ArrayList<>(96);
+        for (DateTimeInterval timeSlotInterval : timeSlotIntervals) {
+            for (StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()) {
+                if ((!unpublishedChanges || isCollectionEmpty(staffingLevelInterval.getStaffingLevelIntervalLogs())) && staffingLevelInterval.getStaffingLevelDuration().getInterval(localDateAtomicReference.get()).overlaps(timeSlotInterval) && staffingLevelInterval.getActivityIds().contains(activityId)) {
+                    updatedIntervals.add(staffingLevelInterval);
+                }else {
+                    if(unpublishedChanges && isCollectionNotEmpty(staffingLevelInterval.getStaffingLevelIntervalLogs()) &&  staffingLevelInterval.getStaffingLevelDuration().getInterval(localDateAtomicReference.get()).overlaps(timeSlotInterval) && staffingLevelInterval.getStaffingLevelIntervalLogs().last().getActivityIds().contains(activityId)) {
+                        updatedIntervals.add(staffingLevelInterval);
+                    }
+                }
             }
-        }).collect(Collectors.toList());
+        }
+        return updatedIntervals;
     }
 
     private int[] getMinAndMaxCount(List<StaffingLevelInterval> staffingLevelIntervals, List<ShiftActivity> shiftActivities, LocalDate localDate, int detailLevelMinutes, boolean calculateActivityWise,boolean unpublishedChanges,BigInteger activityId){
@@ -1135,11 +1154,13 @@ public class StaffingLevelService  {
             long count = shiftActivities.stream().filter(shiftActivity -> shiftActivity.getInterval().overlapMinutes(staffingLevelInterval.getStaffingLevelDuration().getInterval(localDate))==detailLevelMinutes
             ).count();
             if(calculateActivityWise){
-                StaffingLevelActivity staffingLevelActivity = !unpublishedChanges || isCollectionEmpty(staffingLevelInterval.getStaffingLevelIntervalLogs()) ? staffingLevelInterval.getStaffingLevelActivities().iterator().next() : staffingLevelInterval.getStaffingLevelIntervalLogs().last().getStaffingLevelActivities().stream().filter(staffingLevelActivity1 -> staffingLevelActivity1.getActivityId().equals(activityId)).findFirst().orElseThrow(()->new InvalidRequestException(convertMessage(MESSAGE_STAFFINGLEVEL_ACTIVITY)));
-                overStaffing += staffingLevelActivity.getMaxNoOfStaff()<count ? count - staffingLevelActivity.getMaxNoOfStaff() : 0;
-                underStaffing += staffingLevelActivity.getMinNoOfStaff()>count ? staffingLevelActivity.getMinNoOfStaff() - count : 0;
-                totalMinNoOfStaff += staffingLevelInterval.getMinNoOfStaff();
-                totalMaxNoOfStaff += staffingLevelInterval.getMaxNoOfStaff();
+                StaffingLevelActivity staffingLevelActivity = !unpublishedChanges || isCollectionEmpty(staffingLevelInterval.getStaffingLevelIntervalLogs()) ? staffingLevelInterval.getStaffingLevelActivity(activityId) : staffingLevelInterval.getStaffingLevelIntervalLogs().last().getStaffingLevelActivities().stream().filter(staffingLevelActivity1 -> staffingLevelActivity1.getActivityId().equals(activityId)).findFirst().orElse(null);
+                if (isNotNull(staffingLevelActivity)) {
+                    overStaffing += staffingLevelActivity.getMaxNoOfStaff()<count ? count - staffingLevelActivity.getMaxNoOfStaff() : 0;
+                    underStaffing += staffingLevelActivity.getMinNoOfStaff()>count ? staffingLevelActivity.getMinNoOfStaff() - count : 0;
+                    totalMinNoOfStaff += staffingLevelInterval.getMinNoOfStaff();
+                    totalMaxNoOfStaff += staffingLevelInterval.getMaxNoOfStaff();
+                }
             }else {
                 overStaffing += staffingLevelInterval.getMaxNoOfStaff()<count ? count - staffingLevelInterval.getMaxNoOfStaff() : 0;
                 underStaffing += staffingLevelInterval.getMinNoOfStaff()>count ? staffingLevelInterval.getMinNoOfStaff() - count  : 0;
