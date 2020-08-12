@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
@@ -106,7 +107,7 @@ public interface CustomShiftMongoRepository {
     List<ActivityWithCompositeDTO> findMostlyUsedActivityByStaffId(Long staffId);
 
     void updateValidateDetailsOfShift(BigInteger shiftId, AccessGroupRole accessGroupRole, LocalDate localDate);
-    List<ShiftActivity> getShiftActivityByUnitIdAndActivityId(Long unitId, Date startDate,Date endDate, Set<BigInteger> activityIds);
+    List<ShiftActivityDTO> getShiftActivityByUnitIdAndActivityId(Long unitId, Date startDate, Date endDate, Set<BigInteger> activityIds);
 
 
 
