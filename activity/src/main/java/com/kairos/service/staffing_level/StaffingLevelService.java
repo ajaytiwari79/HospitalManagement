@@ -1071,7 +1071,7 @@ public class StaffingLevelService  {
 
     public Map<LocalDate,DailyStaffingLevelDetailsDTO> getWeeklyStaffingLevel(Long unitId, LocalDate date, BigInteger activityId,boolean unpublishedChanges) {
         LocalDate startLocalDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
-        LocalDate endLocalDate = startLocalDate.plusWeeks(3);
+        LocalDate endLocalDate = startLocalDate.plusWeeks(3).plusDays(1);
         List<TimeSlotDTO> timeSlots = userIntegrationService.getUnitTimeSlot(unitId);
         List<PresenceStaffingLevelDto> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDatesAndActivityId(unitId,asDate(startLocalDate),asDate(endLocalDate),activityId);
         Object[] staffingLevelMapAndActivityIds = getStaffingLevelMapAndActivityIds(staffingLevels);
@@ -1087,7 +1087,7 @@ public class StaffingLevelService  {
         Map<LocalDate,List<ShiftActivityDTO>> breakIntervalMapByDate = mapArray[2];
         Map<BigInteger,List<ShiftActivityDTO>> shiftIdAndBreakMap = mapArray[3];
         Map<LocalDate,DailyStaffingLevelDetailsDTO> localDateDailyStaffingLevelDetailsDTOMap = new HashMap<>();
-        while (!startLocalDate.isAfter(endLocalDate)){
+        while (startLocalDate.isBefore(endLocalDate)){
             PresenceStaffingLevelDto staffingLevel = staffingLevelMap.get(startLocalDate);
             List<ShiftActivityDTO> currentShiftActivities = activityWiseMap.getOrDefault(startLocalDate,new ArrayList<>());
             List<StaffingLevelDetailsByTimeSlotDTO> staffingLevelDetailsByTimeSlotDTOS = new ArrayList<>();
@@ -1101,8 +1101,9 @@ public class StaffingLevelService  {
                     LocalDate nextDay = startLocalDate.plusDays(1);
                     currentShiftActivities.addAll(activityWiseMap.getOrDefault(nextDay,new ArrayList<>()));
                     breakActivities.addAll(breakIntervalMapByDate.getOrDefault(nextDay,new ArrayList<>()));
-                    PresenceStaffingLevelDto nextDayStaffingLevel = staffingLevelMap.get(startLocalDate);
-                    staffingLevelIntervals.addAll(staffingLevelIntervals = getStaffingLevelInterval(activityId, unpublishedChanges, nextDayStaffingLevel, timeSlotIntervals, localDateAtomicReference));
+                    PresenceStaffingLevelDto nextDayStaffingLevel = staffingLevelMap.get(nextDay);
+                    localDateAtomicReference = new AtomicReference<>(nextDay);
+                    staffingLevelIntervals.addAll(getStaffingLevelInterval(activityId, unpublishedChanges, nextDayStaffingLevel, timeSlotIntervals, localDateAtomicReference));
                 }
                 int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevelIntervals,currentShiftActivities,startLocalDate, detailLevelMinutes, true,unpublishedChanges,activityId,breakActivities,shiftIdAndBreakMap);
                 int overStaffing = maxAndMinNoOfStaff[0];
