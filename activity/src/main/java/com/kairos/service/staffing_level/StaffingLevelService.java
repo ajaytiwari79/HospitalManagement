@@ -1094,6 +1094,11 @@ public class StaffingLevelService  {
             List<ShiftActivityDTO> breakActivities = breakIntervalMapByDate.getOrDefault(startLocalDate,new ArrayList<>());
             Integer detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDetailLevelMinutes();
             for (TimeSlotDTO timeSlot : timeSlots) {
+                if(timeSlot.getStartHour()>timeSlot.getEndHour()){
+                    LocalDate nextDay = startLocalDate.plusDays(1);
+                    currentShiftActivities.addAll(activityWiseMap.getOrDefault(nextDay,new ArrayList<>()));
+                    breakActivities.addAll(breakIntervalMapByDate.getOrDefault(nextDay,new ArrayList<>()));
+                }
                 List<DateTimeInterval> timeSlotIntervals = getTimeSlotInterval(startLocalDate, timeSlot);
                 AtomicReference<LocalDate> localDateAtomicReference = new AtomicReference<>(startLocalDate);
                 List<StaffingLevelInterval> staffingLevelIntervals = getStaffingLevelInterval(activityId, unpublishedChanges, staffingLevel, timeSlotIntervals, localDateAtomicReference);
@@ -1126,11 +1131,6 @@ public class StaffingLevelService  {
         ZonedDateTime endZonedDateTime = timeSlot.getEndZoneDateTime(startLocalDate);
         List<DateTimeInterval> timeIntervals = new ArrayList<>();
         timeIntervals.add(new DateTimeInterval(startZonedDateTime,endZonedDateTime));
-        if(timeSlot.getStartHour()>timeSlot.getEndHour()){
-            startZonedDateTime = asZonedDateTime(startLocalDate,LocalTime.MIN);
-            endZonedDateTime = timeSlot.getEndZoneDateTimeWithoutConsiderStartHours(startLocalDate);
-            timeIntervals.add(new DateTimeInterval(startZonedDateTime,endZonedDateTime));
-        }
         return timeIntervals;
     }
 
