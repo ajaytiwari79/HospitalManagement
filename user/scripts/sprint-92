@@ -1,0 +1,6 @@
+//new tab
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Time Balance",isModule:false,moduleId:"tab_447",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_258" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Resting Hours",isModule:false,moduleId:"tab_448",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_258" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Default KPI List",isModule:false,moduleId:"tab_449",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_258" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Default",isModule:false,moduleId:"tab_450",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_259" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Hub Manager",isModule:false,moduleId:"tab_451",active:true});
