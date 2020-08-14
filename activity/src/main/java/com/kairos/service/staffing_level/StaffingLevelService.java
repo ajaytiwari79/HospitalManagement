@@ -1094,14 +1094,16 @@ public class StaffingLevelService  {
             List<ShiftActivityDTO> breakActivities = breakIntervalMapByDate.getOrDefault(startLocalDate,new ArrayList<>());
             Integer detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDetailLevelMinutes();
             for (TimeSlotDTO timeSlot : timeSlots) {
+                List<DateTimeInterval> timeSlotIntervals = getTimeSlotInterval(startLocalDate, timeSlot);
+                AtomicReference<LocalDate> localDateAtomicReference = new AtomicReference<>(startLocalDate);
+                List<StaffingLevelInterval> staffingLevelIntervals = getStaffingLevelInterval(activityId, unpublishedChanges, staffingLevel, timeSlotIntervals, localDateAtomicReference);
                 if(timeSlot.getStartHour()>timeSlot.getEndHour()){
                     LocalDate nextDay = startLocalDate.plusDays(1);
                     currentShiftActivities.addAll(activityWiseMap.getOrDefault(nextDay,new ArrayList<>()));
                     breakActivities.addAll(breakIntervalMapByDate.getOrDefault(nextDay,new ArrayList<>()));
+                    PresenceStaffingLevelDto nextDayStaffingLevel = staffingLevelMap.get(startLocalDate);
+                    staffingLevelIntervals.addAll(staffingLevelIntervals = getStaffingLevelInterval(activityId, unpublishedChanges, nextDayStaffingLevel, timeSlotIntervals, localDateAtomicReference));
                 }
-                List<DateTimeInterval> timeSlotIntervals = getTimeSlotInterval(startLocalDate, timeSlot);
-                AtomicReference<LocalDate> localDateAtomicReference = new AtomicReference<>(startLocalDate);
-                List<StaffingLevelInterval> staffingLevelIntervals = getStaffingLevelInterval(activityId, unpublishedChanges, staffingLevel, timeSlotIntervals, localDateAtomicReference);
                 int[] maxAndMinNoOfStaff = getMinAndMaxCount(staffingLevelIntervals,currentShiftActivities,startLocalDate, detailLevelMinutes, true,unpublishedChanges,activityId,breakActivities,shiftIdAndBreakMap);
                 int overStaffing = maxAndMinNoOfStaff[0];
                 int underStaffing = maxAndMinNoOfStaff[1];
