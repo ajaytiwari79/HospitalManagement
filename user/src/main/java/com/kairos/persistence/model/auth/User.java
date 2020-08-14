@@ -98,6 +98,9 @@ public class User extends UserBaseEntity {
     @Transient
     private Boolean hubMember;
 
+    @Transient
+    private Boolean systemAdmin;
+
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private UserPersonalizedSettings userPersonalizedSettings;
 

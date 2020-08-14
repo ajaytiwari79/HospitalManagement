@@ -119,7 +119,7 @@ public class PermissionMapperUtils {
     public static  <T> List<T> checkAndReturnValidModel(Object[] objects) {
         List<T> validModels = new ArrayList<>();
         if(isNotNull(UserContext.getUserDetails())){
-            boolean accessGroupValid = !UserContext.getUserDetails().isHubMember();
+            boolean accessGroupValid = !UserContext.getUserDetails().isSystemAdmin();
             boolean argsValid = objects.length!=0;
             if(accessGroupValid && argsValid){
                 validModels = Arrays.stream(objects).filter(arg -> arg.getClass().isAnnotationPresent(KPermissionModel.class) || arg.getClass().isAnnotationPresent(PermissionClass.class) || arg.getClass().isAnnotationPresent(KPermissionRelatedModel.class)).map(model->(T)model).collect(Collectors.toList());

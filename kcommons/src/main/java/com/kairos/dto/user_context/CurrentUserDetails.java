@@ -27,12 +27,12 @@ public class CurrentUserDetails {
     private boolean passwordUpdated;
     private  int age;
     private Long countryId;
-    private boolean hubMember;
     private Long languageId;
     private Long lastSelectedOrganizationId;
     private OrganizationCategory lastSelectedOrganizationCategory;
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
     private String profilePic;
+    private boolean systemAdmin;
 
 
     public CurrentUserDetails(Long id, String userName, String nickName,

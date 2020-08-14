@@ -888,9 +888,10 @@ public class AccessGroupService {
     }
 
     public List<AccessGroup> validAccessGroupByDate(Long unitId,Date date){
+
         AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
         List<AccessGroup> accessGroups = new ArrayList<>();
-        if(!UserContext.getUserDetails().isHubMember()){
+        if(!UserContext.getUserDetails().isSystemAdmin()){
             List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
             for (AccessGroupDayTypesQueryResult accessGroupDayTypesQueryResult : accessGroupDayTypesQueryResults) {
                 if(isNotNull(accessGroupDayTypesQueryResult.getAccessGroup())){
@@ -951,6 +952,10 @@ public class AccessGroupService {
 
     public Set<String> getAccessRoles(Set<Long> accessGroupIds){
         return accessGroupRepository.getAccessRolesByAccessGroupId(accessGroupIds);
+    }
+
+    public Set<Long> getAccessGroupIdsOfUnit(final Long unitId){
+        return organizationService.fetchParentOrganization(unitId).getAccessGroups().stream().map(k->k.getId()).collect(Collectors.toSet());
     }
 
 }

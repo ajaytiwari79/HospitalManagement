@@ -929,9 +929,9 @@ public class ShiftValidatorService {
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.invalidRequestException(MESSAGE_STAFF_UNIT, shiftDTO.getStaffId(), shiftDTO.getUnitId());
         }
-        DateTimeInterval shiftInterval = null;
+        DateTimeInterval shiftInterval;
         Date startDate = asDate(shiftDTO.getShiftDate());
-        Date endDate = null;
+        Date endDate;
         if (CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
 
             endDate = asDate(shiftDTO.getShiftDate().plusDays(6).atTime(LocalTime.MAX));

@@ -436,7 +436,7 @@ public class StaffFilterService {
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
         staffEmploymentTypeWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
-        List<Long> allOrgIds=unit?Arrays.asList(organization.getId()):organizationGraphRepository.findAllOrganizationIdsInHierarchy(organization.getId());
+        List<Long> allOrgIds=organization.isKairosHub() || unit?Arrays.asList(organization.getId()):organizationGraphRepository.findAllOrganizationIdsInHierarchy(organization.getId());
         Map<FilterType, Set<T>> filterTypeSetMap = getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData());
         List<Map> staffListMap=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId, filterTypeSetMap, staffFilterDTO.getSearchText(), envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),null,selectedDate);
         staffListMap = filterStaffList(unitId,staffListMap, filterTypeSetMap);
@@ -632,7 +632,7 @@ public class StaffFilterService {
         List<Map> staffListByRole = new ArrayList<>();
         Organization organization=organizationService.fetchParentOrganization(unitId);
         Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(organization.getId(), userId);
-        if (staffAtHub != null) {
+        if (staffAtHub != null || organization.isKairosHub()) {
             staffListByRole = staffList;
         } else {
             AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);

@@ -54,11 +54,11 @@ public class UserOauth2Service implements UserDetailsService {
             exceptionService.usernameNotFoundException(MESSAGE_USER_USERNAME_NOTFOUND, username);
         }
         user.setHubMember(accessPageService.isHubMember(user.getId()));
+        user.setSystemAdmin(userGraphRepository.isSystemAdmin(user.getId()));
         updateLastSelectedOrganization(user);
         Optional<User> loggedUser = Optional.ofNullable(user);
         String otpString = HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");
         String password = HttpRequestHolder.getCurrentRequest().getParameter("password");
-        user.setHubMember(accessPageService.isHubMember(user.getId()));
         if (passwordEncoder.matches(password, user.getPassword()) && user.getUserType().toString().
                 equals(UserType.SYSTEM_ACCOUNT.toString())) {
             return new UserPrincipal(user, getPermission(user));

@@ -43,7 +43,7 @@ public class ActivityPermissionService {
 
     public <T,E extends MongoBaseEntity> void updateModelBasisOfPermission(List<T> objects, Set<FieldLevelPermission> fieldLevelPermissions){
         try {
-            if(UserContext.getUserDetails().isHubMember()){
+            if(UserContext.getUserDetails().isSystemAdmin()){
                 return;
             }
             Set<String> modelNames=getModelNames(objects);
@@ -84,13 +84,13 @@ public class ActivityPermissionService {
         private Map<Long, E> mapOfDataBaseObject;
         private Map<Long, OtherPermissionDTO> otherPermissionDTOMap;
         private Long currentUserStaffId;
-        private boolean hubMember;
+        private boolean systemAdmin;
         private Long staffId;
         private FieldPermissionUserData fieldPermissionUserData;
 
         private FieldPermissionHelperDTO(List<T> objects,Set<FieldLevelPermission> fieldLevelPermissions,FieldPermissionUserData fieldPermissionUserData) {
             this.objects = objects;
-            hubMember = UserContext.getUserDetails().isHubMember();
+            systemAdmin = UserContext.getUserDetails().isSystemAdmin();
             List<ModelDTO> modelDTOS = fieldPermissionUserData.getModelDTOS();
             modelMap = modelDTOS.stream().collect(Collectors.toMap(k -> k.getModelName(), v -> v));
             Map[] mapArray = getObjectByIds(objects,fieldLevelPermissions);
@@ -137,7 +137,7 @@ public class ActivityPermissionService {
         }
 
         public PermissionMapperUtils.PermissionHelper getPermissionHelper(String className,Set<FieldLevelPermission> fieldLevelPermissions){
-            return new PermissionMapperUtils.PermissionHelper(modelMap.get(className),currentUserStaffId,otherPermissionDTOMap,hubMember,fieldLevelPermissions);
+            return new PermissionMapperUtils.PermissionHelper(modelMap.get(className),currentUserStaffId,otherPermissionDTOMap, systemAdmin,fieldLevelPermissions);
         }
     }
 
