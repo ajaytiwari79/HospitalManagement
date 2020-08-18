@@ -3,9 +3,12 @@ package com.kairos.service.organization;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.Unit;
@@ -21,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -334,6 +339,20 @@ public class OrganizationServiceService {
     public List<OrganizationServiceQueryResult> getAllOrganizationServicesByUnitId(Long unitId){
         return organizationServiceRepository.getAllOrganizationServicesByUnitId(unitId);
     }
+
+    public Map<String, TranslationInfo> updateTranslation(Long serviceId, TranslationDTO translationDTO) {
+        OrganizationService service = organizationServiceRepository.findOne(serviceId);
+        service.setTranslatedNames(translationDTO.getTranslatedNames());
+        service.setTranslatedDescriptions(translationDTO.getTranslatedDescriptions());
+        organizationServiceRepository.save(service);
+        return service.getTranslatedData();
+    }
+
+    public Map<String, TranslationInfo> getTranslatedData(Long serviceId) {
+        OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
+        return organizationService.getTranslatedData();
+    }
+
 
 
 }

@@ -1,5 +1,6 @@
 package com.kairos.controller.cta;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
@@ -128,6 +129,8 @@ public class CostTimeAgreementController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 costTimeAgreementService.getCTARuleTemplateOfUnit(unitId,ctaId));
     }
+
+
 
 
     /**
@@ -306,5 +309,14 @@ public class CostTimeAgreementController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 ctaCompensationSettingService.getCTACompensationSettingByUnit(unitId,expertiseId));
     }
+
+//    Todo please do not remove this method I am working on it later
+
+//    @PutMapping(value = UNIT_URL + "/cta/{id}/language_settings")
+//    @ApiOperation("Add translated data")
+//        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    ResponseEntity<Map<String, Object>> updateTranslationsOfCTA(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.updateTranslation(id,translations));
+//    }
 }
 
