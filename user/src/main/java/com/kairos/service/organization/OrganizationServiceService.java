@@ -3,8 +3,11 @@ package com.kairos.service.organization;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.TranslationDTO;
+import com.kairos.dto.user.country.LevelDTO;
+import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
@@ -29,6 +32,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.*;
 
@@ -89,13 +93,25 @@ public class OrganizationServiceService {
     }
 
 
-    public List<Object> getAllOrganizationService(long countryId) {
-        List<Map<String, Object>> map = organizationServiceRepository.getOrganizationServicesByCountryId(countryId);
-        List<Object> objectList = new ArrayList<>();
-        for (Map<String, Object> result : map) {
-            objectList.add(result.get(RESULT));
+    public List<Map<String,Object>> getAllOrganizationService(long countryId) {
+//        List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServices(countryId);
+//        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
+        List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServicesByCountryId(countryId);
+        List<OrganizationService> organizationServiceList =organizationServices.stream().filter(organizationService->isCollectionNotEmpty(organizationService.getOrganizationSubService())).collect(Collectors.toList());
+        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceList, OrganizationServiceDTO.class);
+        List<Map<String,Object>> mapList =new ArrayList<>();
+        Map<String,Object> data = new HashMap<>();
+        for (OrganizationServiceDTO result : organizationServiceDTOS) {
+            result.setTranslations(result.getTranslatedData());
+            data.put("id", result.getId());
+            data.put("name", result.getName());
+            data.put("description", result.getDescription());
+            data.put("children", result.getOrganizationSubService());
+            data.put("translations", result.getTranslations());
+            mapList.add(data);
+            data = new HashMap<>();
         }
-        return objectList;
+        return mapList;
     }
 
 
@@ -340,10 +356,16 @@ public class OrganizationServiceService {
         return organizationServiceRepository.getAllOrganizationServicesByUnitId(unitId);
     }
 
-    public Map<String, TranslationInfo> updateTranslation(Long serviceId, TranslationDTO translationDTO) {
+    public Map<String, TranslationInfo> updateTranslation(Long serviceId, Map<String,TranslationInfo> translationInfoMap) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translationInfoMap.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
         OrganizationService service = organizationServiceRepository.findOne(serviceId);
-        service.setTranslatedNames(translationDTO.getTranslatedNames());
-        service.setTranslatedDescriptions(translationDTO.getTranslatedDescriptions());
+        service.setTranslatedNames(translatedNames);
+        service.setTranslatedDescriptions(translatedDescriptios);
         organizationServiceRepository.save(service);
         return service.getTranslatedData();
     }

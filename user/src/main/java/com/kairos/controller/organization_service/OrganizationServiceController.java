@@ -131,13 +131,13 @@ public class OrganizationServiceController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.getAllOrganizationServicesByUnitId(unitId));
     }
 
-// Todo please do not remove this commited code I am working On it later
-//    @RequestMapping(value = COUNTRY_URL+"/organization_service/{id}/update_translation", method = RequestMethod.POST)
-//    @ApiOperation("Add translated data")
-//        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    ResponseEntity<Map<String, Object>> updateTranslationsOfActivity(@PathVariable Long id, @RequestBody TranslationDTO translationDTO) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateTranslation(id,translationDTO));
-//    }
+    @RequestMapping(value = COUNTRY_URL+"/organization_service/{id}/update_translation", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfActivity(@PathVariable Long id, @RequestBody Map<String,TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateTranslation(id,translations));
+    }
+
 //  Todo please do not remove this commited code I am working On it later
 //    @ApiOperation(value = "get translated data")
 //    @RequestMapping(value = COUNTRY_URL+"/organization_service/{id}/get_translation_data", method = RequestMethod.GET)
