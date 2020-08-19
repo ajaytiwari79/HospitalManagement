@@ -37,6 +37,7 @@ public class AccessPageQueryResult {
     private List<OrganizationCategory> accessibleFor = new ArrayList<>();
     private boolean hasSubTabs;
     private Map<String,String> translatedNames;
+    private String helperText;
 
     @JsonIgnore
     private AccessPage accessPage;
