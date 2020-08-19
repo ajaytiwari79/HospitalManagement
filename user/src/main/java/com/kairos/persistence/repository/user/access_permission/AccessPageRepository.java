@@ -99,11 +99,11 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
     @Query("MATCH (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
-            "OPTIONAL MATCH (country:Country)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage) " +
+            "OPTIONAL MATCH (country:Country)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage)-[ar:" + ACCESS_PAGE_HAS_LANGUAGE + "]-(systemLanguage:SystemLanguage) " +
             "OPTIONAL MATCH(accessPage)-[subTabs:"+SUB_PAGE+"]-(sub:AccessPage) " +
-            "WITH r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage,subTabs \n" +
+            "WITH r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage,subTabs,ar.description as helperText \n" +
             "RETURN \n" +
-            "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.editable as editable,accessPage.sequence as sequence,accessPage as accessPage, " +
+            "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.editable as editable,accessPage.sequence as sequence,accessPage as accessPage,helperText, " +
             "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
             "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
@@ -121,11 +121,11 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
     @Query("MATCH (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) WHERE id(accessPage)={0} WITH subPage,accessPage \n" +
-            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(subPage) \n" +
+            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(subPage)-[ar:" + ACCESS_PAGE_HAS_LANGUAGE + "]-(systemLanguage:SystemLanguage) \n" +
             "OPTIONAL MATCH(subPage)-[subTabs:"+SUB_PAGE+"]->(sub:AccessPage)\n" +
             "WITH r,subPage,id(accessPage) as parentTabId,subTabs,\n" +
-            "r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization\n" +
-            "RETURN id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,subPage.sequence as sequence,subPage.editable as editable, parentTabId,subPage as accessPage, " +
+            "r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,ar.description as helperText\n" +
+            "RETURN id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,subPage.sequence as sequence,subPage.editable as editable, parentTabId,subPage as accessPage,helperText, " +
             "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
             "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
