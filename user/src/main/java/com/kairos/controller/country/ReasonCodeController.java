@@ -1,5 +1,6 @@
 package com.kairos.controller.country;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.service.country.ReasonCodeService;
@@ -102,6 +103,13 @@ public class ReasonCodeController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAddressByZipCode(@PathVariable long zipCodeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.getAllZipCodesData(zipCodeId));
+    }
+
+    @PutMapping(value = UNIT_URL + "/reason_code/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfSkill(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.updateTranslation(id,translations));
     }
 
 }
