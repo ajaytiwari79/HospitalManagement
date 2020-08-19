@@ -297,7 +297,7 @@ public class ProcessingActivityService {
         processingActivityResponseDTO.setDescription(processingActivity.getDescription());
         processingActivityResponseDTO.setControllerContactInfo(processingActivity.getControllerContactInfo());
         processingActivityResponseDTO.setJointControllerContactInfo(processingActivity.getJointControllerContactInfo());
-        processingActivityResponseDTO.setMaxDataSubjectVolume(processingActivity.getMinDataSubjectVolume());
+        processingActivityResponseDTO.setMaxDataSubjectVolume(processingActivity.getMaxDataSubjectVolume());
         processingActivityResponseDTO.setMinDataSubjectVolume(processingActivity.getMinDataSubjectVolume());
         processingActivityResponseDTO.setManagingDepartment(ObjectMapperUtils.copyPropertiesByMapper(processingActivity.getManagingDepartment(), com.kairos.dto.gdpr.ManagingOrganization.class));
         processingActivityResponseDTO.setProcessOwner(ObjectMapperUtils.copyPropertiesByMapper(processingActivity.getProcessOwner(), com.kairos.dto.gdpr.Staff.class));
