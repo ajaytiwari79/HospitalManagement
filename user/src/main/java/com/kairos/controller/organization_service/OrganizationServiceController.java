@@ -1,5 +1,7 @@
 package com.kairos.controller.organization_service;
 
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.TranslationDTO;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.utils.response.ResponseHandler;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -127,5 +130,19 @@ public class OrganizationServiceController {
     public ResponseEntity<Map<String, Object>> getAllOrganizationServiceByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.getAllOrganizationServicesByUnitId(unitId));
     }
+
+    @RequestMapping(value = COUNTRY_URL+"/organization_service/{id}/update_translation", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfActivity(@PathVariable Long id, @RequestBody Map<String,TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateTranslation(id,translations));
+    }
+
+//  Todo please do not remove this commited code I am working On it later
+//    @ApiOperation(value = "get translated data")
+//    @RequestMapping(value = COUNTRY_URL+"/organization_service/{id}/get_translation_data", method = RequestMethod.GET)
+//    public ResponseEntity<Map<String, Object>> getTranslatedData(@PathVariable Long id) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.getTranslatedData(id));
+//    }
 
 }

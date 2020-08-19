@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prerna on 16/11/17.
