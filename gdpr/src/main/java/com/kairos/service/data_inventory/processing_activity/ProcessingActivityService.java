@@ -206,7 +206,7 @@ public class ProcessingActivityService {
         processingActivity.setDescription(processingActivityDTO.getDescription());
         processingActivity.setControllerContactInfo(processingActivityDTO.getControllerContactInfo());
         processingActivity.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
-        processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
+        processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMaxDataSubjectVolume());
         processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setManagingDepartment(new ManagingOrganization(processingActivityDTO.getManagingDepartment().getManagingOrgId(), processingActivityDTO.getManagingDepartment().getManagingOrgName()));
         processingActivity.setProcessOwner(new Staff(processingActivityDTO.getProcessOwner().getStaffId(), processingActivityDTO.getProcessOwner().getFirstName(), processingActivityDTO.getProcessOwner().getLastName()));
