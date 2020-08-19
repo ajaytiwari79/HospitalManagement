@@ -35,4 +35,5 @@ public class AccessPageDTO {
     private boolean hasSubTabs;
     private int sequence;
     private Map<String,String> translatedNames;
+    private List<AccessPageDTO> children = new ArrayList<>();
 }

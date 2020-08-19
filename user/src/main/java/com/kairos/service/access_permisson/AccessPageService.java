@@ -282,4 +282,22 @@ public class AccessPageService {
         AccessPage accessPage = accessPageRepository.findOne(accessPageId);
         return accessPage.getTranslatedData();
     }
+
+    public List<AccessPageDTO> getTabHierarchy() {
+        List<AccessPageDTO> mainTabs = getMainTabs();
+        for (AccessPageDTO accessPageDTO : mainTabs) {
+            setChildrenAccessPages(accessPageDTO);
+        }
+        return mainTabs;
+    }
+
+    private void setChildrenAccessPages(AccessPageDTO accessPageDTO){
+        List<AccessPageDTO> childAccessPageDTOS = getChildTabs(accessPageDTO.getId());
+        for (AccessPageDTO childAccessPageDTO : childAccessPageDTOS) {
+            if(childAccessPageDTO.isHasSubTabs()){
+                setChildrenAccessPages(childAccessPageDTO);
+            }
+        }
+        accessPageDTO.setChildren(childAccessPageDTOS);
+    }
 }
