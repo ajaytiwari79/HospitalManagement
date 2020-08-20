@@ -19,4 +19,6 @@ public class WeeklyGraphConfiguration {
     private boolean unpublishedChanges;
     private boolean showStandBy;
     private boolean showOnCall;
+    private int rightIntervalSetting;
+    private int leftIntervalSetting;
 }
