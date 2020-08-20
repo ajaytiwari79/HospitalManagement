@@ -143,6 +143,8 @@ public class ShiftBreakService implements KPIService {
     private void validateBreakDuration(Shift shift) {
         shift.getBreakActivities().forEach(k->{
             if(!shift.getInterval().contains(k.getInterval())){
+                LOGGER.info("Shift Interval {}",shift.getInterval().toString());
+                LOGGER.info("Activity Interval {}",k.getInterval().toString());
                 exceptionService.actionNotPermittedException(BREAK_NOT_VALID);
             }
         });
