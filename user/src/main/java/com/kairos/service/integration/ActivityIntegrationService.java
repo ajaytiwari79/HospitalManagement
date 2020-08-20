@@ -9,6 +9,7 @@ import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.common.StaffFilterDataDTO;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
+import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.dto.activity.night_worker.NightWorkerGeneralResponseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
@@ -232,6 +233,10 @@ public class ActivityIntegrationService {
 
     public Set<BigInteger> getActivitiesWithAllChildren(Long unitId,Set<BigInteger> activityIds) {
         return genericRestClient.publishRequest(activityIds, unitId, true, IntegrationOperation.UPDATE, "/activity/get_all_Children", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>(){});
+    }
+
+    public List<CTACompensationSettingDTO> getCTACompensationSettingByCountryId(Long countryId) {
+        return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/cta_compensations", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CTACompensationSettingDTO>>>(){});
     }
 }
 

@@ -2,6 +2,7 @@ package com.kairos.service.expertise;
 
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.union.Location;
@@ -18,6 +19,7 @@ import com.kairos.persistence.repository.user.expertise.OrganizationPersonalizeL
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -61,6 +63,8 @@ public class ExpertiseUnitService {
     private OrganizationBaseRepository organizationBaseRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
 
 
 
@@ -111,8 +115,13 @@ public class ExpertiseUnitService {
         return true;
     }
 
-    public List<ExpertiseQueryResult> findAllExpertiseWithUnits() {
-        return expertiseGraphRepository.findAllExpertiseWithUnitIds();
+    public List<ExpertiseQueryResult> findAllExpertiseWithUnits(Long unitId) {
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
+        List<CTACompensationSettingDTO> ctaCompensationSettingDTOS = activityIntegrationService.getCTACompensationSettingByCountryId(countryId);
+        Map<Long,CTACompensationSettingDTO> ctaCompensationSettingDTOMap = ctaCompensationSettingDTOS.stream().collect(Collectors.toMap(ctaCompensationSettingDTO -> ctaCompensationSettingDTO.getExpertiseId(),v->v));
+        List<ExpertiseQueryResult> expertiseQueryResults = expertiseGraphRepository.findAllExpertiseWithUnitIds();
+        expertiseQueryResults.forEach(expertiseQueryResult -> expertiseQueryResult.setCtaCompensationSetting(ctaCompensationSettingDTOMap.get(expertiseQueryResult.getId())));
+        return expertiseQueryResults;
     }
 
     public List<Long> getExpertiseIdsByUnit(Long unitId){

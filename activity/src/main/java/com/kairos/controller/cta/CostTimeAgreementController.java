@@ -300,6 +300,13 @@ public class CostTimeAgreementController {
                 ctaCompensationSettingService.getCTACompensationSetting(countryId,expertiseId));
     }
 
+    @GetMapping(value =COUNTRY_URL + "/cta_compensations")
+    @ApiOperation("Cta Compensation of expertise in Country")
+    public ResponseEntity<Map<String, Object>> getCTACompensationSettingByCountryId(@PathVariable Long countryId)  {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                ctaCompensationSettingService.getCTACompensationSettingByCountryId(countryId));
+    }
+
     @GetMapping(value =UNIT_URL+API_EXPERTISE_URL + "/cta_compensation")
     @ApiOperation("Cta Compensation of expertise in Country")
     public ResponseEntity<Map<String, Object>> getCTACompensationSettingByUnit(@PathVariable Long unitId,@PathVariable Long expertiseId)  {
