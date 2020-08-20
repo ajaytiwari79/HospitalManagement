@@ -9,6 +9,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.BreakAction;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftFilterParam;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ViewType;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.service.activity.ActivityService;
@@ -129,6 +130,13 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.deleteAllLinkedShifts(shiftId));
     }
 
+    @ApiOperation("delete Shifts")
+    @DeleteMapping(value = "/shifts")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteAllShifts(@RequestBody List<BigInteger> shiftIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.deleteAllShifts(shiftIds));
+    }
+
     @ApiOperation("update status of shifts")
     @PutMapping(value = "/shift/update_status")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -155,7 +163,7 @@ public class ShiftController {
                                                                                                 Long employmentEndDate, @PathVariable Long staffId,
                                                                                         @PathVariable Long unitId) {
 
-        shiftService.deleteShiftsAndOpenShiftsOnEmploymentEnd(staffId, DateUtils.getLocalDatetimeFromLong(employmentEndDate), unitId);
+        shiftService.deleteShiftsAndOpenShiftsOnEmploymentEnd(staffId, DateUtils.getLocalDatetimeFromLong(employmentEndDate));
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
 
     }
@@ -281,4 +289,5 @@ public class ShiftController {
     public ResponseEntity<Map<String, Object>> breakInterrupt(@PathVariable BigInteger shiftId, @RequestParam("breakAction") BreakAction breakAction) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftBreakService.interruptBreak(shiftId,breakAction));
     }
+
 }
