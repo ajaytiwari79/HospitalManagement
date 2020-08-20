@@ -237,8 +237,8 @@ public class ExpertiseController {
 
     @ApiOperation(value = "get all expertise for multiple units")
     @GetMapping(value = UNIT_URL + "/units_expertise")
-    public ResponseEntity<Map<String, Object>> findAllExpertiseWithUnits() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.findAllExpertiseWithUnits());
+    public ResponseEntity<Map<String, Object>> findAllExpertiseWithUnits(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.findAllExpertiseWithUnits(unitId));
     }
 
 

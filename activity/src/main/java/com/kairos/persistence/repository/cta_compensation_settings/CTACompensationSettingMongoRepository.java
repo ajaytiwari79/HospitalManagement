@@ -22,6 +22,9 @@ public interface CTACompensationSettingMongoRepository extends MongoBaseReposito
     @Query("{countryId:?0,deleted:false,expertiseId:?1}")
     CTACompensationSetting findByDeletedFalseAndCountryIdAndExpertiseIdAndPrimaryTrue(Long countryId, Long expertiseId);
 
+    @Query("{countryId:?0,deleted:false}")
+    List<CTACompensationSetting> findByDeletedFalseAndCountryId(Long countryId);
+
     @Query("{unitId:?0,deleted:false,expertiseId:?1}")
     CTACompensationSetting findByDeletedFalseAndUnitIdAndExpertiseIdAndPrimaryTrue(Long unitId, Long expertiseId);
 

@@ -93,4 +93,9 @@ public class CTACompensationSettingService {
         return new CTACompensationSetting(configurations,countryId,expertiseId,unitId);
     }
 
+    public List<CTACompensationSettingDTO> getCTACompensationSettingByCountryId(Long countryId) {
+        List<CTACompensationSetting> ctaCompensationSettings = ctaCompensationSettingMongoRepository.findByDeletedFalseAndCountryId(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(ctaCompensationSettings,CTACompensationSettingDTO.class);
+    }
+
 }

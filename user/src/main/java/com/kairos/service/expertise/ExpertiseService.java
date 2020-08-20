@@ -7,6 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
+import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
@@ -52,6 +53,7 @@ import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationServiceService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -128,6 +130,8 @@ public class ExpertiseService {
     private SeniorDaysGraphRepository seniorDaysGraphRepository;
     @Inject
     private ChildCareDaysGraphRepository childCareDaysGraphRepository;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
 
 
     public ExpertiseQueryResult saveExpertise(Long countryId, ExpertiseDTO expertiseDTO) {
@@ -269,8 +273,13 @@ public class ExpertiseService {
         List<ExpertiseQueryResult> expertiseQueryResults = expertiseGraphRepository.getAllExpertise(countryId, new boolean[]{true});
         List<Long> allExpertiseIds = expertiseQueryResults.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
         List<ExpertiseLineQueryResult> expertiseLineQueryResults = expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
+        List<CTACompensationSettingDTO> ctaCompensationSettingDTOS = activityIntegrationService.getCTACompensationSettingByCountryId(countryId);
+        Map<Long,CTACompensationSettingDTO> ctaCompensationSettingDTOMap = ctaCompensationSettingDTOS.stream().collect(Collectors.toMap(ctaCompensationSettingDTO -> ctaCompensationSettingDTO.getExpertiseId(),v->v));
         Map<Long, List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap = expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
-        expertiseQueryResults.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
+        expertiseQueryResults.forEach(expertiseQueryResult -> {
+            expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId()));
+            expertiseQueryResult.setCtaCompensationSetting(ctaCompensationSettingDTOMap.get(expertiseQueryResult.getId()));
+        });
         return expertiseQueryResults;
     }
 
