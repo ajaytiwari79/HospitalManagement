@@ -186,19 +186,8 @@ public class StaffingLevelUtil {
         for (int i = 0; i < 96; i++) {
             StaffingLevelIntervalLog staffingLevelIntervalLog = isCollectionEmpty(staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelIntervalLogs()) ? null : staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelIntervalLogs().last();
             StaffingLevelInterval interval = ObjectMapperUtils.copyPropertiesByMapper(isNull(staffingLevelIntervalLog) ? staffingLevel.getPresenceStaffingLevelInterval().get(i) : staffingLevelIntervalLog, StaffingLevelInterval.class);
-<<<<<<< HEAD
             if (presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getSequence() == i) {
                 staffingLevelIntervals.add(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0));
-=======
-            if (presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getSequence() == i || (isNotNull(presenceStaffingLevelDTO.getInterval()) && presenceStaffingLevelDTO.getInterval().contains(currentDate))) {
-                if(isNotNull(presenceStaffingLevelDTO.getStaffingLevelChange())){
-                    StaffingLevelInterval staffingLevelInterval= updateInterval(interval,presenceStaffingLevelDTO);
-                    staffingLevelIntervals.add(staffingLevelInterval);
-                    currentDate.plusMinutes(15);
-                }else {
-                    staffingLevelIntervals.add(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0));
-                }
->>>>>>> 1340342... Added fixes of break
             } else {
                 if (presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().size() < interval.getStaffingLevelActivities().size()) {
                     for (Iterator<StaffingLevelActivity> iterator = interval.getStaffingLevelActivities().iterator(); iterator.hasNext(); ) {
