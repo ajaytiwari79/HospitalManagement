@@ -30,9 +30,9 @@ import static com.kairos.enums.kpermissions.FieldLevelPermission.READ;
 
 
 @Service
-public class PermissionService {
+public class ActivityPermissionService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PermissionService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityPermissionService.class);
 
     @Inject
     private ExceptionService exceptionService;

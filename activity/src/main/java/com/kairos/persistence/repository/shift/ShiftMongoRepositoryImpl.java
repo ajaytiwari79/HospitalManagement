@@ -357,16 +357,26 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public List<ShiftActivity> getShiftActivityByUnitIdAndActivityId(Long unitId,Date startDate,Date endDate,Set<BigInteger> activityIds){
+    public List<ShiftActivityDTO> getShiftActivityByUnitIdAndActivityId(Long unitId,Date startDate,Date endDate,Set<BigInteger> activityIds){
         Set<String> activites = activityIds.stream().map(bigInteger -> bigInteger.toString()).collect(Collectors.toSet());
         Aggregation aggregation = newAggregation(
                 match(Criteria.where("unitId").is(unitId).and(DELETED).is(false).and(DISABLED).is(false).and("startDate").lt(endDate).and("endDate").gt(startDate)),
+                project("activities").and("breakActivities").concatArrays("activities").as("activities"),
                 unwind("activities"),
+                new CustomAggregationOperation(Document.parse("{\n" +
+                        "    \"$project\": {\n" +
+                        "      \"activities.shiftId\": \"$_id\",\n" +
+                        "        \"activities.startDate\": 1,\n" +
+                        "        \"activities.endDate\": 1,\n" +
+                        "        \"activities.activityId\": 1,\n" +
+                        "        \"activities.breakNotHeld\": 1\n" +
+                        "    }\n" +
+                        "  }")),
                 replaceRoot("activities"),
-                match(Criteria.where("startDate").lt(endDate).and("endDate").gt(startDate).and("activityId").in(activites)),
-                project("startDate","endDate","activityId")
+                match(Criteria.where("startDate").lt(endDate).and("endDate").gt(startDate).and("activityId").in(activites).and("breakNotHeld").is(false)),
+                project("startDate","endDate","activityId","breakNotHeld","shiftId")
         );
-        return mongoTemplate.aggregate(aggregation,Shift.class, ShiftActivity.class).getMappedResults();
+        return mongoTemplate.aggregate(aggregation,Shift.class, ShiftActivityDTO.class).getMappedResults();
     }
 
     public static Document shiftWithActivityGroup() {

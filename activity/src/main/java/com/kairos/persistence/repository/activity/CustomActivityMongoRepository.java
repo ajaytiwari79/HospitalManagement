@@ -115,4 +115,6 @@ public interface CustomActivityMongoRepository {
     List<ActivityTimeTypeWrapper> getActivityPath(final String activityId);
 
     List<ActivityDTO> getActivityDetailsWithRankByUnitId(Long unitId);
+
+    List<Activity> findAllBreakActivitiesByOrganizationId(Long unitId);
 }

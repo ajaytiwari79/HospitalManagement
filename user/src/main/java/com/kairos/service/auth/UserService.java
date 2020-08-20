@@ -222,6 +222,7 @@ public class UserService {
         map.put("email", currentUser.getEmail());
         map.put("userNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
+        map.put("userName", currentUser.getUserName());
         return map;
     }
 
@@ -381,11 +382,15 @@ public class UserService {
         if (user == null) {
             LOGGER.error("User not found belongs to this email {}" , firstTimePasswordUpdateDTO.getEmail());
             exceptionService.dataNotFoundByIdException(MESSAGE_USER_EMAIL_NOTFOUND, firstTimePasswordUpdateDTO.getEmail());
-
+        }
+        if(userGraphRepository.existByUserName("(?i)" + firstTimePasswordUpdateDTO.getUserName(),"(?i)" + firstTimePasswordUpdateDTO.getEmail())){
+            exceptionService.actionNotPermittedException(MESSAGE_USER_USERNAME_ALREADY_USE);
         }
         CharSequence password = CharBuffer.wrap(firstTimePasswordUpdateDTO.getRepeatPassword());
         user.setPassword(new BCryptPasswordEncoder().encode(password));
         user.setPasswordUpdated(true);
+        user.setUserName(firstTimePasswordUpdateDTO.getUserName());
+        user.setUserNameUpdated(true);
         userGraphRepository.save(user);
         return true;
     }
@@ -394,6 +399,7 @@ public class UserService {
     public Map<String, AccessPageQueryResult> prepareUnitPermissions(List<AccessPageQueryResult> accessPageQueryResults, boolean parentOrganization) {
         List<AccessPage> accessPagesDetails = accessPageRepository.findAllById(accessPageQueryResults.stream().map(accessPageQueryResult -> accessPageQueryResult.getId()).collect(Collectors.toList()));
         Map<Long,List<Long>> accessPageIdAndChildrenId = accessPagesDetails.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getSubPages().stream().map(accessPage -> accessPage.getId()).collect(Collectors.toList())));
+        Map<Long,AccessPage> accessPageIdAndAccessPageMap = accessPagesDetails.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         Map<String, AccessPageQueryResult> unitPermissionMap = new HashMap<>();
         for (AccessPageQueryResult permission : accessPageQueryResults) {
             if (unitPermissionMap.containsKey(permission.getModuleId()) && parentOrganization) {
@@ -406,6 +412,7 @@ public class UserService {
                 permission.setRead(isAccessPageRead(permission, accessPageQueryResults, accessPageIdAndChildrenId));
                 permission.setWrite(isAccessPageWrite(permission, accessPageQueryResults, accessPageIdAndChildrenId));
                 permission.setActive(permission.isRead() || permission.isWrite());
+                permission.setTranslatedNames(accessPageIdAndAccessPageMap.get(permission.getId()).getTranslatedNames());
                 unitPermissionMap.put(permission.getModuleId(), permission);
             }
         }

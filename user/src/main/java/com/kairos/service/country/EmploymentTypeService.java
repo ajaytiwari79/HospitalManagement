@@ -199,6 +199,11 @@ public class EmploymentTypeService {
         return unitGraphRepository.getEmploymentTypeByOrganization(organization.getId(), isDeleted);
     }
 
+    public List<EmploymentType> getEmploymentTypes(Long unitId){
+        Organization organization=organizationService.fetchParentOrganization(unitId);
+        return employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false);
+    }
+
     public OrganizationEmploymentTypeDTO setEmploymentTypeSettingsOfOrganization(Long unitId, Long employmentTypeId, OrganizationEmploymentTypeDTO organizationEmploymentTypeDTO) {
         Unit unit = (Optional.ofNullable(unitId).isPresent()) ? unitGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(unit).isPresent()) {

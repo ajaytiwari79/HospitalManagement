@@ -2,14 +2,14 @@ package com.kairos.shiftplanning.move;
 
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import org.optaplanner.core.impl.heuristic.move.AbstractMove;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-public class ActivityLineIntervalIteratorMove extends AbstractMove<ShiftRequestPhasePlanningSolution> {
+public class ActivityLineIntervalIteratorMove extends AbstractMove<ShiftPlanningSolution> {
     private final ActivityLineInterval activityLineInterval;
     private final ShiftImp shiftImp;
 
@@ -19,19 +19,19 @@ public class ActivityLineIntervalIteratorMove extends AbstractMove<ShiftRequestP
     }
 
     @Override
-    protected AbstractMove<ShiftRequestPhasePlanningSolution> createUndoMove(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    protected AbstractMove<ShiftPlanningSolution> createUndoMove(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         return new ActivityLineIntervalIteratorMove(activityLineInterval,activityLineInterval.getShift());
     }
 
     @Override
-    protected void doMoveOnGenuineVariables(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    protected void doMoveOnGenuineVariables(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         scoreDirector.beforeVariableChanged(activityLineInterval, "shift");
         activityLineInterval.setShift(shiftImp);
         scoreDirector.afterVariableChanged(activityLineInterval, "shift");
     }
 
     @Override
-    public boolean isMoveDoable(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    public boolean isMoveDoable(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         return true;
     }
 

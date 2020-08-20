@@ -337,11 +337,11 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     Map<String, Object> getContactAddressOfParentOrganization(Long unitId);
 
     @Query("MATCH (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(org)={0} \n" +
-            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{deleted:false}]->(skill:Skill) WITH distinct skill,org\n" +
-            "MATCH (org)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WITH skill,r,org\n" +
+            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{deleted:false}]->(skill:Skill{isEnabled:true}) WITH distinct skill,org\n" +
+            "MATCH (org)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill{isEnabled:true}) WITH skill,r,org\n" +
             "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH org,skillCategory,skill,r\n" +
             "OPTIONAL MATCH (skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + COUNTRY_HAS_TAG + "]-(c:Country) WHERE tag.countryTag=org.showCountryTags WITH DISTINCT  r,skill,skillCategory,org,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + ORGANIZATION_HAS_TAG + "]-(org) WITH  r,skill,org,skillCategory,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "OPTIONAL MATCH (skill:Skill{isEnabled:true})-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + ORGANIZATION_HAS_TAG + "]-(org) WITH  r,skill,org,skillCategory,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
             "OPTIONAL MATCH (staff:Staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE id(staff) IN {1}\n" +
             "WITH {staff:case when staffSkillRel is null then [] else COLLECT(id(staff)) end} as staff,skillCategory,skill,r,otags,ctags\n" +
             "RETURN {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:COLLECT({id:id(skill),name:case when r is null or r.customName is null then skill.name else r.customName end,description:skill.description,isSelected:case when r is null then false else true end, customName:case when r is null or r.customName is null then skill.name else r.customName end, isEdited:true,staff:staff.staff,tags:ctags+otags})} as data")

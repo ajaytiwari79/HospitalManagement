@@ -39,6 +39,7 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.wrapper.StaffUnionWrapper;
@@ -52,7 +53,7 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -95,6 +96,8 @@ public class UnionService {
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject
     private ContactAddressGraphRepository contactAddressGraphRepository;
+    @Inject
+    private ReasonCodeService reasonCodeService;
 
 
     public List<Sector> findAllSectorsByCountry(Long countryId) {
@@ -581,7 +584,7 @@ public class UnionService {
         List<UnionResponseDTO> unions = unitGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
         List<OrganizationBasicResponse> organizationHierarchy = unitGraphRepository.getOrganizationHierarchy(organization.getId());
 
-        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(organizationBaseEntity.getId(), ReasonCodeType.EMPLOYMENT);
+        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeService.getReasonCodesByUnitId(organizationBaseEntity.getId(), ReasonCodeType.EMPLOYMENT);
         return new StaffUnionWrapper(unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
     }
 }

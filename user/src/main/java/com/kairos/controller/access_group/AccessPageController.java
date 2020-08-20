@@ -118,4 +118,10 @@ public class AccessPageController {
     public ResponseEntity<Map<String, Object>> getTranslatedData(@PathVariable Long accessPageId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getTranslatedData(accessPageId));
     }
+
+    @ApiOperation(value = "get tab hierarchy")
+    @GetMapping("/tab_hierarchy")
+    public ResponseEntity<Map<String, Object>> getTabHierarchy(@RequestParam("languageId") Long languageId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getTabHierarchy(languageId));
+    }
 }

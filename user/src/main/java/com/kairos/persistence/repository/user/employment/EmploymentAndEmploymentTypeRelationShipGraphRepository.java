@@ -14,7 +14,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_E
 @Repository
 public interface EmploymentAndEmploymentTypeRelationShipGraphRepository extends Neo4jBaseRepository<EmploymentLineEmploymentTypeRelationShip, Long> {
 
-    @Query("MATCH(employmentLine:EmploymentLine),(newEmployment:EmploymentType) WHERE id(newEmployment)={2} AND id(employmentLine)={0} "+
+    @Query("MATCH(employmentLine:EmploymentLine),(newEmployment:EmploymentType) WHERE id(newEmployment)={1} AND id(employmentLine)={0} "+
     "MATCH(employmentLine)-[oldRelation:"+HAS_EMPLOYMENT_TYPE+"]-(emp:EmploymentType) "+
     "DETACH DELETE oldRelation "+
     "MERGE(employmentLine)-[newRelation:"+HAS_EMPLOYMENT_TYPE+"]->(newEmployment) "+
@@ -23,4 +23,5 @@ public interface EmploymentAndEmploymentTypeRelationShipGraphRepository extends 
 
     @Query("MATCH(employmentLine:EmploymentLine)-[rel:"+HAS_EMPLOYMENT_TYPE+"]-(empType:EmploymentType) WHERE ID(employmentLine)={0} return employmentLine,rel,empType" )
     EmploymentLineEmploymentTypeRelationShip findByEmploymentLineId(Long employmentLineId);
+
 }

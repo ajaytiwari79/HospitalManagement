@@ -3,19 +3,19 @@ package com.kairos.shiftplanning.move;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.move.helper.ActivityLineIntervalChangeMoveHelper;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import org.optaplanner.core.impl.heuristic.move.AbstractMove;
+import org.optaplanner.core.impl.heuristic.move.Move;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class ActivityLineIntervalSwapMove extends AbstractMove<ShiftRequestPhasePlanningSolution> {
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+
+public class ActivityLineIntervalSwapMove extends AbstractMove<ShiftPlanningSolution> {
     private ActivityLineInterval leftActivityLineInterval;
     private ShiftImp leftToShift;
     private List<ActivityLineInterval> leftExActivityLineIntervals;
@@ -37,13 +37,13 @@ public class ActivityLineIntervalSwapMove extends AbstractMove<ShiftRequestPhase
         this.rightExToShift=rightExToShift;
     }
     @Override
-    protected AbstractMove<ShiftRequestPhasePlanningSolution> createUndoMove(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    protected AbstractMove<ShiftPlanningSolution> createUndoMove(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         return new ActivityLineIntervalSwapMove(leftActivityLineInterval, leftActivityLineInterval.getShift(), leftExActivityLineIntervals,rightActivityLineInterval.getShift(),
                 rightActivityLineInterval, rightActivityLineInterval.getShift(), rightExActivityLineIntervals,leftActivityLineInterval.getShift());
     }
 
     @Override
-    protected void doMoveOnGenuineVariables(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    protected void doMoveOnGenuineVariables(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         try {
             ActivityLineIntervalChangeMoveHelper.assignActivityIntervalToShift
                     (scoreDirector, leftActivityLineInterval, leftToShift, leftExActivityLineIntervals, leftExToShift);
@@ -56,7 +56,7 @@ public class ActivityLineIntervalSwapMove extends AbstractMove<ShiftRequestPhase
     }
 
     @Override
-    public boolean isMoveDoable(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    public boolean isMoveDoable(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         boolean isDoable=leftActivityLineInterval.getActivity().isTypeAbsence()==rightActivityLineInterval.getActivity().isTypeAbsence() &&
                 !Objects.equals(leftActivityLineInterval,rightActivityLineInterval) &&
                 !Objects.equals(leftActivityLineInterval.getShift(),rightActivityLineInterval.getShift());
@@ -71,6 +71,22 @@ public class ActivityLineIntervalSwapMove extends AbstractMove<ShiftRequestPhase
     @Override
     public Collection<?> getPlanningValues() {
         return Arrays.asList(leftActivityLineInterval.getShift(),rightActivityLineInterval.getShift());
+    }
+
+    @Override
+    public ActivityLineIntervalSwapMove rebase(ScoreDirector<ShiftPlanningSolution> destinationScoreDirector) {
+        return new ActivityLineIntervalSwapMove(destinationScoreDirector.lookUpWorkingObject(leftActivityLineInterval),destinationScoreDirector.lookUpWorkingObject(leftToShift),rebaseList(leftExActivityLineIntervals,destinationScoreDirector),destinationScoreDirector.lookUpWorkingObject(leftExToShift),destinationScoreDirector.lookUpWorkingObject(rightActivityLineInterval),destinationScoreDirector.lookUpWorkingObject(rightToShift),rebaseList(rightExActivityLineIntervals,destinationScoreDirector),destinationScoreDirector.lookUpWorkingObject(rightExToShift));
+    }
+
+    protected static  <E> List<E> rebaseList(List<E> externalObjectList, ScoreDirector<?> destinationScoreDirector) {
+        if(isNull(externalObjectList)){
+            return null;
+        }
+        List<E> rebasedObjectList = new ArrayList<>(externalObjectList.size());
+        for (E entity : externalObjectList) {
+            rebasedObjectList.add(destinationScoreDirector.lookUpWorkingObject(entity));
+        }
+        return rebasedObjectList;
     }
 
     @Override

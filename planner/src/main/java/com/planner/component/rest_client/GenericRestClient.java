@@ -38,10 +38,10 @@ public class GenericRestClient {
     @Inject
     private ExceptionService exceptionService;
 
-    @Value("${gateway.userservice.url}")
-    private String userServiceUrl;// = "http://localdev.kairosplanning.com/kairos/user/api/v1";
-    @Value("${gateway.activityservice.url}")
-    private String activityServiceUrl;// = "http://localdev.kairosplanning.com/kairos/activity/api/v1";
+   // @Value("${gateway.userservice.url}")
+    private String userServiceUrl = "http://dev.kairosplanning.com/kairos/user/api/v1";
+   // @Value("${gateway.activityservice.url}")
+    private String activityServiceUrl = "http://dev.kairosplanning.com/kairos/activity/api/v1";
 
 
     /**

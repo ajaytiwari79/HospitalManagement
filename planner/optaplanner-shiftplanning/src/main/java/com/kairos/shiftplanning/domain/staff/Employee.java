@@ -7,6 +7,7 @@ import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.WTABaseRuleTemplate;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -18,10 +19,10 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 
 @Getter
@@ -68,6 +69,23 @@ public class Employee {
     public int checkConstraints(Unit unit, ShiftImp shiftImp, List<ShiftImp> shiftImps,ConstraintSubType constraintSubType) {
         if(!this.wtaRuleTemplateMap.containsKey(constraintSubType)) return 0;
         return this.wtaRuleTemplateMap.get(shiftImp.getStartDate()).get(constraintSubType).checkConstraints(unit,shiftImp,shiftImps);
+    }
+
+    public int checkConstraints(ShiftImp shiftImp, List<ShiftImp> shiftImps,HardMediumSoftLongScoreHolder scoreHolder,RuleContext ruleContext) throws InterruptedException, ExecutionException {
+        List<Callable<Boolean>> callables = new ArrayList<>();
+        for (WTABaseRuleTemplate wtaBaseRuleTemplate : this.wtaRuleTemplateMap.get(shiftImp.getStartDate()).values()) {
+            Callable<Boolean> callable = ()->{
+                int constraintPenality = wtaBaseRuleTemplate.checkConstraints(unit,shiftImp,shiftImps);
+                wtaBaseRuleTemplate.breakLevelConstraints(scoreHolder,ruleContext,constraintPenality);
+                return true;
+            };
+            callables.add(callable);
+        }
+        List<Future<Boolean>> futures = ShiftPlanningUtility.executeAsynchronously(callables);
+        for (Future<Boolean> future : futures) {
+            future.get();
+        }
+        return 0;
     }
 
     public void breakContraints(ShiftImp shiftImp,HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, ConstraintSubType constraintSubType) {

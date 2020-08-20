@@ -1,9 +1,12 @@
 package com.kairos.controller.cta;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
+import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.cta.CountryCTAService;
+import com.kairos.service.cta_compensation_settings.CTACompensationSettingService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -30,6 +33,8 @@ public class CostTimeAgreementController {
     private CostTimeAgreementService costTimeAgreementService;
     @Inject
     private CountryCTAService countryCTAService;
+    @Inject
+    private CTACompensationSettingService ctaCompensationSettingService;
 
     /**
      *
@@ -124,6 +129,8 @@ public class CostTimeAgreementController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 costTimeAgreementService.getCTARuleTemplateOfUnit(unitId,ctaId));
     }
+
+
 
 
     /**
@@ -272,5 +279,44 @@ public class CostTimeAgreementController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 countryCTAService.createCostTimeAgreementInOrganization(unitId,collectiveTimeAgreementDTO));
     }
+
+    @PutMapping(value =COUNTRY_URL+API_EXPERTISE_URL + "/cta_compensation")
+    @ApiOperation("Cta Compensation of expertise in Country")
+    public ResponseEntity<Map<String, Object>> updateCTACompensationSetting(@PathVariable Long countryId,@PathVariable Long expertiseId
+            , @RequestBody @Valid CTACompensationSettingDTO ctaCompensationSettingDTO )  {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                ctaCompensationSettingService.updateCTACompensationSetting(countryId,expertiseId,ctaCompensationSettingDTO));
+    }
+
+    @PutMapping(value =UNIT_URL+API_EXPERTISE_URL + "/cta_compensation")
+    @ApiOperation("Cta Compensation of expertise in Country")
+    public ResponseEntity<Map<String, Object>> updateCTACompensationSettingByUnit(@PathVariable Long unitId,@PathVariable Long expertiseId
+            , @RequestBody @Valid CTACompensationSettingDTO ctaCompensationSettingDTO )  {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                ctaCompensationSettingService.updateCTACompensationSettingByUnit(unitId,expertiseId,ctaCompensationSettingDTO));
+    }
+
+    @GetMapping(value =COUNTRY_URL+API_EXPERTISE_URL + "/cta_compensation")
+    @ApiOperation("Cta Compensation of expertise in Country")
+    public ResponseEntity<Map<String, Object>> getCTACompensationSetting(@PathVariable Long countryId,@PathVariable Long expertiseId)  {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                ctaCompensationSettingService.getCTACompensationSetting(countryId,expertiseId));
+    }
+
+    @GetMapping(value =UNIT_URL+API_EXPERTISE_URL + "/cta_compensation")
+    @ApiOperation("Cta Compensation of expertise in Country")
+    public ResponseEntity<Map<String, Object>> getCTACompensationSettingByUnit(@PathVariable Long unitId,@PathVariable Long expertiseId)  {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                ctaCompensationSettingService.getCTACompensationSettingByUnit(unitId,expertiseId));
+    }
+
+//    Todo please do not remove this method I am working on it later
+
+//    @PutMapping(value = UNIT_URL + "/cta/{id}/language_settings")
+//    @ApiOperation("Add translated data")
+//        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    ResponseEntity<Map<String, Object>> updateTranslationsOfCTA(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.updateTranslation(id,translations));
+//    }
 }
 

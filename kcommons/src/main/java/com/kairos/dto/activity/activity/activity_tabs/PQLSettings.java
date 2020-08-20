@@ -8,9 +8,7 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.open_shift.DurationField;
 
 import java.util.Optional;
-
 public class PQLSettings {
-
     private DurationField approvalTimeInAdvance; // TODO need to rename
     private Float approvalPercentageWithoutMovement;
     private ApprovalCriteria approvalWithMovement;

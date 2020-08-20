@@ -2,7 +2,7 @@ package com.kairos.shiftplanning.move;
 
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionFilter;
 import org.optaplanner.core.impl.heuristic.selector.move.generic.PillarChangeMove;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
@@ -13,9 +13,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ActivityLineIntervalPillarMoveFilter implements SelectionFilter<ShiftRequestPhasePlanningSolution,PillarChangeMove<ShiftRequestPhasePlanningSolution>> {
+public class ActivityLineIntervalPillarMoveFilter implements SelectionFilter<ShiftPlanningSolution,PillarChangeMove<ShiftPlanningSolution>> {
     @Override
-    public boolean accept(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector, PillarChangeMove<ShiftRequestPhasePlanningSolution> selection) {
+    public boolean accept(ScoreDirector<ShiftPlanningSolution> scoreDirector, PillarChangeMove<ShiftPlanningSolution> selection) {
         List objects = selection.getPillar();
         List<ActivityLineInterval> activityLineIntervalList=(List<ActivityLineInterval>)objects;
         Set<LocalDate> dates=new HashSet<>();

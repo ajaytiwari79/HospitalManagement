@@ -1,9 +1,12 @@
 package com.kairos.planner.vrp.taskplanning.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
 import com.kairos.planner.vrp.taskplanning.util.VrpPlanningUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
@@ -22,6 +25,8 @@ import java.util.UUID;
  * @date - 7/6/18
  */
 @PlanningEntity
+@Getter
+@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Task extends TaskOrShift{
@@ -159,7 +164,7 @@ public class Task extends TaskOrShift{
         this.skills = skills;
     }
 
-    
+
 
     public long getInstallationNo() {
         return installationNo;
@@ -185,31 +190,35 @@ public class Task extends TaskOrShift{
         this.longitude = longitude;
     }
 
+    @JsonIgnore
     public LocalDateTime getPlannedStartTime() {
         return plannedStartTime;
     }
+    @JsonIgnore
     public LocalDateTime getPlannedEndTime() {
         if(plannedStartTime ==null) return null;
         return plannedStartTime.plusMinutes((long)getPlannedDuration());
 
     }
 
+    @JsonIgnore
     public void setPlannedStartTime(LocalDateTime plannedStartTime) {
         this.plannedStartTime = plannedStartTime;
     }
-
+    @JsonIgnore
     public LocationsDistanceMatrix getLocationsDistanceMatrix() {
         return locationsDistanceMatrix;
     }
-
+    @JsonIgnore
     public void setLocationsDistanceMatrix(LocationsDistanceMatrix locationsDistanceMatrix) {
         this.locationsDistanceMatrix = locationsDistanceMatrix;
     }
-
+    @JsonIgnore
     public int getPlannedDuration(){
         return (int)Math.ceil(shiftBreak?duration:this.getDuration()/(this.getShiftFromAnchor().getEmployee().getEfficiency()/100d));
     }
     //for rules only
+    @JsonIgnore
     public int getDrivingTimeSeconds(){
         if(prevTaskOrShift ==null){
             throw new IllegalStateException("prevTaskOrShift should not be null if its a prt of move.");
@@ -223,7 +232,7 @@ public class Task extends TaskOrShift{
         LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLatitude(),prevTask.getLongitude(),this.getLatitude(),this.getLongitude()));
         return lpd.getTime();
     }
-
+    @JsonIgnore
     public int getDrivingDistance(){
         if(prevTaskOrShift ==null){
             throw new IllegalStateException("prevTaskOrShift should not be null if its a prt of move.");
@@ -234,18 +243,18 @@ public class Task extends TaskOrShift{
         LocationPairDifference lpd=locationsDistanceMatrix.getLocationsDifference(new LocationPair(prevTask.getLatitude(),prevTask.getLongitude(),this.getLatitude(),this.getLongitude()));
         return lpd.getDistance();
     }
-
+    @JsonIgnore
     public Task getPreviousValidTask() {
             return VrpPlanningUtil.getPreviousValidTask(this);
     }
-
+    @JsonIgnore
     public Task getPreviousTask() {
         if(this.getPrevTaskOrShift() instanceof Task){
             return (Task) this.getPrevTaskOrShift();
         }
         return null;
     }
-
+    @JsonIgnore
     public int getDrivingTime(){
         return (int)Math.ceil(getDrivingTimeSeconds()/60d);
     }
@@ -277,7 +286,7 @@ public class Task extends TaskOrShift{
                 "-" + duration +(shiftBreak?"(break)":"")+
                 '}';
     }
-
+    @JsonIgnore
     public Shift getShiftFromAnchor(){
         Task temp=this;
         while(temp.getPrevTaskOrShift() instanceof Task){
@@ -285,36 +294,45 @@ public class Task extends TaskOrShift{
         }
         return (Shift) temp.getPrevTaskOrShift();
     }
-
+    @JsonIgnore
     public String getLatLongString(){
         return latitude +":"+longitude;
     }
+    @JsonIgnore
     public boolean isConsecutive(Task task){
         return VrpPlanningUtil.isConsecutive(this, task);
     }
+    @JsonIgnore
     public boolean isEmployeeEligible(){
         return shift==null || shiftBreak || shift.getEmployee().getSkills().containsAll(this.skills);
     }
+    @JsonIgnore
     public boolean hasSameLocation(Task task){
         return VrpPlanningUtil.hasSameLocation(this,task);
     }
+    @JsonIgnore
     public boolean hasSameChain(Task task){
         return VrpPlanningUtil.hasSameChain(this,task);
     }
+    @JsonIgnore
     public boolean hasSameSkillset(Task task){
         return VrpPlanningUtil.hasSameSkillset(this,task);
     }
+    @JsonIgnore
     public int getMissingSkills(){
             return VrpPlanningUtil.getMissingSkills(this,this.getShift().getEmployee());
     }
 
+    @JsonIgnore
     public boolean isShiftBreak() {
         return shiftBreak;
     }
 
+    @JsonIgnore
     public void setShiftBreak(boolean shiftBreak) {
         this.shiftBreak = shiftBreak;
     }
+    @JsonIgnore
     public boolean isBreakInWindow(){
 
         if(plannedStartTime==null) return true;
@@ -323,6 +341,7 @@ public class Task extends TaskOrShift{
         return mins >=660 && mins<=750;
     }
     //0 means 1st task
+    @JsonIgnore
     public int getOrder(){
         int i=0;
         Task temp=this;
@@ -333,9 +352,11 @@ public class Task extends TaskOrShift{
         return  i;
     }
 
+    @JsonIgnore
     public String getFullStreetName(){
         return city+streetName;
     }
+    @JsonIgnore
     public boolean areHouseNumberSameLane(Task task){
         return this.houseNo %2 ==task.getHouseNo()%2;
     }
@@ -347,6 +368,7 @@ public class Task extends TaskOrShift{
     public void setLocationsRouteMatrix(LocationsRouteMatrix locationsRouteMatrix) {
         this.locationsRouteMatrix = locationsRouteMatrix;
     }
+    @JsonIgnore
     public boolean isOnOneWayStreet(){
         /*if("5b18f9b4016fe33f761ebd92".equals(id)){
             log.info("itssz");
@@ -359,6 +381,7 @@ public class Task extends TaskOrShift{
         }*/
         return streetName.equals("Adelgade")&&city.equals("Hobro");
     }
+    @JsonIgnore
     public boolean isTaskLocationOnRightSide(Task prevTask){
         /*assert !prevTask.isShiftBreak();
 

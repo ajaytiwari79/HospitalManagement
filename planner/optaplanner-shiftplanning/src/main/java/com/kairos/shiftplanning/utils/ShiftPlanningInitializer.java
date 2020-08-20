@@ -35,7 +35,7 @@ import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.domain.unit.*;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.WTABaseRuleTemplate;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 
 import java.math.BigInteger;
@@ -60,24 +60,24 @@ public class ShiftPlanningInitializer {
     private BigInteger id = BigInteger.valueOf(1);
 
 
-    public ShiftRequestPhasePlanningSolution initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
+    public ShiftPlanningSolution initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
 
-        ShiftRequestPhasePlanningSolution shiftRequestPhasePlanningSolution = new ShiftRequestPhasePlanningSolution();
-        updateUnit(shiftPlanningProblemSubmitDTO.getUnitId(), shiftPlanningProblemSubmitDTO,shiftRequestPhasePlanningSolution);
-        updateEmployees(shiftPlanningProblemSubmitDTO, shiftRequestPhasePlanningSolution);
-        Map<BigInteger, Activity> activityMap = updateActivityRelatedDetails(shiftPlanningProblemSubmitDTO, shiftRequestPhasePlanningSolution);
-        List<ShiftImp> shiftImp = getShiftRequestPhase(shiftPlanningProblemSubmitDTO, shiftRequestPhasePlanningSolution,activityMap);
-        int activitiesRank[] = shiftRequestPhasePlanningSolution.getActivities().stream().mapToInt(activity -> activity.getActivityPrioritySequence()).toArray();
-        StaffingLevelMatrix staffingLevelMatrix = new StaffingLevelMatrix(ShiftPlanningUtility.createStaffingLevelMatrix(shiftRequestPhasePlanningSolution.getWeekDates(), shiftRequestPhasePlanningSolution.getActivityLineIntervals(), INTERVAL_MINS, shiftRequestPhasePlanningSolution.getActivities()), activitiesRank);
-        shiftRequestPhasePlanningSolution.setStaffingLevelMatrix(staffingLevelMatrix);
-        shiftRequestPhasePlanningSolution.setShifts(shiftImp);
-        shiftRequestPhasePlanningSolution.setSkillLineIntervals(new ArrayList<>());
-        shiftRequestPhasePlanningSolution.setScore(HardMediumSoftLongScore.of(0,0,0));
+        ShiftPlanningSolution shiftPlanningSolution = new ShiftPlanningSolution();
+        updateUnit(shiftPlanningProblemSubmitDTO.getUnitId(), shiftPlanningProblemSubmitDTO, shiftPlanningSolution);
+        updateEmployees(shiftPlanningProblemSubmitDTO, shiftPlanningSolution);
+        Map<BigInteger, Activity> activityMap = updateActivityRelatedDetails(shiftPlanningProblemSubmitDTO, shiftPlanningSolution);
+        List<ShiftImp> shiftImp = getShiftRequestPhase(shiftPlanningProblemSubmitDTO, shiftPlanningSolution,activityMap);
+        int activitiesRank[] = shiftPlanningSolution.getActivities().stream().mapToInt(activity -> activity.getActivityPrioritySequence()).toArray();
+        StaffingLevelMatrix staffingLevelMatrix = new StaffingLevelMatrix(ShiftPlanningUtility.createStaffingLevelMatrix(shiftPlanningSolution.getWeekDates(), shiftPlanningSolution.getActivityLineIntervals(), INTERVAL_MINS, shiftPlanningSolution.getActivities()), activitiesRank);
+        shiftPlanningSolution.setStaffingLevelMatrix(staffingLevelMatrix);
+        shiftPlanningSolution.setShifts(shiftImp);
+        shiftPlanningSolution.setSkillLineIntervals(new ArrayList<>());
+        shiftPlanningSolution.setScore(HardMediumSoftLongScore.of(0,0,0));
         //ShiftRequestPhasePlanningSolution planningSolution = new ShiftPlanningSolver(getSolverConfigDTO()).solveProblem(shiftRequestPhasePlanningSolution);
-        return shiftRequestPhasePlanningSolution;
+        return shiftPlanningSolution;
     }
 
-    private void updateUnit(Long unitId, ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO, ShiftRequestPhasePlanningSolution shiftRequestPhasePlanningSolution) {
+    private void updateUnit(Long unitId, ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO, ShiftPlanningSolution shiftPlanningSolution) {
         Phase phase = new Phase(shiftPlanningProblemSubmitDTO.getPlanningPeriod().getCurrentPhaseId(), shiftPlanningProblemSubmitDTO.getPlanningPeriod().getPhaseEnum(), PhaseType.PLANNING);
         PlanningPeriod planningPeriod = new PlanningPeriod(shiftPlanningProblemSubmitDTO.getPlanningPeriod().getId(), shiftPlanningProblemSubmitDTO.getPlanningPeriod().getStartDate(), shiftPlanningProblemSubmitDTO.getPlanningPeriod().getEndDate());
         planningPeriod.setPhase(phase);
@@ -87,11 +87,11 @@ public class ShiftPlanningInitializer {
         AbsencePlannedTime absencePlannedTime = ObjectMapperUtils.copyPropertiesByMapper(shiftPlanningProblemSubmitDTO.getActivityConfiguration().getAbsencePlannedTime(), AbsencePlannedTime.class);
         NonWorkingPlannedTime nonWorkingPlannedTime = ObjectMapperUtils.copyPropertiesByMapper(shiftPlanningProblemSubmitDTO.getActivityConfiguration().getNonWorkingPlannedTime(), NonWorkingPlannedTime.class);
         Unit unit = Unit.builder().planningPeriod(planningPeriod).id(unitId).dayTypeMap(dayTypeMap).timeSlotMap(timeSlotMap).accessGroupRole(AccessGroupRole.MANAGEMENT).absencePlannedTime(absencePlannedTime).nonWorkingPlannedTime(nonWorkingPlannedTime).presencePlannedTime(presencePlannedTime).build();
-        shiftRequestPhasePlanningSolution.setUnit(unit);
+        shiftPlanningSolution.setUnit(unit);
     }
 
 
-    public void updateEmployees(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO, ShiftRequestPhasePlanningSolution shiftRequestPhasePlanningSolution) {
+    public void updateEmployees(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO, ShiftPlanningSolution shiftPlanningSolution) {
         List<Employee> employeeList = new ArrayList<>();
         Map[] agreementMap = getCostTimeAgreementMap(shiftPlanningProblemSubmitDTO);
         Map<Long, Map<LocalDate, Map<ConstraintSubType, WTABaseRuleTemplate>>> employmentIdAndDateWiseWTARuleTemplateMap = agreementMap[0];
@@ -114,7 +114,7 @@ public class ShiftPlanningInitializer {
                         .seniorAndChildCareDays(ObjectMapperUtils.copyPropertiesByMapper(staffDTO.getSeniorAndChildCareDays(),SeniorAndChildCareDays.class))
                         .tags(new HashSet(ObjectMapperUtils.copyCollectionPropertiesByMapper(isNullOrElse(staffDTO.getTags(),new ArrayList<>()),Tag.class)))
                         .teams(new HashSet(ObjectMapperUtils.copyCollectionPropertiesByMapper(isNullOrElse(staffDTO.getTeams(),new ArrayList<>()),Team.class)))
-                        .unit(shiftRequestPhasePlanningSolution.getUnit())
+                        .unit(shiftPlanningSolution.getUnit())
                         .wtaRuleTemplateMap(employmentIdAndDateWiseWTARuleTemplateMap.get(employment.getId()))
                         .expertiseNightWorkerSetting(ObjectMapperUtils.copyPropertiesByMapper(employmentDTO.getExpertiseNightWorkerSetting(),ExpertiseNightWorkerSetting.class))
                         .breakSettings(getBreakSettings(employmentDTO))
@@ -122,7 +122,7 @@ public class ShiftPlanningInitializer {
                 employeeList.add(employee);
             }
         }
-        shiftRequestPhasePlanningSolution.setEmployees(employeeList);
+        shiftPlanningSolution.setEmployees(employeeList);
     }
 
     private BreakSettings getBreakSettings(EmploymentDTO employmentDTO) {
@@ -177,7 +177,7 @@ public class ShiftPlanningInitializer {
     }
 
 
-    public Map<BigInteger, Activity> updateActivityRelatedDetails(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO, ShiftRequestPhasePlanningSolution shiftRequestPhasePlanningSolution) {
+    public Map<BigInteger, Activity> updateActivityRelatedDetails(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO, ShiftPlanningSolution shiftPlanningSolution) {
         Map<LocalDate, List<StaffingLevelInterval>> localDateStaffingLevelTimeSlotMap = shiftPlanningProblemSubmitDTO.getStaffingLevels().stream().collect(Collectors.toMap(k -> asLocalDate(k.getCurrentDate()), v -> v.getPresenceStaffingLevelInterval()));
         List<ActivityLineInterval> activityLineIntervalList = new ArrayList<>();
         Map<LocalDate, Set<Activity>> dateActivityMap = new HashMap<>();
@@ -211,11 +211,11 @@ public class ShiftPlanningInitializer {
                 }
             }
         }
-        shiftRequestPhasePlanningSolution.setActivityLineIntervals(activityLineIntervalList);
-        shiftRequestPhasePlanningSolution.setActivities(dateActivityMap.values().stream().flatMap(activities -> activities.stream()).distinct().sorted(Comparator.comparing(Activity::getActivityPrioritySequence)).collect(Collectors.toList()));
-        shiftRequestPhasePlanningSolution.setWeekDates(new ArrayList<>(localDates));
-        shiftRequestPhasePlanningSolution.setActivitiesIntervalsGroupedPerDay(activityLineIntervalMap);
-        shiftRequestPhasePlanningSolution.setActivitiesPerDay(activitiesPerDay);
+        shiftPlanningSolution.setActivityLineIntervals(activityLineIntervalList);
+        shiftPlanningSolution.setActivities(dateActivityMap.values().stream().flatMap(activities -> activities.stream()).distinct().sorted(Comparator.comparing(Activity::getActivityPrioritySequence)).collect(Collectors.toList()));
+        shiftPlanningSolution.setWeekDates(new ArrayList<>(localDates));
+        shiftPlanningSolution.setActivitiesIntervalsGroupedPerDay(activityLineIntervalMap);
+        shiftPlanningSolution.setActivitiesPerDay(activitiesPerDay);
         return activityMap;
     }
 
@@ -308,10 +308,10 @@ public class ShiftPlanningInitializer {
 
     }
 
-    public List<ShiftImp> getShiftRequestPhase(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO, ShiftRequestPhasePlanningSolution shiftRequestPhasePlanningSolution,Map<BigInteger, Activity> activityMap) {
+    public List<ShiftImp> getShiftRequestPhase(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO, ShiftPlanningSolution shiftPlanningSolution, Map<BigInteger, Activity> activityMap) {
         List<ShiftImp> shiftImpList = new ArrayList<>();
-        Map<Long, Employee> employeeMap = shiftRequestPhasePlanningSolution.getEmployees().stream().collect(Collectors.toMap(k -> k.getEmployment().getId(), v -> v));
-        Map<LocalDate,List<ActivityLineInterval>> activityLineIntervalMap = shiftRequestPhasePlanningSolution.getActivityLineIntervals().stream().collect(Collectors.groupingBy(activityLineInterval -> activityLineInterval.getStart().toLocalDate()));
+        Map<Long, Employee> employeeMap = shiftPlanningSolution.getEmployees().stream().collect(Collectors.toMap(k -> k.getEmployment().getId(), v -> v));
+        Map<LocalDate,List<ActivityLineInterval>> activityLineIntervalMap = shiftPlanningSolution.getActivityLineIntervals().stream().collect(Collectors.groupingBy(activityLineInterval -> activityLineInterval.getStart().toLocalDate()));
         for (ShiftDTO shiftDTO : shiftPlanningProblemSubmitDTO.getShifts()) {
             if (employeeMap.containsKey(shiftDTO.getEmploymentId())) {
                 List<ShiftActivity> actualShiftActivities = ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftDTO.getActivities(), ShiftActivity.class);

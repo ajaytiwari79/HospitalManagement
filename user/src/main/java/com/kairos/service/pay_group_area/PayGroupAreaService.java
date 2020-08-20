@@ -2,6 +2,7 @@ package com.kairos.service.pay_group_area;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.country.pay_group_area.PayGroupAreaDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.pay_group_area.PayGroupAreaResponse;
@@ -100,6 +101,9 @@ public class PayGroupAreaService {
             if (existAlready) {
                 exceptionService.duplicateDataException(MESSAGE_PAYGROUPAREA_EXISTS, payGroupAreaDTO.getName());
             }
+        }
+        if(!payGroupAreaDTO.getStartDateMillis().equals(DateUtils.getDate(municipalityRelationship.getStartDateMillis()))){
+            exceptionService.actionNotPermittedException(MESSAGE_PAYGROUPAREA_GAP_NOT_CREATE);
         }
 
         List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.findPayGroupAreaByLevelAndMunicipality(payGroupAreaDTO.getLevelId(), Collections.singletonList(payGroupAreaDTO.getMunicipalityId()), payGroupAreaDTO.getId());

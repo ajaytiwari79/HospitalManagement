@@ -163,13 +163,14 @@ public class UserMessagesConstants {
     public static final String MESSAGE_CATEGORY_NOTEXIST = "message.category.notExist";
     public static final String MESSAGE_COUNTRY_ID_NOTEXIST = "message.country.id.notExist";
     public static final String MESSAGE_USER_USERNAME_NOTFOUND = "message.user.userName.notFound";
+    public static final String ERROR_USERNAME_BLANK = "error.userName.notnull";
     public static final String MESSAGE_USER_MOBILENUMBER_NOTFOUND = "message.user.mobileNumber.notFound";
     public static final String MESSAGE_ORGANISATION_NOTFOUND = "message.organisation.notFound";
     public static final String MESSAGE_USER_EMAIL_NOTFOUND = "message.user.email.notFound";
     public static final String MESSAGE_USER_TOKEN_NOTFOUND = "message.user.token.notFound";
     public static final String MESSAGE_USER_TOKEN_EXPIRED = "message.user.token.expired";
     public static final String MESSAGE_USER_MAIL_INVALID = "message.user.mail.invalid";
-    public static final String MESSAGE_USER_USERNAME_ALREADY_USE  = "message.user.userName.already.use ";
+    public static final String MESSAGE_USER_USERNAME_ALREADY_USE  = "message.user.userName.already.use";
     public static final String MESSAGE_USER_USERNAME_OR_EMAIL_NOTFOUND  = "message.user.userName.or.email.notFound ";
     public static final String ERROR_ACCESSTOLOCATION_NULL = "error.accessToLocation.null";
     public static final String ERROR_XSSFSHEET_NOMOREROW = "error.xssfsheet.noMoreRow";
@@ -311,6 +312,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_PAYGROUP_DATERANGE_OVERLAPOLD = "message.paygroup.daterange.overlapold";
     public static final String MESSAGE_PAYGROUP_LEVEL_NOTFOUND = "message.paygroup.level.notfound";
     public static final String MESSAGE_PAYGROUPAREA_EXISTS = "message.payGroupArea.exists";
+    public static final String MESSAGE_PAYGROUPAREA_GAP_NOT_CREATE = "message.payGroupArea.gap.not.create";
     public static final String MESSAGE_PAYTABLE_LEVEL_NOTFOUND = "message.paytable.level.notfound";
     public static final String MESSAGE_PAYTABLE_NAME_ALREADYEXIST = "message.payTable.name.alreadyExist";
     public static final String MESSAGE_STARTDATE_ALLOWED = "message.startdate.allowed";
@@ -370,6 +372,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_DATE_SOMETHINGWRONG = "message.date.somethingwrong";
     public static final String MESSAGE_CITIZEN_STAFF_ALREADYEXIST = "message.citizen.staff.alreadyexist";
     public static final String MESSAGE_STAFF_DATA_EMPLOYMENTDATE_LESSTHAN = "message.staff.data.employmentdate.lessthan";
+    public static final String MESSAGE_STAFF_DATA_EMPLOYMENTDATE_GREATERTHAN = "message.staff.data.employmentdate.greaterthan";
     public static final String MESSAGE_POSITION_EMPLOYMENTTYPE_NOTEXIST = "message.position.employmenttype.notexist";
     public static final String MESSAGE_WTA_ID = "message.wta.id";
     public static final String MESSAGE_CTA_ID = "message.cta.id";
@@ -472,4 +475,5 @@ public class UserMessagesConstants {
     public static  final String ERROR_TAB_CAN_NOT_BE_HIDE_FOR_HUB="Tab can not be hide for HUB";
     public static final String STAFF_SKILL_DOES_NOT_MATCHED = "team.skill.not.matched";
     public static final String UNIT_IS_MANDATORY = "error.unit.mandatory";
+    public static final String SHIFT_PERCENTAGE_CAN_NOT_BE_LESS_THEN_ZERO_OR_GREATER_THEN_HUNDRED ="shift.percentage.can.not.be.less.then.zero";
 }

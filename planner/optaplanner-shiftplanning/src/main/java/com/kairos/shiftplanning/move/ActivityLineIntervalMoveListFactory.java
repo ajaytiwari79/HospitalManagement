@@ -2,16 +2,16 @@ package com.kairos.shiftplanning.move;
 
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import org.optaplanner.core.impl.heuristic.move.Move;
 import org.optaplanner.core.impl.heuristic.selector.move.factory.MoveListFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ActivityLineIntervalMoveListFactory implements MoveListFactory<ShiftRequestPhasePlanningSolution> {
+public class ActivityLineIntervalMoveListFactory implements MoveListFactory<ShiftPlanningSolution> {
     @Override
-    public List<? extends Move<ShiftRequestPhasePlanningSolution>> createMoveList(ShiftRequestPhasePlanningSolution solution) {
+    public List<? extends Move<ShiftPlanningSolution>> createMoveList(ShiftPlanningSolution solution) {
         List<ActivityLineInterval> activityLineIntervals= solution.getActivityLineIntervals();
         List<ActivityLineIntervalIteratorMove> possibleActivityLineIntervals= new ArrayList<>();
         List<ShiftImp> shifts= solution.getShifts();

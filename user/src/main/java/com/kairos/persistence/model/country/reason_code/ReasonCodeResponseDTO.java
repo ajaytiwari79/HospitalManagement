@@ -2,10 +2,15 @@ package com.kairos.persistence.model.country.reason_code;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.reason_code.ReasonCodeType;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by pavan on 23/3/18.
@@ -13,6 +18,8 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
+@Getter
+@Setter
 public class ReasonCodeResponseDTO {
     private Long id;
     private String name;
@@ -20,6 +27,10 @@ public class ReasonCodeResponseDTO {
     private String description;
     private ReasonCodeType reasonCodeType;
     private BigInteger timeTypeId;
+    private Long unitId;
+    private Map<String, TranslationInfo> translations;
+    private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
 
     public ReasonCodeResponseDTO() {
         //Default Constructor
@@ -31,6 +42,11 @@ public class ReasonCodeResponseDTO {
         this.code = code;
         this.description = description;
         this.reasonCodeType = reasonCodeType;
+    }
+    public Map<String, TranslationInfo> getTranslatedData() {
+        Map<String, TranslationInfo> infoMap=new HashMap<>();
+        translatedNames.forEach((k,v)-> infoMap.put(k,new TranslationInfo(v,translatedDescriptions.get(k))));
+        return infoMap;
     }
 
     public Long getId() {

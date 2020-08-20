@@ -34,7 +34,8 @@ public class ActivityGeneralSettings {
     private String backgroundColor;
     @KPermissionField
     private String description;
-    private boolean isActive = true;
+    @KPermissionField
+    private boolean active = true;
     @KPermissionField
     private String shortName;
     private boolean eligibleForUse = true;
@@ -42,10 +43,12 @@ public class ActivityGeneralSettings {
     private String modifiedIconName;
     @KPermissionField
     private String ultraShortName;
+    @KPermissionField
     private LocalDate startDate;
+    @KPermissionField
     private LocalDate endDate;
 
-
+    @KPermissionField
     private List<BigInteger> tags = new ArrayList<>();
 
     public ActivityGeneralSettings(String name, String description, String ultraShortName) {

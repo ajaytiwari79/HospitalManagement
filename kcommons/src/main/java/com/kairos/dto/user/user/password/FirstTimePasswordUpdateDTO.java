@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Arrays;
 
@@ -21,6 +22,8 @@ public class FirstTimePasswordUpdateDTO {
     private char[] repeatPassword;
     @Email
     private String email;
+    @NotBlank(message = "error.userName.notnull")
+    private String userName;
 
 
     @AssertTrue(message="The password fields mush match")

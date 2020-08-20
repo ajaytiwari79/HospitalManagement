@@ -48,6 +48,7 @@ public abstract class UserBaseEntity  {
     protected Map<String,String> translatedDescriptions;
 
 
+
     @JsonIgnore
     public Map<String, TranslationInfo> getTranslatedData() {
         Map<String, TranslationInfo> infoMap=new HashMap<>();

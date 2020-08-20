@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.organization;
 
+import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
@@ -23,9 +24,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface OrganizationServiceRepository extends Neo4jBaseRepository<OrganizationService,Long>{
     List<OrganizationService> findAll();
 
-    @Query("MATCH (c:Country),(n:OrganizationService{isEnabled:true}) where id(c)={0} match (c)-[:HAS_ORGANIZATION_SERVICES]->(n) OPTIONAL MATCH (n)-[:ORGANIZATION_SUB_SERVICE]->(s:OrganizationService{isEnabled:true})" +
-            " RETURN {children: case when s is NULL then [] else collect({id:id(s),name:s.name,description:s.description}) END,id:id(n),name:n.name,description:n.description} as result")
-    List<Map<String,Object>> getOrganizationServicesByCountryId(long countryId);
+//    @Query("MATCH (c:Country),(n:OrganizationService{isEnabled:true}) where id(c)={0} match (c)-[:HAS_ORGANIZATION_SERVICES]->(n) OPTIONAL MATCH (n)-[:ORGANIZATION_SUB_SERVICE]->(s:OrganizationService{isEnabled:true})" +
+//            " RETURN {children: case when s is NULL then [] else collect({id:id(s),name:s.name,description:s.description}) END,id:id(n),name:n.name,description:n.description} as result")
+//    List<Map<String,Object>> getOrganizationServicesByCountryId(long countryId);
+
+    @Query("MATCH (c:Country),(n:OrganizationService{isEnabled:true}) where id(c)={0} match (c)-[:HAS_ORGANIZATION_SERVICES]->(n) OPTIONAL MATCH (n)-[r:ORGANIZATION_SUB_SERVICE]->(s:OrganizationService{isEnabled:true})RETURN n,COLLECT(s),COLLECT(r)")
+    List<OrganizationService> getOrganizationServicesByCountryId(long countryId);
 
     @Query(" MATCH  (o:OrganizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]->(ss:OrganizationService{isEnabled:true}) where id(o)={0} " +
             "MATCH (ss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService {isEnabled:true} ) " +

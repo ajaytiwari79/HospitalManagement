@@ -14,6 +14,7 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 import lombok.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.lookup.PlanningId;
 import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
 import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
@@ -41,6 +42,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 @XStreamAlias("ShiftImp")
 public class ShiftImp implements Shift{
     private static Logger log= LoggerFactory.getLogger(ShiftImp.class);
+    @PlanningId
     private BigInteger id;
     private Employee employee;
     @CustomShadowVariable(variableListenerClass = ShiftStartTimeListener.class,

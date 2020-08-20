@@ -226,12 +226,6 @@ public class OrganizationActivityService extends MongoBaseService {
             activity.getActivityPhaseSettings().setPhaseTemplateValues(phaseTemplateValues);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
         } else {
-            if (!userIntegrationService.isUnit(unitId)) {
-                List<Long> childUnitIds = userIntegrationService.getAllOrganizationIds(unitId);
-                if (activityMongoRepository.existsByParentIdAndDeletedFalse(activityId, childUnitIds)) {
-                    exceptionService.actionNotPermittedException(ACTIVITY_USED_AT_UNIT);
-                }
-            }
             activityCopied = Optional.ofNullable(activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId)).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_ACTIVITY_ID, activityId)));
             if (!userIntegrationService.isUnit(unitId)) {
                 List<Long> childUnitIds = userIntegrationService.getAllOrganizationIds(unitId);
@@ -622,10 +616,13 @@ public class OrganizationActivityService extends MongoBaseService {
 
     }
 
-    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId, Long staffId, List<ActivityWithCompositeDTO> staffPersonalizedActivities) {
+    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId, Long staffId, List<ActivityWithCompositeDTO> staffPersonalizedActivities,boolean isActivityType) {
         Set<BigInteger> activityList = userIntegrationService.getTeamActivitiesOfStaff(unitId, staffId);
-        activityList.addAll(staffPersonalizedActivities.stream().map(ActivityWithCompositeDTO::getActivityId).collect(Collectors.toSet()));
-        return activityMongoRepository.findAllActivityWithCompositeDTOByIds(activityList);
+        List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityList);
+        Set<BigInteger> activityIds = activities.stream().filter(activity -> isCollectionNotEmpty(activity.getChildActivityIds())).map(activity -> activity.getId()).collect(Collectors.toSet());
+        Set<BigInteger> allActivities = isActivityType?activityIds:activityList;
+        allActivities.addAll(staffPersonalizedActivities.stream().map(ActivityWithCompositeDTO::getActivityId).collect(Collectors.toSet()));
+        return activityMongoRepository.findAllActivityWithCompositeDTOByIds(allActivities);
     }
 
     private void updateSkills(Activity activityCopied){
@@ -824,10 +821,8 @@ public class OrganizationActivityService extends MongoBaseService {
         Set<BigInteger> activityIdsToSet=new HashSet<>();
         Collection<Activity> activities =  activityMongoRepository.findAllById(activityIds);
         activities.forEach(activity -> {
-            if(isCollectionNotEmpty(activity.getChildActivityIds()) || activityMongoRepository.existsByActivityIdInChildActivities(activity.getId())){
                 activityIdsToSet.add(activity.getId());
                 activityIdsToSet.addAll(activity.getChildActivityIds());
-            }
         });
         return activityIdsToSet;
     }

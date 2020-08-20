@@ -114,4 +114,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "\n" +
             "RETURN CASE WHEN e IS NULL THEN id(organization) ELSE id(u) END LIMIT 1")
     Long getLastSelectedOrganizationId(Long id);
+
+    @Query("MATCH (user:User) WHERE user.userName=~{0} AND NOT user.email=~{1} RETURN COUNT(user)>0")
+    boolean existByUserName(String userName, String email);
 }

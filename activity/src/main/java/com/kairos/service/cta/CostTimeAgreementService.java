@@ -3,6 +3,7 @@ package com.kairos.service.cta;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.cta.*;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
@@ -692,6 +693,14 @@ public class CostTimeAgreementService {
     public List<CTAResponseDTO> getAllCTAByUnitId(long unitId){
         return costTimeAgreementRepository.findCTAByUnitId(unitId);
     }
+
+    //    Todo please do not remove this method I am working on it later
+//    public Map<String, TranslationInfo> updateTranslation(BigInteger ctaId, Map<String,TranslationInfo> translations) {
+//        CostTimeAgreement costTimeAgreement =costTimeAgreementRepository.findOne(ctaId);
+//        costTimeAgreement.setTranslations(translations);
+//        costTimeAgreementRepository.save(costTimeAgreement);
+//        return costTimeAgreement.getTranslations();
+//    }
 
 }
 

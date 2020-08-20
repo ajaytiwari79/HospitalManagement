@@ -1,0 +1,2 @@
+//Add new tab
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Action",isModule:false,moduleId:"tab_452",active:true,`translatedNames.english`:"Action"});

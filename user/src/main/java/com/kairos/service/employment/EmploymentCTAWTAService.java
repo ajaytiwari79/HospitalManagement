@@ -9,6 +9,8 @@ import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
+import com.kairos.dto.activity.wta.templates.BreakWTATemplateDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.enums.IntegrationOperation;
@@ -119,6 +121,20 @@ public class EmploymentCTAWTAService {
             exceptionService.dataNotFoundByIdException(MESSAGE_INVALIDEMPLOYMENTID, employmentId);
 
         }
+        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateList=updateDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplateDTO -> WTATemplateType.WTA_FOR_BREAKS_IN_SHIFT.equals(wtaBaseRuleTemplateDTO.getWtaTemplateType()) && !wtaBaseRuleTemplateDTO.isDisabled()).collect(Collectors.toList());
+            if(isCollectionNotEmpty(wtaBaseRuleTemplateList)){
+                wtaBaseRuleTemplateList.forEach(wtaRuleTemplate->{
+                     if(WTATemplateType.WTA_FOR_BREAKS_IN_SHIFT.equals(wtaRuleTemplate.getWtaTemplateType()) && (wtaRuleTemplate instanceof BreakWTATemplateDTO)){
+                         BreakWTATemplateDTO breakWTATemplateDTO =(BreakWTATemplateDTO)wtaRuleTemplate;
+                        for(BreakAvailabilitySettings breakAvailabilitySettings :breakWTATemplateDTO.getBreakAvailability()){
+                            if(breakAvailabilitySettings.getShiftPercentage()<=0 || breakAvailabilitySettings.getShiftPercentage()>100){
+                                exceptionService.actionNotPermittedException(SHIFT_PERCENTAGE_CAN_NOT_BE_LESS_THEN_ZERO_OR_GREATER_THEN_HUNDRED);
+                            }
+                        }
+                     }
+                });
+        }
+
         if(!activityIntegrationService.isStaffNightWorker(unitId,employment.getStaff().getId())) {
             List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS=updateDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplateDTO -> WTATemplateType.DAYS_OFF_AFTER_A_SERIES.equals(wtaBaseRuleTemplateDTO.getWtaTemplateType()) && !wtaBaseRuleTemplateDTO.isDisabled()).collect(Collectors.toList());
             if(isCollectionNotEmpty(wtaBaseRuleTemplateDTOS)){

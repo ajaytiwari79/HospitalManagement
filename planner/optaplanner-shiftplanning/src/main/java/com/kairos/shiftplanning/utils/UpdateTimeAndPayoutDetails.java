@@ -158,6 +158,7 @@ public class UpdateTimeAndPayoutDetails {
         private boolean updateShiftActivityByBreakInterval(List<ShiftActivity> updatedShiftActivities, ShiftActivity shiftActivity, List<DateTimeInterval> dateTimeIntervals,boolean scheduledHourAdded) {
             for (DateTimeInterval timeInterval : dateTimeIntervals) {
                 ShiftActivity updatedShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivity, ShiftActivity.class);
+                updatedShiftActivity.getActivity().setConstraints(shiftActivity.getActivity().getConstraints());
                 updatedShiftActivity.setStartDate(timeInterval.getStart());
                 updatedShiftActivity.setEndDate(timeInterval.getEnd());
                 List<PlannedTime> plannedTimes = new ArrayList<>();

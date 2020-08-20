@@ -74,8 +74,8 @@ public class StaffActivitySettingController {
     @ApiOperation("Get Staff Personalized activity settings")
     @GetMapping(value = "/staff_activity_setting/staff/{staffId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffSpecificActivitySettings( @PathVariable Long unitId,@PathVariable Long staffId,@RequestParam(value = "includeTeamActivity") boolean includeTeamActivity) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.getStaffSpecificActivitySettings(unitId,staffId,includeTeamActivity));
+    public ResponseEntity<Map<String, Object>> getStaffSpecificActivitySettings( @PathVariable Long unitId,@PathVariable Long staffId,@RequestParam(value = "includeTeamActivity") boolean includeTeamActivity,@RequestParam(value = "isActivityType") boolean isActivityType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.getStaffSpecificActivitySettings(unitId,staffId,includeTeamActivity,isActivityType));
     }
 
     @ApiOperation("Get Staff Personalized activity settings")

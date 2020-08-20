@@ -2,7 +2,7 @@ package com.kairos.shiftplanning.move.helper;
 
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
@@ -24,7 +24,7 @@ public class ActivityLineIntervalChangeMoveHelper {
      * @param activityLineInterval gets assigned
      * @param shiftImp  to be assigned to
      */
-    public static void assignActivityIntervalToShift(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector, ActivityLineInterval activityLineInterval,
+    public static void assignActivityIntervalToShift(ScoreDirector<ShiftPlanningSolution> scoreDirector, ActivityLineInterval activityLineInterval,
                                                      ShiftImp shiftImp, List<ActivityLineInterval> exActivityLineIntervalsForThisShift, ShiftImp exActivityLineIntervalShift){
         LOGGER.debug("**********************STARTS********************");
         if(CollectionUtils.isNotEmpty(exActivityLineIntervalsForThisShift)){
@@ -51,7 +51,7 @@ public class ActivityLineIntervalChangeMoveHelper {
         //but it IRSV would be triggered then then wwhy not here with scoreDirector.afterVariableChanged(activityLineInterval, "shift");??????????
     }
 
-    public static void assignActivityIntervalToShift(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector, ActivityLineInterval activityLineInterval,
+    public static void assignActivityIntervalToShift(ScoreDirector<ShiftPlanningSolution> scoreDirector, ActivityLineInterval activityLineInterval,
                                                      ShiftImp shiftImp) {
         if(Objects.equals(activityLineInterval.getShift(), shiftImp)){
             return;

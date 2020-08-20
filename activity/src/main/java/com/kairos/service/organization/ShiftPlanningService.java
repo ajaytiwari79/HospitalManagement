@@ -4,8 +4,10 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.filter_utils.FilterUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
+import com.kairos.dto.activity.shift.EmploymentType;
 import com.kairos.dto.activity.shift.ShiftSearchDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.employment.PlanningEmploymentDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.FilterType;
@@ -25,6 +27,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.enums.FilterType.CTA_ACCOUNT_TYPE;
 
@@ -41,6 +45,7 @@ public class ShiftPlanningService {
 
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
+
 
     public <T> List<StaffShiftDetails> getShiftPlanningDetailsForUnit(final Long unitId, final ShiftSearchDTO shiftSearchDTO) {
 
@@ -116,7 +121,7 @@ public class ShiftPlanningService {
         if (shiftFilterCount > 0) {
             shiftWithActivityDTOS = shiftMongoRepository.getStaffListFilteredByShiftCriteria(employmentIds, validMatches, unitId, shiftSearchDTO.getStartDate(), shiftSearchDTO.getEndDate(), includeDateComparison);
         }
-        return getStaffListAfterShiftFilterMatches(staffListWithPersonalDetails, shiftWithActivityDTOS, shiftSearchDTO.getLoggedInUserId());
+        return getStaffListAfterShiftFilterMatches(staffListWithPersonalDetails, shiftWithActivityDTOS, shiftSearchDTO.getLoggedInUserId(),shiftSearchDTO,shiftFilterCount);
     }
 
     public StaffShiftDetails getShiftPlanningDetailsForOneStaff(Long unitId, ShiftSearchDTO shiftSearchDTO) {
@@ -231,7 +236,7 @@ public class ShiftPlanningService {
     }
 
 
-    private List<StaffShiftDetails> getStaffListAfterShiftFilterMatches(List<StaffShiftDetails> staffShiftPersonalDetailsList, List<StaffShiftDetails> shiftData,final Long loggedInUserId) {
+    private List<StaffShiftDetails> getStaffListAfterShiftFilterMatches(List<StaffShiftDetails> staffShiftPersonalDetailsList, List<StaffShiftDetails> shiftData,final Long loggedInUserId,ShiftSearchDTO shiftSearchDTO,long shiftFilterCount) {
         boolean staffToAdd = false;
         StaffShiftDetails loggedInStaff = null;
         if (staffShiftPersonalDetailsList.get(0).getUserId().equals(loggedInUserId)) {
@@ -239,7 +244,7 @@ public class ShiftPlanningService {
             loggedInStaff = staffShiftPersonalDetailsList.get(0);
         }
 
-        if (CollectionUtils.isNotEmpty(shiftData)) {
+        if (CollectionUtils.isNotEmpty(shiftData)||(isCollectionNotEmpty(shiftSearchDTO.getFiltersData())&&shiftFilterCount>0)) {
             Set<Long> filteredShiftStaff = shiftData.stream().map(StaffShiftDetails::getId).collect(Collectors.toSet());
             staffShiftPersonalDetailsList = staffShiftPersonalDetailsList.stream().filter(spl -> filteredShiftStaff.contains(spl.getId())).collect(Collectors.toList());
         }
@@ -251,6 +256,10 @@ public class ShiftPlanningService {
             staffShiftPersonalDetailsList.add(0, loggedInStaff);
         }
         return staffShiftPersonalDetailsList;
+    }
+    public List<EmploymentTypeDTO> getEmploymentTypes(Long unitId){
+       List<EmploymentTypeDTO> employmentTypeDTOList = userIntegrationService.getEmploymentTypeList(unitId);
+       return employmentTypeDTOList;
     }
 
     public Set<Long> getStaffListAsId(final Long unitId, final Set<String> statuses) {
@@ -294,6 +303,8 @@ public class ShiftPlanningService {
          }
        return staffIdAndEmploymentIdsMap;
     }
+
+
 
 
     }

@@ -16,7 +16,6 @@ import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.kpermissions.*;
 import com.kairos.persistence.model.organization.Organization;
@@ -99,9 +98,9 @@ public class PermissionService {
 
     public List<ModelDTO> createPermissionSchema(List<ModelDTO> modelDTOS){
         LOGGER.info("creating model permission");
-        Map<String,KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll(2).spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k->k.getModelName().toLowerCase(),v->v));
+        Map<String,KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll(3).spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k->k.getModelName().toLowerCase(),v->v));
         List<KPermissionModel> kPermissionModels = buildPermissionModelData(modelDTOS, modelNameAndModelMap, false);
-        permissionModelRepository.save(kPermissionModels,2);
+        permissionModelRepository.save(kPermissionModels,3);
         return modelDTOS;
     }
 
@@ -320,10 +319,6 @@ public class PermissionService {
         return modelPermissionQueryResults;
     }
 
-    private boolean isValidOrganizationCategory(OrganizationCategory organizationCategory, boolean hubMember, Set<OrganizationCategory> organizationCategories) {
-        return hubMember ? hubMember : organizationCategories.contains(organizationCategory);
-    }
-
     private List<FieldPermissionQueryResult> getFieldLevelPermissionQueryResult(Map<Long,FieldPermissionQueryResult> fieldLevelPermissionMap,List<KPermissionField> fields,boolean hubMember){
         List<FieldPermissionQueryResult> fieldPermissionQueryResults = new ArrayList<>();
         for (KPermissionField field : fields) {
@@ -421,8 +416,9 @@ public class PermissionService {
         List<Organization> unions;
         OrganizationDTO organizationDTO = null;
         if(ConfLevel.ORGANIZATION.equals(confLevel)){
+            Organization organization=organizationService.fetchParentOrganization(refrenceId);
             organizationDTO = organizationService.getOrganizationWithCountryId(refrenceId);
-            unions = organizationService.getAllUnionsByOrganizationOrCountryId(refrenceId, DEFAULT_ID);
+            unions = organizationService.getAllUnionsByOrganizationOrCountryId(organization.getId(), DEFAULT_ID);
         }else {
             unions = organizationService.getAllUnionsByOrganizationOrCountryId(DEFAULT_ID, refrenceId);
         }
@@ -580,10 +576,10 @@ public class PermissionService {
     public <T> FieldPermissionUserData fetchPermissions(Set<String> modelNames, Long unitId){
         List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
         boolean hubMember = UserContext.getUserDetails().isHubMember();
-        List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember,null);
-        List<ModelDTO> modelDTOS = copyCollectionPropertiesByMapper(modelPermissionQueryResults,ModelDTO.class);
         Organization parentOrganisation=organizationService.fetchParentOrganization(unitId);
         Long currentUserStaffId = staffService.getStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganisation.getId());
+        List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember,currentUserStaffId);
+        List<ModelDTO> modelDTOS = copyCollectionPropertiesByMapper(modelPermissionQueryResults,ModelDTO.class);
         return new FieldPermissionUserData(modelDTOS,currentUserStaffId);
     }
 
@@ -591,17 +587,13 @@ public class PermissionService {
         Set<Long> kPermissionModelIds=permissionModelRepository.kPermissionModelIds(customPermissionDTO.getId());
         OtherPermissionDTO forOtherPermissions=customPermissionDTO.getForOtherPermissions();
         LOGGER.info("other permissions are {}",customPermissionDTO.getForOtherPermissions().toString());
-        accessGroupRepository.setCustomPermissionForSubModelAndFields(customPermissionDTO.getStaffId(), unitId, accessGroupId,kPermissionModelIds, customPermissionDTO.getPermissions(),forOtherPermissions.getExpertiseIds(),forOtherPermissions.getUnionIds(),forOtherPermissions.getTeamIds(),
-                forOtherPermissions.getEmploymentTypeIds(),forOtherPermissions.getTagIds(),forOtherPermissions.getStaffStatuses(),forOtherPermissions.getPermissions());
-    }
-
-    private Set<Long> getAllIdsToSetPermissions(KPermissionModel kPermissionModel,Set<Long> kPermissionModelIds) {
-        kPermissionModelIds.add(kPermissionModel.getId());
-        kPermissionModelIds.addAll(kPermissionModel.getFieldPermissions().stream().map(UserBaseEntity::getId).collect(Collectors.toSet()));
-        kPermissionModel.getSubModelPermissions().forEach(subModel->{
-            getAllIdsToSetPermissions(subModel,kPermissionModelIds);
-        });
-        return kPermissionModelIds;
+        LOGGER.info("Children are  {}",kPermissionModelIds.toString());
+        if(customPermissionDTO.isForOtherStaff()){
+            accessGroupRepository.setCustomPermissionForSubModelAndFieldsForOtherStaffs(customPermissionDTO.getStaffId(), unitId, accessGroupId,kPermissionModelIds,forOtherPermissions.getExpertiseIds(),forOtherPermissions.getUnionIds(),forOtherPermissions.getTeamIds(),
+                    forOtherPermissions.getEmploymentTypeIds(),forOtherPermissions.getTagIds(),forOtherPermissions.getStaffStatuses(),forOtherPermissions.getPermissions());
+        }else {
+            accessGroupRepository.setCustomPermissionForSubModelAndFields(customPermissionDTO.getStaffId(), unitId, accessGroupId,kPermissionModelIds, customPermissionDTO.getPermissions());
+        }
     }
 
 }

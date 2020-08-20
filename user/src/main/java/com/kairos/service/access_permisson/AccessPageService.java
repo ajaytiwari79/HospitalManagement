@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.MODULE_11;
 import static com.kairos.constants.AppConstants.TAB_119;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -76,28 +77,42 @@ public class AccessPageService {
     }
 
     public AccessPage updateAccessPage(Long accessPageId,AccessPageDTO accessPageDTO){
-        AccessPage accessPage = (Optional.ofNullable(accessPageId).isPresent())?accessPageRepository.
-                updateAccessTab(accessPageId,accessPageDTO.getName()): null;
-        if(!Optional.ofNullable(accessPage).isPresent()){
+        AccessPage accessPage = accessPageRepository.findOne(accessPageId);
+        if(isNull(accessPage)){
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,TAB,accessPageId);
-
         }
+        accessPage.setName(accessPageDTO.getName());
+        accessPage.setTranslatedNames(accessPageDTO.getTranslatedNames());
+        accessPageRepository.save(accessPage);
         return accessPage;
     }
 
     public List<AccessPageDTO> getMainTabs(){
-        return accessPageRepository.getMainTabs();
+        List<AccessPageQueryResult> accessPageQueryResults = accessPageRepository.getMainTabs();
+        return prepareAccessPageDTOList(accessPageQueryResults);
     }
 
     public List<AccessPageDTO> getMainTabsForUnit(Long unitId){
-        return accessPageRepository.getMainTabsForUnit(unitId);
+        List<AccessPageQueryResult> accessPageQueryResults = accessPageRepository.getMainTabsForUnit(unitId);
+        return prepareAccessPageDTOList(accessPageQueryResults);
     }
 
     public List<AccessPageDTO> getChildTabs(Long tabId){
         if( !Optional.ofNullable(tabId).isPresent() ){
             return Collections.emptyList();
         }
-        return accessPageRepository.getChildTabs(tabId);
+        List<AccessPageQueryResult> accessPageQueryResults = accessPageRepository.getChildTabs(tabId);
+        return prepareAccessPageDTOList(accessPageQueryResults);
+    }
+
+    private List<AccessPageDTO> prepareAccessPageDTOList(List<AccessPageQueryResult> accessPageQueryResults){
+        List<AccessPageDTO> accessPageDTOS = new ArrayList<>();
+        for (AccessPageQueryResult accessPageQueryResult : accessPageQueryResults) {
+            AccessPageDTO accessPageDTO = ObjectMapperUtils.copyPropertiesByMapper(accessPageQueryResult, AccessPageDTO.class);
+            accessPageDTO.setTranslatedNames(accessPageQueryResult.getAccessPage().getTranslatedNames());
+            accessPageDTOS.add(accessPageDTO);
+        }
+        return accessPageDTOS;
     }
 
     public Boolean updateStatus(boolean active,Long tabId){
@@ -266,5 +281,23 @@ public class AccessPageService {
     public Map<String, TranslationInfo> getTranslatedData(Long accessPageId) {
         AccessPage accessPage = accessPageRepository.findOne(accessPageId);
         return accessPage.getTranslatedData();
+    }
+
+    public List<AccessPageDTO> getTabHierarchy(Long languageId) {
+        List<AccessPageDTO> mainTabs = prepareAccessPageDTOList(accessPageRepository.getMainTabsWithHelperText(languageId));
+        for (AccessPageDTO accessPageDTO : mainTabs) {
+            setChildrenAccessPages(accessPageDTO, languageId);
+        }
+        return mainTabs;
+    }
+
+    private void setChildrenAccessPages(AccessPageDTO accessPageDTO, Long languageId){
+        List<AccessPageDTO> childAccessPageDTOS = prepareAccessPageDTOList(accessPageRepository.getChildTabsWithHelperText(accessPageDTO.getId(), languageId));
+        for (AccessPageDTO childAccessPageDTO : childAccessPageDTOS) {
+            if(childAccessPageDTO.isHasSubTabs()){
+                setChildrenAccessPages(childAccessPageDTO, languageId);
+            }
+        }
+        accessPageDTO.setChildren(childAccessPageDTOS);
     }
 }

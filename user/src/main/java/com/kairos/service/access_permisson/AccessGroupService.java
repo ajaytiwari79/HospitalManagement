@@ -50,6 +50,7 @@ import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffRetrievalService;
@@ -111,6 +112,8 @@ public class AccessGroupService {
     @Inject
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject private UserGraphRepository userGraphRepository;
+    @Inject
+    private ReasonCodeService reasonCodeService;
 
 
     public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
@@ -263,10 +266,10 @@ public class AccessGroupService {
             counter.addAndGet(1);
         });
         if (company) {
-            ((Organization) organization).setAccessGroups(newAccessGroupList);
+            organization.setAccessGroups(newAccessGroupList);
             organizationGraphRepository.save(((Organization) organization));
         } else {
-            ((Unit) organization).setAccessGroups(newAccessGroupList);
+            organization.setAccessGroups(newAccessGroupList);
             unitGraphRepository.save((Unit) organization);
         }
         return countryAndOrgAccessGroupIdsMap;
@@ -820,7 +823,7 @@ public class AccessGroupService {
 
     public ReasonCodeWrapper getAbsenceReasonCodesAndAccessRole(Long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = findUserAccessRole(unitId);
-        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
+        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeService.getReasonCodesByUnitId(unitId,ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
 
         return new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO);
     }
@@ -890,14 +893,17 @@ public class AccessGroupService {
     public List<AccessGroup> validAccessGroupByDate(Long unitId,Date date){
         AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
         List<AccessGroup> accessGroups = new ArrayList<>();
-        List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
-        for (AccessGroupDayTypesQueryResult accessGroupDayTypesQueryResult : accessGroupDayTypesQueryResults) {
-            if(isNotNull(accessGroupDayTypesQueryResult.getAccessGroup())){
-                if(!accessGroupDayTypesQueryResult.getAccessGroup().isAllowedDayTypes() && isDayTypeValid(date,accessGroupDayTypesQueryResult.getDayTypes()));{
-                    accessGroups.add(accessGroupDayTypesQueryResult.getAccessGroup());
+        if(!UserContext.getUserDetails().isHubMember()){
+            List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
+            for (AccessGroupDayTypesQueryResult accessGroupDayTypesQueryResult : accessGroupDayTypesQueryResults) {
+                if(isNotNull(accessGroupDayTypesQueryResult.getAccessGroup())){
+                    if(!accessGroupDayTypesQueryResult.getAccessGroup().isAllowedDayTypes() && isDayTypeValid(date,accessGroupDayTypesQueryResult.getDayTypes()));{
+                        accessGroups.add(accessGroupDayTypesQueryResult.getAccessGroup());
+                    }
                 }
             }
         }
+
         return accessGroups;
     }
 

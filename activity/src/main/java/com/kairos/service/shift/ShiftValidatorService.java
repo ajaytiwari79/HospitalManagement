@@ -191,10 +191,11 @@ public class ShiftValidatorService {
     public ShiftWithViolatedInfoDTO validateRuleCheck(Shift shift, boolean ruleCheckRequired, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, boolean valid, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shiftWithActivityDTO, Shift oldStateShift) {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
         if (ruleCheckRequired) {
+            boolean isValidateStaffingLevel = false;
             if (!valid && oldStateShift.getShiftType().equals(shift.getShiftType())) {
-                staffingLevelService.validateStaffingLevel(shift, activityWrapperMap, phase, oldStateShift);
+                isValidateStaffingLevel = staffingLevelService.validateStaffingLevel(shift, activityWrapperMap, phase, oldStateShift);
             }
-            shiftWithViolatedInfoDTO = validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldStateShift, activityWrapperMap, true, false);
+            shiftWithViolatedInfoDTO = validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldStateShift, activityWrapperMap, true, false, !isValidateStaffingLevel);
         }
         if (isNull(shiftWithViolatedInfoDTO)) {
             shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO(new ViolatedRulesDTO());
@@ -213,7 +214,7 @@ public class ShiftValidatorService {
         return new DateTimeInterval(startDate, endDate);
     }
 
-    public ShiftWithViolatedInfoDTO validateShiftWithActivity(Phase phase, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean byUpdate, boolean byTandAPhase) {
+    public ShiftWithViolatedInfoDTO validateShiftWithActivity(Phase phase, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean byUpdate, boolean byTandAPhase, boolean isValidateStaffingLevel) {
         if (wtaQueryResultDTO.getEndDate() != null && wtaQueryResultDTO.getEndDate().isBefore(asLocalDate(shift.getEndDate()))) {
             exceptionService.actionNotPermittedException(MESSAGE_WTA_EXPIRED_UNIT);
         }
@@ -229,12 +230,14 @@ public class ShiftValidatorService {
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap, CREATE);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
         ruleTemplateSpecificInfo.getViolatedRules().getActivities().addAll(activityRuleViolations);
-        List<ShiftActivity>[] shiftActivities = mainShift.getShiftActivitiesForValidatingStaffingLevel(oldShift);
-        for (ShiftActivity shiftActivity : shiftActivities[1]) {
-            validateStaffingLevel(phase, mainShift, activityWrapperMap, true, shiftActivity, ruleTemplateSpecificInfo, new StaffingLevelHelper());
-        }
-        for (ShiftActivity shiftActivity : shiftActivities[0]) {
-            validateStaffingLevel(phase, mainShift, activityWrapperMap, false, shiftActivity, ruleTemplateSpecificInfo, new StaffingLevelHelper());
+        if(isValidateStaffingLevel) {
+            List<ShiftActivity>[] shiftActivities = mainShift.getShiftActivitiesForValidatingStaffingLevel(oldShift);
+            for (ShiftActivity shiftActivity : shiftActivities[1]) {
+                validateStaffingLevel(phase, mainShift, activityWrapperMap, true, shiftActivity, ruleTemplateSpecificInfo, new StaffingLevelHelper());
+            }
+            for (ShiftActivity shiftActivity : shiftActivities[0]) {
+                validateStaffingLevel(phase, mainShift, activityWrapperMap, false, shiftActivity, ruleTemplateSpecificInfo, new StaffingLevelHelper());
+            }
         }
         validateAbsenceReasonCodeRule(activityWrapperMap, shift, ruleTemplateSpecificInfo);
         updateScheduledAndDurationMinutesInShift(shift, staffAdditionalInfoDTO, activityWrapperMap);
@@ -632,15 +635,15 @@ public class ShiftValidatorService {
     }
 
 
-    public void validateStaffingLevel(Phase phase, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, ShiftActivity shiftActivity, RuleTemplateSpecificInfo ruleTemplateSpecificInfo, StaffingLevelHelper staffingLevelHelper) {
+    public boolean validateStaffingLevel(Phase phase, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, ShiftActivity shiftActivity, RuleTemplateSpecificInfo ruleTemplateSpecificInfo, StaffingLevelHelper staffingLevelHelper) {
         Date shiftStartDate = shiftActivity.getStartDate();
         Date shiftEndDate = shiftActivity.getEndDate();
         PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
         if (!Optional.ofNullable(phaseSettings).isPresent()) {
             exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
         }
-
-        if (isVerificationRequired(checkOverStaffing, phaseSettings)) {
+        boolean isStaffingLevelVerify = isVerificationRequired(checkOverStaffing, phaseSettings);
+        if (isStaffingLevelVerify) {
             Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.asZonedDateTime(shiftStartDate).truncatedTo(ChronoUnit.DAYS));
             Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZonedDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));
             List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(shift.getUnitId(), startDate, endDate);
@@ -648,8 +651,8 @@ public class ShiftValidatorService {
             List<ShiftActivity> shiftActivities = shifts.stream().flatMap(curShift -> curShift.getActivities().stream()).collect(Collectors.toList());
             validateUnderAndOverStaffing(shift, activityWrapperMap, checkOverStaffing, staffingLevels, shiftActivities, shiftActivity, ruleTemplateSpecificInfo, staffingLevelHelper);
             staffingLevelMongoRepository.saveEntities(staffingLevels);
-
         }
+        return isStaffingLevelVerify;
     }
 
     private void validateUnderAndOverStaffing(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, List<StaffingLevel> staffingLevels, List<ShiftActivity> shiftActivities, ShiftActivity shiftActivity, RuleTemplateSpecificInfo ruleTemplateSpecificInfo, StaffingLevelHelper staffingLevelHelper) {

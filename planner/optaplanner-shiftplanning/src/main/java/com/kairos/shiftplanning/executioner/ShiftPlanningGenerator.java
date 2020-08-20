@@ -39,7 +39,7 @@ import com.kairos.shiftplanning.domain.wta_ruletemplates.BreakWTATemplate;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.WTABaseRuleTemplate;
 import com.kairos.shiftplanning.enums.SkillType;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import com.kairos.shiftplanning.utils.LocalDateConverter;
 import com.kairos.shiftplanning.utils.LocalTimeConverter;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
@@ -94,8 +94,8 @@ public class ShiftPlanningGenerator {
     private Set<BigInteger> plannedTimeIds = new HashSet<>();
     private Set<BigInteger> phaseIds = new HashSet<>();
 
-    public ShiftRequestPhasePlanningSolution loadUnsolvedSolution() {
-        ShiftRequestPhasePlanningSolution unresolvedSolution = new ShiftRequestPhasePlanningSolution();
+    public ShiftPlanningSolution loadUnsolvedSolution() {
+        ShiftPlanningSolution unresolvedSolution = new ShiftPlanningSolution();
         TimeType[] timeTypes = createTimeTypes();
         Object[] objects = dailyStaffingLines(timeTypes);
         List<DailyStaffingLine> staffingLines = (List<DailyStaffingLine>)objects[1];
@@ -137,7 +137,7 @@ public class ShiftPlanningGenerator {
         return groupedAlis;
     }
 
-    public BreaksIndirectAndActivityPlanningSolution loadUnsolvedBreakAndIndirectActivityPlanningSolution(ShiftRequestPhasePlanningSolution solution){
+    public BreaksIndirectAndActivityPlanningSolution loadUnsolvedBreakAndIndirectActivityPlanningSolution(ShiftPlanningSolution solution){
         BreaksIndirectAndActivityPlanningSolution secondarySolution= new BreaksIndirectAndActivityPlanningSolution();
         secondarySolution.setActivityLineIntervals(solution.getActivityLineIntervals());
         secondarySolution.setEmployees(solution.getEmployees());
@@ -191,7 +191,7 @@ public class ShiftPlanningGenerator {
         return staffingLines.stream().map(dailyStaffingLine -> dailyStaffingLine.getDailyActivityLine().getActivityLineIntervals()).collect(ArrayList::new, List::addAll, List::addAll);
     }
 
-    public ShiftRequestPhasePlanningSolution loadUnsolvedSolutionFromXML(String problemXml) {
+    public ShiftPlanningSolution loadUnsolvedSolutionFromXML(String problemXml) {
         XStream xstream = new XStream(new PureJavaReflectionProvider());
         xstream.processAnnotations(Employee.class);
         xstream.processAnnotations(StaffingLevelPlannerEntity.class);
@@ -200,9 +200,9 @@ public class ShiftPlanningGenerator {
         xstream.registerConverter(new ZonedDateTimeConverter());
         xstream.registerConverter(new LocalTimeConverter());
         xstream.registerConverter(new LocalDateConverter());
-        ShiftRequestPhasePlanningSolution unresolvedSolution = null;
+        ShiftPlanningSolution unresolvedSolution = null;
         try {
-            unresolvedSolution = (ShiftRequestPhasePlanningSolution) xstream.fromXML(new File(problemXml));
+            unresolvedSolution = (ShiftPlanningSolution) xstream.fromXML(new File(problemXml));
          } catch (Exception e) {
             LOGGER.error(ERROR,e.getMessage());
         }

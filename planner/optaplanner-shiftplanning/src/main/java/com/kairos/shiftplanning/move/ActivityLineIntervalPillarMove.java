@@ -2,8 +2,9 @@ package com.kairos.shiftplanning.move;
 
 import com.kairos.shiftplanning.move.helper.ActivityLineIntervalChangeMoveHelper;
 import com.kairos.shiftplanning.move.helper.ActivityLineIntervalWrapper;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import org.optaplanner.core.impl.heuristic.move.AbstractMove;
+import org.optaplanner.core.impl.heuristic.move.Move;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ActivityLineIntervalPillarMove extends AbstractMove<ShiftRequestPhasePlanningSolution> {
+public class ActivityLineIntervalPillarMove extends AbstractMove<ShiftPlanningSolution> {
     private List<ActivityLineIntervalWrapper> activityLineIntervalWrappers;
     private List<ActivityLineIntervalWrapper> exActivityLineIntervalWrappers;
     private static Logger log= LoggerFactory.getLogger(ActivityLineIntervalPillarMove.class);
@@ -30,7 +31,7 @@ public class ActivityLineIntervalPillarMove extends AbstractMove<ShiftRequestPha
      * @return
      */
     @Override
-    protected AbstractMove<ShiftRequestPhasePlanningSolution> createUndoMove(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    protected AbstractMove<ShiftPlanningSolution> createUndoMove(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         List<ActivityLineIntervalWrapper> undoActivityLineIntervalWrappers= new ArrayList<>();
         for(ActivityLineIntervalWrapper aliw: activityLineIntervalWrappers){
             undoActivityLineIntervalWrappers.add(new ActivityLineIntervalWrapper(aliw.getActivityLineInterval(), aliw.getActivityLineInterval().getShift()));
@@ -43,7 +44,7 @@ public class ActivityLineIntervalPillarMove extends AbstractMove<ShiftRequestPha
     }
 
     @Override
-    protected void doMoveOnGenuineVariables(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    protected void doMoveOnGenuineVariables(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         long start=System.currentTimeMillis();
         log.debug("*P1*********************STARTS********************");
         for(ActivityLineIntervalWrapper aliw: exActivityLineIntervalWrappers){
@@ -60,7 +61,7 @@ public class ActivityLineIntervalPillarMove extends AbstractMove<ShiftRequestPha
     }
 
     @Override
-    public boolean isMoveDoable(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector) {
+    public boolean isMoveDoable(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
         return  true;
     }
 
@@ -72,6 +73,19 @@ public class ActivityLineIntervalPillarMove extends AbstractMove<ShiftRequestPha
     @Override
     public Collection<?> getPlanningValues() {
         return Collections.singletonList(activityLineIntervalWrappers.get(0).getShiftImp());
+    }
+
+    @Override
+    public ActivityLineIntervalPillarMove rebase(ScoreDirector<ShiftPlanningSolution> destinationScoreDirector) {
+        List<ActivityLineIntervalWrapper> updatedActivityLineIntervalWrappers = new ArrayList<>();
+        for (ActivityLineIntervalWrapper activityLineIntervalWrapper : this.activityLineIntervalWrappers) {
+            updatedActivityLineIntervalWrappers.add(new ActivityLineIntervalWrapper(destinationScoreDirector.lookUpWorkingObject(activityLineIntervalWrapper.getActivityLineInterval()),destinationScoreDirector.lookUpWorkingObject(activityLineIntervalWrapper.getShiftImp())));
+        }
+        List<ActivityLineIntervalWrapper> updatedExActivityLineIntervalWrappers = new ArrayList<>();
+        for (ActivityLineIntervalWrapper activityLineIntervalWrapper : this.exActivityLineIntervalWrappers) {
+            updatedExActivityLineIntervalWrappers.add(new ActivityLineIntervalWrapper(destinationScoreDirector.lookUpWorkingObject(activityLineIntervalWrapper.getActivityLineInterval()),destinationScoreDirector.lookUpWorkingObject(activityLineIntervalWrapper.getShiftImp())));
+        }
+        return new ActivityLineIntervalPillarMove(updatedActivityLineIntervalWrappers,updatedExActivityLineIntervalWrappers);
     }
 
     @Override

@@ -41,13 +41,13 @@ public class Activity extends MongoBaseEntity {
     @KPermissionField
     private String description;
     private Long countryId;
+    @KPermissionField
     private List<Long> expertises;
     private List<Long> organizationTypes;
     private List<Long> organizationSubTypes;
     private List<Long> regions;
     private List<Long> levels;
     private List<Long> employmentTypes;
-    @KPermissionField
     private List<BigInteger> tags = new ArrayList<>();
     private ActivityStateEnum state = ActivityStateEnum.DRAFT;
 
@@ -58,12 +58,15 @@ public class Activity extends MongoBaseEntity {
     private boolean isParentActivity = true;
     @KPermissionSubModel
     private ActivityGeneralSettings activityGeneralSettings;
+    @KPermissionSubModel
     private ActivityBalanceSettings activityBalanceSettings;
     @KPermissionSubModel
     private ActivityIndividualPointsSettings activityIndividualPointsSettings;
+    @KPermissionField
     private Set<BigInteger> childActivityIds=new HashSet<>();
     @KPermissionSubModel
     private ActivityNotesSettings activityNotesSettings;
+    @KPermissionSubModel
     private ActivityCommunicationSettings activityCommunicationSettings;
     @KPermissionSubModel
     private ActivityBonusSettings activityBonusSettings;
@@ -71,11 +74,15 @@ public class Activity extends MongoBaseEntity {
     private ActivityRulesSettings activityRulesSettings;
     @KPermissionSubModel
     private ActivityTimeCalculationSettings activityTimeCalculationSettings;
-    @KPermissionSubModel
+    @KPermissionField
     private ActivitySkillSettings activitySkillSettings;
+    @KPermissionField
     private ActivityPhaseSettings activityPhaseSettings;
+    @KPermissionSubModel
     private ActivityOptaPlannerSetting activityOptaPlannerSetting;
+    @KPermissionSubModel
     private ActivityCTAAndWTASettings activityCTAAndWTASettings;
+    @KPermissionSubModel
     private ActivityLocationSettings activityLocationSettings;
     private BigInteger countryParentId;
     @JsonIgnore

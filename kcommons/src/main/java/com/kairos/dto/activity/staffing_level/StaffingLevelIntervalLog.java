@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -33,6 +34,10 @@ public class StaffingLevelIntervalLog implements Comparable<StaffingLevelInterva
         this.staffingLevelSkills = staffingLevelSkills;
     }
 
+    public Set<BigInteger> getActivityIds() {
+        return staffingLevelActivities.stream().map(staffingLevelActivity -> staffingLevelActivity.getActivityId()).collect(Collectors.toSet());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -43,7 +48,6 @@ public class StaffingLevelIntervalLog implements Comparable<StaffingLevelInterva
 
     @Override
     public int hashCode() {
-
         return Objects.hash(updatedAt);
     }
 

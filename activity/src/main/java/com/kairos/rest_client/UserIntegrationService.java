@@ -865,6 +865,11 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/employment_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EmploymentTypeDTO>>>() {
         });
     }
+    public List<EmploymentTypeDTO> getEmploymentTypeList(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/employment_types", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EmploymentTypeDTO>>>() {
+        });
+    }
+
 
     public Set<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
         Set<Object> data= genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Object>>>() {});
@@ -958,9 +963,6 @@ public class UserIntegrationService {
     public Set<String> getAccessRolesByAccessGroupIds(Long unitId, Set<Long> accessGroupIds) {
         return genericRestClient.publishRequest(accessGroupIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_access_roles", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<String>>>() {});
     }
-
-
-
 }
 
 
