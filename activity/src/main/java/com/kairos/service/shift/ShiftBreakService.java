@@ -89,6 +89,7 @@ public class ShiftBreakService implements KPIService {
 
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
         if (TIME_AND_ATTENDANCE.equals(phase.getName()) && isCollectionNotEmpty(shift.getBreakActivities())) {
+            validateBreakDuration(shift);
             return shift.getBreakActivities();
             //return getBreakActivity(shift, dbShift, activityWrapperMap);
         }
@@ -137,6 +138,14 @@ public class ShiftBreakService implements KPIService {
             }
         }
         return breakActivities;
+    }
+
+    private void validateBreakDuration(Shift shift) {
+        shift.getBreakActivities().forEach(k->{
+            if(!shift.getInterval().contains(k.getInterval())){
+                exceptionService.actionNotPermittedException(BREAK_NOT_VALID);
+            }
+        });
     }
 
     public List<ShiftActivity> getBreakActivity(Shift shift, Shift dbShift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
