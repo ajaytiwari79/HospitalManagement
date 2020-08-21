@@ -1,6 +1,7 @@
 package com.kairos.controller.activity;
 
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityPriorityDTO;
 import com.kairos.service.activity.ActivityPriorityService;
 import com.kairos.utils.response.ResponseHandler;
@@ -85,6 +86,13 @@ public class ActivityPriorityController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateActivityPriorityInActvitiy(@PathVariable BigInteger activityId, @PathVariable BigInteger activityPriorityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityPriorityService.updateActivityPriorityInActivity(activityPriorityId,activityId));
+    }
+
+    @ApiOperation("update translations in activity priority")
+    @PutMapping(value = UNIT_URL+"/activity_priority/{activityPriorityId}/language_settings")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateActivityPriorityTranslations(@PathVariable BigInteger activityPriorityId,@RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityPriorityService.updateTranslation(activityPriorityId,translations));
     }
 
 }

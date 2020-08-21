@@ -461,7 +461,7 @@ public class CountryService {
         List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId, false);
         List<TimeTypeDTO> timeType = timeTypeRestClient.getAllTimeTypes(countryId);
         List<PresenceTypeDTO> plannedTime = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
-        List<DayType> dayTypes = dayTypeService.getAllDayTypeByCountryId(countryId);
+        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
         //wrap data into wrapper class
         CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper = new CTARuleTemplateDefaultDataWrapper();
@@ -560,9 +560,6 @@ public class CountryService {
         return level.getTranslatedData();
     }
 
-//    public Map<String, TranslationInfo> getTranslatedData(Long levelId) {
-//        Level skill = levelGraphRepository.findOne(levelId);
-//        return skill.getTranslatedData();
-//    }
+
 
 }
