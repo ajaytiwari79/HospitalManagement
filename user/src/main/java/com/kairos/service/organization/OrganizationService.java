@@ -628,7 +628,7 @@ public class OrganizationService {
 
     public List<DayType> getAllDayTypeofOrganization() {
         Long countryId = UserContext.getUserDetails().getCountryId();
-        return dayTypeService.getAllDayTypeByCountryId(countryId);
+        return dayTypeGraphRepository.findByCountryId(countryId);
     }
 
     public List<Map<String, Object>> getUnitsByOrganizationIs(Long orgID) {
@@ -920,7 +920,7 @@ public class OrganizationService {
         Long countryId = UserContext.getUserDetails().getCountryId();
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeGraphRepository.findReasonCodeByUnitId(unitId), ReasonCodeDTO.class);
-        return new SelfRosteringMetaData(ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypeService.getAllDayTypeByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
+        return new SelfRosteringMetaData(ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypeGraphRepository.findByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
     }
 
     public boolean isUnit(Long unitId) {

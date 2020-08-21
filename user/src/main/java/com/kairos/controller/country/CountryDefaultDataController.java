@@ -646,14 +646,15 @@ public class CountryDefaultDataController {
     @PutMapping(value = COUNTRY_URL + "/level/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateTranslationsOfSkill(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+    ResponseEntity<Map<String, Object>> updateTranslationsOfLevel(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateTranslation(id,translations));
     }
 
+    @PutMapping(value = COUNTRY_URL + "/day_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfDayType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.updateTranslation(id,translations));
+    }
 
-//    @GetMapping(value = COUNTRY_URL + "/level/{id}/get_language_settings")
-//    @ApiOperation(value = "get translated data")
-//    public ResponseEntity<Map<String, Object>> getTranslatedData(@PathVariable Long id) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getTranslatedData(id));
-//    }
 }
