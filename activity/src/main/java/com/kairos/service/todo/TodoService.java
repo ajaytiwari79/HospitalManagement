@@ -73,7 +73,7 @@ public class TodoService {
 
     public void createOrUpdateTodo(Shift shift, TodoType todoType) {
         List<Todo> todos = new ArrayList<>();
-        if (todoType.equals(TodoType.APPROVAL_REQUIRED)) {
+        if (TodoType.APPROVAL_REQUIRED.equals(todoType)) {
             Set<BigInteger> activityIds = shift.getActivities().stream().filter(shiftActivity -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivity.getStatus())).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
             List<Activity> activities;
             if(!UserContext.getUserDetails().isManagement()) {
