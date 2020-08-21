@@ -132,7 +132,7 @@ public class ShiftController {
 
     //This is delete api but mapping with post because in delete mapping frontend cannot send list data in payload.
     @ApiOperation("delete Shifts")
-    @PostMapping(value = "/shifts")
+    @PostMapping(value = "/delete/shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteAllShifts(@RequestBody List<BigInteger> shiftIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.deleteAllShifts(shiftIds));
