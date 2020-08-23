@@ -1,6 +1,7 @@
 package com.kairos.service.activity;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityPriorityDTO;
 import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.activity.Activity;
@@ -9,12 +10,14 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ActivityPriorityMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -228,6 +231,13 @@ public class ActivityPriorityService {
             exceptionService.dataNotFoundByIdException(MESSAGE_DUPLICATE_ACTIVITY_PRIORITY_ID, activityPriorityId);
         }
         return isExist;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger activityPriorityId, Map<String,TranslationInfo> translations) {
+        ActivityPriority activityPriority =activityPriorityMongoRepository.findOne(activityPriorityId);
+        activityPriority.setTranslations(translations);
+        activityPriorityMongoRepository.save(activityPriority);
+        return activityPriority.getTranslations();
     }
 
 }

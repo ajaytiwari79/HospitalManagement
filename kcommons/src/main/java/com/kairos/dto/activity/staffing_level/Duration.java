@@ -36,7 +36,7 @@ public class Duration {
     }
 
     public DateTimeInterval getInterval(LocalDate localDate){
-        return new DateTimeInterval(asZonedDateTime(localDate,from),asZonedDateTime(localDate,to));
+        return new DateTimeInterval(asZonedDateTime(localDate,from),from.isAfter(to) ? asZonedDateTime(localDate.plusDays(1),to) : asZonedDateTime(localDate,to));
     }
 
     @Override

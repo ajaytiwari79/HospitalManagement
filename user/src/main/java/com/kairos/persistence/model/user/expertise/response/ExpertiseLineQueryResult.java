@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.expertise.response;
 
+import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.pay_table.PayTable;
@@ -25,4 +26,5 @@ public class ExpertiseLineQueryResult {
     private int fullTimeWeeklyMinutes;
     private int numberOfWorkingDaysInWeek;
     private BreakPaymentSetting breakPaymentSetting;
+
 }

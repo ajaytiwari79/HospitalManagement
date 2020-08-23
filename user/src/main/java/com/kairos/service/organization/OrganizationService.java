@@ -69,6 +69,7 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.country.EmploymentTypeService;
+import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -187,6 +188,8 @@ public class OrganizationService {
     @Inject private UnitService unitService;
     @Inject
     private TagService tagService;
+    @Inject
+    private ReasonCodeService reasonCodeService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationService.class);
 
@@ -625,7 +628,7 @@ public class OrganizationService {
 
     public List<DayType> getAllDayTypeofOrganization() {
         Long countryId = UserContext.getUserDetails().getCountryId();
-        return dayTypeService.getAllDayTypeByCountryId(countryId);
+        return dayTypeGraphRepository.findByCountryId(countryId);
     }
 
     public List<Map<String, Object>> getUnitsByOrganizationIs(Long orgID) {
@@ -776,7 +779,7 @@ public class OrganizationService {
         List<StaffPersonalDetailQueryResult> staffList = staffGraphRepository.getAllStaffWithMobileNumber(unitId);
         List<PresenceTypeDTO> plannedTypes = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<FunctionDTO> functions = functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
-        List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.ORDER);
+        List<ReasonCodeResponseDTO> reasonCodes = reasonCodeService.getReasonCodesByUnitId(unitId, ReasonCodeType.ORDER);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         return new OrderDefaultDataWrapper(orderAndActivityDTO.getOrders(), orderAndActivityDTO.getActivities(), skills, expertise, staffList, plannedTypes, functions, reasonCodes, dayTypes, orderAndActivityDTO.getMinOpenShiftHours(), orderAndActivityDTO.getCounters());
     }
@@ -917,7 +920,7 @@ public class OrganizationService {
         Long countryId = UserContext.getUserDetails().getCountryId();
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeGraphRepository.findReasonCodeByUnitId(unitId), ReasonCodeDTO.class);
-        return new SelfRosteringMetaData(ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypeService.getAllDayTypeByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
+        return new SelfRosteringMetaData(ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypeGraphRepository.findByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
     }
 
     public boolean isUnit(Long unitId) {

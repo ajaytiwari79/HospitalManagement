@@ -41,8 +41,12 @@ public class TimeSlotDTO {
         return DateUtils.asZonedDateTime(localDate, LocalTime.of(startHour,startMinute));
     }
 
+    public ZonedDateTime getEndZoneDateTimeWithoutConsiderStartHours(LocalDate localDate) {
+        return DateUtils.asZonedDateTime(localDate, LocalTime.of(endHour,endMinute));
+    }
+
     public ZonedDateTime getEndZoneDateTime(LocalDate localDate) {
-        if(endHour>startHour){
+        if(endHour<startHour){
             localDate = localDate.plusDays(1);
         }
         return DateUtils.asZonedDateTime(localDate, LocalTime.of(endHour,endMinute));

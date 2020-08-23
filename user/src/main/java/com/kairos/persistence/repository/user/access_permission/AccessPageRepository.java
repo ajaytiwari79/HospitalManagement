@@ -319,5 +319,33 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "RETURN id(unit) as unitId, CASE WHEN COUNT(r)>0 THEN TRUE ELSE FALSE END AS hasPermission")
     List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, Set<Long> organizationIds);
 
+    @Query("MATCH (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
+            "OPTIONAL MATCH (country:Country)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage)-[alr:" + ACCESS_PAGE_HAS_LANGUAGE + "]-(systemLanguage:SystemLanguage) " +
+            "WHERE id(systemLanguage)={0} " +
+            "WITH country,accessPage,r,alr " +
+            "OPTIONAL MATCH(accessPage)-[subTabs:"+SUB_PAGE+"]-(sub:AccessPage) " +
+            "WITH r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage,subTabs,alr.description as helperText \n" +
+            "RETURN \n" +
+            "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.editable as editable,accessPage.sequence as sequence,accessPage as accessPage,helperText, " +
+            "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
+            "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
+            "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
+            "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization ORDER BY id(accessPage)")
+    List<AccessPageQueryResult> getMainTabsWithHelperText(Long languageId);
+
+    @Query("MATCH (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) WHERE id(accessPage)={0} WITH subPage,accessPage \n" +
+            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(subPage)-[alr:" + ACCESS_PAGE_HAS_LANGUAGE + "]-(systemLanguage:SystemLanguage) \n" +
+            "WHERE id(systemLanguage)={1} " +
+            "WITH country,accessPage,subPage,r,alr " +
+            "OPTIONAL MATCH(subPage)-[subTabs:"+SUB_PAGE+"]->(sub:AccessPage)\n" +
+            "WITH r,subPage,id(accessPage) as parentTabId,subTabs,\n" +
+            "r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,alr.description as helperText\n" +
+            "RETURN id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,subPage.sequence as sequence,subPage.editable as editable, parentTabId,subPage as accessPage,helperText, " +
+            "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
+            "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
+            "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
+            "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization "
+    )
+    List<AccessPageQueryResult> getChildTabsWithHelperText(Long tabId, Long languageId);
 
 }

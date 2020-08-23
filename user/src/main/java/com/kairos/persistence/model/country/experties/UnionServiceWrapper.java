@@ -5,6 +5,7 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by vipul on 27/3/18.
@@ -12,12 +13,20 @@ import java.util.List;
 
 public class UnionServiceWrapper {
     private List<UnionQueryResult> unions;
-    private List<Object> services;
+    private List<Map<String,Object>> services;
     private List<Level> organizationLevels;
     private List<SectorDTO> sectors;
 
     public UnionServiceWrapper() {
         //Default Constructor
+    }
+
+    public List<Map<String, Object>> getServices() {
+        return services;
+    }
+
+    public void setServices(List<Map<String, Object>> services) {
+        this.services = services;
     }
 
     public List<Level> getOrganizationLevels() {
@@ -36,13 +45,7 @@ public class UnionServiceWrapper {
         this.unions = unions;
     }
 
-    public List<Object> getServices() {
-        return services;
-    }
 
-    public void setServices(List<Object> services) {
-        this.services = services;
-    }
 
     public List<SectorDTO> getSectors() {
         return sectors;

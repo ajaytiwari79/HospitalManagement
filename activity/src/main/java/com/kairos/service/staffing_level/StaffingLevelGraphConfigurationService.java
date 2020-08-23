@@ -32,7 +32,7 @@ public class StaffingLevelGraphConfigurationService {
     }
 
     private StaffingLevelGraphConfiguration getDefaultConfiguration(Long unitId,Long userId) {
-        WeeklyGraphConfiguration weeklyGraphConfiguration = new WeeklyGraphConfiguration(30,30,50,50,30,30,50,50,false,false,false);
+        WeeklyGraphConfiguration weeklyGraphConfiguration = new WeeklyGraphConfiguration(30,30,50,50,30,30,50,50,false,false,false,1,1);
         DailyGraphConfiguration dailyGraphConfiguration = new DailyGraphConfiguration(true,false,false,true,true,false,false,false,10,10,0,24);
         return new StaffingLevelGraphConfiguration(weeklyGraphConfiguration,dailyGraphConfiguration,userId,unitId);
     }

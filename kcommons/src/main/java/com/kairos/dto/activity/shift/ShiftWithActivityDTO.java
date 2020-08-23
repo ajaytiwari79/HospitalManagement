@@ -7,6 +7,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.enums.TimeTypeEnum;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,6 +33,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Getter
 @Setter
 @Data
+@EqualsAndHashCode(callSuper=true)
 public class ShiftWithActivityDTO extends ShiftDTO{
     private PhaseDTO phase;
     private String timeType;

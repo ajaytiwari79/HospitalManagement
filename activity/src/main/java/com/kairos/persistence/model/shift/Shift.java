@@ -251,7 +251,7 @@ public class Shift extends MongoBaseEntity {
 
 
     public boolean isSickShift() {
-        return !SICK.equals(this.shiftType);
+        return SICK.equals(this.shiftType);
     }
 
     public Set<ShiftStatus> getShiftStatuses() {

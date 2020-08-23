@@ -6,9 +6,12 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.dto.user.TranslationDTO;
+import com.kairos.dto.user.country.LevelDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
@@ -25,6 +28,7 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
+import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -328,8 +332,13 @@ public class CountryService {
         return true;
     }
 
-    public List<Level> getLevels(long countryId) {
-        return countryGraphRepository.getLevelsByCountry(countryId);
+    public List<LevelDTO> getLevels(long countryId) {
+        List<Level> levels = countryGraphRepository.getLevelsByCountry(countryId);
+        List<LevelDTO> levelDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(levels,LevelDTO.class);
+        for(LevelDTO level :levelDTOS){
+            level.setTranslations(level.getTranslatedData());
+        }
+        return levelDTOS;
     }
 
     public RelationTypeDTO addRelationType(Long countryId, RelationTypeDTO relationTypeDTO) {
@@ -452,7 +461,7 @@ public class CountryService {
         List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId, false);
         List<TimeTypeDTO> timeType = timeTypeRestClient.getAllTimeTypes(countryId);
         List<PresenceTypeDTO> plannedTime = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
-        List<DayType> dayTypes = dayTypeService.getAllDayTypeByCountryId(countryId);
+        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
         //wrap data into wrapper class
         CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper = new CTARuleTemplateDefaultDataWrapper();
@@ -536,5 +545,21 @@ public class CountryService {
     public Country findById(Long countryId){
         return countryGraphRepository.findById(countryId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_COUNTRY_ID_NOTFOUND, countryId)));
     }
+
+    public Map<String, TranslationInfo> updateTranslation(Long levelId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Level level =levelGraphRepository.findOne(levelId);
+        level.setTranslatedNames(translatedNames);
+        level.setTranslatedDescriptions(translatedDescriptios);
+        levelGraphRepository.save(level);
+        return level.getTranslatedData();
+    }
+
+
 
 }

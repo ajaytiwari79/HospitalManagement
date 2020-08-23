@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
@@ -47,6 +48,7 @@ public class CTAResponseDTO {
     private Long employmentId;
     private Boolean disabled;
     private List<TagDTO> tags;
+    private Map<String, TranslationInfo> translations;
 
     public CTAResponseDTO(String name, BigInteger id,BigInteger parentId) {
         this.name = name;

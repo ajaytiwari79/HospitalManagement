@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.country;
 
+import com.kairos.dto.user.country.LevelDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.persistence.model.country.default_data.RelationType;

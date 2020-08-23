@@ -89,7 +89,9 @@ public class ShiftBreakService implements KPIService {
 
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
         if (TIME_AND_ATTENDANCE.equals(phase.getName()) && isCollectionNotEmpty(shift.getBreakActivities())) {
-            return getBreakActivity(shift, dbShift, activityWrapperMap);
+            validateBreakDuration(shift);
+            return shift.getBreakActivities();
+            //return getBreakActivity(shift, dbShift, activityWrapperMap);
         }
         BreakSettings breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseId(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
         List<ShiftActivity> breakActivities = new ArrayList<>();
@@ -136,6 +138,16 @@ public class ShiftBreakService implements KPIService {
             }
         }
         return breakActivities;
+    }
+
+    private void validateBreakDuration(Shift shift) {
+        shift.getBreakActivities().forEach(k->{
+            if(!shift.getInterval().contains(k.getInterval())){
+                LOGGER.info("Shift Interval {}",shift.getInterval().toString());
+                LOGGER.info("Activity Interval {}",k.getInterval().toString());
+                exceptionService.actionNotPermittedException(BREAK_NOT_VALID);
+            }
+        });
     }
 
     public List<ShiftActivity> getBreakActivity(Shift shift, Shift dbShift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
@@ -261,7 +273,7 @@ public class ShiftBreakService implements KPIService {
     }
 
     private void updateBreakHeldInShift(ShiftActivity breakActivity, Shift shift, Shift dbShift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
-        if (isCollectionNotEmpty(dbShift.getBreakActivities())||breakActivity.isBreakNotHeld()) {
+        if (isCollectionNotEmpty(dbShift.getBreakActivities()) || breakActivity.isBreakNotHeld()) {
             ShiftActivity shiftActivity = shift.getActivities().stream().filter(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()).contains(breakActivity.getStartDate())).findFirst().orElseThrow(()->new InvalidRequestException(convertMessage(BREAK_NOT_VALID)));
             if (!activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isBreakAllowed()) {
                 exceptionService.actionNotPermittedException(BREAK_NOT_VALID);

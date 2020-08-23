@@ -206,7 +206,7 @@ public class ProcessingActivityService {
         processingActivity.setDescription(processingActivityDTO.getDescription());
         processingActivity.setControllerContactInfo(processingActivityDTO.getControllerContactInfo());
         processingActivity.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
-        processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
+        processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMaxDataSubjectVolume());
         processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setManagingDepartment(new ManagingOrganization(processingActivityDTO.getManagingDepartment().getManagingOrgId(), processingActivityDTO.getManagingDepartment().getManagingOrgName()));
         processingActivity.setProcessOwner(new Staff(processingActivityDTO.getProcessOwner().getStaffId(), processingActivityDTO.getProcessOwner().getFirstName(), processingActivityDTO.getProcessOwner().getLastName()));
@@ -297,7 +297,7 @@ public class ProcessingActivityService {
         processingActivityResponseDTO.setDescription(processingActivity.getDescription());
         processingActivityResponseDTO.setControllerContactInfo(processingActivity.getControllerContactInfo());
         processingActivityResponseDTO.setJointControllerContactInfo(processingActivity.getJointControllerContactInfo());
-        processingActivityResponseDTO.setMaxDataSubjectVolume(processingActivity.getMinDataSubjectVolume());
+        processingActivityResponseDTO.setMaxDataSubjectVolume(processingActivity.getMaxDataSubjectVolume());
         processingActivityResponseDTO.setMinDataSubjectVolume(processingActivity.getMinDataSubjectVolume());
         processingActivityResponseDTO.setManagingDepartment(ObjectMapperUtils.copyPropertiesByMapper(processingActivity.getManagingDepartment(), com.kairos.dto.gdpr.ManagingOrganization.class));
         processingActivityResponseDTO.setProcessOwner(ObjectMapperUtils.copyPropertiesByMapper(processingActivity.getProcessOwner(), com.kairos.dto.gdpr.Staff.class));
@@ -439,5 +439,14 @@ public class ProcessingActivityService {
     }
 
 
+    public ProcessingActivityRiskResponseDTO updateRiskDetail(Long unitId, Long id, ProcessingActivityRiskResponseDTO processingActivityRiskResponseDTO) {
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
+        if (!processingActivity.isActive()) {
+            exceptionService.invalidRequestException("message.processing.activity.inactive");
+        }
+        processingActivity.setRisks(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivityRiskResponseDTO.getRisks(), Risk.class));
+        processingActivityRepository.save(processingActivity);
+        return processingActivityRiskResponseDTO;
+    }
 }
 
