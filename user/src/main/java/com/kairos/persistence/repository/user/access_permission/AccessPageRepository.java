@@ -229,6 +229,10 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             " RETURN module.name as name,id(module) as id,module.moduleId as moduleId,modulePermission.read  as read,modulePermission.write  as write,module.isModule as module,module.sequence as sequence  ")
     List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId, List<Long> accessGroupIds, Set<Long> allAccessGroupIds);
 
+    @Query(" MATCH (module:AccessPage) " +
+            " RETURN module.name as name,id(module) as id,module.moduleId as moduleId,true  as read,true  as write,module.isModule as module,module.sequence as sequence  ")
+    List<AccessPageQueryResult> fetchHubSystemAdminPermissions();
+
     @Query("MATCH (u:User) WHERE id(u)={0} \n" +
             "MATCH (org:Organization{isEnable:true})-[:"+ HAS_POSITIONS +"]-(position:Position)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
             "OPTIONAL MATCH (org)-[:"+HAS_UNIT+"]->(unit:Unit{isEnable:true,boardingCompleted:true}) WITH position,org+[unit] as coll\n" +

@@ -461,29 +461,38 @@ public class UserService {
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
         permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
         Set<Long> unitAccessGroupIds=new HashSet<>();
-        if (permissionData.isHub()) {
+        if(UserContext.getUserDetails().isSystemAdmin()){
+            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubSystemAdminPermissions();
+            preparePermission(permissionData, permissions);
+        }
+        else if (permissionData.isHub()) {
              Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
              unitAccessGroupIds=parentHub.getId().equals(organizationId)?parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet()):accessGroupService.getAccessGroupIdsOfUnit(organizationId);
             //List<AccessGroupQueryResult> accessGroupQueryResults = accessGroupService.getCountryAccessGroupByOrgCategory(UserContext.getUserDetails().getCountryId(), OrganizationCategory.HUB.toString());
             List<Long> accessGroupIds = parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toList());
             List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId(), accessGroupIds,unitAccessGroupIds);
-            Map<String, AccessPageQueryResult> permissionMap = prepareUnitPermissions(permissions,true);
-            HashMap<String, Object> unitPermissionMap = new HashMap<>();
-            for (AccessPageQueryResult permission : permissions) {
-                unitPermissionMap.put(permission.getModuleId(), permissionMap.get(permission.getModuleId()));
-            }
-            permissionData.setHubPermissions(unitPermissionMap);
+            preparePermission(permissionData, permissions);
 
         } else {
             loadUnitPermissions(organizationId, currentUserId, permissionData);
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
         permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
+
         permissionData.setModelPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isSystemAdmin(),userAccessRoleDTO.getStaffId(),unitAccessGroupIds), ModelDTO.class));
         Organization parent = organizationService.fetchParentOrganization(organizationId);
         permissionData.setStaffId(staffGraphRepository.getStaffIdByUserId(currentUserId,parent.getId()));
         updateChatStatus(ChatStatus.ONLINE);
         return permissionData;
+    }
+
+    private void preparePermission(UnitWiseStaffPermissionsDTO permissionData, List<AccessPageQueryResult> permissions) {
+        Map<String, AccessPageQueryResult> permissionMap = prepareUnitPermissions(permissions,true);
+        HashMap<String, Object> unitPermissionMap = new HashMap<>();
+        for (AccessPageQueryResult permission : permissions) {
+            unitPermissionMap.put(permission.getModuleId(), permissionMap.get(permission.getModuleId()));
+        }
+        permissionData.setHubPermissions(unitPermissionMap);
     }
 
     private void loadUnitPermissions(Long organizationId, long currentUserId, UnitWiseStaffPermissionsDTO permissionData) {
