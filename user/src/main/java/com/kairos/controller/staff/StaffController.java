@@ -2,6 +2,7 @@ package com.kairos.controller.staff;
 
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
+import com.kairos.dto.user.access_group.PermissionDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
@@ -134,12 +135,12 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/unit_permission", method = RequestMethod.POST)
     @ApiOperation("update employments of staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable long staffId, @RequestBody Map<String, Object> unitPermissionDetails) {
+    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable long staffId, @RequestBody PermissionDTO unitPermissionDetails) {
 
-        long accessGroupId = Long.parseLong((String) unitPermissionDetails.get("roleId"));
-        boolean isCreated = (boolean) unitPermissionDetails.get("isCreated");
-        long unitId = Long.parseLong((String) unitPermissionDetails.get("organizationId"));
-        Map<String, Object> response = positionService.createUnitPermission(unitId, staffId, accessGroupId, isCreated);
+//        long accessGroupId = Long.parseLong((String) unitPermissionDetails.get("roleId"));
+//        boolean isCreated = (boolean) unitPermissionDetails.get("isCreated");
+//        long unitId = Long.parseLong((String) unitPermissionDetails.get("organizationId"));
+        Map<String, Object> response = positionService.createUnitPermission(unitPermissionDetails.getOrganizationId(), staffId, unitPermissionDetails.getRoleId(), unitPermissionDetails.isCreated(),unitPermissionDetails);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }

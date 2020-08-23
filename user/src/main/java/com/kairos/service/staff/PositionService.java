@@ -8,6 +8,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
+import com.kairos.dto.user.access_group.PermissionDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
@@ -176,7 +177,7 @@ public class PositionService {
     }
 
 
-    public Map<String, Object> createUnitPermission(Long unitId, Long staffId, Long accessGroupId, boolean created) {
+    public Map<String, Object> createUnitPermission(Long unitId, Long staffId, Long accessGroupId, boolean created, PermissionDTO permissionDTO) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
@@ -192,7 +193,7 @@ public class PositionService {
         Map<String, Object> response = new HashMap<>();
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         if (created) {
-            staffAccessGroupQueryResult = setUnitPermission(unitId, staffId, accessGroupId, accessGroup, unit, parentUnit, position, response);
+            staffAccessGroupQueryResult = setUnitPermission(unitId, staffId, accessGroupId, accessGroup, unit, parentUnit, position, response,permissionDTO);
         } else {
             staffAccessGroupQueryResult = removeUnitPermisssion(unitId, staffId, accessGroupId, parentUnit);
         }
@@ -217,7 +218,7 @@ public class PositionService {
         return staffAccessGroupQueryResult;
     }
 
-    private StaffAccessGroupQueryResult setUnitPermission(Long unitId, Long staffId, Long accessGroupId, AccessGroup accessGroup, OrganizationBaseEntity unit, Organization parentUnit, Position position, Map<String, Object> response) {
+    private StaffAccessGroupQueryResult setUnitPermission(Long unitId, Long staffId, Long accessGroupId, AccessGroup accessGroup, OrganizationBaseEntity unit, Organization parentUnit, Position position, Map<String, Object> response,PermissionDTO permissionDTO) {
         UnitPermission unitPermission;
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentUnit.getId(), unitId, staffId, accessGroupId);
@@ -235,6 +236,7 @@ public class PositionService {
         } else {
             unitPermissionGraphRepository.createPermission(accessGroupId, unitPermission.getId());
         }
+        unitPermissionGraphRepository.updateDatesInUnitPermission(accessGroupId, unitPermission.getId(),permissionDTO.getStartDate().toString(),permissionDTO.getEndDate()==null?null:permissionDTO.getEndDate().toString());
         LOGGER.info(" Currently created Unit Permission ");
         response.put("startDate", getDate(unitPermission.getStartDate()));
         response.put("endDate", getDate(unitPermission.getEndDate()));
@@ -632,7 +634,7 @@ public class PositionService {
             deleteAuthTokenOfUsersByPositionIds(positionIds);
             for (ExpiredPositionsQueryResult expiredPositionsQueryResult : expiredPositionsQueryResults) {
                 for (OrganizationBaseEntity unit : expiredPositionsQueryResult.getUnits()) {
-                    createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true);
+                    createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true,new PermissionDTO());
                 }
             }
         }
