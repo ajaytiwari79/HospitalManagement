@@ -30,4 +30,9 @@ public class ShiftWithViolatedInfoDTO {
     public ShiftWithViolatedInfoDTO(@Valid List<ShiftDTO> shifts) {
         this.shifts = shifts;
     }
+
+    public ShiftWithViolatedInfoDTO(List<ShiftDTO> shifts, ViolatedRulesDTO violatedRules){
+        this.shifts = shifts;
+        this.violatedRules = violatedRules;
+    }
 }

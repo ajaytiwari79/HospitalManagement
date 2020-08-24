@@ -354,7 +354,7 @@ public class TimeBankService implements KPIService {
         Date endDate = plusMinutes(startDate, (int) ONE_DAY_MINUTES);
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), startDate);
         if(isNull(ctaResponseDTO)) {
-            exceptionService.dataNotFoundException(MESSAGE_CTA_NOTFOUND);
+            exceptionService.dataNotFoundException(MESSAGE_CTA_NOTFOUND,asLocalDate(startDate));
         }
         staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
@@ -389,7 +389,7 @@ public class TimeBankService implements KPIService {
                 ctaResponseDTO = ctaResponseDTOMap.getOrDefault(shiftDate, costTimeAgreementRepository.getCTAByEmploymentIdAndDate(employmentId, DateUtils.asDate(shiftDate)));
             }
             if(isNull(ctaResponseDTO)) {
-                exceptionService.dataNotFoundException(MESSAGE_CTA_NOTFOUND);
+                exceptionService.dataNotFoundException(MESSAGE_CTA_NOTFOUND,shiftDate);
             }
             staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
@@ -591,7 +591,7 @@ public class TimeBankService implements KPIService {
                 StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffAdditionalInfoMap.get(shift.getEmploymentId());
                 CTAResponseDTO ctaResponseDTO = getCTAByDate(employmentAndCTAResponseMap.get(shift.getEmploymentId()), asLocalDate(shift.getStartDate()));
                 if(isNull(ctaResponseDTO)){
-                    exceptionService.dataNotFoundException(MESSAGE_CTA_NOTFOUND);
+                    exceptionService.dataNotFoundException(MESSAGE_CTA_NOTFOUND,asLocalDate(shift.getStartDate()));
                 }
                 staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                 staffAdditionalInfoDTO.setUnitId(shifts.get(0).getUnitId());
