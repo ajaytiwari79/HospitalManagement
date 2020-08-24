@@ -1,5 +1,6 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.Day;
 import lombok.Getter;
@@ -33,11 +34,11 @@ public class DayTypeDTO {
     private Map<String,String> translatedDescriptions;
     private Map<String, TranslationInfo> translations;
 
-    public Map<String, TranslationInfo> getTranslatedData() {
-        Map<String, TranslationInfo> infoMap=new HashMap<>();
-        translatedNames.forEach((k,v)-> infoMap.put(k,new TranslationInfo(v,translatedDescriptions.get(k))));
-        return infoMap;
-    }
+//    public Map<String, TranslationInfo> getTranslatedData() {
+//        Map<String, TranslationInfo> infoMap=new HashMap<>();
+//        translatedNames.forEach((k,v)-> infoMap.put(k,new TranslationInfo(v,translatedDescriptions.get(k))));
+//        return infoMap;
+//    }
 
     public DayTypeDTO(Long id, String name, List<Day> validDays, List<CountryHolidayCalenderDTO> countryHolidayCalenderData, boolean holidayType, boolean allowTimeSettings) {
         this.id = id;
