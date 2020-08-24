@@ -4,14 +4,12 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.TranslationDTO;
-import com.kairos.dto.user.country.LevelDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.Unit;
@@ -27,8 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -357,6 +353,7 @@ public class OrganizationServiceService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long serviceId, Map<String,TranslationInfo> translationInfoMap) {
+        TranslationUtil.updateTranslationsIfActivityNameIsNull(translationInfoMap);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptios = new HashMap<>();
         for(Map.Entry<String,TranslationInfo> entry :translationInfoMap.entrySet()){

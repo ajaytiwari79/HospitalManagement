@@ -17,8 +17,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 public interface IndustryTypeGraphRepository extends Neo4jBaseRepository<IndustryType,Long>{
 
     @Query("MATCH (country:Country)<-[:"+BELONGS_TO+"]-(it:IndustryType {isEnabled:true}) WHERE id(country)={0} " +
-            "RETURN id(it) as id, it.name as name, it.description as description ORDER BY it.creationDate DESC")
-    List<IndustryTypeDTO> findIndustryTypeByCountry(long countryId);
+            "RETURN it")
+    List<IndustryType> findIndustryTypeByCountry(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(industryType:IndustryType {isEnabled:true}) WHERE id(country)={0} AND id(industryType)<>{2} AND industryType.name =~{1}  " +
             " WITH count(industryType) as totalCount " +
