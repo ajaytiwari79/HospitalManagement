@@ -133,7 +133,7 @@ public class RequestAbsenceService {
                 Date endDate = CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) ? asDate(asZonedDateTime(shift.getStartDate()).plusWeeks(1).truncatedTo(ChronoUnit.DAYS)) : asDate(asZonedDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
                 ShiftDTO shiftDTO = new ShiftDTO(asLocalDate(startDate),newArrayList(new ShiftActivityDTO(activityWrapper.getActivity().getId(),activityWrapper.getActivity().getName(),newHashSet(ShiftStatus.REQUEST))),shift.getId());
                 shiftDTO.setUnitId(shift.getUnitId());
-                shiftWithViolatedInfoDTOS = absenceShiftService.createAbsenceTypeShift(activityWrapper,shiftDTO,staffAdditionalInfoDTO, false,ShiftActionType.SAVE);
+                shiftWithViolatedInfoDTOS = absenceShiftService.createAbsenceTypeShift(activityWrapper,shiftDTO,staffAdditionalInfoDTO, new Object[]{false,null},ShiftActionType.SAVE);
                 shiftMongoRepository.deleteShiftBetweenDatesByEmploymentId(shift.getEmploymentId(),startDate,endDate, getShiftIds(shiftWithViolatedInfoDTOS));
             }else {
                 shiftWithViolatedInfoDTOS = updateShiftWithRequestAbsence(activityWrapper,shift,staffAdditionalInfoDTO);
