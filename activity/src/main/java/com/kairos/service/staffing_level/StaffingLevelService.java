@@ -220,7 +220,6 @@ public class StaffingLevelService  {
     public List<PresenceStaffingLevelDto> updatePresenceStaffingLevel(BigInteger staffingLevelId, Long unitId, PresenceStaffingLevelDto presenceStaffingLevelDTO) {
         LOGGER.info("updating staffing level organizationId and staffingLevelId is {} ,{}", unitId, staffingLevelId);
         List<PresenceStaffingLevelDto> presenceStaffingLevelDtos=new ArrayList<>();
-
         List<StaffingLevel> staffingLevels=staffingLevelMongoRepository.findByUnitIdAndDates(unitId,presenceStaffingLevelDTO.getStartDate(),presenceStaffingLevelDTO.getEndDate());
         for(StaffingLevel staffingLevel:staffingLevels){
             StaffingLevelUtil.setUserWiseLogs(staffingLevel,presenceStaffingLevelDTO);

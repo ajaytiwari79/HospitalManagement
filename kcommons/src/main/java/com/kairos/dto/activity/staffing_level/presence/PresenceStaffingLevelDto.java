@@ -2,6 +2,7 @@ package com.kairos.dto.activity.staffing_level.presence;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
@@ -34,7 +35,7 @@ public class PresenceStaffingLevelDto {
     private Date startTime;
     private Date endTime;
     private StaffingLevelChange staffingLevelChange;
-    private Number entityId;
+    private StaffingLevelAction staffingLevelAction;
 
     public PresenceStaffingLevelDto(BigInteger phaseId, Date currentDate, Integer weekCount,
                                     StaffingLevelSetting staffingLevelSetting) {
@@ -45,13 +46,24 @@ public class PresenceStaffingLevelDto {
     }
 
     public enum StaffingLevelChange{
-        ACTIVITY_MIN,ACTIVITY_MAX,SKILL_BASIC,SKILL_ADVANCE,SKILL_EXPERT,REMOVE
+        ACTIVITY_MIN,ACTIVITY_MAX,SKILL_BASIC,SKILL_ADVANCE,SKILL_EXPERT
+    }
+
+    public enum StaffingLevelAction{
+        ADD,UPDATE,REMOVE
     }
 
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
     public Date getCurrentDate() {
         return currentDate;
+    }
+
+    public DateTimeInterval getInterval(){
+        if(this.startTime==null || this.endTime==null){
+            return null;
+        }
+        return new DateTimeInterval(this.startTime,this.endTime);
     }
 
 
