@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.expertise.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
@@ -53,6 +54,7 @@ public class ExpertiseQueryResult {
     private Location unionLocation;// in case of expertise at unit level only
     private Set<Long> supportedUnitIds;
     private List<ExpertiseLineQueryResult> expertiseLines=new ArrayList<>();
+    private CTACompensationSettingDTO ctaCompensationSetting;
 
     @JsonIgnore
     public ExpertiseLineQueryResult getCurrentlyActiveLine(){

@@ -1,5 +1,6 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.Day;
 import lombok.Getter;

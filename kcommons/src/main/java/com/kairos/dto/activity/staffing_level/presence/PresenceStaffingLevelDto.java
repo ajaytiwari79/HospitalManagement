@@ -29,12 +29,23 @@ public class PresenceStaffingLevelDto {
     private Date updatedAt;
     private boolean draft;
 
+    private Date startDate;
+    private Date endDate;
+    private Date startTime;
+    private Date endTime;
+    private StaffingLevelChange staffingLevelChange;
+    private Number entityId;
+
     public PresenceStaffingLevelDto(BigInteger phaseId, Date currentDate, Integer weekCount,
                                     StaffingLevelSetting staffingLevelSetting) {
         this.phaseId = phaseId;
         this.currentDate = currentDate;
         this.weekCount = weekCount;
         this.staffingLevelSetting = staffingLevelSetting;
+    }
+
+    public enum StaffingLevelChange{
+        ACTIVITY_MIN,ACTIVITY_MAX,SKILL_BASIC,SKILL_ADVANCE,SKILL_EXPERT,REMOVE
     }
 
 

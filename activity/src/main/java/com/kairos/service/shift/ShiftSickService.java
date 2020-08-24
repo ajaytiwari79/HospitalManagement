@@ -119,7 +119,7 @@ public class ShiftSickService extends MongoBaseService {
                 ShiftDTO shiftDTO1 = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftDTO.class);
                 shiftDTO1.setShiftDate(shiftDTO1.getShiftDate().plusDays(i));
                 setStartAndEndDate(shiftDTO1);
-                ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, shiftDTO1, phase, false, ShiftActionType.SAVE);
+                ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, shiftDTO1, phase, new Object[]{false,null}, ShiftActionType.SAVE);
                 shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
                 i++;
             }
@@ -221,7 +221,7 @@ public class ShiftSickService extends MongoBaseService {
         });
         shiftService.createShifts(activity.getUnitId(),ObjectMapperUtils.copyCollectionPropertiesByMapper(allShiftsToUpdate,ShiftDTO.class),ShiftActionType.SAVE);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(allShiftsToDelete.get(0).getStartDate()), allShiftsToDelete.get(0).getStaffId(), allShiftsToDelete.get(0).getEmploymentId(), Collections.emptySet());
-        shiftService.deleteFullWeekShifts(new ArrayList<>(),allShiftsToDelete,staffAdditionalInfoDTO);
+        shiftService.deleteShifts(new ArrayList<>(),allShiftsToDelete,staffAdditionalInfoDTO);
         shiftMongoRepository.saveEntities(allShiftsToDelete);
 
     }
