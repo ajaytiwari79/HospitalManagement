@@ -911,29 +911,11 @@ public class ShiftValidatorService {
             shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase) {
         Activity activity = activityWrapper.getActivity();
         boolean shiftOverlappedWithNonWorkingType = false;
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.invalidRequestException(MESSAGE_ACTIVITY_ID, shiftDTO.getActivities().get(0).getActivityId());
-        }
-        if (staffAdditionalInfoDTO == null) {
-            exceptionService.invalidRequestException(MESSAGE_STAFF_NOTFOUND);
-        }
-        if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
-            exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_ABSENT);
-        }
-        if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
-            exceptionService.invalidRequestException(MESSAGE_SHIFT_NOT_PUBLISHED);
-        }
-        if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
-            exceptionService.invalidRequestException(MESSAGE_SHIFT_NOT_PUBLISHED);
-        }
-        if (staffAdditionalInfoDTO.getUnitId() == null) {
-            exceptionService.invalidRequestException(MESSAGE_STAFF_UNIT, shiftDTO.getStaffId(), shiftDTO.getUnitId());
-        }
+        validateStaffAndShift(staffAdditionalInfoDTO, shiftDTO, activity);
         DateTimeInterval shiftInterval = null;
         Date startDate = asDate(shiftDTO.getShiftDate());
         Date endDate = null;
         if (CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
-
             endDate = asDate(shiftDTO.getShiftDate().plusDays(6).atTime(LocalTime.MAX));
             shiftInterval = new DateTimeInterval(startDate, endDate);
         } else if (CommonConstants.FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
@@ -957,6 +939,27 @@ public class ShiftValidatorService {
             shiftOverlappedWithNonWorkingType = true;
         }
         return new Object[]{shiftOverlappedWithNonWorkingType,shiftOverlapInfo[1]};
+    }
+
+    private void validateStaffAndShift(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO, Activity activity) {
+        if (!Optional.ofNullable(activity).isPresent()) {
+            exceptionService.invalidRequestException(MESSAGE_ACTIVITY_ID, shiftDTO.getActivities().get(0).getActivityId());
+        }
+        if (staffAdditionalInfoDTO == null) {
+            exceptionService.invalidRequestException(MESSAGE_STAFF_NOTFOUND);
+        }
+        if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
+            exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_ABSENT);
+        }
+        if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
+            exceptionService.invalidRequestException(MESSAGE_SHIFT_NOT_PUBLISHED);
+        }
+        if (!staffAdditionalInfoDTO.getEmployment().isPublished()) {
+            exceptionService.invalidRequestException(MESSAGE_SHIFT_NOT_PUBLISHED);
+        }
+        if (staffAdditionalInfoDTO.getUnitId() == null) {
+            exceptionService.invalidRequestException(MESSAGE_STAFF_UNIT, shiftDTO.getStaffId(), shiftDTO.getUnitId());
+        }
     }
 
 

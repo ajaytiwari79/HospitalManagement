@@ -77,7 +77,7 @@ public class AbsenceShiftService {
     @Inject
     private StaffActivitySettingService staffActivitySettingService;
 
-    public List<ShiftWithViolatedInfoDTO> createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean shiftOverlappedWithNonWorkingType, ShiftActionType shiftActionType) {
+    public List<ShiftWithViolatedInfoDTO> createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Object[] shiftOverlapInfo, ShiftActionType shiftActionType) {
         List<ShiftWithViolatedInfoDTO>  shiftWithViolatedInfoDTOS = new ArrayList<>();
         Long absenceReasonCodeId = shiftDTO.getActivities().get(0).getAbsenceReasonCodeId();
         if (activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
@@ -97,7 +97,7 @@ public class AbsenceShiftService {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(staffAdditionalInfoDTO.getUnitId(), newShiftDTO.getActivities().get(0).getStartDate(), newShiftDTO.getActivities().get(newShiftDTO.getActivities().size() - 1).getEndDate());
             newShiftDTO.setId(shiftDTO.getId());
             newShiftDTO.setShiftType(ShiftType.ABSENCE);
-            ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
+            ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase, shiftOverlapInfo, shiftActionType);
             shiftService.addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
             shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
         } else {
