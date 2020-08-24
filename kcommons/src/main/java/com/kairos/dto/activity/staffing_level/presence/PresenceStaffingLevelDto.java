@@ -28,6 +28,9 @@ public class PresenceStaffingLevelDto {
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private Date updatedAt;
     private boolean draft;
+
+    private Date startDate;
+    private Date endDate;
     private Date startTime;
     private Date endTime;
     private StaffingLevelChange staffingLevelChange;
