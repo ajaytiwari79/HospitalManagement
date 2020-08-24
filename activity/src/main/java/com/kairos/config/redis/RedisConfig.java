@@ -2,9 +2,12 @@ package com.kairos.config.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -14,13 +17,13 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.net.UnknownHostException;
 import java.util.Map;
 
 /**
  * Created by anil on 10/8/17.
  */
 
+@EnableCaching
 @Configuration
 @PropertySource({"classpath:application-${spring.profiles.active}.properties"})
 public class RedisConfig {
@@ -48,14 +51,40 @@ public class RedisConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public RedisConnectionFactory redisConnectionFactory() throws UnknownHostException {
+    public RedisConnectionFactory redisConnectionFactory() {
 
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setTestOnBorrow(true);
         poolConfig.setTestOnReturn(true);
-        RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration(redisHostName,redisPort);
+        RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration(redisHostName, redisPort);
         standaloneConfiguration.setPassword(RedisPassword.of(passcode));
         return new JedisConnectionFactory(standaloneConfiguration);
+    }
+
+
+   /* @Bean
+    public JedisConnectionFactory jedisConnectionFactory(){
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+        redisStandaloneConfiguration.setHostName(this.redisHostName);
+        redisStandaloneConfiguration.setPort(this.redisPort);
+        redisStandaloneConfiguration.setPassword(RedisPassword.of(this.passcode));
+        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
+        return jedisConnectionFactory;
+    }*/
+
+    @Bean
+    public RedisTemplate<Object, Object> redisTemplate() {
+        RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setExposeConnection(true);
+        return redisTemplate;
+    }
+
+    @Bean
+    public CacheManager cacheManager() {
+        RedisCacheManager redisCacheManager = RedisCacheManager.builder(redisConnectionFactory()).build();
+        redisCacheManager.setTransactionAware(true);
+        return redisCacheManager;
     }
 
 }

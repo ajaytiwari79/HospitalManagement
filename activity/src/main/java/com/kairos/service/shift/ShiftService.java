@@ -75,6 +75,7 @@ import lombok.Getter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -1115,6 +1116,7 @@ public class ShiftService extends MongoBaseService {
     }
 
     //Description this method will fetch all shifts / open shifts and shift states based on the above request param
+    @Cacheable(value = "shifts", key = "#shifts")
     public Object getAllShiftAndStates(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, ViewType viewType, ShiftFilterParam shiftFilterParam, Long expertiseId, StaffFilterDTO staffFilterDTO) {
 
         Object object = null;
