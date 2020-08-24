@@ -907,7 +907,7 @@ public class ShiftValidatorService {
         }
     }
 
-    public boolean validateStaffDetailsAndShiftOverlapping(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO
+    public Object[] validateStaffDetailsAndShiftOverlapping(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO
             shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase) {
         Activity activity = activityWrapper.getActivity();
         boolean shiftOverlappedWithNonWorkingType = false;
@@ -951,10 +951,12 @@ public class ShiftValidatorService {
                 overlappedShifts.get(0).setEndDate(asDateEndOfDay(asLocalDate(overlappedShifts.get(0).getStartDate())));
             }
         }
-        if (isShiftOverlap(overlappedShifts, shiftInterval) && !CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) && isNull(activityWrapper.getActivity().getActivityRulesSettings().getSicknessSetting()) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
+        Object[] shiftOverlapInfo = getShiftOverlapInfo(overlappedShifts, shiftInterval);
+        boolean isShiftOverlapped = (boolean) shiftOverlapInfo[0];
+        if (isShiftOverlapped && !CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) && isNull(activityWrapper.getActivity().getActivityRulesSettings().getSicknessSetting()) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
             shiftOverlappedWithNonWorkingType = true;
         }
-        return shiftOverlappedWithNonWorkingType;
+        return new Object[]{shiftOverlappedWithNonWorkingType,shiftOverlapInfo[1]};
     }
 
 
@@ -1096,19 +1098,22 @@ public class ShiftValidatorService {
         return shifts;
     }
 
-    private boolean isShiftOverlap(List<ShiftWithActivityDTO> shiftWithActivityDTOS, DateTimeInterval shiftInterval) {
+    private Object[] getShiftOverlapInfo(List<ShiftWithActivityDTO> shiftWithActivityDTOS, DateTimeInterval shiftInterval) {
         boolean shiftOverlap = false;
+        BigInteger shiftOverlapWithShiftId = null;
         for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
             DateTimeInterval existingShiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate());
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
                 if ((WORKING_TYPE.toString().equals(activity.getTimeType())) && shiftInterval.overlaps(existingShiftInterval)) {
-                    exceptionService.invalidRequestException("message.shift.date.startandend", shiftWithActivityDTO.getStartDate(),
-                            shiftWithActivityDTO.getEndDate());
+                    shiftOverlapWithShiftId = shiftWithActivityDTO.getShiftId();
+//                    exceptionService.invalidRequestException(MESSAGE_SHIFT_DATE_STARTANDEND, shiftWithActivityDTO.getStartDate(),
+//                            shiftWithActivityDTO.getEndDate());
                 } else if (CommonConstants.FULL_WEEK.equals(activity.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || FULL_DAY.equals(activity.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
                     existingShiftInterval = new DateTimeInterval(getStartOfDay(shiftWithActivityDTO.getStartDate()), getEndOfDay(shiftWithActivityDTO.getEndDate()));
                     if (shiftInterval.overlaps(existingShiftInterval)) {
-                        exceptionService.invalidRequestException("message.shift.date.startandend", shiftWithActivityDTO.getStartDate(),
-                                shiftWithActivityDTO.getEndDate());
+                         shiftOverlapWithShiftId = shiftWithActivityDTO.getShiftId();
+//                        exceptionService.invalidRequestException(MESSAGE_SHIFT_DATE_STARTANDEND, shiftWithActivityDTO.getStartDate(),
+//                                shiftWithActivityDTO.getEndDate());
                     }
                 }
                 if ((NON_WORKING_TYPE.toString().equals(activity.getTimeType()) && shiftInterval.overlaps(existingShiftInterval))) {
@@ -1119,7 +1124,7 @@ public class ShiftValidatorService {
                 }
             }
         }
-        return shiftOverlap;
+        return new Object[]{shiftOverlap, shiftOverlapWithShiftId};
     }
 
     public List<ShiftViolatedRules> findAllViolatedRulesByShiftIds(List<BigInteger> shiftIds, boolean draft) {
@@ -1136,6 +1141,9 @@ public class ShiftValidatorService {
         List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate());
+        if(isNull(ctaResponseDTO)){
+            exceptionService.dataNotFoundException(MESSAGE_CTA_NOTFOUND,asLocalDate(shift.getStartDate()));
+        }
         staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
 
