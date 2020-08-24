@@ -404,8 +404,7 @@ public class StaffingLevelUtil {
             }
             interval.setMinNoOfStaff(interval.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMinNoOfStaff())));
             interval.setMaxNoOfStaff(interval.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMaxNoOfStaff())));
-            presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().set(i,interval);
-
+            staffingLevelIntervals.add(interval);
         }
 
     }
