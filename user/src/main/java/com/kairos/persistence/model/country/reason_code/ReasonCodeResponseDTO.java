@@ -43,11 +43,7 @@ public class ReasonCodeResponseDTO {
         this.description = description;
         this.reasonCodeType = reasonCodeType;
     }
-    public Map<String, TranslationInfo> getTranslatedData() {
-        Map<String, TranslationInfo> infoMap=new HashMap<>();
-        translatedNames.forEach((k,v)-> infoMap.put(k,new TranslationInfo(v,translatedDescriptions.get(k))));
-        return infoMap;
-    }
+
 
     public Long getId() {
         return id;
