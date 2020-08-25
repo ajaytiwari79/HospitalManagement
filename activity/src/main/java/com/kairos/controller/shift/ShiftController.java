@@ -291,10 +291,10 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftBreakService.interruptBreak(shiftId,breakAction));
     }
 
-    @ApiOperation("change Shift status")
-    @PutMapping(value = "/shift/{shiftId}")
+    @ApiOperation("update status of absence request")
+    @PutMapping(value = "/absence_request")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateShiftStatus(@PathVariable Long unitId, @PathVariable BigInteger shiftId, @RequestParam("shiftStatus") ShiftStatus shiftStatus) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStatusService.updateShiftStatus(unitId, shiftId, shiftStatus));
+    public ResponseEntity<Map<String, Object>> updateShiftStatus(@PathVariable Long unitId, @RequestParam("shift_status") ShiftStatus shiftStatus, @RequestBody ShiftActivitiesIdDTO shiftActivitiesIdDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStatusService.updateShiftStatus(unitId, shiftStatus, shiftActivitiesIdDTO));
     }
 }
