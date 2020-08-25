@@ -417,5 +417,12 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityDetailsWithRankByUnitId(unitId));
     }
 
+    @ApiOperation("Get all on call And stand by activityIds ")
+    @GetMapping(value = "/get_on_call_and_stand_by_activitIds")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getShowOnCallAndStandByActivityId(@PathVariable long unitId,@RequestParam boolean showStandBy,@RequestParam boolean showOnCall) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getShowOnCallAndStandByActivityId(unitId,showStandBy,showOnCall));
+    }
+
 
 }
