@@ -664,4 +664,18 @@ public class CountryDefaultDataController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, industryTypeService.updateTranslation(id,translations));
     }
 
+    @PutMapping(value = COUNTRY_URL + "/clinic_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfClinicType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clinicTypeService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/ownership_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfOwnershipType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ownershipTypeService.updateTranslation(id,translations));
+    }
+
 }
