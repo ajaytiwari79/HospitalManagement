@@ -291,4 +291,10 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftBreakService.interruptBreak(shiftId,breakAction));
     }
 
+    @ApiOperation("change Shift status")
+    @PutMapping(value = "/shift/{shiftId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateShiftStatus(@PathVariable Long unitId, @PathVariable BigInteger shiftId, @RequestParam("shiftStatus") ShiftStatus shiftStatus) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStatusService.updateShiftStatus(unitId, shiftId, shiftStatus));
+    }
 }
