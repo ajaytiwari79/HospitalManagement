@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 
@@ -30,8 +31,8 @@ public class PresenceStaffingLevelDto {
     private Date updatedAt;
     private boolean draft;
 
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Date startTime;
     private Date endTime;
     private StaffingLevelChange staffingLevelChange;

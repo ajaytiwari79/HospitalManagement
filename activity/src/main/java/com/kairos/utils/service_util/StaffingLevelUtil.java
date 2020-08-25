@@ -440,7 +440,7 @@ public class StaffingLevelUtil {
                 activityRemoveLogs.add(new ActivityRemoveLog(presenceStaffingLevelDTO.getStaffingLevelActivities().iterator().next().getActivityId(), new Date(), UserContext.getUserDetails().getFirstName()));
             } else {
                 interval.getStaffingLevelSkills().remove(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().iterator().next());
-                activityRemoveLogs.add(new ActivityRemoveLog(presenceStaffingLevelDTO.getStaffingLevelActivities().iterator().next().getActivityId(), new Date(), UserContext.getUserDetails().getFirstName()));
+                skillRemoveLogs.add(new SkillRemoveLog(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().iterator().next().getSkillId(), new Date(), UserContext.getUserDetails().getFirstName()));
             }
             if (isNotNull(staffingLevelIntervalLog)) {
                 activityRemoveLogs.addAll(staffingLevelIntervalLog.getActivityRemoveLogs());
