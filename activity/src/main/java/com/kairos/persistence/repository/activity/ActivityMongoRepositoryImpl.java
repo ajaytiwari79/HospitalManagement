@@ -35,6 +35,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
@@ -930,6 +931,19 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
+    }
+
+    @Override
+    public  Set<BigInteger> findAllShowOnCallAndStandByActivitiesByUnitId(Long unitId, boolean showStandBy, boolean showOnCall){
+        Criteria criteriaDefinition = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false);
+        if(showStandBy){
+            criteriaDefinition.and(RULES_ACTIVITY_TAB+".showStandBy").is(showStandBy);
+        }if(showOnCall){
+            criteriaDefinition.and(RULES_ACTIVITY_TAB+".showOnCall").is(showOnCall);
+        }
+        Query query = new Query(criteriaDefinition);
+        query.fields().include("id");
+        return mongoTemplate.find(query,Activity.class).stream().map(activity -> activity.getId()).collect(Collectors.toSet());
     }
 
 }

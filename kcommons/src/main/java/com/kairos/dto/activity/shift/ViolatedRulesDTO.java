@@ -30,10 +30,6 @@ public class ViolatedRulesDTO {
     private BigInteger overlapWithShiftId;
     private String overlapMessage;
 
-    public ViolatedRulesDTO(BigInteger overlapWithShiftId, String overlapMessage){
-        this.overlapWithShiftId = overlapWithShiftId;
-        this.overlapMessage = overlapMessage;
-    }
     public List<WorkTimeAgreementRuleViolation> getWorkTimeAgreements() {
         workTimeAgreements=Optional.ofNullable(workTimeAgreements).orElse(new ArrayList<>());
         workTimeAgreements.sort(Comparator.comparing(WorkTimeAgreementRuleViolation::isCanBeIgnore));

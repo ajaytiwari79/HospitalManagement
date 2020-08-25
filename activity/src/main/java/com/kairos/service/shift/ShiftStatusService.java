@@ -161,8 +161,8 @@ public class ShiftStatusService {
 
     private ShiftActivityResponseDTO getShiftActivityResponseDTO(Long unitId,ShiftPublishDTO shiftPublishDTO, Map<BigInteger, Activity> activityIdAndActivityMap, StaffAccessGroupDTO staffAccessGroupDTO, Shift shift, ShiftActivity shiftActivity, ActivityShiftStatusSettings activityShiftStatusSettings,Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap) {
         String staffAccessRole = UserContext.getUserDetails().getUnitWiseAccessRole().get(unitId.toString());
-        Set<String> accessRoles =userIntegrationService.getAccessRolesByAccessGroupIds(unitId,activityShiftStatusSettings.getAccessGroupIds());
         boolean validAccessGroup = shiftValidatorService.validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
+        Set<String> accessRoles =userIntegrationService.getAccessRolesByAccessGroupIds(unitId,activityShiftStatusSettings.getAccessGroupIds());
         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
         boolean validateShiftActivityStatus = validateShiftActivityStatus(shiftPublishDTO.getStatus(), shiftActivity, activityIdAndActivityMap.get(shiftActivity.getActivityId()));
         boolean draftShift=false;
@@ -399,5 +399,18 @@ public class ShiftStatusService {
             templateParam.put("descriptionPart8", bodyPart8);
         }
         sendGridMailService.sendMailWithSendGrid(SHIFT_NOTIFICATION_EMAIL_TEMPLATE, templateParam, null, MAIL_SUBJECT, staffDTO.getContactDetail().getPrivateEmail());
+    }
+
+    public ShiftAndActivtyStatusDTO updateShiftStatus(Long unitId, ShiftStatus shiftStatus, ShiftActivitiesIdDTO shiftActivitiesIdDTO) {
+        if(isCollectionEmpty(shiftActivitiesIdDTO.getActivityIds())){
+            Shift shift = shiftMongoRepository.findOne(shiftActivitiesIdDTO.getShiftId());
+            List<BigInteger> activityIds = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getStatus().contains(PENDING) || shiftActivity.getStatus().contains(REQUEST)).map(ShiftActivity::getActivityId).collect(Collectors.toList());
+            if(isCollectionEmpty(activityIds)){
+                exceptionService.actionNotPermittedException("Activity not found for update status");
+            }
+            shiftActivitiesIdDTO.setActivityIds(activityIds);
+        }
+        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(newArrayList(shiftActivitiesIdDTO), shiftStatus, null);
+        return updateStatusOfShifts(unitId,shiftPublishDTO);
     }
 }

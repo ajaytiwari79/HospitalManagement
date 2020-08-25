@@ -16,4 +16,18 @@ public class TranslationUtil {
         }
     }
 
+    public static void updateTranslationsIfActivityNameIsNull(Map<String, TranslationInfo> translations){
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            if(entry.getValue().getName().equals("")){
+                entry.getValue().setDescription("");
+            }
+        }
+    }
+
+    public static Map<String, TranslationInfo> getTranslatedData(Map<String,String> translatedNames,Map<String,String> translatedDescriptions) {
+        Map<String, TranslationInfo> infoMap=new HashMap<>();
+        translatedNames.forEach((k,v)-> infoMap.put(k,new TranslationInfo(v,translatedDescriptions.get(k))));
+        return infoMap;
+    }
+
 }
