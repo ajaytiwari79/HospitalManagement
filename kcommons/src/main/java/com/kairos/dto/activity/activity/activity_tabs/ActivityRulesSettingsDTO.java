@@ -61,6 +61,8 @@ public class ActivityRulesSettingsDTO {
     private int noOfTransferLeave;
     private SicknessSettingDTO sicknessSetting;
     private boolean sicknessSettingValid;
+    private boolean showStandBy;
+    private boolean showOnCall;
 
     public PQLSettings getPqlSettings() {
         return pqlSettings=Optional.ofNullable(pqlSettings).orElse(new PQLSettings());

@@ -75,5 +75,7 @@ public class ActivityRulesSettings {
     private List<BigInteger> staffTagIds;
     private SicknessSetting sicknessSetting=new SicknessSetting();
     private boolean sicknessSettingValid;
+    private boolean showStandBy;
+    private boolean showOnCall;
 
 }
