@@ -826,4 +826,8 @@ public class OrganizationActivityService extends MongoBaseService {
         });
         return activityIdsToSet;
     }
+
+    public Set<BigInteger> getShowOnCallAndStandByActivityId(Long unitId,boolean showStandBy,boolean showOnCall){
+        return activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId,showStandBy,showOnCall);
+    }
 }

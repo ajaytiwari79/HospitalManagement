@@ -117,4 +117,6 @@ public interface CustomActivityMongoRepository {
     List<ActivityDTO> getActivityDetailsWithRankByUnitId(Long unitId);
 
     List<Activity> findAllBreakActivitiesByOrganizationId(Long unitId);
+
+    Set<BigInteger> findAllShowOnCallAndStandByActivitiesByUnitId(Long unitId, boolean showStandBy, boolean showOnCall);
 }
