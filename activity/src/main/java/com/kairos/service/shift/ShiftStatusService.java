@@ -400,4 +400,17 @@ public class ShiftStatusService {
         }
         sendGridMailService.sendMailWithSendGrid(SHIFT_NOTIFICATION_EMAIL_TEMPLATE, templateParam, null, MAIL_SUBJECT, staffDTO.getContactDetail().getPrivateEmail());
     }
+
+    public ShiftAndActivtyStatusDTO updateShiftStatus(Long unitId, ShiftStatus shiftStatus, ShiftActivitiesIdDTO shiftActivitiesIdDTO) {
+        if(isCollectionEmpty(shiftActivitiesIdDTO.getActivityIds())){
+            Shift shift = shiftMongoRepository.findOne(shiftActivitiesIdDTO.getShiftId());
+            List<BigInteger> activityIds = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getStatus().contains(PENDING) || shiftActivity.getStatus().contains(REQUEST)).map(ShiftActivity::getActivityId).collect(Collectors.toList());
+            if(isCollectionEmpty(activityIds)){
+                exceptionService.actionNotPermittedException("Activity not found for update status");
+            }
+            shiftActivitiesIdDTO.setActivityIds(activityIds);
+        }
+        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(newArrayList(shiftActivitiesIdDTO), shiftStatus, null);
+        return updateStatusOfShifts(unitId,shiftPublishDTO);
+    }
 }
