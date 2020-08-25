@@ -21,8 +21,8 @@ public interface ContractTypeGraphRepository extends Neo4jBaseRepository<Contrac
     List<ContractType> findAll();
 
     @Query("MATCH (country:Country)-[:" +BELONGS_TO+ "]-(contractType:ContractType {isEnabled:true}) where id(country)={0} " +
-            " RETURN id(contractType) as id, contractType.name as name, contractType.code as code, contractType.description as description ORDER BY contractType.creationDate DESC")
-    List<ContractTypeDTO> findContractTypeByCountry(long countryId);
+            " RETURN contractType")
+    List<ContractType> findContractTypeByCountry(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(contractType:ContractType {isEnabled:true}) WHERE id(country)={0} AND id(contractType)<>{3} AND (contractType.name =~{1} OR contractType.code={2}) " +
             " WITH count(contractType) as totalCount " +
