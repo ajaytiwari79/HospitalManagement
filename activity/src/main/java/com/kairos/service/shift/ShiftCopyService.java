@@ -176,7 +176,7 @@ public class ShiftCopyService extends MongoBaseService {
                         act.setEndDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(act.getEndDate())));
                     });
 
-                    ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityMap,sourceShift);
+                    ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(shiftDTO, activityMap,sourceShift);
                     shiftWithActivityDTO.setEndDate(endDate);
                     shiftWithActivityDTO.setStartDate(startDate);
                     shiftWithActivityDTO.setStaffId(staffEmployment.getStaff().getId());
