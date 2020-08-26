@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
@@ -547,6 +548,7 @@ public class CountryService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long levelId, Map<String,TranslationInfo> translations) {
+        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptios = new HashMap<>();
         for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){

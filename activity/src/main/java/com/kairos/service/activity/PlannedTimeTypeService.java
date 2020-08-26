@@ -1,5 +1,7 @@
 package com.kairos.service.activity;
 
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.persistence.model.activity.PlannedTimeType;
@@ -12,9 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /*
  * @author: Mohit Shakya
@@ -66,7 +66,6 @@ public class PlannedTimeTypeService{
         if (!presenceTypeOptional.isPresent()) {
             LOGGER.error("Presence type not found by Id removing {}" , presenceTypeId);
             exceptionService.dataNotFoundByIdException("message.presenceType.id.notFound");
-
         }
         PlannedTimeType plannedTimeType = presenceTypeOptional.get();
         plannedTimeType.setDeleted(true);
@@ -97,5 +96,18 @@ public class PlannedTimeTypeService{
 
     public Collection<PlannedTimeType> getAllPlannedTimeByIds(Collection<BigInteger> plannedTimeIds){
         return plannedTimeTypeRepository.findAllById(plannedTimeIds);
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger plannedTimeTypeId, Map<String,TranslationInfo> translations) {
+        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
+        Optional<PlannedTimeType> presenceTypeOptional = plannedTimeTypeRepository.findById(plannedTimeTypeId);
+        if (!presenceTypeOptional.isPresent()) {
+            LOGGER.error("Planned time type not found by Id removing {}" , plannedTimeTypeId);
+            exceptionService.dataNotFoundByIdException("message.plannedTimeType.id.notFound");
+        }
+        PlannedTimeType plannedTimeType = presenceTypeOptional.get();
+        plannedTimeType.setTranslations(translations);
+        plannedTimeTypeRepository.save(plannedTimeType);
+        return plannedTimeType.getTranslations();
     }
 }

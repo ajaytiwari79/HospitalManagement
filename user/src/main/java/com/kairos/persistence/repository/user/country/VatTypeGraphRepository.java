@@ -17,8 +17,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 public interface VatTypeGraphRepository extends Neo4jBaseRepository<VatType,Long>{
 
     @Query("MATCH (c:Country)-[:"+ BELONGS_TO +"]-(vt:VatType {isEnabled:true}) where id(c)={0} " +
-            " RETURN id(vt) as id, vt.name as name, vt.code as code, vt.description as description, vt.percentage as percentage ORDER BY vt.creationDate DESC")
-    List<VatTypeDTO> findVatTypesByCountry(long countryId);
+            " RETURN vt")
+    List<VatType> findVatTypesByCountry(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(vatType:VatType {isEnabled:true}) WHERE id(country)={0} AND id(vatType)<>{3} AND (vatType.name =~{1} OR vatType.code={2}) " +
             " WITH count(vatType) as totalCount " +

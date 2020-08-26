@@ -217,17 +217,21 @@ public class StaffingLevelService  {
      * @param presenceStaffingLevelDTO
      * @param unitId
      */
-    public PresenceStaffingLevelDto updatePresenceStaffingLevel(BigInteger staffingLevelId, Long unitId, PresenceStaffingLevelDto presenceStaffingLevelDTO) {
+    public List<PresenceStaffingLevelDto> updatePresenceStaffingLevel(BigInteger staffingLevelId, Long unitId, PresenceStaffingLevelDto presenceStaffingLevelDTO) {
         LOGGER.info("updating staffing level organizationId and staffingLevelId is {} ,{}", unitId, staffingLevelId);
-        StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).orElseThrow(()->new DataNotFoundException(convertMessage("Staffing Level Not Found")));
-        if (!staffingLevel.getCurrentDate().equals(presenceStaffingLevelDTO.getCurrentDate())) {
-            LOGGER.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), presenceStaffingLevelDTO.getCurrentDate());
-            exceptionService.unsupportedOperationException(MESSAGE_STAFFLEVEL_CURRENTDATE_UPDATE);
+        List<PresenceStaffingLevelDto> presenceStaffingLevelDtos=new ArrayList<>();
+        List<StaffingLevel> staffingLevels=staffingLevelMongoRepository.findByUnitIdBetweenDates(unitId,presenceStaffingLevelDTO.getStartDate(),presenceStaffingLevelDTO.getEndDate());
+        for(StaffingLevel staffingLevel:staffingLevels){
+            StaffingLevelUtil.setUserWiseLogs(staffingLevel,presenceStaffingLevelDTO);
+            publishStaffingLevel(presenceStaffingLevelDTO,unitId, staffingLevel);
+        }if(isCollectionNotEmpty(staffingLevels)){
+            staffingLevelMongoRepository.saveEntities(staffingLevels);
         }
-        StaffingLevelUtil.setUserWiseLogs(staffingLevel,presenceStaffingLevelDTO);
-        staffingLevelMongoRepository.save(staffingLevel);
-        publishStaffingLevel(presenceStaffingLevelDTO,unitId, staffingLevel);
-       return ObjectMapperUtils.copyPropertiesByMapper(updateStaffingLevelAvailableStaffCount(asLocalDate(presenceStaffingLevelDTO.getCurrentDate()),unitId),PresenceStaffingLevelDto.class);
+        for(StaffingLevel staffingLevel:staffingLevels){
+            presenceStaffingLevelDtos.add(ObjectMapperUtils.copyPropertiesByMapper(updateStaffingLevelAvailableStaffCount(asLocalDate(staffingLevel.getCurrentDate()),unitId),PresenceStaffingLevelDto.class));
+        }
+
+        return presenceStaffingLevelDtos;
     }
 
 

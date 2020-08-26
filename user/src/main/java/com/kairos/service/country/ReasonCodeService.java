@@ -8,7 +8,6 @@ import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
-import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -89,7 +88,7 @@ public class ReasonCodeService {
         List<ReasonCodeResponseDTO> reasonCodeResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodes, ReasonCodeResponseDTO.class);
         for(ReasonCodeResponseDTO reasonCodeResponseDTO :reasonCodeResponseDTOS){
             reasonCodeResponseDTO.setUnitId(unitId);
-            reasonCodeResponseDTO.setTranslations(reasonCodeResponseDTO.getTranslatedData());
+            reasonCodeResponseDTO.setTranslations(TranslationUtil.getTranslatedData(reasonCodeResponseDTO.getTranslatedNames(),reasonCodeResponseDTO.getTranslatedDescriptions()));
         }
         return reasonCodeResponseDTOS;
     }
@@ -184,6 +183,7 @@ public class ReasonCodeService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long reasonCodeId, Map<String,TranslationInfo> translations) {
+        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptios = new HashMap<>();
         TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
