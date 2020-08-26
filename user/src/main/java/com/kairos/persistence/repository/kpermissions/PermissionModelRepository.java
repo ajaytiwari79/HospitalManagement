@@ -34,8 +34,12 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "CASE WHEN customRel IS NULL THEN permission.tagIds ELSE customRel.tagIds END as tagIds,\n" +
             "CASE WHEN customRel IS NULL THEN permission.teamIds ELSE customRel.teamIds END as teamIds,\n" +
             "CASE WHEN customRel IS NULL THEN permission.employmentTypeIds ELSE customRel.employmentTypeIds END as employmentTypeIds,\n" +
-            "CASE WHEN customRel IS NULL THEN permission.unionIds ELSE customRel.unionIds END as unionIds,id(field) as id,field.fieldName as fieldName")
-    List<FieldPermissionQueryResult> getAllFieldPermission(Collection<Long> accessGroupIds, Long lastSelectedOrganizationId, Long staffId);
+            "CASE WHEN customRel IS NULL THEN permission.unionIds ELSE customRel.unionIds END as unionIds,id(field) as id,field.fieldName as fieldName " +
+            " UNION " +
+            " MATCH(ag:AccessGroup{deleted:false}) where id(ag) in {3} MATCH (ag)<-[permission:HAS_PERMISSION]-(field:KPermissionField) " +
+            "RETURN permission.fieldLevelPermissions AS permissions,permission.expertiseIds as expertiseIds, permission.forOtherFieldLevelPermissions AS forOtherFieldLevelPermissions, " +
+            "permission.staffStatuses AS staffStatuses, permission.tagIds AS tagIds,permission.teamIds AS teamIds, permission.employmentTypeIds AS employmentTypeIds,permission.unionIds AS  unionIds, id(field) as id,field.fieldName as fieldName ")
+    List<FieldPermissionQueryResult> getAllFieldPermission(Collection<Long> accessGroupIds, Long lastSelectedOrganizationId, Long staffId, Set<Long> unitAccessGroupIds);
 
     @Query("MATCH(model:KPermissionModel) where model.modelName={0} MATCH(model)-[unitRel:HAS_FIELD]->(field:KPermissionField) where field.fieldName IN {1}\n" +
             "MATCH (field)-[permission:HAS_PERMISSION]->(ag:AccessGroup{deleted:false}) where id(ag) in {2} \n" +
@@ -55,8 +59,12 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "CASE WHEN customRel IS NULL THEN permission.tagIds ELSE customRel.tagIds END as tagIds,\n" +
             "CASE WHEN customRel IS NULL THEN permission.teamIds ELSE customRel.teamIds END as teamIds,\n" +
             "CASE WHEN customRel IS NULL THEN permission.employmentTypeIds ELSE customRel.employmentTypeIds END as employmentTypeIds,\n" +
-            "CASE WHEN customRel IS NULL THEN permission.unionIds ELSE customRel.unionIds END as unionIds,id(model) as id,model.modelName as modelName")
-    List<ModelPermissionQueryResult> getAllModelPermission(Collection<Long> accessGroupIds, Long unitId, Long staffId);
+            "CASE WHEN customRel IS NULL THEN permission.unionIds ELSE customRel.unionIds END as unionIds,id(model) as id,model.modelName as modelName " +
+            " UNION " +
+            " MATCH(ag:AccessGroup{deleted:false}) where id(ag) in {3} MATCH (ag)<-[permission:HAS_PERMISSION]-(model:KPermissionModel) " +
+            "RETURN permission.fieldLevelPermissions AS permissions,permission.expertiseIds as expertiseIds, permission.forOtherFieldLevelPermissions AS forOtherFieldLevelPermissions, " +
+            "permission.staffStatuses AS staffStatuses, permission.tagIds AS tagIds,permission.teamIds AS teamIds, permission.employmentTypeIds AS employmentTypeIds,permission.unionIds AS  unionIds, id(model) as id,model.modelName as modelName ")
+    List<ModelPermissionQueryResult> getAllModelPermission(Collection<Long> accessGroupIds, Long unitId, Long staffId, Set<Long> unitAccessGroupIds);
 
     @Query("MATCH(model:KPermissionModel{deleted:false}) where model.modelName in {0}" +
             "WITH model " +

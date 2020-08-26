@@ -135,7 +135,6 @@ public class StaffController {
     @ApiOperation("update employments of staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable long staffId, @RequestBody Map<String, Object> unitPermissionDetails) {
-
         long accessGroupId = Long.parseLong((String) unitPermissionDetails.get("roleId"));
         boolean isCreated = (boolean) unitPermissionDetails.get("isCreated");
         long unitId = Long.parseLong((String) unitPermissionDetails.get("organizationId"));

@@ -11,7 +11,6 @@ import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPerm
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -235,6 +234,7 @@ public class PositionService {
         } else {
             unitPermissionGraphRepository.createPermission(accessGroupId, unitPermission.getId());
         }
+        //unitPermissionGraphRepository.updateDatesInUnitPermission(accessGroupId, unitPermission.getId(),permissionDTO.getStartDate().toString(),permissionDTO.getEndDate()==null?null:permissionDTO.getEndDate().toString());
         LOGGER.info(" Currently created Unit Permission ");
         response.put("startDate", getDate(unitPermission.getStartDate()));
         response.put("endDate", getDate(unitPermission.getEndDate()));

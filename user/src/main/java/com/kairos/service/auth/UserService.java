@@ -23,6 +23,7 @@ import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
@@ -459,28 +460,39 @@ public class UserService {
         long currentUserId = UserContext.getUserDetails().getId();
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
         permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
-        if (permissionData.isHub()) {
-            Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
-            List<AccessGroupQueryResult> accessGroupQueryResults = accessGroupService.getCountryAccessGroupByOrgCategory(UserContext.getUserDetails().getCountryId(), OrganizationCategory.HUB.toString());
-            List<Long> accessGroupIds = accessGroupQueryResults.stream().map(AccessGroupQueryResult::getId).collect(Collectors.toList());
-            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId(), accessGroupIds);
-            Map<String, AccessPageQueryResult> permissionMap = prepareUnitPermissions(permissions,true);
-            HashMap<String, Object> unitPermissionMap = new HashMap<>();
-            for (AccessPageQueryResult permission : permissions) {
-                unitPermissionMap.put(permission.getModuleId(), permissionMap.get(permission.getModuleId()));
-            }
-            permissionData.setHubPermissions(unitPermissionMap);
+        Set<Long> unitAccessGroupIds=new HashSet<>();
+        if(UserContext.getUserDetails().isSystemAdmin()){
+            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubSystemAdminPermissions();
+            preparePermission(permissionData, permissions);
+        }
+        else if (permissionData.isHub()) {
+             Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
+             unitAccessGroupIds=parentHub.getId().equals(organizationId)?parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet()):accessGroupService.getAccessGroupIdsOfUnit(organizationId);
+            //List<AccessGroupQueryResult> accessGroupQueryResults = accessGroupService.getCountryAccessGroupByOrgCategory(UserContext.getUserDetails().getCountryId(), OrganizationCategory.HUB.toString());
+            List<Long> accessGroupIds = parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toList());
+            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId(), accessGroupIds,unitAccessGroupIds);
+            preparePermission(permissionData, permissions);
 
         } else {
             loadUnitPermissions(organizationId, currentUserId, permissionData);
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
         permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
-        permissionData.setModelPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isHubMember(),userAccessRoleDTO.getStaffId()), ModelDTO.class));
+
+        permissionData.setModelPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isSystemAdmin(),userAccessRoleDTO.getStaffId(),unitAccessGroupIds), ModelDTO.class));
         Organization parent = organizationService.fetchParentOrganization(organizationId);
         permissionData.setStaffId(staffGraphRepository.getStaffIdByUserId(currentUserId,parent.getId()));
         updateChatStatus(ChatStatus.ONLINE);
         return permissionData;
+    }
+
+    private void preparePermission(UnitWiseStaffPermissionsDTO permissionData, List<AccessPageQueryResult> permissions) {
+        Map<String, AccessPageQueryResult> permissionMap = prepareUnitPermissions(permissions,true);
+        HashMap<String, Object> unitPermissionMap = new HashMap<>();
+        for (AccessPageQueryResult permission : permissions) {
+            unitPermissionMap.put(permission.getModuleId(), permissionMap.get(permission.getModuleId()));
+        }
+        permissionData.setHubPermissions(unitPermissionMap);
     }
 
     private void loadUnitPermissions(Long organizationId, long currentUserId, UnitWiseStaffPermissionsDTO permissionData) {
@@ -661,6 +673,7 @@ public class UserService {
         if(isNotNull(UserContext.getUserDetails())) {
             user = userRepository.findOne(UserContext.getUserDetails().getId());
             user.setHubMember(accessPageService.isHubMember(user.getId()));
+            user.setSystemAdmin(userGraphRepository.isSystemAdmin(user.getId()));
         }
         return user;
     }

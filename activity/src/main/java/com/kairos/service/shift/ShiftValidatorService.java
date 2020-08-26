@@ -914,7 +914,7 @@ public class ShiftValidatorService {
         validateStaffAndShift(staffAdditionalInfoDTO, shiftDTO, activity);
         DateTimeInterval shiftInterval = null;
         Date startDate = asDate(shiftDTO.getShiftDate());
-        Date endDate = null;
+        Date endDate;
         if (CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
             endDate = asDate(shiftDTO.getShiftDate().plusDays(6).atTime(LocalTime.MAX));
             shiftInterval = new DateTimeInterval(startDate, endDate);
