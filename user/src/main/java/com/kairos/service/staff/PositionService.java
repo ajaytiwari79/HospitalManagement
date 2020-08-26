@@ -175,7 +175,7 @@ public class PositionService {
     }
 
 
-    public Map<String, Object> createUnitPermission(Long unitId, Long staffId, Long accessGroupId, boolean created) {
+    public Map<String, Object> createUnitPermission(Long unitId, Long staffId, Long accessGroupId, boolean created,LocalDate startDate,LocalDate endDate) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
@@ -191,7 +191,7 @@ public class PositionService {
         Map<String, Object> response = new HashMap<>();
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         if (created) {
-            staffAccessGroupQueryResult = setUnitPermission(unitId, staffId, accessGroupId, accessGroup, unit, parentUnit, position, response);
+            staffAccessGroupQueryResult = setUnitPermission(unitId, staffId, accessGroup, unit, parentUnit, position, response,startDate,endDate);
         } else {
             staffAccessGroupQueryResult = removeUnitPermisssion(unitId, staffId, accessGroupId, parentUnit);
         }
@@ -216,10 +216,10 @@ public class PositionService {
         return staffAccessGroupQueryResult;
     }
 
-    private StaffAccessGroupQueryResult setUnitPermission(Long unitId, Long staffId, Long accessGroupId, AccessGroup accessGroup, OrganizationBaseEntity unit, Organization parentUnit, Position position, Map<String, Object> response) {
+    private StaffAccessGroupQueryResult setUnitPermission(Long unitId, Long staffId, AccessGroup accessGroup, OrganizationBaseEntity unit, Organization parentUnit, Position position, Map<String, Object> response, LocalDate startDate, LocalDate endDate) {
         UnitPermission unitPermission;
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
-        unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentUnit.getId(), unitId, staffId, accessGroupId);
+        unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentUnit.getId(), unitId, staffId, accessGroup.getId());
         if (!Optional.ofNullable(unitPermission).isPresent()) {
             unitPermission = new UnitPermission();
             if (unit instanceof Organization) {
@@ -232,9 +232,9 @@ public class PositionService {
             position.getUnitPermissions().add(unitPermission);
             positionGraphRepository.save(position, 2);
         } else {
-            unitPermissionGraphRepository.createPermission(accessGroupId, unitPermission.getId());
+            unitPermissionGraphRepository.createPermission(accessGroup.getId(), unitPermission.getId());
         }
-        //unitPermissionGraphRepository.updateDatesInUnitPermission(accessGroupId, unitPermission.getId(),permissionDTO.getStartDate().toString(),permissionDTO.getEndDate()==null?null:permissionDTO.getEndDate().toString());
+        unitPermissionGraphRepository.updateDatesInUnitPermission(accessGroup.getId(), unitPermission.getId(),startDate.toString(),endDate==null?null:endDate.toString());
         LOGGER.info(" Currently created Unit Permission ");
         response.put("startDate", getDate(unitPermission.getStartDate()));
         response.put("endDate", getDate(unitPermission.getEndDate()));
@@ -632,7 +632,7 @@ public class PositionService {
             deleteAuthTokenOfUsersByPositionIds(positionIds);
             for (ExpiredPositionsQueryResult expiredPositionsQueryResult : expiredPositionsQueryResults) {
                 for (OrganizationBaseEntity unit : expiredPositionsQueryResult.getUnits()) {
-                    createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true);
+                    createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true,null,null);
                 }
             }
         }
