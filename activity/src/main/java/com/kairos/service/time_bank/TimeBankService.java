@@ -173,7 +173,7 @@ public class TimeBankService implements KPIService {
         DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(shift.getUnitId());
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(shift.getId(),staffAdditionalInfoDTO.getEmployment().getId(), startDate.toDate(), endDate.toDate(),null);
         if(!shift.isDeleted()) {
-            shiftWithActivityDTOS.add(shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(null, activityService.getActivityWrapperMap(newArrayList(shift), null), shift));
+            shiftWithActivityDTOS.add(shiftService.getShiftWithActivityDTO(null, activityService.getActivityWrapperMap(newArrayList(shift), null), shift));
         }
         List<ShiftWithActivityDTO> draftShifts = getDraftShift(shiftWithActivityDTOS);
         shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> !shiftWithActivityDTO.isDraft()).collect(toList());

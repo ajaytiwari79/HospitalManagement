@@ -692,4 +692,19 @@ public class CountryDefaultDataController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, contractTypeService.updateTranslation(id,translations));
     }
 
+    @PutMapping(value = COUNTRY_URL + "/business_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfBuisnessType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, businessTypeService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/kairos_status/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfKairosStatus(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kairosStatusService.updateTranslation(id,translations));
+    }
+
+
 }

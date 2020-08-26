@@ -150,7 +150,7 @@ public class WTARuleTemplateCalculationService {
         WTAQueryResultDTO wtaQueryResultDTO = workTimeAgreementService.getWtaQueryResultDTOByDateAndEmploymentId(shift.getEmploymentId(),shift.getStartDate());
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(isNotNull(shift) ? newArrayList(shift) : newArrayList(), null);
         DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(shift.getUnitId());
-        ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftDTO.class), activityWrapperMap,null);
+        ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftDTO.class), activityWrapperMap,null);
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shiftWithActivityDTO, wtaQueryResultDTO.getRuleTemplates(), activityWrapperMap, planningPeriodInterval.getEndLocalDate());
         List<PlanningPeriodDTO> planningPeriodDTOS = planningPeriodService.findAllPlanningPeriodBetweenDatesAndUnitId(shift.getUnitId(),intervalByRuleTemplates.getStartDate(),intervalByRuleTemplates.getEndDate());
         List<WTAQueryResultDTO> wtaQueryResultDTOS = workTimeAgreementService.getWTAByEmploymentIdAndDates(shift.getEmploymentId(),intervalByRuleTemplates.getStartDate(),intervalByRuleTemplates.getEndDate());
