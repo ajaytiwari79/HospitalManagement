@@ -237,7 +237,8 @@ public class ShiftService extends MongoBaseService {
         mainShift.setBreakActivities(breakActivities);
         activityConfigurationService.addPlannedTimeInShift(mainShift, activityWrapperMap, staffAdditionalInfoDTO, false);
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(mainShift, ShiftDTO.class);
-        shiftDTO.setShiftType(updateShiftType(activityWrapperMap,mainShift));
+        ShiftType shiftType =updateShiftType(activityWrapperMap,mainShift);
+        shiftDTO.setShiftType(shiftType);
         ShiftWithActivityDTO shiftWithActivityDTO = getShiftWithActivityDTO(shiftDTO, activityWrapperMap, null);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false, true);
         if(isNotNull(shiftOverlapInfo[1])){
@@ -263,7 +264,8 @@ public class ShiftService extends MongoBaseService {
             shiftStatusService.updateStatusOfShiftIfPhaseValid(planningPeriod, phase, shift, activityWrapperMap, staffAdditionalInfoDTO);
         }
         //As discuss with Arvind Presence and Absence type of activity cann't be perform in a Shift
-        shift.setShiftType(updateShiftType(activityWrapperMap, shift));
+        ShiftType shiftType = updateShiftType(activityWrapperMap, shift);
+        shift.setShiftType(shiftType);
         shiftFunctionService.updateAppliedFunctionDetail(activityWrapperMap, shift, functionId);
         if (!shift.isSickShift() && updateShift && isNotNull(shiftAction) && newHashSet(PhaseDefaultName.CONSTRUCTION, PhaseDefaultName.DRAFT, PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum())) {
             shift = updateShiftAfterPublish(shift, shiftAction);
@@ -271,7 +273,8 @@ public class ShiftService extends MongoBaseService {
         if(isNull(shift.getDraftShift())) {
             if (!shift.isSickShift() && isValidForDraftShiftFunctionality(staffAdditionalInfoDTO, updateShift, phase, shiftAction, planningPeriod)) {
                 Shift draftShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
-                draftShift.setShiftType(updateShiftType(activityWrapperMap, draftShift));
+                ShiftType draftShiftType =updateShiftType(activityWrapperMap, draftShift);
+                draftShift.setShiftType(draftShiftType);
                 draftShift.setDraft(true);
                 shift.setDraftShift(draftShift.getDraftShift());
                 shift.setDraft(true);
@@ -623,7 +626,8 @@ public class ShiftService extends MongoBaseService {
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
 
             shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
-            shift.setShiftType(updateShiftType(activityWrapperMap, shift));
+            ShiftType shiftType =updateShiftType(activityWrapperMap, shift);
+            shift.setShiftType(shiftType);
             shift.setPhaseId(phase.getId());
             if (byTAndAView) {
                 shift.setId(shiftDTO.getShiftId());

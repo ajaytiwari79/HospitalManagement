@@ -4,6 +4,7 @@ package com.kairos.controller.payroll;
  *
  */
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.payroll.PensionProviderDTO;
 import com.kairos.service.payroll.PensionProviderService;
 import com.kairos.utils.response.ResponseHandler;
@@ -56,5 +57,11 @@ public class PensionProviderController {
     @GetMapping(COUNTRY_URL+PENSION_PROVIDER)
     public ResponseEntity<Map<String,Object>> getAllPensionProvider(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,pensionProviderService.getAllPensionProvider(countryId));
+    }
+
+    @ApiOperation("update translation data ")
+    @PutMapping(COUNTRY_URL+"/pension_provider/{id}/language_settings")
+    public ResponseEntity<Map<String,Object>> updatePensionProviderTranslation(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,pensionProviderService.updateTranslation(id,translations));
     }
 }
