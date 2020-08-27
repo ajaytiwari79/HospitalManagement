@@ -907,12 +907,12 @@ public class ShiftValidatorService {
         }
     }
 
-    public Object[] validateStaffDetailsAndShiftOverlapping(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO
-            shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase) {
+    //As discussed with Arvind we remove the Check of cross organization overlapping functionality
+    public Object[] validateStaffDetailsAndShiftOverlapping(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase) {
         Activity activity = activityWrapper.getActivity();
         boolean shiftOverlappedWithNonWorkingType = false;
         validateStaffAndShift(staffAdditionalInfoDTO, shiftDTO, activity);
-        DateTimeInterval shiftInterval = null;
+        DateTimeInterval shiftInterval;
         Date startDate = asDate(shiftDTO.getShiftDate());
         Date endDate;
         if (CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
@@ -926,7 +926,6 @@ public class ShiftValidatorService {
             startDate = getStartOfDay(shiftDTO.getStartDate());
             endDate = getEndOfDay(shiftDTO.getEndDate());
         }
-        //As discussed with Arvind we remove the Check of cross organization overlapping functionality
         List<ShiftWithActivityDTO> overlappedShifts = shiftMongoRepository.findOverlappedShiftsByEmploymentId(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getId(), startDate, endDate);
         if (isCollectionNotEmpty(overlappedShifts)) {
             if (ShiftType.ABSENCE.equals(overlappedShifts.get(0).getShiftType())) {
