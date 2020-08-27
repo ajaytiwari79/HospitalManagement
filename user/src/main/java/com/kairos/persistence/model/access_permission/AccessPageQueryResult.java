@@ -38,6 +38,7 @@ public class AccessPageQueryResult {
     private boolean hasSubTabs;
     private Map<String,String> translatedNames;
     private String helperText;
+    private String url;
 
     @JsonIgnore
     private AccessPage accessPage;
