@@ -1,5 +1,6 @@
 package com.kairos.service.access_permisson;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
@@ -25,8 +26,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ResourceUtils;
 
 import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -299,5 +303,18 @@ public class AccessPageService {
             }
         }
         accessPageDTO.setChildren(childAccessPageDTOS);
+    }
+
+    public boolean setUrlInAccessPages() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        File file = ResourceUtils.getFile("classpath:accesspage/accessPageUrl.json");
+        Map<String, String> accessPageMap = mapper.readValue(file, new TypeReference<Map<String, String>>() {
+        });
+        List<AccessPage> accessPages= (List<AccessPage>) accessPageRepository.findAll();
+        accessPages.forEach(accessPage->{
+            accessPage.setUrl(accessPageMap.get(accessPage.getModuleId()));
+        });
+        accessPageRepository.saveAll(accessPages);
+        return true;
     }
 }

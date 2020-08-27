@@ -114,8 +114,6 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private PayOutService payOutService;
     @Inject
-    private TimeBankCalculationService timeBankCalculationService;
-    @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject
     private ExceptionService exceptionService;
@@ -124,11 +122,7 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
-    private StaffWTACounterRepository wtaCounterRepository;
-    @Inject
     private ShiftValidatorService shiftValidatorService;
-    @Inject
-    private ActivityConfigurationRepository activityConfigurationRepository;
     @Inject
     private OpenShiftNotificationMongoRepository openShiftNotificationMongoRepository;
     @Inject
@@ -144,15 +138,11 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
-    private StaffingLevelService staffingLevelService;
-    @Inject
     private ShiftStateService shiftStateService;
     @Inject
     private ShiftStatusService shiftStatusService;
     @Inject
     private AbsenceShiftService absenceShiftService;
-    @Inject
-    private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
     @Inject
     private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
     @Inject
@@ -168,8 +158,6 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private ActivityConfigurationService activityConfigurationService;
     @Inject
-    private ActivityPriorityMongoRepository activityPriorityMongoRepository;
-    @Inject
     private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject
     private ShiftSickService shiftSickService;
@@ -177,8 +165,6 @@ public class ShiftService extends MongoBaseService {
     private ActivitySchedulerJobService activitySchedulerJobService;
     @Inject
     private ActivityService activityService;
-    @Inject
-    private SickService sickService;
     @Inject private ShiftFunctionService shiftFunctionService;
     @Inject private StaffActivityDetailsService staffActivityDetailsService;
 
@@ -225,14 +211,10 @@ public class ShiftService extends MongoBaseService {
     public void addReasonCode(List<ShiftDTO> shiftDTOS, List<ReasonCodeDTO> reasonCodes) {
         Map<Long, ReasonCodeDTO> reasonCodeDTOMap = reasonCodes.stream().collect(Collectors.toMap(ReasonCodeDTO::getId, v -> v));
         for (ShiftDTO shift : shiftDTOS) {
-            Set<BigInteger> multipleActivityCount = new HashSet<>();
+            shift.setMultipleActivity(shift.getActivities().size()>1);
             for (ShiftActivityDTO activity : shift.getActivities()) {
                 activity.setReasonCode(reasonCodeDTOMap.get(activity.getAbsenceReasonCodeId()));
-                if (!activity.isBreakShift()) {
-                    multipleActivityCount.add(activity.getActivityId());
-                }
             }
-            shift.setMultipleActivity(multipleActivityCount.size() > CommonConstants.MULTIPLE_ACTIVITY);
         }
     }
 
