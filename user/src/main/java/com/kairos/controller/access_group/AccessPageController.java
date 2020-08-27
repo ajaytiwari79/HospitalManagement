@@ -126,8 +126,8 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getTabHierarchy(languageId));
     }
 
-    @ApiOperation(value = "get tab hierarchy")
-    @GetMapping("/set_url_in_pages")
+    @ApiOperation(value = "set ulr in  tab hierarchy")
+    @PutMapping("/set_url_in_pages")
     public ResponseEntity<Map<String, Object>> setUrlInTabHierarchy() throws IOException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.setUrlInAccessPages());
     }
