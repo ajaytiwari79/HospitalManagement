@@ -706,5 +706,19 @@ public class CountryDefaultDataController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kairosStatusService.updateTranslation(id,translations));
     }
 
+    @PutMapping(value = COUNTRY_URL + "/employee_limit/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfEmployeeLimit(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employeeLimitService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/payment_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfPaymentType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, paymentTypeService.updateTranslation(id,translations));
+    }
+
 
 }
