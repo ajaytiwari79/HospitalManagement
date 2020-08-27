@@ -316,11 +316,9 @@ public class ActivityConfigurationService extends MongoBaseService {
         List<PlannedTime> plannedTimes = new ArrayList<>();
         final boolean endDateInside = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().containsStartOrEnd(endDate));
         final boolean activityIntervalOverLapped = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().overlaps(activityInterval));
-
         if (!activityIntervalOverLapped) {
             plannedTimes.add(new PlannedTime(plannedTimeId, startDate, endDate));
         } else {
-
             if (plannedTimeMap.size() != 0) {
                 DateTimeInterval lastInterval = plannedTimeMap.keySet().stream().skip(plannedTimeMap.keySet().size() - 1).findFirst().get();
                 boolean addedAtLeading = false;

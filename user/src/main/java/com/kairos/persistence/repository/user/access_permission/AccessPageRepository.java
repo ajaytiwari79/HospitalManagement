@@ -227,7 +227,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             " UNION " +
             " MATCH (module:AccessPage)<-[modulePermission:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(ag:AccessGroup) WHERE id (ag) IN {3} " +
             " RETURN module.name as name,id(module) as id,module.moduleId as moduleId,modulePermission.read  as read,modulePermission.write  as write,module.isModule as module,module.sequence as sequence  ")
-    List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId, List<Long> accessGroupIds, Set<Long> allAccessGroupIds);
+    List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId, Set<Long> accessGroupIds, Set<Long> allAccessGroupIds);
 
     @Query(" MATCH (module:AccessPage) " +
             " RETURN module.name as name,id(module) as id,module.moduleId as moduleId,true  as read,true  as write,module.isModule as module,module.sequence as sequence  ")

@@ -169,7 +169,7 @@ public class PermissionService {
         return copyCollectionPropertiesByMapper(kPermissionModels, ModelDTO.class);
     }
 
-    public Map<String, Object> getPermissionSchema(List<Long> accessGroupIds,Long staffId){
+    public Map<String, Object> getPermissionSchema(Set<Long> accessGroupIds,Long staffId){
         Map<String, Object> permissionSchemaMap = new HashMap<>();
         List<KPermissionModel> kPermissionModels = getkPermissionModels();
         permissionSchemaMap.put(PERMISSIONS_SCHEMA, copyCollectionPropertiesByMapper(kPermissionModels, ModelDTO.class));
@@ -272,8 +272,8 @@ public class PermissionService {
         return modelPermissionQueryResult;
     }
 
-    public List<ModelPermissionQueryResult> getModelPermission(List<String> modelNames,Collection<Long> accessGroupIds,boolean systemAdmin,Long staffId, Set<Long> unitAccessGroupIds){
-        Map[] permissionMap = getMapOfPermission(accessGroupIds,systemAdmin,staffId,unitAccessGroupIds);
+    public List<ModelPermissionQueryResult> getModelPermission(List<String> modelNames,Set<Long> accessGroupIds,boolean systemAdmin,Long staffId, Set<Long> unitAccessGroupIds){
+        Map[] permissionMap = getMapOfPermission(accessGroupIds,systemAdmin,staffId,accessGroupIds.equals(unitAccessGroupIds)?new HashSet<>():unitAccessGroupIds);
         Map<Long,ModelPermissionQueryResult> modelPermissionMap = permissionMap[0];
         Map<Long,FieldPermissionQueryResult> fieldLevelPermissionMap = permissionMap[1];
         OrganizationCategory organizationCategory = UserContext.getUserDetails().getLastSelectedOrganizationCategory();
