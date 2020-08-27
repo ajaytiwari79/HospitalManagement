@@ -24,6 +24,7 @@ import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepositor
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ResourceUtils;
@@ -31,6 +32,7 @@ import org.springframework.util.ResourceUtils;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -307,13 +309,13 @@ public class AccessPageService {
 
     public boolean setUrlInAccessPages() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        File file = ResourceUtils.getFile("classpath:accesspage/accessPageUrl.json");
-        Map<String, String> accessPageMap = mapper.readValue(file, new TypeReference<Map<String, String>>() {
+        ClassPathResource resource = new ClassPathResource("accesspage/accessPageUrl.json");
+        InputStream inputStream = resource.getInputStream();
+        //File file = ResourceUtils.getFile("classpath:accesspage/accessPageUrl.json");
+        Map<String, String> accessPageMap = mapper.readValue(inputStream, new TypeReference<Map<String, String>>() {
         });
         List<AccessPage> accessPages= (List<AccessPage>) accessPageRepository.findAll();
-        accessPages.forEach(accessPage->{
-            accessPage.setUrl(accessPageMap.get(accessPage.getModuleId()));
-        });
+        accessPages.forEach(accessPage-> accessPage.setUrl(accessPageMap.get(accessPage.getModuleId())));
         accessPageRepository.saveAll(accessPages);
         return true;
     }
