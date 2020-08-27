@@ -1,6 +1,10 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.country.default_data.LocationType;
 import com.kairos.persistence.model.country.default_data.LocationTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -10,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
 
@@ -47,7 +53,13 @@ public class LocationTypeService {
     }
 
     public List<LocationTypeDTO> getLocationTypeByCountryId(long countryId) {
-        return locationTypeGraphRepository.findLocationTypeByCountry(countryId);
+        List<LocationType> locationTypes = locationTypeGraphRepository.findLocationTypeByCountry(countryId);
+        List<LocationTypeDTO> locationTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(locationTypes,LocationTypeDTO.class);
+        locationTypeDTOS.forEach(locationTypeDTO -> {
+            locationTypeDTO.setCountryId(countryId);
+            locationTypeDTO.setTranslations(TranslationUtil.getTranslatedData(locationTypeDTO.getTranslatedNames(),locationTypeDTO.getTranslatedDescriptions()));
+        });
+        return locationTypeDTOS;
     }
 
     public LocationTypeDTO updateLocationType(long countryId, LocationTypeDTO locationTypeDTO) {
@@ -74,5 +86,17 @@ public class LocationTypeService {
             exceptionService.dataNotFoundByIdException("error.LocationType.notfound");
         }
         return false;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long locationTypeId, Map<String,TranslationInfo> translations) {
+        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptions = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
+        LocationType locationType =locationTypeGraphRepository.findOne(locationTypeId);
+        locationType.setTranslatedNames(translatedNames);
+        locationType.setTranslatedDescriptions(translatedDescriptions);
+        locationTypeGraphRepository.save(locationType);
+        return locationType.getTranslatedData();
     }
 }
