@@ -469,8 +469,8 @@ public class UserService {
              Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
              unitAccessGroupIds=parentHub.getId().equals(organizationId)?parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet()):accessGroupService.getAccessGroupIdsOfUnit(organizationId);
             //List<AccessGroupQueryResult> accessGroupQueryResults = accessGroupService.getCountryAccessGroupByOrgCategory(UserContext.getUserDetails().getCountryId(), OrganizationCategory.HUB.toString());
-            List<Long> accessGroupIds = parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toList());
-            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId(), accessGroupIds,unitAccessGroupIds);
+            Set<Long> accessGroupIds = parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet());
+            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId(), accessGroupIds,accessGroupIds.equals(unitAccessGroupIds)?new HashSet<>():unitAccessGroupIds);
             preparePermission(permissionData, permissions);
 
         } else {
