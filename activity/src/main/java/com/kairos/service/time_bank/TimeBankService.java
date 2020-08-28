@@ -611,11 +611,13 @@ public class TimeBankService implements KPIService {
 
     private CTAResponseDTO getCTAByDate(List<CTAResponseDTO> ctaResponseDTOS, LocalDate shiftDate) {
         CTAResponseDTO ctaResponse = null;
-        for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
-            DateTimeInterval dateTimeInterval = new DateTimeInterval(asDate(ctaResponseDTO.getStartDate()),isNotNull(ctaResponseDTO.getEndDate()) ? asDateEndOfDay(ctaResponseDTO.getEndDate()) : asDateEndOfDay(shiftDate));
-            if(dateTimeInterval.contains(asDate(shiftDate))) {
-                ctaResponse = ctaResponseDTO;
-                break;
+        if(isCollectionNotEmpty(ctaResponseDTOS)) {
+            for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
+                DateTimeInterval dateTimeInterval = new DateTimeInterval(asDate(ctaResponseDTO.getStartDate()), isNotNull(ctaResponseDTO.getEndDate()) ? asDateEndOfDay(ctaResponseDTO.getEndDate()) : asDateEndOfDay(shiftDate));
+                if (dateTimeInterval.contains(asDate(shiftDate))) {
+                    ctaResponse = ctaResponseDTO;
+                    break;
+                }
             }
         }
         return ctaResponse;
