@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
@@ -180,6 +181,7 @@ public class PositionService {
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
+        validateDates(startDate,endDate,accessGroup);
         OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_UNIT_NOTFOUND, unitId)));
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
         Position position = positionGraphRepository.findPosition(parentUnit.getId(), staffId);
@@ -204,6 +206,14 @@ public class PositionService {
         response.put("organizationId", unitId);
         response.put("synInFls", flsSyncStatus);
         return response;
+    }
+
+    private void validateDates(LocalDate startDate, LocalDate endDate, AccessGroup accessGroup) {
+        DateTimeInterval dateTimeInterval=new DateTimeInterval(accessGroup.getStartDate(),accessGroup.getEndDate());
+        DateTimeInterval timeInterval=new DateTimeInterval(startDate,endDate);
+        if(!dateTimeInterval.contains(timeInterval)){
+            exceptionService.actionNotPermittedException("message.staff.access_group.exceed");
+        }
     }
 
     private StaffAccessGroupQueryResult removeUnitPermisssion(Long unitId, Long staffId, Long accessGroupId, Organization parentUnit) {
