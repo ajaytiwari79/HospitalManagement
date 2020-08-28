@@ -112,7 +112,7 @@ public class WTARuleTemplateCalculationService {
                 shift.setRestingMinutes(restingMinutes);
                 shift.setEscalationReasons(shiftViolatedRulesMap.containsKey(shift.getId()) ? shiftViolatedRulesMap.get(shift.getId()).getEscalationReasons():newHashSet());
                 shift.setEscalationResolved(escalationFreeShiftIds.contains(shift.getId()));
-                boolean editable=shiftValidatorService.validateGracePeriod(shift.getStartDate(), true, shift.getUnitId(), phaseMapByDate.get(shift.getStartDate()));
+                boolean editable=shiftValidatorService.validateGracePeriod(shift.getStartDate(), true, shift.getUnitId(), phaseMapByDate.get(shift.getActivities().get(0).getStartDate()));
                 shift.setEditable(editable);
             }
         }
