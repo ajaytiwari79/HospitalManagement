@@ -320,8 +320,8 @@ public class PositionService {
                 if (employment != null && !employment.isEmpty()) {
                     positions.add(employment);
                     queryResult.setAccessable(true);
-                    queryResult.setStartDate((LocalDate) employment.get("startDate"));
-                    queryResult.setEndDate((LocalDate) employment.get("endDate"));
+                    queryResult.setStartDate(String.valueOf(employment.get("startDate")));
+                    queryResult.setEndDate(String.valueOf((LocalDate) employment.get("endDate")));
                 } else {
                     queryResult.setAccessable(false);
                 }
@@ -355,8 +355,8 @@ public class PositionService {
                             if (position != null && !position.isEmpty()) {
                                 positions.add(position);
                                 child.setAccessable(true);
-                                child.setStartDate((LocalDate) position.get("startDate"));
-                                child.setEndDate((LocalDate) position.get("endDate"));
+                                child.setStartDate(String.valueOf(position.get("startDate")));
+                                child.setEndDate(String.valueOf(position.get("endDate")));
                             } else {
                                 child.setAccessable(false);
                             }
@@ -371,8 +371,8 @@ public class PositionService {
                     if (position != null && !position.isEmpty()) {
                         positions.add(position);
                         child.setAccessable(true);
-                        child.setStartDate((LocalDate) position.get("startDate"));
-                        child.setEndDate((LocalDate) position.get("endDate"));
+                        child.setStartDate(String.valueOf(position.get("startDate")));
+                        child.setEndDate(String.valueOf(position.get("endDate")));
 
                     } else {
                         child.setAccessable(false);
@@ -383,8 +383,8 @@ public class PositionService {
                     if (position != null && !position.isEmpty()) {
                         positions.add(position);
                         queryResult.setAccessable(true);
-                        queryResult.setStartDate((LocalDate) position.get("startDate"));
-                        queryResult.setEndDate((LocalDate) position.get("endDate"));
+                        queryResult.setStartDate(String.valueOf(position.get("startDate")));
+                        queryResult.setEndDate(String.valueOf(position.get("endDate")));
                     } else {
                         queryResult.setAccessable(false);
                     }
