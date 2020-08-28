@@ -138,7 +138,10 @@ public class StaffController {
         long accessGroupId = Long.parseLong((String) unitPermissionDetails.get("roleId"));
         boolean isCreated = (boolean) unitPermissionDetails.get("isCreated");
         long unitId = Long.parseLong((String) unitPermissionDetails.get("organizationId"));
-        Map<String, Object> response = positionService.createUnitPermission(unitId, staffId, accessGroupId, isCreated);
+        LocalDate startDate= (LocalDate) unitPermissionDetails.get("startDate");
+        LocalDate endDate= (LocalDate) unitPermissionDetails.get("endDate");
+
+        Map<String, Object> response = positionService.createUnitPermission(unitId, staffId, accessGroupId, isCreated,startDate,endDate);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }

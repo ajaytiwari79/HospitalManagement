@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,8 @@ public class QueryResult {
     private boolean hasPermission;
     private boolean unit;
     private CompanyType type;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     public QueryResult(String name, long id, List<QueryResult> children) {
         this.name = name;

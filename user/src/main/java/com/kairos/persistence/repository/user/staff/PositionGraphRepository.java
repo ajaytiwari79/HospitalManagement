@@ -27,8 +27,8 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
 
     @Query("MATCH (organization),(accessGroup:AccessGroup),(staff:Staff) WHERE id(organization)={1} AND id(accessGroup)={2} AND id(staff) ={0} WITH organization,accessGroup,staff\n" +
             "MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitPermission:UnitPermission) WITH unitPermission,organization,accessGroup\n" +
-            "MATCH (organization)<-[:"+ APPLICABLE_IN_UNIT +"]-(unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup) WITH DISTINCT unitPermission,organization\n" +
-            "RETURN {id:id(unitPermission),startDate:unitPermission.startDate,endDate:unitPermission.endDate,organizationId:id(organization),status:unitPermission.employmentStatus} AS data")
+            "MATCH (organization)<-[:"+ APPLICABLE_IN_UNIT +"]-(unitPermission)-[r:"+HAS_ACCESS_GROUP+"]->(accessGroup) WITH DISTINCT unitPermission,organization\n" +
+            "RETURN {id:id(unitPermission),startDate:r.startDate,endDate:r.endDate,organizationId:id(organization),status:unitPermission.employmentStatus} AS data")
     Map<String,Object> getPositionOfParticularRole(long staffId, long organizationId, long accessGroupId);
 
     @Query("MATCH (organization:Organization),(staff:Staff),(unit) WHERE id(organization)={0} AND id(staff) IN {1} AND id(unit)={2}\n" +
