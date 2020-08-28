@@ -75,7 +75,7 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
             "RETURN COUNT(accessGroup)=0 ")
     boolean isOnlyStaff(Long unitId,Long staffId);
 
-    @Query("MATCH(ag:AccessGroup)-[r:"+HAS_ACCESS_GROUP+"]->(up:UnitPermission) WHERE id(ag)={0} AND id(up)={1}  " +
+    @Query("MATCH(ag:AccessGroup)-[r:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission) WHERE id(ag)={0} AND id(up)={1}  " +
             "SET r.startDate={2}, r.endDate={3} ")
     void updateDatesInUnitPermission(Long accessGroupId,Long unitPermissionId,String startDate,String endDate);
 
