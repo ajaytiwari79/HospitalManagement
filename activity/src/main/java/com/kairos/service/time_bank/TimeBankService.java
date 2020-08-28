@@ -588,18 +588,7 @@ public class TimeBankService implements KPIService {
             List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(new ArrayList<>(staffAdditionalInfoMap.keySet()), startDateTime, endDateTime);
             Map<Long, List<CTAResponseDTO>> employmentAndCTAResponseMap = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getEmploymentId));
             for (Shift shift : shifts) {
-                StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffAdditionalInfoMap.get(shift.getEmploymentId());
-                CTAResponseDTO ctaResponseDTO = getCTAByDate(employmentAndCTAResponseMap.get(shift.getEmploymentId()), asLocalDate(shift.getStartDate()));
-                if(isNull(ctaResponseDTO)){
-                    exceptionService.dataNotFoundException(MESSAGE_CTA_NOTFOUND,asLocalDate(shift.getStartDate()));
-                }
-                staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-                staffAdditionalInfoDTO.setUnitId(shifts.get(0).getUnitId());
-                setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                if(isNotNull(planningPeriod)) {
-                    DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO, shift, planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId()));
-                    timeBankRepository.save(dailyTimeBankEntry);
-                }
+                updateAndRenewDailyTimeBank(shifts, planningPeriod, staffAdditionalInfoMap, employmentAndCTAResponseMap, shift);
             }
             shiftMongoRepository.saveEntities(shifts);
         }
@@ -607,6 +596,24 @@ public class TimeBankService implements KPIService {
             updatePublishBalance(staffAdditionalInfoMap,planningPeriod);
         }
         return true;
+    }
+
+    private void updateAndRenewDailyTimeBank(List<Shift> shifts, PlanningPeriod planningPeriod, Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap, Map<Long, List<CTAResponseDTO>> employmentAndCTAResponseMap, Shift shift) {
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffAdditionalInfoMap.get(shift.getEmploymentId());
+        CTAResponseDTO ctaResponseDTO = getCTAByDate(employmentAndCTAResponseMap.get(shift.getEmploymentId()), asLocalDate(shift.getStartDate()));
+        if(isNull(ctaResponseDTO)){
+            if(isNotNull(planningPeriod)){
+                return;
+            }
+            exceptionService.dataNotFoundException(MESSAGE_CTA_NOTFOUND,asLocalDate(shift.getStartDate()));
+        }
+        staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+        staffAdditionalInfoDTO.setUnitId(shifts.get(0).getUnitId());
+        setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
+        if(isNotNull(planningPeriod)) {
+            DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO, shift, planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId()));
+            timeBankRepository.save(dailyTimeBankEntry);
+        }
     }
 
     private CTAResponseDTO getCTAByDate(List<CTAResponseDTO> ctaResponseDTOS, LocalDate shiftDate) {
@@ -690,14 +697,6 @@ public class TimeBankService implements KPIService {
         }
         if(isCollectionNotEmpty(updatedDailyTimebanks)) {
             timeBankRepository.saveEntities(updatedDailyTimebanks);
-        }
-    }
-
-    public void updateTimeBankForProtectedDaysOff(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, boolean validatedByPlanner) {
-        staffAdditionalInfoDTO.getEmployment().setStaffId(shift.getStaffId());
-        DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
-        if(isNotNull(dailyTimeBankEntry)) {
-            timeBankRepository.save(dailyTimeBankEntry);
         }
     }
 
@@ -786,9 +785,6 @@ public class TimeBankService implements KPIService {
         shiftActivity.setActivityName(activityWrapper.getActivity().getName());
         return new int[]{scheduledMinutes, durationMinutes};
     }
-
-
-
     @Getter
     private class AdvanceViewData {
         private Long unitId;
