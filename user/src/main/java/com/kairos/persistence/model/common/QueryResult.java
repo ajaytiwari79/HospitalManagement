@@ -37,8 +37,8 @@ public class QueryResult {
     private boolean hasPermission;
     private boolean unit;
     private CompanyType type;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private String startDate;
+    private String endDate;
 
     public QueryResult(String name, long id, List<QueryResult> children) {
         this.name = name;
