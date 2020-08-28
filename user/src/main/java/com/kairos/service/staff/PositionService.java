@@ -234,7 +234,7 @@ public class PositionService {
         } else {
             unitPermissionGraphRepository.createPermission(accessGroup.getId(), unitPermission.getId());
         }
-        unitPermissionGraphRepository.updateDatesInUnitPermission(accessGroup.getId(), unitPermission.getId(),startDate.toString(),endDate==null?null:endDate.toString());
+        unitPermissionGraphRepository.updateDatesInUnitPermission(accessGroup.getId(), unitPermission.getId(),startDate==null?null:startDate.toString(),endDate==null?null:endDate.toString());
         LOGGER.info(" Currently created Unit Permission ");
         response.put("startDate", getDate(unitPermission.getStartDate()));
         response.put("endDate", getDate(unitPermission.getEndDate()));
