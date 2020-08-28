@@ -265,7 +265,7 @@ public class StaffingLevelUtil {
             }
             if (presenceStaffingLevelDTO.getInterval().contains(currentDate)) {
                 staffingLevelIntervals.add(updateInterval(interval, presenceStaffingLevelDTO));
-                currentDate.plusMinutes(15);
+                currentDate=currentDate.plusMinutes(15);
             } else {
                 staffingLevelIntervals.add(interval);
             }
