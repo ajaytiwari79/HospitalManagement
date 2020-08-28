@@ -236,8 +236,8 @@ public class PositionService {
         }
         unitPermissionGraphRepository.updateDatesInUnitPermission(accessGroup.getId(), unitPermission.getId(),startDate==null?null:startDate.toString(),endDate==null?null:endDate.toString());
         LOGGER.info(" Currently created Unit Permission ");
-        response.put("startDate", getDate(unitPermission.getStartDate()));
-        response.put("endDate", getDate(unitPermission.getEndDate()));
+        response.put("startDate", startDate);
+        response.put("endDate", endDate);
         response.put("id", unitPermission.getId());
         staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
         return staffAccessGroupQueryResult;
