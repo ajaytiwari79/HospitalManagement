@@ -17,8 +17,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 public interface HousingTypeGraphRepository extends Neo4jBaseRepository<HousingType,Long>{
 
     @Query("MATCH (country:Country)<-[:"+ BELONGS_TO +"]-(housingType:HousingType {isEnabled:true}) where id(country)={0} " +
-            "RETURN id(housingType) as id, housingType.name as name, housingType.description as description ORDER BY housingType.creationDate DESC")
-    List<HousingTypeDTO> findHousingTypeByCountry(long countryId);
+            "RETURN housingType")
+    List<HousingType> findHousingTypeByCountry(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(housingType:HousingType {isEnabled:true}) WHERE id(country)={0} AND id(housingType)<>{2} AND housingType.name =~{1}  " +
             " WITH count(housingType) as totalCount " +
