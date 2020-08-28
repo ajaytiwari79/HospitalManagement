@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
@@ -180,6 +181,7 @@ public class PositionService {
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
+        validateDates(startDate,endDate,accessGroup);
         OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_UNIT_NOTFOUND, unitId)));
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
         Position position = positionGraphRepository.findPosition(parentUnit.getId(), staffId);
@@ -204,6 +206,14 @@ public class PositionService {
         response.put("organizationId", unitId);
         response.put("synInFls", flsSyncStatus);
         return response;
+    }
+
+    private void validateDates(LocalDate startDate, LocalDate endDate, AccessGroup accessGroup) {
+        DateTimeInterval dateTimeInterval=new DateTimeInterval(accessGroup.getStartDate(),accessGroup.getEndDate());
+        DateTimeInterval timeInterval=new DateTimeInterval(startDate,endDate);
+        if(!dateTimeInterval.contains(timeInterval)){
+            exceptionService.actionNotPermittedException("message.staff.access_group.exceed");
+        }
     }
 
     private StaffAccessGroupQueryResult removeUnitPermisssion(Long unitId, Long staffId, Long accessGroupId, Organization parentUnit) {
@@ -320,8 +330,8 @@ public class PositionService {
                 if (employment != null && !employment.isEmpty()) {
                     positions.add(employment);
                     queryResult.setAccessable(true);
-                    queryResult.setStartDate((LocalDate) employment.get("startDate"));
-                    queryResult.setEndDate((LocalDate) employment.get("endDate"));
+                    queryResult.setStartDate(String.valueOf(employment.get("startDate")));
+                    queryResult.setEndDate(String.valueOf((LocalDate) employment.get("endDate")));
                 } else {
                     queryResult.setAccessable(false);
                 }
@@ -355,8 +365,8 @@ public class PositionService {
                             if (position != null && !position.isEmpty()) {
                                 positions.add(position);
                                 child.setAccessable(true);
-                                child.setStartDate((LocalDate) position.get("startDate"));
-                                child.setEndDate((LocalDate) position.get("endDate"));
+                                child.setStartDate(String.valueOf(position.get("startDate")));
+                                child.setEndDate(String.valueOf(position.get("endDate")));
                             } else {
                                 child.setAccessable(false);
                             }
@@ -371,8 +381,8 @@ public class PositionService {
                     if (position != null && !position.isEmpty()) {
                         positions.add(position);
                         child.setAccessable(true);
-                        child.setStartDate((LocalDate) position.get("startDate"));
-                        child.setEndDate((LocalDate) position.get("endDate"));
+                        child.setStartDate(String.valueOf(position.get("startDate")));
+                        child.setEndDate(String.valueOf(position.get("endDate")));
 
                     } else {
                         child.setAccessable(false);
@@ -383,8 +393,8 @@ public class PositionService {
                     if (position != null && !position.isEmpty()) {
                         positions.add(position);
                         queryResult.setAccessable(true);
-                        queryResult.setStartDate((LocalDate) position.get("startDate"));
-                        queryResult.setEndDate((LocalDate) position.get("endDate"));
+                        queryResult.setStartDate(String.valueOf(position.get("startDate")));
+                        queryResult.setEndDate(String.valueOf(position.get("endDate")));
                     } else {
                         queryResult.setAccessable(false);
                     }
