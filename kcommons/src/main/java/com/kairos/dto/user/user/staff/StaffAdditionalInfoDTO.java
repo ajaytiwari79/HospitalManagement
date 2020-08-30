@@ -16,11 +16,15 @@ import com.kairos.utils.CPRUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalTime;
+
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.asLocalTime;
 import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
@@ -87,6 +91,11 @@ public class StaffAdditionalInfoDTO {
 
     public SeniorAndChildCareDaysDTO getSeniorAndChildCareDays() {
         return isNullOrElse(seniorAndChildCareDays,new SeniorAndChildCareDaysDTO());
+    }
+
+    public String getTimeSlotByShiftStartTime(Date startDate){
+        LocalDate localDate = asLocalTime(startDate).equals(LocalTime.MIDNIGHT) ? asLocalDate(startDate).minusDays(1) : asLocalDate(startDate);
+        return timeSlotSets.stream().filter(timeSlotWrapper -> timeSlotWrapper.getTimeSlotInterval(localDate).contains(startDate)).findAny().get().getName();
     }
 
     public Set<AccessGroupRole> getRoles() {

@@ -109,7 +109,6 @@ public class ShiftPlanningService {
         staffListWithPersonalDetails.forEach(staffShiftDetails ->
                 employmentIds.addAll(staffShiftDetails.getEmployments().stream().map(PlanningEmploymentDTO::getId).collect(Collectors.toList()))
         );
-
         if (shiftSearchDTO.getStartDate().equals(shiftSearchDTO.getEndDate())) {
             shiftSearchDTO.setEndDate(new Date(shiftSearchDTO.getEndDate().getTime() + 86400000));
         }
