@@ -58,9 +58,9 @@ public class TimeBankKpiCalculationService implements CounterService {
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
-    private TimeBankRepository timeBankRepository;
+    public TimeBankRepository timeBankRepository;
     @Inject
-    private CounterHelperService counterHelperService;
+    public CounterHelperService counterHelperService;
     @Inject private PlanningPeriodService planningPeriodService;
 
     private List<DailyTimeBankEntry> getDailyTimeBankEntryByDate(List<Long> employmentIds, LocalDate startDate, LocalDate endDate, Set<DayOfWeek> daysOfWeeks) {

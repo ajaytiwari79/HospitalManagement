@@ -13,10 +13,7 @@ import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
@@ -38,12 +35,14 @@ public class ShiftWithActivityDTO extends ShiftDTO{
     private PhaseDTO phase;
     private String timeType;
     @JsonIgnore
-    private List<BigInteger> activitiesTimeTypeIds = new ArrayList<>();
+    private Set<BigInteger> activitiesTimeTypeIds = new HashSet<>();
     @JsonIgnore
-    private List<BigInteger> activityIds = new ArrayList<>();
+    private Set<BigInteger> activityIds = new HashSet<>();
     @JsonIgnore
-    private List<BigInteger> activitiesPlannedTimeIds = new ArrayList<>();
+    private Set<BigInteger> activitiesPlannedTimeIds = new HashSet<>();
     private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
+    private transient String oldShiftTimeSlot;//it is only for conditional CTA calculation
+
 
     public ShiftWithActivityDTO() {
     }
@@ -54,24 +53,28 @@ public class ShiftWithActivityDTO extends ShiftDTO{
         this.activities = activities;
     }
 
-    public List<BigInteger> getActivitiesTimeTypeIds(){
+    public Set<BigInteger> getActivitiesTimeTypeIds(){
         if(activitiesTimeTypeIds.isEmpty()) {
-            activitiesTimeTypeIds = activities.stream().filter(shiftActivityDTO -> shiftActivityDTO.getActivity()!=null).map(shiftActivityDTO -> shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeTypeId()).collect(Collectors.toList());
+            activitiesTimeTypeIds = activities.stream().filter(shiftActivityDTO -> shiftActivityDTO.getActivity()!=null).map(shiftActivityDTO -> shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeTypeId()).collect(Collectors.toSet());
         }
         return activitiesTimeTypeIds;
     }
 
-    public List<BigInteger> getActivitiesPlannedTimeIds(){
+    public Set<BigInteger> getActivitiesPlannedTimeIds(){
         if(activitiesPlannedTimeIds.isEmpty()) {
-            activitiesPlannedTimeIds = activities.stream().flatMap(k -> k.getPlannedTimes().stream().map(plannedTime->plannedTime.getPlannedTimeId())).collect(Collectors.toList());
+            activitiesPlannedTimeIds = activities.stream().flatMap(k -> k.getPlannedTimes().stream().map(plannedTime->plannedTime.getPlannedTimeId())).collect(Collectors.toSet());
         }
         return activitiesPlannedTimeIds;
     }
 
+    public List<PlannedTime> getActivitiesPlannedTimes(){
+        return activities.stream().flatMap(k -> k.getPlannedTimes().stream()).collect(Collectors.toList());
+    }
+
     @JsonIgnore
-    public List<BigInteger> getActivityIds(){
+    public Set<BigInteger> getActivityIds(){
         if(activityIds.isEmpty()) {
-            activityIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toList());
+            activityIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toSet());
         }
         return activityIds;
     }

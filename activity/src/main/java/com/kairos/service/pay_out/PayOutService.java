@@ -182,7 +182,7 @@ public class PayOutService extends MongoBaseService {
     private void updatePayoutByShift(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftWithActivityDTO shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, DateTimeInterval interval) {
         PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shift.getId());
         payOutPerShift = isNullOrElse(payOutPerShift, new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(), shift.getUnitId()));
-        payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getEmployment(), shift, activityWrapperMap, payOutPerShift, staffAdditionalInfoDTO.getDayTypes());
+        payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO, shift, activityWrapperMap, payOutPerShift, staffAdditionalInfoDTO.getDayTypes());
         payOutRepository.save(payOutPerShift);
     }
 
