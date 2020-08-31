@@ -85,4 +85,15 @@ public class PermissionController {
     public ResponseEntity<Map<String, Object>> getAccessPageByAccessGroup(@RequestParam("staffId") Long staffId, @PathVariable Long accessGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(newHashSet(accessGroupId),staffId));
     }
+
+    @PostMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/action_permission")
+    public ResponseEntity<Map<String, Object>> assignActionPermissionToModel(@PathVariable Long unitId,@PathVariable Long accessGroupId, @RequestBody CustomPermissionDTO customPermissionDTO) {
+        permissionService.assignActionPermission(unitId,accessGroupId,customPermissionDTO);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
+
+    @GetMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/action_permission")
+    public ResponseEntity<Map<String, Object>> getActionPermissionByAccessGroup(@RequestParam("staffId") Long staffId, @PathVariable Long accessGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(newHashSet(accessGroupId),staffId));
+    }
 }

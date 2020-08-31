@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.kpermissions;
 
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
+import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.kpermissions.FieldPermissionQueryResult;
 import com.kairos.persistence.model.kpermissions.KPermissionModel;
 import com.kairos.persistence.model.kpermissions.ModelPermissionQueryResult;
@@ -56,6 +57,7 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "CASE WHEN customRel IS NULL THEN permission.expertiseIds ELSE customRel.expertiseIds END as expertiseIds,\n" +
             "CASE WHEN customRel IS NULL THEN permission.forOtherFieldLevelPermissions ELSE customRel.forOtherFieldLevelPermissions END as forOtherFieldLevelPermissions,\n" +
             "CASE WHEN customRel IS NULL THEN permission.staffStatuses ELSE customRel.staffStatuses END as staffStatuses,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.actions ELSE customRel.actions END as actions,\n" +
             "CASE WHEN customRel IS NULL THEN permission.tagIds ELSE customRel.tagIds END as tagIds,\n" +
             "CASE WHEN customRel IS NULL THEN permission.teamIds ELSE customRel.teamIds END as teamIds,\n" +
             "CASE WHEN customRel IS NULL THEN permission.employmentTypeIds ELSE customRel.employmentTypeIds END as employmentTypeIds,\n" +
@@ -63,7 +65,7 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             " UNION " +
             " MATCH(ag:AccessGroup{deleted:false}) where id(ag) in {3} MATCH (ag)<-[permission:HAS_PERMISSION]-(model:KPermissionModel) " +
             "RETURN permission.fieldLevelPermissions AS permissions,permission.expertiseIds as expertiseIds, permission.forOtherFieldLevelPermissions AS forOtherFieldLevelPermissions, " +
-            "permission.staffStatuses AS staffStatuses, permission.tagIds AS tagIds,permission.teamIds AS teamIds, permission.employmentTypeIds AS employmentTypeIds,permission.unionIds AS  unionIds, id(model) as id,model.modelName as modelName ")
+            "permission.staffStatuses AS staffStatuses,permission.actions AS actions, permission.tagIds AS tagIds,permission.teamIds AS teamIds, permission.employmentTypeIds AS employmentTypeIds,permission.unionIds AS  unionIds, id(model) as id,model.modelName as modelName ")
     List<ModelPermissionQueryResult> getAllModelPermission(Collection<Long> accessGroupIds, Long unitId, Long staffId, Set<Long> unitAccessGroupIds);
 
     @Query("MATCH(model:KPermissionModel{deleted:false}) where model.modelName in {0}" +
@@ -81,5 +83,9 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "unwind ids as allIdsToSetPermission with distinct allIdsToSetPermission \n" +
             "Return allIdsToSetPermission")
     Set<Long> kPermissionModelIds(Long kPermissionModelId);
+
+    @Query(value = "MATCH (kPermissionModel:KPermissionModel),(accessGroup:AccessGroup) where id(kPermissionModel)={0} AND id(accessGroup) IN {1} CREATE UNIQUE (kPermissionModel)-[r:"+HAS_PERMISSION+"]->(accessGroup) " +
+            "SET r.actions={2} ")
+    void createAccessGroupPermissionModelRelationshipForAction(Long kpermissionModelId, List<Long> accessGroupIds, Set<PermissionAction> actions);
 
 }

@@ -88,6 +88,7 @@ public class ShiftBreakService implements KPIService {
     public List<ShiftActivity> updateBreakInShift(boolean shiftUpdated, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot, Shift dbShift) {
 
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
+        LOGGER.info("Phase is between {} {} {}",shift.getActivities().get(0).getStartDate().toString(),shift.getActivities().get(shift.getActivities().size()-1).getStartDate().toString(),phase.getName());
         if ((TIME_AND_ATTENDANCE.equals(phase.getName()) || REALTIME.equals(phase.getName())) && isCollectionNotEmpty(shift.getBreakActivities())) {
             validateBreakDuration(shift);
             return shift.getBreakActivities();
