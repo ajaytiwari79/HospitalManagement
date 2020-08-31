@@ -240,7 +240,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH  (o:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]-(units) \n" +
             "WITH o,position, [o]+units as units  unwind units as org  WITH DISTINCT org,o,position\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
-            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) " +
+            "MATCH (unitPermission)-[agr:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE agr.endDate IS NULL OR DATE(agr.endDate) >= DATE() " +
             "MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayType:DayType) " +
             "WITH collect(dayType) as dayType,accessGroup,org,unitPermission " +
             "WHERE ANY(dt IN dayType WHERE id(dt) IN   {1})   AND (accessGroup.endDate IS NULL OR DATE(accessGroup.endDate) >= DATE())  WITH org,accessGroup,unitPermission\n" +
@@ -260,7 +260,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH  (o:Unit{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]-(units) \n" +
             "WITH o,position, [o]+units as units  unwind units as org  WITH DISTINCT org,o,position\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
-            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date())  WITH org,accessGroup,unitPermission\n" +
+            "MATCH (unitPermission)-[agr:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE (agr.endDate IS NULL OR date(agr.endDate) >= date())  WITH org,accessGroup,unitPermission\n" +
             "MATCH (accessPage:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) \n" +
             "MATCH (org) WHERE id(org)={1} \n"+
             "OPTIONAL MATCH (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
