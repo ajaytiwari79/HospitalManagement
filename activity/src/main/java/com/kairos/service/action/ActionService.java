@@ -111,7 +111,7 @@ public class ActionService {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId, isBefore ? getStartOfDay(ShiftDate) : ShiftDate, isBefore ? ShiftDate : getEndOfDay(ShiftDate));
         for (Shift shift : shifts) {
-            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS1 = deleteOrUpdateAvailabilityUnavailabilityShift(shift, isAvailability ? TimeTypeEnum.AVAILABLE_TIME : TimeTypeEnum.UNAVAILABLE_TIME);
+            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS1 = removeAvailabilityUnavailabilityActivity(shift, isAvailability ? TimeTypeEnum.AVAILABLE_TIME : TimeTypeEnum.UNAVAILABLE_TIME);
             if(isCollectionNotEmpty(shiftWithViolatedInfoDTOS1)){
                 shiftWithViolatedInfoDTOS.addAll(shiftWithViolatedInfoDTOS1);
             }
@@ -119,7 +119,7 @@ public class ActionService {
         return shiftWithViolatedInfoDTOS;
     }
 
-    private List<ShiftWithViolatedInfoDTO> deleteOrUpdateAvailabilityUnavailabilityShift(Shift shift, TimeTypeEnum timeTypeEnum) {
+    private List<ShiftWithViolatedInfoDTO> removeAvailabilityUnavailabilityActivity(Shift shift, TimeTypeEnum timeTypeEnum) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         List<ShiftActivity> shiftActivities = shift.getActivities().stream().filter(shiftActivity -> !shiftActivity.getSecondLevelTimeType().equals(timeTypeEnum)).collect(Collectors.toList());
         if(isCollectionEmpty(shiftActivities)){
