@@ -437,7 +437,7 @@ public class StaffingLevelUtil {
             StaffingLevelInterval interval = ObjectMapperUtils.copyPropertiesByMapper(isNull(staffingLevelIntervalLog) ? staffingLevel.getPresenceStaffingLevelInterval().get(i) : staffingLevelIntervalLog, StaffingLevelInterval.class);
             if (isCollectionNotEmpty(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities())) {
                 interval.getStaffingLevelActivities().remove(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().iterator().next());
-                activityRemoveLogs.add(new ActivityRemoveLog(presenceStaffingLevelDTO.getStaffingLevelActivities().iterator().next().getActivityId(), new Date(), UserContext.getUserDetails().getFirstName()));
+                activityRemoveLogs.add(new ActivityRemoveLog(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().iterator().next().getActivityId(), new Date(), UserContext.getUserDetails().getFirstName()));
             } else {
                 interval.getStaffingLevelSkills().remove(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().iterator().next());
                 skillRemoveLogs.add(new SkillRemoveLog(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().iterator().next().getSkillId(), new Date(), UserContext.getUserDetails().getFirstName()));
