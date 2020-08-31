@@ -279,7 +279,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     @Override
     public void setEndDateToCTAOfEmployment(Long employmentId, LocalDate endDate){
         Update update=Update.update(END_DATE,DateUtils.asDate(endDate));
-        Query query = new Query(Criteria.where(EMPLOYMENT_ID).is(employmentId)).with(Sort.by(Sort.Direction.DESC,"startDate")).limit(1);
+        Query query = new Query(Criteria.where(EMPLOYMENT_ID).is(employmentId)).with(Sort.by(Sort.Direction.DESC,START_DATE)).limit(1);
         mongoTemplate.findAndModify(query,update,CostTimeAgreement.class);
     }
 
@@ -296,7 +296,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Override
     public boolean existsOngoingCTAByEmployment(Long employmentId,Date endDate){
-        Criteria criteria = Criteria.where("employmentId").is(employmentId).orOperator(Criteria.where("endDate").exists(false),Criteria.where("startDate").gte(endDate));
+        Criteria criteria = Criteria.where(EMPLOYMENT_ID).is(employmentId).orOperator(Criteria.where(END_DATE).exists(false),Criteria.where(START_DATE).gte(endDate));
         return mongoTemplate.exists(new Query(criteria), WorkingTimeAgreement.class);
     }
 }

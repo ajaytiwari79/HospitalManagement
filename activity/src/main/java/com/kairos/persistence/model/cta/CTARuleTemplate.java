@@ -2,6 +2,7 @@ package com.kairos.persistence.model.cta;
 
 import com.kairos.dto.activity.cta.CTARuleTemplatePhaseInfo;
 import com.kairos.dto.activity.cta.CompensationTable;
+import com.kairos.dto.activity.cta.ConditionalCompensation;
 import com.kairos.dto.activity.cta.PlannedTimeWithFactor;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
@@ -56,6 +57,7 @@ public class CTARuleTemplate extends MongoBaseEntity {
     private boolean calculateScheduledHours;
     private CalculationFor calculationFor;
     private Long countryId;
+    private ConditionalCompensation conditionalCompensation;
 
     public void setActivityIds(Set<BigInteger> activityIds) {
         this.activityIds = isNotNull(activityIds) ? activityIds : new HashSet<>();
@@ -97,7 +99,7 @@ public class CTARuleTemplate extends MongoBaseEntity {
                 Objects.equals(timeTypeIds, ctaRuleTemplate.timeTypeIds) &&
                 Objects.equals(plannedTimeIds, ctaRuleTemplate.plannedTimeIds) &&
                 Objects.equals(dayTypeIds, ctaRuleTemplate.dayTypeIds) &&
-                calculationFor == ctaRuleTemplate.calculationFor);
+                calculationFor == ctaRuleTemplate.calculationFor && Objects.equals(conditionalCompensation,ctaRuleTemplate.conditionalCompensation));
     }
 }
 

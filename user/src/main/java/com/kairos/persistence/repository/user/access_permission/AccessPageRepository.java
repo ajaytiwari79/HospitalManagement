@@ -227,7 +227,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             " UNION " +
             " MATCH (module:AccessPage)<-[modulePermission:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(ag:AccessGroup) WHERE id (ag) IN {3} " +
             " RETURN module.name as name,id(module) as id,module.moduleId as moduleId,modulePermission.read  as read,modulePermission.write  as write,module.isModule as module,module.sequence as sequence  ")
-    List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId, List<Long> accessGroupIds, Set<Long> allAccessGroupIds);
+    List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId, Set<Long> accessGroupIds, Set<Long> allAccessGroupIds);
 
     @Query(" MATCH (module:AccessPage) " +
             " RETURN module.name as name,id(module) as id,module.moduleId as moduleId,true  as read,true  as write,module.isModule as module,module.sequence as sequence  ")
@@ -330,7 +330,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH(accessPage)-[subTabs:"+SUB_PAGE+"]-(sub:AccessPage) " +
             "WITH r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage,subTabs,alr.description as helperText \n" +
             "RETURN \n" +
-            "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.editable as editable,accessPage.sequence as sequence,accessPage as accessPage,helperText, " +
+            "id(accessPage) as id,accessPage.name as name,accessPage.url as url,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.editable as editable,accessPage.sequence as sequence,accessPage as accessPage,helperText, " +
             "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
             "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
@@ -344,7 +344,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH(subPage)-[subTabs:"+SUB_PAGE+"]->(sub:AccessPage)\n" +
             "WITH r,subPage,id(accessPage) as parentTabId,subTabs,\n" +
             "r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,alr.description as helperText\n" +
-            "RETURN id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,subPage.sequence as sequence,subPage.editable as editable, parentTabId,subPage as accessPage,helperText, " +
+            "RETURN id(subPage) as id, subPage.name as name,subPage.url as url,subPage.moduleId as moduleId,subPage.active as active,subPage.sequence as sequence,subPage.editable as editable, parentTabId,subPage as accessPage,helperText, " +
             "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
             "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +

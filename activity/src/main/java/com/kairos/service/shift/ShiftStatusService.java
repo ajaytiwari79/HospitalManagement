@@ -404,9 +404,14 @@ public class ShiftStatusService {
     public ShiftAndActivtyStatusDTO updateShiftStatus(Long unitId, ShiftStatus shiftStatus, ShiftActivitiesIdDTO shiftActivitiesIdDTO) {
         if(isCollectionEmpty(shiftActivitiesIdDTO.getActivityIds())){
             Shift shift = shiftMongoRepository.findOne(shiftActivitiesIdDTO.getShiftId());
-            List<BigInteger> activityIds = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getStatus().contains(PENDING) || shiftActivity.getStatus().contains(REQUEST)).map(ShiftActivity::getActivityId).collect(Collectors.toList());
+            List<BigInteger> activityIds;
+            if(isNotNull(shift.getRequestAbsence())){
+                activityIds = shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
+            } else {
+                activityIds = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getStatus().contains(PENDING) || shiftActivity.getStatus().contains(REQUEST)).map(ShiftActivity::getId).collect(Collectors.toList());
+            }
             if(isCollectionEmpty(activityIds)){
-                exceptionService.actionNotPermittedException("Activity not found for update status");
+                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_NOTFOUND);
             }
             shiftActivitiesIdDTO.setActivityIds(activityIds);
         }

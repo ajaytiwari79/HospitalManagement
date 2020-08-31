@@ -260,6 +260,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS = "message.activity.active.alreadyExists";
     public static final String MESSAGE_ACTIVITY_ENDDATE_REQUIRED = "message.activity.enddate.required";
     public static final String MESSAGE_ACTIVITY_OVERLAPING = "message.activity.overlaping";
+    public static final String MESSAGE_ACTIVITY_NOTFOUND = "message.activity.notfound";
     public static final String SHORTEST_TIME_GREATER_LONGEST = "shortest.time.greater.longest";
     public static final String EARLIEST_START_TIME_LESS_LATEST = "earliest.start.time.less.latest";
     public static final String LONGEST_DURATION_EXCEED_LIMIT = "longest.duration.exceed.limit";

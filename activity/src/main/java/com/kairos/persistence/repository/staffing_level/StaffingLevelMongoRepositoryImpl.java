@@ -26,12 +26,16 @@ import java.util.Map;
 @Component
 public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepository{
     public static final String CURRENT_DATE = "currentDate";
+    public static final String UNIT_ID ="unitId";
+    public static final String DELETED ="deleted";
+    public static final String PRESENCE_STAFFING_LEVEL_INTERVAL = "presenceStaffingLevelInterval";
+    public static final String ACTIVITIES ="activities";
     @Autowired
     private MongoTemplate mongoTemplate;
 
 
     public List<StaffingLevel> getStaffingLevelsByUnitIdAndDate(Long unitId, Date startDate, Date endDate){
-        Query query = new Query(Criteria.where("unitId").is(unitId).and(CURRENT_DATE).gte(startDate).lte(endDate).and("deleted").is(false));
+        Query query = new Query(Criteria.where(UNIT_ID).is(unitId).and(CURRENT_DATE).gte(startDate).lte(endDate).and(DELETED).is(false));
         query.with(Sort.by(Sort.Direction.ASC, CURRENT_DATE));
         return mongoTemplate.find(query,StaffingLevel.class);
     }
@@ -39,8 +43,8 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
     @Override
     public List<PresenceStaffingLevelDto> findByUnitIdAndDatesAndActivityId(Long unitId, Date startDate, Date endDate, BigInteger activityId){
         Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and(CURRENT_DATE).gte(startDate).lte(endDate)),
-                Aggregation.unwind("presenceStaffingLevelInterval"),
+                Aggregation.match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(CURRENT_DATE).gte(startDate).lte(endDate)),
+                Aggregation.unwind(PRESENCE_STAFFING_LEVEL_INTERVAL),
                 new CustomAggregationOperation(Document.parse("{$addFields: { \"presenceStaffingLevelInterval.activityIds\":\"$presenceStaffingLevelInterval.staffingLevelActivities.activityId\"}}")),
                 new CustomAggregationOperation(Document.parse("{\n" +
                         "      $project: {\n" +
@@ -57,8 +61,8 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
                         "      }\n" +
                         "   }")),
                 new CustomAggregationOperation(Document.parse("{$addFields: {\"presenceStaffingLevelInterval.activities\":\"$staffingLevelActivities\"}}")),
-                Aggregation.group("currentDate","staffingLevelSetting").push("presenceStaffingLevelInterval").as("presenceStaffingLevelInterval"),
-                Aggregation.project("presenceStaffingLevelInterval").andExclude("_id").and("_id.currentDate").as(CURRENT_DATE).and("_id.staffingLevelSetting").as("staffingLevelSetting")
+                Aggregation.group(CURRENT_DATE,"staffingLevelSetting").push(PRESENCE_STAFFING_LEVEL_INTERVAL).as(PRESENCE_STAFFING_LEVEL_INTERVAL),
+                Aggregation.project(PRESENCE_STAFFING_LEVEL_INTERVAL).andExclude("_id").and("_id.currentDate").as(CURRENT_DATE).and("_id.staffingLevelSetting").as("staffingLevelSetting")
         );
         return mongoTemplate.aggregate(aggregation,StaffingLevel.class, PresenceStaffingLevelDto.class).getMappedResults();
     }
@@ -66,10 +70,10 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
     @Override
     public List<HashMap> getStaffingLevelActivities(Long unitId, LocalDate startDate, LocalDate endDate){
         Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and(CURRENT_DATE).gte(startDate).lte(endDate)),
-                Aggregation.project().and("presenceStaffingLevelInterval.staffingLevelActivities").arrayElementAt(0).as("activities").and("absenceStaffingLevelInterval.staffingLevelActivities").arrayElementAt(0).as("absenceActivities"),
-                Aggregation.project().and("activities").concatArrays("activities","absenceActivities").as("activities"),
-                Aggregation.unwind("activities"),
+                Aggregation.match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(CURRENT_DATE).gte(startDate).lte(endDate)),
+                Aggregation.project().and("presenceStaffingLevelInterval.staffingLevelActivities").arrayElementAt(0).as(ACTIVITIES).and("absenceStaffingLevelInterval.staffingLevelActivities").arrayElementAt(0).as("absenceActivities"),
+                Aggregation.project().and(ACTIVITIES).concatArrays(ACTIVITIES,"absenceActivities").as(ACTIVITIES),
+                Aggregation.unwind(ACTIVITIES),
                 new CustomAggregationOperation(Document.parse("{\n" +
                         "      $lookup:\n" +
                         "         {\n" +
@@ -96,10 +100,10 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
                         "           as: \"activities\"\n" +
                         "         }\n" +
                         "    }")),
-                Aggregation.project().and("activities").arrayElementAt(0).as("activity"),
+                Aggregation.project().and(ACTIVITIES).arrayElementAt(0).as("activity"),
                 Aggregation.replaceRoot("activity"),
-                Aggregation.group("timeType").addToSet("$$ROOT").as("activities"),
-                Aggregation.project("activities").and("_id").as("timeType")
+                Aggregation.group("timeType").addToSet("$$ROOT").as(ACTIVITIES),
+                Aggregation.project(ACTIVITIES).and("_id").as("timeType")
         );
         return mongoTemplate.aggregate(aggregation,StaffingLevel.class, HashMap.class).getMappedResults();
     }

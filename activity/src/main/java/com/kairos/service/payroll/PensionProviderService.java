@@ -3,6 +3,8 @@ package com.kairos.service.payroll;/*
  *
  */
 
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.payroll.PensionProviderDTO;
 import com.kairos.persistence.model.payroll.PensionProvider;
 import com.kairos.persistence.repository.payroll.PensionProviderRepository;
@@ -12,7 +14,9 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -58,7 +62,11 @@ public class PensionProviderService extends MongoBaseService {
     }
 
     public List<PensionProviderDTO> getAllPensionProvider(Long countryId){
-        return pensionProviderRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
+        List<PensionProviderDTO> pensionProviderDTOS =pensionProviderRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
+        pensionProviderDTOS.forEach(pensionProviderDTO -> {
+            pensionProviderDTO.setCountryId(countryId);
+        });
+        return pensionProviderDTOS;
     }
 
     private void validatePensionProviderDetails(PensionProvider pensionProvider, PensionProviderDTO pensionProviderDTO){
@@ -71,5 +79,13 @@ public class PensionProviderService extends MongoBaseService {
             }
         }
 
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger paymentTypeId, Map<String,TranslationInfo> translations) {
+        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
+        PensionProvider pensionProvider =pensionProviderRepository.findOne(paymentTypeId);
+        pensionProvider.setTranslations(translations);
+        pensionProviderRepository.save(pensionProvider);
+        return pensionProvider.getTranslations();
     }
 }

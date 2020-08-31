@@ -692,4 +692,60 @@ public class CountryDefaultDataController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, contractTypeService.updateTranslation(id,translations));
     }
 
+    @PutMapping(value = COUNTRY_URL + "/business_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfBuisnessType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, businessTypeService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/kairos_status/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfKairosStatus(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kairosStatusService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/employee_limit/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfEmployeeLimit(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employeeLimitService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/payment_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfPaymentType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, paymentTypeService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/engineer_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfEngineerType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, engineerTypeService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/location_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfLocationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, locationTypeService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/language/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfLanguage(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, languageService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/housing_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfHousingType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, housingTypeService.updateTranslation(id,translations));
+    }
+
 }

@@ -10,6 +10,7 @@ import com.kairos.service.payroll_setting.UnitPayrollSettingService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.shift.ActivityReminderService;
 import com.kairos.service.shift.ShiftReminderService;
+import com.kairos.service.time_bank.CalculatePlannedHoursAndScheduledHours;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 break;
             case PROTECTED_DAYS_OFF:
                 LOGGER.info("Job to protected days off ");
-                timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().updateTimeBankAgainstProtectedDaysOffSetting();
+                new CalculatePlannedHoursAndScheduledHours(timeBankCalculationService).updateTimeBankAgainstProtectedDaysOffSetting();
                 break;
             case WTA_LEAVE_COUNT:
                 LOGGER.info("Job to protected days off ");
