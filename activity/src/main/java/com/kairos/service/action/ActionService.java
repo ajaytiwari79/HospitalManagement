@@ -111,7 +111,7 @@ public class ActionService {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId, isBefore ? getStartOfDay(ShiftDate) : ShiftDate, isBefore ? ShiftDate : getEndOfDay(ShiftDate));
         for (Shift shift : shifts) {
-            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS1 = deleteOrUpdateAvailabilityUnavailabilityShift(shift, isAvailability ? TimeTypeEnum.AVAILABLE_TIME : TimeTypeEnum.UNAVAILABLE_TIME);
+            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS1 = removeAvailabilityUnavailabilityActivity(shift, isAvailability ? TimeTypeEnum.AVAILABLE_TIME : TimeTypeEnum.UNAVAILABLE_TIME);
             if(isCollectionNotEmpty(shiftWithViolatedInfoDTOS1)){
                 shiftWithViolatedInfoDTOS.addAll(shiftWithViolatedInfoDTOS1);
             }
@@ -119,7 +119,7 @@ public class ActionService {
         return shiftWithViolatedInfoDTOS;
     }
 
-    private List<ShiftWithViolatedInfoDTO> deleteOrUpdateAvailabilityUnavailabilityShift(Shift shift, TimeTypeEnum timeTypeEnum) {
+    private List<ShiftWithViolatedInfoDTO> removeAvailabilityUnavailabilityActivity(Shift shift, TimeTypeEnum timeTypeEnum) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         List<ShiftActivity> shiftActivities = shift.getActivities().stream().filter(shiftActivity -> !shiftActivity.getSecondLevelTimeType().equals(timeTypeEnum)).collect(Collectors.toList());
         if(isCollectionEmpty(shiftActivities)){
@@ -129,11 +129,24 @@ public class ActionService {
         } else if(shiftActivities.size() != shift.getActivities().size()){
             ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
             shiftDTO.setActivities(ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftActivities, ShiftActivityDTO.class));
+            updateStartAndEndDate(shift, shiftActivities);
+            shiftDTO.setStartDate(shiftActivities.get(0).getStartDate());
+            shiftDTO.setEndDate(shiftActivities.get(shiftActivities.size()-1).getEndDate());
             List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOList = shiftService.updateShift(shiftDTO, false, false, ShiftActionType.SAVE);
             shiftWithViolatedInfoDTOList.forEach(shiftWithViolatedInfoDTO -> shiftWithViolatedInfoDTO.setActionPerformed(UPDATE));
             shiftWithViolatedInfoDTOS.addAll(shiftWithViolatedInfoDTOList);
         }
         return shiftWithViolatedInfoDTOS;
+    }
+
+    private void updateStartAndEndDate(Shift shift, List<ShiftActivity> shiftActivities) {
+        for(int n=0; n < shiftActivities.size() ; n++){
+            if(shiftActivities.get(n).getStartDate().equals(shift.getActivities().get(n).getStartDate()) && shiftActivities.get(n).getEndDate().equals(shift.getActivities().get(n).getStartDate())){
+                continue;
+            }
+            shiftActivities.get(n).setStartDate(shift.getActivities().get(n+1).getStartDate());
+            shiftActivities.get(n).setEndDate(shift.getActivities().get(n+1).getEndDate());
+        }
     }
 
 }
