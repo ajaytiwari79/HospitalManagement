@@ -18,8 +18,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.CIVIL
 public interface CitizenStatusGraphRepository extends Neo4jBaseRepository<CitizenStatus,Long>{
 
     @Query("MATCH (country:Country)<-[:"+ CIVILIAN_STATUS +"]-(citizenStatus:CitizenStatus {isEnabled:true}) where id(country)={0} " +
-            "RETURN id(citizenStatus) as id, citizenStatus.name as name, citizenStatus.description as description ORDER BY citizenStatus.creationDate DESC")
-    List<CitizenStatusDTO> findCitizenStatusByCountryId(long countryId);
+            "RETURN citizenStatus")
+    List<CitizenStatus> findCitizenStatusByCountryId(long countryId);
 
     @Query("MATCH (cs:CitizenStatus{isEnabled:true})-[:"+ CIVILIAN_STATUS +"]-(c:Country) where id(c)={0} return {value:id(cs), label:cs.name,description:cs.description} as result")
     List<Map<String,Object>> findCitizenStatusByCountryIdAnotherFormat(long countryId);

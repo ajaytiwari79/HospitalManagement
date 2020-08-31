@@ -1,8 +1,12 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.model.country.default_data.CurrencyDTO;
+import com.kairos.persistence.model.country.default_data.HousingType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CurrencyGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -10,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
 
@@ -46,7 +52,13 @@ public class CurrencyService {
     }
 
     public List<CurrencyDTO> getCurrencies(long countryId) {
-        return currencyGraphRepository.findCurrencyByCountry(countryId);
+        List<Currency> currencies = currencyGraphRepository.findCurrencyByCountry(countryId);
+        List<CurrencyDTO> currencyDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(currencies,CurrencyDTO.class);
+        currencyDTOS.forEach(currencyDTO -> {
+            currencyDTO.setCountryId(countryId);
+            currencyDTO.setTranslations(TranslationUtil.getTranslatedData(currencyDTO.getTranslatedNames(),currencyDTO.getTranslatedDescriptions()));
+        });
+        return currencyDTOS;
     }
 
     public CurrencyDTO updateCurrency(long countryId, CurrencyDTO currencyDTO) {
@@ -77,5 +89,17 @@ public class CurrencyService {
 
     public Currency getCurrencyByCountryId(Long countryId){
        return  currencyGraphRepository.findFirstByCountryIdAndDeletedFalse(countryId);
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long currencyId, Map<String,TranslationInfo> translations) {
+        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptions = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
+        Currency currency =currencyGraphRepository.findOne(currencyId);
+        currency.setTranslatedNames(translatedNames);
+        currency.setTranslatedDescriptions(translatedDescriptions);
+        currencyGraphRepository.save(currency);
+        return currency.getTranslatedData();
     }
 }
