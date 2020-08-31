@@ -99,7 +99,7 @@ public class CTARuleTemplate extends MongoBaseEntity {
                 Objects.equals(timeTypeIds, ctaRuleTemplate.timeTypeIds) &&
                 Objects.equals(plannedTimeIds, ctaRuleTemplate.plannedTimeIds) &&
                 Objects.equals(dayTypeIds, ctaRuleTemplate.dayTypeIds) &&
-                calculationFor == ctaRuleTemplate.calculationFor);
+                calculationFor == ctaRuleTemplate.calculationFor && Objects.equals(conditionalCompensation,ctaRuleTemplate.conditionalCompensation));
     }
 }
 
