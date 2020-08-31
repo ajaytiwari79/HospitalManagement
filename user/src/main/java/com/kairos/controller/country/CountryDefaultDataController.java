@@ -1,7 +1,6 @@
 package com.kairos.controller.country;
 
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.organization.Level;
@@ -746,6 +745,27 @@ public class CountryDefaultDataController {
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfHousingType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, housingTypeService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/currency/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfCurrency(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, currencyService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/citizen_status/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfCitizenStatus(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, citizenStatusService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/relation_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfRelationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateTranslationOfRelationType(id,translations));
     }
 
 }

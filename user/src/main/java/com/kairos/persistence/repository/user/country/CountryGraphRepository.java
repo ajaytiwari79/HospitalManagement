@@ -119,8 +119,8 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     List<Level> getLevelsByCountry(Long countryId);
 
     @Query("MATCH (country:Country)-[:"+ HAS_RELATION_TYPES +"]->(relationType:RelationType {enabled:true}) where id(country)={0} " +
-            "RETURN id(relationType) as id, relationType.name as name, relationType.description as description ORDER BY relationType.creationDate DESC")
-    List<RelationTypeDTO> getRelationTypesByCountry(Long countryId);
+            "RETURN relationType ")
+    List<RelationType> getRelationTypesByCountry(Long countryId);
 
     @Query("MATCH (country:Country)-[:"+HAS_RELATION_TYPES+"]->(relationType:RelationType{enabled:true}) where id(country)={0} AND id(relationType)={1} RETURN relationType")
     RelationType getRelationType(Long countryId, Long relationTypeId);
