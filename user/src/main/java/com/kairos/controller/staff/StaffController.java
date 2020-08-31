@@ -19,6 +19,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.employment.EmploymentJobService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.*;
 import com.kairos.utils.response.ResponseHandler;
@@ -56,6 +57,8 @@ public class StaffController {
     private AccessGroupService accessGroupService;
     @Inject
     private PositionService positionService;
+    @Inject
+    private ExceptionService exceptionService;
     @Inject
     private ApiExternalStaffService apiExternalStaffService;
     @Inject
@@ -138,9 +141,14 @@ public class StaffController {
         long accessGroupId = Long.parseLong((String) unitPermissionDetails.get("roleId"));
         boolean isCreated = (boolean) unitPermissionDetails.get("isCreated");
         long unitId = Long.parseLong((String) unitPermissionDetails.get("organizationId"));
-        LocalDate startDate= LocalDate.parse((CharSequence) unitPermissionDetails.get("startDate"));
-        LocalDate endDate= unitPermissionDetails.get("endDate")==null?null:LocalDate.parse((CharSequence) unitPermissionDetails.get("endDate"));
-
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        if(isCreated && unitPermissionDetails.get("startDate")==null){
+            exceptionService.actionNotPermittedException("message.startDateMillis.null");
+        }else {
+             startDate= LocalDate.parse((CharSequence) unitPermissionDetails.get("startDate"));
+             endDate= unitPermissionDetails.get("endDate")==null?null:LocalDate.parse((CharSequence) unitPermissionDetails.get("endDate"));
+        }
         Map<String, Object> response = positionService.createUnitPermission(unitId, staffId, accessGroupId, isCreated,startDate,endDate);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);

@@ -181,7 +181,6 @@ public class PositionService {
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
-        validateDates(startDate,endDate,accessGroup);
         OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_UNIT_NOTFOUND, unitId)));
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
         Position position = positionGraphRepository.findPosition(parentUnit.getId(), staffId);
@@ -193,6 +192,7 @@ public class PositionService {
         Map<String, Object> response = new HashMap<>();
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         if (created) {
+            validateDates(startDate,endDate,accessGroup);
             staffAccessGroupQueryResult = setUnitPermission(unitId, staffId, accessGroup, unit, parentUnit, position, response,startDate,endDate);
         } else {
             staffAccessGroupQueryResult = removeUnitPermisssion(unitId, staffId, accessGroupId, parentUnit);
