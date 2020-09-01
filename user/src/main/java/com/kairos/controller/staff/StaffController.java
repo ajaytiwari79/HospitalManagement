@@ -145,7 +145,8 @@ public class StaffController {
         LocalDate endDate = null;
         if(isCreated && unitPermissionDetails.get("startDate")==null){
             exceptionService.actionNotPermittedException("message.startDateMillis.null");
-        }else {
+        }
+        if(isCreated){
              startDate= LocalDate.parse((CharSequence) unitPermissionDetails.get("startDate"));
              endDate= unitPermissionDetails.get("endDate")==null?null:LocalDate.parse((CharSequence) unitPermissionDetails.get("endDate"));
         }
