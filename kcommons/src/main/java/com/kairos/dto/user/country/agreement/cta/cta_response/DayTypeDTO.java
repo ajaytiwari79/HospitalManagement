@@ -34,12 +34,6 @@ public class DayTypeDTO {
     private Map<String,String> translatedDescriptions;
     private Map<String, TranslationInfo> translations;
 
-//    public Map<String, TranslationInfo> getTranslatedData() {
-//        Map<String, TranslationInfo> infoMap=new HashMap<>();
-//        translatedNames.forEach((k,v)-> infoMap.put(k,new TranslationInfo(v,translatedDescriptions.get(k))));
-//        return infoMap;
-//    }
-
     public DayTypeDTO(Long id, String name, List<Day> validDays, List<CountryHolidayCalenderDTO> countryHolidayCalenderData, boolean holidayType, boolean allowTimeSettings) {
         this.id = id;
         this.name = name;

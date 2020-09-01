@@ -36,5 +36,6 @@ public class AccessPageDTO {
     private int sequence;
     private Map<String,String> translatedNames;
     private String helperText;
+    private String url;
     private List<AccessPageDTO> children = new ArrayList<>();
 }

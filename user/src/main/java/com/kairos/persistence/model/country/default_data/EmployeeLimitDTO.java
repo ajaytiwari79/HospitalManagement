@@ -1,10 +1,16 @@
 package com.kairos.persistence.model.country.default_data;
 
+import com.kairos.dto.TranslationInfo;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotBlank;
+import java.util.Map;
 
 @QueryResult
+@Getter
+@Setter
 public class EmployeeLimitDTO {
 
     private Long id;
@@ -13,48 +19,12 @@ public class EmployeeLimitDTO {
     private String description;
     private int  minimum;
     private int  maximum;
+    private Long countryId;
+    private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
+    private Map<String, TranslationInfo> translations ;
 
     public EmployeeLimitDTO() {
         //Default Constructor
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getMinimum() {
-        return minimum;
-    }
-
-    public void setMinimum(int minimum) {
-        this.minimum = minimum;
-    }
-
-    public int getMaximum() {
-        return maximum;
-    }
-
-    public void setMaximum(int maximum) {
-        this.maximum = maximum;
     }
 }

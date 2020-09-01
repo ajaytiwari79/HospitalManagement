@@ -83,6 +83,7 @@ import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGr
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.country.EngineerTypeService;
 import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
@@ -180,6 +181,7 @@ public class StaffRetrievalService {
     @Inject private ActivityIntegrationService activityIntegrationService;
     @Inject private StaffGraphRepositoryImpl staffGraphRepositoryImpl;
     @Inject private GroupService groupService;
+    @Inject private EngineerTypeService engineerTypeService;
 
 
     public Map<String, Object> getDefaultDataOfStaff(long staffId, long unitId) {
@@ -189,7 +191,7 @@ public class StaffRetrievalService {
         List<Language> languages;
         List<EngineerTypeDTO> engineerTypes;
         if (countryId != null) {
-            engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
+            engineerTypes = engineerTypeService.getEngineerTypeByCountryId(countryId);
             languages = languageGraphRepository.getLanguageByCountryId(countryId);
         } else {
             languages = Collections.emptyList();
@@ -309,7 +311,7 @@ public class StaffRetrievalService {
         }
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         staffAccessGroupQueryResult.setManagement(userAccessRoleDTO.getManagement());
-        staffAccessGroupQueryResult.setCountryAdmin(isSuperAdmin);
+        staffAccessGroupQueryResult.setCountryAdmin(isSuperAdmin || isNotNull(staffId));
         staffAccessGroupQueryResult.setStaffId(staffId);
         return staffAccessGroupQueryResult;
     }
@@ -420,7 +422,7 @@ public class StaffRetrievalService {
             staff = getStaffWithBasicInfo(id, allStaffRequired);
             roles = accessGroupService.getAccessGroups(id);
             countryId = countryGraphRepository.getCountryIdByUnitId(id);
-            engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
+            engineerTypes = engineerTypeService.getEngineerTypeByCountryId(countryId);
         } else if (TEAM.equalsIgnoreCase(type)) {
             staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             Unit unit = unitGraphRepository.getOrganizationByTeamId(id);
@@ -431,7 +433,7 @@ public class StaffRetrievalService {
         Map<String, Object> map = new HashMap<>();
         map.put("staffList", staff);
         map.put("engineerTypes", engineerTypes);
-        map.put("engineerList", engineerTypeGraphRepository.findEngineerTypeByCountry(countryId));
+        map.put("engineerList", engineerTypeService.getEngineerTypeByCountryId(countryId));
         map.put("roles", roles);
         return map;
     }

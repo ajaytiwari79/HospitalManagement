@@ -99,7 +99,7 @@ public class StaffAdditionalInfoDTO {
         for (TimeSlotWrapper timeSlotSet : this.timeSlotSets) {
             LocalTime startTime = LocalTime.of(timeSlotSet.getStartHour(),timeSlotSet.getStartMinute());
             LocalTime endTime = LocalTime.of(timeSlotSet.getEndHour(),timeSlotSet.getEndMinute());
-            if(!shiftTime.isBefore(startTime) && shiftTime.isBefore(endTime) || (startTime.isAfter(endTime) && !startTime.isAfter(shiftTime) && endTime.isAfter(shiftTime))){
+            if(!shiftTime.isBefore(startTime) && shiftTime.isBefore(endTime) || (startTime.isAfter(endTime) && (!startTime.isAfter(shiftTime) || shiftTime.isBefore(endTime)))){
                 return timeSlotSet.getName();
             }
         }
@@ -107,15 +107,15 @@ public class StaffAdditionalInfoDTO {
     }
 
     public Set<AccessGroupRole> getRoles() {
-            Set<AccessGroupRole> roles = new HashSet<>();
-            if(userAccessRoleDTO!=null) {
-                if (Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement()) {
-                    roles.add(AccessGroupRole.MANAGEMENT);
-                }
-                if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
-                    roles.add(AccessGroupRole.STAFF);
-                }
+        Set<AccessGroupRole> roles = new HashSet<>();
+        if(userAccessRoleDTO!=null) {
+            if (Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement()) {
+                roles.add(AccessGroupRole.MANAGEMENT);
             }
+            if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
+                roles.add(AccessGroupRole.STAFF);
+            }
+        }
         return roles;
     }
 

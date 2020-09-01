@@ -35,6 +35,7 @@ public class AccessPage extends UserBaseEntity {
     private String moduleId;
     private boolean active;
     private Boolean editable;
+    private String url;
 
 
     @Relationship(type = SUB_PAGE)

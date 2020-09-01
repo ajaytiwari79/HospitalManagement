@@ -1,8 +1,12 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.EmployeeLimit;
 import com.kairos.persistence.model.country.default_data.EmployeeLimitDTO;
+import com.kairos.persistence.model.country.default_data.KairosStatus;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmployeeLimitGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -10,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
 
@@ -47,7 +53,13 @@ public class EmployeeLimitService {
     }
 
     public List<EmployeeLimitDTO> getEmployeeLimitByCountryId(long countryId){
-        return employeeLimitGraphRepository.findEmployeeLimitByCountry(countryId);
+        List<EmployeeLimit> employeeLimits =employeeLimitGraphRepository.findEmployeeLimitByCountry(countryId);
+        List<EmployeeLimitDTO> employeeLimitDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(employeeLimits,EmployeeLimitDTO.class);
+        for(EmployeeLimitDTO employeeLimitDTO :employeeLimitDTOS){
+            employeeLimitDTO.setCountryId(countryId);
+            employeeLimitDTO.setTranslations(TranslationUtil.getTranslatedData(employeeLimitDTO.getTranslatedNames(),employeeLimitDTO.getTranslatedDescriptions()));
+        }
+        return employeeLimitDTOS;
     }
 
     public EmployeeLimitDTO updateEmployeeLimit(long countryId, EmployeeLimitDTO employeeLimitDTO){
@@ -75,5 +87,17 @@ public class EmployeeLimitService {
             exceptionService.dataNotFoundByIdException("error.EmployeeLimit.notfound");
         }
         return true;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long employeeLimitId, Map<String,TranslationInfo> translations) {
+        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptions = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
+        EmployeeLimit employeeLimit =employeeLimitGraphRepository.findOne(employeeLimitId);
+        employeeLimit.setTranslatedNames(translatedNames);
+        employeeLimit.setTranslatedDescriptions(translatedDescriptions);
+        employeeLimitGraphRepository.save(employeeLimit);
+        return employeeLimit.getTranslatedData();
     }
 }

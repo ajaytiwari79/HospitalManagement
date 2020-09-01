@@ -21,8 +21,8 @@ public interface EngineerTypeGraphRepository extends Neo4jBaseRepository<Enginee
     List<EngineerType> findAll();
 
     @Query("MATCH (country:Country)<-[:"+ BELONGS_TO +"]-(engineerType:EngineerType {isEnabled:true}) where id(country)={0} " +
-            "RETURN id(engineerType) as id, engineerType.name as name, engineerType.description as description ORDER BY engineerType.creationDate DESC")
-    List<EngineerTypeDTO> findEngineerTypeByCountry(Long countryId);
+            "RETURN engineerType")
+    List<EngineerType> findEngineerTypeByCountry(Long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(engineerType:EngineerType {isEnabled:true}) WHERE id(country)={0} AND id(engineerType)<>{2} AND engineerType.name =~{1}  " +
             " WITH count(engineerType) as totalCount " +

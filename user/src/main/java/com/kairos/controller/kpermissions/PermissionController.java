@@ -45,7 +45,7 @@ public class PermissionController {
     }
 
     @RequestMapping(value = "/access_group_permissions",method = RequestMethod.GET)
-    public ResponseEntity getAccessGroupPermissions(@RequestParam List<Long> accessGroupIds )  {
+    public ResponseEntity getAccessGroupPermissions(@RequestParam Set<Long> accessGroupIds )  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(accessGroupIds,null));
 
@@ -83,6 +83,6 @@ public class PermissionController {
 
     @GetMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/field_level_permission")
     public ResponseEntity<Map<String, Object>> getAccessPageByAccessGroup(@RequestParam("staffId") Long staffId, @PathVariable Long accessGroupId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(Arrays.asList(accessGroupId),staffId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(newHashSet(accessGroupId),staffId));
     }
 }

@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
@@ -360,7 +361,13 @@ public class CountryService {
     }
 
     public List<RelationTypeDTO> getRelationTypes(Long countryId) {
-        return countryGraphRepository.getRelationTypesByCountry(countryId);
+        List<RelationType> relationTypes = countryGraphRepository.getRelationTypesByCountry(countryId);
+        List<RelationTypeDTO> relationTypeDTOS =ObjectMapperUtils.copyCollectionPropertiesByMapper(relationTypes,RelationTypeDTO.class);
+        relationTypeDTOS.forEach(relationTypeDTO -> {
+            relationTypeDTO.setCountryId(countryId);
+            relationTypeDTO.setTranslations(TranslationUtil.getTranslatedData(relationTypeDTO.getTranslatedNames(),relationTypeDTO.getTranslatedDescriptions()));
+        });
+        return relationTypeDTOS;
     }
 
     public boolean deleteRelationType(Long countryId, Long relationTypeId) {
@@ -547,6 +554,7 @@ public class CountryService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long levelId, Map<String,TranslationInfo> translations) {
+        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptios = new HashMap<>();
         for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
@@ -558,6 +566,21 @@ public class CountryService {
         level.setTranslatedDescriptions(translatedDescriptios);
         levelGraphRepository.save(level);
         return level.getTranslatedData();
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfRelationType(Long relationTypeId, Map<String,TranslationInfo> translations) {
+        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        RelationType relationType =relationTypeGraphRepository.findOne(relationTypeId);
+        relationType.setTranslatedNames(translatedNames);
+        relationType.setTranslatedDescriptions(translatedDescriptios);
+        relationTypeGraphRepository.save(relationType);
+        return relationType.getTranslatedData();
     }
 
 
