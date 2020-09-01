@@ -246,6 +246,7 @@ public class StaffingLevelUtil {
                     newlyAddedActivities.add(staffingLevelActivityToAddOrUpdate.getActivityId());
                     activityRemoveLogs.removeIf(k -> k.getActivityId().equals(staffingLevelActivityToAddOrUpdate.getActivityId()));
                 }
+                interval.getStaffingLevelActivities().add(new StaffingLevelActivity(staffingLevelActivityToAddOrUpdate.getActivityId(),0,0));
             }
             if (isNotNull(staffingLevelIntervalLog)) {
                 newlyAddedActivities.addAll(staffingLevelIntervalLog.getNewlyAddedActivityIds());
@@ -258,6 +259,7 @@ public class StaffingLevelUtil {
                     newlyAddedSkills.add(staffingLevelSkillToAddOrUpdate.getSkillId());
                     skillRemoveLogs.removeIf(k -> k.getSkillId().equals(staffingLevelSkillToAddOrUpdate.getSkillId()));
                 }
+                interval.getStaffingLevelSkills().add(new StaffingLevelSkill(staffingLevelSkillToAddOrUpdate.getSkillId()));
             }
             if (isNotNull(staffingLevelIntervalLog)) {
                 newlyAddedSkills.addAll(staffingLevelIntervalLog.getNewlyAddedSkillIds());
@@ -266,6 +268,7 @@ public class StaffingLevelUtil {
             if (presenceStaffingLevelDTO.getInterval().contains(currentDate)) {
                 staffingLevelIntervals.add(updateInterval(interval, presenceStaffingLevelDTO));
             } else {
+                interval.getStaffingLevelActivities().add(new StaffingLevelActivity())
                 staffingLevelIntervals.add(interval);
             }
             currentDate=currentDate.plusMinutes(15);
