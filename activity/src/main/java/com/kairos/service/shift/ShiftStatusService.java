@@ -86,7 +86,7 @@ public class ShiftStatusService {
 
     public <T> T updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
         Shift currentShift = shiftMongoRepository.findOne(shiftPublishDTO.getShifts().get(0).getShiftId());
-        T response = null;
+        T response;
         if(isNotNull(currentShift.getRequestAbsence())){
             response = (T)todoService.updateTodoStatus(null,TodoStatus.PENDING,shiftPublishDTO.getShifts().get(0).getShiftId(),null);
         }else {
