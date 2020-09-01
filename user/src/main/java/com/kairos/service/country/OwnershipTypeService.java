@@ -87,7 +87,6 @@ public class OwnershipTypeService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long ownershipTypeId, Map<String,TranslationInfo> translations) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptios = new HashMap<>();
         TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);

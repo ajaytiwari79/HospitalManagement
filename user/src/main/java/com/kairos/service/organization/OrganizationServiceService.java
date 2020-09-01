@@ -353,7 +353,6 @@ public class OrganizationServiceService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long serviceId, Map<String,TranslationInfo> translationInfoMap) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translationInfoMap);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptios = new HashMap<>();
         for(Map.Entry<String,TranslationInfo> entry :translationInfoMap.entrySet()){

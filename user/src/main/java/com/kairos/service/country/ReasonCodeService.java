@@ -79,7 +79,13 @@ public class ReasonCodeService {
 
 
     public List<ReasonCodeResponseDTO> getReasonCodesForCountry(long countryId, ReasonCodeType reasonCodeType) {
-        return reasonCodeGraphRepository.findReasonCodesByCountry(countryId, reasonCodeType);
+        List<ReasonCode> reasonCodes =reasonCodeGraphRepository.findReasonCodesByCountry(countryId, reasonCodeType);
+        List<ReasonCodeResponseDTO> reasonCodeResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodes,ReasonCodeResponseDTO.class);
+        reasonCodeResponseDTOS.forEach(reasonCodeResponseDTO -> {
+            reasonCodeResponseDTO.setCountryId(countryId);
+            reasonCodeResponseDTO.setTranslations(TranslationUtil.getTranslatedData(reasonCodeResponseDTO.getTranslatedNames(),reasonCodeResponseDTO.getTranslatedDescriptions()));
+        });
+        return reasonCodeResponseDTOS;
     }
 
 
@@ -183,7 +189,6 @@ public class ReasonCodeService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long reasonCodeId, Map<String,TranslationInfo> translations) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptios = new HashMap<>();
         TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);

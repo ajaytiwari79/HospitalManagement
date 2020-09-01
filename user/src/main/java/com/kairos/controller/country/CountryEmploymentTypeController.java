@@ -1,5 +1,6 @@
 package com.kairos.controller.country;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
@@ -141,5 +142,12 @@ public class CountryEmploymentTypeController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEmploymentTypes(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getEmploymentTypes(unitId));
+    }
+
+    @RequestMapping(value = COUNTRY_URL+"/employment_type/{id}/language_settings", method = RequestMethod.PUT)
+    @ApiOperation("Get all employment type of the unit")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfEmploymentTypes(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.updateTranslationOfEmploymentType(id,translations));
     }
 }

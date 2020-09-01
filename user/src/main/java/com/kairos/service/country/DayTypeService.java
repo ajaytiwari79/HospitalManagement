@@ -181,7 +181,6 @@ public class DayTypeService {
 
     }
     public Map<String, TranslationInfo> updateTranslation(Long dayTypeId, Map<String,TranslationInfo> translations) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptios = new HashMap<>();
         TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
