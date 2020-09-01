@@ -88,7 +88,10 @@ public class ShiftStatusService {
         Shift currentShift = shiftMongoRepository.findOne(shiftPublishDTO.getShifts().get(0).getShiftId());
         T response = null;
         if(isNotNull(currentShift.getRequestAbsence())){
-            response = (T)todoService.updateTodoStatus(null,TodoStatus.PENDING,shiftPublishDTO.getShifts().get(0).getShiftId(),null);
+            todoService.updateTodoStatus(null,TodoStatus.PENDING,shiftPublishDTO.getShifts().get(0).getShiftId(),null);
+            ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(currentShift.getId());
+            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, newHashSet(PENDING)));
+            response = (T) shiftActivityResponseDTO;
         }else {
             Activity activity = activityMongoRepository.findOne(currentShift.getActivities().get(0).getActivityId());
             if (CommonConstants.FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
@@ -149,6 +152,9 @@ public class ShiftStatusService {
             activityIds.addAll(shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
             staffIds.add(shift.getStaffId());
             employmentIds.add(shift.getEmploymentId());
+            if(isNotNull(shift.getRequestAbsence())){
+                activityIds.add(shift.getRequestAbsence().getActivityId());
+            }
         }
         List<Activity> activities = activityMongoRepository.findAllPhaseSettingsByActivityIds(activityIds);
         Map<BigInteger, ActivityPhaseSettings> activityPhaseSettingMap = activities.stream().collect(Collectors.toMap(Activity::getId, Activity::getActivityPhaseSettings));
