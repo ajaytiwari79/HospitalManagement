@@ -29,6 +29,7 @@ import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -126,7 +127,7 @@ public class CalculatePlannedHoursAndScheduledHours {
     public double calculateConditionalBonus(CTARuleTemplateDTO ruleTemplate, StaffEmploymentDetails employment, ShiftWithActivityDTO shift, AccountType accountType) {
         boolean ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, staffAdditionalInfoDTO.getEmployment(), shift.getPhaseId(), shift.getActivityIds(), shift.getActivitiesTimeTypeIds(), shift.getActivitiesPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(accountType);
         double compensation = 0;
-        if(ruleTemplateValid && ruleTemplate.getConditionalCompensation().getConditionalCompensationTypes().contains(ConditionalCompensationType.MANUAL_PLANNING)) {
+        if(ruleTemplateValid && ruleTemplate.getConditionalCompensation().getConditionalCompensationTypes().contains(ConditionalCompensationType.MANUAL_PLANNING) && CollectionUtils.containsAny(ruleTemplate.getCalculateValueIfPlanned(),staffAdditionalInfoDTO.getCalculateValueIfPlanneds())) {
             ZonedDateTime todayDate = asZonedDateTime(LocalDate.now());
             for (CTACompensationConfiguration ctaCompensationConfiguration : ruleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations()) {
                 ZonedDateTime startDate = getDateByIntervalType(ctaCompensationConfiguration.getIntervalType(), ctaCompensationConfiguration.getFrom(), todayDate);

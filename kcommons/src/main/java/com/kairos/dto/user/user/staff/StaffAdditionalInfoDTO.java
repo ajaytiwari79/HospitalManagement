@@ -5,6 +5,7 @@ import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
@@ -113,6 +114,19 @@ public class StaffAdditionalInfoDTO {
             }
             if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
                 roles.add(AccessGroupRole.STAFF);
+            }
+        }
+        return roles;
+    }
+
+    public Set<CalculateValueIfPlanned> getCalculateValueIfPlanneds() {
+        Set<CalculateValueIfPlanned> roles = new HashSet<>();
+        if(userAccessRoleDTO!=null) {
+            if (Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement()) {
+                roles.add(CalculateValueIfPlanned.MANAGER);
+            }
+            if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
+                roles.add(CalculateValueIfPlanned.STAFF);
             }
         }
         return roles;
