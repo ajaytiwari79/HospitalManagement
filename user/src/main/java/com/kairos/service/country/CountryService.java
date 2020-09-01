@@ -554,7 +554,6 @@ public class CountryService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long levelId, Map<String,TranslationInfo> translations) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptios = new HashMap<>();
         for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
@@ -569,7 +568,6 @@ public class CountryService {
     }
 
     public Map<String, TranslationInfo> updateTranslationOfRelationType(Long relationTypeId, Map<String,TranslationInfo> translations) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptios = new HashMap<>();
         for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){

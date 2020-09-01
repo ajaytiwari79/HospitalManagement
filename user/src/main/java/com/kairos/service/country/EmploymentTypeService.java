@@ -3,6 +3,8 @@ package com.kairos.service.country;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.EmploymentTypeKpiDTO;
@@ -26,6 +28,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.persistence.model.country.default_data.OrganizationMappingDTO;
+import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.tag.TagQueryResult;
 import com.kairos.persistence.model.organization.Organization;
@@ -186,12 +189,18 @@ public class EmploymentTypeService {
         return true;
     }
 
-    public List<EmploymentType> getEmploymentTypeList(long countryId, boolean isDeleted) {
+    public List<EmploymentTypeDTO> getEmploymentTypeList(long countryId, boolean isDeleted) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
         }
-        return countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
+        List<EmploymentType> employmentTypes =countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
+        List<EmploymentTypeDTO> employmentTypeDTOS =ObjectMapperUtils.copyCollectionPropertiesByMapper(employmentTypes,EmploymentTypeDTO.class);
+        employmentTypeDTOS.forEach(employmentTypeDTO -> {
+            employmentTypeDTO.setCountryId(countryId);
+            employmentTypeDTO.setTranslations(TranslationUtil.getTranslatedData(employmentTypeDTO.getTranslatedNames(),employmentTypeDTO.getTranslatedDescriptions()));
+        });
+        return employmentTypeDTOS;
     }
 
     public List<Map<String, Object>> getEmploymentTypeOfOrganization(Long unitId, boolean isDeleted) {
@@ -251,7 +260,7 @@ public class EmploymentTypeService {
     public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId,String selectedDate) {
         OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         // Set employment type
-        organizationMappingDTO.setEmploymentTypes(getEmploymentTypeList(countryId, false));
+        organizationMappingDTO.setEmploymentTypes(countryGraphRepository.getEmploymentTypeByCountry(countryId,false));
         // set Expertise
         organizationMappingDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByCountry(countryId));
         //set levels
@@ -412,5 +421,19 @@ public class EmploymentTypeService {
         LocalDate endDate = asLocalDate(staffEmploymentTypeDTO.getEndDate());
         List<CountryHolidayCalenderDTO> holidayCalenders = ObjectMapperUtils.copyCollectionPropertiesByMapper(countryHolidayCalenderService.getCountryHolidayCalenders(UserContext.getUserDetails().getCountryId(), startDate, endDate), CountryHolidayCalenderDTO.class);
         return DefaultKpiDataDTO.builder().staffKpiFilterDTOs(staffKpiFilterDTOS).timeSlotDTOS(timeSlotDTOS).holidayCalenders(holidayCalenders).build();
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfEmploymentType(Long employmentTypeId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        EmploymentType employmentType =employmentTypeGraphRepository.findOne(employmentTypeId);
+        employmentType.setTranslatedNames(translatedNames);
+        employmentType.setTranslatedDescriptions(translatedDescriptios);
+        employmentTypeGraphRepository.save(employmentType);
+        return employmentType.getTranslatedData();
     }
 }

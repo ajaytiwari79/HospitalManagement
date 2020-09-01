@@ -89,7 +89,6 @@ public class ContractTypeService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long contractTypeId, Map<String,TranslationInfo> translations) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptions = new HashMap<>();
         TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);

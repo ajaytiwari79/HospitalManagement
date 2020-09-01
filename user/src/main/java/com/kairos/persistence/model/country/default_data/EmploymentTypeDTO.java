@@ -1,12 +1,16 @@
 package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.employment_type.EmploymentCategory;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -14,6 +18,8 @@ import java.util.Set;
  */
 @JsonIgnoreProperties(ignoreUnknown = true,value={ "valid" })
 @QueryResult
+@Getter
+@Setter
 public class EmploymentTypeDTO {
     private Long id;
     @NotNull(message = "error.EmploymentType.name.notEmptyOrNotNull")
@@ -27,89 +33,13 @@ public class EmploymentTypeDTO {
     //Added By Pavan
     private boolean editableAtEmployment;
     private Short weeklyMinutes;
+    private Long countryId;
+    private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
+    private Map<String, TranslationInfo> translations ;
 
     public EmploymentTypeDTO() {
         //Default Constructor
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isAllowedForContactPerson() {
-        return allowedForContactPerson;
-    }
-
-    public void setAllowedForContactPerson(boolean allowedForContactPerson) {
-        this.allowedForContactPerson = allowedForContactPerson;
-    }
-
-    public boolean isAllowedForShiftPlan() {
-        return allowedForShiftPlan;
-    }
-
-    public void setAllowedForShiftPlan(boolean allowedForShiftPlan) {
-        this.allowedForShiftPlan = allowedForShiftPlan;
-    }
-
-    public boolean isAllowedForFlexPool() {
-        return allowedForFlexPool;
-    }
-
-    public void setAllowedForFlexPool(boolean allowedForFlexPool) {
-        this.allowedForFlexPool = allowedForFlexPool;
-    }
-
-    public Set<EmploymentCategory> getEmploymentCategories() {
-        return employmentCategories;
-    }
-
-    public void setEmploymentCategories(Set<EmploymentCategory> employmentCategories) {
-        this.employmentCategories = employmentCategories;
-    }
-
-    public PaidOutFrequencyEnum getPaymentFrequency() {
-        return paymentFrequency;
-    }
-
-    public void setPaymentFrequency(PaidOutFrequencyEnum paymentFrequency) {
-        this.paymentFrequency = paymentFrequency;
-    }
-
-    public boolean isEditableAtEmployment() {
-        return editableAtEmployment;
-    }
-
-    public void setEditableAtEmployment(boolean editableAtEmployment) {
-        this.editableAtEmployment = editableAtEmployment;
-    }
-
-    public Short getWeeklyMinutes() {
-        return weeklyMinutes;
-    }
-
-    public void setWeeklyMinutes(Short weeklyMinutes) {
-        this.weeklyMinutes = weeklyMinutes;
     }
 
     @AssertTrue(message = "At least one role should be selected")

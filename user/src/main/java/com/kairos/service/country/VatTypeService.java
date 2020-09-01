@@ -90,7 +90,6 @@ public class VatTypeService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long vatTypeId, Map<String,TranslationInfo> translations) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptios = new HashMap<>();
         TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);

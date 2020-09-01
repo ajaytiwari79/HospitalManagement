@@ -88,7 +88,6 @@ public class BusinessTypeService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long businessTypeId, Map<String,TranslationInfo> translations) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Map<String,String> translatedNames = new HashMap<>();
         Map<String,String> translatedDescriptions = new HashMap<>();
         TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);

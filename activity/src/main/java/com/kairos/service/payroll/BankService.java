@@ -168,7 +168,6 @@ public class BankService{
     }
 
     public Map<String, TranslationInfo> updateTranslation(BigInteger paymentTypeId, Map<String,TranslationInfo> translations) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Bank bank =bankRepository.findOne(paymentTypeId);
         bank.setTranslations(translations);
         bankRepository.save(bank);
