@@ -1,5 +1,6 @@
 package com.kairos.controller.staff;
 
+import com.kairos.annotations.KPermissionAction;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
@@ -8,6 +9,7 @@ import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
 import com.kairos.persistence.model.staff.StaffSkillDTO;
@@ -25,6 +27,7 @@ import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -211,7 +214,6 @@ public class StaffController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> saveNote(@PathVariable long staffId, @RequestBody Map<String, String> reqData) {
         Map<String, Object> response = staffService.saveNotes(staffId, reqData.get("generalNote"), reqData.get("reqFromPerson"));
-
         if (response != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
         }
@@ -420,6 +422,7 @@ public class StaffController {
     }
 
     @RequestMapping(value = "/create_staff_from_web", method = RequestMethod.POST)
+    @KPermissionAction(modelName = "Staff",action = PermissionAction.ADD)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffCreationService.createStaff(unitId, staffCreationDTO));

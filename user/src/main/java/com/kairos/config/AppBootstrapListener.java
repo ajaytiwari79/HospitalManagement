@@ -1,5 +1,7 @@
 package com.kairos.config;
 
+import com.kairos.annotations.KPermissionAction;
+import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -11,17 +13,23 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.service.country.CountryHolidayCalenderService;
+import org.reflections.Reflections;
+import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * Creates below mentioned bootstrap data(if Not Available)
@@ -59,6 +67,8 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
 
     @Inject
     CountryHolidayCalenderService countryHolidayCalenderService;
+    @Inject
+    private ListableBeanFactory listableBeanFactory;
 
     /**
      * Executes on application ready event
@@ -69,6 +79,27 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
         generateSequence(); // This method create sequence table for mongodb
         //createAccessPages();
         bootDataService.createData();
+        List<Map<String,Object>> list = new ArrayList<>();
+        Reflections reflections = new Reflections(new ConfigurationBuilder()
+                .setUrls(ClasspathHelper.forPackage("com.kairos.controller"))
+                .setScanners(new MethodAnnotationsScanner()));
+        Set<Method> controllers =reflections.getMethodsAnnotatedWith(KPermissionAction.class);
+        for(Method method:controllers){
+            Map<String,Object> map=new HashMap<>();
+            KPermissionAction annotation=method.getAnnotation(KPermissionAction.class);
+            String name=annotation.modelName();
+            PermissionAction permissionAction=annotation.action();
+            map.put("modelName",name);
+            map.put("action",permissionAction);
+            list.add(map);
+
+        }
+        //KPermissionAction kPermissionAction=allMethods.iterator().next().getAnnotation(KPermissionAction.class);
+
+
+        //Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(KPermissionAction.class);
+        System.out.println(list);
+
         //flsVisitourChangeService.registerReceiver("visitourChange");
     }
 
