@@ -43,6 +43,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.enums.kpermissions.PermissionAction.EDIT;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 
 /**
@@ -111,6 +112,7 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.PUT)
     @ApiOperation("update staff personal information")
+    @KPermissionAction(modelName = "Staff",action = EDIT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> savePersonalDetail(@PathVariable long unitId, @PathVariable long staffId, @RequestBody @Valid StaffDTO staffDTO) throws ParseException {
         StaffDTO response = staffService.savePersonalDetail(staffId, staffDTO, unitId);
