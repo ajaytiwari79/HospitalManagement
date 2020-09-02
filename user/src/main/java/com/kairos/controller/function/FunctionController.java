@@ -1,5 +1,6 @@
 package com.kairos.controller.function;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.user.TranslationDTO;
 import com.kairos.service.country.FunctionService;
@@ -107,4 +108,12 @@ public class FunctionController {
     public ResponseEntity<Map<String, Object>> getTranslatedData(@PathVariable Long functionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getTranslatedData(functionId));
     }
+
+    @ApiOperation(value = "add translated data")
+    @PutMapping(API_V1 + COUNTRY_URL + "/function/{id}/language_settings")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfCountryFunctions(@PathVariable Long id, @RequestBody Map<String,TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.updateTranslationOfCountryFunctions(id, translations));
+    }
+
+
 }

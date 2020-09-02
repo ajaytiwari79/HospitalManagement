@@ -1,9 +1,11 @@
 package com.kairos.controller.pay_table;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.pay_group_area.PayGroupAreaDTO;
 import com.kairos.service.pay_group_area.PayGroupAreaService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -64,6 +66,13 @@ public class PayGroupAreaController {
     public ResponseEntity<Map<String, Object>> getPayGroupAreaByLevel(@RequestParam Long organizationLevel)
     {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.getPayGroupAreaByLevel( organizationLevel));
+    }
+
+    @PutMapping(API_ORGANIZATION_COUNTRY_URL+"/pay_group_area/{id}/language_settings")
+    @ApiOperation("update translation data")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfEmploymentTypes(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.updateTranslationOfPayGroupArea(id,translations));
     }
 
 

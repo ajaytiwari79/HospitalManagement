@@ -145,7 +145,7 @@ public class CountryEmploymentTypeController {
     }
 
     @RequestMapping(value = COUNTRY_URL+"/employment_type/{id}/language_settings", method = RequestMethod.PUT)
-    @ApiOperation("Get all employment type of the unit")
+    @ApiOperation("update translation data")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTranslationOfEmploymentTypes(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.updateTranslationOfEmploymentType(id,translations));
