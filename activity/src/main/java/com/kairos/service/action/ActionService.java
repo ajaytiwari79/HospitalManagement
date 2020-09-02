@@ -9,9 +9,11 @@ import com.kairos.enums.ActionType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.persistence.model.action.Action;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.action.ActionRepository;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.wrapper.action.ActionDTO;
@@ -40,12 +42,16 @@ public class ActionService {
     private static final String AFTER = "AFTER";
     private static final String DELETE = "DELETE";
     private static final String UPDATE = "UPDATE";
+    private static final String AVAILABILITY_NAME = "AVAILABILITY_NAME";
+    private static final String UNAVAILABILITY_NAME = "UNAVAILABILITY_NAME";
     @Inject
     private ExceptionService exceptionService;
     @Inject
     private ActionRepository actionRepository;
     @Inject
     private ShiftService shiftService;
+    @Inject
+    private ActivityService activityService;
 
     public ActionDTO saveAction(Long unitId, ActionDTO actionDTO) {
         actionDTO.setUnitId(unitId);
@@ -81,7 +87,7 @@ public class ActionService {
         return actionRepository.saveAll(actions);
     }
 
-    public Map<String,Object> getAvailabilityUnavailabilityBeforeAfterShift(Long staffId, Date ShiftDate) {
+    public Map<String,Object> getAvailabilityUnavailabilityBeforeAfterShift(Long unitId, Long staffId, Date ShiftDate) {
         Map<String,Boolean> beforeMap = new HashMap<String,Boolean>(){{put(AVAILABILITY,false);put(UNAVAILABILITY,false);}};
         Map<String,Boolean> afterMap = new HashMap<>(beforeMap);
         List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId,getStartOfDay(ShiftDate),getEndOfDay(ShiftDate));
@@ -96,15 +102,26 @@ public class ActionService {
         Map<String,Object> response = new HashMap<>();
         response.put(BEFORE,beforeMap);
         response.put(AFTER,afterMap);
+        setAvailabilityUnavailabilityNameInMap(unitId, response);
         return response;
     }
 
-    private void updateMap(Map<String, Boolean> beforeMap, List<TimeTypeEnum> timeTypeEnums) {
+    private void updateMap(Map<String, Boolean> map, List<TimeTypeEnum> timeTypeEnums) {
         if (timeTypeEnums.contains(TimeTypeEnum.AVAILABLE_TIME)) {
-            beforeMap.put(AVAILABILITY, true);
+            map.put(AVAILABILITY, true);
         } else if (timeTypeEnums.contains(TimeTypeEnum.UNAVAILABLE_TIME)) {
-            beforeMap.put(UNAVAILABILITY, true);
+            map.put(UNAVAILABILITY, true);
         }
+    }
+
+    private void setAvailabilityUnavailabilityNameInMap(Long unitId, Map<String,Object> response){
+        //TODO As discuss with priya configure only one activity of availability and unavailability at unit
+        List<Activity> availabilityActivities = activityService.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.AVAILABLE_TIME, newHashSet(unitId));
+        String availabilityName = isCollectionNotEmpty(availabilityActivities) ? availabilityActivities.get(0).getName() : "";
+        List<Activity> unavailabilityActivities = activityService.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.UNAVAILABLE_TIME, newHashSet(unitId));
+        String unavailabilityName = isCollectionNotEmpty(unavailabilityActivities) ? unavailabilityActivities.get(0).getName() : "";
+        response.put(AVAILABILITY_NAME, availabilityName);
+        response.put(UNAVAILABILITY_NAME, unavailabilityName);
     }
 
     public List<ShiftWithViolatedInfoDTO> removeAvailabilityUnavailabilityBeforeAfterShift(Long staffId, boolean isAvailability, boolean isBefore, Date ShiftDate) {

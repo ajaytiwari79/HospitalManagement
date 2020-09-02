@@ -931,4 +931,8 @@ public class ActivityService {
             prepareFLPMap(model.getSubModelPermissions(),fieldPermissionMap);
         });
     }
+
+    public List<Activity> findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum timeTypeEnum, Set<Long> unitIds){
+        return activityMongoRepository.findAllBySecondLevelTimeTypeAndUnitIds(timeTypeEnum, unitIds);
+    }
 }
