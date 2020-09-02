@@ -2,11 +2,14 @@ package com.kairos.persistence.model.user.pay_group_area;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.user.region.Municipality;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.util.Map;
 
 /**
  * Created by vipul on 12/3/18.
@@ -27,6 +30,10 @@ public class PayGroupAreaQueryResult {
     private Long startDateMillis;
     private Long endDateMillis;
     private Long levelId;
+    private Long countryId;
+    private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
+    private Map<String, TranslationInfo> translations;
 
 
     public PayGroupAreaQueryResult(PayGroupArea payGroupArea, PayGroupAreaMunicipalityRelationship relationship, Municipality municipality) {

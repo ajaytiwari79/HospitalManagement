@@ -16,9 +16,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @Repository
 public interface CompanyCategoryGraphRepository extends Neo4jBaseRepository<CompanyCategory, Long> {
 
-    @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(companyCategory:CompanyCategory{deleted:false}) where id(country)={0} return id(companyCategory) as id, companyCategory.name as name," +
-            " companyCategory.description as description ")
-    List<CompanyCategoryResponseDTO> findCompanyCategoriesByCountry(Long countryId);
+    @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(companyCategory:CompanyCategory{deleted:false}) where id(country)={0} return companyCategory ")
+    List<CompanyCategory> findCompanyCategoriesByCountry(Long countryId);
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(companyCategory:CompanyCategory{deleted:false}) where id(country)={0} AND id(companyCategory)= {1} return companyCategory")
     CompanyCategory findByCountryAndCompanycategory(Long countryId, Long companyCategoryId);
