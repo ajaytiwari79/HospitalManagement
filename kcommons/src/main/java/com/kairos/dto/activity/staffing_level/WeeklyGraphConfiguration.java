@@ -21,4 +21,6 @@ public class WeeklyGraphConfiguration {
     private boolean showOnCall;
     private int rightIntervalSetting;
     private int leftIntervalSetting;
+    private int[] rightConfigurations;
+    private int[] leftConfigurations;
 }
