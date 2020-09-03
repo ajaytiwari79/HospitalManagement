@@ -85,11 +85,11 @@ public class ShiftStatusService {
     @Inject private TodoRepository todoRepository;
     @Inject private TodoService todoService;
 
-    public <T> T updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
+    public ShiftAndActivtyStatusDTO updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
         Shift currentShift = shiftMongoRepository.findOne(shiftPublishDTO.getShifts().get(0).getShiftId());
-        T response;
+        ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO;
         if(isNotNull(currentShift.getRequestAbsence())){
-            response = updateStatusOfRequestAbsence(unitId, shiftPublishDTO, currentShift);
+            shiftAndActivtyStatusDTO = updateStatusOfRequestAbsence(unitId, shiftPublishDTO, currentShift);
         }else {
             Activity activity = activityMongoRepository.findOne(currentShift.getActivities().get(0).getActivityId());
             if (CommonConstants.FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
@@ -136,13 +136,12 @@ public class ShiftStatusService {
                 timeBankService.updateDailyTimeBankEntriesForStaffs(shifts, null);
             }
             wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
-            response = (T)new ShiftAndActivtyStatusDTO(shiftDTOS, shiftActivityResponseDTOS);
+            shiftAndActivtyStatusDTO = new ShiftAndActivtyStatusDTO(shiftDTOS, shiftActivityResponseDTOS);
         }
-        return response;
+        return shiftAndActivtyStatusDTO;
     }
 
-    private <T> T updateStatusOfRequestAbsence(Long unitId, ShiftPublishDTO shiftPublishDTO, Shift currentShift) {
-        T response;
+    private ShiftAndActivtyStatusDTO updateStatusOfRequestAbsence(Long unitId, ShiftPublishDTO shiftPublishDTO, Shift currentShift) {
         Activity activity = activityMongoRepository.findOne(currentShift.getRequestAbsence().getActivityId());
         PhaseDTO phase = phaseService.getUnitPhaseByDate(unitId, currentShift.getStartDate());
         PhaseTemplateValue phaseTemplateValue = activity.getActivityPhaseSettings().getPhaseTemplateValues().stream().filter(p -> p.getPhaseId().equals(phase.getId())).findFirst().get();
@@ -160,8 +159,8 @@ public class ShiftStatusService {
         }else {
             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(),currentShift.getRequestAbsence().getStartDate(), currentShift.getRequestAbsence().getEndDate(), currentShift.getId(), localeService.getMessage(ACTIVITY_STATUS_INVALID), false));
         }
-        response = (T) shiftActivityResponseDTO;
-        return response;
+
+        return new ShiftAndActivtyStatusDTO(newArrayList(ObjectMapperUtils.copyPropertiesByMapper(currentShift,ShiftDTO.class)), newArrayList(shiftActivityResponseDTO));
     }
 
     private Object[] getActivityDetailsMap(List<Shift> shifts){
