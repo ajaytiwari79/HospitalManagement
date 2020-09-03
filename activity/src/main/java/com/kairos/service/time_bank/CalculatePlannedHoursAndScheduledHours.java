@@ -132,14 +132,15 @@ public class CalculatePlannedHoursAndScheduledHours {
             for (CTACompensationConfiguration ctaCompensationConfiguration : ruleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations()) {
                 ZonedDateTime startDate = getDateByIntervalType(ctaCompensationConfiguration.getIntervalType(), ctaCompensationConfiguration.getFrom(), todayDate);
                 ZonedDateTime endDate = getDateByIntervalType(ctaCompensationConfiguration.getIntervalType(), ctaCompensationConfiguration.getTo(), todayDate);
-                DateTimeInterval dateTimeInterval = new DateTimeInterval(startDate, endDate);
+                DateTimeInterval dateTimeInterval = new DateTimeInterval(ctaCompensationConfiguration.getFrom()==0 ? todayDate.minusDays(2) : startDate, ctaCompensationConfiguration.getTo()==0 ? asZonedDateTime(shift.getEndDate()) : endDate);
                 if (dateTimeInterval.contains(shift.getStartDate())) {
                     if (CompensationType.HOURS.equals(ctaCompensationConfiguration.getCompensationType())) {
                         compensation = ctaCompensationConfiguration.getValue();
                         ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaCompensationConfiguration.getValue());
                         totalDailyPlannedMinutes += ctaCompensationConfiguration.getValue();
                     } else {
-                        int value = !timeBankCalculationService.getHourlyCostByDate(employment.getEmploymentLines(), dateTimeInterval.getStartLocalDate()).equals(BigDecimal.valueOf(0)) ? BigDecimal.valueOf(ctaCompensationConfiguration.getValue()).divide(employment.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(60)).intValue() : 0;
+                        BigDecimal hourlyCostByDate = timeBankCalculationService.getHourlyCostByDate(employment.getEmploymentLines(),asLocalDate(shift.getStartDate()));
+                        int value = !hourlyCostByDate.equals(BigDecimal.valueOf(0)) ? BigDecimal.valueOf(ctaCompensationConfiguration.getValue()).divide(employment.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(60)).intValue() : 0;
                         ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + value);
                         totalDailyPlannedMinutes += value;
                         compensation = value;
