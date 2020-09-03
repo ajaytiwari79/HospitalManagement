@@ -1108,13 +1108,13 @@ public class ShiftValidatorService {
             DateTimeInterval existingShiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate());
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
                 if ((WORKING_TYPE.toString().equals(activity.getTimeType())) && shiftInterval.overlaps(existingShiftInterval)) {
-                    shiftOverlapWithShiftId = shiftWithActivityDTO.getShiftId();
+                    shiftOverlapWithShiftId = shiftWithActivityDTO.getId();
 //                    exceptionService.invalidRequestException(MESSAGE_SHIFT_DATE_STARTANDEND, shiftWithActivityDTO.getStartDate(),
 //                            shiftWithActivityDTO.getEndDate());
                 } else if (CommonConstants.FULL_WEEK.equals(activity.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || FULL_DAY.equals(activity.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
                     existingShiftInterval = new DateTimeInterval(getStartOfDay(shiftWithActivityDTO.getStartDate()), getEndOfDay(shiftWithActivityDTO.getEndDate()));
                     if (shiftInterval.overlaps(existingShiftInterval)) {
-                         shiftOverlapWithShiftId = shiftWithActivityDTO.getShiftId();
+                         shiftOverlapWithShiftId = shiftWithActivityDTO.getId();
 //                        exceptionService.invalidRequestException(MESSAGE_SHIFT_DATE_STARTANDEND, shiftWithActivityDTO.getStartDate(),
 //                                shiftWithActivityDTO.getEndDate());
                     }

@@ -10,6 +10,7 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.country.ReasonCodeService;
@@ -44,11 +45,12 @@ public class CompanyDefaultDataService {
     @Inject
     private GdprIntegrationService gdprIntegrationService;
     @Inject private EmploymentTypeService employmentTypeService;
+    @Inject private CountryGraphRepository countryGraphRepository;
 
 
     public void createDefaultDataInUnit(Long parentId, List<Unit> units, Long countryId, List<TimeSlot> timeSlots) {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId, parentId);
-        List<EmploymentType> employmentTypes = employmentTypeService.getEmploymentTypeList(countryId,false);
+        List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId,false);
         List<Long> employmentTypeIds = employmentTypes.stream().map(UserBaseEntity::getId).collect(Collectors.toList());
         units.forEach(unit -> {
             orgTypeAndSubTypeDTO.setOrganizationTypeId(unit.getOrganizationType().getId());

@@ -2,6 +2,7 @@ package com.kairos.persistence.model.country.functions;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by pavan on 14/3/18.
@@ -36,6 +38,10 @@ public class FunctionDTO {
     private List<LocalDate> appliedDates;
     private Long employmentId;
     private String code;
+    private Long countryId;
+    private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
+    private Map<String, TranslationInfo> translations;
 
 
     public FunctionDTO(Long id, String name, String description, LocalDate startDate, LocalDate endDate, List<Organization> unions, List<Level> organizationLevels, String icon,String code) {

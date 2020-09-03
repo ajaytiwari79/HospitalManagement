@@ -5,6 +5,7 @@ import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
@@ -94,20 +95,40 @@ public class StaffAdditionalInfoDTO {
     }
 
     public String getTimeSlotByShiftStartTime(Date startDate){
-        LocalDate localDate = asLocalTime(startDate).equals(LocalTime.MIDNIGHT) ? asLocalDate(startDate).minusDays(1) : asLocalDate(startDate);
-        return timeSlotSets.stream().filter(timeSlotWrapper -> timeSlotWrapper.getTimeSlotInterval(localDate).contains(startDate)).findAny().get().getName();
+        LocalTime shiftTime = asLocalTime(startDate);
+        for (TimeSlotWrapper timeSlotSet : this.timeSlotSets) {
+            LocalTime startTime = LocalTime.of(timeSlotSet.getStartHour(),timeSlotSet.getStartMinute());
+            LocalTime endTime = LocalTime.of(timeSlotSet.getEndHour(),timeSlotSet.getEndMinute());
+            if(!shiftTime.isBefore(startTime) && shiftTime.isBefore(endTime) || (startTime.isAfter(endTime) && (!startTime.isAfter(shiftTime) || shiftTime.isBefore(endTime)))){
+                return timeSlotSet.getName();
+            }
+        }
+        return null;
     }
 
     public Set<AccessGroupRole> getRoles() {
-            Set<AccessGroupRole> roles = new HashSet<>();
-            if(userAccessRoleDTO!=null) {
-                if (Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement()) {
-                    roles.add(AccessGroupRole.MANAGEMENT);
-                }
-                if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
-                    roles.add(AccessGroupRole.STAFF);
-                }
+        Set<AccessGroupRole> roles = new HashSet<>();
+        if(userAccessRoleDTO!=null) {
+            if (Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement()) {
+                roles.add(AccessGroupRole.MANAGEMENT);
             }
+            if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
+                roles.add(AccessGroupRole.STAFF);
+            }
+        }
+        return roles;
+    }
+
+    public Set<CalculateValueIfPlanned> getCalculateValueIfPlanneds() {
+        Set<CalculateValueIfPlanned> roles = new HashSet<>();
+        if(userAccessRoleDTO!=null) {
+            if (Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement()) {
+                roles.add(CalculateValueIfPlanned.MANAGER);
+            }
+            if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
+                roles.add(CalculateValueIfPlanned.STAFF);
+            }
+        }
         return roles;
     }
 

@@ -246,6 +246,7 @@ public class StaffingLevelUtil {
                     newlyAddedActivities.add(staffingLevelActivityToAddOrUpdate.getActivityId());
                     activityRemoveLogs.removeIf(k -> k.getActivityId().equals(staffingLevelActivityToAddOrUpdate.getActivityId()));
                 }
+                interval.getStaffingLevelActivities().add(new StaffingLevelActivity(staffingLevelActivityToAddOrUpdate.getActivityId(),0,0));
             }
             if (isNotNull(staffingLevelIntervalLog)) {
                 newlyAddedActivities.addAll(staffingLevelIntervalLog.getNewlyAddedActivityIds());
@@ -258,6 +259,7 @@ public class StaffingLevelUtil {
                     newlyAddedSkills.add(staffingLevelSkillToAddOrUpdate.getSkillId());
                     skillRemoveLogs.removeIf(k -> k.getSkillId().equals(staffingLevelSkillToAddOrUpdate.getSkillId()));
                 }
+                interval.getStaffingLevelSkills().add(new StaffingLevelSkill(staffingLevelSkillToAddOrUpdate.getSkillId()));
             }
             if (isNotNull(staffingLevelIntervalLog)) {
                 newlyAddedSkills.addAll(staffingLevelIntervalLog.getNewlyAddedSkillIds());
@@ -265,10 +267,10 @@ public class StaffingLevelUtil {
             }
             if (presenceStaffingLevelDTO.getInterval().contains(currentDate)) {
                 staffingLevelIntervals.add(updateInterval(interval, presenceStaffingLevelDTO));
-                currentDate=currentDate.plusMinutes(15);
             } else {
                 staffingLevelIntervals.add(interval);
             }
+            currentDate=currentDate.plusMinutes(15);
         }
     }
 
@@ -433,20 +435,26 @@ public class StaffingLevelUtil {
 
     private static void removeDataFromStaffingLevel(PresenceStaffingLevelDto presenceStaffingLevelDTO, StaffingLevel staffingLevel, Set<ActivityRemoveLog> activityRemoveLogs, Set<SkillRemoveLog> skillRemoveLogs, List<StaffingLevelInterval> staffingLevelIntervals, Set<BigInteger> newlyAddedActivities, Set<Long> newlyAddedSkills) {
         for (int i = 0; i < 96; i++) {
+            BigInteger activityId = null;
+            Long skillId=null;
             StaffingLevelIntervalLog staffingLevelIntervalLog = isCollectionEmpty(staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelIntervalLogs()) ? null : staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelIntervalLogs().last();
             StaffingLevelInterval interval = ObjectMapperUtils.copyPropertiesByMapper(isNull(staffingLevelIntervalLog) ? staffingLevel.getPresenceStaffingLevelInterval().get(i) : staffingLevelIntervalLog, StaffingLevelInterval.class);
             if (isCollectionNotEmpty(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities())) {
+                 activityId=presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().iterator().next().getActivityId();
                 interval.getStaffingLevelActivities().remove(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().iterator().next());
-                activityRemoveLogs.add(new ActivityRemoveLog(presenceStaffingLevelDTO.getStaffingLevelActivities().iterator().next().getActivityId(), new Date(), UserContext.getUserDetails().getFirstName()));
+                activityRemoveLogs.add(new ActivityRemoveLog(activityId, new Date(), UserContext.getUserDetails().getFirstName()));
             } else {
+                skillId=presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().iterator().next().getSkillId();
                 interval.getStaffingLevelSkills().remove(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().iterator().next());
-                skillRemoveLogs.add(new SkillRemoveLog(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().iterator().next().getSkillId(), new Date(), UserContext.getUserDetails().getFirstName()));
+                skillRemoveLogs.add(new SkillRemoveLog(skillId, new Date(), UserContext.getUserDetails().getFirstName()));
             }
             if (isNotNull(staffingLevelIntervalLog)) {
                 activityRemoveLogs.addAll(staffingLevelIntervalLog.getActivityRemoveLogs());
                 skillRemoveLogs.addAll(staffingLevelIntervalLog.getSkillRemoveLogs());
                 newlyAddedActivities.addAll(staffingLevelIntervalLog.getNewlyAddedActivityIds());
                 newlyAddedSkills.addAll(staffingLevelIntervalLog.getNewlyAddedSkillIds());
+                newlyAddedActivities.remove(activityId);
+                newlyAddedSkills.remove(skillId);
             }
             interval.setMinNoOfStaff(interval.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMinNoOfStaff())));
             interval.setMaxNoOfStaff(interval.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMaxNoOfStaff())));

@@ -99,7 +99,6 @@ public class PlannedTimeTypeService{
     }
 
     public Map<String, TranslationInfo> updateTranslation(BigInteger plannedTimeTypeId, Map<String,TranslationInfo> translations) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         Optional<PlannedTimeType> presenceTypeOptional = plannedTimeTypeRepository.findById(plannedTimeTypeId);
         if (!presenceTypeOptional.isPresent()) {
             LOGGER.error("Planned time type not found by Id removing {}" , plannedTimeTypeId);

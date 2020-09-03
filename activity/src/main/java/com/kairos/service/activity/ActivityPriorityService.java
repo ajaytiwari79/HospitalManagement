@@ -233,7 +233,6 @@ public class ActivityPriorityService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(BigInteger activityPriorityId, Map<String,TranslationInfo> translations) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         ActivityPriority activityPriority =activityPriorityMongoRepository.findOne(activityPriorityId);
         activityPriority.setTranslations(translations);
         activityPriorityMongoRepository.save(activityPriority);

@@ -82,7 +82,6 @@ public class PensionProviderService extends MongoBaseService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(BigInteger paymentTypeId, Map<String,TranslationInfo> translations) {
-        TranslationUtil.updateTranslationsIfActivityNameIsNull(translations);
         PensionProvider pensionProvider =pensionProviderRepository.findOne(paymentTypeId);
         pensionProvider.setTranslations(translations);
         pensionProviderRepository.save(pensionProvider);

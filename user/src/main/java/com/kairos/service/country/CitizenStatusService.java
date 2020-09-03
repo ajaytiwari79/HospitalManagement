@@ -1,8 +1,12 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.country.default_data.CitizenStatusDTO;
+import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -11,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,7 +80,13 @@ public class CitizenStatusService{
     }
 
     public List<CitizenStatusDTO> getCitizenStatusByCountryId(long countryId){
-        return citizenStatusGraphRepository.findCitizenStatusByCountryId(countryId);
+        List<CitizenStatus> citizenStatusList = citizenStatusGraphRepository.findCitizenStatusByCountryId(countryId);
+        List<CitizenStatusDTO> citizenStatusDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(citizenStatusList,CitizenStatusDTO.class);
+        citizenStatusDTOS.forEach(citizenStatusDTO -> {
+            citizenStatusDTO.setCountryId(countryId);
+            citizenStatusDTO.setTranslations(TranslationUtil.getTranslatedData(citizenStatusDTO.getTranslatedNames(),citizenStatusDTO.getTranslatedDescriptions()));
+        });
+        return citizenStatusDTOS;
     }
 
 
@@ -85,6 +96,17 @@ public class CitizenStatusService{
           return  null;
         }
         return FormatUtil.formatNeoResponse(data);
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long citizenStatusId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptions = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
+        CitizenStatus citizenStatus =citizenStatusGraphRepository.findOne(citizenStatusId);
+        citizenStatus.setTranslatedNames(translatedNames);
+        citizenStatus.setTranslatedDescriptions(translatedDescriptions);
+        citizenStatusGraphRepository.save(citizenStatus);
+        return citizenStatus.getTranslatedData();
     }
 
 

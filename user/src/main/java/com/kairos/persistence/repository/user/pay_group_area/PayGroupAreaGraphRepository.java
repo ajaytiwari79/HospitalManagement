@@ -21,7 +21,9 @@ public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGrou
     @Query("match(level:Level)  where id(level) = {0}\n" +
             "match(level)-[:" + IN_LEVEL + "]-(payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality)\n" +
             "RETURN  id(payGroupArea) as payGroupAreaId,payGroupArea.name as name,payGroupArea.description as description, municipality as municipality, " +
-            "id(level) as levelId,id(rel) as id,rel.endDateMillis as endDateMillis,rel.startDateMillis as startDateMillis")
+            "id(level) as levelId,id(rel) as id,rel.endDateMillis as endDateMillis,rel.startDateMillis as startDateMillis," +
+            "{english:payGroupArea.`translatedNames.english`,danish:payGroupArea.`translatedNames.danish`,hindi:payGroupArea.`translatedNames.hindi`,britishenglish:payGroupArea.`translatedNames.britishenglish`} as translatedNames,\n" +
+            "{english:payGroupArea.`translatedDescriptions.english`,danish:payGroupArea.`translatedDescriptions.danish`,hindi:payGroupArea.`translatedDescriptions.hindi`,britishenglish:payGroupArea.`translatedDescriptions.britishenglish`} as translatedDescriptions")
     List<PayGroupAreaQueryResult> getPayGroupAreaWithMunicipalityByOrganizationLevelId(Long organizationLevelId);
 
 
