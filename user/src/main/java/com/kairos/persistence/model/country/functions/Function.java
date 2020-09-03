@@ -2,6 +2,7 @@ package com.kairos.persistence.model.country.functions;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.KPermissionModel;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Level;
@@ -28,6 +29,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@KPermissionModel
 public class Function extends UserBaseEntity {
     private String name;
     private String description;

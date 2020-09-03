@@ -613,7 +613,7 @@ public class PermissionService {
 
     public void assignActionPermission(Long unitId, Long accessGroupId, CustomPermissionDTO customPermissionDTO) {
         LOGGER.info("actions permissions are {}", customPermissionDTO.getActions());
-        accessGroupRepository.setActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId, customPermissionDTO.getId(), customPermissionDTO.getActions());
+        accessGroupRepository.setActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId, customPermissionDTO.getId(), customPermissionDTO.getActionId(),customPermissionDTO.isHasAccess());
     }
 
 }

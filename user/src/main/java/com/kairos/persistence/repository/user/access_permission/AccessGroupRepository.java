@@ -356,14 +356,14 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     @Query("MATCH (a:AccessGroup) where id(a) IN {0} RETURN a.role")
     Set<String> getAccessRolesByAccessGroupId(Set<Long> accessGroupIds);
 
-    @Query("MATCH (kPermissionTab),(accessGroup:AccessGroup) WHERE id(kPermissionTab) = {3} AND id(accessGroup)={2} WITH kPermissionTab,accessGroup  " +
+    @Query("MATCH (kPermissionTab:KPermissionModel)->[actionRel:"+HAS_ACTION+"]->(action:KPermissionAction),(accessGroup:AccessGroup) WHERE id(action)={4} AND id(kPermissionTab) = {3} AND id(accessGroup)={2} WITH kPermissionTab,accessGroup  " +
             "MATCH (staff:Staff) WHERE  id(staff)={0} WITH staff,kPermissionTab,accessGroup " +
             "MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff) WITH position,kPermissionTab,accessGroup  " +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,kPermissionTab,accessGroup  " +
             "MERGE (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_FIELD +"{accessGroupId:{2}}]->(kPermissionTab) " +
-            "ON CREATE SET r.actions={4}  " +
-            "ON MATCH SET r.actions={4}  RETURN distinct true")
-    void setActionPermissions(Long staffId, Long unitId, Long accessGroupId, Long kPermissionId, Set<PermissionAction> actions);
+            "ON CREATE SET r.hasAccess={5}  " +
+            "ON MATCH SET r.hasAccess={5}  RETURN distinct true")
+    void setActionPermissions(Long staffId, Long unitId, Long accessGroupId, Long kPermissionId, Long actionId,boolean hasAccess);
 
 
 

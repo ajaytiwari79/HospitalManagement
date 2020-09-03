@@ -79,14 +79,16 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
         //flsVisitourChangeService.registerReceiver("visitourChange");
     }
 
-    public List<Map<String, Object>> createActionPermissions() {
-        Map<String,List<Object>> map = new HashMap<>();
+    public void createActionPermissions() {
+        Map<String,List<PermissionAction>> map = new HashMap<>();
         Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage("com.kairos.controller")).setScanners(new MethodAnnotationsScanner()));
         Set<Method> controllers =reflections.getMethodsAnnotatedWith(KPermissionActions.class);
         for(Method method:controllers){
             KPermissionActions annotation=method.getAnnotation(KPermissionActions.class);
             if(!map.containsKey(annotation.modelName())){
-                map.put(annotation.modelName(),Arrays.asList(annotation.modelName()));
+                List<PermissionAction> permissionActions=new ArrayList<>();
+                permissionActions.add(annotation.action());
+                map.put(annotation.modelName(),permissionActions);
             }else {
                 map.get(annotation.modelName()).add(annotation.action());
             }
@@ -95,11 +97,8 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
         map.forEach((modelName,actions)-> actions.forEach(action-> permissionActions.add(new KPermissionAction(modelName, (PermissionAction) action))));
 
         if(isCollectionNotEmpty(permissionActions)) {
-            bootDataService.createActions(map,permissionActions);
-            permissionService.createPermissionSchema(modelDTOList);
+            bootDataService.createActions(permissionActions);
         }
-
-        return list;
     }
 
     public void createSkillCategoryAndSkills() {
