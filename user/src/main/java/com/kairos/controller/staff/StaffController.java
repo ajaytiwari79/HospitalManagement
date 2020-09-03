@@ -1,6 +1,6 @@
 package com.kairos.controller.staff;
 
-import com.kairos.annotations.KPermissionAction;
+import com.kairos.annotations.KPermissionActions;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
@@ -27,7 +27,6 @@ import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -112,7 +111,7 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.PUT)
     @ApiOperation("update staff personal information")
-    @KPermissionAction(modelName = "Staff",action = EDIT)
+    @KPermissionActions(modelName = "Staff",action = EDIT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> savePersonalDetail(@PathVariable long unitId, @PathVariable long staffId, @RequestBody @Valid StaffDTO staffDTO) throws ParseException {
         StaffDTO response = staffService.savePersonalDetail(staffId, staffDTO, unitId);
@@ -424,7 +423,7 @@ public class StaffController {
     }
 
     @RequestMapping(value = "/create_staff_from_web", method = RequestMethod.POST)
-    @KPermissionAction(modelName = "Staff",action = PermissionAction.ADD)
+    @KPermissionActions(modelName = "Staff",action = PermissionAction.ADD)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffCreationService.createStaff(unitId, staffCreationDTO));

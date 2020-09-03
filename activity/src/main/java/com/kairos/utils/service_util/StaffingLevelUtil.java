@@ -241,7 +241,7 @@ public class StaffingLevelUtil {
             StaffingLevelIntervalLog staffingLevelIntervalLog = isCollectionEmpty(staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelIntervalLogs()) ? null : staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelIntervalLogs().last();
             StaffingLevelInterval interval = ObjectMapperUtils.copyPropertiesByMapper(isNull(staffingLevelIntervalLog) ? staffingLevel.getPresenceStaffingLevelInterval().get(i) : staffingLevelIntervalLog, StaffingLevelInterval.class);
             if (staffingLevelActivityToAddOrUpdate != null) {
-                if (!staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().contains(staffingLevelActivityToAddOrUpdate)) {
+                if (!staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelActivities().contains(staffingLevelActivityToAddOrUpdate)) {
                     staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelActivities().add(new StaffingLevelActivity(staffingLevelActivityToAddOrUpdate.getActivityId(), 0, 0));
                     newlyAddedActivities.add(staffingLevelActivityToAddOrUpdate.getActivityId());
                     activityRemoveLogs.removeIf(k -> k.getActivityId().equals(staffingLevelActivityToAddOrUpdate.getActivityId()));
@@ -253,7 +253,7 @@ public class StaffingLevelUtil {
             }
 
             if (staffingLevelSkillToAddOrUpdate != null) {
-                if (!staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelSkills().contains(staffingLevelSkillToAddOrUpdate)) {
+                if (!staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelSkills().contains(staffingLevelSkillToAddOrUpdate)) {
                     staffingLevel.getPresenceStaffingLevelInterval().get(i).getStaffingLevelSkills().add(new StaffingLevelSkill(staffingLevelSkillToAddOrUpdate.getSkillId()));
                     newlyAddedSkills.add(staffingLevelSkillToAddOrUpdate.getSkillId());
                     skillRemoveLogs.removeIf(k -> k.getSkillId().equals(staffingLevelSkillToAddOrUpdate.getSkillId()));

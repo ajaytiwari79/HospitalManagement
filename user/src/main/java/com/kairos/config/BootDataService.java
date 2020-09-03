@@ -12,6 +12,8 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
+import com.kairos.persistence.model.kpermissions.KPermissionAction;
+import com.kairos.persistence.model.kpermissions.KPermissionModel;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
@@ -26,12 +28,16 @@ import com.kairos.persistence.model.user.region.Region;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.kpermissions.KPermissionActionGraphRepository;
+import com.kairos.persistence.repository.kpermissions.PermissionModelRepository;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.UserBaseRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CurrencyGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentCategoryGraphRepository;
@@ -44,9 +50,7 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffTeamRelationshipGraphRepository;
-import com.kairos.persistence.repository.user.staff.UnitPermissionAndAccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
-import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OpenningHourService;
 import com.kairos.utils.CPRUtil;
@@ -60,6 +64,9 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
@@ -89,8 +96,6 @@ public class BootDataService {
     @Inject
     CountryGraphRepository countryGraphRepository;
     @Inject
-    UnitGraphRepository unitGraphRepository;
-    @Inject
     SkillGraphRepository skillGraphRepository;
     @Inject
     UserGraphRepository userGraphRepository;
@@ -100,8 +105,6 @@ public class BootDataService {
     UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
     LanguageGraphRepository languageGraphRepository;
-    @Inject
-    CitizenStatusGraphRepository citizenStatusGraphRepository;
     @Inject
     ZipCodeGraphRepository zipCodeGraphRepository;
     @Inject
@@ -119,10 +122,6 @@ public class BootDataService {
       @Inject
     private OpenningHourService openningHourService;
     @Inject
-    private AccessPageService accessPageService;
-    @Inject
-    private UnitPermissionAndAccessPermissionGraphRepository unitPermissionAndAccessPermissionGraphRepository;
-    @Inject
     private EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;
     @Inject
     private UserBaseRepository userBaseRepository;
@@ -131,6 +130,10 @@ public class BootDataService {
     @Inject private StaffTeamRelationshipGraphRepository StaffTeamRelationshipGraphRepository;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private KPermissionActionGraphRepository kPermissionActionGraphRepository;
+    @Inject
+    private PermissionModelRepository permissionModelRepository;
 
     private List<Long> skillList;
     private OrganizationService homeCareService;
@@ -670,6 +673,16 @@ public class BootDataService {
         catch (HttpClientErrorException e){
             logger.debug("Some error occurred in activity micro service");
         }
+
+    }
+
+    public void createActions(Map<String, List<Object>> list, List<KPermissionAction> permissionActions) {
+        Map<String, KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll().spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k -> k.getModelName().toLowerCase(), v -> v));
+        List<KPermissionModel> kPermissionModels=new ArrayList<>();
+        for (KPermissionAction permissionAction : permissionActions) {
+            if(modelNameAndModelMap.get(permissionAction.getModelName()).getActionPermissions().)
+        }
+        Map<String, List<KPermissionAction>> kPermissionActionMap = StreamSupport.stream(kPermissionActionGraphRepository.findAll().spliterator(), false).collect(Collectors.groupingBy(k -> k.getModelName().toLowerCase(),Collectors.toList()));
 
     }
 }
