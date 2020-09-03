@@ -95,4 +95,11 @@ public class ActivityPriorityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityPriorityService.updateTranslation(activityPriorityId,translations));
     }
 
+    @ApiOperation("update translations in activity priority")
+    @PutMapping(value = COUNTRY_URL+"/activity_priority/{activityPriorityId}/language_settings")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateActivityPriorityTranslationsAtCountry(@PathVariable BigInteger activityPriorityId,@RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityPriorityService.updateTranslation(activityPriorityId,translations));
+    }
+
 }
