@@ -4,59 +4,59 @@
 
     "module_1" : "/dashboard",
 
-    
+
     "module_11": "/system-setting",
     "tab_439" : "/general-settings",
     "tab_391": "/payroll",
     "tab_236": "/languages",
     "tab_119": "/tabs-hierarchy",
 
-    
+
     "module_7": "/shift-workflow/unit/:selectedUnitId/staff/0",
-    "tab_284": "",
+    "tab_284": "?tab=tab_284",
     "tab_447": "",
-    "tab_415": "",
-    "tab_410": "",
+    "tab_415": "?tab=tab_415",
+    "tab_410": "?tab=tab_410",
     "tab_421": "",
-    "tab_282": "",
-    "tab_445": "",
+    "tab_282": "?tab=tab_282",
+    "tab_445": "?tab=tab_445",
     "tab_187": "",
-    "tab_442": "",
+    "tab_442": "?tab=tab_442",
     "tab_418": "",
-    "tab_441": "",
+    "tab_441": "?tab=tab_441",
     "tab_443": "",
-    "tab_413": "",
+    "tab_413": "?tab=tab_413",
     "tab_417": "",
-    "tab_452": "",
-    "tab_416": "",
-    "tab_412": "",
-    "tab_411": "",
+    "tab_452": "?tab=tab_452",
+    "tab_416": "?tab=tab_416",
+    "tab_412": "?tab=tab_412",
+    "tab_411": "?tab=tab_411",
     "tab_440": "",
     "tab_419": "",
     "tab_188": "",
     "tab_444": "",
-    "tab_283": "",
-    "tab_285": "",
-    "tab_414": "",
+    "tab_283": "?tab=tab_283",
+    "tab_285": "?tab=tab_285",
+    "tab_414": "?tab=tab_414",
 
-    
+
     "module_6": null,
     "tab_278": null,
     "tab_281": null,
     "tab_280": null,
     "tab_279": null,
 
-    
+
     "module_9": null,
     "tab_291": null,
     "tab_292": null,
     "tab_290": null,
     "tab_293": null,
 
-    
+
     "module_2": null,
 
-    
+
     "module_3": "/unit/:selectedUnitId/settings",
     "tab_10": "/general",
     "tab_43": "/management",
@@ -204,14 +204,14 @@
     "tab_424": "/solver-configuration-settings",
 
 
-    
+
     "module_12": "/staff-workflow/unit/:selectedUnitId/staff/0",
     "tab_20": "/personalDetails",
     "tab_22": "/workplace",
     "tab_23": "/employmentDetails",
-    "tab_232": "",
-    "tab_231": "",
-    "tab_24": "",
+    "tab_232": "?tab=tab_232",
+    "tab_231": "?tab=tab_231",
+    "tab_24": "?tab=tab_24",
     "tab_26": "/perform",
     "tab_27": "/skills",
     "tab_28": "/notes",
@@ -219,22 +219,22 @@
     "tab_30": "/balance",
 
     "tab_137": "/timebank",
-    "tab_365": "",
+    "tab_365": "?tab=tab_365",
     "tab_364": "",
-    "tab_366": "",
+    "tab_366": "?tab=tab_366",
 
     "tab_19": "/activities",
     "tab_151": "/balanceAdjustments",
     "tab_153": "/emailSms",
     "tab_332": "/nightWorker",
-    "tab_333": "",
-    "tab_334": "",
+    "tab_333": "?tab=tab_333",
+    "tab_334": "?tab=tab_334",
 
     "tab_256": "/task-type-settings",
     "tab_395": "/payroll-details",
     "tab_396": "",
 
-    
+
     "module_4": "/country-settings/:countryId",
     "tab_47": "/services",
     "tab_133": "/activity",
@@ -354,12 +354,12 @@
     "tab_408": "/kpi-set",
     "tab_261": "/kpi-settings",
 
-    
+
     "module_13": "/payroll/unit/:selectedUnitId",
     "tab_397": "/bank-details",
     "tab_403": "/payroll-settings",
 
-    
+
     "module_8": "/gdpr-workflow/country/:countryId",
     "tab_377": "/clauses",
     "tab_206": "/policy-docs",
