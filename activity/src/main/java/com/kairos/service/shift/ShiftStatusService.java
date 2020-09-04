@@ -153,13 +153,18 @@ public class ShiftStatusService {
         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(currentShift.getId());
         if(currentShift.getRequestAbsence().getTodoStatus().equals(TodoStatus.REQUESTED) && validAccessGroup && accessRoles.contains(staffAccessRole)){
             todoService.updateTodoStatus(null, TodoStatus.PENDING,shiftPublishDTO.getShifts().get(0).getShiftId(),null);
-            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, newHashSet(PENDING)));
+            ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, newHashSet(PENDING));
+            shiftActivityDTO.setId(currentShift.getId());
+            shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
         }else if(!accessRoles.contains(staffAccessRole) || !validAccessGroup){
-            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(),currentShift.getRequestAbsence().getStartDate(), currentShift.getRequestAbsence().getEndDate(), currentShift.getId(), localeService.getMessage(ACCESS_GROUP_NOT_MATCHED), false));
+            ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), currentShift.getRequestAbsence().getStartDate(), currentShift.getRequestAbsence().getEndDate(), currentShift.getId(), localeService.getMessage(ACCESS_GROUP_NOT_MATCHED), false);
+            shiftActivityDTO.setId(currentShift.getId());
+            shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
         }else {
-            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(),currentShift.getRequestAbsence().getStartDate(), currentShift.getRequestAbsence().getEndDate(), currentShift.getId(), localeService.getMessage(ACTIVITY_STATUS_INVALID), false));
+            ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), currentShift.getRequestAbsence().getStartDate(), currentShift.getRequestAbsence().getEndDate(), currentShift.getId(), localeService.getMessage(ACTIVITY_STATUS_INVALID), false);
+            shiftActivityDTO.setId(currentShift.getId());
+            shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
         }
-
         return new ShiftAndActivtyStatusDTO(newArrayList(ObjectMapperUtils.copyPropertiesByMapper(currentShift,ShiftDTO.class)), newArrayList(shiftActivityResponseDTO));
     }
 
