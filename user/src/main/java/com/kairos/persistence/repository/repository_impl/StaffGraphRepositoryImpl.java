@@ -246,7 +246,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 .append(" collect(distinct {id:id(employments),startDate:employments.startDate,endDate:employments.endDate, employmentType: { id: id(empType),name:empType.name } , employmentSubType: employments.employmentSubType,expertise: {id : id(expertise),name:expertise.name,startDate:employments.startDate,endDate:employments.endDate   },employmentLines:employmentLines  }) as employments, ")
                 .append(" CASE contactAddress WHEN contactAddress IS NULL THEN '' ELSE contactAddress.province END ");
         addMatchingCriteria(filters, queryParameters, query);
-        query.append(" WITH staff,employments,user,contactAddress MATCH (staff)-[:BELONGS_TO_TAGS]-(selectedTags:Tag) ");
+        query.append(" WITH staff,employments,user,contactAddress OPTIONAL MATCH (staff)-[:BELONGS_TO_TAGS]-(selectedTags:Tag) ");
         query.append(" WITH staff,employments,user,contactAddress,selectedTags MATCH (employments)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) ");
         query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise MATCH (employments)-[empL:HAS_EMPLOYMENT_LINES]->(employmentLines:EmploymentLine)-[het:HAS_EMPLOYMENT_TYPE]->(empType:EmploymentType) ");
         query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise,empType,employmentLines OPTIONAL MATCH (employmentLines)-[:APPLICABLE_FUNCTION]-(applicableFunctions:Function) ");
