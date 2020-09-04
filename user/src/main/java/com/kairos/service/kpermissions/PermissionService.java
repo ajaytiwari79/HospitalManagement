@@ -616,4 +616,14 @@ public class PermissionService {
         accessGroupRepository.setActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId, customPermissionDTO.getId(), customPermissionDTO.getActionId(),customPermissionDTO.isHasAccess());
     }
 
+    public boolean validPermissionAction(PermissionActionDTO permissionActionDTO,Long unitId){
+        List<AccessGroup> accessGroups = accessGroupService.validAccessGroupByDate(unitId, getDate());
+        Organization parentOrganisation = organizationService.fetchParentOrganization(unitId);
+        Long currentUserStaffId = staffService.getStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganisation.getId());
+        Set<Long> unitAccessGroupIds = getUnitAccessGroupIds(unitId);
+        return permissionModelRepository.hasActionPermission();
+
+
+    }
+
 }

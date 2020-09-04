@@ -81,11 +81,14 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "WITH collect(id(kPermissionField)) as kPermissionFieldIds,collect(id(subModelFields)) as subModelFieldsIds,collect(id(subModel)) as subModelIds, collect(id(kPermissionModel)) as kPermissionModelId\n" +
             "WITH kPermissionFieldIds+subModelFieldsIds+subModelIds+ kPermissionModelId AS ids\n" +
             "unwind ids as allIdsToSetPermission with distinct allIdsToSetPermission \n" +
-            "Return allIdsToSetPermission")
+            "Return allIdsToSetPermission ")
     Set<Long> kPermissionModelIds(Long kPermissionModelId);
 
     @Query(value = "MATCH (kPermissionModel:KPermissionModel),(accessGroup:AccessGroup) where id(kPermissionModel)={0} AND id(accessGroup) IN {1} CREATE UNIQUE (kPermissionModel)-[r:"+HAS_PERMISSION+"]->(accessGroup) " +
             "SET r.actions={2} ")
     void createAccessGroupPermissionModelRelationshipForAction(Long kpermissionModelId, List<Long> accessGroupIds, Set<PermissionAction> actions);
 
+    @Query(value = "MATCH (kPermissionModel:KPermissionModel),(accessGroup:AccessGroup) where id(kPermissionModel)={0} AND id(accessGroup) IN {1} CREATE UNIQUE (kPermissionModel)-[r:"+HAS_PERMISSION+"]->(accessGroup) " +
+            "SET r.actions={2} ")
+    boolean hasActionPermission(String modelName,PermissionAction action,);
 }
