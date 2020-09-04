@@ -5,6 +5,8 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
@@ -79,6 +81,7 @@ import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import org.apache.commons.collections.CollectionUtils;
+import org.aspectj.weaver.ast.Or;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -359,6 +362,10 @@ public class OrganizationService {
         Long countryId=viaCountry?countryIdOrOrgId:countryGraphRepository.getCountryIdByUnitId(countryIdOrOrgId);
         List<OrganizationBasicResponse> organizationQueryResult =viaCountry? unitGraphRepository.getAllParentOrganizationOfCountry(countryId):
                 unitGraphRepository.getAllOrganizationOfOrganization(countryIdOrOrgId);
+        organizationQueryResult.forEach(organizationBasicResponse -> {
+            organizationBasicResponse.setCountryId(countryId);
+            organizationBasicResponse.setTranslations(TranslationUtil.getTranslatedData(organizationBasicResponse.getTranslatedNames(),organizationBasicResponse.getTranslatedDescriptions()));
+        });
         OrganizationCreationData organizationCreationData = unitGraphRepository.getOrganizationCreationData(countryId);
         List<Map<String, Object>> zipCodes = FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId));
         if (Optional.ofNullable(organizationCreationData).isPresent()) {
@@ -977,6 +984,20 @@ public class OrganizationService {
             organizationIdsToDelete.addAll(organization.getUnits().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
             return organizationIdsToDelete;
         }
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long organizationId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Organization organization =organizationGraphRepository.findOne(organizationId);
+        organization.setTranslatedNames(translatedNames);
+        organization.setTranslatedDescriptions(translatedDescriptios);
+        organizationGraphRepository.save(organization);
+        return organization.getTranslatedData();
     }
 
 }
