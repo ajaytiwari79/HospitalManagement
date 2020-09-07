@@ -1,5 +1,6 @@
 package com.kairos.controller.staffing_level;
 
+import com.kairos.annotations.KPermissionActions;
 import com.kairos.constants.ApiConstants;
 import com.kairos.dto.activity.staffing_level.StaffingLevelFromTemplateDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelGraphConfigurationDTO;
@@ -8,6 +9,7 @@ import com.kairos.dto.activity.staffing_level.UpdatedStaffingLevelDTO;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.service.staffing_level.StaffingLevelGraphConfigurationService;
 import com.kairos.service.staffing_level.StaffingLevelService;
@@ -49,6 +51,7 @@ public class StaffingLevelController {
 
 
     @RequestMapping(value = "/presence", method = RequestMethod.POST)
+    @KPermissionActions(modelName = "StaffingLevel",action = PermissionAction.ADD)
     @ApiOperation("Create staffing_level for presence")
     public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
@@ -96,6 +99,7 @@ public class StaffingLevelController {
 
     @RequestMapping(value = "/presence/{staffingLevelId}", method = RequestMethod.PUT)
     @ApiOperation("update staffing_level")
+    @KPermissionActions(modelName = "StaffingLevel",action = PermissionAction.EDIT)
     public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto,
         @PathVariable Long unitId,@PathVariable BigInteger staffingLevelId) {
       return ResponseHandler.generateResponse(HttpStatus.OK, true,

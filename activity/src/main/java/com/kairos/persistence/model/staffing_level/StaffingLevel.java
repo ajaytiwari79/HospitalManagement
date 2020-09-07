@@ -3,6 +3,7 @@ package com.kairos.persistence.model.staffing_level;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.KPermissionModel;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -28,6 +29,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 @Getter
 @Setter
 @NoArgsConstructor
+@KPermissionModel
 public class StaffingLevel extends MongoBaseEntity {
     @Indexed
     private Date currentDate;

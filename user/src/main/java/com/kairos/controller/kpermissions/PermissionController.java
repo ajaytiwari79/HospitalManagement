@@ -1,9 +1,11 @@
 package com.kairos.controller.kpermissions;
 
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.kpermissions.ActionDTO;
 import com.kairos.dto.kpermissions.CustomPermissionDTO;
 import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.kpermissions.PermissionDTO;
+import com.kairos.persistence.model.kpermissions.KPermissionAction;
 import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -95,5 +97,11 @@ public class PermissionController {
     @GetMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/action_permission")
     public ResponseEntity<Map<String, Object>> getActionPermissionByAccessGroup(@RequestParam("staffId") Long staffId, @PathVariable Long accessGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(newHashSet(accessGroupId),staffId));
+    }
+
+    @PutMapping(value = "/update_action_permission")
+    public ResponseEntity<Map<String, Object>> updateActionPermission(@RequestBody List<KPermissionAction> permissionActions) {
+        permissionService.createActions(permissionActions);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 }

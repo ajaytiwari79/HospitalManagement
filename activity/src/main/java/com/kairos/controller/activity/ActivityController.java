@@ -1,9 +1,11 @@
 package com.kairos.controller.activity;
 
+import com.kairos.annotations.KPermissionActions;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
+import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.activity.tabs.ActivityOptaPlannerSetting;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.organization.OrganizationActivityService;
@@ -43,6 +45,7 @@ public class ActivityController {
 
     @ApiOperation("Create Activity")
     @PostMapping(value = "/activity")
+    @KPermissionActions(modelName = "Activity",action = PermissionAction.ADD)
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createActivity(@PathVariable Long countryId, @RequestBody @Valid ActivityDTO activity) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.createActivity(countryId, activity));

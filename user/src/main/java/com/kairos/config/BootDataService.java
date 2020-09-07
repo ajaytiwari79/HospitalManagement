@@ -675,16 +675,4 @@ public class BootDataService {
         }
 
     }
-
-    public void createActions(List<KPermissionAction> permissionActions) {
-        Map<String, KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll().spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k -> k.getModelName(), v -> v));
-        for (KPermissionAction permissionAction : permissionActions) {
-            KPermissionModel kPermissionModel=modelNameAndModelMap.get(permissionAction.getModelName());
-            List<KPermissionAction> kPermissionActions=kPermissionModel.getActionPermissions();
-            if(kPermissionActions.stream().noneMatch(k->k.getModelName().equals(permissionAction.getModelName()) && k.getAction().equals(permissionAction.getAction()))){
-                kPermissionModel.getActionPermissions().add(new KPermissionAction(permissionAction.getModelName(),permissionAction.getAction()));
-            }
-        }
-        permissionModelRepository.saveAll(modelNameAndModelMap.values());
-    }
 }

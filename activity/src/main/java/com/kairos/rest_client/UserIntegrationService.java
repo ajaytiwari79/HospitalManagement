@@ -19,6 +19,7 @@ import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.dto.kpermissions.ActionDTO;
 import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -962,6 +963,10 @@ public class UserIntegrationService {
 
     public Set<String> getAccessRolesByAccessGroupIds(Long unitId, Set<Long> accessGroupIds) {
         return genericRestClient.publishRequest(accessGroupIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_access_roles", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<String>>>() {});
+    }
+
+    public void createActions(List<ActionDTO> permissionActions){
+        genericRestClient.publishRequest(permissionActions, null, RestClientUrlType.ORGANIZATION,HttpMethod.PUT, "/update_action_permission", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
     }
 }
 

@@ -1,5 +1,6 @@
 package com.kairos.controller.staff;
 
+import com.kairos.utils.validator.company.ActionValid;
 import com.kairos.annotations.KPermissionActions;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
@@ -31,6 +32,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +45,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.enums.kpermissions.PermissionAction.ADD;
 import static com.kairos.enums.kpermissions.PermissionAction.EDIT;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 
@@ -433,7 +436,8 @@ public class StaffController {
 
     @RequestMapping(value = "/create_staff_from_web", method = RequestMethod.POST)
     @KPermissionActions(modelName = "Staff",action = PermissionAction.ADD)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@ActionValid(modelName = "Staff",action = ADD)
+    @PreAuthorize("@appPermissionEvaluator.isValid('Staff','ADD')")
     public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffCreationService.createStaff(unitId, staffCreationDTO));
     }

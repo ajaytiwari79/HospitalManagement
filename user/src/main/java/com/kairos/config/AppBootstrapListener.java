@@ -1,6 +1,9 @@
 package com.kairos.config;
 
 import com.kairos.annotations.KPermissionActions;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.configuration.PermissionSchemaScanner;
+import com.kairos.dto.kpermissions.ActionDTO;
 import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.access_permission.AccessPage;
@@ -14,6 +17,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
+import com.kairos.service.kpermissions.PermissionService;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
@@ -63,6 +67,8 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
 
     @Inject
     BootDataService bootDataService;
+    @Inject
+    private PermissionService permissionService;
 
     /**
      * Executes on application ready event
@@ -80,24 +86,10 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     }
 
     public void createActionPermissions() {
-        Map<String,List<PermissionAction>> map = new HashMap<>();
-        Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage("com.kairos.controller")).setScanners(new MethodAnnotationsScanner()));
-        Set<Method> controllers =reflections.getMethodsAnnotatedWith(KPermissionActions.class);
-        for(Method method:controllers){
-            KPermissionActions annotation=method.getAnnotation(KPermissionActions.class);
-            if(!map.containsKey(annotation.modelName())){
-                List<PermissionAction> permissionActions=new ArrayList<>();
-                permissionActions.add(annotation.action());
-                map.put(annotation.modelName(),permissionActions);
-            }else {
-                map.get(annotation.modelName()).add(annotation.action());
-            }
-        }
-        List<KPermissionAction> permissionActions = new ArrayList<>();
-        map.forEach((modelName,actions)-> actions.forEach(action-> permissionActions.add(new KPermissionAction(modelName, (PermissionAction) action))));
-
+        List<ActionDTO> actionDTOS=new PermissionSchemaScanner().createActionPermissions("com.kairos.controller");
+        List<KPermissionAction> permissionActions = ObjectMapperUtils.copyCollectionPropertiesByMapper(actionDTOS,KPermissionAction.class);
         if(isCollectionNotEmpty(permissionActions)) {
-            bootDataService.createActions(permissionActions);
+            permissionService.createActions(permissionActions);
         }
     }
 

@@ -1,8 +1,6 @@
 package com.kairos.service.kpermissions;
 
-import com.kairos.annotations.KPermissionRelatedModel;
-import com.kairos.annotations.KPermissionRelationshipFrom;
-import com.kairos.annotations.KPermissionRelationshipTo;
+import com.kairos.annotations.*;
 import com.kairos.commons.annotation.PermissionClass;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.kpermissions.*;
@@ -15,9 +13,12 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
+import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.kpermissions.*;
+import com.kairos.persistence.model.kpermissions.KPermissionField;
+import com.kairos.persistence.model.kpermissions.KPermissionModel;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.repository.custom_repository.CommonRepositoryImpl;
@@ -33,6 +34,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.PermissionMapperUtils;
+import com.kairos.utils.validator.company.ActionValid;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -616,14 +618,23 @@ public class PermissionService {
         accessGroupRepository.setActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId, customPermissionDTO.getId(), customPermissionDTO.getActionId(),customPermissionDTO.isHasAccess());
     }
 
-    public boolean validPermissionAction(PermissionActionDTO permissionActionDTO,Long unitId){
+    public boolean validPermissionAction(String modelName, PermissionAction action, Long unitId){
         List<AccessGroup> accessGroups = accessGroupService.validAccessGroupByDate(unitId, getDate());
-        Organization parentOrganisation = organizationService.fetchParentOrganization(unitId);
-        Long currentUserStaffId = staffService.getStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganisation.getId());
         Set<Long> unitAccessGroupIds = getUnitAccessGroupIds(unitId);
-        return permissionModelRepository.hasActionPermission();
+        unitAccessGroupIds.addAll(accessGroups.stream().map(k->k.getId()).collect(Collectors.toSet()));
+        return permissionModelRepository.hasActionPermission(modelName,action,unitAccessGroupIds);
+    }
 
-
+    public void createActions(List<KPermissionAction> permissionActions) {
+        Map<String, KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll().spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k -> k.getModelName(), v -> v));
+        for (KPermissionAction permissionAction : permissionActions) {
+            KPermissionModel kPermissionModel=modelNameAndModelMap.get(permissionAction.getModelName());
+            List<KPermissionAction> kPermissionActions=kPermissionModel.getActionPermissions();
+            if(kPermissionActions.stream().noneMatch(k->k.getModelName().equals(permissionAction.getModelName()) && k.getAction().equals(permissionAction.getAction()))){
+                kPermissionModel.getActionPermissions().add(new KPermissionAction(permissionAction.getModelName(),permissionAction.getAction()));
+            }
+        }
+        permissionModelRepository.saveAll(modelNameAndModelMap.values());
     }
 
 }
