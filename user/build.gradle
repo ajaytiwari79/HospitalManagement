@@ -82,8 +82,6 @@ dependencies {
     compile 'com.google.api-client:google-api-client:1.22.0'
     compile 'com.google.oauth-client:google-oauth-client-jetty:1.22.0'
     compile 'com.google.apis:google-api-services-calendar:v3-rev239-1.22.0'
-    compile('org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.4.RELEASE')
-
 
     compile group: 'com.twilio.sdk', name: 'twilio-java-sdk', version: '6.3.0'
     compile('org.springframework.data:spring-data-redis:2.0.3.RELEASE')
