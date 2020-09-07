@@ -1,6 +1,8 @@
 package com.kairos.service.tag;
 
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.controller.staffing_level.StaffingLevelController;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.MasterDataTypeEnum;
@@ -21,6 +23,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -202,5 +206,15 @@ public class TagService extends MongoBaseService {
         }
         activityMongoRepository.saveAll(activities);
         return true;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger tagId, Map<String,TranslationInfo> translations) {
+        Tag tag =tagMongoRepository.findTagByIdAndEnabled(tagId);
+        if(ObjectUtils.isNull(tag)){
+            exceptionService.dataNotFoundByIdException(MESSAGE_TAG_ID,tagId);
+        }
+        tag.setTranslations(translations);
+        tagMongoRepository.save(tag);
+        return tag.getTranslations();
     }
 }
