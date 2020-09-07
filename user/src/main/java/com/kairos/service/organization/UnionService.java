@@ -2,7 +2,9 @@ package com.kairos.service.organization;
 
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.organization.MunicipalityDTO;
 import com.kairos.dto.user.organization.ProvinceDTO;
 import com.kairos.dto.user.organization.RegionDTO;
@@ -16,6 +18,7 @@ import com.kairos.persistence.model.address.ZipCodeSectorQueryResult;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
@@ -493,17 +496,19 @@ public class UnionService {
         Map<Long, LocationDataQueryResult> locationDataMap = locationDataObjects.stream().collect(Collectors.toMap(LocationDataQueryResult::getLocationId,
                 locationDataQueryResult -> locationDataQueryResult, (first, second) -> second));
         List<UnionDataDTO> unionDataDTOS = new ArrayList<>();
-        updateUnionData(unionDataObjects, municipalityMap, locationDataMap, unionDataDTOS);
+        updateUnionData(unionDataObjects, municipalityMap, locationDataMap, unionDataDTOS,countryId);
         globalDataDTO.setUnions(unionDataDTOS);
         return globalDataDTO;
     }
 
-    private void updateUnionData(List<UnionDataQueryResult> unionDataObjects, Map<Long, MunicipalityQueryResult> municipalityMap, Map<Long, LocationDataQueryResult> locationDataMap, List<UnionDataDTO> unionDataDTOS) {
+    private void updateUnionData(List<UnionDataQueryResult> unionDataObjects, Map<Long, MunicipalityQueryResult> municipalityMap, Map<Long, LocationDataQueryResult> locationDataMap, List<UnionDataDTO> unionDataDTOS,Long countryId) {
         for (UnionDataQueryResult unionDataQueryResult : unionDataObjects) {
 
             UnionDataDTO unionDataDTO = new UnionDataDTO();
             unionDataDTO.setId(unionDataQueryResult.getUnion().getId());
             unionDataDTO.setName(unionDataQueryResult.getUnion().getName());
+            unionDataDTO.setCountryId(countryId);
+            unionDataDTO.setTranslations(TranslationUtil.getTranslatedData(unionDataQueryResult.getUnion().getTranslatedNames(),unionDataQueryResult.getUnion().getTranslatedDescriptions()));
             unionDataDTO.setSectors(ObjectMapperUtils.copyCollectionPropertiesByMapper(unionDataQueryResult.getSectors(), SectorDTO.class));
             List<LocationDTO> locationDTOS = new ArrayList<>();
             List<MunicipalityDTO> municipalitiesUnion;
@@ -586,5 +591,19 @@ public class UnionService {
 
         List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeService.getReasonCodesByUnitId(organizationBaseEntity.getId(), ReasonCodeType.EMPLOYMENT);
         return new StaffUnionWrapper(unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long unionId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
+        union.setTranslatedNames(translatedNames);
+        union.setTranslatedDescriptions(translatedDescriptios);
+        organizationGraphRepository.save(union);
+        return union.getTranslatedData();
     }
 }
