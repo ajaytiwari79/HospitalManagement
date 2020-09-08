@@ -69,6 +69,7 @@ public class RestClientUrlUtil {
             case UNIT_WITHOUT_PARENT_ORG:
                 baseUrl = new StringBuilder(userServiceUrl).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 break;
+            default:break;
 
         }
         return baseUrl;
@@ -89,6 +90,7 @@ public class RestClientUrlUtil {
             case UNIT_WITHOUT_PARENT_ORG:
                 baseUrl = new StringBuilder(userServiceUrl).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 break;
+            default:break;
 
         }
         return baseUrl;

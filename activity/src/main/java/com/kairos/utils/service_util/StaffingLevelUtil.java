@@ -500,6 +500,7 @@ public class StaffingLevelUtil {
                 staffingLevelSkill.getSkillLevelSettings().stream().filter(k -> k.getSkillLevel().equals(SkillLevel.ADVANCE)).findAny().get().setNoOfStaff(changedStaffingLevelSkillFE.getSkillLevelSettings().stream().filter(k -> k.getSkillLevel().equals(SkillLevel.ADVANCE)).findAny().get().getNoOfStaff());
                 staffingLevelInterval.getStaffingLevelSkills().add(staffingLevelSkill);
                 break;
+            default:break;
         }
         return staffingLevelInterval;
     }
