@@ -312,6 +312,8 @@ public class StaffingLevelUtil {
         staffingLevelIntervalLog.setMinNoOfStaff(staffingLevelIntervalLog.getStaffingLevelActivities().stream().mapToInt(StaffingLevelActivity::getMinNoOfStaff).sum());
         staffingLevelIntervalLog.setMaxNoOfStaff(staffingLevelIntervalLog.getStaffingLevelActivities().stream().mapToInt(StaffingLevelActivity::getMaxNoOfStaff).sum());
         staffingLevelIntervalLog.setUserInfo(new UserInfo(UserContext.getUserDetails().getId(), UserContext.getUserDetails().getEmail(), UserContext.getUserDetails().getFullName()));
+        staffingLevelIntervalLog.setActivityRemoveLogs(activityRemoveLogs);
+        staffingLevelIntervalLog.setNewlyAddedActivityIds(newlyAddedActivities);
         staffingLevelIntervalLog.setUpdatedAt(getCurrentDate());
         staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelIntervalLogs().add(staffingLevelIntervalLog);
     }
