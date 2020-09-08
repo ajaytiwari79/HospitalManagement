@@ -712,6 +712,7 @@ public class StaffingLevelService  {
 */
             absenceStaffingLevelDto.setStaffingLevelSetting(new StaffingLevelSetting());
             absenceStaffingLevelDto.setUpdatedAt(staffingLevel.getUpdatedAt());
+            absenceStaffingLevelDto.setStaffingLevelIntervalLogs(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelIntervalLogs());
             absenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(absenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), absenceStaffingLevelDto);
         }
         return startDate;
