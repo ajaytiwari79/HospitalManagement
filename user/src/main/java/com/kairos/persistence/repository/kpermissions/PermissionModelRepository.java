@@ -84,10 +84,14 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "Return allIdsToSetPermission ")
     Set<Long> kPermissionModelIds(Long kPermissionModelId);
 
-    @Query(value = "MATCH (kPermissionModel:KPermissionModel),(accessGroup:AccessGroup) where id(kPermissionModel)={0} AND id(accessGroup) IN {1} CREATE UNIQUE (kPermissionModel)-[r:"+HAS_PERMISSION+"]->(accessGroup) " +
-            "SET r.actions={2} ")
-    void createAccessGroupPermissionModelRelationshipForAction(Long kpermissionModelId, List<Long> accessGroupIds, Set<PermissionAction> actions);
-
     @Query(value = "MATCH (kPermissionAction:KPermissionAction)-[rel:HAS_ACTION_PERMISSION]->(accessGroup:AccessGroup) where kPermissionAction.modelName={0} AND kPermissionAction.action={1} AND id(accessGroup) IN {2} RETURN COUNT(rel)>0 ")
     boolean hasActionPermission(String modelName,PermissionAction action,Set<Long> accessGroupIds);
+
+    @Query(value = "MATCH (kPermissionAction:KPermissionAction),(accessGroup:AccessGroup) where id(accessGroup)={0} AND id(kPermissionAction) IN{1} " +
+            "CREATE UNIQUE (kPermissionAction)-[r:"+HAS_ACTION_PERMISSION+"]->(accessGroup) ")
+    void setActionPermissions(Long accessGroupId, Set<Long> actions);
+
+    @Query(value = "MATCH(accessGroup:AccessGroup)<-[r:"+HAS_ACTION_PERMISSION+"]-(kPermissionAction:KPermissionAction)<-[:"+HAS_ACTION+"]-(kPermissionModel:KPermissionModel) where id(accessGroup)={0} " +
+            " RETURN DISTINCT id(kPermissionModel) as id, kPermissionModel.modelName as modelName ,COLLECT(kPermissionAction.action) as actions ")
+    List<ModelPermissionQueryResult> getActionPermissions(Long accessGroupId);
 }

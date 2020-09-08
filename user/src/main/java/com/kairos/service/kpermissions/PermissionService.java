@@ -183,6 +183,10 @@ public class PermissionService {
         return permissionSchemaMap;
     }
 
+    public List<ModelPermissionQueryResult> getPermissionActionsSchema(Long accessGroupId, Long staffId) {
+        return permissionModelRepository.getActionPermissions(accessGroupId);
+    }
+
     private List<KPermissionModel> getkPermissionModels() {
         List<KPermissionModel> kPermissionModels = new ArrayList();
         permissionModelRepository.findAll().forEach(kPermissionModel -> {
@@ -291,20 +295,6 @@ public class PermissionService {
         return getModelPermissionQueryResults(kPermissionModels, modelPermissionMap, fieldLevelPermissionMap, organizationCategory, systemAdmin);
     }
 
-
-    private <T> Set<String> getModelNames(List<T> objects) {
-        return objects.stream().map(model -> {
-            if (model.getClass().isAnnotationPresent(com.kairos.annotations.KPermissionModel.class)) {
-                return model.getClass().getSimpleName();
-            } else if (model.getClass().isAnnotationPresent(PermissionClass.class)) {
-                PermissionClass permissionClass = model.getClass().getAnnotation(PermissionClass.class);
-                return permissionClass.name();
-            } else if (model.getClass().isAnnotationPresent(KPermissionRelatedModel.class)) {
-                //return getRelationShipModelPermissionModelName(model.getClass());
-            }
-            return "";
-        }).collect(Collectors.toSet());
-    }
 
     private List<ModelPermissionQueryResult> getModelPermissionQueryResults(List<KPermissionModel> kPermissionModels, Map<Long, ModelPermissionQueryResult> modelPermissionMap, Map<Long, FieldPermissionQueryResult> fieldLevelPermissionMap, OrganizationCategory organizationCategory, boolean hubMember) {
         List<ModelPermissionQueryResult> modelPermissionQueryResults = new ArrayList<>();
@@ -635,6 +625,10 @@ public class PermissionService {
             }
         }
         permissionModelRepository.saveAll(modelNameAndModelMap.values());
+    }
+
+    public void setActionPermissions(CustomPermissionDTO customPermissionDTO){
+        permissionModelRepository.setActionPermissions(customPermissionDTO.getAccessGroupId(),customPermissionDTO.getActions());
     }
 
 }

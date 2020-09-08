@@ -3,6 +3,7 @@ package com.kairos.persistence.model.kpermissions;
 import com.kairos.dto.kpermissions.OtherPermissionDTO;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
+import com.kairos.enums.kpermissions.PermissionAction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,7 @@ public class ModelPermissionQueryResult {
     private Set<Long> tagIds = new HashSet<>();
     private Set<StaffStatusEnum> staffStatuses = new HashSet<>();
     private Set<FieldLevelPermission> forOtherFieldLevelPermissions = new HashSet<>();
-    private Set<String> actions;
+    private Set<PermissionAction> actions;
 
     public ModelPermissionQueryResult(Long id, String modelName) {
         this.id = id;

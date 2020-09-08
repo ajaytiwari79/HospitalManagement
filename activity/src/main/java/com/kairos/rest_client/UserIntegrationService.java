@@ -967,7 +967,7 @@ public class UserIntegrationService {
     }
 
     public void createActions(List<ActionDTO> permissionActions){
-        genericRestClient.publishRequest(permissionActions, null, RestClientUrlType.ORGANIZATION,HttpMethod.PUT, "/update_action_permission", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
+        genericRestClient.publishRequest(permissionActions, null, RestClientUrlType.ORGANIZATION,HttpMethod.PUT, "/create_action_permission", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
     }
 
     public boolean validPermissionAction(String modelName, PermissionAction action, Long lastSelectedOrganizationId) {

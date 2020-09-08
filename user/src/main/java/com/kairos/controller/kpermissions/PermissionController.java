@@ -59,7 +59,12 @@ public class PermissionController {
     @PutMapping(value = "/update_permission")
     public ResponseEntity createFieldPermissions(@Valid @RequestBody PermissionDTO permissionDTO,@RequestParam boolean updateOrganisationCategories)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissions(permissionDTO,updateOrganisationCategories));
+    }
 
+    @PutMapping(value = "/update_action_permission")
+    public ResponseEntity updateActionPermissions(@RequestBody CustomPermissionDTO customPermissionDTO)  {
+        permissionService.setActionPermissions(customPermissionDTO);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
     @GetMapping(value = "/get_default_data_of_permission")
@@ -101,7 +106,7 @@ public class PermissionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(newHashSet(accessGroupId),staffId));
     }
 
-    @PutMapping(value = "/update_action_permission")
+    @PutMapping(value = "/create_action_permission")
     public ResponseEntity<Map<String, Object>> updateActionPermission(@RequestBody List<KPermissionAction> permissionActions) {
         permissionService.createActions(permissionActions);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
