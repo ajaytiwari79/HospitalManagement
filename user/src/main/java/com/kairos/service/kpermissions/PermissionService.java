@@ -183,8 +183,8 @@ public class PermissionService {
         return permissionSchemaMap;
     }
 
-    public List<ModelPermissionQueryResult> getPermissionActionsSchema(Long accessGroupId, Long staffId) {
-        return permissionModelRepository.getActionPermissions(accessGroupId);
+    public List<ModelPermissionQueryResult> getPermissionActions(Long accessGroupId, Long staffId,Long unitId) {
+        return isNotNull(staffId)?permissionModelRepository.getActionPermissionsForStaff(accessGroupId,staffId,unitId):permissionModelRepository.getActionPermissions(accessGroupId);
     }
 
     private List<KPermissionModel> getkPermissionModels() {
@@ -605,7 +605,7 @@ public class PermissionService {
 
     public void assignActionPermission(Long unitId, Long accessGroupId, CustomPermissionDTO customPermissionDTO) {
         LOGGER.info("actions permissions are {}", customPermissionDTO.getActions());
-        accessGroupRepository.setActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId, customPermissionDTO.getId(), customPermissionDTO.getActionId(),customPermissionDTO.isHasAccess());
+        accessGroupRepository.setActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId, customPermissionDTO.getActions());
     }
 
     public boolean validPermissionAction(String modelName, PermissionAction action, Long unitId){

@@ -1,7 +1,6 @@
 package com.kairos.controller.kpermissions;
 
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.kpermissions.ActionDTO;
 import com.kairos.dto.kpermissions.CustomPermissionDTO;
 import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.kpermissions.PermissionDTO;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,17 +39,23 @@ public class PermissionController {
 
     }
 
-    @RequestMapping(value = "/get_permission_schema",method = RequestMethod.GET)
+    @GetMapping(value = "/get_permission_schema")
     public ResponseEntity getFLPSchema()  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema());
 
     }
 
-    @RequestMapping(value = "/access_group_permissions",method = RequestMethod.GET)
+    @GetMapping(value = "/access_group_permissions")
     public ResponseEntity getAccessGroupPermissions(@RequestParam Set<Long> accessGroupIds )  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(accessGroupIds,null));
+
+    }
+
+    @GetMapping(value = "/action_permissions")
+    public ResponseEntity getPermissionActions(@RequestParam Long accessGroupId )  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionActions(accessGroupId,null,null));
 
     }
 
@@ -102,8 +106,8 @@ public class PermissionController {
     }
 
     @GetMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/action_permission")
-    public ResponseEntity<Map<String, Object>> getActionPermissionByAccessGroup(@RequestParam("staffId") Long staffId, @PathVariable Long accessGroupId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(newHashSet(accessGroupId),staffId));
+    public ResponseEntity<Map<String, Object>> getActionPermissionByAccessGroup(@RequestParam("staffId") Long staffId,@PathVariable Long unitId, @PathVariable Long accessGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionActions(accessGroupId,staffId,unitId));
     }
 
     @PutMapping(value = "/create_action_permission")

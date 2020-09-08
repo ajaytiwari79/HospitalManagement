@@ -15,7 +15,5 @@ public class CustomPermissionDTO {
     private OtherPermissionDTO forOtherPermissions;
     private boolean forOtherStaff;
     private Set<Long> actions;
-    private Long actionId;
-    private boolean hasAccess;
     private Long accessGroupId;
 }

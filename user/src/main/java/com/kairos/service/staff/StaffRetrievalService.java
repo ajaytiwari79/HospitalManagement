@@ -862,7 +862,7 @@ public class StaffRetrievalService {
             updateFilterTypeCriteriaListByGroups(unitId, filterTypeSetMap);
         }
 
-        List<StaffEmploymentWithTag> staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday, staffFilterDetails.getSearchText(), loggedInUserId);
+        List<StaffEmploymentWithTag> staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday, staffFilterDetails.getSearchText(), loggedInUserId,envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
         int i = -1;
         StaffEmploymentWithTag matchedStaff = null;
         for (StaffEmploymentWithTag staffDetails : staffEmploymentWithTags) {
@@ -877,7 +877,7 @@ public class StaffRetrievalService {
             staffEmploymentWithTags.remove(i);
             staffEmploymentWithTags.add(0, matchedStaff);
         } else if (matchedStaff == null) {
-            matchedStaff = staffGraphRepository.getLoggedInStaffDetails(unitId, loggedInUserId);
+            matchedStaff = staffGraphRepository.getLoggedInStaffDetails(unitId, loggedInUserId,envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
             if (matchedStaff != null) {
                 staffEmploymentWithTags.add(0, matchedStaff);
             }

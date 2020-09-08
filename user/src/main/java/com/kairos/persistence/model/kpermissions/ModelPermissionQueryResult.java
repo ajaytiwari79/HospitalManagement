@@ -37,7 +37,7 @@ public class ModelPermissionQueryResult {
     private Set<Long> tagIds = new HashSet<>();
     private Set<StaffStatusEnum> staffStatuses = new HashSet<>();
     private Set<FieldLevelPermission> forOtherFieldLevelPermissions = new HashSet<>();
-    private Set<PermissionAction> actions;
+    private List<KPermissionAction> actions;
 
     public ModelPermissionQueryResult(Long id, String modelName) {
         this.id = id;
