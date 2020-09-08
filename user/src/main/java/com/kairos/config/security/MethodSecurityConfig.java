@@ -1,9 +1,7 @@
 package com.kairos.config.security;
 
-import com.kairos.utils.validator.company.AppPermissionEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -22,11 +20,9 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     @Override
     protected MethodSecurityExpressionHandler createExpressionHandler() {
-        DefaultMethodSecurityExpressionHandler expressionHandler =
-                new DefaultMethodSecurityExpressionHandler();
-        //expressionHandler.setPermissionEvaluator(appPermissionEvaluator());
-        expressionHandler.setApplicationContext(context);
-        return expressionHandler;
+        CustomOAuth2WebSecurityExpressionHandler customOAuth2WebSecurityExpressionHandler= new CustomOAuth2WebSecurityExpressionHandler();
+        customOAuth2WebSecurityExpressionHandler.setApplicationContext(context);
+        return customOAuth2WebSecurityExpressionHandler;
     }
 }
 

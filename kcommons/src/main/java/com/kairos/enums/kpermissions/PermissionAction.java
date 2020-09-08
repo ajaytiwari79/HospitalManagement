@@ -1,5 +1,10 @@
 package com.kairos.enums.kpermissions;
 
 public enum PermissionAction {
-    ADD,EDIT,DELETE
+    ADD("Add"),
+    EDIT("Edit"),
+    DELETE("Delete");
+
+    PermissionAction(String value) {
+    }
 }

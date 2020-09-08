@@ -5,6 +5,8 @@ import com.kairos.dto.kpermissions.ActionDTO;
 import com.kairos.dto.kpermissions.CustomPermissionDTO;
 import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.kpermissions.PermissionDTO;
+import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.kpermissions.KPermissionAction;
 import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.utils.response.ResponseHandler;
@@ -103,5 +105,12 @@ public class PermissionController {
     public ResponseEntity<Map<String, Object>> updateActionPermission(@RequestBody List<KPermissionAction> permissionActions) {
         permissionService.createActions(permissionActions);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
+
+    @PutMapping(value = "/validate_action_permission")
+    public ResponseEntity<Map<String, Object>> validateActionPermission(@RequestBody Map<String, Object> permissionActions) {
+        String modelName= (String) permissionActions.get("modelName");
+        PermissionAction action= PermissionAction.valueOf((String)permissionActions.get("action"));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.validPermissionAction(modelName,action, UserContext.getUserDetails().getLastSelectedOrganizationId()));
     }
 }

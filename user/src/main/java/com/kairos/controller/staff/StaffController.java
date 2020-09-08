@@ -436,9 +436,8 @@ public class StaffController {
 
     @RequestMapping(value = "/create_staff_from_web", method = RequestMethod.POST)
     @KPermissionActions(modelName = "Staff",action = PermissionAction.ADD)
-    //@ActionValid(modelName = "Staff",action = ADD)
     @PreAuthorize("@appPermissionEvaluator.isValid('Staff','ADD')")
-    public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) throws ParseException {
+    public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffCreationService.createStaff(unitId, staffCreationDTO));
     }
 

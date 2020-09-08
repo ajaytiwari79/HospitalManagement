@@ -14,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,7 +47,7 @@ public class ActivityController {
     @ApiOperation("Create Activity")
     @PostMapping(value = "/activity")
     @KPermissionActions(modelName = "Activity",action = PermissionAction.ADD)
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    @PreAuthorize("@appPermissionEvaluator.isValid('Activity','ADD')")
     public ResponseEntity<Map<String, Object>> createActivity(@PathVariable Long countryId, @RequestBody @Valid ActivityDTO activity) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.createActivity(countryId, activity));
     }
