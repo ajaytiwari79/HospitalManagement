@@ -183,8 +183,12 @@ public class PermissionService {
         return permissionSchemaMap;
     }
 
-    public List<ModelPermissionQueryResult> getPermissionActions(Long accessGroupId, Long staffId,Long unitId) {
-        return isNotNull(staffId)?permissionModelRepository.getActionPermissionsForStaff(accessGroupId,staffId,unitId):permissionModelRepository.getActionPermissions(accessGroupId);
+    public ModelPermissionQueryResult getPermissionActions(Long accessGroupId, Long staffId,Long unitId,Long modelId) {
+        return isNotNull(staffId)?permissionModelRepository.getActionPermissionsForStaff(accessGroupId,staffId,unitId,modelId):permissionModelRepository.getActionPermissions(accessGroupId,modelId);
+    }
+
+    public List<KPermissionModel> getPermissionActionsSchema() {
+        return getkPermissionModels();
     }
 
     private List<KPermissionModel> getkPermissionModels() {
@@ -605,6 +609,7 @@ public class PermissionService {
 
     public void assignActionPermission(Long unitId, Long accessGroupId, CustomPermissionDTO customPermissionDTO) {
         LOGGER.info("actions permissions are {}", customPermissionDTO.getActions());
+        accessGroupRepository.disableActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId,customPermissionDTO.getId());
         accessGroupRepository.setActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId, customPermissionDTO.getActions());
     }
 
@@ -628,7 +633,7 @@ public class PermissionService {
     }
 
     public void setActionPermissions(CustomPermissionDTO customPermissionDTO){
-        permissionModelRepository.setActionPermissions(customPermissionDTO.getAccessGroupId(),customPermissionDTO.getActions());
+        permissionModelRepository.setActionPermissions(customPermissionDTO.getAccessGroupId(),customPermissionDTO.getActions(),customPermissionDTO.getId());
     }
 
 }
