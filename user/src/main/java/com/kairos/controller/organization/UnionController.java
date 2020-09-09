@@ -1,5 +1,6 @@
 package com.kairos.controller.organization;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.organization.union.LocationDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionDTO;
@@ -129,4 +130,11 @@ public class UnionController {
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true,
 //                unionService.addUnionInOrganization(unitId,unionId,joined));
 //    }
+
+    @PutMapping(value = COUNTRY_URL + "/union/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfRelationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unionService.updateTranslation(id,translations));
+    }
 }

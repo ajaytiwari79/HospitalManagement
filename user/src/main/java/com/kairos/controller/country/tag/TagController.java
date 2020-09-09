@@ -1,5 +1,6 @@
 package com.kairos.controller.country.tag;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.tag.ShowCountryTagSetting;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.MasterDataTypeEnum;
@@ -138,6 +139,13 @@ public class TagController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTagsCategoryForOrganization(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfMasterDataType(unitId));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/tag/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfRelationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, tagService.updateTranslationOfTag(id,translations));
     }
 
 

@@ -1,6 +1,7 @@
 package com.kairos.controller.country;
 
 import com.kairos.config.BootDataService;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
@@ -11,6 +12,7 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
+import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
 import com.kairos.service.country.CountryHolidayCalenderService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.expertise.ExpertiseService;
@@ -177,7 +179,7 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllSkillCategory(@PathVariable Long countryId) {
         if (countryId != null) {
-            List<Object> skillCategory = skillCategoryService.getAllSkillCategoryOfCountry(countryId);
+            List<SkillCategoryQueryResults> skillCategory = skillCategoryService.getAllSkillCategoryOfCountry(countryId);
             if (skillCategory != null) {
                 return ResponseHandler.generateResponse(HttpStatus.OK, true, skillCategory);
             }
@@ -432,6 +434,13 @@ public class CountryController {
     public ResponseEntity<Map<String, Object>> createDefaultCountryAdmin(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, bootDataService.createDefaultCountryAdmin());
 
+    }
+
+    @RequestMapping(value = COUNTRY_URL+"/skill_Category/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfActivity(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillCategoryService.updateTranslation(id,translations));
     }
 
 

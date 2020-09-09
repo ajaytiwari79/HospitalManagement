@@ -9,6 +9,7 @@ import com.kairos.persistence.repository.staffing_level.StaffingLevelGraphConfig
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -33,7 +34,7 @@ public class StaffingLevelGraphConfigurationService {
     }
 
     private StaffingLevelGraphConfiguration getDefaultConfiguration(Long unitId,Long userId) {
-        WeeklyGraphConfiguration weeklyGraphConfiguration = new WeeklyGraphConfiguration(30,30,50,50,30,30,50,50,false,false,false,1,1,new int[]{2,4,6},new int[]{2,4,6});
+        WeeklyGraphConfiguration weeklyGraphConfiguration = new WeeklyGraphConfiguration(new ArrayList<>(),new ArrayList<>(),false,false,false,1,1,new int[]{2,4,6},new int[]{2,4,6});
         DailyGraphConfiguration dailyGraphConfiguration = new DailyGraphConfiguration(true,false,false,true,true,false,false,false,10,10,0,24,new int[]{2,4,6},new int[]{2,4,6});
         return new StaffingLevelGraphConfiguration(weeklyGraphConfiguration,dailyGraphConfiguration,userId,unitId);
     }

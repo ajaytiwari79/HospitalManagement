@@ -11,6 +11,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -60,6 +62,14 @@ public class StaffingLevelInterval {
 
         this.getStaffingLevelActivities().addAll(staffLevelActivitys);
 
+    }
+
+    //This Getter is used for Unity Graph don't remove it
+    public StaffingLevelIntervalLog getUnpublishChanges(){
+        if(isCollectionNotEmpty(this.staffingLevelIntervalLogs)){
+            return this.staffingLevelIntervalLogs.last();
+        }
+        return null;
     }
 
     public Set<BigInteger> getActivityIds(){

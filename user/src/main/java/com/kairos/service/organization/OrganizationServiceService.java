@@ -98,6 +98,9 @@ public class OrganizationServiceService {
         List<Map<String,Object>> mapList =new ArrayList<>();
         Map<String,Object> data = new HashMap<>();
         for (OrganizationServiceDTO result : organizationServiceDTOS) {
+            result.getOrganizationSubService().forEach(organizationServiceDTO -> {
+                organizationServiceDTO.setTranslations(TranslationUtil.getTranslatedData(organizationServiceDTO.getTranslatedNames(),organizationServiceDTO.getTranslatedDescriptions()));
+            });
             result.setTranslations(result.getTranslatedData());
             data.put("id", result.getId());
             data.put("name", result.getName());

@@ -152,13 +152,19 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     List<OpeningHours> getOpeningHours(Long organizationId);
 
 
-    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:false})-[:" + BELONGS_TO + "]->(c:Country)  WHERE id(c)={0} \n" +
-            "OPTIONAL MATCH (org)-[:" + TYPE_OF + "]->(ot:OrganizationType) WITH org,ot\n" +
-            "OPTIONAL MATCH (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH COLLECT(id(subType)) as organizationSubTypeIds,org,ot\n" +
-            "OPTIONAL MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH organizationSubTypeIds,org,ot,zipCode\n" +
-            "OPTIONAL MATCH (org)-[:" + HAS_ACCOUNT_TYPE + "]-(accountType:AccountType)\n" +
-            "RETURN id(org) as id,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId," +
-            "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY org.name")
+    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:false})-[:BELONGS_TO]->(c:Country)  WHERE id(c)={0} \n" +
+            "OPTIONAL MATCH (org)-[:TYPE_OF]->(ot:OrganizationType) WITH org,ot\n" +
+            "OPTIONAL MATCH (org)-[:SUB_TYPE_OF]->(subType:OrganizationType) WITH COLLECT(id(subType)) as organizationSubTypeIds,org,ot\n" +
+            "OPTIONAL MATCH (org)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) WITH organizationSubTypeIds,org,ot,zipCode\n" +
+            "OPTIONAL MATCH (org)-[:HAS_ACCOUNT_TYPE]-(accountType:AccountType)\n" +
+            "RETURN\n" +
+            "{english: CASE WHEN org.`translatedNames.english` IS NULL THEN '' ELSE org.`translatedNames.english`\n" +
+            "END,\n" +
+            "danish: CASE WHEN org.`translatedNames.danish` IS NULL THEN '' ELSE org.`translatedNames.danish` END,\n" +
+            "hindi: CASE WHEN org.`translatedNames.hindi` IS NULL THEN '' ELSE org.`translatedNames.hindi` END,\n" +
+            "britishenglish: CASE WHEN org.`translatedNames.britishenglish` IS NULL THEN '' ELSE org.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN org.`translatedDescriptions.english` IS NULL THEN '' ELSE org.`translatedDescriptions.english` END,danish: CASE WHEN org.`translatedDescriptions.danish` IS NULL THEN '' ELSE org.`translatedDescriptions.danish` END,hindi: CASE WHEN  org.`translatedDescriptions.hindi` IS NULL THEN '' ELSE org.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN org.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE org.`translatedDescriptions.britishenglish` END} as translatedDescriptions,\n" +
+            "id(org) as id,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId,id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY org.name")
     List<OrganizationBasicResponse> getAllParentOrganizationOfCountry(Long countryId);
 
     @Query("MATCH (organization:Organization)-[:" + HAS_UNIT + "]->(org:Unit{deleted:false}) WHERE id(organization)={0}  \n" +

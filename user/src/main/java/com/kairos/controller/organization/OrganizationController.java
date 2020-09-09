@@ -1,5 +1,6 @@
 package com.kairos.controller.organization;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
@@ -1008,6 +1009,14 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getAllUnitIdsByCountryId(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllUnitIdsByCountryId(countryId));
     }
+
+    @RequestMapping(value = COUNTRY_URL+"/organization/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfActivity(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateTranslation(id,translations));
+    }
+
 
 
 }
