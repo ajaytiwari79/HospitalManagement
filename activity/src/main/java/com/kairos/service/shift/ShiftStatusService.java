@@ -86,6 +86,9 @@ public class ShiftStatusService {
     @Inject private TodoService todoService;
 
     public ShiftAndActivtyStatusDTO updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
+        if (isCollectionEmpty(shiftPublishDTO.getShifts())) {
+            exceptionService.dataNotFoundException(MESSAGE_SHIFT_IDS);
+        }
         Shift currentShift = shiftMongoRepository.findOne(shiftPublishDTO.getShifts().get(0).getShiftId());
         ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO;
         if(isNotNull(currentShift.getRequestAbsence())){
