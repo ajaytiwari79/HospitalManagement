@@ -28,8 +28,13 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
 //            " RETURN {children: case when s is NULL then [] else collect({id:id(s),name:s.name,description:s.description}) END,id:id(n),name:n.name,description:n.description} as result")
 //    List<Map<String,Object>> getOrganizationServicesByCountryId(long countryId);
 
-    @Query("MATCH (c:Country),(n:OrganizationService{isEnabled:true}) where id(c)={0} match (c)-[:HAS_ORGANIZATION_SERVICES]->(n) OPTIONAL MATCH (n)-[r:ORGANIZATION_SUB_SERVICE]->(s:OrganizationService{isEnabled:true})RETURN n,COLLECT(s),COLLECT(r)")
+    @Query("MATCH (c:Country)-[:HAS_ORGANIZATION_SERVICES]->(n:OrganizationService{isEnabled:true}) where id(c)={0} WITH DISTINCT n" +
+            " OPTIONAL MATCH (n)-[r:ORGANIZATION_SUB_SERVICE]->(s:OrganizationService{isEnabled:true}) RETURN DISTINCT  n,COLLECT(s),COLLECT(r)")
     List<OrganizationService> getOrganizationServicesByCountryId(long countryId);
+
+    @Query("MATCH (c:Country)-[:HAS_ORGANIZATION_SERVICES]->(n:OrganizationService{isEnabled:true}) where id(c)={0} WITH DISTINCT n" +
+            "  RETURN id(n)")
+    Set<Long> getOrganizationServicesIdsByCountryId(long countryId);
 
     @Query(" MATCH  (o:OrganizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]->(ss:OrganizationService{isEnabled:true}) where id(o)={0} " +
             "MATCH (ss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService {isEnabled:true} ) " +
