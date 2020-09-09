@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,4 +33,10 @@ public class OrganizationServiceDTO {
         return infoMap;
     }
 
+    public List<OrganizationServiceDTO> getOrganizationSubService() {
+        if(this.organizationSubService==null){
+            this.organizationSubService=new ArrayList<>();
+        }
+        return organizationSubService;
+    }
 }
