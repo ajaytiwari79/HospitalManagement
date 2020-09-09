@@ -19,8 +19,10 @@ import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.GdprIntegrationService;
+import org.apache.commons.collections.IteratorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.neo4j.util.IterableUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,11 +92,9 @@ public class OrganizationServiceService {
 
 
     public List<Map<String,Object>> getAllOrganizationService(long countryId) {
-//        List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServices(countryId);
-//        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
-        List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServicesByCountryId(countryId);
-        List<OrganizationService> organizationServiceList =organizationServices.stream().filter(organizationService->isCollectionNotEmpty(organizationService.getOrganizationSubService())).collect(Collectors.toList());
-        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceList, OrganizationServiceDTO.class);
+        Set<Long> serviceIds=organizationServiceRepository.getOrganizationServicesIdsByCountryId(countryId);
+        List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(serviceIds));
+        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
         List<Map<String,Object>> mapList =new ArrayList<>();
         Map<String,Object> data = new HashMap<>();
         for (OrganizationServiceDTO result : organizationServiceDTOS) {
