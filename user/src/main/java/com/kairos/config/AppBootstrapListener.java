@@ -1,6 +1,7 @@
 package com.kairos.config;
 
 import com.kairos.annotations.KPermissionActions;
+import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.configuration.PermissionSchemaScanner;
 import com.kairos.dto.kpermissions.ActionDTO;
@@ -69,6 +70,8 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     BootDataService bootDataService;
     @Inject
     private PermissionService permissionService;
+    @Inject
+    private EnvConfigCommon envConfigCommon;
 
     /**
      * Executes on application ready event
@@ -86,7 +89,7 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     }
 
     public void createActionPermissions() {
-        List<ActionDTO> actionDTOS=new PermissionSchemaScanner().createActionPermissions("com.kairos.controller");
+        List<ActionDTO> actionDTOS=new PermissionSchemaScanner().createActionPermissions(envConfigCommon.getControllerPackagePath());
         List<KPermissionAction> permissionActions = ObjectMapperUtils.copyCollectionPropertiesByMapper(actionDTOS,KPermissionAction.class);
         if(isCollectionNotEmpty(permissionActions)) {
             permissionService.createActions(permissionActions);

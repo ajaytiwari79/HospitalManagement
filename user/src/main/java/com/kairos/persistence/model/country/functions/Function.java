@@ -29,13 +29,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@KPermissionModel
 public class Function extends UserBaseEntity {
     private String name;
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
-
     @Relationship(type = HAS_UNION)
     private List<Organization> unions;
 

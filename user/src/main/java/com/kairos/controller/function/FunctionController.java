@@ -1,10 +1,8 @@
 package com.kairos.controller.function;
 
-import com.kairos.annotations.KPermissionActions;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.user.TranslationDTO;
-import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.service.country.FunctionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
@@ -45,7 +43,6 @@ public class FunctionController {
 
     @ApiOperation(value = "Add function by countryId")
     @RequestMapping(value = API_V1 + COUNTRY_URL + "/function", method = RequestMethod.POST)
-    @KPermissionActions(modelName = "Function",action = PermissionAction.ADD)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addFunction(@PathVariable long countryId, @Validated @RequestBody FunctionDTO functionDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.createFunction(countryId, functionDTO));
@@ -61,7 +58,6 @@ public class FunctionController {
 
     @ApiOperation(value = "Update functions")
     @RequestMapping(value = API_V1 + COUNTRY_URL + "/function/{functionId}", method = RequestMethod.PUT)
-    @KPermissionActions(modelName = "Function",action = PermissionAction.EDIT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateFunction(@PathVariable long countryId, @Validated @RequestBody FunctionDTO functionDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.updateFunction(countryId, functionDTO));
@@ -69,7 +65,6 @@ public class FunctionController {
 
     @ApiOperation(value = "Delete function by functionId")
     @RequestMapping(value = API_V1 + COUNTRY_URL + "/function/{functionId}", method = RequestMethod.DELETE)
-    @KPermissionActions(modelName = "Function",action = PermissionAction.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteFunction(@PathVariable long functionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.deleteFunction(functionId));

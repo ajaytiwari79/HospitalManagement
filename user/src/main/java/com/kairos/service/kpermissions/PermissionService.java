@@ -1,6 +1,8 @@
 package com.kairos.service.kpermissions;
 
-import com.kairos.annotations.*;
+import com.kairos.annotations.KPermissionRelatedModel;
+import com.kairos.annotations.KPermissionRelationshipFrom;
+import com.kairos.annotations.KPermissionRelationshipTo;
 import com.kairos.commons.annotation.PermissionClass;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.kpermissions.*;
@@ -17,8 +19,6 @@ import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.kpermissions.*;
-import com.kairos.persistence.model.kpermissions.KPermissionField;
-import com.kairos.persistence.model.kpermissions.KPermissionModel;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.repository.custom_repository.CommonRepositoryImpl;
@@ -34,7 +34,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.PermissionMapperUtils;
-import com.kairos.utils.validator.company.ActionValid;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;

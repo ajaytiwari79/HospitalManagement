@@ -44,32 +44,18 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-
-        //flsVisitourChangeService.registerReceiver("visitourChange");
-       // payRollSystemService.createDefaultPayRollSystemList();
         createPermissionModel();
         createActionPermissions();
 
     }
 
     private void createPermissionModel(){
-        try {
             List<Map<String, Object>> permissionSchema= new PermissionSchemaScanner().createPermissionSchema(envConfigCommon.getModelPackagePath());
             userIntegrationService.createPermissionModels(permissionSchema);
-        }catch (Exception ignored){
-
-        }
-
-    }
+     }
 
     public void createActionPermissions() {
-        try {
-            List<ActionDTO> permissionActions=new PermissionSchemaScanner().createActionPermissions("com.kairos.controller");
+            List<ActionDTO> permissionActions=new PermissionSchemaScanner().createActionPermissions(envConfigCommon.getControllerPackagePath());
             userIntegrationService.createActions(permissionActions);
-        }catch (Exception ignored){
-
-        }
-
-
     }
 }

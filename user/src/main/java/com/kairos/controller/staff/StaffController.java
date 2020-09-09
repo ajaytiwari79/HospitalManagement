@@ -1,6 +1,5 @@
 package com.kairos.controller.staff;
 
-import com.kairos.utils.validator.company.ActionValid;
 import com.kairos.annotations.KPermissionActions;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
@@ -45,7 +44,6 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.enums.kpermissions.PermissionAction.ADD;
 import static com.kairos.enums.kpermissions.PermissionAction.EDIT;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 
