@@ -3,14 +3,17 @@ package com.kairos.service.organization;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.enums.team.LeaderType;
 import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.StaffTeamRelationShipQueryResult;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
@@ -185,13 +188,19 @@ public class TeamService {
 
 
     public TeamDTO getTeamDetails(Long teamId) {
-        return teamGraphRepository.getTeamDetailsById(teamId);
+        TeamDTO teamDTO = teamGraphRepository.getTeamDetailsById(teamId);
+        teamDTO.setTranslations(TranslationUtil.getTranslatedData(teamDTO.getTranslatedNames(),teamDTO.getTranslatedDescriptions()));
+        return teamDTO;
     }
 
     public Map<String, Object> getTeamsAndPrerequisite(long unitId) {
-        List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);
+        List<TeamDTO> teams = teamGraphRepository.getTeams(unitId);
+        teams.forEach(teamDTO -> {
+            teamDTO.setUnitId(unitId);
+            teamDTO.setTranslations(TranslationUtil.getTranslatedData(teamDTO.getTranslatedNames(),teamDTO.getTranslatedDescriptions()));
+        });
         Map<String, Object> map = new HashMap<>();
-        map.put("teams", (isCollectionNotEmpty(teams)) ? teams.get(0).get("teams") : Collections.emptyList());
+        map.put("teams", (isCollectionNotEmpty(teams)) ? teams : Collections.emptyList());
         List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         map.put("staffList", staffPersonalDetailQueryResults);
         map.put("skillList", skillService.getSkillsOfOrganization(unitId));
@@ -428,5 +437,19 @@ public class TeamService {
 
     public List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds){
         return teamGraphRepository.getAllStaffToAssignActivitiesByTeam(unitId, activityIds);
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfOrganizationTeams(Long teamId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Team team =teamGraphRepository.findOne(teamId);
+        team.setTranslatedNames(translatedNames);
+        team.setTranslatedDescriptions(translatedDescriptios);
+        teamGraphRepository.save(team);
+        return team.getTranslatedData();
     }
 }
