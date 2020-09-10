@@ -3,16 +3,14 @@ package com.kairos.persistence.model.kpermissions;
 import com.kairos.dto.kpermissions.OtherPermissionDTO;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
+import com.kairos.enums.kpermissions.PermissionAction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -36,7 +34,7 @@ public class ModelPermissionQueryResult {
     private Set<Long> tagIds = new HashSet<>();
     private Set<StaffStatusEnum> staffStatuses = new HashSet<>();
     private Set<FieldLevelPermission> forOtherFieldLevelPermissions = new HashSet<>();
-
+    private List<Map<String,Object>> actions;
     public ModelPermissionQueryResult(Long id, String modelName) {
         this.id = id;
         this.modelName = modelName;

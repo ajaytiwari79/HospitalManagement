@@ -1,6 +1,7 @@
 package com.kairos.dto.kpermissions;
 
 import com.kairos.enums.kpermissions.FieldLevelPermission;
+import com.kairos.enums.kpermissions.PermissionAction;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,4 +14,7 @@ public class CustomPermissionDTO {
     private Set<FieldLevelPermission> permissions;
     private OtherPermissionDTO forOtherPermissions;
     private boolean forOtherStaff;
+    private Set<Long> actions;
+    private Long accessGroupId;
+    private boolean hasPermission;
 }

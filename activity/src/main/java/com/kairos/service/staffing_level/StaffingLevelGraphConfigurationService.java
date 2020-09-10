@@ -25,7 +25,8 @@ public class StaffingLevelGraphConfigurationService {
         StaffingLevelGraphConfiguration staffingLevelGraphConfiguration = Optional.ofNullable(staffingLevelGraphConfigurationMongoRepository.findOneByUnitIdAndUserId(unitId,userId)).orElse(getDefaultConfiguration(unitId,userId));
         if(isNotNull(staffingLevelGraphConfigurationDTO.getDailyGraphConfiguration())){
             staffingLevelGraphConfiguration.setDailyGraphConfiguration(staffingLevelGraphConfigurationDTO.getDailyGraphConfiguration());
-        }if (isNotNull(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration())){
+        }
+        if (isNotNull(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration())){
             staffingLevelGraphConfiguration.setWeeklyGraphConfiguration(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration());
         }
         staffingLevelGraphConfigurationMongoRepository.save(staffingLevelGraphConfiguration);

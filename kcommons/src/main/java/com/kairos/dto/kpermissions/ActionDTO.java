@@ -2,6 +2,7 @@ package com.kairos.dto.kpermissions;
 
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
+import com.kairos.enums.kpermissions.PermissionAction;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,11 +18,12 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 public class ActionDTO {
 
     private Long id;
-    private String actionName;
+    private String modelName;
     private Set<OrganizationCategory> organizationCategories;
-    private Set<FieldLevelPermission> permissions;
+    private PermissionAction action;
 
-    public Set<FieldLevelPermission> getPermissions() {
-        return isCollectionNotEmpty(permissions) ? permissions : new HashSet<>();
+    public ActionDTO(String modelName, PermissionAction action) {
+        this.modelName = modelName;
+        this.action = action;
     }
 }

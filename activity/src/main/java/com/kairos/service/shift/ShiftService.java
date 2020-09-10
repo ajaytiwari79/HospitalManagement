@@ -40,7 +40,6 @@ import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.activity.ActivityPriorityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.TimeAndAttendanceRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
@@ -52,21 +51,15 @@ import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.todo.TodoRepository;
-import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
-import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
-import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.StaffActivityDetailsService;
-import com.kairos.service.dashboard.SickService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
-import com.kairos.service.staffing_level.StaffingLevelService;
-import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.todo.TodoService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
@@ -898,6 +891,7 @@ public class ShiftService extends MongoBaseService {
     public Long countByActivityId(BigInteger activityId) {
         return shiftMongoRepository.countByActivityId(activityId);
     }
+
 
     private ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate, ViewType viewType, StaffFilterDTO staffFilterDTO) {
         if (endLocalDate == null) {

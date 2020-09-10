@@ -2,12 +2,10 @@ package com.kairos.service.staffing_level;
 
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
-import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityValidationError;
@@ -15,8 +13,8 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.StaffingLevelHelper;
-import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.Duration;
+import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDetailsByTimeSlotDTO;
@@ -87,7 +85,9 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.*;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -118,8 +118,6 @@ public class StaffingLevelService  {
 
     @Inject
     private PhaseService phaseService;
-    @Inject
-    private EnvConfig envConfig;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
