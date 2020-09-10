@@ -33,29 +33,29 @@ public class PermissionController {
     private PermissionService permissionService;
 
     @PostMapping(value = "/create_permission_schema")
-    public ResponseEntity createFLPSchema(@Valid @RequestBody List<ModelDTO> modelDTO)  {
+    public ResponseEntity<Map<String, Object>> createFLPSchema(@Valid @RequestBody List<ModelDTO> modelDTO)  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissionSchema(modelDTO));
 
     }
 
     @GetMapping(value = "/get_permission_schema")
-    public ResponseEntity getFLPSchema()  {
+    public ResponseEntity<Map<String, Object>> getFLPSchema()  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema());
     }
 
     @GetMapping(value = "/access_group_permissions")
-    public ResponseEntity getAccessGroupPermissions(@RequestParam Set<Long> accessGroupIds )  {
+    public ResponseEntity<Map<String, Object>> getAccessGroupPermissions(@RequestParam Set<Long> accessGroupIds )  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(accessGroupIds,null));
     }
 
     @GetMapping(value = "/action_permissions")
-    public ResponseEntity getPermissionActions(@RequestParam Long accessGroupId,@RequestParam Long modelId )  {
+    public ResponseEntity<Map<String, Object>> getPermissionActions(@RequestParam Long accessGroupId,@RequestParam Long modelId )  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionActions(accessGroupId,null,null,modelId));
     }
 
     @GetMapping(value = "/action_permissions_schema")
-    public ResponseEntity getPermissionActionsSchema()  {
+    public ResponseEntity<Map<String, Object>> getPermissionActionsSchema()  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionActionsSchema());
     }
 
@@ -63,30 +63,30 @@ public class PermissionController {
 
 
     @PutMapping(value = "/update_permission")
-    public ResponseEntity createFieldPermissions(@Valid @RequestBody PermissionDTO permissionDTO,@RequestParam boolean updateOrganisationCategories)  {
+    public ResponseEntity<Map<String, Object>> createFieldPermissions(@Valid @RequestBody PermissionDTO permissionDTO,@RequestParam boolean updateOrganisationCategories)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissions(permissionDTO,updateOrganisationCategories));
     }
 
     @PutMapping(value = "/update_action_permission")
-    public ResponseEntity updateActionPermissions(@RequestBody CustomPermissionDTO customPermissionDTO)  {
+    public ResponseEntity<Map<String, Object>> updateActionPermissions(@RequestBody CustomPermissionDTO customPermissionDTO)  {
         permissionService.setActionPermissions(customPermissionDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
     @GetMapping(value = "/get_default_data_of_permission")
-    public ResponseEntity getDefaultDataOfPermission(@RequestParam Long referenceId, @RequestParam ConfLevel confLevel)  {
+    public ResponseEntity<Map<String, Object>> getDefaultDataOfPermission(@RequestParam Long referenceId, @RequestParam ConfLevel confLevel)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getDefaultDataOfPermission(referenceId,confLevel));
 
     }
 
     @PutMapping(value = "/validate_permission")
-    public ResponseEntity validatePermission(@RequestParam Long referenceId, @RequestParam ConfLevel confLevel)  {
+    public ResponseEntity<Map<String, Object>> validatePermission(@RequestParam Long referenceId, @RequestParam ConfLevel confLevel)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getDefaultDataOfPermission(referenceId,confLevel));
 
     }
 
     @PostMapping(value = "/unit/{unitId}/fetch_permissions")
-    public ResponseEntity fetchPermission(@RequestBody Set<String> objects, @PathVariable Long unitId)  {
+    public ResponseEntity<Map<String, Object>> fetchPermission(@RequestBody Set<String> objects, @PathVariable Long unitId)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.fetchPermissions(objects,unitId));
     }
 

@@ -29,6 +29,7 @@ import com.kairos.persistence.repository.user.access_permission.AccessGroupRepos
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
@@ -85,6 +86,8 @@ public class PermissionService {
     private AccessPageRepository accessPageRepository;
     @Inject
     private AccessGroupRepository accessGroupRepository;
+    @Inject
+    private StaffGraphRepository staffGraphRepository;
 
     @Inject
     public void setOrganizationService(OrganizationService organizationService) {
@@ -186,8 +189,11 @@ public class PermissionService {
         return isNotNull(staffId)?permissionModelRepository.getActionPermissionsForStaff(accessGroupId,staffId,unitId,modelId):permissionModelRepository.getActionPermissions(accessGroupId,modelId);
     }
 
-    public List<KPermissionModel> getPermissionActionsSchema() {
-        return getkPermissionModels();
+    public Map<String, Object> getPermissionActionsSchema() {
+        Map<String, Object> permissionSchemaMap = new HashMap<>();
+        permissionSchemaMap.put(PERMISSIONS_SCHEMA,getkPermissionModels());
+        permissionSchemaMap.put(ACTIONS,PermissionAction.values());
+        return permissionSchemaMap;
     }
 
     private List<KPermissionModel> getkPermissionModels() {
@@ -615,8 +621,10 @@ public class PermissionService {
     public boolean validPermissionAction(String modelName, PermissionAction action, Long unitId){
         List<AccessGroup> accessGroups = accessGroupService.validAccessGroupByDate(unitId, getDate());
         Set<Long> unitAccessGroupIds = getUnitAccessGroupIds(unitId);
-        unitAccessGroupIds.addAll(accessGroups.stream().map(k->k.getId()).collect(Collectors.toSet()));
-        return permissionModelRepository.hasActionPermission(modelName,action,unitAccessGroupIds);
+        unitAccessGroupIds.addAll(accessGroups.stream().map(UserBaseEntity::getId).collect(Collectors.toSet()));
+        Organization organization=organizationService.fetchParentOrganization(unitId);
+        Long loggedInStaffId=staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
+        return permissionModelRepository.hasActionPermission(modelName,action,unitAccessGroupIds,loggedInStaffId,unitId);
     }
 
     public void createActions(List<KPermissionAction> permissionActions) {
@@ -632,6 +640,7 @@ public class PermissionService {
     }
 
     public void setActionPermissions(CustomPermissionDTO customPermissionDTO){
+        permissionModelRepository.disableActionPermission(customPermissionDTO.getId(),customPermissionDTO.getAccessGroupId());
         permissionModelRepository.setActionPermissions(customPermissionDTO.getAccessGroupId(),customPermissionDTO.getActions(),customPermissionDTO.getId());
     }
 

@@ -357,16 +357,16 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     Set<String> getAccessRolesByAccessGroupId(Set<Long> accessGroupIds);
 
     @Query("MATCH (staff:Staff),(action:KPermissionAction) WHERE  id(staff)={0} AND id(action) IN {3} WITH staff,action " +
-            "MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,action  " +
-            "MERGE (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_FIELD +"{accessGroupId:{2}}]->(action) " +
-            " ON CREATE SET r.access=TRUE " +
-            " ON MATCH SET r.access=TRUE  RETURN distinct true ")
+            "MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,action  " +
+            "MERGE (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_ACTION +"{accessGroupId:{2}}]->(action) " +
+            " ON CREATE SET r.hasPermission=TRUE " +
+            " ON MATCH SET r.hasPermission=TRUE  RETURN distinct true ")
     void setActionPermissions(Long staffId, Long unitId, Long accessGroupId, Set<Long> actionIds);
 
     @Query("MATCH (staff:Staff) WHERE  id(staff)={0}  with staff " +
-            "MATCH(kPermissionModel:KPermissionModel)-[:"+HAS_ACTION+"]-(k:KPermissionAction) WHERE id(kPermissionModel) ={3} WITH staff,action " +
-            "MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,action  " +
-            "MATCH (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_FIELD +"{accessGroupId:{2}}]->(action) SET r.access=FALSE ")
+            "MATCH(kPermissionModel:KPermissionModel)-[:"+HAS_ACTION+"]-(action:KPermissionAction) WHERE id(kPermissionModel) ={3} WITH staff,action " +
+            "MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,action  " +
+            "MATCH (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_ACTION +"{accessGroupId:{2}}]->(action) SET r.hasPermission=FALSE ")
     void disableActionPermissions(Long staffId, Long unitId, Long accessGroupId,Long modelId);
 
 

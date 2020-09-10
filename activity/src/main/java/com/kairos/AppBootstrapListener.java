@@ -34,7 +34,8 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     @Inject
     private EnvConfigCommon envConfigCommon;
 
-    @Inject private UserIntegrationService userIntegrationService;
+    @Inject
+    private UserIntegrationService userIntegrationService;
 
 
     /**
@@ -49,13 +50,20 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
 
     }
 
-    private void createPermissionModel(){
-            List<Map<String, Object>> permissionSchema= new PermissionSchemaScanner().createPermissionSchema(envConfigCommon.getModelPackagePath());
+    private void createPermissionModel() {
+        try {
+            List<Map<String, Object>> permissionSchema = new PermissionSchemaScanner().createPermissionSchema(envConfigCommon.getModelPackagePath());
             userIntegrationService.createPermissionModels(permissionSchema);
-     }
+        } catch (Exception ignored) {
+        }
+
+    }
 
     public void createActionPermissions() {
-            List<ActionDTO> permissionActions=new PermissionSchemaScanner().createActionPermissions(envConfigCommon.getControllerPackagePath());
+        try {
+            List<ActionDTO> permissionActions = new PermissionSchemaScanner().createActionPermissions(envConfigCommon.getControllerPackagePath());
             userIntegrationService.createActions(permissionActions);
+        } catch (Exception ignored) {
+        }
     }
 }
