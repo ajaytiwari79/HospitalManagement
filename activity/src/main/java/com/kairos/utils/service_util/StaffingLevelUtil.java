@@ -309,7 +309,9 @@ public class StaffingLevelUtil {
         staffingLevel.setPhaseId(absenceStaffingLevelDto.getPhaseId());
         staffingLevel.setWeekCount(absenceStaffingLevelDto.getWeekCount());
         StaffingLevelIntervalLog staffingLevelIntervalLog = staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelIntervalLogs().stream().filter(k -> k.getUserInfo().getId().equals(UserContext.getUserDetails().getId())).findFirst().orElse(new StaffingLevelIntervalLog());
-        staffingLevelIntervalLog.setStaffingLevelActivities(absenceStaffingLevelDto.getStaffingLevelActivities());
+        Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMapOfLogs = staffingLevelIntervalLog.getStaffingLevelActivities().stream().collect(toMap(StaffingLevelActivity::getActivityId, v -> v));
+        Set<StaffingLevelActivity> staffingLevelActivities=getActivities(staffingLevelActivityMapOfLogs,absenceStaffingLevelDto.getStaffingLevelActivities());
+        staffingLevelIntervalLog.setStaffingLevelActivities(staffingLevelActivities);
         staffingLevelIntervalLog.setMinNoOfStaff(staffingLevelIntervalLog.getStaffingLevelActivities().stream().mapToInt(StaffingLevelActivity::getMinNoOfStaff).sum());
         staffingLevelIntervalLog.setMaxNoOfStaff(staffingLevelIntervalLog.getStaffingLevelActivities().stream().mapToInt(StaffingLevelActivity::getMaxNoOfStaff).sum());
         staffingLevelIntervalLog.setUserInfo(new UserInfo(UserContext.getUserDetails().getId(), UserContext.getUserDetails().getEmail(), UserContext.getUserDetails().getFullName()));
@@ -317,6 +319,22 @@ public class StaffingLevelUtil {
         staffingLevelIntervalLog.setNewlyAddedActivityIds(newlyAddedActivities);
         staffingLevelIntervalLog.setUpdatedAt(getCurrentDate());
         staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelIntervalLogs().add(staffingLevelIntervalLog);
+    }
+
+    private static Set<StaffingLevelActivity> getActivities(Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMapOfLogs, Set<StaffingLevelActivity> staffingLevelActivities) {
+        for(StaffingLevelActivity staffingLevelActivity:staffingLevelActivities){
+        if (isEmpty(staffingLevelActivityMapOfLogs) || !staffingLevelActivityMapOfLogs.containsKey(staffingLevelActivity.getActivityId()) || staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMaxNoOfStaff() != staffingLevelActivity.getMaxNoOfStaff()) {
+            staffingLevelActivity.setMaxUpdatedAt(getCurrentDate());
+        } else {
+            staffingLevelActivity.setMaxUpdatedAt(staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMaxUpdatedAt());
+        }
+        if (isEmpty(staffingLevelActivityMapOfLogs) || !staffingLevelActivityMapOfLogs.containsKey(staffingLevelActivity.getActivityId()) || staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMinNoOfStaff() != staffingLevelActivity.getMinNoOfStaff()) {
+            staffingLevelActivity.setMinUpdatedAt(getCurrentDate());
+        } else {
+            staffingLevelActivity.setMinUpdatedAt(staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMinUpdatedAt());
+        }
+        }
+        return staffingLevelActivities;
     }
 
     public static void updateStaffingLevelToPublish(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevel staffingLevel) {
