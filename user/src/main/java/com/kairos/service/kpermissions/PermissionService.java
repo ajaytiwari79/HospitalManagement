@@ -185,8 +185,8 @@ public class PermissionService {
         return permissionSchemaMap;
     }
 
-    public ModelPermissionQueryResult getPermissionActions(Long accessGroupId, Long staffId,Long unitId,Long modelId) {
-        return isNotNull(staffId)?permissionModelRepository.getActionPermissionsForStaff(accessGroupId,staffId,unitId,modelId):permissionModelRepository.getActionPermissions(accessGroupId,modelId);
+    public List<ModelPermissionQueryResult> getPermissionActions(Long accessGroupId, Long staffId,Long unitId,Long modelId) {
+        return isNotNull(staffId)?permissionModelRepository.getActionPermissionsForStaff(accessGroupId,staffId,unitId):permissionModelRepository.getActionPermissions(accessGroupId);
     }
 
     public Map<String, Object> getPermissionActionsSchema() {
