@@ -426,11 +426,12 @@ public class StaffingLevelUtil {
             Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMap =isCollectionEmpty(staffingLevel.getAbsenceStaffingLevelInterval())?new HashMap<>(): staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().stream().collect(toMap(StaffingLevelActivity::getActivityId, v -> v));
             for (StaffingLevelActivity staffingLevelActivity : absenceStaffingLevelDto.getStaffingLevelActivities()) {
                 if (!staffingLevelActivityMap.containsKey(staffingLevelActivity.getActivityId())) {
+                    StaffingLevelActivity newActivity=new StaffingLevelActivity(staffingLevelActivity.getActivityId(),staffingLevelActivity.getName(),0,0);
                     if(isCollectionEmpty(staffingLevel.getAbsenceStaffingLevelInterval())){
                         staffingLevel.getAbsenceStaffingLevelInterval().add(interval);
-                        staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().add(staffingLevelActivity);
+                        staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().add(newActivity);
                     }else {
-                        staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().add(staffingLevelActivity);
+                        staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().add(newActivity);
                     }
                     newlyAddedActivities.add(staffingLevelActivity.getActivityId());
                 }
