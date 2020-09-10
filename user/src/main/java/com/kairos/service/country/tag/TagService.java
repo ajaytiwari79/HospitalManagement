@@ -262,9 +262,19 @@ public class TagService {
         }
         Map<String, Object> tagsData = new HashMap<>();
         if (masterDataType == null) {
-            tagsData.put("tags", tagGraphRepository.getListOfOrganizationTags(organizationId, false, filterText));
+            List<TagQueryResult> tagQueryResults =tagGraphRepository.getListOfOrganizationTags(organizationId, false, filterText);
+            tagQueryResults.forEach(tagQueryResult -> {
+                tagQueryResult.setUnutId(unit.getId());
+                tagQueryResult.setTranslations(TranslationUtil.getTranslatedData(tagQueryResult.getTranslatedNames(),tagQueryResult.getTranslatedDescriptions()));
+            });
+            tagsData.put("tags", tagQueryResults);
         }else {
-            tagsData.put("tags", tagGraphRepository.getListOfOrganizationTagsByMasterDataType(organizationId, false, filterText, masterDataType.toString()));
+            List<TagQueryResult> tagQueryResults = tagGraphRepository.getListOfOrganizationTagsByMasterDataType(organizationId, false, filterText, masterDataType.toString());
+            tagQueryResults.forEach(tagQueryResult -> {
+                tagQueryResult.setCountryId(unit.getId());
+                tagQueryResult.setTranslations(TranslationUtil.getTranslatedData(tagQueryResult.getTranslatedNames(),tagQueryResult.getTranslatedDescriptions()));
+            });
+            tagsData.put("tags", tagQueryResults);
         }
         return tagsData;
     }
