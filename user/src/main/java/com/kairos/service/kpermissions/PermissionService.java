@@ -185,7 +185,7 @@ public class PermissionService {
         return permissionSchemaMap;
     }
 
-    public List<ModelPermissionQueryResult> getPermissionActions(Long accessGroupId, Long staffId,Long unitId,Long modelId) {
+    public List<ModelPermissionQueryResult> getPermissionActions(Long accessGroupId, Long staffId,Long unitId) {
         return isNotNull(staffId)?permissionModelRepository.getActionPermissionsForStaff(accessGroupId,staffId,unitId):permissionModelRepository.getActionPermissions(accessGroupId);
     }
 
