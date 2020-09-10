@@ -50,8 +50,8 @@ public class PermissionController {
     }
 
     @GetMapping(value = "/action_permissions")
-    public ResponseEntity<Map<String, Object>> getPermissionActions(@RequestParam Long accessGroupId,@RequestParam Long modelId )  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionActions(accessGroupId,null,null,modelId));
+    public ResponseEntity<Map<String, Object>> getPermissionActions(@RequestParam Long accessGroupId )  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionActions(accessGroupId,null,null));
     }
 
     @GetMapping(value = "/action_permissions_schema")
@@ -108,8 +108,8 @@ public class PermissionController {
     }
 
     @GetMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/action_permission")
-    public ResponseEntity<Map<String, Object>> getActionPermissionByAccessGroup(@RequestParam("staffId") Long staffId,@RequestParam("modelId") Long modelId,@PathVariable Long unitId, @PathVariable Long accessGroupId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionActions(accessGroupId,staffId,unitId,modelId));
+    public ResponseEntity<Map<String, Object>> getActionPermissionByAccessGroup(@RequestParam("staffId") Long staffId,@PathVariable Long unitId, @PathVariable Long accessGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionActions(accessGroupId,staffId,unitId));
     }
 
     @PutMapping(value = "/create_action_permission")
