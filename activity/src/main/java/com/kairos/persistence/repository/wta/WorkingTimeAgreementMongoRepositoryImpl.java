@@ -100,7 +100,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
                 match(Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(countryId)),
                 lookup("tag","tags","_id","tags"),
                 lookup(WTA_BASE_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES),
-                project("name", DESCRIPTION, DISABLED, EXPERTISE, ORGANIZATION_TYPE, ORGANIZATION_SUB_TYPE, COUNTRY_ID, ORGANIZATION, PARENT_ID, COUNTRY_PARENT_WTA, ORGANIZATION_PARENT_ID, "tags", START_DATE, END_DATE, EXPIRY_DATE, RULE_TEMPLATES)
+                project("name", DESCRIPTION, DISABLED, EXPERTISE, ORGANIZATION_TYPE, ORGANIZATION_SUB_TYPE, COUNTRY_ID, ORGANIZATION, PARENT_ID, COUNTRY_PARENT_WTA, ORGANIZATION_PARENT_ID, "tags", START_DATE, END_DATE, EXPIRY_DATE, RULE_TEMPLATES,"translations")
 
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);

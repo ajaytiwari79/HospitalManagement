@@ -470,7 +470,7 @@ public class CostTimeAgreementService {
      * @return List<CTAResponseDTO>
      */
     public List<CTAResponseDTO> loadAllCTAByCountry(Long countryId) {
-        return costTimeAgreementRepository.findCTAByCountryId(countryId);
+       return costTimeAgreementRepository.findCTAByCountryId(countryId);
     }
 
     /**
@@ -694,13 +694,20 @@ public class CostTimeAgreementService {
         return costTimeAgreementRepository.findCTAByUnitId(unitId);
     }
 
-    //    Todo please do not remove this method I am working on it later
-//    public Map<String, TranslationInfo> updateTranslation(BigInteger ctaId, Map<String,TranslationInfo> translations) {
-//        CostTimeAgreement costTimeAgreement =costTimeAgreementRepository.findOne(ctaId);
-//        costTimeAgreement.setTranslations(translations);
-//        costTimeAgreementRepository.save(costTimeAgreement);
-//        return costTimeAgreement.getTranslations();
-//    }
+
+    public Map<String, TranslationInfo> updateCtaRuleTranslations(BigInteger ctaId, Map<String,TranslationInfo> translations) {
+        CTARuleTemplate ctaRuleTemplate =ctaRuleTemplateRepository.findOne(ctaId);
+        ctaRuleTemplate.setTranslations(translations);
+        ctaRuleTemplateRepository.save(ctaRuleTemplate);
+        return ctaRuleTemplate.getTranslations();
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger ctaId, Map<String,TranslationInfo> translations) {
+        CostTimeAgreement costTimeAgreement =costTimeAgreementRepository.findOne(ctaId);
+        costTimeAgreement.setTranslations(translations);
+        costTimeAgreementRepository.save(costTimeAgreement);
+        return costTimeAgreement.getTranslations();
+    }
 
 }
 

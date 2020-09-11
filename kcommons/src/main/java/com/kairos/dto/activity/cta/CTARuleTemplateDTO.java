@@ -2,6 +2,7 @@ package com.kairos.dto.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
@@ -74,6 +75,8 @@ public class CTARuleTemplateDTO {
     private String ruleTemplateCategoryName;
     private UserInfo lastModifiedBy;
     private ConditionalCompensation conditionalCompensation;
+    private Long countryId;
+    private Map<String, TranslationInfo> translations;
 
 
     public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
