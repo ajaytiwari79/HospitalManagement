@@ -146,7 +146,7 @@ public class ShiftStatusService {
 
     private ShiftAndActivtyStatusDTO updateStatusOfRequestAbsence(Long unitId, ShiftPublishDTO shiftPublishDTO, Shift currentShift) {
         Activity activity = activityMongoRepository.findOne(currentShift.getRequestAbsence().getActivityId());
-        PhaseDTO phase = phaseService.getUnitPhaseByDate(unitId, currentShift.getStartDate());
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, currentShift.getStartDate(),currentShift.getEndDate());
         PhaseTemplateValue phaseTemplateValue = activity.getActivityPhaseSettings().getPhaseTemplateValues().stream().filter(p -> p.getPhaseId().equals(phase.getId())).findFirst().get();
         StaffAccessGroupDTO staffAccessGroupDTO = userIntegrationService.getStaffAccessGroupDTO(unitId);
         ActivityShiftStatusSettings activityShiftStatusSettings = getActivityShiftStatusSettingByStatus(phaseTemplateValue, shiftPublishDTO.getStatus());
