@@ -106,7 +106,7 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
     ModelPermissionQueryResult getActionPermissions(Long accessGroupId,Long modelId);
 
     @Query(value = "MATCH (accessGroup:AccessGroup) WHERE id(accessGroup) = {0} " +
-            "MATCH(kPermissionModel:KPermissionModel)-[:"+HAS_ACTION+"]-(kPermissionAction:KPermissionAction)" +
+            "MATCH(kPermissionModel:KPermissionModel)-[:"+HAS_ACTION+"]-(kPermissionAction:KPermissionAction) WHERE ID(kPermissionModel)={3} " +
             "OPTIONAL MATCH(kPermissionAction)-[rel:"+HAS_ACTION_PERMISSION+"]->(accessGroup) " +
             "OPTIONAL MATCH(staff:Staff)<-[:"+BELONGS_TO+"]-(position:Position)-["+HAS_UNIT_PERMISSIONS+"]->(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit) WHERE ID(staff)={1} AND ID(unit)={2} " +
             "OPTIONAL MATCH(up)-[customRel:"+HAS_CUSTOMIZED_PERMISSION_FOR_ACTION+"]->(kPermissionAction) WHERE customRel.accessGroupId=id(accessGroup) " +
