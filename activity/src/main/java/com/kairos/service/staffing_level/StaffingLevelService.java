@@ -272,7 +272,7 @@ public class StaffingLevelService  {
         Duration duration = new Duration(LocalTime.MIN, LocalTime.MAX);
         StaffingLevelSetting staffingLevelSetting = new StaffingLevelSetting(15, duration);
 
-        PhaseDTO phase = phaseService.getUnitPhaseByDate(unitId, currentDate);
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, currentDate,null);
         LocalDate date = LocalDate.now();
         TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeekCount = date.get(woy);
@@ -316,7 +316,7 @@ public class StaffingLevelService  {
     }
 
     public Map<String, Object> getPhaseAndDayTypesForStaffingLevel(Long unitId, Date proposedDate) {
-        PhaseDTO phase = phaseService.getUnitPhaseByDate(unitId, proposedDate);
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, proposedDate,null);
         List<DayType> dayTypes = userIntegrationService.getDayType(proposedDate);
         Map<String, Object> mapOfPhaseAndDayType = new HashMap<>();
         mapOfPhaseAndDayType.put("phase", phase);
@@ -1002,7 +1002,8 @@ public class StaffingLevelService  {
                 StaffingLevelUtil.updateStaffingLevelToPublish(staffingLevelPublishDTO, staffingLevel);
             }
             staffingLevelMongoRepository.saveEntities(staffingLevels);
-            return ObjectMapperUtils.copyPropertiesByMapper(staffingLevels.get(0), PresenceStaffingLevelDto.class);
+            StaffingLevel staffingLevel=staffingLevels.stream().filter(k->asLocalDate(k.getCurrentDate()).equals(staffingLevelPublishDTO.getSelectedDate())).findAny().orElse(new StaffingLevel());
+            return ObjectMapperUtils.copyPropertiesByMapper(staffingLevel, PresenceStaffingLevelDto.class);
         }
 
     public boolean validateStaffingLevel(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, Shift oldStateShift) {

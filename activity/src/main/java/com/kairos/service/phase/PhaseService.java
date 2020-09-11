@@ -104,33 +104,6 @@ public class PhaseService extends MongoBaseService {
     }
 
 
-    public PhaseDTO getUnitPhaseByDate(Long unitId, Date date) {
-        PhaseDTO phaseDTO = new PhaseDTO();
-        LocalDate currentDate = LocalDate.now();
-        LocalDate proposedDate = DateUtils.getLocalDateFromDate(date);
-        long weekDifference = currentDate.until(proposedDate, ChronoUnit.WEEKS);
-        List<PhaseDTO> phaseDTOS = phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.ASC);
-        int weekCount = 0;
-        if (weekDifference < 0) {    // Week has passed so FINAL will be the object returned
-            phaseDTO = phaseDTOS.get(0);
-        } else {
-            for (PhaseDTO phase : phaseDTOS) {
-                for (int i = 0; i < phase.getDuration(); i++) {
-                    if (weekDifference == weekCount) {
-                        phaseDTO = phase;
-                    }
-                    weekCount++;
-                }
-
-            }
-            if (weekDifference > weekCount) {    // Week has still greater  so It will be request and Request object will be  returned
-                phaseDTO = phaseDTOS.get(phaseDTOS.size() - 1);
-            }
-        }
-
-        return phaseDTO;
-    }
-
     public Phase createPhaseInCountry(Long countryId, PhaseDTO phaseDTO) {
         long phaseExists = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
         if (phaseExists > 0) {
