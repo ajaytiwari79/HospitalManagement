@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
@@ -25,6 +26,7 @@ import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryResult;
 import com.kairos.persistence.model.country.experties.UnionServiceWrapper;
@@ -277,6 +279,7 @@ public class ExpertiseService {
         Map<Long,CTACompensationSettingDTO> ctaCompensationSettingDTOMap = ctaCompensationSettingDTOS.stream().collect(Collectors.toMap(ctaCompensationSettingDTO -> ctaCompensationSettingDTO.getExpertiseId(),v->v));
         Map<Long, List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap = expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
         expertiseQueryResults.forEach(expertiseQueryResult -> {
+            expertiseQueryResult.setCountryId(countryId);
             expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId()));
             expertiseQueryResult.setCtaCompensationSetting(ctaCompensationSettingDTOMap.get(expertiseQueryResult.getId()));
         });
@@ -369,7 +372,10 @@ public class ExpertiseService {
         List<Long> allExpertiseIds = expertiseQueryResults.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
         List<ExpertiseLineQueryResult> expertiseLineQueryResults = expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
         Map<Long, List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap = expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
-        expertiseQueryResults.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
+        expertiseQueryResults.forEach(expertiseQueryResult ->{
+                expertiseQueryResult.setCountryId(countryId);
+                expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId()));
+    });
         return expertiseQueryResults;
     }
 
@@ -675,6 +681,20 @@ public class ExpertiseService {
         if (CollectionUtils.isNotEmpty(staffExpertiseRelationShips)) {
             staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
         }
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long expertiseId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Expertise expertise =expertiseGraphRepository.findOne(expertiseId);
+        expertise.setTranslatedNames(translatedNames);
+        expertise.setTranslatedDescriptions(translatedDescriptios);
+        expertiseGraphRepository.save(expertise);
+        return expertise.getTranslatedData();
     }
 
 

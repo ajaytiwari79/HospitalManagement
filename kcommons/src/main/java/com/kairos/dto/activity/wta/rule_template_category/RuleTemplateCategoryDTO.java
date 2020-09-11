@@ -3,6 +3,7 @@ package com.kairos.dto.activity.wta.rule_template_category;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -35,12 +37,13 @@ public class RuleTemplateCategoryDTO {
     private String name;
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;
-    private Long country;
+    private Long countryId;
     private BigInteger id;
     private Date createdAt;
     private Date updatedAt;
     private boolean deleted;
     private List<BigInteger> ruleTemplateIds;
+    private Map<String, TranslationInfo> translations;
 
     private List<TagDTO> tags = new ArrayList<>();
 

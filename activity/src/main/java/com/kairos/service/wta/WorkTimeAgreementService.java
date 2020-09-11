@@ -3,6 +3,8 @@ package com.kairos.service.wta;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
@@ -37,6 +39,7 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
@@ -378,6 +381,7 @@ public class WorkTimeAgreementService{
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
             WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
+            wtaResponseDTO.setCountryId(countryId);
             wtaResponseDTOS.add(wtaResponseDTO);
         });
 
@@ -1059,5 +1063,19 @@ public class WorkTimeAgreementService{
                 }
             }
         }
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger wtaId, Map<String,TranslationInfo> translations) {
+        WorkingTimeAgreement workingTimeAgreement= workingTimeAgreementMongoRepository.findOne(wtaId);
+        workingTimeAgreement.setTranslations(translations);
+        workingTimeAgreementMongoRepository.save(workingTimeAgreement);
+        return workingTimeAgreement.getTranslations();
+    }
+
+    public Map<String, TranslationInfo> updateTranslationRuleTemplates(BigInteger wtaId, Map<String,TranslationInfo> translations) {
+        WTABaseRuleTemplate wtaBaseRuleTemplate= wtaBaseRuleTemplateRepository.findOne(wtaId);
+        wtaBaseRuleTemplate.setTranslations(translations);
+        wtaBaseRuleTemplateRepository.save(wtaBaseRuleTemplate);
+        return wtaBaseRuleTemplate.getTranslations();
     }
 }

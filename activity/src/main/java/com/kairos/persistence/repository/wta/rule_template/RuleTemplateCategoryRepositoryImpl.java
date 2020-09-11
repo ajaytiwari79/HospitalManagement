@@ -36,7 +36,7 @@ public class RuleTemplateCategoryRepositoryImpl implements CustomRuleTemplateCat
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(countryId).and(RULE_TEMPLATE_CATEGORY_TYPE).is(RuleTemplateCategoryType.WTA)),
                 lookup("tag", "tags", "_id", "tags"),
-                project("name", "description", "tags")
+                project("name", "description", "tags","translations")
         );
         AggregationResults<RuleTemplateCategoryTagDTO> result = mongoTemplate.aggregate(aggregation, RuleTemplateCategory.class, RuleTemplateCategoryTagDTO.class);
         return result.getMappedResults();

@@ -2,6 +2,7 @@ package com.kairos.dto.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
@@ -47,6 +48,8 @@ public class WTAResponseDTO {
     private List<WTAResponseDTO> versions = new ArrayList<>();
     private List<TagDTO> tags;
     private Map<String, Object> unitInfo;
+    private Long countryId;
+    private Map<String, TranslationInfo> translations;
 
     public WTAResponseDTO(String name, BigInteger id,BigInteger parentId) {
         this.name = name;

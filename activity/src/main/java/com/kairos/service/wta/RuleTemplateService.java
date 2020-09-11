@@ -296,6 +296,9 @@ public class RuleTemplateService{
     public RuleTemplateWrapper getRuleTemplate(long countryId) {
 
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(countryId);
+        categoryList.forEach(category->{
+            category.setCountryId(countryId);
+        });
 
         if (categoryList == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_CATEGORY_NULL_LIST);
