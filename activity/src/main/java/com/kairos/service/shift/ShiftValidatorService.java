@@ -1015,16 +1015,9 @@ public class ShiftValidatorService {
 
 
     //This method is being used to check overlapping shift with full day and full week activity
-    public void checkAbsenceTypeShift(ShiftDTO shiftDTO, ActivityWrapper activityWrapper) {
-        Date startDate = null;
-        Date endDate = null;
-        List<Shift> shiftList;
-        startDate = isNull(shiftDTO.getStartDate()) ? asDateStartOfDay(shiftDTO.getShiftDate()) : shiftDTO.getStartDate();
-        endDate = isNull(shiftDTO.getEndDate()) ? asDateEndOfDay(shiftDTO.getShiftDate()) : shiftDTO.getEndDate();
-
-        shiftList = shiftMongoRepository.getAllOverlappedShiftsAndEmploymentId(shiftDTO.getEmploymentId(), startDate, endDate);
-
-
+    public void checkAbsenceTypeShift(ShiftDTO shiftDTO) {
+        Date startDate;
+        Date endDate;
         if (shiftDTO.getStartDate() != null && asLocalDate(shiftDTO.getEndDate()).isAfter(asLocalDate(shiftDTO.getStartDate()))) {
             startDate = DateUtils.getStartOfDay(shiftDTO.getStartDate());
             endDate = DateUtils.getEndOfDay(shiftDTO.getEndDate());
@@ -1033,9 +1026,6 @@ public class ShiftValidatorService {
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
         }
         boolean absenceShiftExists = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
-        if (isCollectionEmpty(shiftList) || (shiftList.get(0).getActivities().get(0).getTimeType().equals(activityWrapper.getTimeType()) && TimeTypeEnum.ABSENCE.equals(activityWrapper.getTimeTypeInfo().getSecondLevelType()))) {
-            absenceShiftExists = false;
-        }
         if (absenceShiftExists) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERLAP_WITH_FULL_DAY);
         }
