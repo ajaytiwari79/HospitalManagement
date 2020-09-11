@@ -19,12 +19,12 @@ public class AppPermissionEvaluator implements PermissionEvaluator {
     private ExceptionService exceptionService;
 
     public boolean isValid(String modelName, PermissionAction action) {
-        if(!UserContext.getUserDetails().isSystemAdmin()){
-            boolean authorized= userIntegrationService.validPermissionAction(modelName,action, UserContext.getUserDetails().getLastSelectedOrganizationId());
-            if(!authorized){
-                exceptionService.actionNotPermittedException("message.invalid_action",action.toString(),modelName);
-            }
-        }
+//        if(!UserContext.getUserDetails().isSystemAdmin()){
+//            boolean authorized= userIntegrationService.validPermissionAction(modelName,action, UserContext.getUserDetails().getLastSelectedOrganizationId());
+//            if(!authorized){
+//                exceptionService.actionNotPermittedException("message.invalid_action",action.toString(),modelName);
+//            }
+//        }
         return true;
 
     }
