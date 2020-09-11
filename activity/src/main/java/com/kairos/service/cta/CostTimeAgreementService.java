@@ -15,6 +15,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
+import com.kairos.enums.cta.ActivityTypeForCostCalculation;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
@@ -512,14 +513,11 @@ public class CostTimeAgreementService {
      * @param ctaRuleTemplate
      */
     private void setActivityBasesCostCalculationSettings(CTARuleTemplate ctaRuleTemplate) {
-        switch (ctaRuleTemplate.getActivityTypeForCostCalculation()) {
-            case TIME_TYPE_ACTIVITY:
-                ctaRuleTemplate.setActivityIds(new HashSet<>());
-                break;
-            default:
-                ctaRuleTemplate.setPlannedTimeIds(null);
-                ctaRuleTemplate.setTimeTypeIds(null);
-                break;
+        if (ctaRuleTemplate.getActivityTypeForCostCalculation() == ActivityTypeForCostCalculation.TIME_TYPE_ACTIVITY) {
+            ctaRuleTemplate.setActivityIds(new HashSet<>());
+        } else {
+            ctaRuleTemplate.setPlannedTimeIds(null);
+            ctaRuleTemplate.setTimeTypeIds(null);
         }
     }
 
