@@ -31,6 +31,7 @@ public class TagQueryResult {
     private Date startDate;
     private Date endDate;
     private Long countryId;
+    private Long unutId;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
     private Map<String, TranslationInfo> translations;

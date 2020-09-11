@@ -115,4 +115,11 @@ public class TagController {
     public ResponseEntity<Map<String, Object>> updateTranslationOfTags(@PathVariable BigInteger tagId, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateTranslation(tagId,translations));
     }
+
+    @ApiOperation(value = "Update translated data")
+    @PutMapping(value = UNIT_URL + "/tag/{tagId}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfTagsOfOrganization(@PathVariable BigInteger tagId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateTranslation(tagId,translations));
+    }
 }

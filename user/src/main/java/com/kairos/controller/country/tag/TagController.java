@@ -144,7 +144,13 @@ public class TagController {
     @PutMapping(value = COUNTRY_URL + "/tag/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateTranslationsOfRelationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+    ResponseEntity<Map<String, Object>> updateTranslationsOfTag(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, tagService.updateTranslationOfTag(id,translations));
+    }
+    @PutMapping(value = UNIT_URL + "/tag/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationTag(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, tagService.updateTranslationOfTag(id,translations));
     }
 
