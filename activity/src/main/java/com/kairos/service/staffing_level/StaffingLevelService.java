@@ -996,14 +996,14 @@ public class StaffingLevelService  {
         return staffingLevelMongoRepository.findByUnitIdAndDates(unitId, startDate, endDate);
     }
 
-    public <T> T publishStaffingLevel(Long unitId,StaffingLevelPublishDTO staffingLevelPublishDTO){
+    public PresenceStaffingLevelDto publishStaffingLevel(Long unitId,StaffingLevelPublishDTO staffingLevelPublishDTO){
             List<StaffingLevel> staffingLevels =isCollectionNotEmpty(staffingLevelPublishDTO.getWeekDates())?staffingLevelMongoRepository.findByUnitIdAndDates(unitId,staffingLevelPublishDTO.getWeekDates()): staffingLevelMongoRepository.findByUnitIdAndDates(unitId, staffingLevelPublishDTO.getStartDate(), staffingLevelPublishDTO.getEndDate());
             for (StaffingLevel staffingLevel : staffingLevels) {
                 StaffingLevelUtil.updateStaffingLevelToPublish(staffingLevelPublishDTO, staffingLevel);
             }
             staffingLevelMongoRepository.saveEntities(staffingLevels);
             StaffingLevel staffingLevel=staffingLevels.stream().filter(k->asLocalDate(k.getCurrentDate()).equals(staffingLevelPublishDTO.getSelectedDate())).findAny().orElse(new StaffingLevel());
-            return (T) ObjectMapperUtils.copyPropertiesByMapper(staffingLevel, PresenceStaffingLevelDto.class);
+            return ObjectMapperUtils.copyPropertiesByMapper(staffingLevel, PresenceStaffingLevelDto.class);
         }
 
     public boolean validateStaffingLevel(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, Shift oldStateShift) {
