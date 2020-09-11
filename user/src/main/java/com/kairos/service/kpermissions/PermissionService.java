@@ -186,16 +186,11 @@ public class PermissionService {
     }
 
     public List<ModelPermissionQueryResult> getPermissionActions(Long accessGroupId, Long staffId,Long unitId) {
-        List<KPermissionModel> kPermissionModels=getkPermissionModels();
-        List<ModelPermissionQueryResult> queryResults=new ArrayList<>();
-        for (KPermissionModel kPermissionModel:kPermissionModels){
             if(isNotNull(staffId)){
-                queryResults.add(permissionModelRepository.getActionPermissionsForStaff(accessGroupId,staffId,unitId,kPermissionModel.getId()));
+                return permissionModelRepository.getActionPermissionsForStaff(accessGroupId,staffId,unitId);
             }else {
-                queryResults.add(permissionModelRepository.getActionPermissions(accessGroupId,kPermissionModel.getId()));
+                return permissionModelRepository.getActionPermissions(accessGroupId);
             }
-        }
-       return queryResults;
     }
 
     public Map<String, Object> getPermissionActionsSchema() {
