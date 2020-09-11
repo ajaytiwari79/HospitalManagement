@@ -100,10 +100,10 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
     void disableActionPermission(Long id,Long accessGroupId);
 
 
-    @Query(value = "MATCH(accessGroup:AccessGroup)<-[r:"+HAS_ACTION_PERMISSION+"]-(kPermissionAction:KPermissionAction)<-[:"+HAS_ACTION+"]-(kPermissionModel:KPermissionModel) where id(accessGroup)={0} " +
+    @Query(value = "MATCH(accessGroup:AccessGroup)<-[r:"+HAS_ACTION_PERMISSION+"]-(kPermissionAction:KPermissionAction)<-[:"+HAS_ACTION+"]-(kPermissionModel:KPermissionModel) where id(accessGroup)={0} AND ID(kPermissionModel)={1} " +
             "RETURN id(kPermissionModel) as id,kPermissionModel.modelName as modelName," +
             "{id:id(kPermissionAction),action:kPermissionAction.action,hasPermission:r.hasPermission} as actions " )
-    List<ModelPermissionQueryResult> getActionPermissions(Long accessGroupId);
+    ModelPermissionQueryResult getActionPermissions(Long accessGroupId,Long modelId);
 
     @Query(value = "MATCH (accessGroup:AccessGroup) WHERE id(accessGroup) = {0} " +
             "MATCH(kPermissionModel:KPermissionModel)-[:"+HAS_ACTION+"]-(kPermissionAction:KPermissionAction)" +
@@ -112,5 +112,5 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "OPTIONAL MATCH(up)-[customRel:"+HAS_CUSTOMIZED_PERMISSION_FOR_ACTION+"]->(kPermissionAction) WHERE customRel.accessGroupId=id(accessGroup) " +
             "RETURN id(kPermissionModel) as id,kPermissionModel.modelName as modelName," +
             "COLLECT({id:id(kPermissionAction),action:kPermissionAction.action,hasPermission:CASE WHEN customRel IS NULL THEN  rel.hasPermission ELSE customRel.hasPermission END}) as actions " )
-    List<ModelPermissionQueryResult> getActionPermissionsForStaff(Long accessGroupId,Long staffId,Long unitId);
+    ModelPermissionQueryResult getActionPermissionsForStaff(Long accessGroupId,Long staffId,Long unitId,Long modelId);
 }
