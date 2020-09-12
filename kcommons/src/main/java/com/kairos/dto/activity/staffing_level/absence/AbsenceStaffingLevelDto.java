@@ -35,7 +35,7 @@ public class AbsenceStaffingLevelDto {
     private StaffingLevelSetting staffingLevelSetting;
     private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
     private Long unitId;
-    private TreeSet<StaffingLevelIntervalLog> staffingLevelIntervalLogs;
+    private TreeSet<StaffingLevelIntervalLog> staffingLevelIntervalLogs=new TreeSet<>();
 
 
     public AbsenceStaffingLevelDto(BigInteger id, BigInteger phaseId, Date currentDate, Integer weekCount) {
