@@ -18,9 +18,12 @@ public class StaffingLevelPublishDTO {
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private Date endDate;
     private Set<LocalDate> weekDates;
-    private LocalDate selectedDate;
+    private LocalDate selectedDateForPresence;
+    private LocalDate selectedEndDateForPresence;
+    private LocalDate selectedDateForAbsence;
+    private LocalDate selectedEndDateForAbsence;
 
     private Set<BigInteger> activityIds=new HashSet<>();
     private Set<Long> skillIds=new HashSet<>();
-    private boolean publishAbsence;
+
 }
