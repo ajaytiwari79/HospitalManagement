@@ -339,15 +339,12 @@ public class StaffingLevelUtil {
 
     public static void updateStaffingLevelToPublish(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevel staffingLevel) {
         List<StaffingLevelInterval> staffingLevelIntervals = staffingLevel.getPresenceStaffingLevelInterval();
-        if (!staffingLevelPublishDTO.isPublishAbsence()) {
             for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
                 updateActivities(staffingLevelPublishDTO, staffingLevelInterval);
             }
-        } else {
             for (int i = 0; i < staffingLevel.getAbsenceStaffingLevelInterval().size(); i++) {
                 updateActivities(staffingLevelPublishDTO, staffingLevelIntervals.get(i));
             }
-        }
     }
 
     private static void updateActivities(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevelInterval staffingLevelInterval) {
