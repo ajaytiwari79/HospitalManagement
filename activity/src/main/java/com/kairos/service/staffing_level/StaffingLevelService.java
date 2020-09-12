@@ -696,24 +696,24 @@ public class StaffingLevelService  {
             presenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
             presenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(presenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), presenceStaffingLevelDto);
         }
+        AbsenceStaffingLevelDto absenceStaffingLevelDto = getAbsenceStaffingLevelDto(staffingLevel);
+        absenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(absenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), absenceStaffingLevelDto);
+        return startDate;
+    }
+
+    private AbsenceStaffingLevelDto getAbsenceStaffingLevelDto(StaffingLevel staffingLevel) {
+        AbsenceStaffingLevelDto absenceStaffingLevelDto = new AbsenceStaffingLevelDto(staffingLevel.getId(), staffingLevel.getPhaseId(),
+                staffingLevel.getCurrentDate(), staffingLevel.getWeekCount());
+        absenceStaffingLevelDto.setStaffingLevelSetting(new StaffingLevelSetting());
+        absenceStaffingLevelDto.setUpdatedAt(staffingLevel.getUpdatedAt());
         if (!staffingLevel.getAbsenceStaffingLevelInterval().isEmpty()) {
-            AbsenceStaffingLevelDto absenceStaffingLevelDto = new AbsenceStaffingLevelDto(staffingLevel.getId(), staffingLevel.getPhaseId(),
-                    staffingLevel.getCurrentDate(), staffingLevel.getWeekCount());
             absenceStaffingLevelDto.setMinNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getMinNoOfStaff());
             absenceStaffingLevelDto.setMaxNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getMaxNoOfStaff());
             absenceStaffingLevelDto.setAbsentNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getAvailableNoOfStaff());
             absenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
-/*
-            List<BigInteger> activityIds =staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().stream().map(staffingLevelActivity -> staffingLevelActivity.getActivityId()).collect(Collectors.toList());
-            Map<BigInteger, Integer> activityRankings = getActivityIdRankingMap(unitId, activityIds);
-            absenceStaffingLevelDto.getStaffingLevelSetting().setActivitiesRank(activityRankings);
-*/
-            absenceStaffingLevelDto.setStaffingLevelSetting(new StaffingLevelSetting());
-            absenceStaffingLevelDto.setUpdatedAt(staffingLevel.getUpdatedAt());
             absenceStaffingLevelDto.setStaffingLevelIntervalLogs(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelIntervalLogs());
-            absenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(absenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), absenceStaffingLevelDto);
         }
-        return startDate;
+        return absenceStaffingLevelDto;
     }
 
     private Map<BigInteger, Integer> getActivityIdRankingMap(Long unitId, List<BigInteger> activityIds) {
