@@ -2,6 +2,7 @@ package com.kairos.service.phase;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
@@ -346,6 +347,13 @@ public class PhaseService extends MongoBaseService {
 
     public Phase getPhaseByName(final Long unitId,final String name){
         return phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId,name);
+    }
+
+    public Map<String, TranslationInfo>  updateTranslations(BigInteger phaseId,Map<String, TranslationInfo> translations){
+        Phase phase = phaseMongoRepository.findOne(phaseId);
+        phase.setTranslations(translations);
+        phaseMongoRepository.save(phase);
+        return phase.getTranslations();
     }
 
 
