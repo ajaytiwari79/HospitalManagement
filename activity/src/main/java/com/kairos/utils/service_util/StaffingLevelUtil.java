@@ -371,7 +371,7 @@ public class StaffingLevelUtil {
         });
         staffingLevelPublishDTO.setSkillIds(staffingLevelSkills.stream().map(StaffingLevelSkill::getSkillId).collect(Collectors.toSet()));
         removeActivityAndSkills(staffingLevelInterval, staffingLevelIntervalLog, staffingLevelPublishDTO);
-        //resetIntervalLogs(staffingLevelIntervalLog, staffingLevelActivities, staffingLevelSkills);
+        resetIntervalLogs(staffingLevelIntervalLog, staffingLevelActivities, staffingLevelSkills);
 
     }
 
@@ -422,7 +422,7 @@ public class StaffingLevelUtil {
         Set<BigInteger> activityIdsToRemove = staffingLevelInterval.getStaffingLevelActivities().stream().map(StaffingLevelActivity::getActivityId).collect(Collectors.toSet());
         Map<BigInteger, StaffingLevelActivity> staffingLevelActivityLogMap = staffingLevelIntervalLog.getStaffingLevelActivities().stream().collect(toMap(k -> k.getActivityId(), v -> v));
         for (BigInteger activityId : activityIdsToRemove) {
-            if (!staffingLevelActivityLogMap.containsKey(activityId)) {
+            if (!staffingLevelActivityLogMap.containsKey(activityId) && staffingLevelPublishDTO.getActivityIds().contains(activityId)) {
                 staffingLevelInterval.getStaffingLevelActivities().removeIf(k->k.getActivityId().equals(activityId));
                 staffingLevelIntervalLog.getActivityRemoveLogs().removeIf(k->k.getActivityId().equals(activityId));
             }
@@ -430,7 +430,7 @@ public class StaffingLevelUtil {
         Set<Long> skillIdsToRemove = staffingLevelInterval.getStaffingLevelSkills().stream().map(StaffingLevelSkill::getSkillId).collect(Collectors.toSet());
         Map<Long, StaffingLevelSkill> staffingLevelSkillLogMap = staffingLevelIntervalLog.getStaffingLevelSkills().stream().collect(toMap(k -> k.getSkillId(), v -> v));
         for (Long skillId : skillIdsToRemove) {
-            if (!staffingLevelSkillLogMap.containsKey(skillId)) {
+            if (!staffingLevelSkillLogMap.containsKey(skillId) && staffingLevelPublishDTO.getSkillIds().contains(skillId)) {
                 staffingLevelInterval.getStaffingLevelSkills().removeIf(k->k.getSkillId().equals(skillId));
                 staffingLevelIntervalLog.getSkillRemoveLogs().removeIf(k->k.getSkillId().equals(skillId));
             }
