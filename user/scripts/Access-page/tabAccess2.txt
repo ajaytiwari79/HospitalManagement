@@ -364,3 +364,8 @@ Match(ap:AccessPage) where ap.moduleId="tab_259" merge (ap)-[:SUB_PAGE]-(accessP
 
 Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Action",isModule:false,moduleId:"tab_452",active:true,`translatedNames.english`:"Action"});
 
+Match(ap:AccessPage) where ap.moduleId="tab_45" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Action Permission",isModule:false,moduleId:"tab_453",active:true,`translatedNames.english`:"Action Permission"});
+Match(ap:AccessPage) where ap.moduleId="tab_184" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Action Permission",isModule:false,moduleId:"tab_454",active:true,`translatedNames.english`:"Action Permission"});
+Match(ap:AccessPage) where ap.moduleId="tab_22" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Tab Permission",isModule:false,moduleId:"tab_455",active:true,`translatedNames.english`:"Tab Permission"});
+Match(ap:AccessPage) where ap.moduleId="tab_22" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Field Permission",isModule:false,moduleId:"tab_456",active:true,`translatedNames.english`:"Field Permission"});
+Match(ap:AccessPage) where ap.moduleId="tab_22" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Action Permission",isModule:false,moduleId:"tab_457",active:true,`translatedNames.english`:"Action Permission"});

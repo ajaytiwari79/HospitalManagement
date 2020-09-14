@@ -223,12 +223,13 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
     }
 
-    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType, Set<T>> filters, final Long unitId, final LocalDate localDateToday, final String searchText, final Long loggedInUserId) {
+    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType, Set<T>> filters, final Long unitId, final LocalDate localDateToday, final String searchText, final Long loggedInUserId,String imagePath) {
         String today = DateUtils.formatLocalDate(localDateToday, "yyyy-MM-dd");
         Map<String, Object> queryParameters = new HashMap<>();
         queryParameters.put(UNIT_ID, unitId);
         queryParameters.put("today", today);
         queryParameters.put("loggedInUserId", loggedInUserId);
+        queryParameters.put("imagePath",imagePath);
         StringBuilder query = new StringBuilder();
         StringBuilder returnData = new StringBuilder();
         query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment{published:true})-[:IN_UNIT]-(unit:Unit)\n" +
@@ -265,11 +266,12 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         return staffEmploymentWithTags;
     }
 
-    public StaffEmploymentWithTag getLoggedInStaffDetails(final Long unitId, final Long loggedInUserId) {
+    public StaffEmploymentWithTag getLoggedInStaffDetails(final Long unitId, final Long loggedInUserId,String imagePath) {
         StringBuilder query = new StringBuilder();
         Map<String, Object> queryParameters = new HashMap<>();
         queryParameters.put(UNIT_ID, unitId);
         queryParameters.put("loggedInUserId", loggedInUserId);
+        queryParameters.put("imagePath",imagePath);
         query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment)-[:IN_UNIT]-(unit:Unit)\n" +
                 "WHERE id(unit)={unitId} AND employments.startDate IS NOT null AND id(user)={loggedInUserId}  \n");
         query.append(" WITH staff,employments,user MATCH (staff)-[:HAS_CONTACT_ADDRESS]-(contactAddress:ContactAddress) ");

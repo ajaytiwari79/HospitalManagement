@@ -29,10 +29,10 @@ public class KPermissionModel extends UserBaseEntity {
     @Relationship(type = HAS_FIELD)
     private List<KPermissionField> fieldPermissions = new ArrayList<>();
 
+    private boolean permissionSubModel;
+
     @Relationship(type = HAS_ACTION)
     private List<KPermissionAction> actionPermissions = new ArrayList<>();
-
-    private boolean permissionSubModel;
 
     @Relationship(type = HAS_SUB_MODEL)
     private List<KPermissionModel> subModelPermissions = new ArrayList<>();

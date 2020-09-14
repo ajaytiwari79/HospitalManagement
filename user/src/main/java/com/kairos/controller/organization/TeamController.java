@@ -1,5 +1,6 @@
     package com.kairos.controller.organization;
 
+    import com.kairos.dto.TranslationInfo;
     import com.kairos.persistence.model.organization.team.TeamDTO;
     import com.kairos.persistence.model.staff.StaffTeamDTO;
     import com.kairos.service.organization.TeamService;
@@ -16,7 +17,7 @@
     import java.util.Map;
     import java.util.Set;
 
-    import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+    import static com.kairos.constants.ApiConstants.*;
 
     /**
      * Created by oodles on 18/10/16.
@@ -190,5 +191,12 @@
         public ResponseEntity<Map<String, Object>> assignChildActivitiesToTeam(@PathVariable BigInteger activityId,@RequestBody Set<BigInteger> childActivityIds) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
                     teamService.assignChildActivitiesToTeam(activityId,childActivityIds));
+        }
+
+        @PutMapping(value = "/team/{id}/language_settings")
+        @ApiOperation("Add translated data")
+            //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        ResponseEntity<Map<String, Object>> updateTranslationsOfRelationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.updateTranslationOfOrganizationTeams(id,translations));
         }
     }

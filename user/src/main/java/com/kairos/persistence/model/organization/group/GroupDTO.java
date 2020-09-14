@@ -2,6 +2,7 @@ package com.kairos.persistence.model.organization.group;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
 
@@ -30,6 +32,10 @@ public class GroupDTO {
     private List<FilterSelectionDTO> filtersData;
     private List<Long> excludedStaffs;
     private String roomId;
+    private Long unitId;
+    private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
+    private Map<String, TranslationInfo> translations;
 
     public GroupDTO(Long id, String name, String description, List<Long> excludedStaffs, String roomId){
         this.id = id;

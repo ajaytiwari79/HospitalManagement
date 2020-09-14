@@ -1017,6 +1017,13 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateTranslation(id,translations));
     }
 
+    @RequestMapping(value = UNIT_URL+"/organization/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfActivityOfOrganization(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateTranslation(id,translations));
+    }
+
 
 
 }

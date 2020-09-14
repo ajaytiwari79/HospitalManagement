@@ -1,5 +1,6 @@
 package com.kairos.controller.skill;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.TranslationDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.service.skill.SkillService;
@@ -18,8 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 
 /**
@@ -85,5 +85,14 @@ public class SkillController {
     public ResponseEntity<Map<String,Object>> getSkillsByUnit(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,skillService.getSkillByUnit(unitId));
     }
+
+    @PutMapping(value = UNIT_URL + "/skill/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationSkill(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.updateTranslationOfOrganizationSkills(id,translations));
+    }
+
+
 
 }

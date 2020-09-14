@@ -1,9 +1,11 @@
 package com.kairos.controller.wta;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryRequestDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.service.wta.RuleTemplateCategoryService;
 import com.kairos.utils.response.ResponseHandler;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,6 +54,13 @@ public class RuleTemplateCategoryController {
     @RequestMapping(value = COUNTRY_URL+"/template_category/{templateCategoryId}", method = RequestMethod.PUT)
     ResponseEntity<Map<String, Object>> updateRuleTemplateCategory(@PathVariable long countryId, @PathVariable BigInteger templateCategoryId, @RequestBody RuleTemplateCategoryRequestDTO ruleTemplateCategory) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.updateRuleTemplateCategory(countryId, templateCategoryId, ruleTemplateCategory));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = COUNTRY_URL+"/template_category/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWtaTemplates(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,ruleTemplateCategoryService.updateTranslation(id,translations));
     }
 
 

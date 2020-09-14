@@ -557,6 +557,8 @@ public class AccessGroupService {
             case UNION:
                 accessGroupRepository.setAccessPageForUnionAccessGroup(countryId, accessGroupId);
                 break;
+            default:
+                break;
         }
     }
 
@@ -654,6 +656,8 @@ public class AccessGroupService {
                     orgCategoryDTO.setCount(accessGroupCountData.getUnionCount());
                     break;
                 }
+                default:
+                    break;
             }
         });
 

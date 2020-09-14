@@ -86,6 +86,9 @@ public class ShiftStatusService {
     @Inject private TodoService todoService;
 
     public ShiftAndActivtyStatusDTO updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
+        if (isCollectionEmpty(shiftPublishDTO.getShifts())) {
+            exceptionService.dataNotFoundException(MESSAGE_SHIFT_IDS);
+        }
         Shift currentShift = shiftMongoRepository.findOne(shiftPublishDTO.getShifts().get(0).getShiftId());
         ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO;
         if(isNotNull(currentShift.getRequestAbsence())){
@@ -143,7 +146,7 @@ public class ShiftStatusService {
 
     private ShiftAndActivtyStatusDTO updateStatusOfRequestAbsence(Long unitId, ShiftPublishDTO shiftPublishDTO, Shift currentShift) {
         Activity activity = activityMongoRepository.findOne(currentShift.getRequestAbsence().getActivityId());
-        PhaseDTO phase = phaseService.getUnitPhaseByDate(unitId, currentShift.getStartDate());
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, currentShift.getStartDate(),currentShift.getEndDate());
         PhaseTemplateValue phaseTemplateValue = activity.getActivityPhaseSettings().getPhaseTemplateValues().stream().filter(p -> p.getPhaseId().equals(phase.getId())).findFirst().get();
         StaffAccessGroupDTO staffAccessGroupDTO = userIntegrationService.getStaffAccessGroupDTO(unitId);
         ActivityShiftStatusSettings activityShiftStatusSettings = getActivityShiftStatusSettingByStatus(phaseTemplateValue, shiftPublishDTO.getStatus());

@@ -6,9 +6,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class TaskTest {
-    @Test
-    public void canEmployeeWork() throws Exception {
-    }
 
     @Test
     public void getOtherTaskTimeDifference() throws Exception {

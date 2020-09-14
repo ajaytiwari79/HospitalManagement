@@ -111,6 +111,7 @@ public class GenericRestClient {
             case UNIT_WITHOUT_PARENT_ORG:
                 baseUrl = serviceUrl.append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 break;
+            default:return null;
 
         }
         return baseUrl;

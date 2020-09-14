@@ -64,12 +64,6 @@ public class PhaseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.removePhase(phaseId));
     }
 
-    @ApiOperation(value = "get ongoing phase based on a date ")
-    @GetMapping(value = "/byDate")
-    public ResponseEntity<Map<String, Object>> getUnitPhaseByDate(@PathVariable Long unitId,@RequestParam(value = "date",required = false)Date date) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getUnitPhaseByDate(unitId,date));
-    }
-
     @ApiOperation(value = "get Unit Default Phases ")
     @GetMapping(value = "/all")
     public ResponseEntity<Map<String, Object>> getDefaultPhasesByUnit(@PathVariable Long unitId) {
