@@ -57,6 +57,7 @@ public class ExpertiseQueryResult {
     private List<ExpertiseLineQueryResult> expertiseLines=new ArrayList<>();
     private CTACompensationSettingDTO ctaCompensationSetting;
     private Long countryId;
+    private Long unitId;
     private Map<String, TranslationInfo> translations;
 
     @JsonIgnore
