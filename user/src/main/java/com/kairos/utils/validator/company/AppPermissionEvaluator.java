@@ -19,13 +19,12 @@ public class AppPermissionEvaluator implements PermissionEvaluator {
     private ExceptionService exceptionService;
 
     public <T> boolean isValid(String modelName, PermissionAction action) {
-        //TODO will uncomment this code after integrating with FE
-//        if(!UserContext.getUserDetails().isSystemAdmin()){
-//            boolean authorized= permissionService.validPermissionAction(modelName,action, UserContext.getUserDetails().getLastSelectedOrganizationId());
-//            if(!authorized){
-//                exceptionService.actionNotPermittedException("message.invalid_action",action.toString(),modelName);
-//            }
-//        }
+        if(!UserContext.getUserDetails().isSystemAdmin()){
+            boolean authorized= permissionService.validPermissionAction(modelName,action, UserContext.getUserDetails().getLastSelectedOrganizationId());
+            if(!authorized){
+                exceptionService.actionNotPermittedException("message.invalid_action",action.toString(),modelName);
+            }
+        }
         return true;
 
     }
