@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.access_permission;
 
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
+import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -354,6 +355,19 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
 
     @Query("MATCH (a:AccessGroup) where id(a) IN {0} RETURN a.role")
     Set<String> getAccessRolesByAccessGroupId(Set<Long> accessGroupIds);
+
+    @Query("MATCH (staff:Staff),(action:KPermissionAction) WHERE  id(staff)={0} AND id(action) IN {3} WITH staff,action " +
+            "MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,action  " +
+            "MERGE (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_ACTION +"{accessGroupId:{2}}]->(action) " +
+            " ON CREATE SET r.hasPermission=TRUE " +
+            " ON MATCH SET r.hasPermission=TRUE  RETURN distinct true ")
+    void setActionPermissions(Long staffId, Long unitId, Long accessGroupId, Set<Long> actionIds);
+
+    @Query("MATCH (staff:Staff) WHERE  id(staff)={0}  with staff " +
+            "MATCH(kPermissionModel:KPermissionModel)-[:"+HAS_ACTION+"]-(action:KPermissionAction) WHERE id(kPermissionModel) ={3} WITH staff,action " +
+            "MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,action  " +
+            "MATCH (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_ACTION +"{accessGroupId:{2}}]->(action) SET r.hasPermission=FALSE ")
+    void disableActionPermissions(Long staffId, Long unitId, Long accessGroupId,Long modelId);
 
 
 

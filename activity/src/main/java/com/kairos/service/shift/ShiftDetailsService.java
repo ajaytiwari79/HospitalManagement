@@ -178,6 +178,8 @@ public class ShiftDetailsService extends MongoBaseService {
         return activity;
     }
 
+
+
     // This function is used for the change the status of the draft shift
 
 

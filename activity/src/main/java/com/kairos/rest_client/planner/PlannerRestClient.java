@@ -71,6 +71,7 @@ public class PlannerRestClient {
             case SUBMIT_VRP_PROBLEM:uri = "/submitVRPPlanning";
                 break;
             case GET_INDICTMENT:uri=String.format("/vrp/%s/get_indictment",pathParams);
+            default:break;
         }
         return uri;
     }

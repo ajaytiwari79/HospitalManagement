@@ -26,6 +26,9 @@ public class SkillDTO {
     private String shortName;
     private List<Long> tags;
     private Set<SkillLevelDTO> skillLevels;
+    private Long visitourId;
+    private String customName;
+    private boolean isEdited;
     private Long countryId;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;

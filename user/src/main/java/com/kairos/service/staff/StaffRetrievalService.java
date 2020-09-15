@@ -331,10 +331,10 @@ public class StaffRetrievalService {
         map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, staffFilterDTO, moduleId, null, null,false,null).getStaffList());
         roles = accessGroupService.getAccessGroups(unitId);
         map.put("roles", roles);
-        List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);
+        List<com.kairos.persistence.model.organization.team.TeamDTO> teams = teamGraphRepository.getTeams(unitId);
         Organization organization=organizationService.fetchParentOrganization(unitId);
         map.put("loggedInStaffId",staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId()));
-        map.put("teamList", (teams.size() != 0) ? teams.get(0).get("teams") : Collections.emptyList());
+        map.put("teamList", (teams.size() != 0) ? teams: Collections.emptyList());
         return map;
     }
 
@@ -862,7 +862,7 @@ public class StaffRetrievalService {
             updateFilterTypeCriteriaListByGroups(unitId, filterTypeSetMap);
         }
 
-        List<StaffEmploymentWithTag> staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday, staffFilterDetails.getSearchText(), loggedInUserId);
+        List<StaffEmploymentWithTag> staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday, staffFilterDetails.getSearchText(), loggedInUserId,envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
         int i = -1;
         StaffEmploymentWithTag matchedStaff = null;
         for (StaffEmploymentWithTag staffDetails : staffEmploymentWithTags) {
@@ -877,7 +877,7 @@ public class StaffRetrievalService {
             staffEmploymentWithTags.remove(i);
             staffEmploymentWithTags.add(0, matchedStaff);
         } else if (matchedStaff == null) {
-            matchedStaff = staffGraphRepository.getLoggedInStaffDetails(unitId, loggedInUserId);
+            matchedStaff = staffGraphRepository.getLoggedInStaffDetails(unitId, loggedInUserId,envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
             if (matchedStaff != null) {
                 staffEmploymentWithTags.add(0, matchedStaff);
             }

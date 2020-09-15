@@ -5,6 +5,7 @@ import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.TranslationDTO;
@@ -18,6 +19,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
+import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.StaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
@@ -25,6 +27,7 @@ import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQu
 import com.kairos.persistence.model.time_care.TimeCareSkill;
 import com.kairos.persistence.model.user.expertise.response.SkillLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.response.SkillQueryResult;
+import com.kairos.persistence.model.user.skill.SelectedSkillQueryResults;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -54,8 +57,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.DateUtils.getDate;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.enums.SkillLevel.BASIC;
@@ -171,25 +173,60 @@ public class SkillService {
     public HashMap<String, Object> getAllAvailableSkills(long id) {
 
         HashMap<String, Object> response = new HashMap<>();
-
         Organization parent = organizationService.fetchParentOrganization(id);
-        List<Map<String, Object>> organizationSkills;
+        List<SelectedSkillQueryResults> skillData = new ArrayList<>();
+        Map<String,Object> availableSkills = new HashMap<>();
+        Map<String,Object> selectedSkills = new HashMap<>();
         if(parent.getId().equals(id)){
-            organizationSkills=unitGraphRepository.getSkillsForParentOrganization(parent.getId(), id);
+            skillData=unitGraphRepository.getSkillsForParentOrganization(parent.getId(), id);
         }else {
-            organizationSkills=unitGraphRepository.getSkillsOfChildUnit(parent.getId(), id);
+            skillData =unitGraphRepository.getSkillsOfChildUnit(parent.getId(), id);
         }
-        List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
-        for (Map<String, Object> map : organizationSkills) {
-            orgSkillRel.add((Map<String, Object>) map.get("data"));
-        }
-
+        getSelectedSkillQueryResults(id, skillData);
+        availableSkills.put("availableSkills",newArrayList(skillData.get(0)));
+        selectedSkills.put("selectedSkills",newArrayList(skillData.get(1)));
+        List<Map<String, Object>> orgSkillRel = newArrayList(availableSkills,selectedSkills);
         response.put("orgData", orgSkillRel);
         response.put("skillLevels", SkillLevel.values());
         response.put("teamList", teamService.getAllTeamsInOrganization(id));
 
         return response;
 
+    }
+
+    private void getSelectedSkillQueryResults(long id, List<SelectedSkillQueryResults> skillData) {
+        skillData.forEach(selectedSkillQueryResults -> {
+            List<Map<String,Object>> data =new ArrayList<>();
+            selectedSkillQueryResults.setUnitId(id);
+            selectedSkillQueryResults.setTranslations(TranslationUtil.getTranslatedData(selectedSkillQueryResults.getTranslatedNames(),selectedSkillQueryResults.getTranslatedDescriptions()));
+            for(Map<String,Object> map :selectedSkillQueryResults.getChildren()) {
+                Map<String,Object> result = ObjectMapperUtils.copyPropertiesByMapper(map,Map.class);
+                Map<String,String> translatedNamesMap = null;
+                Map<String,String> translatedDescriptionsMap = null;
+                Map<String, TranslationInfo> translations =null;
+                translations = getTranslationInfoMap(result, translatedNamesMap, translatedDescriptionsMap, translations);
+                if(isNotNull(translations)) {
+                    result.put("translations",translations );
+                }
+                data.add(result);
+            }
+            selectedSkillQueryResults.setChildren(data);
+        });
+    }
+
+    private Map<String, TranslationInfo> getTranslationInfoMap(Map<String, Object> result, Map<String, String> translatedNamesMap, Map<String, String> translatedDescriptionsMap, Map<String, TranslationInfo> translations) {
+        for (Map.Entry<String, Object> entry : result.entrySet()){
+            if(entry.getKey().equals("translatedNames")){
+                translatedNamesMap =(Map<String,String>)entry.getValue();
+            }
+            if(entry.getKey().equals("translatedDescriptions")){
+                translatedDescriptionsMap =(Map<String,String>)entry.getValue();
+            }
+            if(isNotNull(translatedNamesMap) && isNotNull(translatedDescriptionsMap)) {
+               translations = TranslationUtil.getTranslatedData(translatedNamesMap, translatedDescriptionsMap);
+            }
+        }
+        return translations;
     }
 
 
@@ -471,5 +508,19 @@ public class SkillService {
     public List<StaffQueryResult> getStaffAllSkillAndLevelByStaffIds(List<Long> staffIds) {
         List<StaffQueryResult> staffQueryResults = skillGraphRepository.getAllStaffSkillAndLevelByStaffIds(staffIds);
         return staffQueryResults;
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfOrganizationSkills(Long skillId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Skill skill =skillGraphRepository.findOne(skillId);
+        skill.setTranslatedNames(translatedNames);
+        skill.setTranslatedDescriptions(translatedDescriptios);
+        skillGraphRepository.save(skill);
+        return skill.getTranslatedData();
     }
 }

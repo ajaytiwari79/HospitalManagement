@@ -43,6 +43,9 @@ public class EnvConfigCommon {
     @Value("${kpermissions.model.package.path}")
     private String modelPackagePath;
 
+    @Value("${kpermissions.controller.package.path}")
+    private String controllerPackagePath;
+
     @Value("${spring.profiles.active}")
     private  String currentProfile;
 
