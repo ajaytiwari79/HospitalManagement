@@ -77,6 +77,8 @@ import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 public class PositionService {
 
     public static final String CHILD = "child";
+    public static final String END_DATE = "endDate";
+    public static final String START_DATE = "startDate";
     @Inject
     private UnitGraphRepository unitGraphRepository;
     @Inject
@@ -246,8 +248,8 @@ public class PositionService {
         }
         unitPermissionGraphRepository.updateDatesInUnitPermission(accessGroup.getId(), unitPermission.getId(),startDate==null?null:startDate.toString(),endDate==null?null:endDate.toString());
         LOGGER.info(" Currently created Unit Permission ");
-        response.put("startDate", startDate);
-        response.put("endDate", endDate);
+        response.put(START_DATE, startDate);
+        response.put(END_DATE, endDate);
         response.put("id", unitPermission.getId());
         staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
         return staffAccessGroupQueryResult;
@@ -330,8 +332,8 @@ public class PositionService {
                 if (employment != null && !employment.isEmpty()) {
                     positions.add(employment);
                     queryResult.setAccessable(true);
-                    queryResult.setStartDate((String) employment.get("startDate"));
-                    queryResult.setEndDate((String) employment.get("endDate"));
+                    queryResult.setStartDate((String) employment.get(START_DATE));
+                    queryResult.setEndDate((String) employment.get(END_DATE));
                 } else {
                     queryResult.setAccessable(false);
                 }
@@ -366,8 +368,8 @@ public class PositionService {
                                 positions.add(position);
                                 child.setAccessable(true);
 
-                                child.setStartDate((String) position.get("startDate"));
-                                child.setEndDate((String) position.get("endDate"));
+                                child.setStartDate((String) position.get(START_DATE));
+                                child.setEndDate((String) position.get(END_DATE));
                             } else {
                                 child.setAccessable(false);
                             }
@@ -382,8 +384,8 @@ public class PositionService {
                     if (position != null && !position.isEmpty()) {
                         positions.add(position);
                         child.setAccessable(true);
-                        child.setStartDate((String) position.get("startDate"));
-                        child.setEndDate((String) position.get("endDate"));
+                        child.setStartDate((String) position.get(START_DATE));
+                        child.setEndDate((String) position.get(END_DATE));
 
                     } else {
                         child.setAccessable(false);
@@ -394,8 +396,8 @@ public class PositionService {
                     if (position != null && !position.isEmpty()) {
                         positions.add(position);
                         queryResult.setAccessable(true);
-                        queryResult.setStartDate((String) position.get("startDate"));
-                        queryResult.setEndDate((String) position.get("endDate"));
+                        queryResult.setStartDate((String) position.get(START_DATE));
+                        queryResult.setEndDate((String) position.get(END_DATE));
                     } else {
                         queryResult.setAccessable(false);
                     }
@@ -506,8 +508,8 @@ public class PositionService {
     private Map<String, Object> parsePartialLeaveObj(PartialLeave partialLeave) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", partialLeave.getId());
-        map.put("startDate", getDate(partialLeave.getStartDate()));
-        map.put("endDate", getDate(partialLeave.getEndDate()));
+        map.put(START_DATE, getDate(partialLeave.getStartDate()));
+        map.put(END_DATE, getDate(partialLeave.getEndDate()));
         map.put("leaveType", partialLeave.getLeaveType());
         map.put("amount", partialLeave.getAmount());
         map.put("note", partialLeave.getNote());
