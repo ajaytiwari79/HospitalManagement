@@ -27,8 +27,8 @@ public class StaffingLevelGraphConfigurationService {
         if(isNotNull(staffingLevelGraphConfigurationDTO.getDailyGraphConfiguration())){
             staffingLevelGraphConfiguration.setDailyGraphConfiguration(staffingLevelGraphConfigurationDTO.getDailyGraphConfiguration());
         }if (isNotNull(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration())){
-            staffingLevelGraphConfiguration.getWeeklyGraphConfiguration().setOverStaffingConfigurations(isCollectionNotEmpty(staffingLevelGraphConfiguration.getWeeklyGraphConfiguration().getOverStaffingConfigurations()) ? staffingLevelGraphConfiguration.getWeeklyGraphConfiguration().getOverStaffingConfigurations() : getOverStaffingConfigurations());
-            staffingLevelGraphConfiguration.getWeeklyGraphConfiguration().setUnderStaffingConfigurations(isCollectionNotEmpty(staffingLevelGraphConfiguration.getWeeklyGraphConfiguration().getUnderStaffingConfigurations()) ? staffingLevelGraphConfiguration.getWeeklyGraphConfiguration().getUnderStaffingConfigurations() : getUnderStaffingConfigurations());
+            staffingLevelGraphConfiguration.getWeeklyGraphConfiguration().setOverStaffingConfigurations(isCollectionNotEmpty(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration().getOverStaffingConfigurations()) ? staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration().getOverStaffingConfigurations() : getOverStaffingConfigurations());
+            staffingLevelGraphConfiguration.getWeeklyGraphConfiguration().setUnderStaffingConfigurations(isCollectionNotEmpty(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration().getUnderStaffingConfigurations()) ? staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration().getUnderStaffingConfigurations() : getUnderStaffingConfigurations());
             staffingLevelGraphConfiguration.setWeeklyGraphConfiguration(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration());
         }
         staffingLevelGraphConfigurationMongoRepository.save(staffingLevelGraphConfiguration);
