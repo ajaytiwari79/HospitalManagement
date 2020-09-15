@@ -16,17 +16,18 @@ import org.springframework.web.client.RestTemplate;
 
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static com.kairos.utils.RestClientUrlUtil.getPlannerBaseUrl;
+
 @Service
 public class PlannerRestClient {
     private Logger logger = LoggerFactory.getLogger(com.kairos.rest_client.planner.PlannerRestClient.class);
     @Autowired
     private RestTemplate restTemplate;
 
-    public <T, V> RestTemplateResponseEnvelope<V> publish(int plannerNo,T t, Long unitId, IntegrationOperation integrationOperation, PlannerUrl plannerUrl, Object... pathParams) {
+    public <T, V> RestTemplateResponseEnvelope<V> publish(int plannerNo, T t, Long unitId, IntegrationOperation integrationOperation, PlannerUrl plannerUrl, Object... pathParams) {
         final String baseUrl = getPlannerBaseUrl();
         try {
-            String url=baseUrl+"/"+plannerNo+"/api/v1/"+"unit/" + unitId + "/planner"+ getURI(plannerUrl,pathParams);
-            logger.info("calling url:{} with http method:{}",url,integrationOperation);
+            String url = baseUrl + "/" + plannerNo + "/api/v1/" + "unit/" + unitId + "/planner" + getURI(plannerUrl, pathParams);
+            logger.info("calling url:{} with http method:{}", url, integrationOperation);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
@@ -57,21 +58,29 @@ public class PlannerRestClient {
                 return HttpMethod.PUT;
             case GET:
                 return HttpMethod.GET;
-            default:return null;
+            default:
+                return null;
 
         }
     }
-    public static String getURI(PlannerUrl plannerUrl,Object... pathParams){
-        String uri=null;
-        switch (plannerUrl){
-            case GET_VRP_SOLUTION:uri = String.format("/vrp/%s",pathParams);
+
+    public static String getURI(PlannerUrl plannerUrl, Object... pathParams) {
+        String uri = null;
+        switch (plannerUrl) {
+            case GET_VRP_SOLUTION:
+                uri = String.format("/vrp/%s", pathParams);
                 break;
-            case STOP_VRP_PROBLEM:uri = String.format("/vrp/%s",pathParams);
+            case STOP_VRP_PROBLEM:
+                uri = String.format("/vrp/%s", pathParams);
                 break;
-            case SUBMIT_VRP_PROBLEM:uri = "/submitVRPPlanning";
+            case SUBMIT_VRP_PROBLEM:
+                uri = "/submitVRPPlanning";
                 break;
-            case GET_INDICTMENT:uri=String.format("/vrp/%s/get_indictment",pathParams);
-            default:break;
+            case GET_INDICTMENT:
+                uri = String.format("/vrp/%s/get_indictment", pathParams);
+                break;
+            default:
+                break;
         }
         return uri;
     }
