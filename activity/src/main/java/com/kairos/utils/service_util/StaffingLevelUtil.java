@@ -416,15 +416,13 @@ public class StaffingLevelUtil {
         if(staffingLevelInterval.getStaffingLevelActivities().size()==staffingLevelActivities.size() && staffingLevelInterval.getStaffingLevelSkills().size()==staffingLevelSkills.size()){
             staffingLevelInterval.setStaffingLevelIntervalLogs(new TreeSet<>());
         } else {
-            Map<BigInteger,StaffingLevelActivity> staffingLevelActivityMap=staffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.toMap(k->k.getActivityId(), Function.identity()));
+            Map<BigInteger,StaffingLevelActivity> staffingLevelActivityMap=staffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.toMap(StaffingLevelActivity::getActivityId, Function.identity()));
+            Map<Long,StaffingLevelSkill> staffingLevelSkillMap=staffingLevelInterval.getStaffingLevelSkills().stream().collect(Collectors.toMap(StaffingLevelSkill::getSkillId, Function.identity()));
             staffingLevelInterval.getStaffingLevelIntervalLogs().forEach(log->{
                 staffingLevelActivities.forEach(activity->{
                     log.getStaffingLevelActivities().remove(activity);
                     log.getStaffingLevelActivities().add(staffingLevelActivityMap.get(activity.getActivityId()));
                 });
-            });
-            Map<Long,StaffingLevelSkill> staffingLevelSkillMap=staffingLevelInterval.getStaffingLevelSkills().stream().collect(Collectors.toMap(k->k.getSkillId(), Function.identity()));
-            staffingLevelInterval.getStaffingLevelIntervalLogs().forEach(log->{
                 staffingLevelSkills.forEach(skill->{
                     log.getStaffingLevelSkills().remove(skill);
                     log.getStaffingLevelSkills().add(staffingLevelSkillMap.get(skill.getSkillId()));
