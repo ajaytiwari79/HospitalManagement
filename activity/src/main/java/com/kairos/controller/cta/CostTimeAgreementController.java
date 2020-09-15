@@ -320,7 +320,7 @@ public class CostTimeAgreementController {
     @ApiOperation(value = "update translation data")
     @PutMapping(value = COUNTRY_URL+"/cta/rule_template/{id}/language_settings")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWtaTemplates(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfCtaTemplates(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.updateCtaRuleTranslations(id,translations));
     }
 
@@ -330,5 +330,20 @@ public class CostTimeAgreementController {
     ResponseEntity<Map<String, Object>> updateTranslationsOfCTA(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.updateTranslation(id,translations));
     }
+
+    @PutMapping(value = UNIT_URL + "/cta/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfCTAOfOrganization(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.updateTranslation(id,translations));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = UNIT_URL+"/cta/rule_template/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfCTATemplatesOfOrganization(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.updateCtaRuleTranslations(id,translations));
+    }
+
 }
 

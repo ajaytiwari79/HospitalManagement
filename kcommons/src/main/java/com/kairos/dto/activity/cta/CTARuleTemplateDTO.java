@@ -76,6 +76,7 @@ public class CTARuleTemplateDTO {
     private UserInfo lastModifiedBy;
     private ConditionalCompensation conditionalCompensation;
     private Long countryId;
+    private Long unitId;
     private Map<String, TranslationInfo> translations;
 
 

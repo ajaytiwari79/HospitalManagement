@@ -49,6 +49,7 @@ public class WTAResponseDTO {
     private List<TagDTO> tags;
     private Map<String, Object> unitInfo;
     private Long countryId;
+    private Long unitId;
     private Map<String, TranslationInfo> translations;
 
     public WTAResponseDTO(String name, BigInteger id,BigInteger parentId) {
