@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -83,7 +84,7 @@ public class ActivityPriorityController {
 
     @ApiOperation("update ActivityPriority In Activity")
     @PutMapping(value = "/activity/{activityId}/activity_priority/{activityPriorityId}")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
     public ResponseEntity<Map<String, Object>> updateActivityPriorityInActvitiy(@PathVariable BigInteger activityId, @PathVariable BigInteger activityPriorityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityPriorityService.updateActivityPriorityInActivity(activityPriorityId,activityId));
     }
