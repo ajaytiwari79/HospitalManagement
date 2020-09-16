@@ -433,7 +433,6 @@ public class CountryController {
     @PostMapping(value = COUNTRY_URL + "/admin")
     public ResponseEntity<Map<String, Object>> createDefaultCountryAdmin(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, bootDataService.createDefaultCountryAdmin());
-
     }
 
     @RequestMapping(value = COUNTRY_URL+"/skill_Category/{id}/languageSettings", method = RequestMethod.PUT)
@@ -448,6 +447,20 @@ public class CountryController {
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfExpertise(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateTranslation(id,translations));
+    }
+
+    @RequestMapping(value = COUNTRY_URL+"/organization_type/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateTranslation(id,translations));
+    }
+
+    @RequestMapping(value = COUNTRY_URL+"/organization_sub_type/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationSubType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateTranslation(id,translations));
     }
 
 

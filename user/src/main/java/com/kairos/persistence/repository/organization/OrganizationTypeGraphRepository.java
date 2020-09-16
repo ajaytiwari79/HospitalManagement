@@ -28,7 +28,10 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     List<OrganizationType> findByIdIn(List<Long> ids);
 
     @Query("MATCH (ot:OrganizationType{isEnable:true})-[:" + BELONGS_TO + "]->(c:Country) WHERE id(c)= {0}\n" +
-            "Optional Match (ot)-[:" + HAS_LEVEL + "]->(level:Level{deleted:false,isEnabled:true}) return ot.name as name,id(ot) as id,collect(level) as levels")
+            "Optional Match (ot)-[:" + HAS_LEVEL + "]->(level:Level{deleted:false,isEnabled:true}) return " +
+            "{english: CASE WHEN ot.`translatedNames.english` IS NULL THEN '' ELSE ot.`translatedNames.english` END,danish: CASE WHEN ot.`translatedNames.danish` IS NULL THEN '' ELSE ot.`translatedNames.danish` END,hindi: CASE WHEN ot.`translatedNames.hindi` IS NULL THEN '' ELSE ot.`translatedNames.hindi` END,britishenglish: CASE WHEN ot.`translatedNames.britishenglish` IS NULL THEN '' ELSE ot.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN ot.`translatedDescriptions.english` IS NULL THEN '' ELSE ot.`translatedDescriptions.english` END,danish: CASE WHEN ot.`translatedDescriptions.danish` IS NULL THEN '' ELSE ot.`translatedDescriptions.danish` END,hindi: CASE WHEN ot.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ot.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN ot.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ot.`translatedDescriptions.britishenglish` END}as translatedDescriptions,  " +
+            "ot.name as name,id(ot) as id,collect(level) as levels")
     List<OrgTypeLevelWrapper> getOrganizationTypeByCountryId(Long countryId);
 
     OrganizationType findByName(OrganizationType.OrganizationTypeEnum name);
@@ -51,7 +54,12 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("Match (o:OrganizationType)-[rel:" + ORGANIZATION_TYPE_HAS_SERVICES + "]->(os:OrganizationService) where id(o) IN {0}  AND  id(os)={1} DELETE rel ")
     void deleteRelOrganizationTypeWithService(Set<Long> orgTypeId, long serviceId);
 
-    @Query("MATCH (pot:OrganizationType {isEnable:true})-[:HAS_SUB_TYPE]-(ot:OrganizationType{isEnable:true}) WHERE id(pot)={0} return {name:ot.name,id:id(ot),description:ot.description } as result")
+    @Query("MATCH (pot:OrganizationType {isEnable:true})-[:HAS_SUB_TYPE]-(ot:OrganizationType{isEnable:true}) WHERE id(pot)={0} return " +
+            "{ translations :{english :{name: CASE WHEN ot.`translatedNames.english` IS NULL THEN '' ELSE ot.`translatedNames.english` END, description : CASE WHEN ot.`translatedDescriptions.english` IS NULL THEN '' ELSE ot.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN ot.`translatedNames.hindi` IS NULL THEN '' ELSE ot.`translatedNames.hindi` END, description : CASE WHEN ot.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ot.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN ot.`translatedNames.danish` IS NULL THEN '' ELSE ot.`translatedNames.danish` END, description : CASE WHEN ot.`translatedDescriptions.danish` IS NULL THEN '' ELSE ot.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN ot.`translatedNames.britishenglish` IS NULL THEN '' ELSE ot.`translatedNames.britishenglish` END, description : CASE WHEN ot.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ot.`translatedDescriptions.britishenglish` END}},\n" +
+            "name:ot.name,id:id(ot),description:ot.description } as result")
     List<Map<String, Object>> getOrganizationSubTypeByTypeId(Long organizationTypeId);
 
     @Query("MATCH (pot:OrganizationType),(ot:OrganizationType) WHERE id(ot)={0} AND id(pot)={1} Create (pot)-[:HAS_SUB_TYPE]->(ot) return ot")
