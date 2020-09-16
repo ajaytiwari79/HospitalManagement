@@ -65,6 +65,7 @@ import static com.kairos.constants.UserMessagesConstants.*;
 @Service
 @Transactional
 public class UnionService {
+    public static final String MESSAGE_LOCATION_NOT_FOUND = "message.location.notFound";
     @Inject
     private UnitGraphRepository unitGraphRepository;
     @Inject
@@ -154,7 +155,7 @@ public class UnionService {
     public List<Location> findAllLocationsByUnion(Long unionId) {
         List<Location> locations = locationGraphRepository.findLocationsByUnion(unionId);
         if (CollectionUtils.isEmpty(locations)) {
-            exceptionService.dataNotFoundByIdException("message.location.notFound", unionId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_LOCATION_NOT_FOUND, unionId);
         }
         return locations;
     }
@@ -281,7 +282,7 @@ public class UnionService {
 
         }
         if (publish && isCollectionEmpty(unionData.getLocationIds())) {
-            exceptionService.dataNotFoundByIdException("message.location.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_LOCATION_NOT_FOUND);
         }
         return country;
     }
@@ -332,7 +333,7 @@ public class UnionService {
             exceptionService.invalidRequestException(MESSAGE_PUBLISH_UNION_UNPUBLISH);
         }
         if (publish && isCollectionEmpty(unionDataQueryResults.get(0).getLocations())) {
-            exceptionService.dataNotFoundByIdException("message.location.notFound", unionId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_LOCATION_NOT_FOUND, unionId);
         }
         List<Long> sectorIDsToBeCreated = new ArrayList<>();
         List<SectorDTO> sectorDTOS = new ArrayList<>();

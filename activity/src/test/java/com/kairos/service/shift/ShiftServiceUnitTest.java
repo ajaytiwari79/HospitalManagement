@@ -45,6 +45,7 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ShiftServiceUnitTest {
+    public static final String TIME_ATTENDANCE = "TIME & ATTENDANCE";
     @InjectMocks
     private ShiftStateService shiftStateService;
     @InjectMocks
@@ -92,7 +93,7 @@ public class ShiftServiceUnitTest {
         shifts.add(shift);
 
         List<ShiftState> shiftStates = new ArrayList<>();
-        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT,"TIME & ATTENDANCE",LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
+        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT, TIME_ATTENDANCE,LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
         shiftStates.add(shiftState);
         Set<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
 
@@ -123,9 +124,9 @@ public class ShiftServiceUnitTest {
 
 
         List<ShiftState> shiftStates = new ArrayList<>();
-        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT,"TIME & ATTENDANCE",LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
+        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT, TIME_ATTENDANCE,LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
         shiftStates.add(shiftState);
-        shiftState = new ShiftState(BigInteger.valueOf(13880L),AccessGroupRole.MANAGEMENT,"TIME & ATTENDANCE",LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,21,0),35602L,14139L);
+        shiftState = new ShiftState(BigInteger.valueOf(13880L),AccessGroupRole.MANAGEMENT, TIME_ATTENDANCE,LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,21,0),35602L,14139L);
         shiftStates.add(shiftState);
         Set<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
 

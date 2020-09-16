@@ -23,6 +23,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.matc
 @Repository
 public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository {
     public static final String SOLVER_CONFIG = "solverConfig";
+    public static final String DELETED = "deleted";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -37,12 +38,12 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
         }
 
     public List<SolverConfig> getAllSolverConfigWithConstraintsByCountryId(Long countryId){
-        Criteria criteria=Criteria.where("deleted").ne(true).and("countryId").is(countryId);
+        Criteria criteria=Criteria.where(DELETED).ne(true).and("countryId").is(countryId);
         return mongoTemplate.find(new Query(criteria), SolverConfig.class);
     }
 
     public List<SolverConfig> getAllSolverConfigWithConstraintsByUnitId(Long unitId){
-        Criteria criteria=Criteria.where("deleted").ne(true).and("unitId").is(unitId);
+        Criteria criteria=Criteria.where(DELETED).ne(true).and("unitId").is(unitId);
         return mongoTemplate.find(new Query(criteria), SolverConfig.class);
     }
 
@@ -52,7 +53,7 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
 
 
     public List<SolverConfig> getAllSolverConfigByParentId(BigInteger solverConfigId){
-        return mongoTemplate.find(new Query(Criteria.where("parentCountrySolverConfigId").is(solverConfigId).and("deleted").is(false)), SolverConfig.class, SOLVER_CONFIG);
+        return mongoTemplate.find(new Query(Criteria.where("parentCountrySolverConfigId").is(solverConfigId).and(DELETED).is(false)), SolverConfig.class, SOLVER_CONFIG);
     }
 
 
