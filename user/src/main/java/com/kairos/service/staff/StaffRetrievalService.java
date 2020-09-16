@@ -83,6 +83,7 @@ import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGr
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.country.EngineerTypeService;
 import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
@@ -180,6 +181,7 @@ public class StaffRetrievalService {
     @Inject private ActivityIntegrationService activityIntegrationService;
     @Inject private StaffGraphRepositoryImpl staffGraphRepositoryImpl;
     @Inject private GroupService groupService;
+    @Inject private EngineerTypeService engineerTypeService;
 
 
     public Map<String, Object> getDefaultDataOfStaff(long staffId, long unitId) {
@@ -189,7 +191,7 @@ public class StaffRetrievalService {
         List<Language> languages;
         List<EngineerTypeDTO> engineerTypes;
         if (countryId != null) {
-            engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
+            engineerTypes = engineerTypeService.getEngineerTypeByCountryId(countryId);
             languages = languageGraphRepository.getLanguageByCountryId(countryId);
         } else {
             languages = Collections.emptyList();
@@ -309,7 +311,7 @@ public class StaffRetrievalService {
         }
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         staffAccessGroupQueryResult.setManagement(userAccessRoleDTO.getManagement());
-        staffAccessGroupQueryResult.setCountryAdmin(isSuperAdmin);
+        staffAccessGroupQueryResult.setCountryAdmin(isSuperAdmin || isNotNull(staffId));
         staffAccessGroupQueryResult.setStaffId(staffId);
         return staffAccessGroupQueryResult;
     }
@@ -329,10 +331,10 @@ public class StaffRetrievalService {
         map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, staffFilterDTO, moduleId, null, null,false,null).getStaffList());
         roles = accessGroupService.getAccessGroups(unitId);
         map.put("roles", roles);
-        List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);
+        List<com.kairos.persistence.model.organization.team.TeamDTO> teams = teamGraphRepository.getTeams(unitId);
         Organization organization=organizationService.fetchParentOrganization(unitId);
         map.put("loggedInStaffId",staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId()));
-        map.put("teamList", (teams.size() != 0) ? teams.get(0).get("teams") : Collections.emptyList());
+        map.put("teamList", (teams.size() != 0) ? teams: Collections.emptyList());
         return map;
     }
 
@@ -420,7 +422,7 @@ public class StaffRetrievalService {
             staff = getStaffWithBasicInfo(id, allStaffRequired);
             roles = accessGroupService.getAccessGroups(id);
             countryId = countryGraphRepository.getCountryIdByUnitId(id);
-            engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
+            engineerTypes = engineerTypeService.getEngineerTypeByCountryId(countryId);
         } else if (TEAM.equalsIgnoreCase(type)) {
             staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             Unit unit = unitGraphRepository.getOrganizationByTeamId(id);
@@ -431,7 +433,7 @@ public class StaffRetrievalService {
         Map<String, Object> map = new HashMap<>();
         map.put("staffList", staff);
         map.put("engineerTypes", engineerTypes);
-        map.put("engineerList", engineerTypeGraphRepository.findEngineerTypeByCountry(countryId));
+        map.put("engineerList", engineerTypeService.getEngineerTypeByCountryId(countryId));
         map.put("roles", roles);
         return map;
     }
@@ -860,7 +862,7 @@ public class StaffRetrievalService {
             updateFilterTypeCriteriaListByGroups(unitId, filterTypeSetMap);
         }
 
-        List<StaffEmploymentWithTag> staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday, staffFilterDetails.getSearchText(), loggedInUserId);
+        List<StaffEmploymentWithTag> staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday, staffFilterDetails.getSearchText(), loggedInUserId,envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
         int i = -1;
         StaffEmploymentWithTag matchedStaff = null;
         for (StaffEmploymentWithTag staffDetails : staffEmploymentWithTags) {
@@ -875,7 +877,7 @@ public class StaffRetrievalService {
             staffEmploymentWithTags.remove(i);
             staffEmploymentWithTags.add(0, matchedStaff);
         } else if (matchedStaff == null) {
-            matchedStaff = staffGraphRepository.getLoggedInStaffDetails(unitId, loggedInUserId);
+            matchedStaff = staffGraphRepository.getLoggedInStaffDetails(unitId, loggedInUserId,envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
             if (matchedStaff != null) {
                 staffEmploymentWithTags.add(0, matchedStaff);
             }

@@ -64,6 +64,7 @@ import com.kairos.service.activity.ActivityUtil;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.staffing_level.StaffingLevelService;
+import com.kairos.service.time_bank.CalculatePlannedHoursAndScheduledHours;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
@@ -247,7 +248,7 @@ public class ShiftValidatorService {
         }
         DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate().getTime(), shift.getEndDate().getTime());
         Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
-        TimeBankCalculationService.CalculatePlannedHoursAndScheduledHours calculatePlannedHoursAndScheduledHours = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours(staffAdditionalInfoDTO, dateTimeInterval, newArrayList(shift), false, false, dayTypeDTOMap).calculate();
+        CalculatePlannedHoursAndScheduledHours calculatePlannedHoursAndScheduledHours = new CalculatePlannedHoursAndScheduledHours(staffAdditionalInfoDTO, dateTimeInterval, newArrayList(shift), false, false, dayTypeDTOMap,timeBankCalculationService).calculate();
         shift.setPlannedMinutesOfTimebank(calculatePlannedHoursAndScheduledHours.getTotalDailyPlannedMinutes());
         Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkillLevelDTOS(), ruleTemplateSpecificInfo, exceptionService);
         Specification<ShiftWithActivityDTO> tagSpecification = new TagSpecification(staffAdditionalInfoDTO.getTags(), ruleTemplateSpecificInfo, exceptionService);
@@ -305,7 +306,7 @@ public class ShiftValidatorService {
         WTAQueryResultDTO wtaQueryResultDTO = workTimeAgreementService.getWTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), DateUtils.onlyDate(shift.getActivities().get(0).getStartDate()));
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTO.getRuleTemplates().stream().filter(this::isValidWTARuleForDelete).collect(Collectors.toList());
         if (isCollectionNotEmpty(wtaBaseRuleTemplates)) {
-            ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class), activityWrapperMap, null);
+            ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class), activityWrapperMap, null);
             RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shiftWithActivityDTO, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap, ShiftOperationType.DELETE);
             List<ShiftActivity>[] shiftActivities = shift.getShiftActivitiesForValidatingStaffingLevel(shift);
             for (ShiftActivity shiftActivity : shiftActivities[0]) {
@@ -907,14 +908,14 @@ public class ShiftValidatorService {
         }
     }
 
-    public Object[] validateStaffDetailsAndShiftOverlapping(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO
-            shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase) {
+    //As discussed with Arvind we remove the Check of cross organization overlapping functionality
+    public Object[] validateStaffDetailsAndShiftOverlapping(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO, ActivityWrapper activityWrapper, boolean byTandAPhase) {
         Activity activity = activityWrapper.getActivity();
         boolean shiftOverlappedWithNonWorkingType = false;
         validateStaffAndShift(staffAdditionalInfoDTO, shiftDTO, activity);
-        DateTimeInterval shiftInterval = null;
+        DateTimeInterval shiftInterval;
         Date startDate = asDate(shiftDTO.getShiftDate());
-        Date endDate = null;
+        Date endDate;
         if (CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
             endDate = asDate(shiftDTO.getShiftDate().plusDays(6).atTime(LocalTime.MAX));
             shiftInterval = new DateTimeInterval(startDate, endDate);
@@ -926,7 +927,6 @@ public class ShiftValidatorService {
             startDate = getStartOfDay(shiftDTO.getStartDate());
             endDate = getEndOfDay(shiftDTO.getEndDate());
         }
-        //As discussed with Arvind we remove the Check of cross organization overlapping functionality
         List<ShiftWithActivityDTO> overlappedShifts = shiftMongoRepository.findOverlappedShiftsByEmploymentId(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getId(), startDate, endDate);
         if (isCollectionNotEmpty(overlappedShifts)) {
             if (ShiftType.ABSENCE.equals(overlappedShifts.get(0).getShiftType())) {
@@ -1015,16 +1015,9 @@ public class ShiftValidatorService {
 
 
     //This method is being used to check overlapping shift with full day and full week activity
-    public void checkAbsenceTypeShift(ShiftDTO shiftDTO, ActivityWrapper activityWrapper) {
-        Date startDate = null;
-        Date endDate = null;
-        List<Shift> shiftList;
-        startDate = isNull(shiftDTO.getStartDate()) ? asDateStartOfDay(shiftDTO.getShiftDate()) : shiftDTO.getStartDate();
-        endDate = isNull(shiftDTO.getEndDate()) ? asDateEndOfDay(shiftDTO.getShiftDate()) : shiftDTO.getEndDate();
-
-        shiftList = shiftMongoRepository.getAllOverlappedShiftsAndEmploymentId(shiftDTO.getEmploymentId(), startDate, endDate);
-
-
+    public void checkAbsenceTypeShift(ShiftDTO shiftDTO) {
+        Date startDate;
+        Date endDate;
         if (shiftDTO.getStartDate() != null && asLocalDate(shiftDTO.getEndDate()).isAfter(asLocalDate(shiftDTO.getStartDate()))) {
             startDate = DateUtils.getStartOfDay(shiftDTO.getStartDate());
             endDate = DateUtils.getEndOfDay(shiftDTO.getEndDate());
@@ -1033,9 +1026,6 @@ public class ShiftValidatorService {
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
         }
         boolean absenceShiftExists = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
-        if (isCollectionEmpty(shiftList) || (shiftList.get(0).getActivities().get(0).getTimeType().equals(activityWrapper.getTimeType()) && TimeTypeEnum.ABSENCE.equals(activityWrapper.getTimeTypeInfo().getSecondLevelType()))) {
-            absenceShiftExists = false;
-        }
         if (absenceShiftExists) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERLAP_WITH_FULL_DAY);
         }
@@ -1108,13 +1098,13 @@ public class ShiftValidatorService {
             DateTimeInterval existingShiftInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate());
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
                 if ((WORKING_TYPE.toString().equals(activity.getTimeType())) && shiftInterval.overlaps(existingShiftInterval)) {
-                    shiftOverlapWithShiftId = shiftWithActivityDTO.getShiftId();
+                    shiftOverlapWithShiftId = shiftWithActivityDTO.getId();
 //                    exceptionService.invalidRequestException(MESSAGE_SHIFT_DATE_STARTANDEND, shiftWithActivityDTO.getStartDate(),
 //                            shiftWithActivityDTO.getEndDate());
                 } else if (CommonConstants.FULL_WEEK.equals(activity.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || FULL_DAY.equals(activity.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
                     existingShiftInterval = new DateTimeInterval(getStartOfDay(shiftWithActivityDTO.getStartDate()), getEndOfDay(shiftWithActivityDTO.getEndDate()));
                     if (shiftInterval.overlaps(existingShiftInterval)) {
-                         shiftOverlapWithShiftId = shiftWithActivityDTO.getShiftId();
+                         shiftOverlapWithShiftId = shiftWithActivityDTO.getId();
 //                        exceptionService.invalidRequestException(MESSAGE_SHIFT_DATE_STARTANDEND, shiftWithActivityDTO.getStartDate(),
 //                                shiftWithActivityDTO.getEndDate());
                     }

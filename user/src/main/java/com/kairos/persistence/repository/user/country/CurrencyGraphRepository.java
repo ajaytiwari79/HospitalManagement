@@ -17,8 +17,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 public interface CurrencyGraphRepository extends Neo4jBaseRepository<Currency,Long> {
 
     @Query("MATCH (country:Country)<-[:"+ BELONGS_TO +"]-(currency:Currency {deleted:false}) where id(country)={0} " +
-            "RETURN id(currency) as id, currency.name as name, currency.description as description, currency.currencyCode as currencyCode ORDER BY currency.creationDate DESC")
-    List<CurrencyDTO> findCurrencyByCountry(long countryId);
+            "RETURN currency")
+    List<Currency> findCurrencyByCountry(long countryId);
 
 
     @Query("Match (n:Currency{deleted:false})-[:"+ BELONGS_TO +"]->(country:Country) where id(country)={0} return n limit 1")

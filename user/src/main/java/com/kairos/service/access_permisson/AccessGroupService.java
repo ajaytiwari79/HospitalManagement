@@ -25,6 +25,7 @@ import com.kairos.persistence.model.access_permission.query_result.AccessGroupDa
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.DayTypeCountryHolidayCalenderQueryResult;
 import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
 import com.kairos.persistence.model.country.default_data.DayType;
@@ -126,6 +127,9 @@ public class AccessGroupService {
             exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, accessGroupDTO.getName());
         }
         Organization organization = organizationGraphRepository.findById(organizationId).orElseThrow(() -> new ActionNotPermittedException(exceptionService.convertMessage(MESSAGE_PERMITTED, ACCESS_GROUP)));
+        if (organization.isKairosHub() && AccessGroupRole.STAFF.equals(accessGroupDTO.getRole())) {
+            exceptionService.duplicateDataException("error.org.access.management.notnull");
+        }
         List<DayType> dayTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())) {
             dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
@@ -142,13 +146,10 @@ public class AccessGroupService {
         setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(), organization.getOrganizationCategory());
         accessGroupDTO.setId(accessGroup.getId());
         return accessGroupDTO;
-
     }
 
     public AccessGroupDTO updateAccessGroup(long accessGroupId, Long unitId, AccessGroupDTO accessGroupDTO) {
-
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
-
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
         }
@@ -556,6 +557,8 @@ public class AccessGroupService {
             case UNION:
                 accessGroupRepository.setAccessPageForUnionAccessGroup(countryId, accessGroupId);
                 break;
+            default:
+                break;
         }
     }
 
@@ -653,6 +656,8 @@ public class AccessGroupService {
                     orgCategoryDTO.setCount(accessGroupCountData.getUnionCount());
                     break;
                 }
+                default:
+                    break;
             }
         });
 
@@ -781,6 +786,8 @@ public class AccessGroupService {
             Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(parent.getId(), userId);
             if (staffAtHub != null) {
                 userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staffAtHub.getId(), false, true);
+                Organization parentHub = accessPageRepository.fetchParentHub(userId);
+                userAccessRoleDTO.setAccessGroupIds(parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet()));
             } else {
                 userAccessRoleDTO = getStaffAccessRole(unitId, userId, userAccessRoleDTO, parent);
             }
@@ -891,9 +898,10 @@ public class AccessGroupService {
     }
 
     public List<AccessGroup> validAccessGroupByDate(Long unitId,Date date){
+
         AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
         List<AccessGroup> accessGroups = new ArrayList<>();
-        if(!UserContext.getUserDetails().isHubMember()){
+        if(!UserContext.getUserDetails().isSystemAdmin()){
             List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
             for (AccessGroupDayTypesQueryResult accessGroupDayTypesQueryResult : accessGroupDayTypesQueryResults) {
                 if(isNotNull(accessGroupDayTypesQueryResult.getAccessGroup())){
@@ -954,6 +962,10 @@ public class AccessGroupService {
 
     public Set<String> getAccessRoles(Set<Long> accessGroupIds){
         return accessGroupRepository.getAccessRolesByAccessGroupId(accessGroupIds);
+    }
+
+    public Set<Long> getAccessGroupIdsOfUnit(final Long unitId){
+        return organizationService.fetchParentOrganization(unitId).getAccessGroups().stream().map(k->k.getId()).collect(Collectors.toSet());
     }
 
 }

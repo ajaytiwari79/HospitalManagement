@@ -1,6 +1,7 @@
 package com.kairos.controller.country.default_data;
 
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.system_setting.AccountTypeDTO;
 import com.kairos.service.country.default_data.AccountTypeService;
 import com.kairos.utils.response.ResponseHandler;
@@ -17,6 +18,7 @@ import javax.validation.Valid;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ACCOUNT_TYPE_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 /*
  *
  *  created by bobby 20/4/2018
@@ -68,6 +70,13 @@ public class AccountTypeController {
     public ResponseEntity<Map<String,Object>> deleteAccountTypeById(@PathVariable Long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.deleteAccountTypeById( id ));
 
+    }
+
+    @PutMapping(value = "/account_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfRelationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.updateTranslationOfAccountType(id,translations));
     }
 
 

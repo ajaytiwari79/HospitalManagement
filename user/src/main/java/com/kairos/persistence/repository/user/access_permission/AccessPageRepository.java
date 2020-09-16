@@ -210,7 +210,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
     @Query("MATCH (position:Position)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={0} WITH position\n" +
-            "MATCH (position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization{isKairosHub:true}) RETURN org ORDER BY id(org) LIMIT 1 \n" )
+            "MATCH (position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization{isKairosHub:true})-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup) RETURN org, COLLECT(r),COLLECT(ag) ORDER BY id(org) LIMIT 1 \n" )
     Organization fetchParentHub(Long userId);
 
 
@@ -223,8 +223,15 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (module:AccessPage)<-[modulePermission:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(accessGroup) WITH module,modulePermission,unitPermission,accessGroup\n" +
             "OPTIONAL MATCH (unitPermission)-[moduleCustomRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(module) WHERE moduleCustomRel.accessGroupId=id(accessGroup) \n" +
             "WITH module,modulePermission,unitPermission,moduleCustomRel,accessGroup\n" +
-            "RETURN module.name as name,id(module) as id,module.moduleId as moduleId,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.read ELSE moduleCustomRel.read END as read,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.write ELSE moduleCustomRel.write END as write,module.isModule as module,module.sequence as sequence")
-    List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId, List<Long> accessGroupIds);
+            "RETURN module.name as name,id(module) as id,module.moduleId as moduleId,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.read ELSE moduleCustomRel.read END as read,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.write ELSE moduleCustomRel.write END as write,module.isModule as module,module.sequence as sequence  " +
+            " UNION " +
+            " MATCH (module:AccessPage)<-[modulePermission:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(ag:AccessGroup) WHERE id (ag) IN {3} " +
+            " RETURN module.name as name,id(module) as id,module.moduleId as moduleId,modulePermission.read  as read,modulePermission.write  as write,module.isModule as module,module.sequence as sequence  ")
+    List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId, Set<Long> accessGroupIds, Set<Long> allAccessGroupIds);
+
+    @Query(" MATCH (module:AccessPage) " +
+            " RETURN module.name as name,id(module) as id,module.moduleId as moduleId,true  as read,true  as write,module.isModule as module,module.sequence as sequence  ")
+    List<AccessPageQueryResult> fetchHubSystemAdminPermissions();
 
     @Query("MATCH (u:User) WHERE id(u)={0} \n" +
             "MATCH (org:Organization{isEnable:true})-[:"+ HAS_POSITIONS +"]-(position:Position)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
@@ -233,7 +240,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH  (o:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]-(units) \n" +
             "WITH o,position, [o]+units as units  unwind units as org  WITH DISTINCT org,o,position\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
-            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) " +
+            "MATCH (unitPermission)-[agr:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE agr.endDate IS NULL OR DATE(agr.endDate) >= DATE() " +
             "MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayType:DayType) " +
             "WITH collect(dayType) as dayType,accessGroup,org,unitPermission " +
             "WHERE ANY(dt IN dayType WHERE id(dt) IN   {1})   AND (accessGroup.endDate IS NULL OR DATE(accessGroup.endDate) >= DATE())  WITH org,accessGroup,unitPermission\n" +
@@ -253,7 +260,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH  (o:Unit{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]-(units) \n" +
             "WITH o,position, [o]+units as units  unwind units as org  WITH DISTINCT org,o,position\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
-            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date())  WITH org,accessGroup,unitPermission\n" +
+            "MATCH (unitPermission)-[agr:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE (agr.endDate IS NULL OR date(agr.endDate) >= date())  WITH org,accessGroup,unitPermission\n" +
             "MATCH (accessPage:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) \n" +
             "MATCH (org) WHERE id(org)={1} \n"+
             "OPTIONAL MATCH (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
@@ -317,31 +324,26 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, Set<Long> organizationIds);
 
     @Query("MATCH (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
-            "OPTIONAL MATCH (country:Country)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage)-[alr:" + ACCESS_PAGE_HAS_LANGUAGE + "]-(systemLanguage:SystemLanguage) " +
+            "OPTIONAL MATCH (accessPage)-[alr:" + ACCESS_PAGE_HAS_LANGUAGE + "]-(systemLanguage:SystemLanguage) " +
             "WHERE id(systemLanguage)={0} " +
-            "WITH country,accessPage,r,alr " +
+            "WITH accessPage,alr " +
             "OPTIONAL MATCH(accessPage)-[subTabs:"+SUB_PAGE+"]-(sub:AccessPage) " +
-            "WITH r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage,subTabs,alr.description as helperText \n" +
+            "WITH accessPage,subTabs,alr.description as helperText \n" +
             "RETURN \n" +
-            "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.editable as editable,accessPage.sequence as sequence,accessPage as accessPage,helperText, " +
-            "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
-            "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
-            "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
-            "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization ORDER BY id(accessPage)")
+            "id(accessPage) as id,accessPage.name as name,accessPage.url as url,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.editable as editable,accessPage.sequence as sequence,accessPage as accessPage,helperText, " +
+            "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs \n" +
+            " ORDER BY id(accessPage) ")
     List<AccessPageQueryResult> getMainTabsWithHelperText(Long languageId);
 
     @Query("MATCH (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) WHERE id(accessPage)={0} WITH subPage,accessPage \n" +
-            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(subPage)-[alr:" + ACCESS_PAGE_HAS_LANGUAGE + "]-(systemLanguage:SystemLanguage) \n" +
+            "OPTIONAL MATCH(subPage)-[alr:" + ACCESS_PAGE_HAS_LANGUAGE + "]-(systemLanguage:SystemLanguage) \n" +
             "WHERE id(systemLanguage)={1} " +
-            "WITH country,accessPage,subPage,r,alr " +
+            "WITH DISTINCT accessPage,subPage,alr " +
             "OPTIONAL MATCH(subPage)-[subTabs:"+SUB_PAGE+"]->(sub:AccessPage)\n" +
-            "WITH r,subPage,id(accessPage) as parentTabId,subTabs,\n" +
-            "r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,alr.description as helperText\n" +
-            "RETURN id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,subPage.sequence as sequence,subPage.editable as editable, parentTabId,subPage as accessPage,helperText, " +
-            "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
-            "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
-            "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
-            "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization "
+            "WITH DISTINCT subPage,id(accessPage) as parentTabId,subTabs,\n" +
+            " alr.description as helperText\n" +
+            "RETURN DISTINCT id(subPage) as id, subPage.name as name,subPage.url as url,subPage.moduleId as moduleId,subPage.active as active,subPage.sequence as sequence,subPage.editable as editable, parentTabId,subPage as accessPage,helperText, " +
+            "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs \n"
     )
     List<AccessPageQueryResult> getChildTabsWithHelperText(Long tabId, Long languageId);
 

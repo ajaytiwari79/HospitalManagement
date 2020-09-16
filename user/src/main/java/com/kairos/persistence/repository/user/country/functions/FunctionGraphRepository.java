@@ -24,7 +24,9 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "OPTIONAL MATCH(function)-[:" + HAS_ORGANIZATION_LEVEL + "]->(level:Level) " +
             "OPTIONAL MATCH(function)-[:" + HAS_UNION + "]->(union:Organization{union:true}) " +
             "with country,function, collect(DISTINCT level) as organizationLevels, collect(DISTINCT union) as unions   " +
-            "RETURN id(function) as id,function.name as name,function.description as description," +
+            "RETURN {english: CASE WHEN function.`translatedNames.english` IS NULL THEN '' ELSE function.`translatedNames.english` END,danish: CASE WHEN function.`translatedNames.danish` IS NULL THEN '' ELSE function.`translatedNames.danish` END,hindi: CASE WHEN function.`translatedNames.hindi` IS NULL THEN '' ELSE function.`translatedNames.hindi` END,britishenglish: CASE WHEN function.`translatedNames.britishenglish` IS NULL THEN '' ELSE function.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN function.`translatedDescriptions.english` IS NULL THEN '' ELSE function.`translatedDescriptions.english` END,danish: CASE WHEN function.`translatedDescriptions.danish` IS NULL THEN '' ELSE function.`translatedDescriptions.danish` END,hindi: CASE WHEN function.`translatedDescriptions.hindi` IS NULL THEN '' ELSE function.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN function.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE function.`translatedDescriptions.britishenglish` END}as translatedDescriptions,  " +
+            "id(function) as id,function.name as name,function.description as description," +
             "function.startDate as startDate,function.endDate as endDate,function.code as code,unions,organizationLevels,function.icon as icon ORDER BY function.creationDate  DESC")
     List<FunctionDTO> findFunctionsByCountry(long countryId);
 

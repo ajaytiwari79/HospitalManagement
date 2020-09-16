@@ -15,6 +15,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
+import com.kairos.enums.cta.ActivityTypeForCostCalculation;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
@@ -212,6 +213,9 @@ public class CostTimeAgreementService {
         if (Optional.ofNullable(ctaResponseDTO).isPresent()) {
             ctaRuleTemplateDTOS = ctaResponseDTO.getRuleTemplates();
         }
+        ctaRuleTemplateDTOS.forEach(ctaRuleTemplateDTO -> {
+            ctaRuleTemplateDTO.setUnitId(unitId);
+        });
         return ctaRuleTemplateDTOS;
     }
 
@@ -470,7 +474,7 @@ public class CostTimeAgreementService {
      * @return List<CTAResponseDTO>
      */
     public List<CTAResponseDTO> loadAllCTAByCountry(Long countryId) {
-        return costTimeAgreementRepository.findCTAByCountryId(countryId);
+       return costTimeAgreementRepository.findCTAByCountryId(countryId);
     }
 
     /**
@@ -478,7 +482,11 @@ public class CostTimeAgreementService {
      * @return List<CTAResponseDTO>
      */
     public List<CTAResponseDTO> loadAllCTAByUnit(Long unitId) {
-        return costTimeAgreementRepository.findCTAByUnitId(unitId);
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.findCTAByUnitId(unitId);
+        ctaResponseDTOS.forEach(ctaResponseDTO -> {
+            ctaResponseDTO.setUnitId(unitId);
+        });
+        return ctaResponseDTOS;
     }
 
 
@@ -512,14 +520,11 @@ public class CostTimeAgreementService {
      * @param ctaRuleTemplate
      */
     private void setActivityBasesCostCalculationSettings(CTARuleTemplate ctaRuleTemplate) {
-        switch (ctaRuleTemplate.getActivityTypeForCostCalculation()) {
-            case TIME_TYPE_ACTIVITY:
-                ctaRuleTemplate.setActivityIds(new HashSet<>());
-                break;
-            default:
-                ctaRuleTemplate.setPlannedTimeIds(null);
-                ctaRuleTemplate.setTimeTypeIds(null);
-                break;
+        if (ctaRuleTemplate.getActivityTypeForCostCalculation() == ActivityTypeForCostCalculation.TIME_TYPE_ACTIVITY) {
+            ctaRuleTemplate.setActivityIds(new HashSet<>());
+        } else {
+            ctaRuleTemplate.setPlannedTimeIds(null);
+            ctaRuleTemplate.setTimeTypeIds(null);
         }
     }
 
@@ -694,13 +699,20 @@ public class CostTimeAgreementService {
         return costTimeAgreementRepository.findCTAByUnitId(unitId);
     }
 
-    //    Todo please do not remove this method I am working on it later
-//    public Map<String, TranslationInfo> updateTranslation(BigInteger ctaId, Map<String,TranslationInfo> translations) {
-//        CostTimeAgreement costTimeAgreement =costTimeAgreementRepository.findOne(ctaId);
-//        costTimeAgreement.setTranslations(translations);
-//        costTimeAgreementRepository.save(costTimeAgreement);
-//        return costTimeAgreement.getTranslations();
-//    }
+
+    public Map<String, TranslationInfo> updateCtaRuleTranslations(BigInteger ctaId, Map<String,TranslationInfo> translations) {
+        CTARuleTemplate ctaRuleTemplate =ctaRuleTemplateRepository.findOne(ctaId);
+        ctaRuleTemplate.setTranslations(translations);
+        ctaRuleTemplateRepository.save(ctaRuleTemplate);
+        return ctaRuleTemplate.getTranslations();
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger ctaId, Map<String,TranslationInfo> translations) {
+        CostTimeAgreement costTimeAgreement =costTimeAgreementRepository.findOne(ctaId);
+        costTimeAgreement.setTranslations(translations);
+        costTimeAgreementRepository.save(costTimeAgreement);
+        return costTimeAgreement.getTranslations();
+    }
 
 }
 

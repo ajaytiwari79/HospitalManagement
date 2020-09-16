@@ -13,6 +13,7 @@ import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.enums.Day;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
+import com.kairos.service.time_bank.CalculatePlannedHoursAndScheduledHours;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.utils.worktimeagreement.RuletemplateUtils;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
 
 @Service
@@ -51,10 +53,10 @@ public class CostCalculationKPIService {
           for (CTARuleTemplateDTO ruleTemplate : ctaResponseDTO.getRuleTemplates()) {
               if (CalculationFor.BONUS_HOURS.equals(ruleTemplate.getCalculationFor())) {
                   RuletemplateUtils.updateDayTypeDetailInCTARuletemplate(daytypesMap, ruleTemplate);
-                  boolean valid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, new StaffEmploymentDetails(new EmploymentType(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentTypeId())), shiftActivityDTO.getPhaseId(), shiftActivityDTO.getActivityId(), shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeTypeId(), shiftActivityDTO.getPlannedTimes());
+                  boolean valid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, new StaffEmploymentDetails(new EmploymentType(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentTypeId())), shiftActivityDTO.getPhaseId(), newHashSet(shiftActivityDTO.getActivityId()), newHashSet(shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeTypeId()), shiftActivityDTO.getPlannedTimes());
                   boolean dayTypeValid = timeBankCalculationService.isDayTypeValid(shiftActivityDTO.getStartDate(), ruleTemplate, dayTypeDTOMap);
                   if (valid && dayTypeValid) {
-                      totalCtaBonus += timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivityDTO, new StaffEmploymentDetails(employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getCtaRuleTemplates(), BigDecimal.valueOf(employmentWithCtaDetailsDTO.getHourlyCost()), employmentWithCtaDetailsDTO.getEmploymentLines()),dayTypeDTOMap).intValue();
+                      totalCtaBonus += new CalculatePlannedHoursAndScheduledHours(timeBankCalculationService).getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivityDTO, new StaffEmploymentDetails(employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getCtaRuleTemplates(), BigDecimal.valueOf(employmentWithCtaDetailsDTO.getHourlyCost()), employmentWithCtaDetailsDTO.getEmploymentLines()),dayTypeDTOMap).intValue();
                   }
               }
           }

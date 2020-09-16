@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -123,5 +124,11 @@ public class AccessPageController {
     @GetMapping("/tab_hierarchy")
     public ResponseEntity<Map<String, Object>> getTabHierarchy(@RequestParam("languageId") Long languageId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getTabHierarchy(languageId));
+    }
+
+    @ApiOperation(value = "set ulr in  tab hierarchy")
+    @PutMapping("/set_url_in_pages")
+    public ResponseEntity<Map<String, Object>> setUrlInTabHierarchy() throws IOException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.setUrlInAccessPages());
     }
 }

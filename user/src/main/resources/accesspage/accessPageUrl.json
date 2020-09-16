@@ -1,0 +1,428 @@
+
+
+{
+
+    "module_1" : "/dashboard",
+
+
+    "module_11": "/system-setting",
+    "tab_439" : "/general-settings",
+    "tab_391": "/payroll",
+    "tab_236": "/languages",
+    "tab_119": "/tabs-hierarchy",
+
+
+    "module_7": "/shift-workflow/unit/:selectedUnitId/staff/0",
+    "tab_284": "?tab=tab_284",
+    "tab_447": "",
+    "tab_415": "?tab=tab_415",
+    "tab_410": "?tab=tab_410",
+    "tab_421": "",
+    "tab_282": "?tab=tab_282",
+    "tab_445": "?tab=tab_445",
+    "tab_187": "",
+    "tab_442": "?tab=tab_442",
+    "tab_418": "",
+    "tab_441": "?tab=tab_441",
+    "tab_443": "",
+    "tab_413": "?tab=tab_413",
+    "tab_417": "",
+    "tab_452": "?tab=tab_452",
+    "tab_416": "?tab=tab_416",
+    "tab_412": "?tab=tab_412",
+    "tab_411": "?tab=tab_411",
+    "tab_440": "",
+    "tab_419": "",
+    "tab_188": "",
+    "tab_444": "",
+    "tab_283": "?tab=tab_283",
+    "tab_285": "?tab=tab_285",
+    "tab_414": "?tab=tab_414",
+
+
+    "module_6": null,
+    "tab_278": null,
+    "tab_281": null,
+    "tab_280": null,
+    "tab_279": null,
+
+
+    "module_9": null,
+    "tab_291": null,
+    "tab_292": null,
+    "tab_290": null,
+    "tab_293": null,
+
+
+    "module_2": null,
+
+
+    "module_3": "/unit/:selectedUnitId/settings",
+    "tab_10": "/general",
+    "tab_43": "/management",
+
+    "tab_138": "/activity",
+    "tab_139":  "/0/activity-general",
+    "tab_140":  null,
+    "tab_141":  "/0/activity-rules",
+    "tab_142":  "/0/activity-time-calculation",
+    "tab_143":  "/0/activity-allowed-activities",
+    "tab_144":  null,
+    "tab_145":  "/0/activity-cta-settings",
+    "tab_146":  "/0/activity-communication",
+    "tab_147":  "/0/activity-skill",
+    "tab_148":  "/0/activity-proficiency",
+    "tab_149":  "/0/activity-organization-mapping",
+    "tab_150":  "/0/activity-opta-planner",
+    "tab_347":  "/0/activity-locations",
+    "tab_348":  null,
+    "tab_356":  "/0/activity-phase-wise-settings",
+
+    "tab_156": "/cta-templates",
+    "tab_157": "/wta-templates",
+    "tab_12": "/services",
+    "tab_49": "/unit-services",
+    "tab_50": "/map-external-services",
+
+    "tab_51": "/task-types-setting",
+    "tab_103": "",
+    "tab_124": "",
+    "tab_67": "",
+    "tab_57": "",
+    "tab_55": "",
+    "tab_63": "",
+    "tab_111": "",
+    "tab_112": "",
+    "tab_110": "",
+    "tab_53": "",
+    "tab_102": "",
+    "tab_60": "",
+    "tab_64": "",
+
+    "tab_390": "/expertise",
+
+    "tab_16": "/integrations",
+    "tab_106": "/control-panel",
+    "tab_107": "/integration-beacon",
+
+    "tab_13": "/skills",
+    "tab_108": "/add-skill",
+    "tab_109": "/assign-skill",
+
+    "tab_45": "/access-group",
+    "tab_435": "/tab-permissions",
+    "tab_437": "/field-permissions",
+
+    "tab_244": "/unit-settings",
+    "tab_252": "/route-planning-settings",
+    "tab_357": "/hot-button-config",
+    "tab_358": "/sick-button",
+    "tab_253": "/activity-configuration",
+    "tab_254": "/presence",
+    "tab_255": "/absence",
+    "tab_429": "/non-working",
+    "tab_245": "/period-management",
+    "tab_405": "/activity-priorities",
+    "tab_367": "/reason",
+    "tab_369": "/reason-timetype",
+    "tab_371": "/reason-ta",
+    "tab_368": "/reason-employment",
+    "tab_370": "/reason-order",
+    "tab_251": "/phase-settings",
+    "tab_249": "/open-shift-rules",
+
+    "tab_160": "/phases",
+
+    "tab_240": "/periods",
+
+    "tab_155": "/employment",
+
+    "tab_350": "/order",
+    "tab_353": "/manual-order",
+    "tab_351": "/rule-templates",
+    "tab_352": "/priority-group-configuration",
+
+    "tab_14": "/manage-hierarchy",
+    "tab_152": "/team",
+    "tab_434": "/groups",
+
+    "tab_242": "/unions",
+
+    "tab_44": "/openinghours",
+
+    "tab_237": "/time-setting",
+    "tab_238": "/task-time-slot",
+    "tab_239": "/shift-time-slot",
+
+    "tab_154": "/tags",
+
+    "tab_11": "/location",
+
+    "tab_41": "/citizens",
+
+    "tab_113": "/local-area-settings",
+
+    "tab_77": "/staff-to-citizen-mapping",
+
+    "tab_42": "/resources",
+
+    "tab_307": "/kpi-configuration",
+    "tab_308": "/module-wise",
+    "tab_309": "/access-group-wise",
+    "tab_407": "/fibonacci-kpi",
+    "tab_409": "/kpi-set",
+    "tab_402": "/kpi-settings",
+
+    "tab_17": "/social",
+    "tab_15": "/sms",
+
+    "tab_241": "/organization-administrative-information",
+
+    "tab_243": "/organization-communication",
+
+    "tab_380": "/unit-structure",
+
+    "tab_381": "/contracts",
+    "tab_382": "/sub-contractors",
+
+    "tab_383": "/invoicing",
+
+    "tab_384": "/marketing",
+
+    "tab_385": "/account-details",
+
+    "tab_386": "/payments",
+
+    "tab_387": "/subscripton-plans",
+
+    "tab_388": "/data-export",
+
+    "tab_389": "/gdpr",
+
+    "tab_422": "/optaplanner-configuration",
+    "tab_423": "/shift-planning",
+    "tab_424": "/solver-configuration-settings",
+
+
+
+    "module_12": "/staff-workflow/unit/:selectedUnitId/staff/0",
+    "tab_20": "/personalDetails",
+    "tab_22": "/workplace",
+    "tab_23": "/employmentDetails",
+    "tab_232": "?tab=tab_232",
+    "tab_231": "?tab=tab_231",
+    "tab_24": "?tab=tab_24",
+    "tab_26": "/perform",
+    "tab_27": "/skills",
+    "tab_28": "/notes",
+    "tab_29": "/tab_29",
+    "tab_30": "/balance",
+
+    "tab_137": "/timebank",
+    "tab_365": "?tab=tab_365",
+    "tab_364": "",
+    "tab_366": "?tab=tab_366",
+
+    "tab_19": "/activities",
+    "tab_151": "/balanceAdjustments",
+    "tab_153": "/emailSms",
+    "tab_332": "/nightWorker",
+    "tab_333": "?tab=tab_333",
+    "tab_334": "?tab=tab_334",
+
+    "tab_256": "/task-type-settings",
+    "tab_395": "/payroll-details",
+    "tab_396": "",
+
+
+    "module_4": "/country-settings/:countryId",
+    "tab_47": "/services",
+    "tab_133": "/activity",
+    "tab_120": "/0/activity-general",
+    "tab_121": null,
+    "tab_122": "/0/activity-rules",
+    "tab_123": "/0/activity-time-calculation",
+    "tab_125": "/0/activity-allowed-activities",
+    "tab_126": null,
+    "tab_127": "/0/activity-cta-settings",
+    "tab_128": "/0/activity-communication",
+    "tab_129": "/0/activity-skill",
+    "tab_130": "/0/activity-proficiency",
+    "tab_131": "/0/activity-organization-mapping",
+    "tab_132": "/0/activity-opta-planner",
+    "tab_345": "/0/activity-locations",
+    "tab_346": null,
+    "tab_355": "/0/activity-phase-wise-settings",
+
+    "tab_114": "/task-types-setting",
+    "tab_199": "",
+    "tab_68": "",
+    "tab_58": "",
+    "tab_66": "",
+    "tab_62": "",
+    "tab_56": "",
+    "tab_61": "",
+    "tab_59": "",
+    "tab_54": "",
+    "tab_52": "",
+    "tab_136": "",
+    "tab_65": "",
+
+    "tab_116": "/cta",
+    "tab_179": "/cta-rule-templates",
+    "tab_178": "/cta-templates",
+
+    "tab_117": "/wta",
+    "tab_181": "/wta-rule-templates",
+    "tab_180": "/wta-templates",
+
+    "tab_70": "/skills-and-expertise",
+    "tab_340": "/skills",
+    "tab_341": "/expertise",
+
+    "tab_48": "/organization-types",
+    "tab_99": "/create-organization-type",
+    "tab_100": "/map-organization-with-service",
+    "tab_101": "/map-organization-with-skills",
+    "tab_134": "/map-organization-with-cta",
+    "tab_135": "/map-organization-with-wta",
+
+    "tab_118": "/organization-levels",
+    "tab_72": "/regions",
+
+    "tab_82": "/common-settings",
+    "tab_84": "/day-type",
+    "tab_161": "/time-type",
+    "tab_162": "/time-type-default",
+    "tab_163": "/presence-time-type",
+    "tab_372": "/glide-time",
+    "tab_335": "/language-settings",
+    "tab_85": "/industry-type",
+    "tab_86": "/clinic-type",
+    "tab_87": "/ownership-type",
+    "tab_98": "/vat-type",
+    "tab_88": "/contract-type",
+    "tab_89": "/business-type",
+    "tab_90": "/kairos-status",
+    "tab_91": "/employee-limit",
+    "tab_92": "/payment-type",
+    "tab_93": "/housing-type",
+    "tab_97": "/language",
+    "tab_446": "/interval",
+    "tab_392": "/payroll-settings",
+    "tab_394": "/pension-provider",
+    "tab_393": "/bank-list",
+    "tab_105": "/currency",
+    "tab_94": "/engineer-type",
+    "tab_95": "/location-type",
+    "tab_96": "/civilian-status",
+    "tab_164": "/resource",
+    "tab_171": "/relation-type",
+    "tab_172": "/employment-type",
+    "tab_173": "/phases",
+    "tab_174": "/reason",
+    "tab_337": "/reason-timetype",
+    "tab_339": "/reason-ta",
+    "tab_175": "/reason-employment",
+    "tab_338": "/reason-order",
+    "tab_176": "/functions-type",
+    "tab_177": "/paygroup-area",
+    "tab_302": "/account-type",
+    "tab_303": "/template-type",
+    "tab_310": "/activity-configuration",
+    "tab_311": "/presence",
+    "tab_312": "/absence",
+    "tab_431": "/non-working",
+    "tab_404": "/activity-priorities",
+    "tab_73": "/parent-organization",
+    "tab_69": "/calendar",
+    "tab_182": "/tags",
+    "tab_74": "/unions",
+    "tab_183": "/pay-table",
+
+    "tab_184": "/access-group",
+    "tab_436": "/tab-permissions",
+    "tab_438": "/field-permissions",
+
+    "tab_83": "/integrations",
+
+    "tab_257": "/kpi-configuration",
+    "tab_258": "/module-wise",
+    "tab_259": "/access-group-wise",
+    "tab_260": "/organization-type",
+    "tab_406": "/fibonacci-kpi",
+    "tab_408": "/kpi-set",
+    "tab_261": "/kpi-settings",
+
+
+    "module_13": "/payroll/unit/:selectedUnitId",
+    "tab_397": "/bank-details",
+    "tab_403": "/payroll-settings",
+
+
+    "module_8": "/gdpr-workflow/country/:countryId",
+    "tab_377": "/clauses",
+    "tab_206": "/policy-docs",
+    "tab_208": "/risks",
+    "tab_313": "/organisation-asset-management",
+    "tab_314": "/asset-list",
+    "tab_315": "/asset-type",
+    "tab_316": "/storage-format",
+    "tab_317": "/hosting-type",
+    "tab_318": "/hosting-provider",
+    "tab_319": "/technical-security-measures",
+    "tab_320": "/organizational-security-measures",
+    "tab_321": "/data-disposal",
+
+    "tab_323": "/processing-activity-management",
+    "tab_324": "/processing-activity list",
+    "tab_325": "/responsibility-type",
+    "tab_326": "/processing-purpose",
+    "tab_327": "/data-source",
+    "tab_328": "/transfer-method",
+    "tab_329": "/accesser-party",
+    "tab_330": "/legal-basis",
+    "tab_331": "/risk",
+    "tab_378": "/risks",
+
+    "tab_376": "/assessment-template",
+    "tab_363": "/organisation-data-management",
+    "tab_373": "/data-category",
+    "tab_374": "/data-subject-mapping",
+
+    "tab_375": "/assessments",
+
+    "tab_205": "/master-settings",
+
+
+    "tab_211": "/asset-management",
+    "tab_216": "/asset-list",
+    "tab_217": "/storage-type",
+    "tab_218": "/storage-format",
+    "tab_219": "/hosting-type",
+    "tab_220": "/hosting-provider",
+    "tab_221": "/technical-security-measures",
+    "tab_222": "/organizational-security-measures",
+    "tab_223": "/data-disposal",
+
+    "tab_209": "/clauses",
+    "tab_210": "/agreement-templates",
+    "tab_215": "",
+    "tab_214": "",
+
+    "tab_212": "/processing-activity-management",
+    "tab_224": "/processing-activity-list",
+    "tab_225": "/responsibility-type",
+    "tab_226": "/processing-purpose",
+    "tab_227": "/data-source",
+    "tab_228": "/transfer-method",
+    "tab_229": "/accesser-party",
+    "tab_230": "/legal-basis",
+    "tab_379": "/risks",
+
+    "tab_213": "/questionnaires",
+    "tab_304": "/data-management",
+    "tab_305": "/data-category",
+    "tab_306": "/data-subject-mapping"
+
+}

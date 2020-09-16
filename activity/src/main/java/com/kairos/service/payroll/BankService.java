@@ -4,6 +4,8 @@ package com.kairos.service.payroll;
  *
  */
 
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.payroll.*;
 import com.kairos.persistence.model.payroll.*;
 import com.kairos.persistence.repository.payroll.*;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
@@ -72,7 +75,11 @@ public class BankService{
     }
 
     public List<BankDTO> getAllBank(Long countryId) {
-        return bankRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
+        List<BankDTO> bankDTOS = bankRepository.findAllByCountryIdAndDeletedFalseOrderByCreatedAtDesc(countryId);
+        bankDTOS.forEach(bankDTO -> {
+            bankDTO.setCountryId(countryId);
+        });
+        return bankDTOS;
     }
 
     private void validateBankDetails(Bank bank, BankDTO bankDTO) {
@@ -158,6 +165,13 @@ public class BankService{
         organizationBankDetails.setEmail(organizationBankDetailsDTO.getEmail());
         organizationBankDetailsRepository.save(organizationBankDetails);
         return true;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger paymentTypeId, Map<String,TranslationInfo> translations) {
+        Bank bank =bankRepository.findOne(paymentTypeId);
+        bank.setTranslations(translations);
+        bankRepository.save(bank);
+        return bank.getTranslations();
     }
 
 }

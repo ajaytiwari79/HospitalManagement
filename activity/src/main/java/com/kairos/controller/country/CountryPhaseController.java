@@ -1,5 +1,6 @@
 package com.kairos.controller.country;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.utils.response.ResponseHandler;
@@ -75,5 +76,12 @@ public class CountryPhaseController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updatePhases(@PathVariable Long countryId,@PathVariable BigInteger phaseId,@RequestBody @Valid PhaseDTO phaseDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.updatePhases(countryId,phaseId,phaseDTO));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = COUNTRY_URL+"/phase/{phaseId}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updatePhasesTRanslations(@PathVariable BigInteger phaseId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.updateTranslations(phaseId,translations));
     }
 }

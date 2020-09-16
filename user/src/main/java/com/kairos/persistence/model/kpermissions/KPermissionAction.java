@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.kpermissions;
 
 import com.kairos.enums.OrganizationCategory;
+import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import lombok.Getter;
@@ -24,16 +25,18 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 public class KPermissionAction extends UserBaseEntity {
 
     @NotBlank(message = ERROR_NAME_NOTNULL)
-    private String actionName;
+    private PermissionAction action;
+
+    private String modelName;
 
     @Relationship(type = HAS_PERMISSION)
     private List<AccessGroup> accessGroups = new ArrayList<>();
 
     private Set<OrganizationCategory> organizationCategories;
 
-    public KPermissionAction(@NotBlank(message = ERROR_NAME_NOTNULL) String actionName,Set<OrganizationCategory> organizationCategories) {
-        this.actionName = actionName;
-        this.organizationCategories = organizationCategories;
+    public KPermissionAction(@NotBlank(message = ERROR_NAME_NOTNULL) String modelName,PermissionAction action) {
+        this.modelName = modelName;
+        this.action = action;
     }
 }
 

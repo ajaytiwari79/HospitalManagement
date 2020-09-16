@@ -1,5 +1,6 @@
 package com.kairos.controller.tag;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.service.tag.TagService;
@@ -106,5 +107,19 @@ public class TagController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> unlinkTagFromActivity(@PathVariable long unitId, @PathVariable BigInteger tagId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.unlinkTagFromActivity(tagId));
+    }
+
+    @ApiOperation(value = "Update translated data")
+    @PutMapping(value = COUNTRY_URL + "/tag/{tagId}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfTags(@PathVariable BigInteger tagId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateTranslation(tagId,translations));
+    }
+
+    @ApiOperation(value = "Update translated data")
+    @PutMapping(value = UNIT_URL + "/tag/{tagId}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfTagsOfOrganization(@PathVariable BigInteger tagId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateTranslation(tagId,translations));
     }
 }

@@ -2,6 +2,7 @@ package com.kairos.controller.expertise;
 
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
@@ -246,6 +247,13 @@ public class ExpertiseController {
     @GetMapping(value =  "/protected_days_setting")
     public ResponseEntity<Map<String, Object>> findAllExpertiseAndLinkProtectedDaysOfSetting() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.linkProtectedDaysOffSetting(new ArrayList<>(),new ArrayList<>()));
+    }
+
+    @PutMapping(value = UNIT_URL+"/expertise/{id}/languageSettings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfExpertise(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateTranslation(id,translations));
     }
 
 }

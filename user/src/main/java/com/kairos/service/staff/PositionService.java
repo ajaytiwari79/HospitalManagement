@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
@@ -11,7 +12,6 @@ import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPerm
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -77,6 +77,8 @@ import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 public class PositionService {
 
     public static final String CHILD = "child";
+    public static final String END_DATE = "endDate";
+    public static final String START_DATE = "startDate";
     @Inject
     private UnitGraphRepository unitGraphRepository;
     @Inject
@@ -176,7 +178,7 @@ public class PositionService {
     }
 
 
-    public Map<String, Object> createUnitPermission(Long unitId, Long staffId, Long accessGroupId, boolean created) {
+    public Map<String, Object> createUnitPermission(Long unitId, Long staffId, Long accessGroupId, boolean created,LocalDate startDate,LocalDate endDate) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
@@ -192,7 +194,8 @@ public class PositionService {
         Map<String, Object> response = new HashMap<>();
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         if (created) {
-            staffAccessGroupQueryResult = setUnitPermission(unitId, staffId, accessGroupId, accessGroup, unit, parentUnit, position, response);
+            validateDates(startDate,endDate,accessGroup);
+            staffAccessGroupQueryResult = setUnitPermission(unitId, staffId, accessGroup, unit, parentUnit, position, response,startDate,endDate);
         } else {
             staffAccessGroupQueryResult = removeUnitPermisssion(unitId, staffId, accessGroupId, parentUnit);
         }
@@ -207,6 +210,14 @@ public class PositionService {
         return response;
     }
 
+    private void validateDates(LocalDate startDate, LocalDate endDate, AccessGroup accessGroup) {
+        DateTimeInterval dateTimeInterval=new DateTimeInterval(accessGroup.getStartDate(),accessGroup.getEndDate());
+        DateTimeInterval timeInterval=new DateTimeInterval(startDate,endDate);
+        if(!dateTimeInterval.contains(timeInterval)){
+            exceptionService.actionNotPermittedException("message.staff.access_group.exceed");
+        }
+    }
+
     private StaffAccessGroupQueryResult removeUnitPermisssion(Long unitId, Long staffId, Long accessGroupId, Organization parentUnit) {
         StaffAccessGroupQueryResult staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
         // need to remove unit permission
@@ -217,10 +228,10 @@ public class PositionService {
         return staffAccessGroupQueryResult;
     }
 
-    private StaffAccessGroupQueryResult setUnitPermission(Long unitId, Long staffId, Long accessGroupId, AccessGroup accessGroup, OrganizationBaseEntity unit, Organization parentUnit, Position position, Map<String, Object> response) {
+    private StaffAccessGroupQueryResult setUnitPermission(Long unitId, Long staffId, AccessGroup accessGroup, OrganizationBaseEntity unit, Organization parentUnit, Position position, Map<String, Object> response, LocalDate startDate, LocalDate endDate) {
         UnitPermission unitPermission;
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
-        unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentUnit.getId(), unitId, staffId, accessGroupId);
+        unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentUnit.getId(), unitId, staffId, accessGroup.getId());
         if (!Optional.ofNullable(unitPermission).isPresent()) {
             unitPermission = new UnitPermission();
             if (unit instanceof Organization) {
@@ -233,11 +244,12 @@ public class PositionService {
             position.getUnitPermissions().add(unitPermission);
             positionGraphRepository.save(position, 2);
         } else {
-            unitPermissionGraphRepository.createPermission(accessGroupId, unitPermission.getId());
+            unitPermissionGraphRepository.createPermission(accessGroup.getId(), unitPermission.getId());
         }
+        unitPermissionGraphRepository.updateDatesInUnitPermission(accessGroup.getId(), unitPermission.getId(),startDate==null?null:startDate.toString(),endDate==null?null:endDate.toString());
         LOGGER.info(" Currently created Unit Permission ");
-        response.put("startDate", getDate(unitPermission.getStartDate()));
-        response.put("endDate", getDate(unitPermission.getEndDate()));
+        response.put(START_DATE, startDate);
+        response.put(END_DATE, endDate);
         response.put("id", unitPermission.getId());
         staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
         return staffAccessGroupQueryResult;
@@ -305,11 +317,8 @@ public class PositionService {
     public List<Map<String, Object>> getWorkPlaces(long staffId, long unitId) {
         Organization organization = organizationGraphRepository.findOrganizationOfStaff(staffId);
         OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
-        List<AccessGroup> accessGroups;
-        List<Map<String, Object>> units;
-
-        accessGroups = accessGroupRepository.getAccessGroups(organization.getId());
-        units = unitGraphRepository.getSubOrgHierarchy(organization.getId());
+        List<AccessGroup> accessGroups = accessGroupRepository.getAccessGroups(organization.getId());
+        List<Map<String, Object>> units= unitGraphRepository.getSubOrgHierarchy(organization.getId());
         List<Map<String, Object>> positions;
         List<Map<String, Object>> workPlaces = new ArrayList<>();
         // This is for parent organization i.e if unit is itself parent organization
@@ -323,6 +332,8 @@ public class PositionService {
                 if (employment != null && !employment.isEmpty()) {
                     positions.add(employment);
                     queryResult.setAccessable(true);
+                    queryResult.setStartDate((String) employment.get(START_DATE));
+                    queryResult.setEndDate((String) employment.get(END_DATE));
                 } else {
                     queryResult.setAccessable(false);
                 }
@@ -356,6 +367,9 @@ public class PositionService {
                             if (position != null && !position.isEmpty()) {
                                 positions.add(position);
                                 child.setAccessable(true);
+
+                                child.setStartDate((String) position.get(START_DATE));
+                                child.setEndDate((String) position.get(END_DATE));
                             } else {
                                 child.setAccessable(false);
                             }
@@ -370,6 +384,9 @@ public class PositionService {
                     if (position != null && !position.isEmpty()) {
                         positions.add(position);
                         child.setAccessable(true);
+                        child.setStartDate((String) position.get(START_DATE));
+                        child.setEndDate((String) position.get(END_DATE));
+
                     } else {
                         child.setAccessable(false);
                     }
@@ -379,6 +396,8 @@ public class PositionService {
                     if (position != null && !position.isEmpty()) {
                         positions.add(position);
                         queryResult.setAccessable(true);
+                        queryResult.setStartDate((String) position.get(START_DATE));
+                        queryResult.setEndDate((String) position.get(END_DATE));
                     } else {
                         queryResult.setAccessable(false);
                     }
@@ -489,8 +508,8 @@ public class PositionService {
     private Map<String, Object> parsePartialLeaveObj(PartialLeave partialLeave) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", partialLeave.getId());
-        map.put("startDate", getDate(partialLeave.getStartDate()));
-        map.put("endDate", getDate(partialLeave.getEndDate()));
+        map.put(START_DATE, getDate(partialLeave.getStartDate()));
+        map.put(END_DATE, getDate(partialLeave.getEndDate()));
         map.put("leaveType", partialLeave.getLeaveType());
         map.put("amount", partialLeave.getAmount());
         map.put("note", partialLeave.getNote());
@@ -632,7 +651,7 @@ public class PositionService {
             deleteAuthTokenOfUsersByPositionIds(positionIds);
             for (ExpiredPositionsQueryResult expiredPositionsQueryResult : expiredPositionsQueryResults) {
                 for (OrganizationBaseEntity unit : expiredPositionsQueryResult.getUnits()) {
-                    createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true);
+                    createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true,null,null);
                 }
             }
         }

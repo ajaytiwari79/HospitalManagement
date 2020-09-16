@@ -9,7 +9,6 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.DayType;
-import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -76,6 +75,7 @@ public class DayTypeService {
         List<DayType> dayTypes =dayTypeGraphRepository.findByCountryId(countryId);
         List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
         for(DayTypeDTO dayTypeDTO :dayTypeDTOS){
+            dayTypeDTO.setTranslations(TranslationUtil.getTranslatedData(dayTypeDTO.getTranslatedNames(),dayTypeDTO.getTranslatedDescriptions()));
             dayTypeDTO.setCountryId(countryId);
         }
         return dayTypeDTOS;

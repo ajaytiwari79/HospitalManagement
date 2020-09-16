@@ -21,8 +21,6 @@ import com.kairos.wrapper.activity.ActivityTimeTypeWrapper;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -35,6 +33,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
@@ -44,8 +43,6 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 
 public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepository {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityMongoRepositoryImpl.class);
 
     public static final String ACTIVITY_RULES_ACTIVITY_TAB = "activity.activityRulesSettings";
     public static final String ACTIVITY_INDIVIDUAL_POINTS_ACTIVITY_TAB = "activity.activityIndividualPointsSettings";
@@ -129,8 +126,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private static final String COUNTRY_PARENT_ID = "countryParentId";
     private static final String ID = "id";
     private static final String $_ID = "$id";
-    private static final String TIME_TYPE_ID ="activity.activityBalanceSettings.timeTypeId";
     public static final String BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE = "activityBalanceSettings.timeType";
+    public static final String TRANSLATIONS="translations";
+    public static final String ACTIVITY_PRIORITY_SEQUENCE="activityPriority.sequence";
+    public static final String ACTIVITY_SEQUENCE ="activitySequence";
+
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -200,7 +200,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(deleted)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, _ID, TIME_TYPE1),
                 lookup("tag", "tags", _ID, "tags"),
-                project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB, "tags", ACTIVITY_PRIORITY_ID,"translations").and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).and(TIME_CALCULATION_ACTIVITY_TAB).as(TIME_CALCULATION_ACTIVITY_TAB)
+                project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB, "tags", ACTIVITY_PRIORITY_ID,TRANSLATIONS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).and(TIME_CALCULATION_ACTIVITY_TAB).as(TIME_CALCULATION_ACTIVITY_TAB)
                         .and(TIME_CALCULATION_ACTIVITY_TAB_METHOD_FOR_CALCULATING_TIME).as("methodForCalculatingTime")
                         .and("timeType.activityCanBeCopiedForOrganizationHierarchy").arrayElementAt(0).as("activityCanBeCopiedForOrganizationHierarchy")
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES)
@@ -217,7 +217,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(IS_PARENT_ACTIVITY).is(true)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, _ID, TIME_TYPE1),
                 lookup("tag", "tags", _ID, "tags"),
-                project(NAME, STATE, DESCRIPTION, COUNTRY_ID, IS_PARENT_ACTIVITY, GENERAL_ACTIVITY_TAB,"translations", "tags", ACTIVITY_PRIORITY_ID, CHILD_ACTIVITY_IDS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID)
+                project(NAME, STATE, DESCRIPTION, COUNTRY_ID, IS_PARENT_ACTIVITY, GENERAL_ACTIVITY_TAB,TRANSLATIONS, "tags", ACTIVITY_PRIORITY_ID, CHILD_ACTIVITY_IDS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID)
                         .and(TIME_CALCULATION_ACTIVITY_TAB_METHOD_FOR_CALCULATING_TIME).as("methodForCalculatingTime")
 
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES)
@@ -532,7 +532,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
     @Override
     public List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType,Long unitId){
-        return getActivityWrappersByCriteria(Criteria.where("activityBalanceSettings.timeType").is(secondLevelTimeType).and(UNIT_ID).is(unitId).and(DELETED).is(false));
+        return getActivityWrappersByCriteria(Criteria.where(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).is(secondLevelTimeType).and(UNIT_ID).is(unitId).and(DELETED).is(false));
     }
 
     public List<TimeTypeAndActivityIdDTO> findAllTimeTypeByActivityIds(Set<BigInteger> activityIds) {
@@ -629,7 +629,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         List<TimeTypeEnum> breakTypes = new ArrayList<>();
         breakTypes.add(PAID_BREAK);
         breakTypes.add(UNPAID_BREAK);
-        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).and("activityBalanceSettings.timeType").in(breakTypes)),
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).in(breakTypes)),
                 project("id")
                 );
         AggregationResults<Activity> result = mongoTemplate.aggregate(aggregation, Activity.class, Activity.class);
@@ -822,7 +822,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, _ID, TIME_TYPE1),
-                project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB,"translations").and(TIME_CALCULATION_ACTIVITY_TAB).as(TIME_CALCULATION_ACTIVITY_TAB)
+                project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB,TRANSLATIONS).and(TIME_CALCULATION_ACTIVITY_TAB).as(TIME_CALCULATION_ACTIVITY_TAB)
                         .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1),
                 match(Criteria.where("timeType.partOfTeam").is(false))
         );
@@ -850,7 +850,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
                         .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY),
                 project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
-                        .and("activityPriority.sequence").as("activitySequence")
+                        .and(ACTIVITY_PRIORITY_SEQUENCE).as(ACTIVITY_SEQUENCE)
                 );
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
@@ -864,7 +864,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
                         .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY),
                 project()
-                        .and("activityPriority.sequence").as("activitySequence")
+                        .and(ACTIVITY_PRIORITY_SEQUENCE).as(ACTIVITY_SEQUENCE)
         );
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
@@ -878,7 +878,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
                         .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY),
                 project(NAME, DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
-                        .and("activityPriority.sequence").as("activitySequence")
+                        .and(ACTIVITY_PRIORITY_SEQUENCE).as(ACTIVITY_SEQUENCE)
         );
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
@@ -900,7 +900,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         CustomAggregationOperation pathArrayProjection = new CustomAggregationOperation(pathArrayProject);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(_ID).is(activityId)),
-                graphLookup("time_Type").
+                graphLookup(TIME_TYPE).
                         startWith("$activityBalanceSettings.timeTypeId")
                         .connectFrom("upperLevelTimeTypeId")
                         .connectTo("_id")
@@ -926,10 +926,24 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 project(NAME, GENERAL_ACTIVITY_TAB)
                         .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY),
                 project(NAME, GENERAL_ACTIVITY_TAB)
-                        .and("activityPriority.sequence").as("activitySequence")
+                        .and(ACTIVITY_PRIORITY_SEQUENCE).as(ACTIVITY_SEQUENCE)
         );
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
+    }
+
+    @Override
+    public  Set<BigInteger> findAllShowOnCallAndStandByActivitiesByUnitId(Long unitId, boolean showStandBy, boolean showOnCall){
+        Criteria criteriaDefinition = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false);
+        if(showStandBy){
+            criteriaDefinition.and(RULES_ACTIVITY_TAB+".showStandBy").is(showStandBy);
+        }
+        if(showOnCall){
+            criteriaDefinition.and(RULES_ACTIVITY_TAB+".showOnCall").is(showOnCall);
+        }
+        Query query = new Query(criteriaDefinition);
+        query.fields().include("id");
+        return mongoTemplate.find(query,Activity.class).stream().map(activity -> activity.getId()).collect(Collectors.toSet());
     }
 
 }

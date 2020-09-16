@@ -55,6 +55,7 @@ import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftBreakService;
 import com.kairos.service.shift.ShiftFilterService;
+import com.kairos.service.time_bank.CalculatePlannedHoursAndScheduledHours;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.todo.TodoService;
 import com.kairos.utils.counter.KPIUtils;
@@ -646,7 +647,7 @@ public class KPIBuilderCalculationService implements CounterService {
             for (ShiftWithActivityDTO shift : shifts) {
                 List<ShiftActivityDTO> shiftActivitys = shift.getActivities();
                 if (excludeBreak) {
-                    shiftActivitys = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getShiftActivityByBreak(shift.getActivities(), shift.getBreakActivities());
+                    shiftActivitys = new CalculatePlannedHoursAndScheduledHours(timeBankCalculationService).getShiftActivityByBreak(shift.getActivities(), shift.getBreakActivities());
                 }
                 shiftActivityDTOS.addAll(shiftActivitys.stream().filter(shiftActivityDTO -> isShiftActivityValid(shiftActivityDTO)).collect(Collectors.toList()));
             }

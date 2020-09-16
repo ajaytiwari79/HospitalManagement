@@ -60,6 +60,8 @@ import static com.kairos.constants.TaskConstants.*;
 @Service
 public class ClientExceptionService extends MongoBaseService {
     public static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String EXCEPTION_LIST = "exceptionList";
+    public static final String TASK_LIST = "taskList";
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -207,8 +209,8 @@ public class ClientExceptionService extends MongoBaseService {
         } else {
             updateClientAggregator(clientExceptions, performCalculation, clientAggregator);
         }
-        map.put("exceptionList", clientExceptions);
-        map.put("taskList", plannerService.customizeTaskData(allUnhandledTasks));
+        map.put(EXCEPTION_LIST, clientExceptions);
+        map.put(TASK_LIST, plannerService.customizeTaskData(allUnhandledTasks));
         return map;
     }
 
@@ -265,8 +267,8 @@ public class ClientExceptionService extends MongoBaseService {
         }
         updateAggregatorForChangeLocationException(tasksUnderException, clientExceptions, houseHoldMembers, unitId);
         Map<String, Object> response = new HashMap<>();
-        response.put("exceptionList", clientExceptions.stream().filter(clientException -> clientException.getClientId() == clientId).collect(Collectors.toList()));
-        response.put("taskList", plannerService.customizeTaskData(tasksUnderException.stream().filter
+        response.put(EXCEPTION_LIST, clientExceptions.stream().filter(clientException -> clientException.getClientId() == clientId).collect(Collectors.toList()));
+        response.put(TASK_LIST, plannerService.customizeTaskData(tasksUnderException.stream().filter
                 (task -> task.getCitizenId() == clientId).collect(Collectors.toList())));
         response.put("tempAddress", clientTemporaryAddress);
         return response;
@@ -520,7 +522,7 @@ public class ClientExceptionService extends MongoBaseService {
         }
         HashMap<String, Object> response = new HashMap<>();
         response.put("exceptionIds", exceptionIdsToDelete);
-        response.put("taskList", taskService.customizeTaskData(allTask));
+        response.put(TASK_LIST, taskService.customizeTaskData(allTask));
         return response;
     }
 
@@ -665,9 +667,9 @@ public class ClientExceptionService extends MongoBaseService {
         if (newCreatedExceptions != null) {
             updateClientAggregator(newCreatedExceptions, (n) -> n + 1, clientAggregator);
         }
-        response.put("exceptionList", clientExceptions);
+        response.put(EXCEPTION_LIST, clientExceptions);
         response.put("deletedExceptions", exceptionIds);
-        response.put("taskList", plannerService.customizeTaskData(allUnhandledTasks));
+        response.put(TASK_LIST, plannerService.customizeTaskData(allUnhandledTasks));
         return response;
 
     }
@@ -693,7 +695,7 @@ public class ClientExceptionService extends MongoBaseService {
         //fixme this needs to be uncommented
 //        updateUnhandledTaskCountForChangeLocationException(updatedTasks, houseHoldMembers, exceptionOfCitizen.getUnitId());
         Map<String, Object> response = new HashMap<>();
-        response.put("exceptionList", Arrays.asList(exceptionOfCitizen));
+        response.put(EXCEPTION_LIST, Arrays.asList(exceptionOfCitizen));
         //fixme this needs to be uncommented
 //        response.put("taskList", updatedTasks.parallelStream().filter(task -> task.getCitizenId() == exceptionOfCitizen.getClientId()).collect(Collectors.toList()));
         return response;

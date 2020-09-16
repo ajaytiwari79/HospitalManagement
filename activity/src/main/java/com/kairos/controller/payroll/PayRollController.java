@@ -1,5 +1,6 @@
 package com.kairos.controller.payroll;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.payroll.PayRollDTO;
 import com.kairos.service.payroll.PayRollService;
 import com.kairos.utils.response.ResponseHandler;
@@ -68,4 +69,12 @@ public class PayRollController {
     public ResponseEntity<Map<String,Object>> getAllPayRollOfCountry(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,payRollService.getAllPayRollOfCountry(countryId));
     }
+
+    @PutMapping(value = "payroll/{id}/language_settings")
+    @ApiOperation("update translation data")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfSystemLanguage(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payRollService.updateTranslation(id,translations));
+    }
+
 }

@@ -97,9 +97,9 @@ public class ShiftSickService extends MongoBaseService {
         if(alreadySickReported){
             exceptionService.actionNotPermittedException(STAFF_ALREADY_SICK);
         }
-        byte shiftNeedsToAddForDays = activityWrapper.getActivity().getActivityRulesSettings().isAllowedAutoAbsence() ? activityWrapper.getActivity().getActivityRulesSettings().getRecurrenceDays() : 0;
-        if(shiftNeedsToAddForDays==0){
-            shiftNeedsToAddForDays = 1;
+        byte shiftNeedsToAddForNumberOfDays = activityWrapper.getActivity().getActivityRulesSettings().isAllowedAutoAbsence() ? activityWrapper.getActivity().getActivityRulesSettings().getRecurrenceDays() : 0;
+        if(shiftNeedsToAddForNumberOfDays==0){
+            shiftNeedsToAddForNumberOfDays = 1;
         }
         if(!EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType())){
             exceptionService.dataNotFoundException(EMPLOYMENT_NOT_VALID_TO_MARK_SICK);
@@ -107,21 +107,21 @@ public class ShiftSickService extends MongoBaseService {
         Date startDate = asDate(shiftDTO.getShiftDate(), LocalTime.MIDNIGHT);
         Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(),startDate,asDate(shiftDTO.getShiftDate().plusDays(1), LocalTime.MIDNIGHT));
         Shift realTimeShift = shiftMongoRepository.findRealTimeShiftByStaffId(shiftDTO.getStaffId(),getCurrentDate());
-        int i=0;
+        int shiftAddedForNumberOfDays=0;
         if(isNotNull(realTimeShift)){
             Map<BigInteger,ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(Arrays.asList(realTimeShift),shiftDTO);
             replaceWithSick(realTimeShift,activityWrapperMap.get(shiftDTO.getActivities().get(0).getActivityId()));
             shiftService.updateShift(ObjectMapperUtils.copyPropertiesByMapper(realTimeShift,ShiftDTO.class),false,false,ShiftActionType.SAVE);
-            i=1;
+            shiftAddedForNumberOfDays=1;
         }
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
-        while ( i<shiftNeedsToAddForDays) {
+        while ( shiftAddedForNumberOfDays<shiftNeedsToAddForNumberOfDays) {
                 ShiftDTO shiftDTO1 = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftDTO.class);
-                shiftDTO1.setShiftDate(shiftDTO1.getShiftDate().plusDays(i));
+                shiftDTO1.setShiftDate(shiftDTO1.getShiftDate().plusDays(shiftAddedForNumberOfDays));
                 setStartAndEndDate(shiftDTO1);
                 ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, shiftDTO1, phase, new Object[]{false,null}, ShiftActionType.SAVE);
                 shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
-                i++;
+                shiftAddedForNumberOfDays++;
             }
         return shiftWithViolatedInfoDTOS;
 

@@ -4,14 +4,12 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.TranslationDTO;
-import com.kairos.dto.user.country.LevelDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.Unit;
@@ -21,19 +19,18 @@ import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.GdprIntegrationService;
+import org.apache.commons.collections.IteratorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.neo4j.util.IterableUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -94,14 +91,15 @@ public class OrganizationServiceService {
 
 
     public List<Map<String,Object>> getAllOrganizationService(long countryId) {
-//        List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServices(countryId);
-//        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
-        List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServicesByCountryId(countryId);
-        List<OrganizationService> organizationServiceList =organizationServices.stream().filter(organizationService->isCollectionNotEmpty(organizationService.getOrganizationSubService())).collect(Collectors.toList());
-        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceList, OrganizationServiceDTO.class);
+        Set<Long> serviceIds=organizationServiceRepository.getOrganizationServicesIdsByCountryId(countryId);
+        List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(serviceIds));
+        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
         List<Map<String,Object>> mapList =new ArrayList<>();
         Map<String,Object> data = new HashMap<>();
         for (OrganizationServiceDTO result : organizationServiceDTOS) {
+            result.getOrganizationSubService().forEach(organizationServiceDTO -> {
+                organizationServiceDTO.setTranslations(TranslationUtil.getTranslatedData(organizationServiceDTO.getTranslatedNames(),organizationServiceDTO.getTranslatedDescriptions()));
+            });
             result.setTranslations(result.getTranslatedData());
             data.put("id", result.getId());
             data.put("name", result.getName());

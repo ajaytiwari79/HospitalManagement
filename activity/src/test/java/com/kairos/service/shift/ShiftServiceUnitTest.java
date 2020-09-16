@@ -45,6 +45,7 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ShiftServiceUnitTest {
+    public static final String TIME_ATTENDANCE = "TIME & ATTENDANCE";
     @InjectMocks
     private ShiftStateService shiftStateService;
     @InjectMocks
@@ -92,7 +93,7 @@ public class ShiftServiceUnitTest {
         shifts.add(shift);
 
         List<ShiftState> shiftStates = new ArrayList<>();
-        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT,"TIME & ATTENDANCE",LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
+        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT, TIME_ATTENDANCE,LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
         shiftStates.add(shiftState);
         Set<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
 
@@ -123,9 +124,9 @@ public class ShiftServiceUnitTest {
 
 
         List<ShiftState> shiftStates = new ArrayList<>();
-        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT,"TIME & ATTENDANCE",LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
+        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT, TIME_ATTENDANCE,LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
         shiftStates.add(shiftState);
-        shiftState = new ShiftState(BigInteger.valueOf(13880L),AccessGroupRole.MANAGEMENT,"TIME & ATTENDANCE",LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,21,0),35602L,14139L);
+        shiftState = new ShiftState(BigInteger.valueOf(13880L),AccessGroupRole.MANAGEMENT, TIME_ATTENDANCE,LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,21,0),35602L,14139L);
         shiftStates.add(shiftState);
         Set<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
 
@@ -324,95 +325,6 @@ public class ShiftServiceUnitTest {
                "   ],\n" +
                "   \"escalationResolved\":false\n" +
                "}" ;
-    }
-
-    private String getShiftViolation(){
-        return "{\n" +
-                "   \"shifts\":[\n" +
-                "      {\n" +
-                "         \"id\":2628,\n" +
-                "         \"startDate\":1557208800000,\n" +
-                "         \"endDate\":1557223200000,\n" +
-                "         \"bid\":0,\n" +
-                "         \"pId\":0,\n" +
-                "         \"amount\":0,\n" +
-                "         \"probability\":0,\n" +
-                "         \"unitId\":1172,\n" +
-                "         \"staffId\":1002,\n" +
-                "         \"employmentId\":19902,\n" +
-                "         \"activities\":[\n" +
-                "            {\n" +
-                "               \"status\":[\n" +
-                "\n" +
-                "               ],\n" +
-                "               \"message\":null,\n" +
-                "               \"success\":false,\n" +
-                "               \"activity\":null,\n" +
-                "               \"activityId\":823,\n" +
-                "               \"startDate\":1557208800000,\n" +
-                "               \"endDate\":1557223200000,\n" +
-                "               \"scheduledMinutes\":0,\n" +
-                "               \"durationMinutes\":240,\n" +
-                "               \"activityName\":\"Er tilgængelig\",\n" +
-                "               \"bid\":0,\n" +
-                "               \"pId\":0,\n" +
-                "               \"reasonCodeId\":null,\n" +
-                "               \"absenceReasonCodeId\":null,\n" +
-                "               \"remarks\":\"\",\n" +
-                "               \"id\":5315,\n" +
-                "               \"timeType\":\"NON_WORKING_TYPE\",\n" +
-                "               \"backgroundColor\":null,\n" +
-                "               \"haltBreak\":false,\n" +
-                "               \"plannedTimeId\":2,\n" +
-                "               \"breakShift\":false,\n" +
-                "               \"breakReplaced\":true,\n" +
-                "               \"reasonCode\":null,\n" +
-                "               \"allowedBreakDurationInMinute\":null,\n" +
-                "               \"timeBankCtaBonusMinutes\":0,\n" +
-                "               \"timeBankCTADistributions\":[\n" +
-                "\n" +
-                "               ],\n" +
-                "               \"location\":null,\n" +
-                "               \"description\":null,\n" +
-                "               \"wtaRuleViolations\":null,\n" +
-                "               \"plannedMinutesOfTimebank\":0,\n" +
-                "               \"startLocation\":\"\",\n" +
-                "               \"endLocation\":\"\",\n" +
-                "               \"scheduledMinutesOfTimebank\":0,\n" +
-                "               \"scheduledMinutesOfPayout\":0\n" +
-                "            }\n" +
-                "         ],\n" +
-                "         \"scheduledMinutes\":0,\n" +
-                "         \"durationMinutes\":240,\n" +
-                "         \"editable\":false,\n" +
-                "         \"functionDeleted\":false,\n" +
-                "         \"shiftType\":\"PRESENCE\",\n" +
-                "         \"timeBankCtaBonusMinutes\":0,\n" +
-                "         \"deltaTimeBankMinutes\":0,\n" +
-                "         \"accumulatedTimeBankMinutes\":0,\n" +
-                "         \"plannedMinutesOfTimebank\":0,\n" +
-                "         \"multipleActivity\":false,\n" +
-                "         \"planningPeriodId\":214,\n" +
-                "         \"phaseId\":97,\n" +
-                "         \"restingMinutes\":0,\n" +
-                "         \"escalationReasons\":[\n" +
-                "\n" +
-                "         ],\n" +
-                "         \"escalationFreeShiftIds\":[\n" +
-                "\n" +
-                "         ],\n" +
-                "         \"escalationResolved\":false\n" +
-                "      }\n" +
-                "   ],\n" +
-                "   \"violatedRules\":{\n" +
-                "      \"workTimeAgreements\":[\n" +
-                "\n" +
-                "      ],\n" +
-                "      \"activities\":[\n" +
-                "\n" +
-                "      ]\n" +
-                "   }\n" +
-                "}";
     }
 
     private String getActivityDetailsJson(){

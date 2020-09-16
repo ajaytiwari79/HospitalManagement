@@ -1,5 +1,6 @@
 package com.kairos.controller.wta;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
@@ -294,5 +295,25 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateDatesInCTAWTA(unitId));
     }
 
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = COUNTRY_URL+"/wta/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWta(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateTranslation(id,translations));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = COUNTRY_URL+"/wta/rule_template/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWtaTemplates(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateTranslationRuleTemplates(id,translations));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = UNIT_URL+"/wta/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWtaOfOrganization(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateTranslation(id,translations));
+    }
 
 }

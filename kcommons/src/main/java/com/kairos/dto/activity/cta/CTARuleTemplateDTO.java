@@ -2,6 +2,7 @@ package com.kairos.dto.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
+import static org.apache.commons.collections.CollectionUtils.containsAny;
 
 /**
  * @author pradeep
@@ -72,6 +74,10 @@ public class CTARuleTemplateDTO {
     private BigInteger ruleTemplateCategoryId;
     private String ruleTemplateCategoryName;
     private UserInfo lastModifiedBy;
+    private ConditionalCompensation conditionalCompensation;
+    private Long countryId;
+    private Long unitId;
+    private Map<String, TranslationInfo> translations;
 
 
     public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
@@ -111,16 +117,16 @@ public class CTARuleTemplateDTO {
         return this.getPhaseInfo().stream().filter(p -> shiftPhaseId.equals(p.getPhaseId())).findFirst().isPresent();
     }
 
-    private boolean isActivityAndTimeTypeAndPlannedTimeValid(BigInteger activityId,BigInteger timeTypeId,List<PlannedTime> plannedTimes){
-        return (this.getActivityIds().contains(activityId) || this.getTimeTypeIds().contains(timeTypeId)) && CollectionUtils.containsAny(this.getPlannedTimeIds(),plannedTimes.stream().map(plannedTime -> plannedTime.getPlannedTimeId()).collect(Collectors.toSet()));
+    private boolean isActivityAndTimeTypeAndPlannedTimeValid(Set<BigInteger> activityIds,Set<BigInteger> timeTypeIds,List<PlannedTime> plannedTimes){
+        return (containsAny(this.getActivityIds(),activityIds) || containsAny(this.getTimeTypeIds(),timeTypeIds)) && CollectionUtils.containsAny(this.getPlannedTimeIds(),plannedTimes.stream().map(plannedTime -> plannedTime.getPlannedTimeId()).collect(Collectors.toSet()));
     }
 
     private boolean isEmployementTypeValid(Long employmentId){
         return this.getEmploymentTypes().contains(employmentId);
     }
 
-    public boolean isRuleTemplateValid(Long employmentTypeId,BigInteger shiftPhaseId,BigInteger activityId,BigInteger timeTypeId,List<PlannedTime> plannedTimes){
-        return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentTypeId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityId,timeTypeId,plannedTimes) || this.getCalculationFor().equals(FUNCTIONS));
+    public boolean isRuleTemplateValid(Long employmentTypeId,BigInteger shiftPhaseId,Set<BigInteger> activityIds,Set<BigInteger> timeTypeIds,List<PlannedTime> plannedTimes){
+        return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentTypeId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityIds,timeTypeIds,plannedTimes) || this.getCalculationFor().equals(FUNCTIONS));
     }
 
     @Override

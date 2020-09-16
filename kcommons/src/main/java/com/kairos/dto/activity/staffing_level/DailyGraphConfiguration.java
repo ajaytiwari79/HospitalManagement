@@ -23,5 +23,7 @@ public class DailyGraphConfiguration {
     private int leftIntervalSetting;
     private int startInterval;
     private int endInterval;
+    private int[] rightConfigurations;
+    private int[] leftConfigurations;
 
 }

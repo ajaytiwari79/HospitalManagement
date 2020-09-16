@@ -16,4 +16,10 @@ public class TranslationUtil {
         }
     }
 
+    public static Map<String, TranslationInfo> getTranslatedData(Map<String,String> translatedNames,Map<String,String> translatedDescriptions) {
+        Map<String, TranslationInfo> infoMap=new HashMap<>();
+        translatedNames.forEach((k,v)-> infoMap.put(k,new TranslationInfo(v,translatedDescriptions.get(k))));
+        return infoMap;
+    }
+
 }

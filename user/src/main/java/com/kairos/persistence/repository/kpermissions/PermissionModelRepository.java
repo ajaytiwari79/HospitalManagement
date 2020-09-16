@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.kpermissions;
 
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
+import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.kpermissions.FieldPermissionQueryResult;
 import com.kairos.persistence.model.kpermissions.KPermissionModel;
 import com.kairos.persistence.model.kpermissions.ModelPermissionQueryResult;
@@ -34,8 +35,12 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "CASE WHEN customRel IS NULL THEN permission.tagIds ELSE customRel.tagIds END as tagIds,\n" +
             "CASE WHEN customRel IS NULL THEN permission.teamIds ELSE customRel.teamIds END as teamIds,\n" +
             "CASE WHEN customRel IS NULL THEN permission.employmentTypeIds ELSE customRel.employmentTypeIds END as employmentTypeIds,\n" +
-            "CASE WHEN customRel IS NULL THEN permission.unionIds ELSE customRel.unionIds END as unionIds,id(field) as id,field.fieldName as fieldName")
-    List<FieldPermissionQueryResult> getAllFieldPermission(Collection<Long> accessGroupIds, Long lastSelectedOrganizationId, Long staffId);
+            "CASE WHEN customRel IS NULL THEN permission.unionIds ELSE customRel.unionIds END as unionIds,id(field) as id,field.fieldName as fieldName " +
+            " UNION " +
+            " MATCH(ag:AccessGroup{deleted:false}) where id(ag) in {3} MATCH (ag)<-[permission:HAS_PERMISSION]-(field:KPermissionField) " +
+            "RETURN permission.fieldLevelPermissions AS permissions,permission.expertiseIds as expertiseIds, permission.forOtherFieldLevelPermissions AS forOtherFieldLevelPermissions, " +
+            "permission.staffStatuses AS staffStatuses, permission.tagIds AS tagIds,permission.teamIds AS teamIds, permission.employmentTypeIds AS employmentTypeIds,permission.unionIds AS  unionIds, id(field) as id,field.fieldName as fieldName ")
+    List<FieldPermissionQueryResult> getAllFieldPermission(Collection<Long> accessGroupIds, Long lastSelectedOrganizationId, Long staffId, Set<Long> unitAccessGroupIds);
 
     @Query("MATCH(model:KPermissionModel) where model.modelName={0} MATCH(model)-[unitRel:HAS_FIELD]->(field:KPermissionField) where field.fieldName IN {1}\n" +
             "MATCH (field)-[permission:HAS_PERMISSION]->(ag:AccessGroup{deleted:false}) where id(ag) in {2} \n" +
@@ -52,11 +57,16 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "CASE WHEN customRel IS NULL THEN permission.expertiseIds ELSE customRel.expertiseIds END as expertiseIds,\n" +
             "CASE WHEN customRel IS NULL THEN permission.forOtherFieldLevelPermissions ELSE customRel.forOtherFieldLevelPermissions END as forOtherFieldLevelPermissions,\n" +
             "CASE WHEN customRel IS NULL THEN permission.staffStatuses ELSE customRel.staffStatuses END as staffStatuses,\n" +
+            "CASE WHEN customRel IS NULL THEN permission.actions ELSE customRel.actions END as actions,\n" +
             "CASE WHEN customRel IS NULL THEN permission.tagIds ELSE customRel.tagIds END as tagIds,\n" +
             "CASE WHEN customRel IS NULL THEN permission.teamIds ELSE customRel.teamIds END as teamIds,\n" +
             "CASE WHEN customRel IS NULL THEN permission.employmentTypeIds ELSE customRel.employmentTypeIds END as employmentTypeIds,\n" +
-            "CASE WHEN customRel IS NULL THEN permission.unionIds ELSE customRel.unionIds END as unionIds,id(model) as id,model.modelName as modelName")
-    List<ModelPermissionQueryResult> getAllModelPermission(Collection<Long> accessGroupIds, Long unitId, Long staffId);
+            "CASE WHEN customRel IS NULL THEN permission.unionIds ELSE customRel.unionIds END as unionIds,id(model) as id,model.modelName as modelName " +
+            " UNION " +
+            " MATCH(ag:AccessGroup{deleted:false}) where id(ag) in {3} MATCH (ag)<-[permission:HAS_PERMISSION]-(model:KPermissionModel) " +
+            "RETURN permission.fieldLevelPermissions AS permissions,permission.expertiseIds as expertiseIds, permission.forOtherFieldLevelPermissions AS forOtherFieldLevelPermissions, " +
+            "permission.staffStatuses AS staffStatuses,permission.actions AS actions, permission.tagIds AS tagIds,permission.teamIds AS teamIds, permission.employmentTypeIds AS employmentTypeIds,permission.unionIds AS  unionIds, id(model) as id,model.modelName as modelName ")
+    List<ModelPermissionQueryResult> getAllModelPermission(Collection<Long> accessGroupIds, Long unitId, Long staffId, Set<Long> unitAccessGroupIds);
 
     @Query("MATCH(model:KPermissionModel{deleted:false}) where model.modelName in {0}" +
             "WITH model " +
@@ -71,7 +81,36 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "WITH collect(id(kPermissionField)) as kPermissionFieldIds,collect(id(subModelFields)) as subModelFieldsIds,collect(id(subModel)) as subModelIds, collect(id(kPermissionModel)) as kPermissionModelId\n" +
             "WITH kPermissionFieldIds+subModelFieldsIds+subModelIds+ kPermissionModelId AS ids\n" +
             "unwind ids as allIdsToSetPermission with distinct allIdsToSetPermission \n" +
-            "Return allIdsToSetPermission")
+            "Return allIdsToSetPermission ")
     Set<Long> kPermissionModelIds(Long kPermissionModelId);
 
+    @Query(value = "MATCH (accessGroup:AccessGroup) WHERE id(accessGroup) IN {2} " +
+            "MATCH (kPermissionAction:KPermissionAction)-[rel:"+HAS_ACTION_PERMISSION+"]->(accessGroup) where kPermissionAction.modelName={0} AND kPermissionAction.action={1}  " +
+            "OPTIONAL MATCH(staff:Staff)<-[:"+BELONGS_TO+"]-(position:Position)-["+HAS_UNIT_PERMISSIONS+"]->(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit) WHERE ID(staff)={3} AND ID(unit)={4} " +
+            "OPTIONAL MATCH(up)-[customRel:"+HAS_CUSTOMIZED_PERMISSION_FOR_ACTION+"]->(kPermissionAction) WHERE customRel.accessGroupId=id(accessGroup) " +
+            "RETURN CASE WHEN customRel IS NULL THEN  rel.hasPermission ELSE customRel.hasPermission END AS result \n" )
+    boolean hasActionPermission(String modelName, PermissionAction action, Set<Long> accessGroupIds, Long loggedInStaffId, Long staffId);
+
+    @Query(value ="MATCH (kPermissionAction:KPermissionAction),(accessGroup:AccessGroup) where id(accessGroup)={0} AND id(kPermissionAction) IN {1} " +
+            "CREATE UNIQUE (kPermissionAction)-[r:"+HAS_ACTION_PERMISSION+"]->(accessGroup) " +
+            "SET r.hasPermission=TRUE ")
+    void setActionPermissions(Long accessGroupId, Set<Long> actions,Long id);
+
+    @Query("MATCH(kPermissionModel:KPermissionModel)-[:"+HAS_ACTION+"]-(k:KPermissionAction)-[rel:"+HAS_ACTION_PERMISSION+"]->(accessGroup:AccessGroup) WHERE id(kPermissionModel)={0} AND id(accessGroup)={1} SET rel.hasPermission=FALSE ")
+    void disableActionPermission(Long id,Long accessGroupId);
+
+
+    @Query(value = "MATCH(accessGroup:AccessGroup)<-[r:"+HAS_ACTION_PERMISSION+"]-(kPermissionAction:KPermissionAction)<-[:"+HAS_ACTION+"]-(kPermissionModel:KPermissionModel) where id(accessGroup)={0}  " +
+            "RETURN id(kPermissionModel) as id,kPermissionModel.modelName as modelName," +
+            "COLLECT({id:id(kPermissionAction),action:kPermissionAction.action,hasPermission:r.hasPermission}) as actions " )
+    List<ModelPermissionQueryResult> getActionPermissions(Long accessGroupId);
+
+    @Query(value = "MATCH (accessGroup:AccessGroup) WHERE id(accessGroup) = {0} " +
+            "MATCH(kPermissionModel:KPermissionModel)-[:"+HAS_ACTION+"]-(kPermissionAction:KPermissionAction) " +
+            "OPTIONAL MATCH(kPermissionAction)-[rel:"+HAS_ACTION_PERMISSION+"]->(accessGroup) " +
+            "OPTIONAL MATCH(staff:Staff)<-[:"+BELONGS_TO+"]-(position:Position)-["+HAS_UNIT_PERMISSIONS+"]->(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit) WHERE ID(staff)={1} AND ID(unit)={2} " +
+            "OPTIONAL MATCH(up)-[customRel:"+HAS_CUSTOMIZED_PERMISSION_FOR_ACTION+"]->(kPermissionAction) WHERE customRel.accessGroupId=id(accessGroup) " +
+            "RETURN id(kPermissionModel) as id,kPermissionModel.modelName as modelName," +
+            "COLLECT({id:id(kPermissionAction),action:kPermissionAction.action,hasPermission:CASE WHEN customRel IS NULL THEN  rel.hasPermission ELSE customRel.hasPermission END}) as actions " )
+    List<ModelPermissionQueryResult> getActionPermissionsForStaff(Long accessGroupId,Long staffId,Long unitId);
 }

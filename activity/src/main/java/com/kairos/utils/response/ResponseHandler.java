@@ -27,7 +27,7 @@ public final class ResponseHandler {
         validateResponseAsPerPermission(responseObj);
         map.put("data", responseObj);
         map.put("time_stamp", dateTime);
-        return new ResponseEntity<Map<String, Object>>(map, status);
+        return new ResponseEntity<>(map, status);
     }
 
     public static <T> ResponseEntity<ResponseDTO<T>> generateResponseDTO(HttpStatus status, boolean isSuccess, T responsObj){

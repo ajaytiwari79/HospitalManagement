@@ -4,11 +4,14 @@ package com.kairos.dto.activity.payroll;
  *
  */
 
+import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
+import java.util.Map;
+
 @Getter
 @Setter
 public class PensionProviderDTO {
@@ -17,4 +20,6 @@ public class PensionProviderDTO {
     private String name;
     @NotBlank(message = "paymentNumber.absent")
     private String paymentNumber;
+    private Long countryId;
+    private Map<String, TranslationInfo> translations;
 }

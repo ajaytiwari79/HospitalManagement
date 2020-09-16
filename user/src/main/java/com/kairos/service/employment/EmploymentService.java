@@ -226,7 +226,8 @@ public class EmploymentService {
             // need to delete the current applied functions
             employmentGraphRepository.removeAllAppliedFunctionOnEmploymentLines(employmentLine.getId());
         }
-        Map<Long, BigDecimal> functionAmountMap = functionDTOS.stream().collect(Collectors.toMap(FunctionsDTO::getId, FunctionsDTO::getAmount));
+        Map<Long, BigDecimal> functionAmountMap = new HashMap<>();
+        functionDTOS.forEach(functionsDTO -> functionAmountMap.put(functionsDTO.getId(), functionsDTO.getAmount()));
         List<EmploymentLineFunctionRelationShip> functionsEmploymentLines = new ArrayList<>(functions.size());
         functions.forEach(currentFunction -> functionsEmploymentLines.add(new EmploymentLineFunctionRelationShip(employmentLine, currentFunction.getFunction(), functionAmountMap.get(currentFunction.getFunction().getId()))));
         employmentLineFunctionRelationRepository.saveAll(functionsEmploymentLines);

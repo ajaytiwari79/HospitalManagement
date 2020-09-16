@@ -112,7 +112,7 @@ public class WTARuleTemplateCalculationService {
                 shift.setRestingMinutes(restingMinutes);
                 shift.setEscalationReasons(shiftViolatedRulesMap.containsKey(shift.getId()) ? shiftViolatedRulesMap.get(shift.getId()).getEscalationReasons():newHashSet());
                 shift.setEscalationResolved(escalationFreeShiftIds.contains(shift.getId()));
-                boolean editable=shiftValidatorService.validateGracePeriod(shift.getStartDate(), true, shift.getUnitId(), phaseMapByDate.get(shift.getStartDate()));
+                boolean editable=shiftValidatorService.validateGracePeriod(shift.getStartDate(), true, shift.getUnitId(), phaseMapByDate.get(shift.getActivities().get(0).getStartDate()));
                 shift.setEditable(editable);
             }
         }
@@ -150,7 +150,7 @@ public class WTARuleTemplateCalculationService {
         WTAQueryResultDTO wtaQueryResultDTO = workTimeAgreementService.getWtaQueryResultDTOByDateAndEmploymentId(shift.getEmploymentId(),shift.getStartDate());
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(isNotNull(shift) ? newArrayList(shift) : newArrayList(), null);
         DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(shift.getUnitId());
-        ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftDTO.class), activityWrapperMap,null);
+        ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftDTO.class), activityWrapperMap,null);
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shiftWithActivityDTO, wtaQueryResultDTO.getRuleTemplates(), activityWrapperMap, planningPeriodInterval.getEndLocalDate());
         List<PlanningPeriodDTO> planningPeriodDTOS = planningPeriodService.findAllPlanningPeriodBetweenDatesAndUnitId(shift.getUnitId(),intervalByRuleTemplates.getStartDate(),intervalByRuleTemplates.getEndDate());
         List<WTAQueryResultDTO> wtaQueryResultDTOS = workTimeAgreementService.getWTAByEmploymentIdAndDates(shift.getEmploymentId(),intervalByRuleTemplates.getStartDate(),intervalByRuleTemplates.getEndDate());

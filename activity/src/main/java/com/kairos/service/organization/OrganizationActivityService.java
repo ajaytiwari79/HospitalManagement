@@ -826,4 +826,11 @@ public class OrganizationActivityService extends MongoBaseService {
         });
         return activityIdsToSet;
     }
+
+    public  Map<String,Set<BigInteger>> getShowOnCallAndStandByActivityId(Long unitId,boolean showStandBy,boolean showOnCall){
+        Map<String,Set<BigInteger>> showOnCallAndStandByActivityIds = new HashMap<>();
+        showOnCallAndStandByActivityIds.put("showStandBy", showStandBy ? activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId, showStandBy, false) : newHashSet());
+        showOnCallAndStandByActivityIds.put("showOnCall", showOnCall ? activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId, false, showOnCall) : newHashSet());
+        return showOnCallAndStandByActivityIds;
+    }
 }

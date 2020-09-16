@@ -1,8 +1,12 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.ClinicType;
 import com.kairos.persistence.model.country.default_data.ClinicTypeDTO;
+import com.kairos.persistence.model.country.default_data.IndustryType;
 import com.kairos.persistence.repository.user.country.ClinicTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -10,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
 
@@ -46,7 +52,13 @@ public class ClinicTypeService {
     }
 
     public List<ClinicTypeDTO> getClinicTypeByCountryId(long countryId){
-        return clinicTypeGraphRepository.findClinicByCountryId(countryId);
+        List<ClinicType> clinicTypes = clinicTypeGraphRepository.findClinicByCountryId(countryId);
+        List<ClinicTypeDTO> clinicTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(clinicTypes,ClinicTypeDTO.class);
+        for(ClinicTypeDTO clinicTypeDTO :clinicTypeDTOS){
+            clinicTypeDTO.setCountryId(countryId);
+            clinicTypeDTO.setTranslations(TranslationUtil.getTranslatedData(clinicTypeDTO.getTranslatedNames(),clinicTypeDTO.getTranslatedDescriptions()));
+        }
+        return clinicTypeDTOS;
     }
 
     public ClinicTypeDTO updateClinicType(long countryId, ClinicTypeDTO clinicTypeDTO){
@@ -72,5 +84,16 @@ public class ClinicTypeService {
             exceptionService.dataNotFoundByIdException("error.ClinicType.notfound");
         }
         return true;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long clinicTypeId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
+        ClinicType clinicType =clinicTypeGraphRepository.findOne(clinicTypeId);
+        clinicType.setTranslatedNames(translatedNames);
+        clinicType.setTranslatedDescriptions(translatedDescriptios);
+        clinicTypeGraphRepository.save(clinicType);
+        return clinicType.getTranslatedData();
     }
 }

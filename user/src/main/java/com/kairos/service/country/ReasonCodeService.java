@@ -8,7 +8,6 @@ import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
-import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -80,7 +79,13 @@ public class ReasonCodeService {
 
 
     public List<ReasonCodeResponseDTO> getReasonCodesForCountry(long countryId, ReasonCodeType reasonCodeType) {
-        return reasonCodeGraphRepository.findReasonCodesByCountry(countryId, reasonCodeType);
+        List<ReasonCode> reasonCodes =reasonCodeGraphRepository.findReasonCodesByCountry(countryId, reasonCodeType);
+        List<ReasonCodeResponseDTO> reasonCodeResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodes,ReasonCodeResponseDTO.class);
+        reasonCodeResponseDTOS.forEach(reasonCodeResponseDTO -> {
+            reasonCodeResponseDTO.setCountryId(countryId);
+            reasonCodeResponseDTO.setTranslations(TranslationUtil.getTranslatedData(reasonCodeResponseDTO.getTranslatedNames(),reasonCodeResponseDTO.getTranslatedDescriptions()));
+        });
+        return reasonCodeResponseDTOS;
     }
 
 
@@ -89,7 +94,7 @@ public class ReasonCodeService {
         List<ReasonCodeResponseDTO> reasonCodeResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodes, ReasonCodeResponseDTO.class);
         for(ReasonCodeResponseDTO reasonCodeResponseDTO :reasonCodeResponseDTOS){
             reasonCodeResponseDTO.setUnitId(unitId);
-            reasonCodeResponseDTO.setTranslations(reasonCodeResponseDTO.getTranslatedData());
+            reasonCodeResponseDTO.setTranslations(TranslationUtil.getTranslatedData(reasonCodeResponseDTO.getTranslatedNames(),reasonCodeResponseDTO.getTranslatedDescriptions()));
         }
         return reasonCodeResponseDTOS;
     }

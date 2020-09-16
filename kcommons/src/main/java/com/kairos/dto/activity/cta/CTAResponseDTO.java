@@ -48,6 +48,8 @@ public class CTAResponseDTO {
     private Long employmentId;
     private Boolean disabled;
     private List<TagDTO> tags;
+    private Long countryId;
+    private Long unitId;
     private Map<String, TranslationInfo> translations;
 
     public CTAResponseDTO(String name, BigInteger id,BigInteger parentId) {

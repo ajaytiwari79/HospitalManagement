@@ -4,12 +4,14 @@ package com.kairos.dto.activity.payroll;
  *
  */
 
+import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 @Getter
 @Setter
@@ -23,4 +25,5 @@ public class PayRollDTO {
     private Set<Long> countryIds=new HashSet<>();
 
     private boolean applicableForCountry;
+    private Map<String, TranslationInfo> translations;
 }

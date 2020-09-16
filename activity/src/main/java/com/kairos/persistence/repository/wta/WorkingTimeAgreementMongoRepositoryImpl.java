@@ -62,8 +62,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
                 match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),
                 lookup(WTA_BASE_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES),
                 lookup("tag","tags","_id","tags"),
-                project("name", DESCRIPTION, DISABLED, EXPERTISE, ORGANIZATION_TYPE, ORGANIZATION_SUB_TYPE, COUNTRY_ID, ORGANIZATION, PARENT_ID, COUNTRY_PARENT_WTA, ORGANIZATION_PARENT_ID, "tags", START_DATE, END_DATE, EXPIRY_DATE, RULE_TEMPLATES)
-
+                project("name", DESCRIPTION, DISABLED, EXPERTISE, ORGANIZATION_TYPE, ORGANIZATION_SUB_TYPE, COUNTRY_ID, ORGANIZATION, PARENT_ID, COUNTRY_PARENT_WTA, ORGANIZATION_PARENT_ID, "tags", START_DATE, END_DATE, EXPIRY_DATE, RULE_TEMPLATES,"translations")
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
@@ -100,7 +99,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
                 match(Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(countryId)),
                 lookup("tag","tags","_id","tags"),
                 lookup(WTA_BASE_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES),
-                project("name", DESCRIPTION, DISABLED, EXPERTISE, ORGANIZATION_TYPE, ORGANIZATION_SUB_TYPE, COUNTRY_ID, ORGANIZATION, PARENT_ID, COUNTRY_PARENT_WTA, ORGANIZATION_PARENT_ID, "tags", START_DATE, END_DATE, EXPIRY_DATE, RULE_TEMPLATES)
+                project("name", DESCRIPTION, DISABLED, EXPERTISE, ORGANIZATION_TYPE, ORGANIZATION_SUB_TYPE, COUNTRY_ID, ORGANIZATION, PARENT_ID, COUNTRY_PARENT_WTA, ORGANIZATION_PARENT_ID, "tags", START_DATE, END_DATE, EXPIRY_DATE, RULE_TEMPLATES,"translations")
 
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
@@ -276,7 +275,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     @Override
     public void setEndDateToWTAOfEmployment(Long employmentId, LocalDate endDate){
         Update update = Update.update(END_DATE, DateUtils.asDate(endDate));
-        Query query = new Query(Criteria.where(EMPLOYMENT_ID).is(employmentId)).with(Sort.by(Sort.Direction.DESC,"startDate")).limit(1);
+        Query query = new Query(Criteria.where(EMPLOYMENT_ID).is(employmentId)).with(Sort.by(Sort.Direction.DESC,START_DATE)).limit(1);
         mongoTemplate.findAndModify(query,update,WorkingTimeAgreement.class);
     }
 
@@ -392,7 +391,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
 
     @Override
     public boolean existsOngoingWTAByEmployment(Long employmentId, Date endDate){
-        Criteria criteria = Criteria.where("employmentId").is(employmentId).orOperator(Criteria.where("endDate").exists(false),Criteria.where("startDate").gte(endDate));
+        Criteria criteria = Criteria.where(EMPLOYMENT_ID).is(employmentId).orOperator(Criteria.where(END_DATE).exists(false),Criteria.where(START_DATE).gte(endDate));
         return mongoTemplate.exists(new Query(criteria),WorkingTimeAgreement.class);
     }
     private String getProjectionWithFilter(WTATemplateType templateType){

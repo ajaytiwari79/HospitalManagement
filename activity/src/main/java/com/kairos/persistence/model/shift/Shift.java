@@ -73,6 +73,7 @@ public class Shift extends MongoBaseEntity {
     protected AccessGroupRole accessGroupRole;
     protected LocalDate validated;
     private ShiftViolatedRules shiftViolatedRules;
+    private transient String oldShiftTimeSlot;//it is only for conditional CTA calculation
 
     public Shift() {
         //Default Constructor

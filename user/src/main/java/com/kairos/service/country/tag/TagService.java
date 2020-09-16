@@ -1,10 +1,13 @@
 package com.kairos.service.country.tag;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.country.tag.PenaltyScore;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.country.tag.TagQueryResult;
@@ -155,9 +158,19 @@ public class TagService {
         }
         Map<String, Object> tagsData = new HashMap<>();
         if (masterDataType == null) {
-            tagsData.put("tags", tagGraphRepository.getListOfCountryTags(countryId, false, filterText));
+            List<TagQueryResult> tagQueryResults =tagGraphRepository.getListOfCountryTags(countryId, false, filterText);
+            tagQueryResults.forEach(tagQueryResult -> {
+                tagQueryResult.setCountryId(countryId);
+                tagQueryResult.setTranslations(TranslationUtil.getTranslatedData(tagQueryResult.getTranslatedNames(),tagQueryResult.getTranslatedDescriptions()));
+            });
+            tagsData.put("tags",tagQueryResults );
         } else {
-            tagsData.put("tags", tagGraphRepository.getListOfCountryTagsByMasterDataType(countryId, false, filterText, masterDataType.toString()));
+            List<TagQueryResult> tagQueryResultList =tagGraphRepository.getListOfCountryTagsByMasterDataType(countryId, false, filterText, masterDataType.toString());
+            tagQueryResultList.forEach(tagQueryResult -> {
+                tagQueryResult.setCountryId(countryId);
+                tagQueryResult.setTranslations(TranslationUtil.getTranslatedData(tagQueryResult.getTranslatedNames(),tagQueryResult.getTranslatedDescriptions()));
+            });
+            tagsData.put("tags",tagQueryResultList );
         }
 
         return tagsData;
@@ -249,9 +262,19 @@ public class TagService {
         }
         Map<String, Object> tagsData = new HashMap<>();
         if (masterDataType == null) {
-            tagsData.put("tags", tagGraphRepository.getListOfOrganizationTags(organizationId, false, filterText));
+            List<TagQueryResult> tagQueryResults =tagGraphRepository.getListOfOrganizationTags(organizationId, false, filterText);
+            tagQueryResults.forEach(tagQueryResult -> {
+                tagQueryResult.setUnutId(unit.getId());
+                tagQueryResult.setTranslations(TranslationUtil.getTranslatedData(tagQueryResult.getTranslatedNames(),tagQueryResult.getTranslatedDescriptions()));
+            });
+            tagsData.put("tags", tagQueryResults);
         }else {
-            tagsData.put("tags", tagGraphRepository.getListOfOrganizationTagsByMasterDataType(organizationId, false, filterText, masterDataType.toString()));
+            List<TagQueryResult> tagQueryResults = tagGraphRepository.getListOfOrganizationTagsByMasterDataType(organizationId, false, filterText, masterDataType.toString());
+            tagQueryResults.forEach(tagQueryResult -> {
+                tagQueryResult.setCountryId(unit.getId());
+                tagQueryResult.setTranslations(TranslationUtil.getTranslatedData(tagQueryResult.getTranslatedNames(),tagQueryResult.getTranslatedDescriptions()));
+            });
+            tagsData.put("tags", tagQueryResults);
         }
         return tagsData;
     }
@@ -345,6 +368,20 @@ public class TagService {
         }
         List<TagQueryResult> tagQueryResults = tagGraphRepository.getListOfStaffOrganizationTags(orgId,false,"", masterDataType.toString());
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(tagQueryResults,TagDTO.class);
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfTag(Long tagId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Tag tag =tagGraphRepository.findOne(tagId);
+        tag.setTranslatedNames(translatedNames);
+        tag.setTranslatedDescriptions(translatedDescriptios);
+        tagGraphRepository.save(tag);
+        return tag.getTranslatedData();
     }
 }
 

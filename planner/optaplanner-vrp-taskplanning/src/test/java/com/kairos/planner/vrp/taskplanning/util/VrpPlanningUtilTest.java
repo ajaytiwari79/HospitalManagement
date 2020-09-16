@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class VrpPlanningUtilTest {
@@ -31,29 +32,17 @@ public class VrpPlanningUtilTest {
     }
 
     @Test
-    public void hasSameChain() {
-    }
-
-    @Test
-    public void hasSameLocation() {
-    }
-
-    @Test
-    public void hasSameSkillset() {
-    }
-
-    @Test
     public void getMissingSkills() {
         Task t1= new Task(UUID.randomUUID().toString(),1234,1234.567,3456.678, null,0,null,0,null,0,0,null,false);
-        t1.setSkills(new HashSet<String>(Arrays.asList(new String[]{"El", "Skill1","Skill2"})));
+        t1.setSkills(new HashSet<>(Arrays.asList("El", "Skill1", "Skill2")));
         Employee employee=new Employee();
-        employee.setSkills(new HashSet<String>(Arrays.asList(new String[]{"El", "Skill1","Skill2"})));
-        assertTrue(VrpPlanningUtil.getMissingSkills(t1,employee)==0);
+        employee.setSkills(new HashSet<>(Arrays.asList("El", "Skill1", "Skill2")));
+        assertEquals(0, VrpPlanningUtil.getMissingSkills(t1, employee));
         t1.getSkills().add("Skill3");
-        assertTrue(VrpPlanningUtil.getMissingSkills(t1,employee)==1);
+        assertEquals(1, VrpPlanningUtil.getMissingSkills(t1, employee));
         employee.getSkills().add("Skill3");
         employee.getSkills().add("Skill4");
-        assertTrue(VrpPlanningUtil.getMissingSkills(t1,employee)==-1);
+        assertEquals(VrpPlanningUtil.getMissingSkills(t1, employee), -1);
 
 
     }

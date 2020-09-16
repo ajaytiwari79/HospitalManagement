@@ -64,6 +64,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public static final String DRAFT ="draft";
     public static final String MOSTLY_USED_COUNT = "mostlyUsedCount";
     public static final String ACTIVITY_PRIORITY = "activityPriority";
+    public static final String SHIFTS ="shifts";
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -84,9 +85,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<Shift> findAllSicknessShiftByEmploymentIdAndActivityIds(Long staffId,Collection<BigInteger> activityIds,Date startDate) {
-        Criteria criteria = where(DELETED).is(false).and("draft").is(false).and(ACTIVITIES_ACTIVITY_ID).in(activityIds).and(START_DATE).gte(startDate).and("staffId").is(staffId);
+        Criteria criteria = where(DELETED).is(false).and(DRAFT).is(false).and(ACTIVITIES_ACTIVITY_ID).in(activityIds).and(START_DATE).gte(startDate).and(STAFF_ID).is(staffId);
         Query query = new Query(criteria);
-        query.with(Sort.by(Sort.Direction.ASC,"startDate"));
+        query.with(Sort.by(Sort.Direction.ASC,START_DATE));
         return mongoTemplate.find(query, Shift.class);
     }
 
@@ -244,7 +245,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 project().and(DateOperators.dateOf(START_DATE).toString("%Y-%m-%d")).as(CURRENT_DATE)
                         .and("$$ROOT").as("shift"),
                 group(CURRENT_DATE).push("shift").as(SHIFTS_LIST),
-                project().and("_id").as(CURRENT_DATE).and(SHIFTS_LIST).as("shifts")
+                project().and("_id").as(CURRENT_DATE).and(SHIFTS_LIST).as(SHIFTS)
                 , sort(Sort.Direction.ASC, CURRENT_DATE)
         );
         AggregationResults<ShiftResponseDTO> shiftData = mongoTemplate.aggregate(aggregation, Shift.class, ShiftResponseDTO.class);
@@ -360,9 +361,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftActivityDTO> getShiftActivityByUnitIdAndActivityId(Long unitId,Date startDate,Date endDate,Set<BigInteger> activityIds){
         Set<String> activites = activityIds.stream().map(bigInteger -> bigInteger.toString()).collect(Collectors.toSet());
         Aggregation aggregation = newAggregation(
-                match(Criteria.where("unitId").is(unitId).and(DELETED).is(false).and(DISABLED).is(false).and("startDate").lt(endDate).and("endDate").gt(startDate)),
-                project("activities").and("breakActivities").concatArrays("activities").as("activities"),
-                unwind("activities"),
+                match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(DISABLED).is(false).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate)),
+                project(ACTIVITIES).and("breakActivities").concatArrays(ACTIVITIES).as(ACTIVITIES),
+                unwind(ACTIVITIES),
                 new CustomAggregationOperation(Document.parse("{\n" +
                         "    \"$project\": {\n" +
                         "      \"activities.shiftId\": \"$_id\",\n" +
@@ -372,9 +373,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                         "        \"activities.breakNotHeld\": 1\n" +
                         "    }\n" +
                         "  }")),
-                replaceRoot("activities"),
-                match(Criteria.where("startDate").lt(endDate).and("endDate").gt(startDate).and("activityId").in(activites).and("breakNotHeld").is(false)),
-                project("startDate","endDate","activityId","breakNotHeld","shiftId")
+                replaceRoot(ACTIVITIES),
+                match(Criteria.where(START_DATE).lt(endDate).and(END_DATE).gt(startDate).and("activityId").in(activites).and("breakNotHeld").is(false)),
+                project(START_DATE,END_DATE,"activityId","breakNotHeld","shiftId")
         );
         return mongoTemplate.aggregate(aggregation,Shift.class, ShiftActivityDTO.class).getMappedResults();
     }
@@ -412,7 +413,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and(START_DATE).lte(endDate).and(END_DATE).gte(startDate)),
                 group(EMPLOYMENT_ID).push("$$ROOT").as(SHIFTS_LIST),
-                project().and("_id").as(EMPLOYMENT_ID).and(SHIFTS_LIST).as("shifts")
+                project().and("_id").as(EMPLOYMENT_ID).and(SHIFTS_LIST).as(SHIFTS)
         );
         AggregationResults<ShiftResponseDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftResponseDTO.class);
         return result.getMappedResults();
@@ -592,7 +593,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     //fixme this method is a  duplicate of above method
    private  List<StaffShiftDetails>  getShiftsByCriteria(Criteria criteria, boolean replaceDraftShift, Class classType){
         List<AggregationOperation> aggregationOperations = getShiftWithActivityAggregationOperations(criteria, replaceDraftShift, new String[]{});
-            GroupOperation groupOperation = group("staffId").addToSet("$$ROOT").as("shifts");
+            GroupOperation groupOperation = group(STAFF_ID).addToSet("$$ROOT").as(SHIFTS);
             aggregationOperations.add(groupOperation);
         List<StaffShiftDetails> shiftWithActivityDTOS = mongoTemplate.aggregate(Aggregation.newAggregation(aggregationOperations),classType ,StaffShiftDetails.class).getMappedResults();
         return shiftWithActivityDTOS;
@@ -600,7 +601,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     private StaffShiftDetails getShiftForOneStaffWithByCriteria(Criteria criteria, boolean replaceDraftShift, Class inputType,Class outputMappingType){
         List<AggregationOperation> aggregationOperations = getShiftWithActivityAggregationOperations(criteria, replaceDraftShift, new String[]{});
-        GroupOperation groupOperation = group("staffId").addToSet("$$ROOT").as("shifts");
+        GroupOperation groupOperation = group(STAFF_ID).addToSet("$$ROOT").as(SHIFTS);
         aggregationOperations.add(groupOperation);
         List<StaffShiftDetails> shiftWithActivityDTOS = mongoTemplate.aggregate(Aggregation.newAggregation(aggregationOperations),inputType ,outputMappingType).getMappedResults();
         if(isCollectionNotEmpty(shiftWithActivityDTOS)) {

@@ -918,7 +918,8 @@ public class ActivityService {
         activityDTOMap.forEach((k,v)->{
             if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
                 v.setName("XXXXX");
-            } if(fieldPermissionMap.get("ultraShortName").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("ultraShortName").isEmpty()){
+            }
+            if(fieldPermissionMap.get("ultraShortName").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("ultraShortName").isEmpty()){
                 v.getActivityGeneralSettings().setUltraShortName("XXXXX");
             }
         });
@@ -930,5 +931,9 @@ public class ActivityService {
             model.getFieldPermissions().forEach(field-> fieldPermissionMap.putIfAbsent(field.getFieldName(),field.getPermissions()));
             prepareFLPMap(model.getSubModelPermissions(),fieldPermissionMap);
         });
+    }
+
+    public List<Activity> findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum timeTypeEnum, Set<Long> unitIds){
+        return activityMongoRepository.findAllBySecondLevelTimeTypeAndUnitIds(timeTypeEnum, unitIds);
     }
 }

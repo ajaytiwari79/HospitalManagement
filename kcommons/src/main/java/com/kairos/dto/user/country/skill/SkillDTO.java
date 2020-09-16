@@ -1,5 +1,6 @@
 package com.kairos.dto.user.country.skill;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,6 +26,13 @@ public class SkillDTO {
     private String shortName;
     private List<Long> tags;
     private Set<SkillLevelDTO> skillLevels;
+    private Long visitourId;
+    private String customName;
+    private boolean isEdited;
+    private Long countryId;
+    private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
+    private Map<String, TranslationInfo> translations;
 
 
     public SkillDTO(Long id, @NotBlank(message = "error.SkillCategory.name.notEmpty") String name, String description) {

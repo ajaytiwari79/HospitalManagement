@@ -1,5 +1,6 @@
 package com.kairos.service.access_permisson;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
@@ -23,10 +24,15 @@ import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepositor
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ResourceUtils;
 
 import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -236,30 +242,21 @@ public class AccessPageService {
     }
 
     public AccessPageLanguageDTO assignLanguageToAccessPage(String moduleId, AccessPageLanguageDTO accessPageLanguageDTO){
-        if(Optional.ofNullable(accessPageLanguageDTO.getId()).isPresent()){
-            Optional<AccessPageLanguageRelationShip> accessPageLanguageRelationShip= accessPageLanguageRelationShipRepository.findById(accessPageLanguageDTO.getId());
-            if(!accessPageLanguageRelationShip.isPresent()){
-                exceptionService.dataNotFoundByIdException(ACCESS_PAGE_LANG_DESCRIPTION_ABSENT,accessPageLanguageDTO.getLanguageId());
+            AccessPage accessPage=accessPageRepository.findByModuleId(moduleId);
+            if(!Optional.ofNullable(accessPage).isPresent()){
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"Access Page",moduleId);
             }
-            accessPageLanguageRelationShip.get().setDescription(accessPageLanguageDTO.getDescription());
-            accessPageLanguageRelationShipRepository.save(accessPageLanguageRelationShip.get());
+            SystemLanguage systemLanguage=systemLanguageGraphRepository.findSystemLanguageById(accessPageLanguageDTO.getLanguageId());
+            if(!Optional.ofNullable(systemLanguage).isPresent()){
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"SystemLanguage", accessPageLanguageDTO.getLanguageId());
+            }
+            AccessPageLanguageRelationShip accessPageLanguageRelationShip= accessPageLanguageRelationShipRepository.findByModuleIdAndLanguageId(accessPageLanguageDTO.getModuleId(),accessPageLanguageDTO.getLanguageId()).orElse(new AccessPageLanguageRelationShip());
+            accessPageLanguageRelationShip.setDescription(accessPageLanguageDTO.getDescription());
+            accessPageLanguageRelationShip.setAccessPage(accessPage);
+            accessPageLanguageRelationShip.setSystemLanguage(systemLanguage);
+            accessPageLanguageRelationShipRepository.save(accessPageLanguageRelationShip);
+            accessPageLanguageDTO.setId(accessPageLanguageRelationShip.getId());
             return accessPageLanguageDTO;
-        }
-
-        AccessPage accessPage=accessPageRepository.findByModuleId(moduleId);
-        if(!Optional.ofNullable(accessPage).isPresent()){
-            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"Access Page",moduleId);
-        }
-        SystemLanguage systemLanguage=systemLanguageGraphRepository.findSystemLanguageById(accessPageLanguageDTO.getLanguageId());
-        if(!Optional.ofNullable(systemLanguage).isPresent()){
-            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"SystemLanguage", accessPageLanguageDTO.getLanguageId());
-        }
-
-        AccessPageLanguageRelationShip accessPageLanguageRelationShip=new AccessPageLanguageRelationShip(accessPageLanguageDTO.getId(),accessPage,systemLanguage, accessPageLanguageDTO.getDescription());
-        accessPageLanguageRelationShipRepository.save(accessPageLanguageRelationShip);
-        accessPageLanguageDTO.setId(accessPageLanguageRelationShip.getId());
-        return accessPageLanguageDTO;
-
     }
 
     public AccessPageLanguageDTO getLanguageDataByModuleId(String moduleId, Long languageId){
@@ -299,5 +296,18 @@ public class AccessPageService {
             }
         }
         accessPageDTO.setChildren(childAccessPageDTOS);
+    }
+
+    public boolean setUrlInAccessPages() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        ClassPathResource resource = new ClassPathResource("accesspage/accessPageUrl.json");
+        InputStream inputStream = resource.getInputStream();
+        //File file = ResourceUtils.getFile("classpath:accesspage/accessPageUrl.json");
+        Map<String, String> accessPageMap = mapper.readValue(inputStream, new TypeReference<Map<String, String>>() {
+        });
+        List<AccessPage> accessPages= (List<AccessPage>) accessPageRepository.findAll();
+        accessPages.forEach(accessPage-> accessPage.setUrl(accessPageMap.get(accessPage.getModuleId())));
+        accessPageRepository.saveAll(accessPages);
+        return true;
     }
 }

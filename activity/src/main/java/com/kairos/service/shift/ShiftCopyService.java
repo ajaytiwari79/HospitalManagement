@@ -176,7 +176,7 @@ public class ShiftCopyService extends MongoBaseService {
                         act.setEndDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(act.getEndDate())));
                     });
 
-                    ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityMap,sourceShift);
+                    ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(shiftDTO, activityMap,sourceShift);
                     shiftWithActivityDTO.setEndDate(endDate);
                     shiftWithActivityDTO.setStartDate(startDate);
                     shiftWithActivityDTO.setStaffId(staffEmployment.getStaff().getId());
@@ -241,7 +241,7 @@ public class ShiftCopyService extends MongoBaseService {
                 exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
             }
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffEmployment,dataWrapper.getDayTypes());
-                List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(false,copiedShift, activityMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),dataWrapper.getTimeSlotWrappers(),sourceShift);
+                List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(false,copiedShift, activityMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),dataWrapper.getTimeSlotWrappers(),sourceShift,null);
                 copiedShift.setBreakActivities(breakActivities);
 
             copiedShift.setActivities(shiftActivities);

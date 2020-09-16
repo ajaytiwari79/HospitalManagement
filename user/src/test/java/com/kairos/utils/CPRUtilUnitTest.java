@@ -19,8 +19,8 @@ import static org.junit.Assert.assertEquals;
     CPRUtil cprUtil;
 
     @Before
-    public void setUp() throws Exception {
-
+    public void setUp() {
+      // setup method
     }
 
     @Test

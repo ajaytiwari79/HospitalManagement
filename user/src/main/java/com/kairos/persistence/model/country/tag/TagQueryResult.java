@@ -1,12 +1,14 @@
 package com.kairos.persistence.model.country.tag;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prerna on 13/11/17.
@@ -28,4 +30,9 @@ public class TagQueryResult {
     private String ultraShortName;
     private Date startDate;
     private Date endDate;
+    private Long countryId;
+    private Long unutId;
+    private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
+    private Map<String, TranslationInfo> translations;
 }

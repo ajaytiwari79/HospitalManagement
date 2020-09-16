@@ -35,6 +35,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     public static final String EXPERTISE_IDS = "expertiseIds";
     public static final String EMPLOYMENT_TYPE_IDS = "employmentTypeIds";
     public static final String TAG_IDS = "tagIds";
+    public static final String IMAGE_PATH = "imagePath";
     @Inject
     private Session session;
 
@@ -183,7 +184,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             selectedDate = LocalDate.now();
         }
         queryParameters.put("selectedDate", selectedDate.toString());
-        queryParameters.put("imagePath", imagePath);
+        queryParameters.put(IMAGE_PATH, imagePath);
         return searchText;
     }
 
@@ -223,12 +224,13 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
     }
 
-    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType, Set<T>> filters, final Long unitId, final LocalDate localDateToday, final String searchText, final Long loggedInUserId) {
+    public <T> List<StaffEmploymentWithTag> getStaffWithFilterCriteria(final Map<FilterType, Set<T>> filters, final Long unitId, final LocalDate localDateToday, final String searchText, final Long loggedInUserId,String imagePath) {
         String today = DateUtils.formatLocalDate(localDateToday, "yyyy-MM-dd");
         Map<String, Object> queryParameters = new HashMap<>();
         queryParameters.put(UNIT_ID, unitId);
         queryParameters.put("today", today);
         queryParameters.put("loggedInUserId", loggedInUserId);
+        queryParameters.put(IMAGE_PATH,imagePath);
         StringBuilder query = new StringBuilder();
         StringBuilder returnData = new StringBuilder();
         query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment{published:true})-[:IN_UNIT]-(unit:Unit)\n" +
@@ -246,7 +248,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 .append(" collect(distinct {id:id(employments),startDate:employments.startDate,endDate:employments.endDate, employmentType: { id: id(empType),name:empType.name } , employmentSubType: employments.employmentSubType,expertise: {id : id(expertise),name:expertise.name,startDate:employments.startDate,endDate:employments.endDate   },employmentLines:employmentLines  }) as employments, ")
                 .append(" CASE contactAddress WHEN contactAddress IS NULL THEN '' ELSE contactAddress.province END ");
         addMatchingCriteria(filters, queryParameters, query);
-        query.append(" WITH staff,employments,user,contactAddress MATCH (staff)-[:BELONGS_TO_TAGS]-(selectedTags:Tag) ");
+        query.append(" WITH staff,employments,user,contactAddress OPTIONAL MATCH (staff)-[:BELONGS_TO_TAGS]-(selectedTags:Tag) ");
         query.append(" WITH staff,employments,user,contactAddress,selectedTags MATCH (employments)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) ");
         query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise MATCH (employments)-[empL:HAS_EMPLOYMENT_LINES]->(employmentLines:EmploymentLine)-[het:HAS_EMPLOYMENT_TYPE]->(empType:EmploymentType) ");
         query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise,empType,employmentLines OPTIONAL MATCH (employmentLines)-[:APPLICABLE_FUNCTION]-(applicableFunctions:Function) ");
@@ -265,11 +267,12 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         return staffEmploymentWithTags;
     }
 
-    public StaffEmploymentWithTag getLoggedInStaffDetails(final Long unitId, final Long loggedInUserId) {
+    public StaffEmploymentWithTag getLoggedInStaffDetails(final Long unitId, final Long loggedInUserId,String imagePath) {
         StringBuilder query = new StringBuilder();
         Map<String, Object> queryParameters = new HashMap<>();
         queryParameters.put(UNIT_ID, unitId);
         queryParameters.put("loggedInUserId", loggedInUserId);
+        queryParameters.put(IMAGE_PATH,imagePath);
         query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment)-[:IN_UNIT]-(unit:Unit)\n" +
                 "WHERE id(unit)={unitId} AND employments.startDate IS NOT null AND id(user)={loggedInUserId}  \n");
         query.append(" WITH staff,employments,user MATCH (staff)-[:HAS_CONTACT_ADDRESS]-(contactAddress:ContactAddress) ");
