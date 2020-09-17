@@ -196,7 +196,7 @@ public class PermissionService {
     public Map<String, Object> getPermissionActionsSchema() {
         Map<String, Object> permissionSchemaMap = new HashMap<>();
         permissionSchemaMap.put(PERMISSIONS_SCHEMA,getkPermissionModels());
-        permissionSchemaMap.put(ACTIONS,PermissionAction.values());
+        permissionSchemaMap.put(ACTIONS,PermissionAction.getValues());
         return permissionSchemaMap;
     }
 
