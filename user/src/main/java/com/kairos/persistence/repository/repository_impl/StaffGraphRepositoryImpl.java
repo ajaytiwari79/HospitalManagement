@@ -137,7 +137,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         String query = "";
         if (ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query = getSelfRosteringQuery(filters, searchText,loggedInStaffId,selectedDate);
-        }else if(ModuleId.Group_TAB_ID.value.equals(moduleId)){
+        }else if(ModuleId.GROUP_TAB_ID.value.equals(moduleId)){
             query = getGroupQuery(filters, searchText);
         } else if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT)).isPresent() && filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITH_EMPLOYMENT.name()) && !filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITHOUT_EMPLOYMENT.name()) && !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId}"+getMatchQueryForStaff(loggedInStaffId)+
