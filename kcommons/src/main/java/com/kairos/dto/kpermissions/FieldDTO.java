@@ -1,5 +1,6 @@
 package com.kairos.dto.kpermissions;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -21,6 +23,7 @@ public class FieldDTO {
     private Set<OrganizationCategory> organizationCategories;
     private Set<FieldLevelPermission> permissions;
     private OtherPermissionDTO forOtherPermissions;
+    private Map<String, TranslationInfo> translations;
 
     public Set<FieldLevelPermission> getPermissions() {
         return isCollectionNotEmpty(permissions) ? permissions : new HashSet<>();

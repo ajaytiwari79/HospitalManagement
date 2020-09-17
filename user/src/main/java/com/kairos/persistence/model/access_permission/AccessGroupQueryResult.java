@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.access_permission;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.country.default_data.DayType;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prerna on 5/3/18.
@@ -30,4 +32,5 @@ public class AccessGroupQueryResult {
     private List<DayType> dayTypes;
     private boolean allowedDayTypes;
     private AccessGroup parentAccessGroup;
+    private Map<String, TranslationInfo> translations;
 }

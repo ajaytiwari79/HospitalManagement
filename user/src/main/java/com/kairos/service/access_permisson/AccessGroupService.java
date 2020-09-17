@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -38,6 +39,7 @@ import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryRes
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
+import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -967,5 +969,37 @@ public class AccessGroupService {
     public Set<Long> getAccessGroupIdsOfUnit(final Long unitId){
         return organizationService.fetchParentOrganization(unitId).getAccessGroups().stream().map(k->k.getId()).collect(Collectors.toSet());
     }
+
+    public Map<String, TranslationInfo> updateTranslation(Long accessGroupId, Map<String,TranslationInfo> translations) {
+        Map<String,Map<String,String>> translatedMap = getMapOfTranslationData(translations);
+        AccessGroup accessGroup =accessGroupRepository.findOne(accessGroupId);
+        accessGroup.setTranslatedNames(translatedMap.get("translatedNames"));
+        accessGroup.setTranslatedDescriptions(translatedMap.get("translatedDescriptions"));
+        accessGroupRepository.save(accessGroup);
+        return accessGroup.getTranslatedData();
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfAccessPage(Long accessPageId, Map<String,TranslationInfo> translations) {
+        Map<String,Map<String,String>> translatedMap = getMapOfTranslationData(translations);
+        AccessPage accessPage =accessPageRepository.findOne(accessPageId);
+        accessPage.setTranslatedNames(translatedMap.get("translatedNames"));
+        accessPage.setTranslatedDescriptions(translatedMap.get("translatedDescriptions"));
+        accessPageRepository.save(accessPage);
+        return accessPage.getTranslatedData();
+    }
+
+    public Map<String,Map<String,String>> getMapOfTranslationData(Map<String,TranslationInfo> translations){
+        Map<String,Map<String,String>> tanslationMap = new HashMap<>();
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        tanslationMap.put("translatedNames",translatedNames);
+        tanslationMap.put("translatedDescriptions",translatedDescriptios);
+        return tanslationMap;
+    }
+
 
 }
