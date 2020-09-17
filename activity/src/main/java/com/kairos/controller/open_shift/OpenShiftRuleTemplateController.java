@@ -1,5 +1,6 @@
 package com.kairos.controller.open_shift;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
 import com.kairos.service.open_shift.OpenShiftRuleTemplateService;
@@ -105,6 +106,13 @@ public class OpenShiftRuleTemplateController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> findByUnitIdAndActivityId(@PathVariable Long unitId,@PathVariable BigInteger activityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.findByUnitIdAndActivityId(activityId,unitId));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = COUNTRY_URL+"/open_shift/rule_template/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWta(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,openShiftRuleTemplateService.updateTranslation(id,translations));
     }
 
 }
