@@ -68,6 +68,7 @@ public class WTABaseRuleTemplateDTO{
     protected Map<String, TranslationInfo> translations;
 
 
+
     public WTABaseRuleTemplateDTO(String name, String description) {
         this.name = name;
         this.description = description;
