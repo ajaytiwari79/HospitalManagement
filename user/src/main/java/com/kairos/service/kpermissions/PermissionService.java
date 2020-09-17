@@ -618,8 +618,8 @@ public class PermissionService {
 
     public void assignActionPermission(Long unitId, Long accessGroupId, CustomPermissionDTO customPermissionDTO) {
         LOGGER.info("actions permissions are {}", customPermissionDTO.getActions());
-        accessGroupRepository.disableActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId,customPermissionDTO.getId());
-        accessGroupRepository.setActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId, customPermissionDTO.getActions());
+        //accessGroupRepository.disableActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId,customPermissionDTO.getId());
+        accessGroupRepository.setActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId, customPermissionDTO.getActions(),customPermissionDTO.isHasPermission());
     }
 
     public boolean validPermissionAction(String modelName, PermissionAction action, Long unitId){
