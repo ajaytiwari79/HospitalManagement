@@ -267,7 +267,7 @@ public class Shift extends MongoBaseEntity {
         } else {
             activityMatch = this.getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getActivityId().equals(activityId));
             if (!activityMatch && includeDraftShift) {
-                activityMatch = isNotNull(this.getDraftShift()) ? this.getDraftShift().getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getActivityId().equals(activityId)) : false;
+                activityMatch = isNotNull(this.getDraftShift()) && this.getDraftShift().getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getActivityId().equals(activityId));
             }
         }
         return activityMatch;
