@@ -9,9 +9,11 @@ import com.kairos.enums.ActionType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.persistence.model.action.Action;
+import com.kairos.persistence.model.action.ActionInfo;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
+import com.kairos.persistence.repository.action.ActionInfoRepository;
 import com.kairos.persistence.repository.action.ActionRepository;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
@@ -48,6 +50,8 @@ public class ActionService {
     private ExceptionService exceptionService;
     @Inject
     private ActionRepository actionRepository;
+    @Inject
+    private ActionInfoRepository actionInfoRepository;
     @Inject
     private ShiftService shiftService;
     @Inject
@@ -166,4 +170,19 @@ public class ActionService {
         }
     }
 
+    public Map<String, Long> updateActionInfoOfStaff(Long unitId, Long staffId, String actionName) {
+        ActionInfo actionInfo = actionInfoRepository.getByUnitIdAndStaffId(unitId, staffId);
+        if(isNull(actionInfo)){
+            actionInfo = new ActionInfo(unitId, staffId, new HashMap<>());
+        }
+        Long actionCount = actionInfo.getActionCount().getOrDefault(actionName, 0L);
+        actionInfo.getActionCount().put(actionName, ++actionCount);
+        actionInfoRepository.save(actionInfo);
+        return actionInfo.getActionCount();
+    }
+
+    public Map<String, Long> getActionInfoOfStaff(Long unitId, Long staffId) {
+        ActionInfo actionInfo = actionInfoRepository.getByUnitIdAndStaffId(unitId, staffId);
+        return isNotNull(actionInfo) ? actionInfo.getActionCount() : new HashMap<>();
+    }
 }
