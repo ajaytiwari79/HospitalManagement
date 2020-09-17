@@ -732,6 +732,13 @@ public class ShiftService extends MongoBaseService {
         if (endDate == null) {
             endDate = DateUtils.getLocalDate();
         }
+        List<ShiftDTO> shifts = getShiftDTOSAfterFilterAndUpdateShiftData(unitId, staffId, startDate, endDate, employmentId, staffFilterDTO, reasonCodeDTOS, staffAdditionalInfoDTO, reasonCodeMap);
+        Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
+        shiftDetailsService.setLayerInShifts(shiftsMap);
+        return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
+    }
+
+    private List<ShiftDTO> getShiftDTOSAfterFilterAndUpdateShiftData(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, StaffFilterDTO staffFilterDTO, List<ReasonCodeDTO> reasonCodeDTOS, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<Long, ReasonCodeDTO> reasonCodeMap) {
         List<ShiftDTO> shifts;
         if (Optional.ofNullable(employmentId).isPresent()) {
             shifts = shiftMongoRepository.findAllShiftsBetweenDuration(employmentId, staffId, asDate(startDate), asDate(endDate), unitId);
@@ -739,7 +746,6 @@ public class ShiftService extends MongoBaseService {
             shifts = shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, asDate(startDate), asDate(endDate), unitId);
         }
         shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO, new ArrayList<>());
-        addReasonCode(shifts, reasonCodeDTOS);
         updateReasonCodeAndNameInActivities(reasonCodeMap, shifts);
         UserAccessRoleDTO userAccessRoleDTO;
         if (isNotNull(staffAdditionalInfoDTO)) {
@@ -755,9 +761,7 @@ public class ShiftService extends MongoBaseService {
                 shift.setEscalationResolved(shift.getShiftViolatedRules().isEscalationResolved());
             }
         }
-        Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
-        shiftDetailsService.setLayerInShifts(shiftsMap);
-        return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
+        return shifts;
     }
 
     private void updateReasonCodeAndNameInActivities(Map<Long, ReasonCodeDTO> reasonCodeMap, List<ShiftDTO> shifts) {
@@ -765,6 +769,7 @@ public class ShiftService extends MongoBaseService {
         Map<String, Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
         activityService.prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
         for (ShiftDTO shift : shifts) {
+            shift.setMultipleActivity(shift.getActivities().size()>1);
             for (ShiftActivityDTO activity : shift.getActivities()) {
                 if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
                     activity.setActivityName("XXXXX");
@@ -1043,6 +1048,21 @@ public class ShiftService extends MongoBaseService {
         List<ShiftDTO> staffValidatedShifts = shiftStateDTOs.stream().filter(s -> s.getAccessGroupRole() != null && s.getAccessGroupRole().equals(AccessGroupRole.STAFF) && s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.TIME_ATTENDANCE.toString()).getId())).collect(Collectors.toList());
         staffValidatedShifts = shiftFilterService.getShiftsByFilters(staffValidatedShifts, staffFilterDTO, new ArrayList<>());
         Map<String, ShiftDTO> staffAndShiftMap = staffValidatedShifts.stream().collect(Collectors.toMap(k -> k.getStaffId() + "" + k.getId(), v -> v));
+        List<ShiftDTO> updateRealTime = getShiftDTOS(timeZone, phaseMap, realTimeShift, staffValidatedShifts, staffAndShiftMap);
+        staffValidatedShifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(staffValidatedShifts);
+        List<ShiftDTO> plannerValidatedShifts = ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftStateDTOs.stream().filter(s -> s.getAccessGroupRole() != null && s.getAccessGroupRole().equals(MANAGEMENT) && s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.TIME_ATTENDANCE.toString()).getId())).collect(Collectors.toList()), ShiftDTO.class);
+        plannerValidatedShifts = shiftFilterService.getShiftsByFilters(plannerValidatedShifts, staffFilterDTO, new ArrayList<>());
+        //change id because id was same and issue on FE side and this is only for show FE side
+        for (ShiftDTO shiftDTO : plannerValidatedShifts) {
+            if (shiftDTO.getValidated() == null) {
+                shiftDTO.setEditable(true);
+            }
+        }
+        plannerValidatedShifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(plannerValidatedShifts);
+        return new ShiftDetailViewDTO(plannedShifts, updateRealTime, staffValidatedShifts, plannerValidatedShifts);
+    }
+
+    private List<ShiftDTO> getShiftDTOS(String timeZone, Map<String, Phase> phaseMap, List<ShiftDTO> realTimeShift, List<ShiftDTO> staffValidatedShifts, Map<String, ShiftDTO> staffAndShiftMap) {
         DateTimeInterval graceInterval;
         List<ShiftDTO> updateRealTime = new ArrayList<>();
         for (ShiftDTO shiftDTO : realTimeShift) {
@@ -1061,17 +1081,7 @@ public class ShiftService extends MongoBaseService {
                 }
             }
         }
-        staffValidatedShifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(staffValidatedShifts);
-        List<ShiftDTO> plannerValidatedShifts = ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftStateDTOs.stream().filter(s -> s.getAccessGroupRole() != null && s.getAccessGroupRole().equals(MANAGEMENT) && s.getShiftStatePhaseId().equals(phaseMap.get(PhaseDefaultName.TIME_ATTENDANCE.toString()).getId())).collect(Collectors.toList()), ShiftDTO.class);
-        plannerValidatedShifts = shiftFilterService.getShiftsByFilters(plannerValidatedShifts, staffFilterDTO, new ArrayList<>());
-        //change id because id was same and issue on FE side and this is only for show FE side
-        for (ShiftDTO shiftDTO : plannerValidatedShifts) {
-            if (shiftDTO.getValidated() == null) {
-                shiftDTO.setEditable(true);
-            }
-        }
-        plannerValidatedShifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(plannerValidatedShifts);
-        return new ShiftDetailViewDTO(plannedShifts, updateRealTime, staffValidatedShifts, plannerValidatedShifts);
+        return updateRealTime;
     }
 
     public CompactViewDTO getDetailedAndCompactViewData(Long selectedStaffId, Long unitId, Date shiftStartDate, StaffFilterDTO staffFilterDTO) {
