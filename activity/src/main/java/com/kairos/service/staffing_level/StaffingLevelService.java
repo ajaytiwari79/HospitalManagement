@@ -218,10 +218,12 @@ public class StaffingLevelService  {
     public List<PresenceStaffingLevelDto> updatePresenceStaffingLevel(BigInteger staffingLevelId, Long unitId, PresenceStaffingLevelDto presenceStaffingLevelDTO) {
         LOGGER.info("updating staffing level organizationId and staffingLevelId is {} ,{}", unitId, staffingLevelId);
         List<PresenceStaffingLevelDto> presenceStaffingLevelDtos=new ArrayList<>();
+        PresenceStaffingLevelDto clonedObjectToReUse=ObjectMapperUtils.copyPropertiesByMapper(presenceStaffingLevelDTO,PresenceStaffingLevelDto.class);
         List<StaffingLevel> staffingLevels=staffingLevelMongoRepository.findByUnitIdBetweenDates(unitId,presenceStaffingLevelDTO.getStartDate(),presenceStaffingLevelDTO.getEndDate());
         for(StaffingLevel staffingLevel:staffingLevels){
             StaffingLevelUtil.setUserWiseLogs(staffingLevel,presenceStaffingLevelDTO);
             publishStaffingLevel(presenceStaffingLevelDTO,unitId, staffingLevel);
+            presenceStaffingLevelDTO=clonedObjectToReUse;
         }if(isCollectionNotEmpty(staffingLevels)){
             staffingLevelMongoRepository.saveEntities(staffingLevels);
         }
