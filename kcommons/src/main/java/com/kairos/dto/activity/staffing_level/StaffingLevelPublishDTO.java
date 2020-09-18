@@ -22,8 +22,9 @@ public class StaffingLevelPublishDTO {
     private LocalDate selectedEndDateForPresence;
     private LocalDate selectedDateForAbsence;
     private LocalDate selectedEndDateForAbsence;
-
     private Set<BigInteger> activityIds=new HashSet<>();
     private Set<Long> skillIds=new HashSet<>();
+    private Date startTime;
+    private Date endTime;
 
 }
