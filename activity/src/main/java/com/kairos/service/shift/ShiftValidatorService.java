@@ -1131,6 +1131,12 @@ public class ShiftValidatorService {
             activityIds.add(activity.getActivityId());
             activityIds.addAll(activity.getChildActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet()));
         }
+        if(isNotNull(shift.getDraftShift())){
+            for (ShiftActivity draftActivity : shift.getDraftShift().getActivities()) {
+                activityIds.add(draftActivity.getActivityId());
+                activityIds.addAll(draftActivity.getChildActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet()));
+            }
+        }
         List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate());
