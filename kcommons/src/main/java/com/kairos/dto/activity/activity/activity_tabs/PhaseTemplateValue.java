@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Optional;
  */
 
 //This for Activity
-public class PhaseTemplateValue implements Comparable<PhaseTemplateValue>{
+public class PhaseTemplateValue implements Comparable<PhaseTemplateValue>, Serializable {
     private BigInteger phaseId;
     private String name;
     private String description;

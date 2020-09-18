@@ -15,6 +15,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
@@ -32,7 +33,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Builder
 @AllArgsConstructor
 @PermissionClass(name = "Activity")
-public class ActivityDTO  {
+public class ActivityDTO implements Serializable {
     private BigInteger id;
     @NotBlank(message = "message.activity.name.notEmpty")
     private String name;

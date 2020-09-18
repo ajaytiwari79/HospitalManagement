@@ -10,6 +10,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
@@ -20,7 +21,7 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ReasonCodeDTO {
+public class ReasonCodeDTO implements Serializable {
     private Long id;
     @NotBlank(message = "message.reasonCode.name.notEmpty")
     private String name;

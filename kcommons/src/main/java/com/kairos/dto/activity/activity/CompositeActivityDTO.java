@@ -6,6 +6,7 @@ import com.kairos.dto.activity.activity.activity_tabs.ActivityGeneralSettingsDTO
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
@@ -15,7 +16,7 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class CompositeActivityDTO {
+public class CompositeActivityDTO implements Serializable {
     private BigInteger id;
     // TODO CHECK HOW TO UPDATE ID DYNAMICALLY
     private BigInteger compositeId;
@@ -24,7 +25,7 @@ public class CompositeActivityDTO {
     private Long countryId;
     private BigInteger categoryId;
     private String categoryName;
-    private Long unitId ;
+    private Long unitId;
     private ActivityGeneralSettingsDTO activityGeneralSettings;
     private Long countryActivityId;
     private Boolean allowedBefore;

@@ -17,6 +17,7 @@ import org.joda.time.Interval;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,7 +36,7 @@ import static com.kairos.constants.CommonConstants.MULTIPLE_ACTIVITY;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class ShiftDTO implements Comparable<ShiftDTO>{
+public class ShiftDTO implements Comparable<ShiftDTO>, Serializable {
 
     protected BigInteger id;
     protected Date startDate;

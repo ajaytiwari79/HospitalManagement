@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
@@ -30,7 +31,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 @Setter
 @Builder
 @AllArgsConstructor
-public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
+public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>, Serializable {
 
     private Set<ShiftStatus> status;
     private String message;
