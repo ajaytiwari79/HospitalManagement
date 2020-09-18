@@ -1005,7 +1005,7 @@ public class ShiftService extends MongoBaseService {
     }
 
     //TODO need to optimize this method
-    public List<ShiftWithViolatedInfoDTO> updateShiftByTandA(Long unitId, ShiftDTO shiftDTO, Boolean updatedByStaff) {
+    public List<ShiftWithViolatedInfoDTO> updateShiftByTandA(Long unitId, ShiftDTO shiftDTO) {
         Phase phase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
         Map<String, Phase> phaseMap = new HashMap<String, Phase>() {{
             put(phase.getPhaseEnum().toString(), phase);
@@ -1161,8 +1161,7 @@ public class ShiftService extends MongoBaseService {
     }
 
     public Long getPublishShiftCount(Long employmentId) {
-        List<Shift> shifts = shiftMongoRepository.findAllPublishShiftByEmploymentId(employmentId);
-        return (long) shifts.size();
+        return shiftMongoRepository.getCountOfPublishShiftByEmploymentId(employmentId);
     }
 
     private List<Shift> getShiftsOnTheBasisOfGapActivity(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {

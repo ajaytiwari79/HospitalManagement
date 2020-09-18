@@ -328,11 +328,11 @@ public class PhaseService extends MongoBaseService {
     }
 
     public boolean shiftEditableInRealtime(String timeZone, Map<String,Phase> phaseMap, Date startDate, Date endDate){
-        int minutesToCalculate=phaseMap.get(PhaseDefaultName.REALTIME.toString()).getRealtimeDuration();
-        LocalDateTime localDateTimeAfterMinus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(minutesToCalculate+1);
-        LocalDateTime localDateTimeAfterPlus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(minutesToCalculate+1);
-        DateTimeInterval shiftInterval=new DateTimeInterval(startDate,endDate);
-        DateTimeInterval realtimeInterval=new DateTimeInterval(DateUtils.asDate(localDateTimeAfterMinus),DateUtils.asDate(localDateTimeAfterPlus));
+        int realtimeDuration = phaseMap.get(PhaseDefaultName.REALTIME.toString()).getRealtimeDuration();
+        LocalDateTime realtimePhaseStartDate = DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(realtimeDuration + 1);
+        LocalDateTime realtimePhaseEndDate = DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(realtimeDuration + 1);
+        DateTimeInterval shiftInterval = new DateTimeInterval(startDate,endDate);
+        DateTimeInterval realtimeInterval = new DateTimeInterval(DateUtils.asDate(realtimePhaseStartDate),DateUtils.asDate(realtimePhaseEndDate));
         return shiftInterval.overlaps(realtimeInterval);
     }
     /**
