@@ -1146,9 +1146,7 @@ public class ShiftValidatorService {
         staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
 
-        ViolatedRulesDTO violatedRulesDTO = validateRuleOnShiftDelete(activityWrapperMap, shift, staffAdditionalInfoDTO);
-
-        return violatedRulesDTO;
+        return validateRuleOnShiftDelete(activityWrapperMap, shift, staffAdditionalInfoDTO);
     }
 
 }
