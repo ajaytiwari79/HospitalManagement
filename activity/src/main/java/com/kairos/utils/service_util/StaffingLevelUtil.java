@@ -339,13 +339,25 @@ public class StaffingLevelUtil {
     }
 
     public static void updateStaffingLevelToPublish(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevel staffingLevel) {
-        List<StaffingLevelInterval> staffingLevelIntervals = staffingLevel.getPresenceStaffingLevelInterval();
+        List<StaffingLevelInterval> staffingLevelIntervals = isNotNull(staffingLevelPublishDTO.getInterval())?getFilteredIntervals(staffingLevelPublishDTO,staffingLevel):staffingLevel.getPresenceStaffingLevelInterval();
             for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
                 updateActivities(staffingLevelPublishDTO, staffingLevelInterval);
             }
             for (int i = 0; i < staffingLevel.getAbsenceStaffingLevelInterval().size(); i++) {
                 updateActivities(staffingLevelPublishDTO, staffingLevelIntervals.get(i));
             }
+    }
+
+    private static List<StaffingLevelInterval> getFilteredIntervals(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevel staffingLevel) {
+        List<StaffingLevelInterval> staffingLevelIntervals=new ArrayList<>();
+        ZonedDateTime currentDate = DateUtils.asZonedDateTime(staffingLevel.getCurrentDate());
+        for(StaffingLevelInterval staffingLevelInterval:staffingLevel.getPresenceStaffingLevelInterval()){
+            if (staffingLevelPublishDTO.getInterval().contains(currentDate)) {
+                staffingLevelIntervals.add(staffingLevelInterval);
+            }
+            currentDate=currentDate.plusMinutes(15);
+        }
+        return staffingLevelIntervals;
     }
 
     private static void updateActivities(StaffingLevelPublishDTO staffingLevelPublishDTO, StaffingLevelInterval staffingLevelInterval) {
