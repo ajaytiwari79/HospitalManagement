@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.open_shift.priority_group;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.PriorityGroupName;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Setter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 @Getter
 @Setter
@@ -27,6 +29,7 @@ public class PriorityGroupDTO {
     private List<Long> employmentTypeIds;
     private List<Long> expertiseIds;
     private BigInteger ruleTemplateId;
+    private Map<String, TranslationInfo>  translations;
 
 
     public PriorityGroupDTO(PriorityGroupName name, BigInteger id, boolean deActivated,RoundRules roundRules, StaffExcludeFilter staffExcludeFilter,

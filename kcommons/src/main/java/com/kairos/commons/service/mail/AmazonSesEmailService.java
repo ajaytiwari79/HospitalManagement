@@ -9,6 +9,7 @@ import javax.validation.constraints.Null;
 
 public class AmazonSesEmailService implements EmailService {
 
+    public static final String UTF_8 = "UTF-8";
     private final String fromAddress = "noreply@dev.kairosplanning.com";
     private AmazonSimpleEmailService client ;
 
@@ -29,11 +30,11 @@ public class AmazonSesEmailService implements EmailService {
                 .withMessage(new Message()
                         .withBody(new Body()
                                 .withHtml(new Content()
-                                        .withCharset("UTF-8").withData(htmlBody))
+                                        .withCharset(UTF_8).withData(htmlBody))
                                 .withText(new Content()
-                                        .withCharset("UTF-8").withData(textBody)))
+                                        .withCharset(UTF_8).withData(textBody)))
                         .withSubject(new Content()
-                                .withCharset("UTF-8").withData(subject)))
+                                .withCharset(UTF_8).withData(subject)))
                 .withSource(from!=null ? from:fromAddress);
                 // Comment or remove the next line if you are not using a
                 // configuration set

@@ -29,6 +29,7 @@ import java.util.Objects;
 public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
 
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
+    private Integer consecutiveDays;
 
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();

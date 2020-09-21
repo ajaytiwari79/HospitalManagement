@@ -572,10 +572,10 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public List<Shift> findAllPublishShiftByEmploymentId(Long employmentId){
+    public Long getCountOfPublishShiftByEmploymentId(Long employmentId){
         Query query = new Query(where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).and(DRAFT).is(false)
                 .and("activities.status").is(ShiftStatus.PUBLISH));
-        return mongoTemplate.find(query, Shift.class);
+        return mongoTemplate.count(query, Shift.class);
     }
 
     @Override

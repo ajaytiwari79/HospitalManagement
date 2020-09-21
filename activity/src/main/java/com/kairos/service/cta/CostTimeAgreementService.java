@@ -213,6 +213,9 @@ public class CostTimeAgreementService {
         if (Optional.ofNullable(ctaResponseDTO).isPresent()) {
             ctaRuleTemplateDTOS = ctaResponseDTO.getRuleTemplates();
         }
+        ctaRuleTemplateDTOS.forEach(ctaRuleTemplateDTO -> {
+            ctaRuleTemplateDTO.setUnitId(unitId);
+        });
         return ctaRuleTemplateDTOS;
     }
 
@@ -479,7 +482,11 @@ public class CostTimeAgreementService {
      * @return List<CTAResponseDTO>
      */
     public List<CTAResponseDTO> loadAllCTAByUnit(Long unitId) {
-        return costTimeAgreementRepository.findCTAByUnitId(unitId);
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.findCTAByUnitId(unitId);
+        ctaResponseDTOS.forEach(ctaResponseDTO -> {
+            ctaResponseDTO.setUnitId(unitId);
+        });
+        return ctaResponseDTOS;
     }
 
 

@@ -56,6 +56,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
     public static final String CONFIG_BREAKS = "com/kairos/shiftplanning/configuration/BreakAndIndirectActivityPlanning.solver.xml";
     public static final String CONFIG_WITH_WTA = "com/kairos/shiftplanning/configuration/ShiftPlanningRequest_activityLine_Wta.xml";
     public static final String DROOLS_FILE_SHIFT_PLANNING = "/droolsFile/Shift_Planning/";
+    public static final String USER_HOME = "user.home";
     boolean readFromFile = false;
     boolean disablePrimarySolver = false;
     boolean readSecondaryFromFile = false;
@@ -392,7 +393,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
     @Override
     public int run(String... args) throws Exception{
         long startTime = new Date().getTime();
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(System.getProperty("user.home")+"/problem.json")))){
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(System.getProperty(USER_HOME)+"/problem.json")))){
             StringBuilder stringBuilder = new StringBuilder();
             bufferedReader.lines().forEach(s -> stringBuilder.append(s));
             ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO = ObjectMapperUtils.jsonStringToObject(stringBuilder.toString(), ShiftPlanningProblemSubmitDTO.class);
@@ -406,7 +407,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
             //writeSolutionToFile(unSolvedsolution);
         }catch (Exception e){
             e.printStackTrace();
-            File file = new File(System.getProperty("user.home") + "/" + "exception.text");
+            File file = new File(System.getProperty(USER_HOME) + "/" + "exception.text");
             if(!file.exists()){
                 file.createNewFile();
             }
@@ -417,7 +418,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
 
     private void writeSolutionToFile(ShiftPlanningSolution unSolvedsolution) throws IOException {
         String objectString = ObjectMapperUtils.objectToJsonString(unSolvedsolution);
-        File file = new File(System.getProperty("user.home") + "/" + "solution.json");
+        File file = new File(System.getProperty(USER_HOME) + "/" + "solution.json");
         if(!file.exists()){
             file.createNewFile();
         }
@@ -445,7 +446,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
             sb.append(s);
             sb.append("\n");
         });
-        filePath = System.getProperty("user.home") + "/" + fileName;
+        filePath = System.getProperty(USER_HOME) + "/" + fileName;
         File file = new File(filePath);
         if (!file.exists()) {
             file.createNewFile();

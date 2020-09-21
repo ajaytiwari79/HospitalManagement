@@ -35,6 +35,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     public static final String EXPERTISE_IDS = "expertiseIds";
     public static final String EMPLOYMENT_TYPE_IDS = "employmentTypeIds";
     public static final String TAG_IDS = "tagIds";
+    public static final String IMAGE_PATH = "imagePath";
     @Inject
     private Session session;
 
@@ -136,7 +137,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         String query = "";
         if (ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query = getSelfRosteringQuery(filters, searchText,loggedInStaffId,selectedDate);
-        }else if(ModuleId.Group_TAB_ID.value.equals(moduleId)){
+        }else if(ModuleId.GROUP_TAB_ID.value.equals(moduleId)){
             query = getGroupQuery(filters, searchText);
         } else if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT)).isPresent() && filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITH_EMPLOYMENT.name()) && !filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITHOUT_EMPLOYMENT.name()) && !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId}"+getMatchQueryForStaff(loggedInStaffId)+
@@ -183,7 +184,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             selectedDate = LocalDate.now();
         }
         queryParameters.put("selectedDate", selectedDate.toString());
-        queryParameters.put("imagePath", imagePath);
+        queryParameters.put(IMAGE_PATH, imagePath);
         return searchText;
     }
 
@@ -229,10 +230,10 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         queryParameters.put(UNIT_ID, unitId);
         queryParameters.put("today", today);
         queryParameters.put("loggedInUserId", loggedInUserId);
-        queryParameters.put("imagePath",imagePath);
+        queryParameters.put(IMAGE_PATH,imagePath);
         StringBuilder query = new StringBuilder();
         StringBuilder returnData = new StringBuilder();
-        query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment{published:true})-[:IN_UNIT]-(unit:Unit)\n" +
+        query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment{published:true,deleted:false})-[:IN_UNIT]-(unit:Unit)\n" +
                 "WHERE id(unit)={unitId}  \n");
         if (searchText != null && searchText.trim() != "") {
             String qText = "(?i)" + searchText + ".*";
@@ -271,7 +272,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         Map<String, Object> queryParameters = new HashMap<>();
         queryParameters.put(UNIT_ID, unitId);
         queryParameters.put("loggedInUserId", loggedInUserId);
-        queryParameters.put("imagePath",imagePath);
+        queryParameters.put(IMAGE_PATH,imagePath);
         query.append("MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments:Employment)-[:IN_UNIT]-(unit:Unit)\n" +
                 "WHERE id(unit)={unitId} AND employments.startDate IS NOT null AND id(user)={loggedInUserId}  \n");
         query.append(" WITH staff,employments,user MATCH (staff)-[:HAS_CONTACT_ADDRESS]-(contactAddress:ContactAddress) ");

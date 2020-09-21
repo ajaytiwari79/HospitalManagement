@@ -116,7 +116,7 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.PUT)
     @ApiOperation("update staff personal information")
     @KPermissionActions(modelName = "Staff",action = EDIT)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    @PreAuthorize("@appPermissionEvaluator.isValid('Staff','EDIT')")
     public ResponseEntity<Map<String, Object>> savePersonalDetail(@PathVariable long unitId, @PathVariable long staffId, @RequestBody @Valid StaffDTO staffDTO) throws ParseException {
         StaffDTO response = staffService.savePersonalDetail(staffId, staffDTO, unitId);
         if (response == null) {

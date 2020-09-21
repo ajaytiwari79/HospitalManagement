@@ -1,12 +1,15 @@
 package com.kairos.service.open_shift;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplate;
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateAndPriorityGroupWrapper;
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
 import com.kairos.persistence.model.priority_group.PriorityGroup;
+import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.open_shift.OpenShiftRuleTemplateRepository;
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -14,10 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -50,7 +50,13 @@ public class OpenShiftRuleTemplateService{
     }
 
     public List<OpenShiftRuleTemplateDTO> findAllRuleTemplateForOpenShift(long countryId) {
-        return openShiftRuleTemplateRepository.findAllRuleTemplateByCountryIdAndDeletedFalse(countryId);
+        List<OpenShiftRuleTemplateDTO> openShiftRuleTemplateDTOS = openShiftRuleTemplateRepository.findAllRuleTemplateByCountryIdAndDeletedFalse(countryId);
+        openShiftRuleTemplateDTOS.forEach(openShiftRuleTemplateDTO -> {
+            if(openShiftRuleTemplateDTO.getTranslations() == null){
+                openShiftRuleTemplateDTO.setTranslations(new HashMap<>());
+            }
+        });
+        return openShiftRuleTemplateDTOS;
     }
 
     public OpenShiftRuleTemplateDTO updateRuleTemplateForOpenShift(long countryId, BigInteger ruleTemplateId, OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO) {
@@ -141,7 +147,15 @@ public class OpenShiftRuleTemplateService{
 
     public OpenShiftRuleTemplateAndPriorityGroupWrapper getRuleTemplateAndPriorityGroupByIdAtCountry(BigInteger ruleTemplateId, long countryId) {
         OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO=  openShiftRuleTemplateRepository.getByIdAndCountryIdAndDeletedFalse(ruleTemplateId,countryId);
+        if(ObjectUtils.isNull(openShiftRuleTemplateDTO.getTranslations())){
+            openShiftRuleTemplateDTO.setTranslations(new HashMap<>());
+        }
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByCountryIdAndRuleTemplateIdAndDeletedFalse(countryId,ruleTemplateId);
+        priorityGroupDTOS.forEach(priorityGroupDTO -> {
+            if(ObjectUtils.isNull(priorityGroupDTO.getTranslations())){
+                priorityGroupDTO.setTranslations(new HashMap<>());
+            }
+        });
         return new OpenShiftRuleTemplateAndPriorityGroupWrapper(openShiftRuleTemplateDTO,priorityGroupDTOS);
     }
 
@@ -170,5 +184,12 @@ public class OpenShiftRuleTemplateService{
         }
         openShiftRuleTemplateDTO.setId(openShiftRuleTemplate.getId());
         return openShiftRuleTemplateDTO;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger ruleTemplateId, Map<String,TranslationInfo> translations) {
+        OpenShiftRuleTemplate openShiftRuleTemplate= openShiftRuleTemplateRepository.findOne(ruleTemplateId);
+        openShiftRuleTemplate.setTranslations(translations);
+        openShiftRuleTemplateRepository.save(openShiftRuleTemplate);
+        return openShiftRuleTemplate.getTranslations();
     }
 }

@@ -3,3 +3,10 @@ Match(ap:AccessPage) where ap.moduleId="tab_184" merge (ap)-[:SUB_PAGE]->(access
 Match(ap:AccessPage) where ap.moduleId="tab_22" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Tab Permission",isModule:false,moduleId:"tab_455",active:true,`translatedNames.english`:"Tab Permission"});
 Match(ap:AccessPage) where ap.moduleId="tab_22" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Field Permission",isModule:false,moduleId:"tab_456",active:true,`translatedNames.english`:"Field Permission"});
 Match(ap:AccessPage) where ap.moduleId="tab_22" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Action Permission",isModule:false,moduleId:"tab_457",active:true,`translatedNames.english`:"Action Permission"});
+
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"WTA Rules Voilated",isModule:false,moduleId:"tab_458",active:true,`translatedNames.english`:"WTA Rules Voilated"});
+
+// To Remove duplicate relationship
+match (n:AccessPage)-[r:ACCESS_PAGE_HAS_LANGUAGE]->(m:SystemLanguage)
+with n,m,type(r) as t, tail(collect(r)) as coll
+foreach(x in coll | delete x)

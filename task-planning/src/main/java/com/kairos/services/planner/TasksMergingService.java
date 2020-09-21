@@ -46,6 +46,9 @@ public class TasksMergingService extends MongoBaseService {
     public static final String UNIT_ID = "unitId";
     public static final String DATE_FROM = "dateFrom";
     public static final String IS_DELETED = "isDeleted";
+    public static final String TASKS_TO_CREATE = "tasksToCreate";
+    public static final String TASK_LIST = "taskList";
+    public static final String TASKS_TO_DELETE = "tasksToDelete";
     @Inject
     TaskMongoRepository taskMongoRepository;
 
@@ -329,9 +332,9 @@ public class TasksMergingService extends MongoBaseService {
 
         List<Task> unMergeTasksList = taskMongoRepository.getAllTasksByIdsIn(unMergeTaskIds);
         returnedData = unMergeTasks(mainTask, unMergeTasksList, isActualPlanningScreen);
-        tasksToReturn.addAll((List<Task>) returnedData.get("taskList"));
-        tasksToCreate.addAll((List<Task>) returnedData.get("tasksToCreate"));
-        tasksToDelete.addAll((List<Task>) returnedData.get("tasksToDelete"));
+        tasksToReturn.addAll((List<Task>) returnedData.get(TASK_LIST));
+        tasksToCreate.addAll((List<Task>) returnedData.get(TASKS_TO_CREATE));
+        tasksToDelete.addAll((List<Task>) returnedData.get(TASKS_TO_DELETE));
 
         Criteria criteria;
         if( !mainTask.isSingleTask() ) {
@@ -375,9 +378,9 @@ public class TasksMergingService extends MongoBaseService {
                 }
                 if (mainTaskNew != null) {
                     returnedData = unMergeTasks(mainTaskNew, mergedTaskList, isActualPlanningScreen);
-                    tasksToReturn.addAll((List<Task>) returnedData.get("taskList"));
-                    tasksToCreate.addAll((List<Task>) returnedData.get("tasksToCreate"));
-                    tasksToDelete.addAll((List<Task>) returnedData.get("tasksToDelete"));
+                    tasksToReturn.addAll((List<Task>) returnedData.get(TASK_LIST));
+                    tasksToCreate.addAll((List<Task>) returnedData.get(TASKS_TO_CREATE));
+                    tasksToDelete.addAll((List<Task>) returnedData.get(TASKS_TO_DELETE));
                 }
             }
         }
@@ -457,9 +460,9 @@ public class TasksMergingService extends MongoBaseService {
         }
         taskService.save(mainTask);
 
-        returnedData.put("taskList", taskList);
-        returnedData.put("tasksToCreate", tasksToCreate);
-        returnedData.put("tasksToDelete", tasksToDelete);
+        returnedData.put(TASK_LIST, taskList);
+        returnedData.put(TASKS_TO_CREATE, tasksToCreate);
+        returnedData.put(TASKS_TO_DELETE, tasksToDelete);
         return returnedData;
     }
 

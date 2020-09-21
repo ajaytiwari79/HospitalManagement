@@ -187,8 +187,8 @@ public class ShiftController {
 
     @ApiOperation("update shift by detail view")
     @PutMapping("/shift/update_shift_by_details_view")
-    public ResponseEntity<Map<String, Object>> updateShiftByDetailsView(@PathVariable Long unitId, @RequestBody ShiftDTO shiftDTO, @RequestParam Boolean updatedByStaff) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShiftByTandA(unitId, shiftDTO, updatedByStaff));
+    public ResponseEntity<Map<String, Object>> updateShiftByDetailsView(@PathVariable Long unitId, @RequestBody ShiftDTO shiftDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShiftByTandA(unitId, shiftDTO));
     }
 
 

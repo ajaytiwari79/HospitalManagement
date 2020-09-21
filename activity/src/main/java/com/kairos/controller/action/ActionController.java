@@ -77,4 +77,18 @@ public class ActionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.removeAvailabilityUnavailabilityBeforeAfterShift(staffId, isAvailability, isBefore, ShiftDate));
     }
 
+    @ApiOperation("Update action count of staff")
+    @PutMapping("/staff/{staffId}/action_info")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateActionInfoOfStaff(@PathVariable Long unitId, @PathVariable Long staffId, @RequestParam("action_name") String actionName) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.updateActionInfoOfStaff(unitId, staffId, actionName));
+    }
+
+    @ApiOperation("Get action info of staff")
+    @GetMapping("/staff/{staffId}/action_info")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getActionInfoOfStaff(@PathVariable Long unitId, @PathVariable Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.getActionInfoOfStaff(unitId, staffId));
+    }
+
 }

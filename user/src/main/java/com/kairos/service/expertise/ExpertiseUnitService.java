@@ -75,6 +75,9 @@ public class ExpertiseUnitService {
         List<ExpertiseQueryResult> expertises=new ArrayList<>();
         if(ObjectUtils.isNotNull(servicesAndLevel)){
             expertises  = expertiseGraphRepository.findExpertiseByOrganizationServicesForUnit(countryId, servicesAndLevel.getServicesId());
+            expertises.forEach(expertiseQueryResult -> {
+                expertiseQueryResult.setUnitId(unitId);
+            });
             List<Long> allExpertiseIds=expertises.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
             List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
             Map<Long,List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap=expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
