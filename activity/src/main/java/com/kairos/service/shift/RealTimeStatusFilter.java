@@ -59,7 +59,8 @@ public class RealTimeStatusFilter <G> implements ShiftFilter {
 
     private boolean isResting(ShiftDTO shiftDTO){
         Date currentDate = getDate();
-        return filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.RESTING.toString()) && !(ShiftType.ABSENCE.equals(shiftDTO.getShiftType()) && (CommonConstants.FULL_WEEK.equals(shiftDTO.getActivities().get(0).getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(shiftDTO.getActivities().get(0).getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()))) && (shiftDTO.getStartDate().after(currentDate) || shiftDTO.getEndDate().before(currentDate));
+        boolean presence = !(ShiftType.ABSENCE.equals(shiftDTO.getShiftType()) && (CommonConstants.FULL_WEEK.equals(shiftDTO.getActivities().get(0).getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(shiftDTO.getActivities().get(0).getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())));
+        return filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.RESTING.toString()) && presence && (shiftDTO.getStartDate().after(currentDate) || shiftDTO.getEndDate().before(currentDate));
     }
 
     private boolean isUpcoming(ShiftDTO shiftDTO){

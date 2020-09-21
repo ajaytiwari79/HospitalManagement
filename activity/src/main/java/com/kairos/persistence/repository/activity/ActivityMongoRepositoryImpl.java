@@ -493,6 +493,13 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false));
     }
 
+    @Override
+    public List<Activity> findActivitiesSickSettingByActivityIds(Collection<BigInteger> activityIds){
+        Query query = new Query(Criteria.where("id").in(activityIds).and(DELETED).is(false));
+        query.fields().include("activityRulesSettings");
+        return mongoTemplate.find(query,Activity.class);
+    }
+
     private List<ActivityWrapper> getActivityWrappersByCriteria(Criteria criteria) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),

@@ -6,7 +6,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.ShiftFilterDurationType;
 import com.kairos.service.organization.ShiftPlanningService;
 import com.kairos.utils.response.ResponseHandler;
-import com.kairos.wrapper.shift.StaffShiftDetails;
+import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ApiConstants.API_UNIT_PLANNING_URL;
 
 @RestController
@@ -29,33 +30,33 @@ public class ShiftPlanningController {
     private ShiftPlanningService shiftPlanningService;
 
     @PostMapping(value = "/search/shifts/staff/{staffId}")
-    public StaffShiftDetails getShiftPlanningDetailsForOneStaff(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO){
+    public StaffShiftDetailsDTO getShiftPlanningDetailsForOneStaff(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO){
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         Long loggedInUserId = currentUserDetails.getId();
         searchDTO.setLoggedInUserId(loggedInUserId);
-        return shiftPlanningService.getShiftPlanningDetailsForOneStaff(unitId,searchDTO);
+        return shiftPlanningService.getShiftPlanningDetailsForOneStaff(unitId,searchDTO,true);
     }
 
     @PostMapping(value = "/search/shifts")
-    public List<StaffShiftDetails> shiftsAndPlanningSettingsForAllStaff(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO) {
+    public List<StaffShiftDetailsDTO> shiftsAndPlanningSettingsForAllStaff(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO) {
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         Long loggedInUserId = currentUserDetails.getId();
         searchDTO.setLoggedInUserId(loggedInUserId);
         if (searchDTO.getShiftFilterDurationType().equals(ShiftFilterDurationType.INDIVIDUAL)) {
-            return shiftPlanningService.getUnitPlanningAndShiftForSelectedStaff(unitId, searchDTO);
+            return shiftPlanningService.getUnitPlanningAndShiftForSelectedStaff(unitId, searchDTO,true);
         } else {
-            return shiftPlanningService.getShiftPlanningDetailsForUnit(unitId, searchDTO);
+            return shiftPlanningService.getShiftPlanningDetailsForUnit(unitId, searchDTO,true);
         }
     }
 
     @PostMapping(value = "/search/shiftFilters/staff")
-    public ResponseEntity<Map<String, Object>> getStaffListForShiftFilters(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO) {
+    public ResponseEntity<Map<String, Object>> getStaffListForShiftFilters(@PathVariable Long unitId, @RequestBody ShiftSearchDTO searchDTO,@RequestParam(required = false) Boolean showAllStaffs) {
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         Long loggedInUserId = currentUserDetails.getId();
         searchDTO.setLoggedInUserId(loggedInUserId);
         Map staffData = new HashMap();
-        List<StaffShiftDetails> staffShiftDetails =shiftPlanningService.getFilteredStaffForMatchingFilter(unitId, searchDTO);
-        staffData.put("staffList",staffShiftDetails);
+        List<StaffShiftDetailsDTO> staffShiftDetailDTOS =shiftPlanningService.getFilteredStaffForMatchingFilter(unitId, searchDTO,isNotNull(showAllStaffs) ? showAllStaffs : true);
+        staffData.put("staffList", staffShiftDetailDTOS);
         staffData.put("employmentTypes",shiftPlanningService.getEmploymentTypes(unitId));
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffData);
     }

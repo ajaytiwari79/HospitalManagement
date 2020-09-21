@@ -15,6 +15,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
+import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
@@ -34,6 +35,7 @@ import com.kairos.persistence.repository.user.access_permission.AccessGroupRepos
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffFavouriteFilterGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
@@ -43,10 +45,8 @@ import com.kairos.service.country.FunctionService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
-import com.kairos.service.organization.GroupService;
-import com.kairos.service.organization.OrganizationService;
-import com.kairos.service.organization.TeamService;
-import com.kairos.service.organization.UnitService;
+import com.kairos.service.organization.*;
+import com.kairos.service.organization_meta_data.SickConfigurationService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.apache.commons.collections.map.HashedMap;
@@ -72,6 +72,7 @@ import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.enums.FilterType.PAY_GRADE_LEVEL;
 import static com.kairos.enums.FilterType.*;
+import static com.kairos.enums.FilterType.TEAM;
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 /**
@@ -136,7 +137,9 @@ public class StaffFilterService {
     private UnitService unitService;
     @Inject
     private TeamService teamService;
-
+    @Inject private TimeSlotService timeSlotService;
+    @Inject private FunctionGraphRepository functionGraphRepository;
+    @Inject private SickConfigurationService sickConfigurationService;
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
 
@@ -666,5 +669,24 @@ public class StaffFilterService {
         staffFilterDTO.setName(staffFavouriteFilter.getName());
         staffFilterDTO.setId(staffFavouriteFilter.getId());
         return staffFilterDTO;
+    }
+
+    public <T> RequiredDataForFilterDTO getRequiredDataForFilter(long unitId, Map<FilterType, Set<T>> filterTypeMap) {
+        RequiredDataForFilterDTO requiredDataForFilterDTO = new RequiredDataForFilterDTO();
+        if (filterTypeMap.containsKey(REAL_TIME_STATUS) && isCollectionNotEmpty(filterTypeMap.get(REAL_TIME_STATUS)) && filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.SICK.toString())) {
+            requiredDataForFilterDTO.setSickTimeTypeIds(sickConfigurationService.getSickSettingsOfUnit(unitId));
+        }
+        if (filterTypeMap.containsKey(FilterType.FUNCTIONS) && isCollectionNotEmpty(filterTypeMap.get(FUNCTIONS))) {
+            List<Long> functionIds = filterTypeMap.get(FUNCTIONS).stream().map(s -> new Long(s.toString())).collect(Collectors.toList());
+            requiredDataForFilterDTO.setFunctionDates(functionGraphRepository.findAllDateByFunctionIds(unitId, functionIds));
+        }
+        if (filterTypeMap.containsKey(TEAM) && isCollectionNotEmpty(filterTypeMap.get(TEAM))) {
+            List<BigInteger> teamActivityIds = teamGraphRepository.getTeamActivityIdsByTeamIds(filterTypeMap.get(TEAM).stream().map(value -> new Long((String) value)).collect(Collectors.toList()));
+            requiredDataForFilterDTO.setTeamActivityIds(teamActivityIds);
+        }
+        if(filterTypeMap.containsKey(TIME_SLOT) && isCollectionNotEmpty(filterTypeMap.get(TIME_SLOT))) {
+            requiredDataForFilterDTO.setTimeSlotDTOS(timeSlotService.getUnitTimeSlotByNames(unitId,(Set<String>) filterTypeMap.get(TIME_SLOT)));
+        }
+        return requiredDataForFilterDTO;
     }
 }

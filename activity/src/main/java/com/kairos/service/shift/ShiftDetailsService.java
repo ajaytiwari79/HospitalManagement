@@ -11,11 +11,9 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.persistence.repository.todo.TodoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
@@ -49,8 +47,6 @@ public class ShiftDetailsService extends MongoBaseService {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private UserIntegrationService userIntegrationService;
-    @Inject
-    private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @Inject
     private PhaseService phaseService;
     @Inject
@@ -98,7 +94,6 @@ public class ShiftDetailsService extends MongoBaseService {
 
     private void setReasonCodeAndRuleViolationsInShifts(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId, List<BigInteger> shiftIds, boolean showDraft) {
         ReasonCodeWrapper reasonCodeWrapper = findReasonCodes(shiftWithActivityDTOS, unitId);
-        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = findAllShiftViolatedRules(shiftIds, showDraft);
         Map<Long, ReasonCodeDTO> reasonCodeDTOMap = reasonCodeWrapper.getReasonCodes().stream().collect(toMap(ReasonCodeDTO::getId, Function.identity()));
         for (ShiftWithActivityDTO shift : shiftWithActivityDTOS) {
             for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
@@ -107,30 +102,10 @@ public class ShiftDetailsService extends MongoBaseService {
                 }
                 shiftActivityDTO.setLocation(reasonCodeWrapper.getContactAddressData());
             }
-            if (shiftViolatedRulesMap.containsKey(shift.getId())) {
-                shift.setWtaRuleViolations(shiftViolatedRulesMap.get(shift.getId()).getWorkTimeAgreements());
+            if (isNotNull(shift.getShiftViolatedRules())) {
+                shift.setWtaRuleViolations(shift.getShiftViolatedRules().getWorkTimeAgreements());
             }
         }
-    }
-
-    private Map<BigInteger, ShiftViolatedRules> findAllShiftViolatedRules(List<BigInteger> shiftIds, boolean showDraft) {
-        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = new HashMap<>();
-        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds);
-        Map<BigInteger, ShiftViolatedRules> draftShiftViolatedRules = shiftViolatedRules.stream().filter(ShiftViolatedRules::isDraft).collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
-        Map<BigInteger, ShiftViolatedRules> originalShiftViolatedRules = shiftViolatedRules.stream().filter(shiftViolatedRule -> !shiftViolatedRule.isDraft()).collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
-        if (showDraft) {
-            for (BigInteger shiftId : originalShiftViolatedRules.keySet()) {
-                if (draftShiftViolatedRules.containsKey(shiftId)) {
-                    shiftViolatedRulesMap.put(shiftId, draftShiftViolatedRules.get(shiftId));
-                } else {
-                    shiftViolatedRulesMap.put(shiftId, originalShiftViolatedRules.get(shiftId));
-                }
-            }
-        } else {
-            shiftViolatedRulesMap = originalShiftViolatedRules;
-        }
-        return shiftViolatedRulesMap;
-
     }
 
     private ReasonCodeWrapper findReasonCodes(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId) {
@@ -142,12 +117,12 @@ public class ShiftDetailsService extends MongoBaseService {
 
     public void setLayerInShifts(Map<LocalDate, List<ShiftDTO>> shiftsMap) {
         Set<BigInteger> activityIds = getAllActivityIds(shiftsMap);
-        List<ActivityWrapper> activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
-        Map<BigInteger, ActivityWrapper> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+        List<Activity> activityWrappers = activityMongoRepository.findActivitiesSickSettingByActivityIds(activityIds);
+        Map<BigInteger, Activity> activityMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         shiftsMap.forEach((date, shifts) -> {
             ShiftDTO sickShift = shifts.stream().filter(k -> k.getShiftType().equals(SICK)).findAny().orElse(null);
             if (sickShift != null) {
-                Activity activity = getWorkingSickActivity(sickShift, activityWrapperMap);
+                Activity activity = getWorkingSickActivity(sickShift, activityMap);
                 if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfPublishedShift()) {
                     shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> act.getStatus().contains(ShiftStatus.PUBLISH) && k.isDisabled())).collect(Collectors.toList()));
                 }
@@ -168,11 +143,11 @@ public class ShiftDetailsService extends MongoBaseService {
         return activityIds;
     }
 
-    public Activity getWorkingSickActivity(ShiftDTO shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+    public Activity getWorkingSickActivity(ShiftDTO shift, Map<BigInteger, Activity> activityWrapperMap) {
         Activity activity = null;
         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
-            if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isSicknessSettingValid()) {
-                return activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
+            if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivityRulesSettings().isSicknessSettingValid()) {
+                return activityWrapperMap.get(shiftActivity.getActivityId());
             }
         }
         return activity;

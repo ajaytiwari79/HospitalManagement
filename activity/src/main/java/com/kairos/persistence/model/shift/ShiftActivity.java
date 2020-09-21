@@ -62,6 +62,8 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
     private transient BigInteger plannedTimeId;
     private boolean breakInterrupt;
     private TimeTypeEnum secondLevelTimeType;
+    private BigInteger timeTypeId;
+    private String methodForCalculatingTime;
 
 
     @IgnoreLogging

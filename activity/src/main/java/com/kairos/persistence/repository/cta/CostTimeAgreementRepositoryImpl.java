@@ -145,6 +145,19 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     }
 
     @Override
+    public List<CTAResponseDTO> getEmploymentIdsByAccountTypes(Set<Long> employmentIds,Set<String> accountTypes) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds)),
+                lookup("tag", "tags", "_id", "tags"),
+                lookup(C_TA_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES),
+                match(Criteria.where("plannedTimeWithFactor.accountType").in(accountTypes)),
+                project("EMPLOYMENT_ID")
+        );
+        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
     public CTAResponseDTO getCTAByEmploymentIdAndDate(Long employmentId, Date date) {
         Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId)
                 .orOperator(Criteria.where(START_DATE).lte(date).and(END_DATE).gte(date),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(date));

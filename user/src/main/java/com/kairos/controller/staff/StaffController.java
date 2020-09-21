@@ -660,9 +660,9 @@ public class StaffController {
 
     @PostMapping(value = "/get_all_planning_staff")
     @ApiOperation("Get all staff eligible for planning")
-    public ResponseEntity<Map<String, Object>> getStaffEligibleForPlanning(@PathVariable Long unitId, @RequestBody StaffFilterDTO staffFilterDetails) {
+    public ResponseEntity<Map<String, Object>> getStaffEligibleForPlanning(@PathVariable Long unitId, @RequestBody StaffFilterDTO staffFilterDetails,@RequestParam boolean showAllStaffs) {
         Long loggedInUserId = UserContext.getUserDetails().getId();
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getAllStaffForUnitWithEmploymentStatus(loggedInUserId, unitId, staffFilterDetails));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getAllStaffForUnitWithEmploymentStatus(loggedInUserId, unitId, staffFilterDetails,showAllStaffs));
     }
 
     @GetMapping(value = "/end_position_process")

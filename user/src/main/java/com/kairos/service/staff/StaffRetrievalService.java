@@ -19,6 +19,8 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
+import com.kairos.dto.user.filter.FilteredStaffsAndRequiredDataFilterDTO;
+import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.StaffWithSkillDTO;
@@ -92,6 +94,7 @@ import com.kairos.service.organization.GroupService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FormatUtil;
+import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.json.JSONArray;
@@ -852,7 +855,7 @@ public class StaffRetrievalService {
                 .build();
     }
 
-    public <T> List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(final Long loggedInUserId, long unitId, StaffFilterDTO staffFilterDetails) {
+    public <T> FilteredStaffsAndRequiredDataFilterDTO getAllStaffForUnitWithEmploymentStatus(final Long loggedInUserId, long unitId, StaffFilterDTO staffFilterDetails,boolean showAllStaffs) {
 
         LOGGER.info("filters received are {} ", staffFilterDetails.getFiltersData());
         LocalDate dateToday = LocalDate.now();
@@ -861,29 +864,37 @@ public class StaffRetrievalService {
         if (Optional.ofNullable(filterTypeSetMap.get(FilterType.GROUPS)).isPresent() && filterTypeSetMap.get(FilterType.GROUPS).size() != 0) {
             updateFilterTypeCriteriaListByGroups(unitId, filterTypeSetMap);
         }
-
-        List<StaffEmploymentWithTag> staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday, staffFilterDetails.getSearchText(), loggedInUserId,envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
-        int i = -1;
-        StaffEmploymentWithTag matchedStaff = null;
-        for (StaffEmploymentWithTag staffDetails : staffEmploymentWithTags) {
-            i++;
-            if (loggedInUserId.equals(staffDetails.getUserId())) {
-                matchedStaff = staffDetails;
-                break;
-            }
-        }
-
-        if (matchedStaff != null && i != 0) {
-            staffEmploymentWithTags.remove(i);
-            staffEmploymentWithTags.add(0, matchedStaff);
-        } else if (matchedStaff == null) {
-            matchedStaff = staffGraphRepository.getLoggedInStaffDetails(unitId, loggedInUserId,envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
+        List<StaffEmploymentWithTag> staffEmploymentWithTags = null;
+        if(!showAllStaffs){
+            StaffEmploymentWithTag matchedStaff = staffGraphRepository.getLoggedInStaffDetails(unitId, loggedInUserId, envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
             if (matchedStaff != null) {
+                staffEmploymentWithTags = new ArrayList<>();
+                staffEmploymentWithTags.add(matchedStaff);
+            }
+        }else {
+            staffEmploymentWithTags = staffGraphRepositoryImpl.getStaffWithFilterCriteria(filterTypeSetMap, unitId, dateToday, staffFilterDetails.getSearchText(), loggedInUserId, envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
+            int i = -1;
+            StaffEmploymentWithTag matchedStaff = null;
+            for (StaffEmploymentWithTag staffDetails : staffEmploymentWithTags) {
+                i++;
+                if (loggedInUserId.equals(staffDetails.getUserId())) {
+                    matchedStaff = staffDetails;
+                    break;
+                }
+            }
+
+            if (matchedStaff != null && i != 0) {
+                staffEmploymentWithTags.remove(i);
                 staffEmploymentWithTags.add(0, matchedStaff);
+            } else if (matchedStaff == null) {
+                matchedStaff = staffGraphRepository.getLoggedInStaffDetails(unitId, loggedInUserId, envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
+                if (matchedStaff != null) {
+                    staffEmploymentWithTags.add(0, matchedStaff);
+                }
             }
         }
-
-        return staffEmploymentWithTags;
+        RequiredDataForFilterDTO requiredDataForFilterDTO = staffFilterService.getRequiredDataForFilter(unitId,filterTypeSetMap);
+        return new FilteredStaffsAndRequiredDataFilterDTO(ObjectMapperUtils.copyCollectionPropertiesByMapper(staffEmploymentWithTags, StaffShiftDetailsDTO.class),requiredDataForFilterDTO);
     }
 
     private <T>  Map<FilterType,T> updateFilterTypeCriteriaListByGroups(final Long unitId,final  Map<FilterType,T> filterTypeSetMap){

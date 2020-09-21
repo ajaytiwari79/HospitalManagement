@@ -16,7 +16,7 @@ import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftState;
-import com.kairos.persistence.model.shift.ShiftViolatedRules;
+import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -198,14 +198,7 @@ public class ShiftFilterService {
         return employmentIdAndEmploymentSubTypeIdMap;
     }
 
-    private <T> List<BigInteger> getBigInteger(Collection<T> objects) {
-        List<BigInteger> ids = new ArrayList<>();
-        for (T object : objects) {
-            String id = (object instanceof String) ? (String) object : ""+object;
-            ids.add(new BigInteger(id));
-        }
-        return ids;
-    }
+
 
     private <G> ShiftFilter getPlannedByFilter(Long unitId,Map<FilterType, Set<G>> filterTypeMap) {
         Set<Long> staffUserIds = new HashSet<>();
