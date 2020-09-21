@@ -16,6 +16,7 @@ public class SystemLanguageDTO {
     private boolean active;
     private boolean defaultLanguage;
     private boolean selected;
+    private Long countryId;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
     private Map<String, TranslationInfo> translations;

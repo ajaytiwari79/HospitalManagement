@@ -22,10 +22,21 @@ public interface MunicipalityGraphRepository extends Neo4jBaseRepository<Municip
 
     List<Municipality> findAll();
 
-    @Query("MATCH (m:Municipality {isEnable:true})-[:PROVINCE]-(p:Province) WHERE id(p) = {0}  RETURN {name:m.name, code:m.code, geoFence:m.geoFence, latitude:m.latitude, longitude:m.longitude,id: id(m)} as result ")
+    @Query("MATCH (m:Municipality {isEnable:true})-[:PROVINCE]-(p:Province) WHERE id(p) = {0}  RETURN " +
+            "{" +
+            "translations :{english :{name: CASE WHEN m.`translatedNames.english` IS NULL THEN '' ELSE m.`translatedNames.english` END, description : CASE WHEN m.`translatedDescriptions.english` IS NULL THEN '' ELSE m.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN m.`translatedNames.hindi` IS NULL THEN '' ELSE m.`translatedNames.hindi` END, description : CASE WHEN m.`translatedDescriptions.hindi` IS NULL THEN '' ELSE m.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN m.`translatedNames.danish` IS NULL THEN '' ELSE m.`translatedNames.danish` END, description : CASE WHEN m.`translatedDescriptions.danish` IS NULL THEN '' ELSE m.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN m.`translatedNames.britishenglish` IS NULL THEN '' ELSE m.`translatedNames.britishenglish` END, description : CASE WHEN m.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE m.`translatedDescriptions.britishenglish` END}},\n" +
+            "name:m.name, code:m.code, geoFence:m.geoFence, latitude:m.latitude, longitude:m.longitude,id: id(m)} as result ")
     List<Map<String, Object>> getAllMunicipalitiesOfProvince(Long provinceId);
 
-    @Query("MATCH (m:Municipality {isEnable:true})-[:MUNICIPALITY]-(zc:ZipCode  {isEnable:true}) WHERE id(m) = {0} RETURN {name:zc.name, zipCode:zc.zipCode, geoFence:zc.geoFence,id: id(zc)} as result ")
+    @Query("MATCH (m:Municipality {isEnable:true})-[:MUNICIPALITY]-(zc:ZipCode  {isEnable:true}) WHERE id(m) = {0} RETURN {" +
+            "translations :{english :{name: CASE WHEN zc.`translatedNames.english` IS NULL THEN '' ELSE zc.`translatedNames.english` END, description : CASE WHEN zc.`translatedDescriptions.english` IS NULL THEN '' ELSE zc.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN zc.`translatedNames.hindi` IS NULL THEN '' ELSE zc.`translatedNames.hindi` END, description : CASE WHEN zc.`translatedDescriptions.hindi` IS NULL THEN '' ELSE zc.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN zc.`translatedNames.danish` IS NULL THEN '' ELSE zc.`translatedNames.danish` END, description : CASE WHEN zc.`translatedDescriptions.danish` IS NULL THEN '' ELSE zc.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN zc.`translatedNames.britishenglish` IS NULL THEN '' ELSE zc.`translatedNames.britishenglish` END, description : CASE WHEN zc.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE zc.`translatedDescriptions.britishenglish` END}},\n" +
+            "name:zc.name, zipCode:zc.zipCode, geoFence:zc.geoFence,id: id(zc)} as result ")
     List<Map<String, Object>> getAllZipCodes(Long municipalityId);
 
     /**

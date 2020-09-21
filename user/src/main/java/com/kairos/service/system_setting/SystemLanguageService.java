@@ -183,7 +183,11 @@ public class SystemLanguageService {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId), SystemLanguageDTO.class);
+        List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId), SystemLanguageDTO.class);
+        systemLanguageDTOS.forEach(systemLanguageDTO -> {
+            systemLanguageDTO.setCountryId(countryId);
+        });
+        return systemLanguageDTOS;
     }
 
     public List<SystemLanguageDTO> getSystemLanguageAndCountryMapping(Long countryId) {
