@@ -90,7 +90,7 @@ public class CalculatePlannedHoursAndScheduledHours {
         boolean ruleTemplateValid = false;
         for (CTARuleTemplateDTO ruleTemplate : staffAdditionalInfoDTO.getEmployment().getCtaRuleTemplates()) {
             for (ShiftWithActivityDTO shift : shifts) {
-                if (CalculationFor.CONDITIONAL_BONUS.equals(ruleTemplate.getCalculationFor()) && (isTimeSlotChanged(shift) || isNull(shift.getId()))) {
+                if (shift.getStatuses().contains(ShiftStatus.PUBLISH) && CalculationFor.CONDITIONAL_BONUS.equals(ruleTemplate.getCalculationFor()) && (isTimeSlotChanged(shift) || isNull(shift.getId()))) {
                     calculateConditionalBonus(ruleTemplate,staffAdditionalInfoDTO.getEmployment(),shift, TIMEBANK_ACCOUNT);
                 }else {
                     ruleTemplateValid = calculateBonusOrScheduledMinutesByShiftActivity(ruleTemplateValid, ruleTemplate, shift);
