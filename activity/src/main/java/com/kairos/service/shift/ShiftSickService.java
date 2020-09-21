@@ -164,8 +164,8 @@ public class ShiftSickService extends MongoBaseService {
         }
         Map<LocalDate,List<Shift>> shiftMap = shifts.stream().collect(Collectors.groupingBy(shift->asLocalDate(shift.getStartDate())));
         Set<BigInteger> allActivityIds=getAllActivityIds(shiftMap);
-        List<ActivityWrapper> activityWrappers=activityRepository.findActivitiesAndTimeTypeByActivityId(allActivityIds);
-        Map<BigInteger, ActivityWrapper> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+        List<Activity> activityWrappers=activityRepository.findActivitiesSickSettingByActivityIds(allActivityIds);
+        Map<BigInteger, Activity> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         BigInteger activityId = shiftDetailsService.getWorkingSickActivity(ObjectMapperUtils.copyPropertiesByMapper(shifts.get(0),ShiftDTO.class),activityWrapperMap).getId();
         Optional<Activity> activityOptional = sicknessActivity.stream().filter(activity -> activity.getId().equals(activityId)).findFirst();
         if(activityOptional.isPresent()){
@@ -182,7 +182,7 @@ public class ShiftSickService extends MongoBaseService {
     }
 
 
-    private void updateSickShift(Activity activity, Map<LocalDate,List<Shift>> shiftMap,Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+    private void updateSickShift(Activity activity, Map<LocalDate,List<Shift>> shiftMap,Map<BigInteger, Activity> activityWrapperMap) {
         List<Shift> allShiftsToDelete=new ArrayList<>();
         List<Shift> allShiftsToUpdate=new ArrayList<>();
         AtomicBoolean autoAbsence=new AtomicBoolean(true);
@@ -214,7 +214,7 @@ public class ShiftSickService extends MongoBaseService {
                     default:
                         break;
                 }
-                autoAbsence.getAndSet(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getActivity().getActivityRulesSettings().isAllowedAutoAbsence());
+                autoAbsence.getAndSet(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getActivityRulesSettings().isAllowedAutoAbsence());
                 allShiftsToDelete.addAll(shifts);
             }
 

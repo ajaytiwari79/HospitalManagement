@@ -187,8 +187,8 @@ public class ShiftController {
 
     @ApiOperation("update shift by detail view")
     @PutMapping("/shift/update_shift_by_details_view")
-    public ResponseEntity<Map<String, Object>> updateShiftByDetailsView(@PathVariable Long unitId, @RequestBody ShiftDTO shiftDTO, @RequestParam Boolean updatedByStaff) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShiftByTandA(unitId, shiftDTO, updatedByStaff));
+    public ResponseEntity<Map<String, Object>> updateShiftByDetailsView(@PathVariable Long unitId, @RequestBody ShiftDTO shiftDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShiftByTandA(unitId, shiftDTO));
     }
 
 
@@ -226,8 +226,10 @@ public class ShiftController {
     public ResponseEntity<Map<String, Object>> getAllShiftAndStates(@PathVariable Long unitId,
                                                                     @RequestParam(value = "employmentId", required = false) Long employmentId,
                                                                     @RequestParam(value = "startDate")
-                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate", required = false)
-                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam(value = "viewType", required = false) ViewType viewType,
+                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                                    @RequestParam(value = "endDate", required = false)
+                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                                                                    @RequestParam(value = "viewType", required = false) ViewType viewType,
                                                                     @RequestParam(value = "staffId", required = false) Long staffId,
                                                                     @RequestParam(value = "expertiseId", required = false) Long expertiseId,
                                                                     @RequestParam(value = "shiftFilterParam") ShiftFilterParam shiftFilterParam,@RequestBody(required = false) StaffFilterDTO staffFilterDTO) {
@@ -239,15 +241,6 @@ public class ShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updatePlanningPeriodInShifts() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updatePlanningPeriodInShifts());
-    }
-
-
-    //TODO We need to remove this API After closing sprint 44
-    @ApiOperation("delete Duplicate Entry Of ShiftViolatedInfo")
-    @DeleteMapping(value = "/delete_duplicate_entry_of_shift_violated_info")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteDuplicateEntryOfShiftViolatedInfo() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftValidatorService.deleteDuplicateEntryOfShiftViolatedInfo());
     }
 
     @ApiOperation("save draft shift after publish")
