@@ -749,8 +749,7 @@ public class ShiftService extends MongoBaseService {
             }
         }
 
-        Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
-        return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
+        return shifts;
     }
 
     private void updateReasonCodeAndNameInActivitiesAndUpdateSicknessDetails(Map<Long, ReasonCodeDTO> reasonCodeMap, List<ShiftDTO> shifts) {
