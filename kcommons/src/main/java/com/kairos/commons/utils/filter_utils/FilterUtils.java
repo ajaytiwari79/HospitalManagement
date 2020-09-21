@@ -4,6 +4,7 @@ import com.kairos.dto.activity.shift.ShiftSearchDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.enums.FilterType;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,8 +17,18 @@ public class FilterUtils {
 
     }
 
-    public static <T> Map<FilterType, Set<T>> filterOutEmptyQueriesAndPrepareMap(ShiftSearchDTO shiftSearchDTO) {
-        return shiftSearchDTO.getFiltersData().stream().filter(e -> isCollectionNotEmpty(e.getValue())).collect(Collectors.toMap(FilterSelectionDTO::getName, FilterSelectionDTO::getValue));
+    public static <T> Object[] filterOutEmptyQueriesAndPrepareMap(ShiftSearchDTO shiftSearchDTO) {
+        Map<FilterType,Set<T>> filterTypeSetMap = new HashMap<>();
+        boolean existsShiftFilter = false;
+        for (FilterSelectionDTO filtersDatum : shiftSearchDTO.getFiltersData()) {
+            if(isCollectionNotEmpty(filtersDatum.getValue())){
+                filterTypeSetMap.put(filtersDatum.getName(),filtersDatum.getValue());
+            }
+            if(!existsShiftFilter && FilterType.MatchType.SHIFT.equals(filtersDatum.getName().getMatchType())){
+                existsShiftFilter = true;
+            }
+        }
+        return new Object[]{filterTypeSetMap,existsShiftFilter};
     }
 
 

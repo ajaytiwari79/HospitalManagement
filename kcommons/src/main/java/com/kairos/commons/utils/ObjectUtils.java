@@ -141,4 +141,12 @@ public class ObjectUtils {
         return objects.toArray();
     }
 
+    public static <T> List<BigInteger> getBigInteger(Collection<T> objects) {
+        List<BigInteger> ids = new ArrayList<>();
+        for (T object : objects) {
+            String id = (object instanceof String) ? (String) object : ""+object;
+            ids.add(new BigInteger(id));
+        }
+        return ids;
+    }
 }

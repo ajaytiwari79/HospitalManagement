@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivityLineInterval;
+import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
@@ -18,10 +19,12 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.addMinutes;
+import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.shift.ShiftType.SICK;
 
@@ -36,8 +39,8 @@ public class Shift extends MongoBaseEntity {
 
     protected Date startDate;
     protected Date endDate;
-    protected Integer shiftStartTime;
-    protected Integer shiftEndTime;
+    protected Integer shiftStartTime;//In Second
+    protected Integer shiftEndTime;//In Second
     protected boolean disabled = false;
     @NotNull(message = "error.ShiftDTO.staffId.notnull")
     protected Long staffId;
@@ -279,7 +282,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     private Integer timeInSeconds(Date date) {
-        return ((date.getHours() * 60 * 60) + (date.getMinutes() * 60));
+        return asZonedDateTime(date).get(ChronoField.SECOND_OF_DAY);
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -30,8 +29,6 @@ public class ShiftDetailsServiceUnitTest {
     private ShiftMongoRepository shiftMongoRepository;
     @Mock
     private UserIntegrationService userIntegrationService;
-    @Mock
-    private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @InjectMocks
     ShiftDetailsService shiftDetailsService;
 

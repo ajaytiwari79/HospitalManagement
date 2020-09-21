@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.shift.ShiftStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -120,6 +121,11 @@ public class ShiftWithActivityDTO extends ShiftDTO{
     @JsonIgnore
     public DateTimeInterval getDateTimeInterval() {
         return new DateTimeInterval(startDate.getTime(), endDate.getTime());
+    }
+
+    @JsonIgnore
+    public Set<ShiftStatus> getStatuses() {
+        return activities.stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getStatus().stream()).collect(Collectors.toSet());
     }
 
     @JsonIgnore

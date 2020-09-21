@@ -33,6 +33,8 @@ import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
+import com.kairos.dto.user.filter.FilteredStaffsAndRequiredDataFilterDTO;
+import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
 import com.kairos.dto.user.organization.skill.Skill;
@@ -48,6 +50,7 @@ import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.FilterType;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.kpermissions.PermissionAction;
@@ -57,7 +60,7 @@ import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.wrapper.shift.StaffShiftDetails;
+import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -948,10 +951,10 @@ public class UserIntegrationService {
        return genericRestClient.publishRequest(objects, null, RestClientUrlType.UNIT, HttpMethod.POST, "/fetch_permissions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<FieldPermissionUserData>>() {
         });
     }
-    public List<StaffShiftDetails> getAllPlanningStaffForUnit(Long unitId, ShiftSearchDTO shiftSearchDTO){
+    public FilteredStaffsAndRequiredDataFilterDTO getAllPlanningStaffForUnit(Long unitId, ShiftSearchDTO shiftSearchDTO, boolean showAllStaffs){
         LOGGER.debug("filter selections being sent {}",shiftSearchDTO);
-        return genericRestClient.publishRequest(shiftSearchDTO, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/staff/get_all_planning_staff", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffShiftDetails>>>() {
-        });
+        List<NameValuePair> queryParamList = newArrayList(new BasicNameValuePair("showAllStaffs", ""+showAllStaffs));
+        return genericRestClient.publishRequest(shiftSearchDTO, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/staff/get_all_planning_staff", queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<FilteredStaffsAndRequiredDataFilterDTO>>() {});
     }
 
     public void createPermissionModels(List<Map<String, Object>> permissionSchema){
@@ -975,6 +978,10 @@ public class UserIntegrationService {
         permissionActions.put("modelName",modelName);
         permissionActions.put("action",action);
         return genericRestClient.publishRequest(permissionActions, null, RestClientUrlType.ORGANIZATION,HttpMethod.PUT, "/validate_action_permission", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
+    }
+
+    public <T> RequiredDataForFilterDTO getRequiredDataForFilter(Long unitId, Map<FilterType, Set<T>> filterTypeMap) {
+        return genericRestClient.publishRequest(filterTypeMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_required_data_for_filter", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<RequiredDataForFilterDTO>>() {});
     }
 }
 

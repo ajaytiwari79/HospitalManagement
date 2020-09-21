@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.custom_repository;
 import com.kairos.commons.audit_logging.AuditLogging;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.common.UserInfo;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.common.MongoSequence;
@@ -148,11 +149,11 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 			if(entity.getClass().equals(FibonacciKPI.class)){
 				className = KPI.class.getSimpleName();
 			}
-			entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+			entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName(),UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
 			entity.setCreatedAt(DateUtils.getDate());
 			entity.setId(nextSequence(className));
 		}else {
-			entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+			entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName(),UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
 		}
 		/**
 		 *  Set updatedAt time as current time

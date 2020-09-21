@@ -1,15 +1,11 @@
-package com.kairos.persistence.model.shift;
+package com.kairos.dto.activity.shift;
 
 import com.kairos.commons.utils.ObjectUtils;
-import com.kairos.dto.activity.shift.ActivityRuleViolation;
-import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftEscalationReason;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.HashSet;
@@ -23,11 +19,10 @@ import java.util.stream.Collectors;
  * @author pradeep
  * @date - 30/8/18
  */
-@Document
 @Getter
 @Setter
 @NoArgsConstructor
-public class ShiftViolatedRules extends MongoBaseEntity {
+public class ShiftViolatedRules{
 
     //TODO We need proper discussion it should be per phase
     private BigInteger shiftId;

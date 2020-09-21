@@ -21,7 +21,6 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.counter.KPIService;
 import com.kairos.service.exception.ExceptionService;
@@ -67,8 +66,6 @@ public class ShiftBreakService implements KPIService {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private PhaseService phaseService;
-    @Inject
-    private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @Inject private KPIBuilderCalculationService kpiBuilderCalculationService;
     @Inject private TimeBankService timeBankService;
 
