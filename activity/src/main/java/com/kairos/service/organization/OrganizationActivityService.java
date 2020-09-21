@@ -833,4 +833,14 @@ public class OrganizationActivityService extends MongoBaseService {
         showOnCallAndStandByActivityIds.put("showOnCall", showOnCall ? activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId, false, showOnCall) : newHashSet());
         return showOnCallAndStandByActivityIds;
     }
+
+    public Map<String, TranslationInfo> updateUnitActivityCategoryTranslationDetails(BigInteger activityCategoryId,Map<String, TranslationInfo> activityCategoryTranslationMap){
+        ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(activityCategoryId);
+        if(isNull(activityCategory)) {
+            exceptionService.dataNotFoundException(MESSAGE_DATA_NOTFOUND);
+        }
+        activityCategory.setTranslations(activityCategoryTranslationMap);
+        activityCategoryRepository.save(activityCategory);
+        return activityCategory.getTranslations();
+    }
 }

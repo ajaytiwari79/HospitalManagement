@@ -83,5 +83,12 @@ public class SystemLanguageController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.updateTranslation(id,translations));
     }
 
+    @PutMapping(value = COUNTRY_URL+ "/system_language/{id}/language_settings")
+    @ApiOperation("update translation data")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfSystemLanguageOnCountryLevel(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.updateTranslation(id,translations));
+    }
+
 
 }
