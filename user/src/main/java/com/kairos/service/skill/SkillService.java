@@ -173,60 +173,25 @@ public class SkillService {
     public HashMap<String, Object> getAllAvailableSkills(long id) {
 
         HashMap<String, Object> response = new HashMap<>();
+
         Organization parent = organizationService.fetchParentOrganization(id);
-        List<SelectedSkillQueryResults> skillData = new ArrayList<>();
-        Map<String,Object> availableSkills = new HashMap<>();
-        Map<String,Object> selectedSkills = new HashMap<>();
+        List<Map<String, Object>> organizationSkills;
         if(parent.getId().equals(id)){
-            skillData=unitGraphRepository.getSkillsForParentOrganization(parent.getId(), id);
+            organizationSkills=unitGraphRepository.getSkillsForParentOrganization(parent.getId(), id);
         }else {
-            skillData =unitGraphRepository.getSkillsOfChildUnit(parent.getId(), id);
+            organizationSkills=unitGraphRepository.getSkillsOfChildUnit(parent.getId(), id);
         }
-        getSelectedSkillQueryResults(id, skillData);
-        availableSkills.put("availableSkills",newArrayList(skillData.get(0)));
-        selectedSkills.put("selectedSkills",newArrayList(skillData.get(1)));
-        List<Map<String, Object>> orgSkillRel = newArrayList(availableSkills,selectedSkills);
+        List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
+        for (Map<String, Object> map : organizationSkills) {
+            orgSkillRel.add((Map<String, Object>) map.get("data"));
+        }
+
         response.put("orgData", orgSkillRel);
         response.put("skillLevels", SkillLevel.values());
         response.put("teamList", teamService.getAllTeamsInOrganization(id));
 
         return response;
 
-    }
-
-    private void getSelectedSkillQueryResults(long id, List<SelectedSkillQueryResults> skillData) {
-        skillData.forEach(selectedSkillQueryResults -> {
-            List<Map<String,Object>> data =new ArrayList<>();
-            selectedSkillQueryResults.setUnitId(id);
-            selectedSkillQueryResults.setTranslations(TranslationUtil.getTranslatedData(selectedSkillQueryResults.getTranslatedNames(),selectedSkillQueryResults.getTranslatedDescriptions()));
-            for(Map<String,Object> map :selectedSkillQueryResults.getChildren()) {
-                Map<String,Object> result = ObjectMapperUtils.copyPropertiesByMapper(map,Map.class);
-                Map<String,String> translatedNamesMap = null;
-                Map<String,String> translatedDescriptionsMap = null;
-                Map<String, TranslationInfo> translations =null;
-                translations = getTranslationInfoMap(result, translatedNamesMap, translatedDescriptionsMap, translations);
-                if(isNotNull(translations)) {
-                    result.put("translations",translations );
-                }
-                data.add(result);
-            }
-            selectedSkillQueryResults.setChildren(data);
-        });
-    }
-
-    private Map<String, TranslationInfo> getTranslationInfoMap(Map<String, Object> result, Map<String, String> translatedNamesMap, Map<String, String> translatedDescriptionsMap, Map<String, TranslationInfo> translations) {
-        for (Map.Entry<String, Object> entry : result.entrySet()){
-            if(entry.getKey().equals("translatedNames")){
-                translatedNamesMap =(Map<String,String>)entry.getValue();
-            }
-            if(entry.getKey().equals("translatedDescriptions")){
-                translatedDescriptionsMap =(Map<String,String>)entry.getValue();
-            }
-            if(isNotNull(translatedNamesMap) && isNotNull(translatedDescriptionsMap)) {
-               translations = TranslationUtil.getTranslatedData(translatedNamesMap, translatedDescriptionsMap);
-            }
-        }
-        return translations;
     }
 
 
