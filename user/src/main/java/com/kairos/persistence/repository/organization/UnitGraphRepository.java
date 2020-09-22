@@ -239,7 +239,18 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     OrganizationCreationData getOrganizationCreationData(long countryId);
 
     @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org " +
-            "MATCH path=(org)-[:"+HAS_UNIT+"]->(child:Unit{isEnable:true,boardingCompleted:true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data")
+            "MATCH path=(org)-[:"+HAS_UNIT+"]->(child:Unit{isEnable:true,boardingCompleted:true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {" +
+            "parent:{" +
+            "translations:{english :{name: CASE WHEN ps.p.`translatedNames.english` IS NULL THEN '' ELSE ps.p.`translatedNames.english` END, description : CASE WHEN ps.p.`translatedDescriptions.english` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN ps.p.`translatedNames.hindi` IS NULL THEN '' ELSE ps.p.`translatedNames.hindi` END, description : CASE WHEN ps.p.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN ps.p.`translatedNames.danish` IS NULL THEN '' ELSE ps.p.`translatedNames.danish` END, description : CASE WHEN ps.p.`translatedDescriptions.danish` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN ps.p.`translatedNames.britishenglish` IS NULL THEN '' ELSE ps.p.`translatedNames.britishenglish` END, description : CASE WHEN ps.p.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.britishenglish` END}}, \n" +
+            "name:ps.p.name,id:id(ps.p)},child:{" +
+            "translations:{english :{name: CASE WHEN ps.c.`translatedNames.english` IS NULL THEN '' ELSE ps.c.`translatedNames.english` END, description : CASE WHEN ps.c.`translatedDescriptions.english` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN ps.c.`translatedNames.hindi` IS NULL THEN '' ELSE ps.c.`translatedNames.hindi` END, description : CASE WHEN ps.c.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN ps.c.`translatedNames.danish` IS NULL THEN '' ELSE ps.c.`translatedNames.danish` END, description : CASE WHEN ps.c.`translatedDescriptions.danish` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN ps.c.`translatedNames.britishenglish` IS NULL THEN '' ELSE ps.c.`translatedNames.britishenglish` END, description : CASE WHEN ps.c.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.britishenglish` END}},\n" +
+            "name:ps.c.name,id:id(ps.c)}} as data")
     List<Map<String, Object>> getSubOrgHierarchy(long organizationId);
 
     @Query("MATCH (c:Client{healthStatus:'ALIVE'})-[r:GET_SERVICE_FROM]-(o:Unit) WHERE id(o)= {0}  WITH c,r\n" +

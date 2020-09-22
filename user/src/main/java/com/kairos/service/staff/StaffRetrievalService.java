@@ -7,6 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
@@ -65,10 +66,7 @@ import com.kairos.persistence.model.user.expertise.response.ExpertiseQueryResult
 import com.kairos.persistence.model.user.filter.FilterSelection;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
-import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
-import com.kairos.persistence.repository.organization.TeamGraphRepository;
-import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.repository_impl.StaffGraphRepositoryImpl;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -181,6 +179,8 @@ public class StaffRetrievalService {
     private StaffAddressService staffAddressService;
     @Inject
     private TeamGraphRepository teamGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject private ActivityIntegrationService activityIntegrationService;
     @Inject private StaffGraphRepositoryImpl staffGraphRepositoryImpl;
     @Inject private GroupService groupService;
@@ -1025,5 +1025,28 @@ public class StaffRetrievalService {
         }
         LOGGER.info(" custom query map prepared is {}",customQueryMap);
         return  customQueryMap;
+    }
+
+    public Map<String, TranslationInfo> updateStaffOrganizationTranslatedData(Long unitId,Map<String,TranslationInfo> translations){
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
+        if(organizationBaseEntity instanceof Organization){
+            Organization organization = organizationGraphRepository.findOne(organizationBaseEntity.getId());
+            organization.setTranslatedNames(translatedNames);
+            organization.setTranslatedDescriptions(translatedDescriptios);
+            organizationGraphRepository.save(organization);
+            return organization.getTranslatedData();
+        }else {
+            Unit unit = unitGraphRepository.findOne(organizationBaseEntity.getId());
+            unit.setTranslatedNames(translatedNames);
+            unit.setTranslatedDescriptions(translatedDescriptios);
+            unitGraphRepository.save(unit);
+            return unit.getTranslatedData();
+        }
     }
 }

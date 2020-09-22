@@ -279,7 +279,8 @@ public class SkillService {
         Map<Long,Skill>  skillMap=skills.stream().collect(Collectors.toMap(UserBaseEntity::getId, Function.identity()));
         for(Long skillId:selectedSkillId){
             Set<SkillLevelQueryResult> skillLevelQueryResult=userSkillLevelRelationshipGraphRepository.getSkillLevel(staffId,skillId);
-            list.add(new SkillQueryResult(skillId,skillLevelQueryResult,skillMap.get(skillId).getName(),skillMap.get(skillId).getSkillCategory().getName()));
+            Map<String,TranslationInfo> translationInfoMap =TranslationUtil.getTranslatedData(skillMap.get(skillId).getTranslatedNames(),skillMap.get(skillId).getTranslatedDescriptions());
+            list.add(new SkillQueryResult(skillId,skillLevelQueryResult,skillMap.get(skillId).getName(),skillMap.get(skillId).getSkillCategory().getName(),translationInfoMap));
         }
         Map<String, Object> map = new HashMap<>();
         map.put("tableData", list);

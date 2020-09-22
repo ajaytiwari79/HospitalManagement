@@ -3,11 +3,9 @@ package com.kairos.service.staff;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
-import com.kairos.commons.utils.CommonsExceptionUtil;
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.*;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -319,15 +317,18 @@ public class PositionService {
         OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
         List<AccessGroup> accessGroups = accessGroupRepository.getAccessGroups(organization.getId());
         List<Map<String, Object>> units= unitGraphRepository.getSubOrgHierarchy(organization.getId());
+        Map<String, TranslationInfo> unitTranslations = TranslationUtil.getTranslatedData(unit.getTranslatedNames(),unit.getTranslatedDescriptions());
         List<Map<String, Object>> positions;
         List<Map<String, Object>> workPlaces = new ArrayList<>();
         // This is for parent organization i.e if unit is itself parent organization
         if (units.isEmpty() && unit instanceof Organization) {
             positions = new ArrayList<>();
             for (AccessGroup accessGroup : accessGroups) {
+                Map<String, TranslationInfo> translations = TranslationUtil.getTranslatedData(accessGroup.getTranslatedNames(),accessGroup.getTranslatedDescriptions());
                 QueryResult queryResult = new QueryResult();
                 queryResult.setId(unit.getId());
                 queryResult.setName(unit.getName());
+                queryResult.setTranslations(unitTranslations);
                 Map<String, Object> employment = positionGraphRepository.getPositionOfParticularRole(staffId, unit.getId(), accessGroup.getId());
                 if (employment != null && !employment.isEmpty()) {
                     positions.add(employment);
@@ -342,6 +343,7 @@ public class PositionService {
                 workPlace.put("name", accessGroup.getName());
                 workPlace.put("tree", queryResult);
                 workPlace.put("positions", positions);
+                workPlace.put("translations",translations);
                 workPlaces.add(workPlace);
             }
             return workPlaces;
@@ -351,6 +353,7 @@ public class PositionService {
         List<QueryResult> list;
         List<Long> ids;
         for (AccessGroup accessGroup : accessGroups) {
+            Map<String, TranslationInfo> translations = TranslationUtil.getTranslatedData(accessGroup.getTranslatedNames(),accessGroup.getTranslatedDescriptions());
             list = new ArrayList<>();
             ids = new ArrayList<>();
             positions = new ArrayList<>();
@@ -363,6 +366,7 @@ public class PositionService {
                         if (queryResult.getId() == id) {
                             List<QueryResult> childs = queryResult.getChildren();
                             QueryResult child = objectMapper.convertValue(((Map<String, Object>) unitData.get("data")).get(CHILD), QueryResult.class);
+                            child.setTranslations(unitTranslations);
                             position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
                             if (position != null && !position.isEmpty()) {
                                 positions.add(position);
@@ -380,6 +384,7 @@ public class PositionService {
                 } else {
                     List<QueryResult> queryResults = new ArrayList<>();
                     QueryResult child = objectMapper.convertValue(((Map<String, Object>) unitData.get("data")).get(CHILD), QueryResult.class);
+                    child.setTranslations(unitTranslations);
                     position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
                     if (position != null && !position.isEmpty()) {
                         positions.add(position);
@@ -392,6 +397,7 @@ public class PositionService {
                     }
                     queryResults.add(child);
                     QueryResult queryResult = new QueryResult((String) parentUnit.get("name"), id, queryResults);
+                    queryResult.setTranslations(TranslationUtil.getTranslatedData(organization.getTranslatedNames(),organization.getTranslatedDescriptions()));
                     position = positionGraphRepository.getPositionOfParticularRole(staffId, queryResult.getId(), accessGroup.getId());
                     if (position != null && !position.isEmpty()) {
                         positions.add(position);
@@ -410,6 +416,7 @@ public class PositionService {
             workPlace.put("name", accessGroup.getName());
             workPlace.put("tree", treeStructureService.getTreeStructure(list));
             workPlace.put("positions", positions);
+            workPlace.put("translations",translations);
             workPlaces.add(workPlace);
         }
         return workPlaces;
