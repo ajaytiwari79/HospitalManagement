@@ -1035,18 +1035,9 @@ public class StaffRetrievalService {
             translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
         }
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
-        if(organizationBaseEntity instanceof Organization){
-            Organization organization = organizationGraphRepository.findOne(organizationBaseEntity.getId());
-            organization.setTranslatedNames(translatedNames);
-            organization.setTranslatedDescriptions(translatedDescriptios);
-            organizationGraphRepository.save(organization);
-            return organization.getTranslatedData();
-        }else {
-            Unit unit = unitGraphRepository.findOne(organizationBaseEntity.getId());
-            unit.setTranslatedNames(translatedNames);
-            unit.setTranslatedDescriptions(translatedDescriptios);
-            unitGraphRepository.save(unit);
-            return unit.getTranslatedData();
-        }
+        organizationBaseEntity.setTranslatedNames(translatedNames);
+        organizationBaseEntity.setTranslatedDescriptions(translatedDescriptios);
+        organizationBaseRepository.save(organizationBaseEntity);
+        return organizationBaseEntity.getTranslatedData();
     }
 }
