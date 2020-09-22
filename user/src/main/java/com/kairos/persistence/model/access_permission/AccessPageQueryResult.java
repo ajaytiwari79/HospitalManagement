@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.access_permission;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.OrganizationCategory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,8 @@ public class AccessPageQueryResult {
     private List<OrganizationCategory> accessibleFor = new ArrayList<>();
     private boolean hasSubTabs;
     private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
+    private Map<String, TranslationInfo> translations;
     private String helperText;
     private String url;
 

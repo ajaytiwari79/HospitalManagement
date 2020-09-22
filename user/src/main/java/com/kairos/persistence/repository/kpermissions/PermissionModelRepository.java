@@ -101,8 +101,18 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
 
 
     @Query(value = "MATCH(accessGroup:AccessGroup)<-[r:"+HAS_ACTION_PERMISSION+"]-(kPermissionAction:KPermissionAction)<-[:"+HAS_ACTION+"]-(kPermissionModel:KPermissionModel) where id(accessGroup)={0}  " +
-            "RETURN id(kPermissionModel) as id,kPermissionModel.modelName as modelName," +
-            "COLLECT({id:id(kPermissionAction),action:kPermissionAction.action,hasPermission:r.hasPermission}) as actions " )
+            "RETURN " +
+            "{english :{name: CASE WHEN kPermissionModel.`translatedNames.english` IS NULL THEN '' ELSE kPermissionModel.`translatedNames.english` END, description : CASE WHEN kPermissionModel.`translatedDescriptions.english` IS NULL THEN '' ELSE kPermissionModel.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN kPermissionModel.`translatedNames.hindi` IS NULL THEN '' ELSE kPermissionModel.`translatedNames.hindi` END, description : CASE WHEN kPermissionModel.`translatedDescriptions.hindi` IS NULL THEN '' ELSE kPermissionModel.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN kPermissionModel.`translatedNames.danish` IS NULL THEN '' ELSE kPermissionModel.`translatedNames.danish` END, description : CASE WHEN kPermissionModel.`translatedDescriptions.danish` IS NULL THEN '' ELSE kPermissionModel.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN kPermissionModel.`translatedNames.britishenglish` IS NULL THEN '' ELSE kPermissionModel.`translatedNames.britishenglish` END, description : CASE WHEN kPermissionModel.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE kPermissionModel.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "id(kPermissionModel) as id,kPermissionModel.modelName as modelName," +
+            "COLLECT({" +
+            "translations:{english :{name: CASE WHEN kPermissionAction.`translatedNames.english` IS NULL THEN '' ELSE kPermissionAction.`translatedNames.english` END, description : CASE WHEN kPermissionAction.`translatedDescriptions.english` IS NULL THEN '' ELSE kPermissionAction.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN kPermissionAction.`translatedNames.hindi` IS NULL THEN '' ELSE kPermissionAction.`translatedNames.hindi` END, description : CASE WHEN kPermissionAction.`translatedDescriptions.hindi` IS NULL THEN '' ELSE kPermissionAction.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN kPermissionAction.`translatedNames.danish` IS NULL THEN '' ELSE kPermissionAction.`translatedNames.danish` END, description : CASE WHEN kPermissionAction.`translatedDescriptions.danish` IS NULL THEN '' ELSE kPermissionAction.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN kPermissionAction.`translatedNames.britishenglish` IS NULL THEN '' ELSE kPermissionAction.`translatedNames.britishenglish` END, description : CASE WHEN kPermissionAction.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE kPermissionAction.`translatedDescriptions.britishenglish` END}} ,\n" +
+            "id:id(kPermissionAction),action:kPermissionAction.action,hasPermission:r.hasPermission}) as actions " )
     List<ModelPermissionQueryResult> getActionPermissions(Long accessGroupId);
 
     @Query(value = "MATCH (accessGroup:AccessGroup) WHERE id(accessGroup) = {0} " +
@@ -110,7 +120,17 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "OPTIONAL MATCH(kPermissionAction)-[rel:"+HAS_ACTION_PERMISSION+"]->(accessGroup) " +
             "OPTIONAL MATCH(staff:Staff)<-[:"+BELONGS_TO+"]-(position:Position)-["+HAS_UNIT_PERMISSIONS+"]->(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit) WHERE ID(staff)={1} AND ID(unit)={2} " +
             "OPTIONAL MATCH(up)-[customRel:"+HAS_CUSTOMIZED_PERMISSION_FOR_ACTION+"]->(kPermissionAction) WHERE customRel.accessGroupId=id(accessGroup) " +
-            "RETURN id(kPermissionModel) as id,kPermissionModel.modelName as modelName," +
-            "COLLECT({id:id(kPermissionAction),action:kPermissionAction.action,hasPermission:CASE WHEN customRel IS NULL THEN  rel.hasPermission ELSE customRel.hasPermission END}) as actions " )
+            "RETURN " +
+            "{english :{name: CASE WHEN kPermissionModel.`translatedNames.english` IS NULL THEN '' ELSE kPermissionModel.`translatedNames.english` END, description : CASE WHEN kPermissionModel.`translatedDescriptions.english` IS NULL THEN '' ELSE kPermissionModel.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN kPermissionModel.`translatedNames.hindi` IS NULL THEN '' ELSE kPermissionModel.`translatedNames.hindi` END, description : CASE WHEN kPermissionModel.`translatedDescriptions.hindi` IS NULL THEN '' ELSE kPermissionModel.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN kPermissionModel.`translatedNames.danish` IS NULL THEN '' ELSE kPermissionModel.`translatedNames.danish` END, description : CASE WHEN kPermissionModel.`translatedDescriptions.danish` IS NULL THEN '' ELSE kPermissionModel.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN kPermissionModel.`translatedNames.britishenglish` IS NULL THEN '' ELSE kPermissionModel.`translatedNames.britishenglish` END, description : CASE WHEN kPermissionModel.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE kPermissionModel.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "id(kPermissionModel) as id,kPermissionModel.modelName as modelName," +
+            "COLLECT({" +
+            "translations:{english :{name: CASE WHEN kPermissionAction.`translatedNames.english` IS NULL THEN '' ELSE kPermissionAction.`translatedNames.english` END, description : CASE WHEN kPermissionAction.`translatedDescriptions.english` IS NULL THEN '' ELSE kPermissionAction.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN kPermissionAction.`translatedNames.hindi` IS NULL THEN '' ELSE kPermissionAction.`translatedNames.hindi` END, description : CASE WHEN kPermissionAction.`translatedDescriptions.hindi` IS NULL THEN '' ELSE kPermissionAction.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN kPermissionAction.`translatedNames.danish` IS NULL THEN '' ELSE kPermissionAction.`translatedNames.danish` END, description : CASE WHEN kPermissionAction.`translatedDescriptions.danish` IS NULL THEN '' ELSE kPermissionAction.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN kPermissionAction.`translatedNames.britishenglish` IS NULL THEN '' ELSE kPermissionAction.`translatedNames.britishenglish` END, description : CASE WHEN kPermissionAction.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE kPermissionAction.`translatedDescriptions.britishenglish` END}},\n" +
+            "id:id(kPermissionAction),action:kPermissionAction.action,hasPermission:CASE WHEN customRel IS NULL THEN  rel.hasPermission ELSE customRel.hasPermission END}) as actions " )
     List<ModelPermissionQueryResult> getActionPermissionsForStaff(Long accessGroupId,Long staffId,Long unitId);
 }

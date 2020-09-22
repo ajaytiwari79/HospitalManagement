@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.kpermissions;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.kpermissions.OtherPermissionDTO;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
@@ -35,6 +36,7 @@ public class ModelPermissionQueryResult {
     private Set<StaffStatusEnum> staffStatuses = new HashSet<>();
     private Set<FieldLevelPermission> forOtherFieldLevelPermissions = new HashSet<>();
     private List<Map<String,Object>> actions;
+    private Map<String, TranslationInfo> translations;
     public ModelPermissionQueryResult(Long id, String modelName) {
         this.id = id;
         this.modelName = modelName;
