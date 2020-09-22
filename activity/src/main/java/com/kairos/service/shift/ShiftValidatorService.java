@@ -1021,7 +1021,7 @@ public class ShiftValidatorService {
             } else {
                 overLappedShift.getShiftViolatedRules().setEscalationResolved(true);
                 isResolved = true;
-            }F
+            }
 
         }
         return isResolved;
