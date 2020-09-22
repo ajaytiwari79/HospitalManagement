@@ -100,7 +100,7 @@ public class WTARuleTemplateCalculationService {
             for (ShiftDTO shift : shifts) {
                 int restingMinutes = getRestingMinutes(intervalWTARuletemplateMap, phaseMapByDate, shift);
                 shift.setRestingMinutes(restingMinutes);
-                if(isNull(shift.getShiftViolatedRules())){
+                if(isNotNull(shift.getShiftViolatedRules())){
                     shift.setEscalationReasons(shift.getShiftViolatedRules().getEscalationReasons());
                     shift.setEscalationResolved(shift.getShiftViolatedRules().isEscalationResolved());
                 }

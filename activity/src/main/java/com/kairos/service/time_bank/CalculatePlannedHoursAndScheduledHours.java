@@ -140,7 +140,7 @@ public class CalculatePlannedHoursAndScheduledHours {
                         totalDailyPlannedMinutes += ctaCompensationConfiguration.getValue();
                     } else {
                         BigDecimal hourlyCostByDate = timeBankCalculationService.getHourlyCostByDate(employment.getEmploymentLines(),asLocalDate(shift.getStartDate()));
-                        int value = !hourlyCostByDate.equals(BigDecimal.valueOf(0)) ? BigDecimal.valueOf(ctaCompensationConfiguration.getValue()).divide(employment.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(60)).intValue() : 0;
+                        int value = !hourlyCostByDate.equals(BigDecimal.valueOf(0)) ? BigDecimal.valueOf(ctaCompensationConfiguration.getValue()).divide(employment.getHourlyCost(), 6).multiply(BigDecimal.valueOf(60)).intValue() : 0;
                         ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + value);
                         totalDailyPlannedMinutes += value;
                         compensation = value;
