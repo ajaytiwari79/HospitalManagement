@@ -599,10 +599,10 @@ public class AccessGroupService {
         }
         boolean isAccessGroupExistWithSameName;
         if ("Organization".equals(accessGroupDTO.getOrganizationCategory().value)) {
-            isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupDTO.getAccountTypeIds());
+            isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupDTO.getAccountTypeIds(),accessGroupDTO.getId()==null?-1L:accessGroupDTO.getId());
 
         } else {
-            isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString());
+            isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(),accessGroupDTO.getId()==null?-1L:accessGroupDTO.getId());
         }
 
         if (isAccessGroupExistWithSameName) {
@@ -733,12 +733,10 @@ public class AccessGroupService {
         Optional<Country> country = countryGraphRepository.findById(countryId);
         if (!country.isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-
         }
-        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getOrganizationCategory().toString());
+        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getOrganizationCategory().toString(),-1L);
         if (isAccessGroupExistWithSameName) {
             exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, countryAccessGroupDTO.getName().trim());
-
         }
         Optional<AccessGroup> currentAccessGroup = accessGroupRepository.findById(countryAccessGroupDTO.getId());
         if (!currentAccessGroup.isPresent()) {

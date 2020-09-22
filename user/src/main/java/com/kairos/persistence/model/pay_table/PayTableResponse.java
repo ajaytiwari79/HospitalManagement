@@ -1,18 +1,24 @@
 package com.kairos.persistence.model.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.organization.Level;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by vipul on 15/3/18.
  */
 @QueryResult
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
 public class PayTableResponse {
     private Long id;
     private String name;
@@ -26,6 +32,7 @@ public class PayTableResponse {
     private Boolean published;
     private Boolean editable;
     private BigDecimal percentageValue;
+    private Map<String, TranslationInfo> translations;
 
 
     public PayTableResponse() {
@@ -42,102 +49,6 @@ public class PayTableResponse {
         this.paymentUnit = paymentUnit;
 
 
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getShortName() {
-        return shortName;
-    }
-
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
-    }
-
-    public LocalDate getStartDateMillis() {
-        return startDateMillis;
-    }
-
-    public void setStartDateMillis(LocalDate startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
-
-    public LocalDate getEndDateMillis() {
-        return endDateMillis;
-    }
-
-    public void setEndDateMillis(LocalDate endDateMillis) {
-        this.endDateMillis = endDateMillis;
-    }
-
-    public Level getLevel() {
-        return level;
-    }
-
-    public void setLevel(Level level) {
-        this.level = level;
-    }
-
-    public List<PayGrade> getPayGrades() {
-        return payGrades;
-    }
-
-    public void setPayGrades(List<PayGrade> payGrades) {
-        this.payGrades = payGrades;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Boolean getPublished() {
-        return published;
-    }
-
-    public void setPublished(Boolean published) {
-        this.published = published;
-    }
-
-    public Boolean getEditable() {
-        return editable;
-    }
-
-    public void setEditable(Boolean editable) {
-        this.editable = editable;
-    }
-
-    public String getPaymentUnit() {
-        return paymentUnit;
-    }
-
-    public void setPaymentUnit(String paymentUnit) {
-        this.paymentUnit = paymentUnit;
-    }
-
-    public BigDecimal getPercentageValue() {
-        return percentageValue;
-    }
-
-    public void setPercentageValue(BigDecimal percentageValue) {
-        this.percentageValue = percentageValue;
     }
 
     @Override

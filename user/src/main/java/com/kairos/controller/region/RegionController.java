@@ -1,5 +1,6 @@
 package com.kairos.controller.region;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.Province;
 import com.kairos.persistence.model.user.region.Region;
@@ -256,8 +257,29 @@ public class RegionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.setMunicipalityInContactAddress());
     }
 
+    @ApiOperation(value = "update translation data")
+    @RequestMapping(value = "/{regionId}/language_settings", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationsOfRegion(@PathVariable Long regionId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.updateTranslationOfRegion(regionId,translations));
+    }
 
+    @ApiOperation(value = "GET Province to Region")
+    @RequestMapping(value = "/province/{provinceId}/language_settings", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String, Object>> updateTranslationsOfProvince(@PathVariable Long provinceId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, provinceService.updateTranslationOfProvince(provinceId,translations));
+    }
 
+    @ApiOperation(value = "GET Province to Region")
+    @RequestMapping(value = "/province/municipality/{municipalityId}/language_settings", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String, Object>> updateTranslationsOfMunicipality(@PathVariable Long municipalityId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, municipalityService.updateTranslationOfMunicipality(municipalityId,translations));
+    }
 
+    @ApiOperation(value = "GET Province to Region")
+    @RequestMapping(value = "/province/municipality/zipcode/{zipcodeId}/language_settings", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String, Object>> updateTranslationsOfZipCode(@PathVariable Long zipcodeId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, municipalityService.updateTranslationOfZipCode(zipcodeId,translations));
+    }
 
 }

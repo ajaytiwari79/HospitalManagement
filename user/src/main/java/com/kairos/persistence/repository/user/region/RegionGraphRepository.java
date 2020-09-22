@@ -20,7 +20,12 @@ public interface RegionGraphRepository extends Neo4jBaseRepository<Region,Long> 
     @Query("Match (region:Region{isEnable:true}) return region")
     List<Region> findAll();
 
-    @Query("MATCH (r:Region{isEnable:true})-[:BELONGS_TO]->(c:Country) where id(c)={0} return {name:r.name, code:r.code, geoFence:r.geoFence, latitude:r.latitude, longitude:r.longitude ,id: id(r)} as result")
+    @Query("MATCH (r:Region{isEnable:true})-[:BELONGS_TO]->(c:Country) where id(c)={0} return {" +
+            "translations :{english :{name: CASE WHEN r.`translatedNames.english` IS NULL THEN '' ELSE r.`translatedNames.english` END, description : CASE WHEN r.`translatedDescriptions.english` IS NULL THEN '' ELSE r.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN r.`translatedNames.hindi` IS NULL THEN '' ELSE r.`translatedNames.hindi` END, description : CASE WHEN r.`translatedDescriptions.hindi` IS NULL THEN '' ELSE r.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN r.`translatedNames.danish` IS NULL THEN '' ELSE r.`translatedNames.danish` END, description : CASE WHEN r.`translatedDescriptions.danish` IS NULL THEN '' ELSE r.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN r.`translatedNames.britishenglish` IS NULL THEN '' ELSE r.`translatedNames.britishenglish` END, description : CASE WHEN r.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE r.`translatedDescriptions.britishenglish` END}},\n" +
+            "name:r.name, code:r.code, geoFence:r.geoFence, latitude:r.latitude, longitude:r.longitude ,id: id(r)} as result")
     List<Map<String,Object>> findAllRegionsByCountryId(Long countryId);
 
     @Query("MATCH (n:Region)  WITH n as r  " +
