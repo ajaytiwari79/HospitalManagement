@@ -110,13 +110,14 @@ public class ShiftSickService extends MongoBaseService {
         Date currentDate=DateUtils.getDateFromTimeZone(timeZone);
         Shift realTimeShift = shiftMongoRepository.findRealTimeShiftByStaffId(shiftDTO.getStaffId(),currentDate);
         int shiftAddedForNumberOfDays=0;
+        List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         if(isNotNull(realTimeShift)){
             Map<BigInteger,ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(Arrays.asList(realTimeShift),shiftDTO);
             replaceWithSick(realTimeShift,activityWrapperMap.get(shiftDTO.getActivities().get(0).getActivityId()),currentDate);
-            shiftService.updateShift(ObjectMapperUtils.copyPropertiesByMapper(realTimeShift,ShiftDTO.class),false,false,ShiftActionType.SAVE);
+            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoList=shiftService.updateShift(ObjectMapperUtils.copyPropertiesByMapper(realTimeShift,ShiftDTO.class),false,false,ShiftActionType.SAVE);
+            shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoList.get(0));
             shiftAddedForNumberOfDays=1;
         }
-        List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         while ( shiftAddedForNumberOfDays<shiftNeedsToAddForNumberOfDays) {
                 ShiftDTO shiftDTO1 = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftDTO.class);
                 shiftDTO1.setShiftDate(shiftDTO1.getShiftDate().plusDays(shiftAddedForNumberOfDays));
