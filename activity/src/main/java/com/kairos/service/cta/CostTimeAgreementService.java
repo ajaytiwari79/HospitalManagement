@@ -312,6 +312,7 @@ public class CostTimeAgreementService {
         responseCTA.setEndDate((isNotNull(responseCTA.getEndDate())&&responseCTA.getStartDate().isBefore(responseCTA.getEndDate()))?responseCTA.getEndDate():null);
         responseCTA.setParentId(oldCTA.getId());
         responseCTA.setOrganizationParentId(oldCTA.getOrganizationParentId());
+        responseCTA.setTranslations(costTimeAgreement.getTranslations());
         CTAResponseDTO versionCTA = ObjectMapperUtils.copyPropertiesByMapper(oldCTA, CTAResponseDTO.class);
         List<CTARuleTemplate> existingCtaRuleTemplates = ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(oldCTA.getRuleTemplateIds());
         List<CTARuleTemplateDTO> existingCtaRuleTemplatesDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(existingCtaRuleTemplates, CTARuleTemplateDTO.class);

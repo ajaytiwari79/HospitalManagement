@@ -809,6 +809,7 @@ public class WorkTimeAgreementService{
         newWta.setParentId(oldWta.getId());
         wtaRepository.save(newWta);
         wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(newWta, WTAResponseDTO.class);
+        wtaResponseDTO.setTranslations(newWta.getTranslations());
         WTAResponseDTO version = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
         wtaResponseDTO.setParentId(oldWta.getId());
         List<WTABaseRuleTemplate> existingWtaBaseRuleTemplates = wtaBaseRuleTemplateRepository.findAllByIdInAndDeletedFalse(oldWta.getRuleTemplateIds());
