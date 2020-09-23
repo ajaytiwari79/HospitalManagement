@@ -316,4 +316,13 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateTranslation(id,translations));
     }
 
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = UNIT_URL+"/wta/rule_template/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWtaTemplatesOnUnitLevel(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateTranslationRuleTemplates(id,translations));
+    }
+
+
+
 }
