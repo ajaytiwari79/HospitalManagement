@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.todo;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoSubtype;
 import com.kairos.enums.todo.TodoType;
@@ -10,6 +11,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by pradeep
@@ -39,6 +41,7 @@ public class TodoDTO {
     private String comment;
     private LocalDateTime disApproveOn;
     private LocalDateTime pendingOn;
+    private Map<String, TranslationInfo> translations;
 
     public TodoDTO(BigInteger id, TodoType type, TodoSubtype subtype, BigInteger entityId, BigInteger subEntityId, TodoStatus status, LocalDate shiftDate, Date shiftDateTime, Date requestedOn, String description, Long staffId, Long employmentId, Long unitId, LocalDate createdAt, String activityName, LocalDateTime approvedOn, String remark, String comment, LocalDateTime disApproveOn, LocalDateTime pendingOn) {
         this.id = id;

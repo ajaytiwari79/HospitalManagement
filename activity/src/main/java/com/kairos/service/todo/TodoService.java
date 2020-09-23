@@ -1,5 +1,6 @@
 package com.kairos.service.todo;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.shift.ShiftActivitiesIdDTO;
 import com.kairos.dto.activity.shift.ShiftAndActivtyStatusDTO;
 import com.kairos.dto.activity.shift.ShiftPublishDTO;
@@ -295,7 +296,7 @@ public class TodoService {
 
     //
     public List<TodoDTO> getAllTodoOfStaff(Long staffId) {
-        Sort sort = new Sort(Sort.Direction.ASC, "shiftDate");
+        Sort sort = new Sort(Sort.Direction.DESC, "createdAt");
         return todoRepository.findAllTodoByStaffId(staffId,sort);
     }
 
@@ -322,6 +323,13 @@ public class TodoService {
 
     public List<TodoDTO> getAllTodoByShiftDate(Date startDate, Date endDate) {
         return todoRepository.findAllTodosByShiftDate(startDate,endDate, newArrayList(APPROVE,DISAPPROVE, REQUESTED,PENDING,VIEWED));
+    }
+
+    public Map<String, TranslationInfo> updateTodoTranslations(BigInteger todoId,Map<String, TranslationInfo> translations){
+        Todo todo =todoRepository.findOne(todoId);
+        todo.setTranslations(translations);
+        todoRepository.save(todo);
+        return  todo.getTranslations();
     }
 
 

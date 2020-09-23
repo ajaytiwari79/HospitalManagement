@@ -1,6 +1,7 @@
 package com.kairos.controller.todo;
 
 import com.kairos.constants.ApiConstants;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.service.todo.TodoService;
 import com.kairos.utils.response.ResponseHandler;
@@ -40,4 +41,12 @@ public class TodoController {
        public ResponseEntity<Map<String,Object>>   getLeavesBalances(@PathVariable Long staffId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,todoService.getAllTodoOfStaff(staffId));
     }
+
+    @ApiOperation("Update translated data")
+    @PutMapping(value="/{todoId}/language_settings")
+    public ResponseEntity<Map<String,Object>> updateTodoTranslation(@PathVariable BigInteger todoId, @RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,todoService.updateTodoTranslations(todoId,translations));
+    }
+
+
 }

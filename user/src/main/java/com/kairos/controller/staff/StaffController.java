@@ -1,6 +1,7 @@
 package com.kairos.controller.staff;
 
 import com.kairos.annotations.KPermissionActions;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
@@ -676,6 +677,12 @@ public class StaffController {
     @ApiOperation("Get all staff eligible for planning")
     public ResponseEntity<Map<String, Object>>  getStaffsByIds(@PathVariable Long unitId, @RequestBody List<Long> staffIds){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsByIds(unitId,staffIds));
+    }
+
+    @PutMapping(value ="/organization/language_settings" )
+    @ApiOperation("update organization staff translation data")
+    public ResponseEntity<Map<String, Object>>  updateStaffOrganizationTranslations(@PathVariable Long unitId,@RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.updateStaffOrganizationTranslatedData(unitId,translations));
     }
 
 }
