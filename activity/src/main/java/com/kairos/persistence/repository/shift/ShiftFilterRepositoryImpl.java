@@ -215,30 +215,33 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         }
         Set<Long> staffIds = new HashSet<>();
         for (String filterValue : filterValues) {
-
-            switch (filterValue) {
-                case "ON_BREAK":
-                    staffIds.addAll(getStaffIdsOnBreak(unitId, dateWithoutTime));
-                    break;
-                case "SICK":
-                    staffIds.addAll(getStaffSickForSelectedDay(unitId, dateWithoutTime));
-                    break;
-                case "CURRENTLY_WORKING":
-                    staffIds.addAll(getStaffCurrentlyWorking(unitId, dateWithoutTime));
-                    break;
-                case "ON_LEAVE":
-                    staffIds.addAll(getStaffIdsOnLeave(unitId, today));
-                    break;
-                case "UPCOMING":
-                    staffIds.addAll(getStaffForUpcomingShift(unitId, dateWithoutTime));
-                    break;
-                case "RESTING":
-                    staffIds.addAll(getStaffIdsOnRest(unitId, today));
-                    break;
-                default:
-            }
+            addStaffIds(unitId, today, dateWithoutTime, staffIds, filterValue);
         }
         return staffIds;
+    }
+
+    private void addStaffIds(Long unitId, String today, Date dateWithoutTime, Set<Long> staffIds, String filterValue) {
+        switch (filterValue) {
+            case "ON_BREAK":
+                staffIds.addAll(getStaffIdsOnBreak(unitId, dateWithoutTime));
+                break;
+            case "SICK":
+                staffIds.addAll(getStaffSickForSelectedDay(unitId, dateWithoutTime));
+                break;
+            case "CURRENTLY_WORKING":
+                staffIds.addAll(getStaffCurrentlyWorking(unitId, dateWithoutTime));
+                break;
+            case "ON_LEAVE":
+                staffIds.addAll(getStaffIdsOnLeave(unitId, today));
+                break;
+            case "UPCOMING":
+                staffIds.addAll(getStaffForUpcomingShift(unitId, dateWithoutTime));
+                break;
+            case "RESTING":
+                staffIds.addAll(getStaffIdsOnRest(unitId, today));
+                break;
+            default:
+        }
     }
 
     public Set<Long> getStaffCurrentlyWorking(Long unitId, Date date) {

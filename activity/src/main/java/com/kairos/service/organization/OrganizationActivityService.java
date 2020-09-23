@@ -321,6 +321,14 @@ public class OrganizationActivityService extends MongoBaseService {
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(organizationDTO.getCountryId());
         PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, organizationDTO.getCountryId());
         ActivityBalanceSettings activityBalanceSettings = activity.getActivityBalanceSettings();
+        setDataInGeneralActivityWithTagDTO(activity, generalActivityWithTagDTO, activityBalanceSettings);
+        ActivitySettingsWrapper activitySettingsWrapper = new ActivitySettingsWrapper(generalActivityWithTagDTO, activityId, activityCategories);
+        activitySettingsWrapper.setTimeTypes(timeTypeService.getAllTimeType(activityBalanceSettings.getTimeTypeId(), presenceType.getCountryId()));
+        activitySettingsWrapper.setPresenceTypeWithTimeType(presenceType);
+        return activitySettingsWrapper;
+    }
+
+    private void setDataInGeneralActivityWithTagDTO(Activity activity, GeneralActivityWithTagDTO generalActivityWithTagDTO, ActivityBalanceSettings activityBalanceSettings) {
         generalActivityWithTagDTO.setAddTimeTo(activityBalanceSettings.getAddTimeTo());
         generalActivityWithTagDTO.setTimeTypeId(activityBalanceSettings.getTimeTypeId());
         generalActivityWithTagDTO.setOnCallTimePresent(activityBalanceSettings.isOnCallTimePresent());
@@ -330,10 +338,6 @@ public class OrganizationActivityService extends MongoBaseService {
         generalActivityWithTagDTO.setOriginalDocumentName(activity.getActivityNotesSettings().getOriginalDocumentName());
         generalActivityWithTagDTO.setModifiedDocumentName(activity.getActivityNotesSettings().getModifiedDocumentName());
         generalActivityWithTagDTO.setTranslations(activity.getTranslations());
-        ActivitySettingsWrapper activitySettingsWrapper = new ActivitySettingsWrapper(generalActivityWithTagDTO, activityId, activityCategories);
-        activitySettingsWrapper.setTimeTypes(timeTypeService.getAllTimeType(activityBalanceSettings.getTimeTypeId(), presenceType.getCountryId()));
-        activitySettingsWrapper.setPresenceTypeWithTimeType(presenceType);
-        return activitySettingsWrapper;
     }
 
     //TODO Need to make sure that its fine to not copy expertise/skills/employmentTypes
@@ -471,7 +475,6 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivityDTO copyActivityDetails(Long unitId, BigInteger activityId, ActivityDTO activityDTO) {
-        //Need to know why we are returning object here as we can also return a simple boolean to check whether activity exist or not
         Activity activity = activityMongoRepository.
                 findByNameIgnoreCaseAndUnitIdAndByDate(activityDTO.getName().trim(), unitId, activityDTO.getStartDate(), activityDTO.getEndDate());
         if (Optional.ofNullable(activity).isPresent() && activityDTO.getStartDate().isBefore(activity.getActivityGeneralSettings().getStartDate())) {
@@ -484,18 +487,13 @@ public class OrganizationActivityService extends MongoBaseService {
         if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
         }
-        //Checking the time type of activity whether it's eligible for copy or not
         TimeType timeType = timeTypeMongoRepository.findOneById(activityFromDatabase.get().getActivityBalanceSettings().getTimeTypeId());
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         Set<OrganizationHierarchy> hierarchies = timeType.getActivityCanBeCopiedForOrganizationHierarchy();
         if ((isCollectionNotEmpty(hierarchies)) && ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
                 (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT)))) {
             Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
-            activityCopied.setName(activityDTO.getName().trim());
-            activityCopied.getActivityGeneralSettings().setName(activityDTO.getName().trim());
-            activityCopied.getActivityGeneralSettings().setStartDate(activityDTO.getStartDate());
-            activityCopied.getActivityGeneralSettings().setEndDate(activityDTO.getEndDate());
-            activityCopied.setState(ActivityStateEnum.DRAFT);
+            setDataInActivity(activityDTO, activityCopied);
             activityMongoRepository.save(activityCopied);
             activityDTO.setId(activityCopied.getId());
             activityDTO.setActivityCanBeCopied(true);
@@ -504,6 +502,14 @@ public class OrganizationActivityService extends MongoBaseService {
             exceptionService.actionNotPermittedException(ACTIVITY_NOT_ELIGIBLE_FOR_COPY);
         }
         return activityDTO;
+    }
+
+    private void setDataInActivity(ActivityDTO activityDTO, Activity activityCopied) {
+        activityCopied.setName(activityDTO.getName().trim());
+        activityCopied.getActivityGeneralSettings().setName(activityDTO.getName().trim());
+        activityCopied.getActivityGeneralSettings().setStartDate(activityDTO.getStartDate());
+        activityCopied.getActivityGeneralSettings().setEndDate(activityDTO.getEndDate());
+        activityCopied.setState(ActivityStateEnum.DRAFT);
     }
 
     public OrderAndActivityDTO getActivitiesWithBalanceSettings(long unitId) {

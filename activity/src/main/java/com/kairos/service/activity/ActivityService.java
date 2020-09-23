@@ -306,21 +306,8 @@ public class ActivityService {
             if (activity.getState().equals(ActivityStateEnum.PUBLISHED)) {
                 exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED, activity.getId());
             }
-            activity.setActivityPhaseSettings(timeType.getActivityPhaseSettings());
-            activity.setActivityRulesSettings(timeType.getActivityRulesSettings());
-            activity.setActivityTimeCalculationSettings(timeType.getActivityTimeCalculationSettings());
-            activity.setEmploymentTypes(timeType.getEmploymentTypes());
-            activity.setExpertises(timeType.getExpertises());
-            activity.setOrganizationSubTypes(timeType.getOrganizationSubTypes());
-            activity.setOrganizationTypes(timeType.getOrganizationTypes());
-            activity.setActivitySkillSettings(timeType.getActivitySkillSettings());
-            activity.setRegions(timeType.getRegions());
-            activity.setLevels(timeType.getLevels());
-            activity.getActivityRulesSettings().setSicknessSettingValid(timeType.isSicknessSettingValid());
-            activity.getActivityRulesSettings().setSicknessSetting(timeType.getActivityRulesSettings().getSicknessSetting());
-            activity.getActivityGeneralSettings().setBackgroundColor(timeType.getBackgroundColor());
+            setDataInActivity(activity, timeType);
         }
-
         activity.getActivityGeneralSettings().setColorPresent(true);
         Long countryId = activity.getCountryId();
         if (countryId == null) {
@@ -331,6 +318,23 @@ public class ActivityService {
         activitySettingsService.updateTimeTypePathInActivity(activity);
         return activity.getActivityBalanceSettings();
     }
+
+    private void setDataInActivity(Activity activity, TimeType timeType) {
+        activity.setActivityPhaseSettings(timeType.getActivityPhaseSettings());
+        activity.setActivityRulesSettings(timeType.getActivityRulesSettings());
+        activity.setActivityTimeCalculationSettings(timeType.getActivityTimeCalculationSettings());
+        activity.setEmploymentTypes(timeType.getEmploymentTypes());
+        activity.setExpertises(timeType.getExpertises());
+        activity.setOrganizationSubTypes(timeType.getOrganizationSubTypes());
+        activity.setOrganizationTypes(timeType.getOrganizationTypes());
+        activity.setActivitySkillSettings(timeType.getActivitySkillSettings());
+        activity.setRegions(timeType.getRegions());
+        activity.setLevels(timeType.getLevels());
+        activity.getActivityRulesSettings().setSicknessSettingValid(timeType.isSicknessSettingValid());
+        activity.getActivityRulesSettings().setSicknessSetting(timeType.getActivityRulesSettings().getSicknessSetting());
+        activity.getActivityGeneralSettings().setBackgroundColor(timeType.getBackgroundColor());
+    }
+
     private void updateBalanceSettingDetails(ActivityGeneralSettingsDTO activityGeneralSettingsDTO, Activity activity, TimeType timeType) {
         activity.getActivityBalanceSettings().setTimeTypeId(activityGeneralSettingsDTO.getTimeTypeId());
         activity.getActivityBalanceSettings().setTimeType(timeType.getSecondLevelType());

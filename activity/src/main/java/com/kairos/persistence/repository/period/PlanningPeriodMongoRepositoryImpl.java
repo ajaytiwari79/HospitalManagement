@@ -348,7 +348,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     private CustomAggregationOperation getActivityConfigurationLookupForPlanning() {
         return new CustomAggregationOperation(Document.parse("{\n" +
                 "        $lookup:{\n" +
-                "            \n" +
                 "         from: \"activityConfiguration\",\n" +
                 "            let: { unitId: \"$unitId\",phaseId:\"$currentPhaseId\" },\n" +
                 "         pipeline: [\n" +
@@ -359,7 +358,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 "                         {$eq:[\"$presencePlannedTime.phaseId\",\"$$phaseId\"]},\n" +
                 "                         {$eq:[\"$absencePlannedTime.phaseId\",\"$$phaseId\"]},\n" +
                 "                         {$eq:[\"$nonWorkingPlannedTime.phaseId\",\"$$phaseId\"]}\n" +
-                "                        \n" +
                 "                       ]\n" +
                 "                    }\n" +
                 "                 }\n" +
@@ -369,7 +367,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 "                      \"absencePlannedTime\":1,\n" +
                 "                      \"nonWorkingPlannedTime\":1,\n" +
                 "                      \"_id\":0\n" +
-                "                      \n" +
                 "                      }\n" +
                 "                  }\n" +
                 "           ],\n" +

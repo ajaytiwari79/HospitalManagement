@@ -296,15 +296,7 @@ public class CostTimeAgreementService {
         oldCTA.setId(null);
         oldCTA.setEndDate(publishDate.equals(oldCTA.getStartDate()) ? oldCTA.getStartDate() : publishDate.minusDays(1));
         costTimeAgreementRepository.save(oldCTA);
-        costTimeAgreement.setStartDate(oldCTA.getEndDate().plusDays(1));
-        costTimeAgreement.setParentId(oldCTA.getId());
-        costTimeAgreement.setOrganizationParentId(oldCTA.getOrganizationParentId());
-        costTimeAgreement.setExpertise(oldCTA.getExpertise());
-        costTimeAgreement.setOrganizationType(oldCTA.getOrganizationType());
-        costTimeAgreement.setOrganizationSubType(oldCTA.getOrganizationSubType());
-        costTimeAgreement.setOrganization(oldCTA.getOrganization());
-        costTimeAgreement.setEmploymentId(oldCTA.getEmploymentId());
-        costTimeAgreement.setDescription(ctaDTO.getDescription());
+        setDataInCostTimeAgreement(oldCTA, ctaDTO, costTimeAgreement);
         costTimeAgreementRepository.save(costTimeAgreement);
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
         ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
@@ -318,6 +310,18 @@ public class CostTimeAgreementService {
         versionCTA.setRuleTemplates(existingCtaRuleTemplatesDTOS);
         responseCTA.setVersions(Arrays.asList(versionCTA));
         return responseCTA;
+    }
+
+    private void setDataInCostTimeAgreement(CostTimeAgreement oldCTA, CollectiveTimeAgreementDTO ctaDTO, CostTimeAgreement costTimeAgreement) {
+        costTimeAgreement.setStartDate(oldCTA.getEndDate().plusDays(1));
+        costTimeAgreement.setParentId(oldCTA.getId());
+        costTimeAgreement.setOrganizationParentId(oldCTA.getOrganizationParentId());
+        costTimeAgreement.setExpertise(oldCTA.getExpertise());
+        costTimeAgreement.setOrganizationType(oldCTA.getOrganizationType());
+        costTimeAgreement.setOrganizationSubType(oldCTA.getOrganizationSubType());
+        costTimeAgreement.setOrganization(oldCTA.getOrganization());
+        costTimeAgreement.setEmploymentId(oldCTA.getEmploymentId());
+        costTimeAgreement.setDescription(ctaDTO.getDescription());
     }
 
     private void validateEmploymentCTAWhileUpdate(CollectiveTimeAgreementDTO collectiveTimeAgreementDTO,StaffAdditionalInfoDTO staffAdditionalInfoDTO,CostTimeAgreement oldCTA){
