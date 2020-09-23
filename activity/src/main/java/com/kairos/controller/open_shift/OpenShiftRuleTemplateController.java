@@ -111,7 +111,14 @@ public class OpenShiftRuleTemplateController {
     @ApiOperation(value = "update translation data")
     @PutMapping(value = COUNTRY_URL+"/open_shift/rule_template/{id}/language_settings")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWta(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOpenShiftRuleTemplate(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,openShiftRuleTemplateService.updateTranslation(id,translations));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = UNIT_URL+"/open_shift/rule_template/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOpenShiftRuleTemplateOnUnitLevel(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,openShiftRuleTemplateService.updateTranslation(id,translations));
     }
 
