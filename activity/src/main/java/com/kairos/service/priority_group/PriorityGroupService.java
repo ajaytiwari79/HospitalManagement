@@ -124,6 +124,11 @@ public class PriorityGroupService extends MongoBaseService {
 
     public PriorityGroupWrapper getPriorityGroupsOfUnit(long unitId) {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByUnitIdAndDeletedFalseAndRuleTemplateIdIsNullAndOrderIdIsNull(unitId);
+        priorityGroupDTOS.forEach(priorityGroupDTO -> {
+            if(priorityGroupDTO.getTranslations()==null){
+                priorityGroupDTO.setTranslations(new HashMap<>());
+            }
+        });
         PriorityGroupDefaultData priorityGroupDefaultData= userIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
         List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new PriorityGroupWrapper(new PriorityGroupDefaultData(priorityGroupDefaultData.getEmploymentTypes(),priorityGroupDefaultData.getExpertises(),counters),priorityGroupDTOS);

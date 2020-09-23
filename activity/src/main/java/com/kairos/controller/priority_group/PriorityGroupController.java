@@ -125,7 +125,14 @@ public class PriorityGroupController {
     @ApiOperation(value = "update translation data")
     @PutMapping(value = COUNTRY_URL+"/priority_groups/{id}/language_settings")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWta(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfPriorityGroup(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,priorityGroupService.updateTranslation(id,translations));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = UNIT_URL+"/priority_groups/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfPriorityGroupOfOrganization(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,priorityGroupService.updateTranslation(id,translations));
     }
 
