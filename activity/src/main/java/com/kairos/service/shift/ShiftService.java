@@ -292,6 +292,9 @@ public class ShiftService extends MongoBaseService {
 
     public ShiftType updateShiftType(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
         ShiftType shiftType = null;
+        if(isSickShift(shift,activityWrapperMap)){
+            return SICK;
+        }
         ACTIVITIES_LOOP: for (ShiftActivity shiftActivity : shift.getActivities()) {
             Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
             TimeTypeEnum timeTypeEnum = activity.getActivityBalanceSettings().getTimeType();
@@ -310,6 +313,16 @@ public class ShiftService extends MongoBaseService {
             }
         }
         return shiftType;
+    }
+
+    private boolean isSickShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap){
+        for(ShiftActivity shiftActivity:shift.getActivities()){
+            Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
+            if(activity.getActivityRulesSettings().isSicknessSettingValid()){
+                return true;
+            }
+        }
+        return false;
     }
 
 

@@ -106,11 +106,13 @@ public class ShiftSickService extends MongoBaseService {
         }
         Date startDate = asDate(shiftDTO.getShiftDate(), LocalTime.MIDNIGHT);
         Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(),startDate,asDate(shiftDTO.getShiftDate().plusDays(1), LocalTime.MIDNIGHT));
-        Shift realTimeShift = shiftMongoRepository.findRealTimeShiftByStaffId(shiftDTO.getStaffId(),getCurrentDate());
+        String timeZone = userIntegrationService.getTimeZoneByUnitId(shiftDTO.getUnitId());
+        Date currentDate=DateUtils.getDateFromTimeZone(timeZone);
+        Shift realTimeShift = shiftMongoRepository.findRealTimeShiftByStaffId(shiftDTO.getStaffId(),currentDate);
         int shiftAddedForNumberOfDays=0;
         if(isNotNull(realTimeShift)){
             Map<BigInteger,ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(Arrays.asList(realTimeShift),shiftDTO);
-            replaceWithSick(realTimeShift,activityWrapperMap.get(shiftDTO.getActivities().get(0).getActivityId()));
+            replaceWithSick(realTimeShift,activityWrapperMap.get(shiftDTO.getActivities().get(0).getActivityId()),currentDate);
             shiftService.updateShift(ObjectMapperUtils.copyPropertiesByMapper(realTimeShift,ShiftDTO.class),false,false,ShiftActionType.SAVE);
             shiftAddedForNumberOfDays=1;
         }
@@ -135,11 +137,11 @@ public class ShiftSickService extends MongoBaseService {
         shiftDTO.getActivities().get(0).setEndDate(endDate);
     }
 
-    private void replaceWithSick(Shift shift, ActivityWrapper sickActivityWrapper) {
+    private void replaceWithSick(Shift shift, ActivityWrapper sickActivityWrapper,Date currentDate) {
         List<ShiftActivity> shiftActivities=new ArrayList<>();
         for (int i = 0; i < shift.getActivities().size(); i++) {
-            if(shift.getActivities().get(i).getInterval().contains(getCurrentDate())){
-                shift.getActivities().get(i).setEndDate(getCurrentDate());
+            if(shift.getActivities().get(i).getInterval().contains(currentDate)){
+                shift.getActivities().get(i).setEndDate(currentDate);
                 shiftActivities.add(shift.getActivities().get(i));
                 ShiftActivity shiftActivity=new ShiftActivity(sickActivityWrapper.getActivity().getName(),shift.getActivities().get(i).getEndDate(),getStartOfDay(asDate(asLocalDate(shift.getStartDate()).plusDays(1))),sickActivityWrapper.getActivity().getId(),null);
                 shiftActivities.add(shiftActivity);
