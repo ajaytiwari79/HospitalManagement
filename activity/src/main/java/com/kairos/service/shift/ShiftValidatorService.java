@@ -1007,8 +1007,7 @@ public class ShiftValidatorService {
         boolean workingTypeShift = WORKING_TYPE.toString().equals(activityWrapper.getTimeType());
         List<Shift> overLappedShifts = shiftMongoRepository.findShiftBetweenDurationByEmploymentId(shift.getEmploymentId(), workingTypeShift ? shiftDTO.getActivities().get(0).getStartDate() : oldShiftStartDate, workingTypeShift ? shiftDTO.getActivities().get(0).getEndDate() : oldShiftEndDate);
         overLappedShifts.forEach(overLappedShift -> {
-
-            if (!shiftOverLappedWithOther(overLappedShift) && isNotNull(shift.getShiftViolatedRules()) && isCollectionEmpty(overLappedShift.getShiftViolatedRules().getWorkTimeAgreements())) {
+            if (!shiftOverLappedWithOther(overLappedShift) && isNotNull(overLappedShift.getShiftViolatedRules()) && isCollectionEmpty(overLappedShift.getShiftViolatedRules().getWorkTimeAgreements())) {
                 if (getEsclationResolved(shift, overLappedShift)) {
                     shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
                     overLappedShift.getShiftViolatedRules().setEscalationResolved(true);

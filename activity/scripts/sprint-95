@@ -24,7 +24,7 @@ db.shifts.find({"deleted":false,"unitId":2403}).forEach(function(shift){
                 }
                 shift.draftShift.shiftViolatedRules = shiftViolated;
             }
-            shift.createdBy : {
+            shift.createdBy = {
                     _id : NumberLong(18728),
                     email : "ulrik@kairosplanning.com",
                     fullName : "Ulrik Rasmussen",

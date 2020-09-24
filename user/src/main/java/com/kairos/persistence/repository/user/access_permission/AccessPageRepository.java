@@ -35,13 +35,28 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WHERE id(parent)=id(ps.p) WITH r2,ps,ag\n" +
             "OPTIONAL MATCH (child:AccessPage)<-[r:"+HAS_ACCESS_OF_TABS+"]-(ag)\n" +
             "WHERE id(child)=id(ps.c) WITH r,r2,ps,ag\n" +
-            "RETURN {name:ps.p.name,id:id(ps.p),sequence:ps.p.sequence,selected:case when r2.isEnabled then true else false end, read:r2.read, write:r2.write,module:ps.p.isModule,children:collect({name:ps.c.name,id:id(ps.c),sequence:ps.c.sequence,read:r.read, write:r.write,selected:case when r.isEnabled then true else false end})} as data\n" +
+            "RETURN {" +
+            "translations:{english :{name: CASE WHEN ps.p.`translatedNames.english` IS NULL THEN '' ELSE ps.p.`translatedNames.english` END, description : CASE WHEN ps.p.`translatedDescriptions.english` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN ps.p.`translatedNames.hindi` IS NULL THEN '' ELSE ps.p.`translatedNames.hindi` END, description : CASE WHEN ps.p.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN ps.p.`translatedNames.danish` IS NULL THEN '' ELSE ps.p.`translatedNames.danish` END, description : CASE WHEN ps.p.`translatedDescriptions.danish` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN ps.p.`translatedNames.britishenglish` IS NULL THEN '' ELSE ps.p.`translatedNames.britishenglish` END, description : CASE WHEN ps.p.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.britishenglish` END}},\n" +
+            "name:ps.p.name,id:id(ps.p),sequence:ps.p.sequence,selected:case when r2.isEnabled then true else false end, read:r2.read, write:r2.write,module:ps.p.isModule,children:collect({" +
+            "translations:{english :{name: CASE WHEN ps.c.`translatedNames.english` IS NULL THEN '' ELSE ps.c.`translatedNames.english` END, description : CASE WHEN ps.c.`translatedDescriptions.english` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN ps.c.`translatedNames.hindi` IS NULL THEN '' ELSE ps.c.`translatedNames.hindi` END, description : CASE WHEN ps.c.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN ps.c.`translatedNames.danish` IS NULL THEN '' ELSE ps.c.`translatedNames.danish` END, description : CASE WHEN ps.c.`translatedDescriptions.danish` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN ps.c.`translatedNames.britishenglish` IS NULL THEN '' ELSE ps.c.`translatedNames.britishenglish` END, description : CASE WHEN ps.c.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.britishenglish` END}},\n" +
+            "name:ps.c.name,id:id(ps.c),sequence:ps.c.sequence,read:r.read, write:r.write,selected:case when r.isEnabled then true else false end})} as data\n" +
             "UNION\n" +
             // Fetch modules which does not have child
             "MATCH (ag:AccessGroup) WHERE id(ag)={0} WITH ag \n" +
             "MATCH (accessPage:AccessPage{isModule:true,active:true}) WHERE not (accessPage)-[:"+SUB_PAGE+"]->() WITH accessPage, ag\n" +
             "MATCH (accessPage)<-[r:"+HAS_ACCESS_OF_TABS+"]-(ag) WITH accessPage, ag,r\n" +
-            "RETURN {name:accessPage.name,id:id(accessPage),sequence:accessPage.sequence,read:r.read, write:r.write,selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
+            "RETURN {" +
+            "translations:{english :{name: CASE WHEN accessPage.`translatedNames.english` IS NULL THEN '' ELSE accessPage.`translatedNames.english` END, description : CASE WHEN accessPage.`translatedDescriptions.english` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN accessPage.`translatedNames.hindi` IS NULL THEN '' ELSE accessPage.`translatedNames.hindi` END, description : CASE WHEN accessPage.`translatedDescriptions.hindi` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN accessPage.`translatedNames.danish` IS NULL THEN '' ELSE accessPage.`translatedNames.danish` END, description : CASE WHEN accessPage.`translatedDescriptions.danish` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN accessPage.`translatedNames.britishenglish` IS NULL THEN '' ELSE accessPage.`translatedNames.britishenglish` END, description : CASE WHEN accessPage.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.britishenglish` END}},\n" +
+            "name:accessPage.name,id:id(accessPage),sequence:accessPage.sequence,read:r.read, write:r.write,selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
     List<Map<String,Object>> getSelectedAccessPageHierarchy(Long accessGroupId);
 
 

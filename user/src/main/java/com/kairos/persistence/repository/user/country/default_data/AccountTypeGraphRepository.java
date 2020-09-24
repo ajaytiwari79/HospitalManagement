@@ -32,7 +32,12 @@ public interface AccountTypeGraphRepository extends Neo4jBaseRepository<AccountT
 
     @Query("MATCH(country:Country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) where id(country)={0} " +
             "OPTIONAL MATCH (ag:AccessGroup{deleted:false})-[:" + HAS_ACCOUNT_TYPE + "]->(accountType)" +
-            "RETURN id(accountType) as id,accountType.name as name,count(ag) as count")
+            "RETURN " +
+            "{english :{name: CASE WHEN accountType.`translatedNames.english` IS NULL THEN '' ELSE accountType.`translatedNames.english` END, description : CASE WHEN accountType.`translatedDescriptions.english` IS NULL THEN '' ELSE accountType.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN accountType.`translatedNames.hindi` IS NULL THEN '' ELSE accountType.`translatedNames.hindi` END, description : CASE WHEN accountType.`translatedDescriptions.hindi` IS NULL THEN '' ELSE accountType.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN accountType.`translatedNames.danish` IS NULL THEN '' ELSE accountType.`translatedNames.danish` END, description : CASE WHEN accountType.`translatedDescriptions.danish` IS NULL THEN '' ELSE accountType.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN accountType.`translatedNames.britishenglish` IS NULL THEN '' ELSE accountType.`translatedNames.britishenglish` END, description : CASE WHEN accountType.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE accountType.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "id(accountType) as id,accountType.name as name,count(ag) as count")
     List<AccountTypeAccessGroupCountQueryResult> getAllAccountTypeWithAccessGroupCountByCountryId(Long countryId);
 
     @Query("MATCH (accountType:AccountType{deleted:false}) where id(accountType)={0} " +

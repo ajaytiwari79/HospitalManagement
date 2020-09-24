@@ -106,15 +106,18 @@ public class ShiftSickService extends MongoBaseService {
         }
         Date startDate = asDate(shiftDTO.getShiftDate(), LocalTime.MIDNIGHT);
         Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(),startDate,asDate(shiftDTO.getShiftDate().plusDays(1), LocalTime.MIDNIGHT));
-        Shift realTimeShift = shiftMongoRepository.findRealTimeShiftByStaffId(shiftDTO.getStaffId(),getCurrentDate());
+        String timeZone = userIntegrationService.getTimeZoneByUnitId(shiftDTO.getUnitId());
+        Date currentDate=DateUtils.getDateFromTimeZone(timeZone);
+        Shift realTimeShift = shiftMongoRepository.findRealTimeShiftByStaffId(shiftDTO.getStaffId(),currentDate);
         int shiftAddedForNumberOfDays=0;
+        List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         if(isNotNull(realTimeShift)){
             Map<BigInteger,ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(Arrays.asList(realTimeShift),shiftDTO);
-            replaceWithSick(realTimeShift,activityWrapperMap.get(shiftDTO.getActivities().get(0).getActivityId()));
-            shiftService.updateShift(ObjectMapperUtils.copyPropertiesByMapper(realTimeShift,ShiftDTO.class),false,false,ShiftActionType.SAVE);
+            replaceWithSick(realTimeShift,activityWrapperMap.get(shiftDTO.getActivities().get(0).getActivityId()),currentDate);
+            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoList=shiftService.updateShift(ObjectMapperUtils.copyPropertiesByMapper(realTimeShift,ShiftDTO.class),false,false,ShiftActionType.SAVE);
+            shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoList.get(0));
             shiftAddedForNumberOfDays=1;
         }
-        List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         while ( shiftAddedForNumberOfDays<shiftNeedsToAddForNumberOfDays) {
                 ShiftDTO shiftDTO1 = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftDTO.class);
                 shiftDTO1.setShiftDate(shiftDTO1.getShiftDate().plusDays(shiftAddedForNumberOfDays));
@@ -135,11 +138,11 @@ public class ShiftSickService extends MongoBaseService {
         shiftDTO.getActivities().get(0).setEndDate(endDate);
     }
 
-    private void replaceWithSick(Shift shift, ActivityWrapper sickActivityWrapper) {
+    private void replaceWithSick(Shift shift, ActivityWrapper sickActivityWrapper,Date currentDate) {
         List<ShiftActivity> shiftActivities=new ArrayList<>();
         for (int i = 0; i < shift.getActivities().size(); i++) {
-            if(shift.getActivities().get(i).getInterval().contains(getCurrentDate())){
-                shift.getActivities().get(i).setEndDate(getCurrentDate());
+            if(shift.getActivities().get(i).getInterval().contains(currentDate)){
+                shift.getActivities().get(i).setEndDate(currentDate);
                 shiftActivities.add(shift.getActivities().get(i));
                 ShiftActivity shiftActivity=new ShiftActivity(sickActivityWrapper.getActivity().getName(),shift.getActivities().get(i).getEndDate(),getStartOfDay(asDate(asLocalDate(shift.getStartDate()).plusDays(1))),sickActivityWrapper.getActivity().getId(),null);
                 shiftActivities.add(shiftActivity);
