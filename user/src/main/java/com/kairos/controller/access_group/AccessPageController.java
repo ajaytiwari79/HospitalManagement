@@ -1,5 +1,6 @@
 package com.kairos.controller.access_group;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.dto.user.access_permission.AccessPageStatusDTO;
@@ -110,8 +111,8 @@ public class AccessPageController {
 
     @ApiOperation(value = "add translated data")
     @PostMapping(COUNTRY_URL + "/access_page/{accessPageId}/update_translation")
-    public ResponseEntity<Map<String, Object>> updateTranslation(@PathVariable Long accessPageId, @RequestBody TranslationDTO translationData) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.updateTranslation(accessPageId, translationData));
+    public ResponseEntity<Map<String, Object>> updateTranslationOfaccesspage(@PathVariable String moduleId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.updateTranslation(moduleId, translations));
     }
 
     @ApiOperation(value = "get translated data")
@@ -130,5 +131,17 @@ public class AccessPageController {
     @PutMapping("/set_url_in_pages")
     public ResponseEntity<Map<String, Object>> setUrlInTabHierarchy() throws IOException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.setUrlInAccessPages());
+    }
+
+    @ApiOperation(value = "add translated data")
+    @PutMapping(COUNTRY_URL + "/access_page//module/{moduleId}/language_settings")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfKpiAccessPages(@PathVariable String moduleId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.updateTranslation(moduleId, translations));
+    }
+
+    @ApiOperation(value = "add translated data")
+    @PutMapping(UNIT_URL + "/access_page//module/{moduleId}/language_settings")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfKpiAccessPagesAtUnit(@PathVariable String moduleId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.updateTranslation(moduleId, translations));
     }
 }

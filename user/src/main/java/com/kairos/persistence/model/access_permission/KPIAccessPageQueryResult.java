@@ -1,11 +1,17 @@
 package com.kairos.persistence.model.access_permission;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
+import java.util.Map;
 
 @QueryResult
+@Getter
+@Setter
 public class KPIAccessPageQueryResult {
     private String name;
     private String moduleId;
@@ -13,6 +19,7 @@ public class KPIAccessPageQueryResult {
     private boolean write;
     private boolean active;
     private List<KPIAccessPageDTO> child;
+    private Map<String, TranslationInfo> translations;
 
     public String getName() {
         return name;

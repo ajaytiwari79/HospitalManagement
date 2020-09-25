@@ -6,6 +6,7 @@ import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.LevelDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
+import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
@@ -227,5 +228,6 @@ public class OrganizationTypeService{
         organizationTypeGraphRepository.save(organizationType);
         return organizationType.getTranslatedData();
     }
+
 
 }

@@ -1,9 +1,12 @@
 package com.kairos.dto.user.access_page;
 
+import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
+
 @Getter
 @Setter
 public class KPIAccessPageDTO {
@@ -15,4 +18,5 @@ public class KPIAccessPageDTO {
     private List<KPIAccessPageDTO> child;
     private boolean enable;
     private boolean defaultTab;
+    private Map<String, TranslationInfo> translations;
 }

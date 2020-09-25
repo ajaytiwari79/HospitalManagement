@@ -299,7 +299,12 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH (accessPage) -[:"+SUB_PAGE+"]->(subPages:AccessPage{active:true,kpiEnabled:true})\n" +
             "OPTIONAL MATCH (up)-[childCustomRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(subPages) WHERE childCustomRel.accessGroupId=id(accessgroup) \n" +
             "WITH accessPage,subPages,customRel,r,childCustomRel\n" +
-            "RETURN accessPage.name as name,accessPage.moduleId as moduleId,\n" +
+            "RETURN " +
+            "{english :{name: CASE WHEN accessPage.`translatedNames.english` IS NULL THEN '' ELSE accessPage.`translatedNames.english` END, description : CASE WHEN accessPage.`translatedDescriptions.english` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN accessPage.`translatedNames.hindi` IS NULL THEN '' ELSE accessPage.`translatedNames.hindi` END, description : CASE WHEN accessPage.`translatedDescriptions.hindi` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN accessPage.`translatedNames.danish` IS NULL THEN '' ELSE accessPage.`translatedNames.danish` END, description : CASE WHEN accessPage.`translatedDescriptions.danish` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN accessPage.`translatedNames.britishenglish` IS NULL THEN '' ELSE accessPage.`translatedNames.britishenglish` END, description : CASE WHEN accessPage.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "accessPage.name as name,accessPage.moduleId as moduleId,\n" +
             "CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read,\n" +
             "CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END as write ,\n" +
             "collect( DISTINCT {name:subPages.name,moduleId:subPages.moduleId,read:CASE WHEN childCustomRel IS NULL THEN r.read ELSE childCustomRel.read END,write:CASE WHEN childCustomRel IS NULL THEN r.write ELSE childCustomRel.write END}) as child ORDER BY moduleId")

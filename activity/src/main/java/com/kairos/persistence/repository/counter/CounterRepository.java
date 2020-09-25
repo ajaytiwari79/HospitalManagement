@@ -196,7 +196,7 @@ public class CounterRepository{
                 project(TITLE,"fibonacciKPIConfigs").and(KPI_ID).as("_id").and(KPI_TYPE).as("type")
                         .and("kpi.calculationFormula").as("calculationFormula").and(KPI_COUNTER).as(COUNTER).
                         and(KPI_FIBONACCI_KPI).as("fibonacciKPI").and("kpi.description").as("kpi.description")
-                        .and("kpi.referenceId").as("referenceId")
+                        .and("kpi.referenceId").as("referenceId").and("kpi.translations").as("translations")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
         return results.getMappedResults();

@@ -69,7 +69,17 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "match(country)<-[:" + BELONGS_TO + "]-(organizationType:OrganizationType{isEnable:true})\n" +
             "optional match(organizationType)-[:" + HAS_SUB_TYPE + "]->(organizationSubType:OrganizationType{isEnable:true}) " +
             "with DISTINCT organizationType, organizationSubType " +
-            "return id(organizationType) as id, organizationType.name as name , CASE WHEN organizationSubType IS NOT NULL THEN collect({id:id(organizationSubType),name:organizationSubType.name}) ELSE [] END as children \n")
+            "return " +
+            "{english :{name: CASE WHEN organizationType.`translatedNames.english` IS NULL THEN '' ELSE organizationType.`translatedNames.english` END, description : CASE WHEN organizationType.`translatedDescriptions.english` IS NULL THEN '' ELSE organizationType.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN organizationType.`translatedNames.hindi` IS NULL THEN '' ELSE organizationType.`translatedNames.hindi` END, description : CASE WHEN organizationType.`translatedDescriptions.hindi` IS NULL THEN '' ELSE organizationType.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN organizationType.`translatedNames.danish` IS NULL THEN '' ELSE organizationType.`translatedNames.danish` END, description : CASE WHEN organizationType.`translatedDescriptions.danish` IS NULL THEN '' ELSE organizationType.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN organizationType.`translatedNames.britishenglish` IS NULL THEN '' ELSE organizationType.`translatedNames.britishenglish` END, description : CASE WHEN organizationType.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE organizationType.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "id(organizationType) as id, organizationType.name as name , CASE WHEN organizationSubType IS NOT NULL THEN collect({" +
+            "translations:{english :{name: CASE WHEN organizationSubType.`translatedNames.english` IS NULL THEN '' ELSE organizationSubType.`translatedNames.english` END, description : CASE WHEN organizationSubType.`translatedDescriptions.english` IS NULL THEN '' ELSE organizationSubType.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN organizationSubType.`translatedNames.hindi` IS NULL THEN '' ELSE organizationSubType.`translatedNames.hindi` END, description : CASE WHEN organizationSubType.`translatedDescriptions.hindi` IS NULL THEN '' ELSE organizationSubType.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN organizationSubType.`translatedNames.danish` IS NULL THEN '' ELSE organizationSubType.`translatedNames.danish` END, description : CASE WHEN organizationSubType.`translatedDescriptions.danish` IS NULL THEN '' ELSE organizationSubType.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN organizationSubType.`translatedNames.britishenglish` IS NULL THEN '' ELSE organizationSubType.`translatedNames.britishenglish` END, description : CASE WHEN organizationSubType.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE organizationSubType.`translatedDescriptions.britishenglish` END}},\n" +
+            "id:id(organizationSubType),name:organizationSubType.name}) ELSE [] END as children \n")
     List<OrganizationTypeAndSubType> getAllOrganizationTypeAndSubType(long countryId);
 
     @Query("Match (organization:Organization) where id(organization)={0} \n" +
