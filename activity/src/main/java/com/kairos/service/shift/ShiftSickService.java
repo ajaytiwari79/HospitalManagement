@@ -168,12 +168,12 @@ public class ShiftSickService extends MongoBaseService {
         Map<LocalDate,List<Shift>> shiftMap = shifts.stream().collect(Collectors.groupingBy(shift->asLocalDate(shift.getStartDate())));
         Set<BigInteger> allActivityIds=getAllActivityIds(shiftMap);
         List<Activity> activityWrappers=activityRepository.findActivitiesSickSettingByActivityIds(allActivityIds);
-        Map<BigInteger, Activity> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        Map<BigInteger, Activity> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(MongoBaseEntity::getId, v -> v));
         BigInteger activityId = shiftDetailsService.getWorkingSickActivity(ObjectMapperUtils.copyPropertiesByMapper(shifts.get(0),ShiftDTO.class),activityWrapperMap).getId();
         Optional<Activity> activityOptional = sicknessActivity.stream().filter(activity -> activity.getId().equals(activityId)).findFirst();
         if(activityOptional.isPresent()){
             Activity activity = activityOptional.get();
-            List<ActivityWrapper> protectDaysOffActivity = null;
+            List<ActivityWrapper> protectDaysOffActivity;
             if(PROTECTED_DAYS_OFF.equals(activity.getActivityRulesSettings().getSicknessSetting().getReplaceSickShift())){
                 protectDaysOffActivity = activityRepository.getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF.toString(),unitId);
                 if(isCollectionEmpty(protectDaysOffActivity)){
@@ -193,6 +193,9 @@ public class ShiftSickService extends MongoBaseService {
             Shift shift=shifts.stream().filter(k->k.getShiftType().equals(ShiftType.SICK)).findAny().orElse(null);
             if(shift!=null && autoAbsence.get()) {
                 shift.setDeleted(true);
+                if(isNull(activity.getActivityRulesSettings().getSicknessSetting().getReplaceSickShift())){
+                    exceptionService.actionNotPermittedException(PLEASE_SELECT_REPLACE_SETTINGS);
+                }
                 switch (activity.getActivityRulesSettings().getSicknessSetting().getReplaceSickShift()) {
                     case PROTECTED_DAYS_OFF:
                         List<ActivityWrapper> protectDaysOffActivity = activityRepository.getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF.toString(),activity.getUnitId());
