@@ -18,6 +18,9 @@ public class StaffingLevelActivityWithDuration {
     private int maxNoOfStaff;
     private int underStaffingOverStaffingCount;
     private Duration staffingLevelDuration;
+    private short overStaffingDurationInMinutes;
+    private short underStaffingDurationInMinutes;
+    private short resolvingUnderOrOverStaffingDurationInMinutes;
 
 
     public StaffingLevelActivityWithDuration(BigInteger activityId, int minNoOfStaff, int maxNoOfStaff, Duration staffingLevelDuration) {
@@ -33,5 +36,9 @@ public class StaffingLevelActivityWithDuration {
         this.underStaffingOverStaffingCount = staffingLevelActivityWithDuration.underStaffingOverStaffingCount;
         this.name = staffingLevelActivityWithDuration.getName();
         this.staffingLevelDuration = new Duration(staffingLevelActivityWithDuration.getStaffingLevelDuration().getFrom(),null) ;
+    }
+
+    public StaffingLevelActivityWithDuration(BigInteger activityId) {
+        this.activityId = activityId;
     }
 }

@@ -1040,10 +1040,11 @@ public class StaffingLevelService  {
             for (int i = 0; i < oldStateShift.getActivities().size(); i++) {
                 try {
                     if (activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor().equals(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor())) {
+                        Map<BigInteger,StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = new HashMap<>();
                         shift.setShiftType(oldStateShiftType);
-                        boolean isOldShiftVerifyStaffingLevel = shiftValidatorService.validateStaffingLevel(phase, oldStateShift, activityWrapperMap, false, oldStateShift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper);
+                        boolean isOldShiftVerifyStaffingLevel = shiftValidatorService.validateStaffingLevel(phase, oldStateShift, activityWrapperMap, false, oldStateShift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper,staffingLevelActivityWithDurationMap);
                         shift.setShiftType(shiftType);
-                        boolean isNewShiftVerifyStaffingLevel = shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper);
+                        boolean isNewShiftVerifyStaffingLevel = shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper,staffingLevelActivityWithDurationMap);
                         if (isNull(activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority()) || isNull(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority())) {
                             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
                         }
