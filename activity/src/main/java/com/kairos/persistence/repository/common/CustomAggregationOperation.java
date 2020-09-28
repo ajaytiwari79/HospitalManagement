@@ -15,6 +15,10 @@ public class CustomAggregationOperation implements AggregationOperation {
         this.operation = operation;
     }
 
+    public CustomAggregationOperation(String operation) {
+        this.operation = Document.parse(operation);
+    }
+
      @Override
     public Document toDocument(AggregationOperationContext context) {
         return context.getMappedObject(operation);

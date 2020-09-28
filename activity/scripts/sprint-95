@@ -31,4 +31,16 @@ db.shifts.find({"deleted":false,"unitId":2403}).forEach(function(shift){
                     accessGroupRole:"MANAGEMENT"
                 }
         db.shifts.save(shift);
-})
+});
+
+db.getCollection('staffActivitySetting').find({}).forEach(function(ac){
+
+    if(ac.activityId){
+    var activity = db.activities.findOne({"_id":ac.activityId});
+
+        print(activity._id);
+        print(activity.activityBalanceSettings.timeType);
+        ac.secondLevelTimtype = activity.activityBalanceSettings.timeType
+    db.staffActivitySetting.save(ac);
+        }
+    })
