@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.getBigIntegerString;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -287,8 +288,8 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
     @Override
     public ShiftPlanningProblemSubmitDTO findDataForAutoPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO){
-        String breakActivityIdString = getBreakActivityIdsString(shiftPlanningProblemSubmitDTO.getBreakSettingMap().values().iterator());
-        Aggregation aggregation = Aggregation.newAggregation(
+        String breakActivityIdString = getBigIntegerString(shiftPlanningProblemSubmitDTO.getBreakSettingMap().values().stream().map(breakSettingsDTO -> breakSettingsDTO.getActivityId()).collect(Collectors.toSet()).iterator());
+        Aggregation aggregation = newAggregation(
                 match(Criteria.where("_id").is(shiftPlanningProblemSubmitDTO.getPlanningPeriodId())),
                 getlookupOperationOfShiftsForPlanning(shiftPlanningProblemSubmitDTO.getStaffIds()),
                 getStaffingLevelLookupForPlanning(),
@@ -312,24 +313,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return shiftPlanningProblemSubmitDTO;
     }
 
-    public String getBreakActivityIdsString(Iterator<BreakSettingsDTO> iterator) {
-        if (!iterator.hasNext()) {
-            return "[]";
-        } else {
-            StringBuilder var2 = new StringBuilder();
-            var2.append("['");
 
-            while(true) {
-                BigInteger var3 = iterator.next().getActivityId();
-                var2.append(var3);
-                if (!iterator.hasNext()) {
-                    return var2.append("']").toString();
-                }
-
-                var2.append("','").append(' ');
-            }
-        }
-    }
 
     private CustomAggregationOperation getProjectionForPlanning() {
         return new CustomAggregationOperation(Document.parse("{$project:{\n" +

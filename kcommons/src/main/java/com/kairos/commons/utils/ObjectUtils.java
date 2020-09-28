@@ -149,4 +149,23 @@ public class ObjectUtils {
         }
         return ids;
     }
+
+    public static String getBigIntegerString(Iterator<BigInteger> iterator) {
+        if (!iterator.hasNext()) {
+            return "[]";
+        } else {
+            StringBuilder var2 = new StringBuilder();
+            var2.append("['");
+
+            while(true) {
+                BigInteger var3 = iterator.next();
+                var2.append(var3);
+                if (!iterator.hasNext()) {
+                    return var2.append("']").toString();
+                }
+
+                var2.append("','");
+            }
+        }
+    }
 }
