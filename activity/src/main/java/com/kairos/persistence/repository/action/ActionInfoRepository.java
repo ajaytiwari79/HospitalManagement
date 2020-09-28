@@ -6,9 +6,10 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 @Repository
 public interface ActionInfoRepository extends MongoBaseRepository<ActionInfo, BigInteger> {
     @Query("{'deleted':false, 'unitId':?0, 'staffId':?1}")
-    ActionInfo getByUnitIdAndStaffId(Long unitId, Long staffId);
+    Optional<ActionInfo> getByUnitIdAndStaffId(Long unitId, Long staffId);
 }
