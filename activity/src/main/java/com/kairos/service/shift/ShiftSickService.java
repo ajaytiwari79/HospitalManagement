@@ -173,7 +173,7 @@ public class ShiftSickService extends MongoBaseService {
         Optional<Activity> activityOptional = sicknessActivity.stream().filter(activity -> activity.getId().equals(activityId)).findFirst();
         if(activityOptional.isPresent()){
             Activity activity = activityOptional.get();
-            List<ActivityWrapper> protectDaysOffActivity = null;
+            List<ActivityWrapper> protectDaysOffActivity;
             if(PROTECTED_DAYS_OFF.equals(activity.getActivityRulesSettings().getSicknessSetting().getReplaceSickShift())){
                 protectDaysOffActivity = activityRepository.getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF.toString(),unitId);
                 if(isCollectionEmpty(protectDaysOffActivity)){
