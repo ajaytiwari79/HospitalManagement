@@ -207,21 +207,21 @@ public class ShiftSickService extends MongoBaseService {
                         Shift protectedShift = new Shift(asDate(date.atStartOfDay()),asDate(date.plusDays(1).atStartOfDay()),
                                  shift.getStaffId(),newArrayList(shiftActivity),shift.getEmploymentId(), shift.getUnitId(),shift.getPhaseId(),shift.getPlanningPeriodId());
                         allShiftsToUpdate.add(protectedShift);
+                        allShiftsToDelete.addAll(shifts);
                         break;
                     case FREE_DAY:
                         shifts.forEach(s->s.setDeleted(true));
+                        allShiftsToDelete.addAll(shifts);
                         break;
                     case PUBLISHED_ACTIVITY:
                         List<Shift> shiftList = shifts.stream().filter(k -> !k.getActivities().get(0).getStatus().contains(ShiftStatus.PUBLISH)).collect(Collectors.toList());
                         shiftList.forEach(shift1 -> shift1.setDeleted(true));
-                        break;
-                    case UNPUBLISHED_ACTIVITY:
+                        allShiftsToDelete.addAll(shiftList);
                         break;
                     default:
                         break;
                 }
                 autoAbsence.getAndSet(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getActivityRulesSettings().isAllowedAutoAbsence());
-                allShiftsToDelete.addAll(shifts);
             }
 
         });
