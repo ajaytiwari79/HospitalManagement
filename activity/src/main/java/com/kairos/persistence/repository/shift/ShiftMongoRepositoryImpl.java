@@ -106,7 +106,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<Shift> findAllSicknessShiftByEmploymentIdAndActivityIds(Long staffId,Collection<BigInteger> activityIds,Date startDate) {
-        Criteria criteria = where(DELETED).is(false).and(DRAFT).is(false).and(ACTIVITIES_ACTIVITY_ID).in(activityIds).and(START_DATE).gte(startDate).and(STAFF_ID).is(staffId);
+        Criteria criteria = where(DELETED).is(false).and(ACTIVITIES_ACTIVITY_ID).in(activityIds).and(START_DATE).gte(startDate).and(STAFF_ID).is(staffId);
         Query query = new Query(criteria);
         query.with(Sort.by(Sort.Direction.ASC,START_DATE));
         return mongoTemplate.find(query, Shift.class);
