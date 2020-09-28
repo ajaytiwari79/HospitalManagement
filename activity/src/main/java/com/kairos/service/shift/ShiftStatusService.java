@@ -90,6 +90,7 @@ public class ShiftStatusService {
             exceptionService.dataNotFoundException(MESSAGE_SHIFT_IDS);
         }
         Shift currentShift = shiftMongoRepository.findOne(shiftPublishDTO.getShifts().get(0).getShiftId());
+        List<ShiftActivityResponseDTO> shiftActivityResponseDTOS = new ArrayList<>();
         ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO;
         if(isNotNull(currentShift.getRequestAbsence())){
             shiftAndActivtyStatusDTO = updateStatusOfRequestAbsence(unitId, shiftPublishDTO, currentShift);
@@ -106,7 +107,7 @@ public class ShiftStatusService {
             if (isCollectionEmpty(shifts)) {
                 exceptionService.dataNotFoundException(MESSAGE_SHIFT_IDS);
             }
-            List<ShiftActivityResponseDTO> shiftActivityResponseDTOS = new ArrayList<>(shifts.size());
+
             List<ShiftDTO> shiftDTOS = new ArrayList<>(shifts.size());
             Object[] activityDetails = getActivityDetailsMap(shifts);
             Map<BigInteger, ActivityPhaseSettings> activityPhaseSettingMap = (Map<BigInteger, ActivityPhaseSettings>) activityDetails[0];
