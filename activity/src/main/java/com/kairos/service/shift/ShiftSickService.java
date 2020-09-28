@@ -127,7 +127,6 @@ public class ShiftSickService extends MongoBaseService {
                 shiftAddedForNumberOfDays++;
             }
         return shiftWithViolatedInfoDTOS;
-
     }
 
     public void setStartAndEndDate(ShiftDTO shiftDTO) {
