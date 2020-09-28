@@ -124,10 +124,10 @@ public class ShiftDetailsService extends MongoBaseService {
             if (sickShift != null) {
                 Activity activity = getWorkingSickActivity(sickShift, activityMap);
                 if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfPublishedShift()) {
-                    shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> act.getStatus().contains(ShiftStatus.PUBLISH))).collect(Collectors.toList()));
+                    shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()))).collect(Collectors.toList()));
                 }
                 if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfUnPublishedShift()) {
-                    shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> !act.getStatus().contains(ShiftStatus.PUBLISH))).collect(Collectors.toList()));
+                    shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> !act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()))).collect(Collectors.toList()));
                 }
             }
         });
