@@ -116,10 +116,10 @@ public class StaffActivitySettingService extends MongoBaseService {
     }
 
     public List<ActivityWithCompositeDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId,boolean includeTeamActivity,boolean isActivityType){
-        List<ActivityWithCompositeDTO> staffPersonalizedActivities = null;
+        List<ActivityWithCompositeDTO> staffPersonalizedActivities = staffActivitySettingRepository.findAllStaffActivitySettingByStaffIdAndUnityIdWithMostUsedActivityCount(unitId,staffId);;
         if(includeTeamActivity) {
             List<StaffActivitySettingDTO> activitySettings = staffActivitySettingRepository.findAllByStaffIdAndDeletedFalse(staffId);
-            List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId, isActivityType);
+            List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId, staffPersonalizedActivities,isActivityType);
             Map<BigInteger, ActivityWithCompositeDTO> activityMap = activityList.stream().collect(Collectors.toMap(ActivityWithCompositeDTO::getId, Function.identity()));
             activitySettings.forEach(activity -> {
                 if (activityMap.containsKey(activity.getActivityId())) {

@@ -616,12 +616,13 @@ public class OrganizationActivityService extends MongoBaseService {
 
     }
 
-    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId, Long staffId, boolean isActivityType) {
-        Set<BigInteger> activityList = newHashSet();
-        if(!isActivityType) {
-            activityList = userIntegrationService.getTeamActivitiesOfStaff(unitId, staffId);
-        }
-        return activityMongoRepository.findAllActivityByIdsAndIncludeChildActivitiesWithMostUsedCountOfActivity(activityList,unitId,staffId,isActivityType);
+    public List<ActivityWithCompositeDTO> getTeamActivitiesOfStaff(Long unitId, Long staffId, List<ActivityWithCompositeDTO> staffPersonalizedActivities,boolean isActivityType) {
+        Set<BigInteger> activityList = userIntegrationService.getTeamActivitiesOfStaff(unitId, staffId);
+        List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityList);
+        Set<BigInteger> activityIds = activities.stream().filter(activity -> isCollectionNotEmpty(activity.getChildActivityIds())).map(activity -> activity.getId()).collect(Collectors.toSet());
+        Set<BigInteger> allActivities = isActivityType?activityIds:activityList;
+        allActivities.addAll(staffPersonalizedActivities.stream().map(ActivityWithCompositeDTO::getActivityId).collect(Collectors.toSet()));
+        return activityMongoRepository.findAllActivityWithCompositeDTOByIds(allActivities);
     }
 
     private void updateSkills(Activity activityCopied){
