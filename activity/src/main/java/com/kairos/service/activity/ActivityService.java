@@ -41,6 +41,7 @@ import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -56,6 +57,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.glide_time.GlideTimeSettingsService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.organization.OrganizationActivityService;
+import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.shift.ShiftService;
@@ -107,7 +109,10 @@ public class ActivityService {
     @Inject private ActivitySchedulerJobService activitySchedulerJobService;
     @Inject private ActivitySettingsService activitySettingsService;
     @Inject private StaffActivityDetailsService staffActivityDetailsService;
+    @Inject private PlanningPeriodService planningPeriodService;
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
+
+
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
         if (activityDTO.getEndDate() != null && activityDTO.getEndDate().isBefore(activityDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ENDDATE_GREATERTHAN_STARTDATE);
@@ -485,7 +490,8 @@ public class ActivityService {
             if (CutOffIntervalUnit.DAYS.equals(rulesActivityDTO.getCutOffIntervalUnit()) && rulesActivityDTO.getCutOffdayValue() == 0) {
                 exceptionService.invalidRequestException(ERROR_DAYVALUE_ZERO);
             }
-            List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(), rulesActivityDTO.getCutOffIntervalUnit(), rulesActivityDTO.getCutOffdayValue());
+            PlanningPeriod planningPeriod = planningPeriodService.getLastPlanningPeriod(UserContext.getUserDetails().getLastSelectedOrganizationId());
+            List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(), rulesActivityDTO.getCutOffIntervalUnit(), rulesActivityDTO.getCutOffdayValue(),planningPeriod.getEndDate());
             activityRulesSettings.setCutOffIntervals(cutOffIntervals);
             rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
         }
@@ -549,7 +555,8 @@ public class ActivityService {
     }
     public List<CutOffInterval> getCutOffInterValOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        return ActivityUtil.getCutoffInterval(activity.getActivityRulesSettings().getCutOffStartFrom(),activity.getActivityRulesSettings().getCutOffIntervalUnit(), activity.getActivityRulesSettings().getCutOffdayValue());
+        PlanningPeriod planningPeriod = planningPeriodService.getLastPlanningPeriod(UserContext.getUserDetails().getLastSelectedOrganizationId());
+        return ActivityUtil.getCutoffInterval(activity.getActivityRulesSettings().getCutOffStartFrom(),activity.getActivityRulesSettings().getCutOffIntervalUnit(), activity.getActivityRulesSettings().getCutOffdayValue(),planningPeriod.getEndDate());
     }
     public ActivitySettingsWrapper getCommunicationTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
