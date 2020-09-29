@@ -409,6 +409,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_EMAIL_ALREADYEXIST = "message.email.alreadyExist";
     public static final String MESSAGE_FUNCTIONALPAYMENT_ALREADYPUBLISHED = "message.functionalPayment.alreadyPublished";
     public static final String MESSAGE_PUBLISHDATE_NOTLESSTHAN_STARTDATE = "message.publishDate.notlessthan.startDate";
+    public static final String MESSAGE_PUBLISHDATE_NOTLESSTHAN_CURRENTDATE = "message.publishDate.notlessthan.currentDate";
     public static final String MESSAGE_PUBLISHDATE_NOTLESSTHAN_OR_EQUALS_PARENT_STARTDATE = "message.publishDate.notlessthan_or_equals.parent_startDate";
     public static final String MESSAGE_MAIN_EMPLOYMENT_EXISTS_WITH_END_DATE = "message.main_employment.exists_with_end_date";
     public static final String MESSAGE_MAIN_EMPLOYMENT_EXISTS = "message.main_employment.exists";
