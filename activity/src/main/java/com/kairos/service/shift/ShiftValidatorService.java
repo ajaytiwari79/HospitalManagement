@@ -221,7 +221,7 @@ public class ShiftValidatorService {
         if (planningPeriod == null) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PLANNING_PERIOD_EXITS, shift.getStartDate());
         }
-        if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaffId().equals(shift.getStaffId())) {
+        if (staffAdditionalInfoDTO.getUserAccessRoleDTO().isStaff() && !staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaffId().equals(shift.getStaffId())) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PERMISSION);
         }
         Shift mainShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
@@ -919,7 +919,7 @@ public class ShiftValidatorService {
         }
         Object[] shiftOverlapInfo = getShiftOverlapInfo(overlappedShifts, shiftInterval);
         boolean isShiftOverlapped = (boolean) shiftOverlapInfo[0];
-        if (isShiftOverlapped && !CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) && isNull(activityWrapper.getActivity().getActivityRulesSettings().getSicknessSetting()) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
+        if (isShiftOverlapped && !CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) && isNull(activityWrapper.getActivity().getActivityRulesSettings().getSicknessSetting()) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().isManagement()) {
             shiftOverlappedWithNonWorkingType = true;
         }
         return new Object[]{shiftOverlappedWithNonWorkingType, shiftOverlapInfo[1]};

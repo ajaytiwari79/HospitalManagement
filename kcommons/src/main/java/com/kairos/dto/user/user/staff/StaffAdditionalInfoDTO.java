@@ -109,10 +109,10 @@ public class StaffAdditionalInfoDTO {
     public Set<AccessGroupRole> getRoles() {
         Set<AccessGroupRole> roles = new HashSet<>();
         if(userAccessRoleDTO!=null) {
-            if (Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement()) {
+            if (userAccessRoleDTO.isManagement()) {
                 roles.add(AccessGroupRole.MANAGEMENT);
             }
-            if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
+            if (userAccessRoleDTO.isStaff()) {
                 roles.add(AccessGroupRole.STAFF);
             }
         }
@@ -122,10 +122,10 @@ public class StaffAdditionalInfoDTO {
     public Set<CalculateValueIfPlanned> getCalculateValueIfPlanneds() {
         Set<CalculateValueIfPlanned> roles = new HashSet<>();
         if(userAccessRoleDTO!=null) {
-            if (Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement()) {
+            if (userAccessRoleDTO.isManagement()) {
                 roles.add(CalculateValueIfPlanned.MANAGER);
             }
-            if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
+            if (userAccessRoleDTO.isStaff()) {
                 roles.add(CalculateValueIfPlanned.STAFF);
             }
         }

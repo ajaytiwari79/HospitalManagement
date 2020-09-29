@@ -803,7 +803,7 @@ public class ShiftService extends MongoBaseService {
 
     public List<ShiftDTO> updateDraftShiftToShift(List<ShiftDTO> shifts, UserAccessRoleDTO userAccessRoleDTO) {
         List<ShiftDTO> shiftDTOS = new ArrayList<>();
-        if (userAccessRoleDTO.getManagement()) {
+        if (userAccessRoleDTO.isManagement()) {
             for (ShiftDTO shift : shifts) {
                 if (isNotNull(shift.getDraftShift())) {
                     ShiftDTO shiftDTO = shift.getDraftShift();
@@ -834,7 +834,7 @@ public class ShiftService extends MongoBaseService {
         Shift shift = shiftMongoRepository.findById(shiftId).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_SHIFT_IDS)));
         Activity activity = activityRepository.findOne(shift.getActivities().get(0).getActivityId());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()), shift.getStaffId(), shift.getEmploymentId(), Collections.emptySet());
-        if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaffId().equals(shift.getStaffId())) {
+        if (staffAdditionalInfoDTO.getUserAccessRoleDTO().isStaff() && !staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaffId().equals(shift.getStaffId())) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PERMISSION);
         }
         ViolatedRulesDTO violatedRulesDTO;
@@ -933,10 +933,10 @@ public class ShiftService extends MongoBaseService {
         for (Map.Entry<Long, List<ShiftDTO>> employmentIdAndShiftEntry : employmentIdAndShiftsMap.entrySet()) {
             assignedShifts.addAll(wtaRuleTemplateCalculationService.updateRestingTimeInShifts(employmentIdAndShiftEntry.getValue()));
         }
-        List<OpenShift> openShifts = userAccessRoleDTO.getManagement() ? openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate) : openShiftNotificationMongoRepository.findValidOpenShiftsForStaff(userAccessRoleDTO.getStaffId(), startDate, endDate);
+        List<OpenShift> openShifts = userAccessRoleDTO.isManagement() ? openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate) : openShiftNotificationMongoRepository.findValidOpenShiftsForStaff(userAccessRoleDTO.getStaffId(), startDate, endDate);
         ButtonConfig buttonConfig = null;
         if (Optional.ofNullable(viewType).isPresent() && viewType.toString().equalsIgnoreCase(ViewType.WEEKLY.toString())) {
-            buttonConfig = shiftStateService.findButtonConfig(assignedShifts, userAccessRoleDTO.getManagement());
+            buttonConfig = shiftStateService.findButtonConfig(assignedShifts, userAccessRoleDTO.isManagement());
         }
         StaffAccessRoleDTO staffAccessRoleDTO = new StaffAccessRoleDTO(userAccessRoleDTO.getStaffId(), getAccessGroupRole(userAccessRoleDTO));
         Map<LocalDate, List<FunctionDTO>> appliedFunctionDTOs = userIntegrationService.getFunctionsOfEmployment(unitId, startLocalDate, endLocalDate);
@@ -948,10 +948,10 @@ public class ShiftService extends MongoBaseService {
 
     private List<AccessGroupRole> getAccessGroupRole(UserAccessRoleDTO userAccessRoleDTO){
         List<AccessGroupRole> roles = new ArrayList<>();
-        if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getManagement()) {
+        if (!userAccessRoleDTO.isStaff()) {
             roles.add(MANAGEMENT);
         }
-        if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
+        if (userAccessRoleDTO.isStaff()) {
             roles.add(AccessGroupRole.STAFF);
         }
         return roles;
@@ -972,7 +972,7 @@ public class ShiftService extends MongoBaseService {
     }
 
     private List<ShiftDTO> getShiftOfStaffByExpertiseId(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long expertiseId, StaffFilterDTO staffFilterDTO) {
-        if (staffId == null || endDate == null || expertiseId == null) {
+        if (isNull(staffId) || isNull(endDate) || isNull(expertiseId)) {
             exceptionService.actionNotPermittedException(STAFF_ID_END_DATE_NULL);
         }
         Long employmentId = userIntegrationService.getEmploymentId(unitId, staffId, expertiseId);
