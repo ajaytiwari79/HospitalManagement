@@ -148,8 +148,7 @@ public class EmploymentCTAWTAService {
     }
 
     public CTATableSettingWrapper getAllCTAOfStaff(Long unitId, Long staffId) {
-        User user = userGraphRepository.getUserByStaffId(staffId);
-        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsAndWTAByUser(user.getId());
+        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsByStaffId(staffId);
         List<Long> employmentIds = employmentQueryResults.stream().map(EmploymentQueryResult::getId).collect(Collectors.toList());
         List<NameValuePair> requestParam = Collections.singletonList(new BasicNameValuePair("employmentIds", employmentIds.toString().replace("[", "").replace("]", "")));
         CTATableSettingWrapper ctaTableSettingWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_CTA, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTATableSettingWrapper>>() {
@@ -165,8 +164,7 @@ public class EmploymentCTAWTAService {
         return ctaTableSettingWrapper;
     }
     public WTATableSettingWrapper getAllWTAOfStaff(Long unitId, Long staffId) {
-        User user = userGraphRepository.getUserByStaffId(staffId);
-        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsAndWTAByUser(user.getId());
+        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsByStaffId(staffId);
         List<Long> employmentIds = employmentQueryResults.stream().map(EmploymentQueryResult::getId).collect(Collectors.toList());
 
         List<NameValuePair> param = Collections.singletonList(new BasicNameValuePair("employmentIds", employmentIds.toString().replace("[", "").replace("]", "")));
