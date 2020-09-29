@@ -9,6 +9,7 @@ import com.kairos.dto.activity.cta.*;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
+import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
@@ -29,6 +30,7 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.cta_compensation_settings.CTACompensationSettingService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -84,6 +86,7 @@ public class CostTimeAgreementService {
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
     private TimeBankService timeBankService;
+    @Inject private CTACompensationSettingService ctaCompensationSettingService;
 
 
     /**
@@ -124,6 +127,9 @@ public class CostTimeAgreementService {
         this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, false, countryDTO);
         ctaRuleTemplate.setCountryId(countryId);
         ctaRuleTemplate.setStaffFunctions(null);
+        if(CalculationFor.CONDITIONAL_BONUS.equals(ctaRuleTemplate.getCalculationFor())){
+            ctaCompensationSettingService.validateInterval(ctaRuleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations());
+        }
         ctaRuleTemplateRepository.save(ctaRuleTemplate);
         ctaRuleTemplateDTO.setId(ctaRuleTemplate.getId());
         return ctaRuleTemplateDTO;
@@ -270,7 +276,12 @@ public class CostTimeAgreementService {
 
     private CTAResponseDTO updateEmploymentCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO ctaDTO) {
         List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyCollectionPropertiesByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
-        ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
+        ctaRuleTemplates.forEach(ctaRuleTemplate -> {
+            if(CalculationFor.CONDITIONAL_BONUS.equals(ctaRuleTemplate.getCalculationFor())){
+                ctaCompensationSettingService.validateInterval(ctaRuleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations());
+            }
+            ctaRuleTemplate.setId(null);
+        });
         if (CollectionUtils.isNotEmpty(ctaRuleTemplates)) {
             ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
         }
@@ -364,7 +375,12 @@ public class CostTimeAgreementService {
     private List<CTARuleTemplate> getCtaRuleTemplates(CollectiveTimeAgreementDTO ctaDTO, CostTimeAgreement costTimeAgreement) {
         List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyCollectionPropertiesByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
         if (!ctaRuleTemplates.isEmpty()) {
-            ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
+            ctaRuleTemplates.forEach(ctaRuleTemplate -> {
+                if(CalculationFor.CONDITIONAL_BONUS.equals(ctaRuleTemplate.getCalculationFor())){
+                    ctaCompensationSettingService.validateInterval(ctaRuleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations());
+                }
+                ctaRuleTemplate.setId(null);
+            });
             ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
             List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
             costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
@@ -501,6 +517,9 @@ public class CostTimeAgreementService {
         collectiveTimeAgreementDTO.setTags(tagDTOS);
         List<CTARuleTemplate> ctaRuleTemplates = new ArrayList<>(collectiveTimeAgreementDTO.getRuleTemplates().size());
         for (CTARuleTemplateDTO ctaRuleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()) {
+            if(CalculationFor.CONDITIONAL_BONUS.equals(ctaRuleTemplateDTO.getCalculationFor())){
+                ctaCompensationSettingService.validateInterval(ctaRuleTemplateDTO.getCalculateValueAgainst().getCtaCompensationConfigurations());
+            }
             CTARuleTemplate ctaRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ctaRuleTemplateDTO, CTARuleTemplate.class);
             ctaRuleTemplate.setId(null);
             setActivityBasesCostCalculationSettings(ctaRuleTemplate);
@@ -567,7 +586,6 @@ public class CostTimeAgreementService {
         logger.info("saving CostTimeAgreement unit {}", unitId);
         if (costTimeAgreementRepository.isCTAExistWithSameNameInUnit(unitId, collectiveTimeAgreementDTO.getName().trim(), new BigInteger("1"))) {
             exceptionService.duplicateDataException(MESSAGE_CTA_NAME_ALREADYEXIST, collectiveTimeAgreementDTO.getName());
-
         }
         OrganizationDTO organization = userIntegrationService.getOrganization();
         collectiveTimeAgreementDTO.setId(null);
@@ -684,6 +702,9 @@ public class CostTimeAgreementService {
             for (CTARuleTemplatePhaseInfo ctaRuleTemplatePhaseInfo : ctaRuleTemplate.getPhaseInfo()) {
                 BigInteger phaseId = parentPhasesAndUnitPhaseIdMap.getOrDefault(phaseDefaultNameMap.get(ctaRuleTemplatePhaseInfo.getPhaseId()), ctaRuleTemplatePhaseInfo.getPhaseId());
                 ctaRuleTemplatePhaseInfo.setPhaseId(phaseId);
+            }
+            if(CalculationFor.CONDITIONAL_BONUS.equals(ctaRuleTemplate.getCalculationFor())){
+                ctaCompensationSettingService.validateInterval(ctaRuleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations());
             }
         }
     }
