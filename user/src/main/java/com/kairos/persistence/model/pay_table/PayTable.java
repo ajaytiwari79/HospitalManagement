@@ -36,7 +36,6 @@ public class PayTable extends UserBaseEntity {
     private List<PayGrade> payGrades=new ArrayList<>();
     private String description;
     private boolean published;
-    private boolean hasTempCopy;
     private boolean editable = true;
 
     @Relationship(type = HAS_TEMP_PAY_TABLE, direction = INCOMING)

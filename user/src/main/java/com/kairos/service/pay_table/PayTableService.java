@@ -251,7 +251,6 @@ public class PayTableService {
         if (payGradeDTO != null) {
             payGradeResponses.add(addPayGradeInCurrentPayTable(copiedPayTable, payGradeDTO));
         }
-        payTable.setHasTempCopy(true);
         copiedPayTable.setPublished(false);
         payTableGraphRepository.save(copiedPayTable);
         //copying all previous and then adding in pay Table as well.
@@ -494,9 +493,7 @@ public class PayTableService {
         payTableByMapper.setPayTable(payTable);
         payTableByMapper.setPayGrades(null);
         payTableByMapper.setPublished(false);
-        payTable.setHasTempCopy(true);
         payTable.setEditable(false);
-        payTableByMapper.setHasTempCopy(false);
         payTableGraphRepository.save(payTableByMapper);
         return payTableByMapper;
     }
@@ -511,7 +508,6 @@ public class PayTableService {
             payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), endDate.toString());
             validatePayTableToPublish(payTableId, publishedDate);
             parentPayTable.setEndDateMillis(endDate);
-            parentPayTable.setHasTempCopy(false);
             parentPayTable.setPayTable(null);
             response.add(parentPayTable);
         } else if (!payTable.getStartDateMillis().equals(publishedDate)) {
