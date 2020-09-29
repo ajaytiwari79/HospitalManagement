@@ -9,6 +9,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
@@ -17,12 +18,14 @@ import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.ActivitySkillSettings;
 import com.kairos.persistence.model.activity.tabs.ActivityTimeCalculationSettings;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.wrapper.activity.ActivitySettingsWrapper;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +58,7 @@ public class TimeTypeService extends MongoBaseService {
     @Inject private ShiftMongoRepository shiftMongoRepository;
     @Inject private ActivityService activityService;
     @Inject private ExecutorService executorService;
+    @Inject private PlanningPeriodService planningPeriodService;
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
         List<String> timeTypeLabels = timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
@@ -474,7 +478,8 @@ public class TimeTypeService extends MongoBaseService {
             if (CutOffIntervalUnit.DAYS.equals(rulesActivityDTO.getCutOffIntervalUnit()) && rulesActivityDTO.getCutOffdayValue() == 0) {
                 exceptionService.invalidRequestException(ERROR_DAYVALUE_ZERO);
             }
-            List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(), rulesActivityDTO.getCutOffIntervalUnit(), rulesActivityDTO.getCutOffdayValue());
+            PlanningPeriod planningPeriod = planningPeriodService.getLastPlanningPeriod(UserContext.getUserDetails().getLastSelectedOrganizationId());
+            List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(), rulesActivityDTO.getCutOffIntervalUnit(), rulesActivityDTO.getCutOffdayValue(),planningPeriod.getEndDate());
             activityRulesSettings.setCutOffIntervals(cutOffIntervals);
             rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
         }
