@@ -942,7 +942,8 @@ public class ShiftService extends MongoBaseService {
         Map<LocalDate, List<FunctionDTO>> appliedFunctionDTOs = userIntegrationService.getFunctionsOfEmployment(unitId, startLocalDate, endLocalDate);
         Map<LocalDate, List<ShiftDTO>> shiftsMap = assignedShifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
         shiftDetailsService.setLayerInShifts(shiftsMap);
-        return new ShiftWrapper(assignedShifts, getOpenShiftResponceDTOS(openShifts), staffAccessRoleDTO, buttonConfig, appliedFunctionDTOs);
+        List<ShiftDTO> shiftDTOS=shiftsMap.values().stream().flatMap(List::stream).collect(Collectors.toList());
+        return new ShiftWrapper(shiftDTOS, getOpenShiftResponceDTOS(openShifts), staffAccessRoleDTO, buttonConfig, appliedFunctionDTOs);
     }
 
     private List<AccessGroupRole> getAccessGroupRole(UserAccessRoleDTO userAccessRoleDTO){

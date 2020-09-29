@@ -8,6 +8,7 @@ import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
@@ -110,7 +111,7 @@ public class ShiftSickService extends MongoBaseService {
         Shift realTimeShift = shiftMongoRepository.findRealTimeShiftByStaffId(shiftDTO.getStaffId(),currentDate);
         int shiftAddedForNumberOfDays=0;
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
-        if(isNotNull(realTimeShift)){
+        if(PhaseDefaultName.REALTIME.equals(phase.getPhaseEnum()) && isNotNull(realTimeShift)){
             Map<BigInteger,ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(Arrays.asList(realTimeShift),shiftDTO);
             replaceWithSick(realTimeShift,activityWrapperMap.get(shiftDTO.getActivities().get(0).getActivityId()),currentDate);
             List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoList=shiftService.updateShift(ObjectMapperUtils.copyPropertiesByMapper(realTimeShift,ShiftDTO.class),false,false,ShiftActionType.SAVE);
@@ -190,6 +191,7 @@ public class ShiftSickService extends MongoBaseService {
         shiftMap.forEach((date,shifts)->{
             Shift shift=shifts.stream().filter(k->k.getShiftType().equals(ShiftType.SICK)).findAny().orElse(null);
             if(shift!=null && autoAbsence.get()) {
+                allShiftsToDelete.add(shift);
                 shift.setDeleted(true);
                 if(isNull(activity.getActivityRulesSettings().getSicknessSetting().getReplaceSickShift())){
                     exceptionService.actionNotPermittedException(PLEASE_SELECT_REPLACE_SETTINGS);
