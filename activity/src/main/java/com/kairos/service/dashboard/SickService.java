@@ -124,20 +124,20 @@ public class SickService {
 
     public void validateSickSettings(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<Shift> shifts, List<String> errorMessages, SicknessSetting sicknessSetting) {
         if (!(sicknessSetting.isCanOnlyUsedOnMainEmployment() && EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType()))) {
-            errorMessages.add(exceptionService.convertMessage(MESSAGE_STAFF_MAIN_EMPLOYMENT_NOT_FOUND));
+            exceptionService.actionNotPermittedException(MESSAGE_STAFF_MAIN_EMPLOYMENT_NOT_FOUND);
         }
         if (isCollectionNotEmpty(activityWrapper.getActivity().getActivityRulesSettings().getStaffTagIds())) {
             Set<BigInteger> tadIds = staffAdditionalInfoDTO.getTags().stream().map(TagDTO::getId).collect(Collectors.toSet());
             if (CollectionUtils.containsAny(tadIds, activityWrapper.getActivity().getActivityRulesSettings().getStaffTagIds())) {
-                errorMessages.add(exceptionService.convertMessage(STAFF_NOT_ALLOWED_ON_TAG));
+                exceptionService.actionNotPermittedException(STAFF_NOT_ALLOWED_ON_TAG);
             }
 
         }
         if (sicknessSetting.isValidForChildCare() && isCollectionEmpty(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays())) {
-            errorMessages.add(exceptionService.convertMessage(MESSAGE_STAFF_CARE_DAYS_NOT_FOUND));
+            exceptionService.actionNotPermittedException(MESSAGE_STAFF_CARE_DAYS_NOT_FOUND);
         }
         if (sicknessSetting.isUsedOnFreeDays() && isCollectionNotEmpty(shifts)) {
-            errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_FREEDAY));
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_USEDON_FREEDAY);
         }
     }
 }
