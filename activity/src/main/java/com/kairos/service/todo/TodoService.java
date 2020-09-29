@@ -296,7 +296,7 @@ public class TodoService {
 
     //
     public List<TodoDTO> getAllTodoOfStaff(Long staffId) {
-        Sort sort = new Sort(Sort.Direction.DESC, "createdAt");
+        Sort sort = new Sort(Sort.Direction.DESC, "updatedAt");
         return todoRepository.findAllTodoByStaffId(staffId,sort);
     }
 

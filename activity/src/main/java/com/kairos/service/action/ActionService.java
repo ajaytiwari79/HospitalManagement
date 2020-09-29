@@ -171,10 +171,7 @@ public class ActionService {
     }
 
     public Map<String, Long> updateActionInfoOfStaff(Long unitId, Long staffId, String actionName) {
-        ActionInfo actionInfo = actionInfoRepository.getByUnitIdAndStaffId(unitId, staffId);
-        if(isNull(actionInfo)){
-            actionInfo = new ActionInfo(unitId, staffId, new HashMap<>());
-        }
+        ActionInfo actionInfo = actionInfoRepository.getByUnitIdAndStaffId(unitId, staffId).orElse(new ActionInfo(unitId, staffId, new HashMap<>()));
         Long actionCount = actionInfo.getActionCount().getOrDefault(actionName, 0L);
         actionInfo.getActionCount().put(actionName, ++actionCount);
         actionInfoRepository.save(actionInfo);
@@ -182,7 +179,7 @@ public class ActionService {
     }
 
     public Map<String, Long> getActionInfoOfStaff(Long unitId, Long staffId) {
-        ActionInfo actionInfo = actionInfoRepository.getByUnitIdAndStaffId(unitId, staffId);
-        return isNotNull(actionInfo) ? actionInfo.getActionCount() : new HashMap<>();
+        ActionInfo actionInfo = actionInfoRepository.getByUnitIdAndStaffId(unitId, staffId).orElse(new ActionInfo(unitId, staffId, new HashMap<>()));
+        return actionInfo.getActionCount();
     }
 }

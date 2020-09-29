@@ -953,4 +953,180 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return mongoTemplate.find(query,Activity.class).stream().map(activity -> activity.getId()).collect(Collectors.toSet());
     }
 
+    @Override
+    public List<ActivityWithCompositeDTO> findAllActivityByIdsAndIncludeChildActivitiesWithMostUsedCountOfActivity(Collection<BigInteger> activityIds,Long unitId, Long staffId, boolean isActivityType) {
+        String activityIdString = getBigIntegerString(activityIds.iterator());
+        AggregationOperation[] aggregations = new AggregationOperation[10];
+        int i=0;
+        aggregations[i++] = match(Criteria.where("staffId").is(staffId).and(DELETED).is(false));
+        aggregations[i++] = group("staffId").addToSet("activityId").as("activityIds");
+        aggregations[i++] = getCustomLookUpForActivityAggregationOperation(activityIdString,isActivityType);
+        aggregations[i++] = getCustomAggregationOperationForChildActivitiyIds();
+        aggregations[i++] = getCustomAggregationOperationForConcatArray();
+        aggregations[i++] = getCustomAggregationOperationForActivities();
+        aggregations[i++] = new CustomAggregationOperation("{\"$unwind\": \"$activities\"}");
+        aggregations[i++] = getCustomAggregationOperationForReplaceActivity();
+        aggregations[i++] = getCustomAggregationOperationForStaffActivitySetting();
+        aggregations[i++] = getCustomAggregationOperationForMatchCount();
+        return mongoTemplate.aggregate(Aggregation.newAggregation(aggregations), "staffActivitySetting", ActivityWithCompositeDTO.class).getMappedResults();
+    }
+
+    private CustomAggregationOperation getCustomAggregationOperationForMatchCount() {
+        return new CustomAggregationOperation("{\n" +
+                "      \"$addFields\": {\n" +
+                "        \"mostlyUsedCount\": {\n" +
+                "          \"$arrayElemAt\": [\n" +
+                "            \"$useActivityCount.useActivityCount\",\n" +
+                "            0\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }");
+    }
+
+    private CustomAggregationOperation getCustomAggregationOperationForStaffActivitySetting() {
+        return new CustomAggregationOperation("{\n" +
+                "      \"$lookup\": {\n" +
+                "        \"from\": \"staffActivityDetails\",\n" +
+                "        \"let\": {\n" +
+                "          \"staffId\": 2455,\n" +
+                "          \"activityId\": \"$_id\"\n" +
+                "        },\n" +
+                "        \"pipeline\": [\n" +
+                "          {\n" +
+                "            \"$match\": {\n" +
+                "              \"$expr\": {\n" +
+                "                \"$and\": [\n" +
+                "                  {\n" +
+                "                    \"$eq\": [\n" +
+                "                      \"$staffId\",\n" +
+                "                      \"$$staffId\"\n" +
+                "                    ]\n" +
+                "                  },\n" +
+                "                  {\n" +
+                "                    \"$gte\": [\n" +
+                "                      \"$activityId\",\n" +
+                "                      \"$$activityId\"\n" +
+                "                    ]\n" +
+                "                  }\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            }\n" +
+                "          },\n" +
+                "          {\n" +
+                "            \"$project\": {\n" +
+                "              \"useActivityCount\": 1,\n" +
+                "              \"_id\": 0\n" +
+                "            }\n" +
+                "          }\n" +
+                "        ],\n" +
+                "        \"as\": \"useActivityCount\"\n" +
+                "      }\n" +
+                "    }");
+    }
+
+    private CustomAggregationOperation getCustomAggregationOperationForReplaceActivity() {
+        return new CustomAggregationOperation("{\n" +
+                "      \"$replaceRoot\": {\n" +
+                "        \"newRoot\": \"$activities\"\n" +
+                "      }\n" +
+                "    }");
+    }
+
+    private CustomAggregationOperation getCustomAggregationOperationForChildActivitiyIds() {
+        return new CustomAggregationOperation("{\n" +
+                "      \"$project\": {\n" +
+                "        \"activityIds\": 1,\n" +
+                "        \"otherActivityIds\": \n" +
+                "               {\n" +
+                "                 $cond: { if: { $ne: [ \"$activities\", [] ] }, then: {\n" +
+                "          \"$arrayElemAt\": [\n" +
+                "            \"$activities.activityIds\",\n" +
+                "            0\n" +
+                "          ]\n" +
+                "        }, else: [] }\n" +
+                "               }\n" +
+                "          \n" +
+                "      }\n" +
+                "    }");
+    }
+
+    private CustomAggregationOperation getCustomAggregationOperationForConcatArray() {
+        return new CustomAggregationOperation("{\n" +
+                "        $project:{\n" +
+                "            \"_id\":0,\n" +
+                "            \"activityIds\": {\n" +
+                "          \"$concatArrays\": [\"$activityIds\",\"$otherActivityIds\"]\n" +
+                "        }\n" +
+                "            }\n" +
+                "        }");
+    }
+
+    private CustomAggregationOperation getCustomAggregationOperationForActivities() {
+        return new CustomAggregationOperation("{\n" +
+                "      \"$lookup\": {\n" +
+                "        \"from\": \"activities\",\n" +
+                "        \"let\": {\n" +
+                "          \"activityIds\": \"$activityIds\"\n" +
+                "        },\n" +
+                "        \"pipeline\": [\n" +
+                "          {\n" +
+                "            \"$match\": {\n" +
+                "              \"$expr\": {\n" +
+                "                \"$and\": [\n" +
+                "                  {\n" +
+                "                    \"$in\": [\n" +
+                "                      \"$_id\",\n" +
+                "                      \"$$activityIds\"\n" +
+                "                    ]\n" +
+                "                  }\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            }\n" +
+                "          }\n" +
+                "        ],\n" +
+                "        \"as\": \"activities\"\n" +
+                "      }\n" +
+                "    }");
+    }
+
+    private CustomAggregationOperation getCustomLookUpForActivityAggregationOperation(String activityString,boolean isActivityType) {
+        String condition = isActivityType ?  "                { \"$ne\": [ \"$childActivityIds\", [] ] },\n" : "";
+        return new CustomAggregationOperation("{\n" +
+                "    \"$lookup\": {\n" +
+                "      \"from\": \"activities\",\n" +
+                "      \"let\": {\n" +
+                "        \"activityIds\": \"$activityIds\"\n" +
+                "      },\n" +
+                "      \"pipeline\": [\n" +
+                "        {\n" +
+                "          \"$match\": {\n" +
+                "            \"$expr\": {\n" +
+                "              \"$and\": [\n" +
+                condition+
+                "                {\n" +
+                "                  \"$in\": [\n" +
+                "                    \"$_id\",\n" +
+                "                    "+activityString+"\n" +
+                "                  ]\n" +
+                "                }\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"$group\": {\n" +
+                "            \"_id\": \"$unitId\",\n" +
+                "            \"activityIds\": {\n" +
+                "              \"$addToSet\": \"$_id\"\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ],\n" +
+                "      \"as\": \"activities\"\n" +
+                "    }\n" +
+                "  }");
+    }
+
+
 }

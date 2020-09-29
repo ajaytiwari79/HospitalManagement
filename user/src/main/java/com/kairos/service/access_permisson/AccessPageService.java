@@ -267,10 +267,16 @@ public class AccessPageService {
        return accessPageRepository.getAccessPermission(userId,  organizationIds);
     }
 
-    public Map<String, TranslationInfo> updateTranslation(Long accessPageId, TranslationDTO translationData) {
-        AccessPage accessPage = accessPageRepository.findOne(accessPageId);
-        accessPage.setTranslatedNames(translationData.getTranslatedNames());
-        accessPage.setTranslatedDescriptions(translationData.getTranslatedDescriptions());
+    public Map<String, TranslationInfo> updateTranslation(String moduleId, Map<String,TranslationInfo> translationData) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translationData.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        AccessPage accessPage = accessPageRepository.findByModuleId(moduleId);
+        accessPage.setTranslatedNames(translatedNames);
+        accessPage.setTranslatedDescriptions(translatedDescriptios);
         accessPageRepository.save(accessPage);
         return accessPage.getTranslatedData();
     }

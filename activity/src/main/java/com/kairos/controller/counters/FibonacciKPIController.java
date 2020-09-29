@@ -1,5 +1,6 @@
 package com.kairos.controller.counters;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
 import com.kairos.dto.response.ResponseDTO;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -86,5 +88,16 @@ public class FibonacciKPIController {
     @GetMapping(value = UNIT_URL+FIBONACCI+"/{fibonacciKPIId}")
     public ResponseEntity<ResponseDTO<Object>> getOneFibonacciKPIAtUnit(@PathVariable BigInteger fibonacciKPIId,@PathVariable Long unitId){
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.getOneFibonacciKPI(fibonacciKPIId,unitId,ConfLevel.UNIT));
+    }
+
+    @PutMapping(value = COUNTRY_URL+FIBONACCI+"/{fibonacciKPIId}/language_settings")
+    public ResponseEntity<ResponseDTO<Object>> updateTranslationDataFibonacciKPIAtCountry(@PathVariable BigInteger fibonacciKPIId, @RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.updateTranslationData(fibonacciKPIId,translations));
+    }
+
+    @PutMapping(value = UNIT_URL+FIBONACCI+"/{fibonacciKPIId}/language_settings")
+    public ResponseEntity<ResponseDTO<Object>> updateTranslationDataFibonacciKPIAtUnit
+            (@PathVariable BigInteger fibonacciKPIId, @RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.updateTranslationData(fibonacciKPIId,translations));
     }
 }

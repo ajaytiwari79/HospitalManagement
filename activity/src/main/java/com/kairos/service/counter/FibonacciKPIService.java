@@ -3,6 +3,7 @@ package com.kairos.service.counter;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.counter.CounterServiceMapping;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
@@ -94,7 +95,13 @@ public class FibonacciKPIService implements CounterService{
     }
 
     public List<KPIDTO> getAllFibonacciKPI(Long referenceId,ConfLevel confLevel){
-        return counterRepository.getFibonacciKpiForReferenceId(referenceId, confLevel, false);
+        List<KPIDTO> kpidtos = counterRepository.getFibonacciKpiForReferenceId(referenceId, confLevel, false);
+        kpidtos.forEach(kpidto -> {
+            if(isNull(kpidto.getTranslations())){
+                kpidto.setTranslations(new HashMap<>());
+            }
+        });
+        return kpidtos;
     }
 
     public KPIDTO getOneFibonacciKPI(BigInteger fibonacciKPIId,Long referenceId,ConfLevel confLevel){
@@ -194,6 +201,13 @@ public class FibonacciKPIService implements CounterService{
             updatedFibonacciKPIConfigs.add(fibonacciKPIConfigMap.get(applicableKPI.getActiveKpiId()));
         }
         return updatedFibonacciKPIConfigs;
+    }
+
+    public Map<String, TranslationInfo> updateTranslationData(BigInteger fibonacciKpiId,Map<String,TranslationInfo> translations){
+       ApplicableKPI applicableKPI = applicableKPIRepository.findOne(fibonacciKpiId);
+       applicableKPI.setTranslations(translations);
+       applicableKPIRepository.save(applicableKPI);
+       return applicableKPI.getTranslations();
     }
 
 }

@@ -32,8 +32,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
@@ -56,8 +55,12 @@ public class StaffActivitySettingService extends MongoBaseService {
         activityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=new StaffActivitySetting();
         ObjectMapperUtils.copyProperties(staffActivitySettingDTO,staffActivitySetting);
+        if(isNotNull(staffActivitySettingDTO.getActivityId())) {
+            Activity activity = activityMongoRepository.findOne(staffActivitySettingDTO.getActivityId());
+            staffActivitySetting.setSecondLevelTimtype(activity.getActivityBalanceSettings().getTimeType());
+        }
         staffActivitySetting.setUnitId(unitId);
-        save(staffActivitySetting);
+        staffActivitySettingRepository.save(staffActivitySetting);
         staffActivitySettingDTO.setId(staffActivitySetting.getId());
         return staffActivitySettingDTO;
     }
@@ -113,36 +116,26 @@ public class StaffActivitySettingService extends MongoBaseService {
     }
 
     public List<ActivityWithCompositeDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId,boolean includeTeamActivity,boolean isActivityType){
-        List<ActivityWithCompositeDTO> staffPersonalizedActivities= staffActivitySettingRepository.findAllByUnitIdAndStaffIdAndDeletedFalse(unitId,staffId);
-        Map<BigInteger, StaffActivityDetails> mostlyUsedActivityData = staffActivityDetailsService.getMapOfActivityAndStaffActivityUseCount(staffId);
+        List<ActivityWithCompositeDTO> staffPersonalizedActivities = staffActivitySettingRepository.findAllStaffActivitySettingByStaffIdAndUnityIdWithMostUsedActivityCount(unitId,staffId);;
         if(includeTeamActivity) {
-            List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId, staffPersonalizedActivities,isActivityType);
+            List<StaffActivitySettingDTO> activitySettings = staffActivitySettingRepository.findAllByStaffIdAndDeletedFalse(staffId);
+            List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId,isActivityType);
             Map<BigInteger, ActivityWithCompositeDTO> activityMap = activityList.stream().collect(Collectors.toMap(ActivityWithCompositeDTO::getId, Function.identity()));
-            staffPersonalizedActivities.forEach(activity -> {
+            activitySettings.forEach(activity -> {
                 if (activityMap.containsKey(activity.getActivityId())) {
                     ActivityWithCompositeDTO teamActivity = activityMap.get(activity.getActivityId());
                     teamActivity.getActivityRulesSettings().setEarliestStartTime(activity.getEarliestStartTime());
                     teamActivity.getActivityRulesSettings().setLatestStartTime(activity.getLatestStartTime());
                     teamActivity.getActivityRulesSettings().setShortestTime(activity.getShortestTime());
                     teamActivity.getActivityRulesSettings().setLongestTime(activity.getLongestTime());
-                    updateActivityPriorityAndMostlyUsedCountAndTimeType(mostlyUsedActivityData, teamActivity);
+
                 }
             });
-            return activityList;
+            staffPersonalizedActivities = activityList;
+        }else {
+            staffPersonalizedActivities = staffActivitySettingRepository.findAllStaffActivitySettingByStaffIdAndUnityIdWithMostUsedActivityCount(unitId,staffId);
         }
-        else {
-            for (ActivityWithCompositeDTO staffPersonalizedActivity : staffPersonalizedActivities) {
-                updateActivityPriorityAndMostlyUsedCountAndTimeType(mostlyUsedActivityData, staffPersonalizedActivity);
-            }
-            return staffPersonalizedActivities;
-        }
-    }
-
-    private void updateActivityPriorityAndMostlyUsedCountAndTimeType(Map<BigInteger, StaffActivityDetails> mostlyUsedActivityData, ActivityWithCompositeDTO staffPersonalizedActivity) {
-        if(mostlyUsedActivityData.containsKey(staffPersonalizedActivity.getActivityId())){
-            staffPersonalizedActivity.setMostlyUsedCount(mostlyUsedActivityData.get(staffPersonalizedActivity.getActivityId()).getUseActivityCount());
-        }
-        staffPersonalizedActivity.setSecondLevelTimtype(staffPersonalizedActivity.getActivityBalanceSettings().getTimeType());
+        return staffPersonalizedActivities;
     }
 
 
@@ -209,10 +202,11 @@ public class StaffActivitySettingService extends MongoBaseService {
        });
 
        activitySettingDTOMap.forEach((activityId,activitySetting)->{
+           Activity activity = activityMap.get(activitySetting.getActivityId());
            StaffActivitySetting staffActivitySetting=new StaffActivitySetting(staffId,activitySetting.getActivityId(),activitySetting.getEmploymentId(),
                    unitId,activitySetting.getShortestTime(),activitySetting.getLongestTime(),activitySetting.getMinLength(),activitySetting.getMaxThisActivityPerShift(),
                    activitySetting.isEligibleForMove(),activitySetting.getEarliestStartTime(),activitySetting.getLatestStartTime(),activitySetting.getMaximumEndTime(),
-                   activityMap.get(activitySetting.getActivityId()).getActivityRulesSettings().getDayTypes(), activitySetting.getDefaultStartTime());
+                   activity.getActivityRulesSettings().getDayTypes(), activitySetting.getDefaultStartTime(),activity.getActivityBalanceSettings().getTimeType());
            staffActivitySettingSet.add(staffActivitySetting);
            StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),newArrayList(localeService.getMessage(DEFAULT_ADDED)));
            success.add(staffActivityResponse);
