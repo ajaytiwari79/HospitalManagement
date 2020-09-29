@@ -4,7 +4,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.EmploymentSubType;
@@ -36,6 +35,7 @@ import com.kairos.service.time_bank.TimeBankService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -101,9 +101,8 @@ public class ShiftSickService extends MongoBaseService {
         if(shiftNeedsToAddForNumberOfDays==0){
             shiftNeedsToAddForNumberOfDays = 1;
         }
-        if(!EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType())){
-            exceptionService.dataNotFoundException(EMPLOYMENT_NOT_VALID_TO_MARK_SICK);
-        }
+        LocalDate endDate=shiftDTO.getShiftDate().plusDays(shiftNeedsToAddForNumberOfDays-1);
+        validateAndUpdateSicknessShift(activityWrapper, shiftDTO, staffAdditionalInfoDTO,endDate);
         Date startDate = asDate(shiftDTO.getShiftDate(), LocalTime.MIDNIGHT);
         Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(),startDate,asDate(shiftDTO.getShiftDate().plusDays(1), LocalTime.MIDNIGHT));
         String timeZone = userIntegrationService.getTimeZoneByUnitId(shiftDTO.getUnitId());
@@ -239,41 +238,31 @@ public class ShiftSickService extends MongoBaseService {
         return activityIds;
     }
 
-    public ActivityRuleViolation validateAndUpdateSicknessShift(Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        ActivityWrapper activityWrapper = activityWrapperMap.get(shift.getActivities().get(0).getActivityId());
-        List<String> errorMessages = new ArrayList<>();
+    public void validateAndUpdateSicknessShift(ActivityWrapper activityWrapper, ShiftDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, LocalDate endDate) {
         if (activityWrapper.getActivity().getActivityRulesSettings().isSicknessSettingValid() && !activityWrapper.getActivity().getActivityRulesSettings().isAllowedAutoAbsence()) {
-            List<Shift> shifts = shiftMongoRepository.findAllShiftByIntervalAndEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), getStartOfDay(shift.getStartDate()), DateUtils.getEndOfDay(shift.getEndDate()));
-            List<Activity> protectedDaysOffActivities = activityRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, newHashSet(shift.getUnitId()));
-            validateSicknessShift(shift, staffAdditionalInfoDTO, activityWrapper, shifts, protectedDaysOffActivities);
-            if (isCollectionEmpty(errorMessages)) {
-                for (Shift oldShift : shifts) {
-                    oldShift.setDisabled(true);
-                }
-                shiftMongoRepository.saveEntities(shifts);
-                shift.setSickShift(true);
-            }
+            List<Shift> shifts = shiftMongoRepository.findAllShiftByIntervalAndEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), getStartOfDay(shift.getStartDate()), DateUtils.getEndOfDay(asDate(endDate)));
+            validateSicknessShift(shift, staffAdditionalInfoDTO, activityWrapper, shifts);
         }
-        return new ActivityRuleViolation(activityWrapper.getActivity().getId(), activityWrapper.getActivity().getName(), 0, new HashSet<>(errorMessages));
     }
 
 
-    public void validateSicknessShift(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<Shift> shifts, List<Activity> activities) {
+    public void validateSicknessShift(ShiftDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<Shift> shifts) {
         List<String> errorMessages = new ArrayList<>();
         SicknessSetting sicknessSetting = activityWrapper.getActivity().getActivityRulesSettings().getSicknessSetting();
         sickService.validateSickSettings(staffAdditionalInfoDTO, activityWrapper, shifts, errorMessages, sicknessSetting);
         if (sicknessSetting.isUsedOnProtecedDaysOff()) {
-            Set<BigInteger> activityIds = activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
+            List<Activity> protectedDaysOffActivities = activityRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, newHashSet(shift.getUnitId()));
+            Set<BigInteger> activityIds = protectedDaysOffActivities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
             for (Shift oldShift : shifts) {
-                if (!activityIds.contains(oldShift.getActivities().stream().map(ShiftActivity::getActivityId))) {
-                    errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_PROTECTEDDAYSOFF));
+                if(CollectionUtils.containsAny(activityIds,oldShift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet()))){
+                    exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_USEDON_PROTECTEDDAYSOFF);
                 }
             }
         }
-        if (!sicknessSetting.isCanNotUsedTopOfApprovedAbsences()) {
+        if (sicknessSetting.isCanNotUsedTopOfApprovedAbsences()) {
             for (Shift currentElement : shifts) {
-                if (ShiftType.ABSENCE.equals(currentElement.getShiftType()) && !shift.getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getStatus().contains(ShiftStatus.APPROVE))) {
-                    errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_APPROVEABSENCES));
+                if (ShiftType.ABSENCE.equals(currentElement.getShiftType()) && shift.getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getStatus().contains(ShiftStatus.APPROVE))) {
+                    exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_USEDON_APPROVEABSENCES);
                 }
             }
         }
