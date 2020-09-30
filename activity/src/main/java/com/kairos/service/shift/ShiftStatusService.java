@@ -160,7 +160,7 @@ public class ShiftStatusService {
         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(currentShift.getId());
         List<TodoStatus> todoStatuses = newArrayList(TodoStatus.REQUESTED,TodoStatus.PENDING);
         if(todoStatuses.contains(currentShift.getRequestAbsence().getTodoStatus()) && validAccessGroup && accessRoles.contains(staffAccessRole)){
-            todoService.updateTodoStatus(null, getTodoStatus(shiftPublishDTO.getStatus()),shiftPublishDTO.getShifts().get(0).getShiftId(),null);
+            todoService.updateTodoStatus(null, currentShift.getRequestAbsence().getTodoStatus(),shiftPublishDTO.getShifts().get(0).getShiftId(),null);
             ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, newHashSet(shiftPublishDTO.getStatus()));
             shiftActivityDTO.setId(currentShift.getId());
             shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
@@ -174,26 +174,6 @@ public class ShiftStatusService {
             shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
         }
         return new ShiftAndActivtyStatusDTO(newArrayList(ObjectMapperUtils.copyPropertiesByMapper(currentShift,ShiftDTO.class)), newArrayList(shiftActivityResponseDTO));
-    }
-
-    private TodoStatus getTodoStatus(ShiftStatus status) {
-        TodoStatus todoStatus;
-        switch (status){
-            case APPROVE:
-                todoStatus = TodoStatus.APPROVE;
-                break;
-            case DISAPPROVE:
-                todoStatus = TodoStatus.DISAPPROVE;
-                break;
-            case PENDING:
-                todoStatus = TodoStatus.PENDING;
-                break;
-            case REQUEST:
-                todoStatus = TodoStatus.REQUESTED;
-                break;
-            default: todoStatus = null;
-        }
-        return todoStatus;
     }
 
     private Object[] getActivityDetailsMap(List<Shift> shifts){
