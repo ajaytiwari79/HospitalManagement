@@ -499,6 +499,9 @@ public class PayTableService {
     }
 
     public List<PayTable> publishPayTable(Long payTableId, LocalDate publishedDate) {
+        if(DateUtils.getCurrentLocalDate().isAfter(publishedDate)){
+            exceptionService.actionNotPermittedException(MESSAGE_PUBLISHDATE_NOTLESSTHAN_CURRENTDATE);
+        }
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         validateDetails(payTable);
         List<PayTable> response = new ArrayList<>();

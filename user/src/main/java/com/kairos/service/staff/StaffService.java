@@ -332,7 +332,7 @@ public class StaffService {
     }
 
     private void updateUserDetails(StaffDTO staffDTO, UserAccessRoleDTO userAccessRoleDTO, Staff staffToUpdate) {
-        if (userAccessRoleDTO.getManagement() || staffToUpdate.getUser().getId().equals(UserContext.getUserDetails().getId())) {
+        if (userAccessRoleDTO.isManagement() || staffToUpdate.getUser().getId().equals(UserContext.getUserDetails().getId())) {
             if (isNull(staffToUpdate.getUser().getUserName()) || !staffToUpdate.getUser().getUserName().equalsIgnoreCase(staffDTO.getUserName()) && !staffToUpdate.getUser().isUserNameUpdated()) {
                 User user = userGraphRepository.findUserByUserName("(?i)" + staffDTO.getUserName());
                 if (!Optional.ofNullable(user).isPresent()) {
@@ -349,7 +349,7 @@ public class StaffService {
     public List<Expertise> assignExpertise(long staffId, StaffDTO staffDTO, UserAccessRoleDTO userAccessRoleDTO, Staff staffToUpdate) {
         List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
         List<Long> expertises = staffDTO.getExpertiseWithExperience().stream().map(StaffExpertiseDTO::getExpertiseId).collect(Collectors.toList());
-        if (!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.getManagement()) {
+        if (!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.isManagement()) {
             exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_EXPERTISE_NOTCHANGED);
         }
         List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
