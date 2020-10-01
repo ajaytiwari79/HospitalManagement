@@ -929,4 +929,15 @@ public  class DateUtils {
         return date1.equals(date2) || date1.isAfter(date2);
     }
 
+    public static ZonedDateTime getDateByIntervalType(DurationType durationType, int value, ZonedDateTime zonedDateTime){
+        switch (durationType){
+            case DAYS: return zonedDateTime.plusDays(value).with(LocalTime.MIN);
+            case HOURS:return zonedDateTime.plusMinutes(value);
+            case MONTHS:return zonedDateTime.plusMonths(value).with(LocalTime.MIN);
+            case WEEKS:return zonedDateTime.plusWeeks(value).with(LocalTime.MIN);
+            case YEAR:return zonedDateTime.plusYears(value).with(LocalTime.MIN);
+            default: return null;
+        }
+    }
+
 }

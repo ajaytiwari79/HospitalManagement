@@ -151,16 +151,7 @@ public class CalculatePlannedHoursAndScheduledHours {
         return compensation;
     }
 
-    private ZonedDateTime getDateByIntervalType(DurationType durationType, int value, ZonedDateTime zonedDateTime){
-        switch (durationType){
-            case DAYS: return zonedDateTime.plusDays(value);
-            case HOURS:return zonedDateTime.plusMinutes(value);
-            case MONTHS:return zonedDateTime.plusMonths(value);
-            case WEEKS:return zonedDateTime.plusWeeks(value);
-            case YEAR:return zonedDateTime.plusYears(value);
-            default: return null;
-        }
-    }
+
 
     private void updateScheduledAndBonusMinutes(CTARuleTemplateDTO ruleTemplate, ShiftWithActivityDTO shift, ShiftActivityDTO shiftActivity, ShiftActivityDTO shiftActivityDTO) {
         int ctaBonusAndScheduledMinutes = 0;

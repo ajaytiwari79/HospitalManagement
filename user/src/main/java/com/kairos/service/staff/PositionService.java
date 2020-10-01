@@ -133,7 +133,7 @@ public class PositionService {
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(objectToUpdate).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
-        } else if (objectToUpdate.getExternalId() != null && !objectToUpdate.getExternalId().equals(staffPositionDetail.getTimeCareExternalId()) && userAccessRoleDTO.getStaff()) {
+        } else if (objectToUpdate.getExternalId() != null && !objectToUpdate.getExternalId().equals(staffPositionDetail.getTimeCareExternalId()) && userAccessRoleDTO.isStaff()) {
             exceptionService.actionNotPermittedException(MESSAGE_STAFF_EXTERNALID_NOTCHANGED);
         }
         if (isNotNull(objectToUpdate.getExternalId()) && !objectToUpdate.getExternalId().equals(staffPositionDetail.getTimeCareExternalId())) {

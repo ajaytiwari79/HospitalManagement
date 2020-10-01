@@ -717,7 +717,7 @@ public class OrganizationActivityService extends MongoBaseService {
         List<PresenceTypeDTO> plannedTimes = plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
         List<ActivityConfiguration> activityConfigurations = activityConfigurationService.findAllByUnitIdAndDeletedFalse(unitId);
         Phase phase=phaseService.getPhaseByName(unitId,TIME_ATTENDANCE.toString());
-        LocalDate gracePeriodEndDate= getGracePeriodExpireDate(phase,reasonCodeWrapper.getUserAccessRoleDTO().getManagement());
+        LocalDate gracePeriodEndDate= getGracePeriodExpireDate(phase,reasonCodeWrapper.getUserAccessRoleDTO().isManagement());
         return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),
                 publicHolidayDayTypeWrapper.getPublicHolidays(), firstRequestPhasePlanningPeriodEndDate, plannedTimes, activityPhaseSettings, copyCollectionPropertiesByMapper(activityConfigurations, ActivityConfigurationDTO.class),gracePeriodEndDate);
     }

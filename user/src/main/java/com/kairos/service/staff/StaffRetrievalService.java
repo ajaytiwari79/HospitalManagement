@@ -313,7 +313,7 @@ public class StaffRetrievalService {
             staffId = staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(), parentUnit.getId());
         }
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
-        staffAccessGroupQueryResult.setManagement(userAccessRoleDTO.getManagement());
+        staffAccessGroupQueryResult.setManagement(userAccessRoleDTO.isManagement());
         staffAccessGroupQueryResult.setCountryAdmin(isSuperAdmin || isNotNull(staffId));
         staffAccessGroupQueryResult.setStaffId(staffId);
         return staffAccessGroupQueryResult;

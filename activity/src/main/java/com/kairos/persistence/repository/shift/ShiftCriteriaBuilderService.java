@@ -71,18 +71,19 @@ public class ShiftCriteriaBuilderService {
     }
 
     private <T> void updateActivityTimeCalculationType(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria) {
-        if(filterTypeMap.containsKey(ACTIVITY_TIMECALCULATION_TYPE) && isCollectionNotEmpty(filterTypeMap.get(ACTIVITY_TIMECALCULATION_TYPE))){
+        if(isValidFilter(filterTypeMap,ACTIVITY_TIMECALCULATION_TYPE)){
             criteria.and(ACTIVITIES+".methodForCalculatingTime").in(filterTypeMap.get(ACTIVITY_TIMECALCULATION_TYPE));
         }
     }
 
     private <T> void updateTimeTypeCriteria(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO){
         Set<BigInteger> timeTypeIds = null;
-        if(filterTypeMap.containsKey(TIME_TYPE) && isCollectionNotEmpty(filterTypeMap.get(TIME_TYPE))) {
-            timeTypeIds = new HashSet<>(getBigInteger(filterTypeMap.get(TIME_TYPE)));
+        FilterType timeType = FilterType.TIME_TYPE;
+        if(isValidFilter(filterTypeMap, timeType)) {
+            timeTypeIds = new HashSet<>(getBigInteger(filterTypeMap.get(timeType)));
             timeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), timeTypeIds).keySet();
         }
-        if(filterTypeMap.containsKey(REAL_TIME_STATUS) && isCollectionNotEmpty(filterTypeMap.get(REAL_TIME_STATUS))){
+        if(isValidFilter(filterTypeMap, REAL_TIME_STATUS)){
             if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.SICK.toString())) {
                 timeTypeIds.addAll(requiredDataForFilterDTO.getSickTimeTypeIds());
             }
@@ -107,8 +108,13 @@ public class ShiftCriteriaBuilderService {
         }
     }
 
+
+    private <T> boolean isValidFilter(Map<FilterType, Set<T>> filterTypeMap, FilterType timeType) {
+        return filterTypeMap.containsKey(timeType) && isCollectionNotEmpty(filterTypeMap.get(timeType));
+    }
+
     private <T> void updateFunctionCriteria(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO){
-        if(filterTypeMap.containsKey(FilterType.FUNCTIONS) && isCollectionNotEmpty(filterTypeMap.get(FUNCTIONS))) {
+        if(isValidFilter(filterTypeMap,FUNCTIONS)) {
             Criteria[] criterias = new Criteria[requiredDataForFilterDTO.getFunctionDates().size()];
             int i = 0;
             for (LocalDate functionDate : requiredDataForFilterDTO.getFunctionDates()) {
@@ -120,17 +126,17 @@ public class ShiftCriteriaBuilderService {
     }
 
     private <T> void updateValidatedByCriteria(Map<FilterType, Set<T>> filterTypeMap,Criteria criteria) {
-        if(filterTypeMap.containsKey(FilterType.VALIDATED_BY) && isCollectionNotEmpty(filterTypeMap.get(VALIDATED_BY))) {
+        if(isValidFilter(filterTypeMap,VALIDATED_BY)) {
             criteria.and(VALIDATED_BY_ROLES).in(filterTypeMap.get(FilterType.VALIDATED_BY).stream().map(v->v.toString()).collect(Collectors.toSet()));
         }
     }
 
     private <T> void updateActivityCriteria( Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO) {
         List<BigInteger> selectedActivityIds = new ArrayList<>();
-        if(filterTypeMap.containsKey(ABSENCE_ACTIVITY) && isCollectionNotEmpty(filterTypeMap.get(ABSENCE_ACTIVITY))) {
+        if(isValidFilter(filterTypeMap,ABSENCE_ACTIVITY)){
             selectedActivityIds.addAll(filterTypeMap.get(ABSENCE_ACTIVITY).stream().map(s -> new BigInteger(s.toString())).collect(Collectors.toList()));
         }
-        if(filterTypeMap.containsKey(TEAM) && isCollectionNotEmpty(filterTypeMap.get(TEAM))){
+        if(isValidFilter(filterTypeMap,TEAM)){
             selectedActivityIds.addAll(requiredDataForFilterDTO.getTeamActivityIds());
         }
         if(isCollectionNotEmpty(selectedActivityIds)){
@@ -139,39 +145,40 @@ public class ShiftCriteriaBuilderService {
     }
 
     private <T> void updatePlannerByCriteria(Map<FilterType, Set<T>> filterTypeMap,Criteria criteria) {
-        if(filterTypeMap.containsKey(PLANNED_BY) && isCollectionNotEmpty(filterTypeMap.get(PLANNED_BY))){
+        if(isValidFilter(filterTypeMap,PLANNED_BY)){
             Set<AccessGroupRole> accessGroups = filterTypeMap.get(PLANNED_BY).stream().map(s -> AccessGroupRole.valueOf(s.toString())).collect(Collectors.toSet());
             criteria.and("createdBy.accessGroupRole").in(accessGroups);
         }
     }
 
     private <T> void updateEscalationCriteria(Map<FilterType, Set<T>> filterTypeMap,Criteria criteria){
-        if(filterTypeMap.containsKey(ESCALATION_CAUSED_BY) && isCollectionNotEmpty(filterTypeMap.get(ESCALATION_CAUSED_BY))) {
+        if(isValidFilter(filterTypeMap,ESCALATION_CAUSED_BY)) {
             criteria.and("shiftViolatedRules.escalationCausedBy").in(filterTypeMap.get(ESCALATION_CAUSED_BY)).and("shiftViolatedRules.escalationResolved").is(false);
         }
     }
 
     private <T> void updatePlannedTimeTypeCriteria(Map<FilterType, Set<T>> filterTypeMap,Criteria criteria){
-        if(filterTypeMap.containsKey(PLANNED_TIME_TYPE) && isCollectionNotEmpty(filterTypeMap.get(PLANNED_TIME_TYPE))) {
+        if(isValidFilter(filterTypeMap,PLANNED_TIME_TYPE)) {
             List<BigInteger> plannedTimeTypeIds = getBigInteger(filterTypeMap.get(PLANNED_TIME_TYPE));
             criteria.and(PLANNED_TIME_IDS).in(plannedTimeTypeIds);
         }
     }
 
     private <T> void updatePhaseCriteria(Map<FilterType, Set<T>> filterTypeMap,Criteria criteria){
-        if(filterTypeMap.containsKey(PHASE) && isCollectionNotEmpty(filterTypeMap.get(PHASE))){
+        if(isValidFilter(filterTypeMap,PHASE)){
             criteria.and("phaseId").in(getBigInteger(filterTypeMap.get(PHASE)));
         }
     }
 
     public <T> void updateActivityStatusCriteria(Map<FilterType, Set<T>> filterTypeMap,Criteria criteria) {
-        if(filterTypeMap.containsKey(FilterType.ACTIVITY_STATUS) && isCollectionNotEmpty(filterTypeMap.get(FilterType.ACTIVITY_STATUS))){
+        if(isValidFilter(filterTypeMap,FilterType.ACTIVITY_STATUS)){
             criteria.and(ACTIVITY_STATUS).in(filterTypeMap.get(FilterType.ACTIVITY_STATUS));
         }
     }
 
+
     private <T> void updateTimeSlotCriteria(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO) {
-        if(filterTypeMap.containsKey(TIME_SLOT) && isCollectionNotEmpty(filterTypeMap.get(TIME_SLOT))) {
+        if(isValidFilter(filterTypeMap,TIME_SLOT)) {
             Criteria[] criterias = new Criteria[requiredDataForFilterDTO.getTimeSlotDTOS().size()];
             int i = 0;
             for (TimeSlotDTO timeSlotDTO : requiredDataForFilterDTO.getTimeSlotDTOS()) {

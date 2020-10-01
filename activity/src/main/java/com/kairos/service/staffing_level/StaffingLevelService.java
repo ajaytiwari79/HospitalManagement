@@ -788,7 +788,7 @@ public class StaffingLevelService  {
     private void updateStaffingLevelSkills(StaffingLevelInterval staffingLevelInterval, Long staffId, List<SkillLevelDTO> skillLevelDTOS,DateTimeInterval interval,ShiftActivity shiftActivity){
         for (StaffingLevelSkill staffingLevelSkill : staffingLevelInterval.getStaffingLevelSkills()){
             for (SkillLevelDTO staffSkill : skillLevelDTOS) {
-                if (staffingLevelSkill.getSkillId().equals(staffSkill.getSkillId()) && interval.overlaps(shiftActivity.getInterval())) {
+                if (isNotNull(staffingLevelSkill.getSkillId()) && staffingLevelSkill.getSkillId().equals(staffSkill.getSkillId()) && interval.overlaps(shiftActivity.getInterval())) {
                     updateAvailableNoOfStaff(staffingLevelSkill, staffSkill);
                 }
             }

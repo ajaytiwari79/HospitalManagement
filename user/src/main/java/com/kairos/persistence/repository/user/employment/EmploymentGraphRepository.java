@@ -145,12 +145,13 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     List<Map<Long, Long>> getMapOfEmploymentAndExpertiseId(Long unitId);
 
 
-    @Query("MATCH (user:User)-[:"+BELONGS_TO+"]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:"+HAS_POSITIONS+"]-(org:Organization) where id(user)={0}\n" +
+    @Query("MATCH (staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:"+HAS_POSITIONS+"]-(org:Organization) where id(staff)={0}\n" +
             "MATCH(org)-[:"+HAS_UNIT+"]->(subOrg:Unit)\n" +
             "MATCH(subOrg)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false,published:true})<-[:"+BELONGS_TO_STAFF+"]-(staff)\n" +
             "return  id(employment) as id,employment.history as history, \n" +
             "id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo ORDER BY employment.creationDate")
-    List<EmploymentQueryResult> getAllEmploymentsBasicDetailsAndWTAByUser(long userId);
+    List<EmploymentQueryResult> getAllEmploymentsBasicDetailsByStaffId(Long staffId);
+
 
     @Query( "MATCH(staff:Staff)-[expertise_from_date:STAFF_HAS_EXPERTISE]->(expertise:Expertise) \n" +
             "WITH staff,expertise,expertise_from_date.expertiseStartDate as expertise_from_date \n" +

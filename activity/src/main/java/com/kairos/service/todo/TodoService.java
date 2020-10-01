@@ -203,7 +203,7 @@ public class TodoService {
     public List<TodoDTO> getAllTodo(Long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessRolesOfStaff(unitId);
         List<TodoDTO> todoDTOS = new ArrayList<>();
-        if (userAccessRoleDTO.getManagement()) {
+        if (userAccessRoleDTO.isManagement()) {
             todoDTOS = todoRepository.findAllByNotApproved(unitId, newArrayList(PENDING, VIEWED, REQUESTED));
         }
         return todoDTOS;
