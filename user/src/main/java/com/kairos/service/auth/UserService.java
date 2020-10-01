@@ -477,7 +477,7 @@ public class UserService {
             loadUnitPermissions(organizationId, currentUserId, permissionData);
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
-        permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
+        permissionData.setRole((userAccessRoleDTO.isManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
 
         permissionData.setModelPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isSystemAdmin(),userAccessRoleDTO.getStaffId(),unitAccessGroupIds), ModelDTO.class));
         Organization parent = organizationService.fetchParentOrganization(organizationId);
