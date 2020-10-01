@@ -57,17 +57,17 @@ public class ShiftCriteriaBuilderService {
                 requiredDataForFilterDTO = userIntegrationService.getRequiredDataForFilter(unitId, filterTypeMap);
             }
         }
-        updateTimeTypeCriteria(unitId,filterTypeMap,criteria,requiredDataForFilterDTO);
-        updateFunctionCriteria(unitId,filterTypeMap,criteria,requiredDataForFilterDTO);
+        updateTimeTypeCriteria(filterTypeMap,criteria,requiredDataForFilterDTO);
+        updateFunctionCriteria(filterTypeMap,criteria,requiredDataForFilterDTO);
         updateValidatedByCriteria(filterTypeMap,criteria);
-        updateActivityCriteria(unitId,filterTypeMap,criteria,requiredDataForFilterDTO);
+        updateActivityCriteria(filterTypeMap,criteria,requiredDataForFilterDTO);
         updatePlannerByCriteria(filterTypeMap,criteria);
         updateEscalationCriteria(filterTypeMap,criteria);
         updatePlannedTimeTypeCriteria(filterTypeMap,criteria);
         updatePhaseCriteria(filterTypeMap,criteria);
         updateActivityTimeCalculationType(filterTypeMap,criteria);
         updateActivityStatusCriteria(filterTypeMap,criteria);
-        updateTimeSlotCriteria(unitId,filterTypeMap,criteria,requiredDataForFilterDTO);
+        updateTimeSlotCriteria(filterTypeMap,criteria,requiredDataForFilterDTO);
     }
 
     private <T> void updateActivityTimeCalculationType(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria) {
@@ -76,7 +76,7 @@ public class ShiftCriteriaBuilderService {
         }
     }
 
-    private <T> void updateTimeTypeCriteria(Long unitId, Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO){
+    private <T> void updateTimeTypeCriteria(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO){
         Set<BigInteger> timeTypeIds = null;
         if(filterTypeMap.containsKey(TIME_TYPE) && isCollectionNotEmpty(filterTypeMap.get(TIME_TYPE))) {
             timeTypeIds = new HashSet<>(getBigInteger(filterTypeMap.get(TIME_TYPE)));
@@ -85,24 +85,29 @@ public class ShiftCriteriaBuilderService {
         if(filterTypeMap.containsKey(REAL_TIME_STATUS) && isCollectionNotEmpty(filterTypeMap.get(REAL_TIME_STATUS))){
             if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.SICK.toString())) {
                 timeTypeIds.addAll(requiredDataForFilterDTO.getSickTimeTypeIds());
-            }if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.CURRENTLY_WORKING.toString())){
-
-            }if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.UPCOMING.toString())){
-
-            }if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_BREAK.toString())){
-
-            }if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_LEAVE.toString())){
-
-            }if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.RESTING.toString())){
+            }
+            /*if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.CURRENTLY_WORKING.toString())){
 
             }
+            if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.UPCOMING.toString())){
+
+            }
+            if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_BREAK.toString())){
+
+            }
+            if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_LEAVE.toString())){
+
+            }
+            if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.RESTING.toString())){
+
+            }*/
         }
         if(isCollectionNotEmpty(timeTypeIds)){
             criteria.and(TIMETYPE_IDS).in(timeTypeIds);
         }
     }
 
-    private <T> void updateFunctionCriteria(Long unitId, Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO){
+    private <T> void updateFunctionCriteria(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO){
         if(filterTypeMap.containsKey(FilterType.FUNCTIONS) && isCollectionNotEmpty(filterTypeMap.get(FUNCTIONS))) {
             Criteria[] criterias = new Criteria[requiredDataForFilterDTO.getFunctionDates().size()];
             int i = 0;
@@ -120,7 +125,7 @@ public class ShiftCriteriaBuilderService {
         }
     }
 
-    private <T> void updateActivityCriteria(Long unitId, Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO) {
+    private <T> void updateActivityCriteria( Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO) {
         List<BigInteger> selectedActivityIds = new ArrayList<>();
         if(filterTypeMap.containsKey(ABSENCE_ACTIVITY) && isCollectionNotEmpty(filterTypeMap.get(ABSENCE_ACTIVITY))) {
             selectedActivityIds.addAll(filterTypeMap.get(ABSENCE_ACTIVITY).stream().map(s -> new BigInteger(s.toString())).collect(Collectors.toList()));
@@ -165,7 +170,7 @@ public class ShiftCriteriaBuilderService {
         }
     }
 
-    private <T> void updateTimeSlotCriteria(Long unitId, Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO) {
+    private <T> void updateTimeSlotCriteria(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO) {
         if(filterTypeMap.containsKey(TIME_SLOT) && isCollectionNotEmpty(filterTypeMap.get(TIME_SLOT))) {
             Criteria[] criterias = new Criteria[requiredDataForFilterDTO.getTimeSlotDTOS().size()];
             int i = 0;

@@ -26,7 +26,8 @@ public class StaffingLevelGraphConfigurationService {
         StaffingLevelGraphConfiguration staffingLevelGraphConfiguration = Optional.ofNullable(staffingLevelGraphConfigurationMongoRepository.findOneByUnitIdAndUserId(unitId,userId)).orElse(getDefaultConfiguration(unitId,userId));
         if(isNotNull(staffingLevelGraphConfigurationDTO.getDailyGraphConfiguration())){
             staffingLevelGraphConfiguration.setDailyGraphConfiguration(staffingLevelGraphConfigurationDTO.getDailyGraphConfiguration());
-        }if (isNotNull(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration())){
+        }
+        if (isNotNull(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration())){
             staffingLevelGraphConfiguration.getWeeklyGraphConfiguration().setOverStaffingConfigurations(isCollectionNotEmpty(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration().getOverStaffingConfigurations()) ? staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration().getOverStaffingConfigurations() : getOverStaffingConfigurations());
             staffingLevelGraphConfiguration.getWeeklyGraphConfiguration().setUnderStaffingConfigurations(isCollectionNotEmpty(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration().getUnderStaffingConfigurations()) ? staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration().getUnderStaffingConfigurations() : getUnderStaffingConfigurations());
             staffingLevelGraphConfiguration.setWeeklyGraphConfiguration(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration());
