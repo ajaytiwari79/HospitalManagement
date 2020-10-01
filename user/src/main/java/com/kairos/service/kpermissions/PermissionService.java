@@ -67,6 +67,8 @@ public class PermissionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PermissionService.class);
     public static final String GET_ID = "getId";
+    public static final String TRANSLATED_NAMES = "translatedNames";
+    public static final String TRANSLATED_DESCRIPTIONS = "translatedDescriptions";
 
     @Inject
     private PermissionFieldRepository permissionFieldRepository;
@@ -661,8 +663,8 @@ public class PermissionService {
     public Map<String, TranslationInfo> updateTranslation(Long kpermisionModelId, Map<String,TranslationInfo> translations) {
         Map<String,Map<String,String>> translatedMap =accessGroupService.getMapOfTranslationData(translations);
         KPermissionModel kPermissionModel =permissionModelRepository.findOne(kpermisionModelId);
-        kPermissionModel.setTranslatedNames(translatedMap.get("translatedNames"));
-        kPermissionModel.setTranslatedDescriptions(translatedMap.get("translatedDescriptions"));
+        kPermissionModel.setTranslatedNames(translatedMap.get(TRANSLATED_NAMES));
+        kPermissionModel.setTranslatedDescriptions(translatedMap.get(TRANSLATED_DESCRIPTIONS));
         permissionModelRepository.save(kPermissionModel);
         return kPermissionModel.getTranslatedData();
     }
@@ -670,8 +672,8 @@ public class PermissionService {
     public Map<String, TranslationInfo> updateTranslationOfActionPermissions(Long actionId, Map<String,TranslationInfo> translations) {
         Map<String,Map<String,String>> translatedMap =accessGroupService.getMapOfTranslationData(translations);
         KPermissionAction kPermissionAction =kPermissionActionGraphRepository.findOne(actionId);
-        kPermissionAction.setTranslatedNames(translatedMap.get("translatedNames"));
-        kPermissionAction.setTranslatedDescriptions(translatedMap.get("translatedDescriptions"));
+        kPermissionAction.setTranslatedNames(translatedMap.get(TRANSLATED_NAMES));
+        kPermissionAction.setTranslatedDescriptions(translatedMap.get(TRANSLATED_DESCRIPTIONS));
         kPermissionActionGraphRepository.save(kPermissionAction);
         return kPermissionAction.getTranslatedData();
     }
@@ -679,8 +681,8 @@ public class PermissionService {
     public Map<String, TranslationInfo> updateTranslationOfFieldPermissions(Long fieldId, Map<String,TranslationInfo> translations) {
         Map<String,Map<String,String>> translatedMap =accessGroupService.getMapOfTranslationData(translations);
         KPermissionField kPermissionField =permissionFieldRepository.findOne(fieldId);
-        kPermissionField.setTranslatedNames(translatedMap.get("translatedNames"));
-        kPermissionField.setTranslatedDescriptions(translatedMap.get("translatedDescriptions"));
+        kPermissionField.setTranslatedNames(translatedMap.get(TRANSLATED_NAMES));
+        kPermissionField.setTranslatedDescriptions(translatedMap.get(TRANSLATED_DESCRIPTIONS));
         permissionFieldRepository.save(kPermissionField);
         return kPermissionField.getTranslatedData();
     }
