@@ -87,21 +87,6 @@ public class ShiftCriteriaBuilderService {
             if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.SICK.toString())) {
                 timeTypeIds.addAll(requiredDataForFilterDTO.getSickTimeTypeIds());
             }
-            /*if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.CURRENTLY_WORKING.toString())){
-
-            }
-            if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.UPCOMING.toString())){
-
-            }
-            if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_BREAK.toString())){
-
-            }
-            if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_LEAVE.toString())){
-
-            }
-            if(filterTypeMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.RESTING.toString())){
-
-            }*/
         }
         if(isCollectionNotEmpty(timeTypeIds)){
             criteria.and(TIMETYPE_IDS).in(timeTypeIds);
