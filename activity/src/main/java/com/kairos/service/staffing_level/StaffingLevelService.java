@@ -36,11 +36,13 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
+import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
+import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.exception.ExceptionService;
@@ -138,6 +140,8 @@ public class StaffingLevelService  {
     private ShiftService shiftService;
     @Inject private ShiftValidatorService shiftValidatorService;
     @Inject private PlanningPeriodService planningPeriodService;
+    @Inject
+    private PhaseSettingsRepository phaseSettingsRepository;
 
 
     /**
@@ -1034,26 +1038,25 @@ public class StaffingLevelService  {
         ShiftType oldStateShiftType = oldStateShift.getShiftType();
         ShiftType shiftType = shift.getShiftType();
         boolean activityReplaced = activityReplaced(oldStateShift, shift);
-        RuleTemplateSpecificInfo ruleTemplateSpecificInfo = new RuleTemplateSpecificInfo();
-        StaffingLevelHelper staffingLevelHelper = new StaffingLevelHelper();
+        PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
+        if (!Optional.ofNullable(phaseSettings).isPresent()) {
+            exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
+        }
         if (activityReplaced) {
             for (int i = 0; i < oldStateShift.getActivities().size(); i++) {
                 try {
                     if (activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor().equals(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor())) {
-                        Map<BigInteger,StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = new HashMap<>();
                         shift.setShiftType(oldStateShiftType);
-                        boolean isOldShiftVerifyStaffingLevel = shiftValidatorService.validateStaffingLevel(phase, oldStateShift, activityWrapperMap, false, oldStateShift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper,staffingLevelActivityWithDurationMap);
+                        boolean isOldShiftVerifyStaffingLevel = shiftValidatorService.isVerificationRequired(false, phaseSettings);
                         shift.setShiftType(shiftType);
-                        boolean isNewShiftVerifyStaffingLevel = shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shift.getActivities().get(i), ruleTemplateSpecificInfo, staffingLevelHelper,staffingLevelActivityWithDurationMap);
+                        boolean isNewShiftVerifyStaffingLevel = shiftValidatorService.isVerificationRequired(true, phaseSettings);
                         if (isNull(activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority()) || isNull(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority())) {
                             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
                         }
                         int rankOfOld = activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
                         int rankOfNew = activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
-                        long durationMinutesOfOld = oldStateShift.getActivities().get(i).getInterval().getMinutes();
-                        long durationMinutesOfNew = shift.getActivities().get(i).getInterval().getMinutes();
                         if(isNewShiftVerifyStaffingLevel || isOldShiftVerifyStaffingLevel){
-                            validateRankOfActivity(staffingLevelHelper, rankOfOld, rankOfNew, durationMinutesOfOld, durationMinutesOfNew);
+                            validateRankOfActivity(rankOfOld, rankOfNew);
                         }
                     }
                 } catch (IndexOutOfBoundsException e) {
@@ -1064,25 +1067,11 @@ public class StaffingLevelService  {
         return activityReplaced;
     }
 
-    private void validateRankOfActivity(final StaffingLevelHelper staffingLevelHelper, final int rankOfOld, final int rankOfNew, final long durationMinutesOfOld, final long durationMinutesOfNew) {
-        boolean allowedForReplace = true;
-        String shiftNotMoveCauses = null;
-        if (UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld()) && OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
-            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, OVERSTAFFING);
-        }
+    private void validateRankOfActivity(final int rankOfOld, final int rankOfNew) {
         if(rankOfNew > rankOfOld){
-            allowedForReplace = false;
-            shiftNotMoveCauses = LOW_ACTIVITY_RANK;
-        } else if(OVERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForNew())) {
-            allowedForReplace = false;
-            shiftNotMoveCauses = OVERSTAFFING;
-        } else if(rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld && UNDERSTAFFING.equals(staffingLevelHelper.getStaffingLevelForOld())){
-            allowedForReplace = false;
-            shiftNotMoveCauses = UNDERSTAFFING;
+            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, LOW_ACTIVITY_RANK);
         }
-        if (!allowedForReplace) {
-            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, shiftNotMoveCauses);
-        }
+
     }
 
     private boolean activityReplaced(Shift dbShift, Shift shift) {

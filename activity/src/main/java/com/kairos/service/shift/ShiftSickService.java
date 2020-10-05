@@ -103,6 +103,7 @@ public class ShiftSickService extends MongoBaseService {
             shiftNeedsToAddForNumberOfDays = 1;
         }
         LocalDate endDate=shiftDTO.getShiftDate().plusDays(shiftNeedsToAddForNumberOfDays-1);
+
         validateAndUpdateSicknessShift(activityWrapper, shiftDTO, staffAdditionalInfoDTO,endDate);
         Date startDate = asDate(shiftDTO.getShiftDate(), LocalTime.MIDNIGHT);
         Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(),startDate,asDate(shiftDTO.getShiftDate().plusDays(1), LocalTime.MIDNIGHT));
