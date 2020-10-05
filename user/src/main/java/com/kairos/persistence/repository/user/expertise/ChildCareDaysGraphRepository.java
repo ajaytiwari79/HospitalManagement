@@ -15,7 +15,7 @@ public interface ChildCareDaysGraphRepository extends Neo4jBaseRepository<ChildC
 
     @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]->(childCareDays:ChildCareDays{deleted:false}) WHERE id(expertise)={0} " +
             "OPTIONAL MATCH(childCareDays)-[careDayRel:"+HAS_CARE_DAYS+"]-(careDays:CareDays) " +
-            " RETURN childCareDays, COLLECT(careDayRel) , COLLECT(careDays) ORDER BY childCareDays.startDate ASC")
+            " RETURN childCareDays, COLLECT(careDayRel) , COLLECT(careDays) ORDER BY childCareDays.startDate,childCareDays.creationDate")
     List<ChildCareDays> getChildCareDaysOfExpertise(Long expertiseId);
 
     @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]-(childCareDays:ChildCareDays{deleted:false,published:true})-[r:"+HAS_CARE_DAYS+"]-(careDays:CareDays) WHERE id(expertise)={0} RETURN childCareDays,expRel,expertise,COLLECT(r),COLLECT(careDays) ORDER BY childCareDays.startDate DESC LIMIT 1 ")
