@@ -335,7 +335,7 @@ public class ShiftService extends MongoBaseService {
             List<ShiftActivity>[] shiftActivities = shift.getShiftActivitiesForValidatingStaffingLevel(null);
 
             for (ShiftActivity shiftActivity : shiftActivities[1]) {
-                shiftValidatorService.validateStaffingLevel(phaseListByDate.get(shift.getStartDate()), shift, activityWrapperMap, true, shiftActivity, null, new StaffingLevelHelper(),staffingLevelActivityWithDurationMap);
+                shiftValidatorService.validateStaffingLevel(phaseListByDate.get(shift.getStartDate()), shift, activityWrapperMap, true, shiftActivity, null, staffingLevelActivityWithDurationMap);
             }
             int scheduledMinutes = 0;
             int durationMinutes = 0;
