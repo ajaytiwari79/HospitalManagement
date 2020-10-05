@@ -351,22 +351,22 @@ public class ActivityService {
         updateActivityCategory(activity, UserContext.getUserDetails().getCountryId());
     }
     private void updateBackgroundColorInActivityAndShift(Activity activity, TimeType timeType) {
-        if (!timeType.getBackgroundColor().equals(activity.getActivityGeneralSettings().getBackgroundColor())) {
-            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()), null, null, null);
-            updateShiftActivityBackGroundColor(activity, timeType, shifts);
-            if (isCollectionNotEmpty(shifts)) {
-                shiftMongoRepository.saveEntities(shifts);
-            }
+        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()), null, null, null);
+        updateShiftActivityBackGroundColor(activity, timeType, shifts);
+        if (isCollectionNotEmpty(shifts)) {
+            shiftMongoRepository.saveEntities(shifts);
         }
     }
     private void updateShiftActivityBackGroundColor(Activity activity, TimeType timeType, List<Shift> shifts) {
         shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
             if (shiftActivity.getActivityId().equals(activity.getId())) {
                 shiftActivity.setBackgroundColor(timeType.getBackgroundColor());
+                shiftActivity.setSecondLevelTimeType(timeType.getSecondLevelType());
             }
             shiftActivity.getChildActivities().forEach(childActivity -> {
                 if (childActivity.getActivityId().equals(activity.getId())) {
                     childActivity.setBackgroundColor(timeType.getBackgroundColor());
+                    childActivity.setSecondLevelTimeType(timeType.getSecondLevelType());
                 }
             });
         }));

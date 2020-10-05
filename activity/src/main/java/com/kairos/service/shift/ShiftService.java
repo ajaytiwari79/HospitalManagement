@@ -554,9 +554,10 @@ public class ShiftService extends MongoBaseService {
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
                     shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
                 }
-                ShiftViolatedRules violatedRules = shift.getShiftViolatedRules();
-                violatedRules.setEscalationCausedBy(UserContext.getUserDetails().isManagement() ? MANAGEMENT : AccessGroupRole.STAFF);
-                saveShiftViolatedRules.add(violatedRules);
+                if(isNotNull(shift.getShiftViolatedRules())){
+                    ShiftViolatedRules violatedRules = shift.getShiftViolatedRules();
+                    violatedRules.setEscalationCausedBy(UserContext.getUserDetails().isManagement() ? MANAGEMENT : AccessGroupRole.STAFF);
+                }
                 saveShifts.add(shift);
             }
         }
