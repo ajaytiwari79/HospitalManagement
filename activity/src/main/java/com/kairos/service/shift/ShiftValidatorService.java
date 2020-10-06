@@ -636,6 +636,9 @@ public class ShiftValidatorService {
             Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZonedDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));
             List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.getStaffingLevelsByUnitIdAndDate(shift.getUnitId(), startDate, endDate);
             List<Shift> shifts = checkOverStaffing ? shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalseAndIdNotEqualTo(shiftStartDate, shiftEndDate, shift.getUnitId(), shift.getId()) : shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(shiftStartDate, shiftEndDate, newArrayList(shift.getUnitId()));
+            if(isNull(shift.getId())){
+               shifts.add(shift);
+            }
             List<ShiftActivity> shiftActivities = shifts.stream().flatMap(curShift -> curShift.getActivities().stream()).collect(Collectors.toList());
             validateUnderAndOverStaffing(shifts, activityWrapperMap, checkOverStaffing, staffingLevels, shiftActivities, shiftActivity, ruleTemplateSpecificInfo,  staffingLevelActivityWithDurationMap);
             staffingLevelMongoRepository.saveEntities(staffingLevels);

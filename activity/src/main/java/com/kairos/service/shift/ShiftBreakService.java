@@ -275,7 +275,7 @@ public class ShiftBreakService implements KPIService {
             if (!activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isBreakAllowed()) {
                 exceptionService.actionNotPermittedException(BREAK_NOT_VALID);
             }
-            breakActivity.setBreakNotHeld(!activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isBreakAllowed());
+            breakActivity.setBreakNotHeld(true);
         }
     }
 
