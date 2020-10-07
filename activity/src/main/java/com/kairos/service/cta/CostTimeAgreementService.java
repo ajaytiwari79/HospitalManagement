@@ -237,6 +237,11 @@ public class CostTimeAgreementService {
         if (ctaResponseDTO != null) {
             ctaRuleTemplateDTOS = ctaResponseDTO.getRuleTemplates();
         }
+        ctaRuleTemplateDTOS.forEach(ctaRuleTemplateDTO -> {
+             if(isNull(ctaRuleTemplateDTO.getTranslations())){
+                 ctaRuleTemplateDTO.setTranslations(new HashMap<>());
+             }
+        });
         return ctaRuleTemplateDTOS;
     }
 
