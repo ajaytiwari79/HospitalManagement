@@ -495,7 +495,13 @@ public class CostTimeAgreementService {
      * @return List<CTAResponseDTO>
      */
     public List<CTAResponseDTO> loadAllCTAByCountry(Long countryId) {
-       return costTimeAgreementRepository.findCTAByCountryId(countryId);
+       List<CTAResponseDTO> ctaResponseDTOS =costTimeAgreementRepository.findCTAByCountryId(countryId);
+       ctaResponseDTOS.forEach(ctaResponseDTO -> {
+           if(isNull(ctaResponseDTO.getTranslations())){
+               ctaResponseDTO.setTranslations(new HashMap<>());
+           }
+       });
+       return ctaResponseDTOS;
     }
 
     /**
