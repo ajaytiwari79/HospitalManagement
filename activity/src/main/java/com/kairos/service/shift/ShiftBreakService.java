@@ -117,7 +117,7 @@ public class ShiftBreakService implements KPIService {
                         Date breakEndDate = asDate(asZonedDateTime(placeBreakAfterThisDate).plusMinutes(breakSettings.getBreakDurationInMinute()));
                         breakActivity = buildBreakActivity(placeBreakAfterThisDate, breakEndDate, breakSettings, staffAdditionalInfoDTO, activityWrapperMap);
                         ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivityOptional.get().getActivityId());
-                        breakActivity.setBreakNotHeld(true);
+                        breakActivity.setBreakNotHeld(!activityWrapper.getActivity().getActivityRulesSettings().isBreakAllowed());
                         if (shiftActivityOptional.isPresent() && breakActivity.isBreakNotHeld() && !activityWrapper.getTimeTypeInfo().isBreakNotHeldValid()) {
                             breakActivity = null;
                         }
@@ -130,7 +130,6 @@ public class ShiftBreakService implements KPIService {
                         breakActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
                     }
                     updateBreakHeldInShift(breakActivity, shift, dbShift, activityWrapperMap);
-                    breakActivity.setBreakNotHeld(true);
                     breakActivities.add(breakActivity);
                 }
             }
@@ -276,7 +275,7 @@ public class ShiftBreakService implements KPIService {
             if (!activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isBreakAllowed()) {
                 exceptionService.actionNotPermittedException(BREAK_NOT_VALID);
             }
-            breakActivity.setBreakNotHeld(true);
+            breakActivity.setBreakNotHeld(!activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isBreakAllowed());
         }
     }
 
