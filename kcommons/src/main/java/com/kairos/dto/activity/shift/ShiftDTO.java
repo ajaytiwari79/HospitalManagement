@@ -10,6 +10,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
@@ -35,6 +36,7 @@ import static com.kairos.constants.CommonConstants.MULTIPLE_ACTIVITY;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@NoArgsConstructor
 public class ShiftDTO implements Comparable<ShiftDTO>{
 
     protected BigInteger id;
@@ -90,11 +92,6 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     protected UserInfo createdBy;
     private boolean disabled;
     private ShiftViolatedRules shiftViolatedRules;
-
-
-    public ShiftDTO() {
-        //default Const
-    }
 
     public ShiftDTO(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivityDTO> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
         this.startDate = startDate;
