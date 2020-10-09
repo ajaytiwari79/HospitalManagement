@@ -4,27 +4,28 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.*;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.FlexibleTimeSettings;
 import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.persistence.model.unit_settings.UnitSetting;
+import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_UNIT_AGESETTING_NOTFOUND;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_UNIT_SETTING_NOTFOUND;
@@ -47,6 +48,8 @@ public class UnitSettingService{
     private UserIntegrationService userIntegrationService;
     @Inject
     private TimeTypeService timeTypeService;
+    @Inject
+    private PhaseMongoRepository phaseMongoRepository;
 
     public UnitAgeSetting createDefaultNightWorkerSettings(Long unitId) {
         UnitAgeSetting unitAgeSetting = new UnitAgeSetting(AppConstants.YOUNGER_AGE, AppConstants.OLDER_AGE, unitId);
@@ -75,9 +78,14 @@ public class UnitSettingService{
     }
 
     public List<UnitSettingDTO> getOpenShiftPhaseSettings(Long unitId) {
+        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
+        Map<BigInteger,Map<String, TranslationInfo>> phaseTranslationMap =phases.stream().collect(Collectors.toMap(Phase::getId,Phase::getTranslations));
         List<UnitSettingDTO> openShiftPhaseSettings = unitSettingRepository.getOpenShiftPhaseSettings(unitId);
         openShiftPhaseSettings.forEach(openSettingDTO ->{
             openSettingDTO.getOpenShiftPhaseSetting().getOpenShiftPhases().sort(Comparator.comparingInt(OpenShiftPhase::getSequence));
+            openSettingDTO.getOpenShiftPhaseSetting().getOpenShiftPhases().forEach(openShiftPhase -> {
+                openShiftPhase.setTranslations(phaseTranslationMap.getOrDefault(openShiftPhase.getPhaseId(),new HashMap<>()));
+            });
         });
         return openShiftPhaseSettings;
     }

@@ -1,6 +1,7 @@
 package com.kairos.controller.activity;
 
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.service.activity.TimeTypeService;
@@ -140,6 +141,14 @@ public class TimeTypeController {
     ResponseEntity<Map<String, Object>> getTimeCalculationTabOfActivity(@PathVariable Long countryId, @PathVariable BigInteger timeTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.getTimeCalculationTabOfTimeType(timeTypeId,countryId));
     }
+
+    @PutMapping(value = COUNTRY_URL + "/time_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfIndustryType(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updateTranslation(id,translations));
+    }
+
 
 
 }
