@@ -415,13 +415,6 @@ public class UserIntegrationService {
         return staffAdditionalInfoDTO;
     }
 
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffWithUnitId(Long unitId, LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId) {
-        List<NameValuePair> queryParamList = new ArrayList<>();
-        queryParamList.add(new BasicNameValuePair("type", type));
-        queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
-        }, staffId, unitEmploymentId);
-    }
 
     public StaffAdditionalInfoDTO verifyEmploymentAndFindFunctionsAfterDate(Long staffId, Long employmentId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_FUNCTIONS_OF_EMPLOYMENT, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {

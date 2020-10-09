@@ -900,6 +900,7 @@ public class ShiftService extends MongoBaseService {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOne(shift.getPlanningPeriodId());
         shift.setPublishPlanningPeriod(planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getId()));
         shiftMongoRepository.save(shift);
+        //TODO call this method only if violation in shift
         wtaRuleTemplateCalculationService.updateWTACounter(shift, staffAdditionalInfoDTO);
         shiftDTO.setId(shift.getId());
         shiftDTO.setStartDate(shift.getStartDate());
