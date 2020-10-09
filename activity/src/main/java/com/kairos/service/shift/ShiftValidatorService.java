@@ -232,14 +232,18 @@ public class ShiftValidatorService {
         ruleTemplateSpecificInfo.getViolatedRules().getActivities().addAll(activityRuleViolations);
         if (isValidateStaffingLevel) {
             List<ShiftActivity>[] shiftActivities = mainShift.getShiftActivitiesForValidatingStaffingLevel(oldShift);
-            Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = new HashMap<>();
+
             for (ShiftActivity shiftActivity : shiftActivities[1]) {
+                Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = new HashMap<>();
                 validateStaffingLevel(phase, mainShift, activityWrapperMap, true, shiftActivity, ruleTemplateSpecificInfo,  staffingLevelActivityWithDurationMap);
+                verifyStaffingLevel(ruleTemplateSpecificInfo,staffingLevelActivityWithDurationMap);
             }
             for (ShiftActivity shiftActivity : shiftActivities[0]) {
+                Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = new HashMap<>();
                 validateStaffingLevel(phase, mainShift, activityWrapperMap, false, shiftActivity, ruleTemplateSpecificInfo, staffingLevelActivityWithDurationMap);
+                verifyStaffingLevel(ruleTemplateSpecificInfo,staffingLevelActivityWithDurationMap);
             }
-            verifyStaffingLevel(ruleTemplateSpecificInfo,staffingLevelActivityWithDurationMap);
+
         }
         validateAbsenceReasonCodeRule(activityWrapperMap, shift, ruleTemplateSpecificInfo);
         updateScheduledAndDurationMinutesInShift(shift, staffAdditionalInfoDTO, activityWrapperMap);
