@@ -11,6 +11,7 @@ import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -35,6 +36,7 @@ import static com.kairos.enums.shift.ShiftType.SICK;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = "shifts")
+@NoArgsConstructor
 public class Shift extends MongoBaseEntity {
 
     protected Date startDate;
@@ -77,11 +79,7 @@ public class Shift extends MongoBaseEntity {
     protected LocalDate validated;
     private ShiftViolatedRules shiftViolatedRules;
     private transient String oldShiftTimeSlot;//it is only for conditional CTA calculation
-
-    public Shift() {
-        //Default Constructor
-    }
-
+    private boolean publishPlanningPeriod;
 
     public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;

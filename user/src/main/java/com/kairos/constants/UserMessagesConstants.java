@@ -431,6 +431,8 @@ public class UserMessagesConstants {
     public static final String MESSAGE_EMPLOYMENT_WTAMISSING  = "message.employment.wtamissing ";
     public static final String MESSAGE_EMPLOYMENT_CONTAIN_SHIFT = "message.employment.contain.shift";
     public static final String MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX = "message_functional_Payment_empty_matrix";
+    public static final String MESSAGE_CHILD_CARE_EMPTY = "message.child.care.empty";
+    public static final String MESSAGE_SENIOR_DAY_EMPTY = "message.senior.day.empty";
     public static final String MESSAGE_HOUSENUMBER_NULL = "message.houseNumber.null";
     public static final String MESSAGE_PROVINCE_NULL  = "message.province.null ";
     public static final String MESSAGE_STREET_NULL  = "message.street.null ";
