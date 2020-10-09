@@ -79,7 +79,7 @@ public class Shift extends MongoBaseEntity {
     protected LocalDate validated;
     private ShiftViolatedRules shiftViolatedRules;
     private transient String oldShiftTimeSlot;//it is only for conditional CTA calculation
-    private boolean publishPlanningPeriod;
+    private boolean planningPeriodPublished;
 
     public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;
