@@ -121,7 +121,7 @@ public class ChildCareDaysService {
     public CareDaysDetails publishChildCareDays(Long childCareDaysId, LocalDate publishedDate) {
         ChildCareDays childCareDays = childCareDaysGraphRepository.findById(childCareDaysId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, FUNCTIONALPAYMENT, childCareDaysId)));
         if (isCollectionEmpty(childCareDays.getCareDays())) {
-            exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX);
+            exceptionService.actionNotPermittedException(MESSAGE_CHILD_CARE_EMPTY);
         }
         if (childCareDays.isPublished()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_FUNCTIONALPAYMENT_ALREADYPUBLISHED);
