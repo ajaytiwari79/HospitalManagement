@@ -145,7 +145,7 @@ public class TimeTypeController {
     @PutMapping(value = COUNTRY_URL + "/time_type/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateTranslationsOfIndustryType(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+    ResponseEntity<Map<String, Object>> updateTranslationsOfTimeType(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updateTranslation(id,translations));
     }
 
