@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.*;
 
@@ -117,8 +118,8 @@ public class SeniorDaysService {
 
     public CareDaysDetails publishSeniorDays(Long seniorDaysId, LocalDate publishedDate) {
         SeniorDays seniorDays = seniorDaysGraphRepository.findById(seniorDaysId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, FUNCTIONALPAYMENT, seniorDaysId)));
-        if (seniorDays.getCareDays().isEmpty()) {
-            exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX);
+        if (isCollectionEmpty(seniorDays.getCareDays())) {
+            exceptionService.actionNotPermittedException(MESSAGE_SENIOR_DAY_EMPTY);
         }
         if (seniorDays.isPublished()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_FUNCTIONALPAYMENT_ALREADYPUBLISHED);
