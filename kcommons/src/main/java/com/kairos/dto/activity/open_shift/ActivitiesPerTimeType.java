@@ -17,4 +17,5 @@ public class ActivitiesPerTimeType {
     private String timeTypeName;
     private List<BigInteger> selectedActivities;
     private boolean selected;
+
 }
