@@ -154,7 +154,7 @@ public class WTARuleTemplateCalculationService {
         List<ShiftWithActivityDTO> existingShifts = new ArrayList<>(shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentIdNotEqualShiftIds(shift.getEmploymentId(), DateUtils.asDate(intervalByRuleTemplates.getStart()), DateUtils.asDate(intervalByRuleTemplates.getEnd()),shiftIds));
         PlanningPeriod lastPlanningPeriod = planningPeriodService.getLastPlanningPeriod(staffAdditionalInfoDTO.getUnitId());
         existingShifts.addAll(shifts);
-        shiftValidatorService.updateFullDayAndFullWeekActivityShift(existingShifts);
+        shiftValidatorService.updateFullDayAndFullWeekActivityShifts(existingShifts);
         Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         Map<String, TimeSlotWrapper> timeSlotWrapperMap = staffAdditionalInfoDTO.getTimeSlotSets().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = getExpertiseNightWorkerSetting(shift, staffAdditionalInfoDTO);
@@ -173,7 +173,7 @@ public class WTARuleTemplateCalculationService {
         for (ShiftWithActivityDTO updateShiftWithActivityDTO : shifts) {
             Phase phase = phaseMapByDate.get(updateShiftWithActivityDTO.getStartDate());
             LocalDate shiftStartDate = asLocalDate(updateShiftWithActivityDTO.getStartDate());
-            if(!shiftStartDate.isBefore(LocalDate.now()) && isNotNull(updateShiftWithActivityDTO.getShiftViolatedRules())) {
+            if(!shiftStartDate.isBefore(getCurrentLocalDate()) && isNotNull(updateShiftWithActivityDTO.getShiftViolatedRules())) {
                 ShiftViolatedRules currentShiftViolatedRules = updateShiftWithActivityDTO.getShiftViolatedRules();
                 List<ShiftWithActivityDTO> shiftForValidation = new ArrayList<>(existingShifts);
                 shiftForValidation.removeIf(currentShiftWithActivityDTO -> currentShiftWithActivityDTO.isDeleted());

@@ -897,6 +897,7 @@ public class ShiftService extends MongoBaseService {
             shift.setFunctionId(functionId);
         }
         shiftMongoRepository.save(shift);
+        //TODO call this method only if violation in shift
         wtaRuleTemplateCalculationService.updateWTACounter(shift, staffAdditionalInfoDTO);
         shiftDTO.setId(shift.getId());
         shiftDTO.setStartDate(shift.getStartDate());

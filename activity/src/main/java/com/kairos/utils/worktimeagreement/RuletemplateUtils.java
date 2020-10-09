@@ -635,15 +635,16 @@ public class RuletemplateUtils {
         staffAdditionalInfoDTO.getEmployment().getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> updateDayTypeDetailInCTARuletemplate(daytypesMap, ctaRuleTemplateDTO));
     }
 
+
     public static void updateDayTypeDetailInCTARuletemplate(Map<Long, List<Day>> daytypesMap, CTARuleTemplateDTO ctaRuleTemplateDTO) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         List<LocalDate> publicHolidays = new ArrayList<>();
         for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
-            List<Day> currentDay = daytypesMap.get(dayTypeId);
-            if (currentDay == null) {
+            List<Day> applicableDaysOfWeek = daytypesMap.get(dayTypeId);
+            if (applicableDaysOfWeek == null) {
                 throwException(ERROR_DAYTYPE_NOTFOUND, dayTypeId);
             }
-            currentDay.forEach(day -> {
+            applicableDaysOfWeek.forEach(day -> {
                 if (!day.name().equals(EVERYDAY)) {
                     dayOfWeeks.add(DayOfWeek.valueOf(day.name()));
                 }
