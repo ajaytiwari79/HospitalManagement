@@ -45,11 +45,11 @@ public class StaffingLevelGraphConfigurationService {
     }
 
     private List<GraphIntervalConfiguration> getUnderStaffingConfigurations() {
-        return newArrayList(new GraphIntervalConfiguration(0,30,"#4dd2fa"),new GraphIntervalConfiguration(31,60,"#3768cb"),new GraphIntervalConfiguration(61,100,"#1c52b0"));
+        return newArrayList(new GraphIntervalConfiguration(0,30,"#4dd2fa"),new GraphIntervalConfiguration(31,50,"#3768cb"),new GraphIntervalConfiguration(51,100,"#1c52b0"));
     }
 
     private List<GraphIntervalConfiguration> getOverStaffingConfigurations() {
-        return newArrayList(new GraphIntervalConfiguration(0,30,"#ffc13d"),new GraphIntervalConfiguration(31,60,"#fb743f"),new GraphIntervalConfiguration(61,100,"#e06b4c"));
+        return newArrayList(new GraphIntervalConfiguration(0,20,"#ffc13d"),new GraphIntervalConfiguration(21,40,"#fb743f"),new GraphIntervalConfiguration(41,100,"#e06b4c"));
     }
 
     public StaffingLevelGraphConfigurationDTO getStaffingLevelGraphConfiguration(Long unitId,Long userId){
