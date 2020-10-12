@@ -107,6 +107,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
@@ -858,7 +859,7 @@ public class StaffRetrievalService {
     public <T> FilteredStaffsAndRequiredDataFilterDTO getAllStaffForUnitWithEmploymentStatus(final Long loggedInUserId, long unitId, StaffFilterDTO staffFilterDetails,boolean showAllStaffs) {
 
         LOGGER.info("filters received are {} ", staffFilterDetails.getFiltersData());
-        LocalDate dateToday = LocalDate.now();
+        LocalDate dateToday = getCurrentLocalDate();
         final Map<FilterType, Set<T>> filterTypeSetMap = staffFilterService.getMapOfFiltersToBeAppliedWithValue(staffFilterDetails.getModuleId(), staffFilterDetails.getFiltersData());
 
         if (Optional.ofNullable(filterTypeSetMap.get(FilterType.GROUPS)).isPresent() && filterTypeSetMap.get(FilterType.GROUPS).size() != 0) {

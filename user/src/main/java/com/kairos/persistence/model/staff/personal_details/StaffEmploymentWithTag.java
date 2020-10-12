@@ -2,6 +2,8 @@ package com.kairos.persistence.model.staff.personal_details;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
+import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.employment.PlanningEmploymentDTO;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.country.tag.Tag;
@@ -33,4 +35,6 @@ public class StaffEmploymentWithTag {
     private String profilePic;
     private String user_id;
     private String province;
+    private List<ExpertiseDTO> expertiseList;
+    private List<SkillDTO> skillList;
 }
