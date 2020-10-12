@@ -119,7 +119,7 @@ public class ShiftPlanningService {
             Set<Long> filteredShiftStaff = shiftWithActivityDTOS.stream().map(StaffShiftDetailsDTO::getId).collect(Collectors.toSet());
             staffListWithPersonalDetails = staffListWithPersonalDetails.stream().filter(spl -> filteredShiftStaff.contains(spl.getId()) && !spl.getUserId().equals(shiftSearchDTO.getLoggedInUserId())).collect(Collectors.toList());
         }
-        if(loggedInStaff.isPresent() && staffListWithPersonalDetails.stream().noneMatch(k->k.getId().equals(shiftSearchDTO.getLoggedInUserId()))){
+        if(loggedInStaff.isPresent() && staffListWithPersonalDetails.stream().noneMatch(k->k.getUserId().equals(shiftSearchDTO.getLoggedInUserId()))){
             staffListWithPersonalDetails.add(0,loggedInStaff.get());
         }
         return staffListWithPersonalDetails;//getStaffListAfterShiftFilterMatches(staffListWithPersonalDetails, shiftWithActivityDTOS, shiftSearchDTO.getLoggedInUserId(),shiftSearchDTO,anyShiftFilterExists);
