@@ -18,9 +18,9 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 @Service
@@ -72,6 +72,9 @@ public class ChildCareDaysService {
 
     //Validating age range
     private void validateAgeRange(List<AgeRangeDTO> ageRangeDTO) {
+        if(ageRangeDTO.stream().filter(ageRange -> isNull(ageRange.getTo())).collect(Collectors.toList()).size() > 1){
+            exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_AGE_OVERLAP);
+        }
         Collections.sort(ageRangeDTO);
         for (int i = 0; i < ageRangeDTO.size(); i++) {
             if (ageRangeDTO.get(i).getTo() != null && (ageRangeDTO.get(i).getFrom() > ageRangeDTO.get(i).getTo()))
