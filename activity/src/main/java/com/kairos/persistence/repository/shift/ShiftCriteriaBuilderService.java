@@ -68,6 +68,13 @@ public class ShiftCriteriaBuilderService {
         updateActivityTimeCalculationType(filterTypeMap,criteria);
         updateActivityStatusCriteria(filterTypeMap,criteria);
         updateTimeSlotCriteria(filterTypeMap,criteria,requiredDataForFilterDTO);
+        updateDataAfterPlanningPeriodPublish(filterTypeMap,criteria);
+    }
+
+    private <T> void updateDataAfterPlanningPeriodPublish(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria) {
+        if(isValidFilter(filterTypeMap,UPDATED_DATA_AFTER_PLANNING_PERIOD_PUBLISH)){
+            criteria.and("planningPeriodPublished").in(filterTypeMap.get(UPDATED_DATA_AFTER_PLANNING_PERIOD_PUBLISH));
+        }
     }
 
     private <T> void updateActivityTimeCalculationType(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria) {

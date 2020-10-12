@@ -1,8 +1,10 @@
 package com.kairos.service.activity;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.constants.AppConstants;
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -588,6 +590,13 @@ public class TimeTypeService extends MongoBaseService {
                 getAllLeafTimeTypeByParentTimeTypeIds(timeType.getChildTimeTypeIds(), leafTimeTypes);
             }
         }
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger timeTypeId, Map<String,TranslationInfo> translations) {
+        TimeType timeType =timeTypeMongoRepository.findOne(timeTypeId);
+        timeType.setTranslations(translations);
+        timeTypeMongoRepository.save(timeType);
+        return timeType.getTranslations();
     }
 
 }
