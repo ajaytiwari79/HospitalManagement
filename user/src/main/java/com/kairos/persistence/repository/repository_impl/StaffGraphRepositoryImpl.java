@@ -255,8 +255,8 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise,empType,applicableFunctions, ");
         query.append(" collect({id: id(employmentLines), startDate:employmentLines.startDate,endDate:employmentLines.endDate,totalWeeklyMinutes:employmentLines.totalWeeklyMinutes,fullTimeWeeklyMinutes:employmentLines.fullTimeWeeklyMinutes,avgDailyWorkingHours:employmentLines.avgDailyWorkingHours,workingDaysInWeek:employmentLines.workingDaysInWeek,hourlyCost:employmentLines.hourlyCost, employmentType: { id: id(empType),name:empType.name } }) as employmentLines " +
                 "MATCH(staff)-["+STAFF_HAS_EXPERTISE+"]->(expList:Expertise) " +
-                "MATCH (staff)-[:"+STAFF_HAS_SKILLS+"]->(skillList:Skill) ");
-        returnData.append(" , collect( distinct selectedTags) as tags , collect( distinct { id : id(empType),name: empType.name}) as employmentList, collect( distinct { id : id(expList),name: expList.name}) as expertiseList , collect( distinct { id : id(skillList),name: skillList.name}) as skillList ").append(" ORDER BY staff.currentStatus, staff.firstName");
+                "OPTIONAL MATCH (staff)-[:"+STAFF_HAS_SKILLS+"]->(skillList:Skill) ");
+        returnData.append(" , collect( distinct selectedTags) as tags , collect( distinct { id : id(empType),name: empType.name}) as employmentList, collect( distinct { id : id(expList),name: expList.name}) as expertiseList , CASE WHEN skillList IS NULL THEN [] ELSE collect( distinct { id : id(skillList),name: skillList.name}) END as skillList ").append(" ORDER BY staff.currentStatus, staff.firstName");
         query.append(returnData);
         LOGGER.debug(query.toString());
         Result staffEmployments = session.query(query.toString(), queryParameters);
@@ -285,7 +285,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise,empType,applicableFunctions, ");
         query.append(" collect({id: id(employmentLines), startDate:employmentLines.startDate,endDate:employmentLines.endDate,totalWeeklyMinutes:employmentLines.totalWeeklyMinutes,fullTimeWeeklyMinutes:employmentLines.fullTimeWeeklyMinutes,avgDailyWorkingHours:employmentLines.avgDailyWorkingHours,workingDaysInWeek:employmentLines.workingDaysInWeek,hourlyCost:employmentLines.hourlyCost, employmentType: { id: id(empType),name:empType.name } }) as employmentLines" +
                 " MATCH(staff)-["+STAFF_HAS_EXPERTISE+"]->(expList:Expertise) " +
-                "MATCH (staff)-[:"+STAFF_HAS_SKILLS+"]->(skillList:Skill) " );
+                "OPTIONAL MATCH (staff)-[:"+STAFF_HAS_SKILLS+"]->(skillList:Skill) " );
 
         StringBuilder returnData = new StringBuilder();
         returnData.append(" RETURN distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName, ")
@@ -294,7 +294,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 .append(" id(user) as userId, ")
                 .append(" collect(distinct {id:id(employments),startDate:employments.startDate,endDate:employments.endDate, employmentType: { id: id(empType),name:empType.name } , employmentSubType: employments.employmentSubType,expertise: {id : id(expertise),name:expertise.name,startDate:employments.startDate,endDate:employments.endDate   },employmentLines:employmentLines  }) as employments, ")
                 .append(" CASE contactAddress WHEN contactAddress IS NULL THEN '' ELSE contactAddress.province END ")
-                .append(" , collect( distinct selectedTags) as tags , collect( distinct { id : id(empType),name: empType.name}) as employmentList , collect( distinct { id : id(expList),name: expList.name}) as expertiseList , collect( distinct { id : id(skillList),name: skillList.name}) as skillList ");
+                .append(" , collect( distinct selectedTags) as tags , collect( distinct { id : id(empType),name: empType.name}) as employmentList , collect( distinct { id : id(expList),name: expList.name}) as expertiseList , CASE WHEN skillList IS NULL THEN [] ELSE collect( distinct { id : id(skillList),name: skillList.name}) END as skillList ");
         query.append(returnData);
         Result staffEmploymentDetails = session.query(query.toString(), queryParameters);
         Iterator si = staffEmploymentDetails.iterator();
