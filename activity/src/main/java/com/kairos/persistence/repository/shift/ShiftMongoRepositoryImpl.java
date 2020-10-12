@@ -716,33 +716,32 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<ShiftDTO> findAllShiftsBetweenDuration(Long employmentId, Long staffId, Date startDate, Date endDate, Long unitId, StaffFilterDTO staffFilterDTO) {
-        Criteria criteria = Criteria.where(START_DATE).gte(startDate).lte(endDate).and(DELETED).is(false);
+        Criteria criteria = Criteria.where(START_DATE).gte(startDate).lte(endDate);
         return getShiftByFilter(criteria, unitId, staffId, employmentId, staffFilterDTO, ShiftDTO.class);
     }
 
 
     @Override
     public List<ShiftDTO> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate, StaffFilterDTO staffFilterDTO) {
-        Criteria criteria = where(DELETED).is(false).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate);
+        Criteria criteria = where(START_DATE).lt(endDate).and(END_DATE).gt(startDate);
         return getShiftByFilter(criteria, unitId, null, null, staffFilterDTO, ShiftDTO.class);
     }
 
     @Override
     public List<ShiftDTO> findAllShiftsBetweenDurationOfUnitAndStaffId(Long staffId, Date startDate, Date endDate, Long unitId, StaffFilterDTO staffFilterDTO) {
-        Criteria criteria = where(DELETED).is(false)
-                .and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
+        Criteria criteria = where(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
         return getShiftByFilter(criteria, unitId, staffId, null, staffFilterDTO, ShiftDTO.class);
     }
 
     @Override
     public List<ShiftDTO> getAllShiftBetweenDuration(Long employmentId, Long staffId, Date startDate, Date endDate, Long unitId, StaffFilterDTO staffFilterDTO) {
-        Criteria criteria = Criteria.where(START_DATE).gte(startDate).lte(endDate).and(DELETED).is(false);
+        Criteria criteria = Criteria.where(START_DATE).gte(startDate).lte(endDate);
         return getShiftByFilter(criteria, unitId, staffId, employmentId, staffFilterDTO, ShiftDTO.class);
     }
 
     @Override
     public List<Shift> findShiftByStaffIdsAndDate(List<Long> staffids, Date startDate, Date endDate, StaffFilterDTO staffFilterDTO) {
-        Criteria criteria = Criteria.where(START_DATE).lt(endDate).and(END_DATE).gt(startDate).and(DELETED).is(false);
+        Criteria criteria = Criteria.where(START_DATE).lt(endDate).and(END_DATE).gt(startDate);
         return getShiftByFilter(criteria, null, null, null, staffFilterDTO, Shift.class);
     }
 
@@ -766,7 +765,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public <T> List<StaffShiftDetailsDTO> getStaffListFilteredByShiftCriteria(Set<Long> staffIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate, boolean includeDateComparison, RequiredDataForFilterDTO requiredDataForFilterDTO) {
-        Criteria criteria = Criteria.where(START_DATE).gte(startDate).and(END_DATE).lte(endDate).and(DELETED).is(false);
+        Criteria criteria = Criteria.where(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
         if(isNotNull(unitId)){
             criteria.and(UNIT_ID).is(unitId);
         }
