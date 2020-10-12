@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
+import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.employment.PlanningEmploymentDTO;
 import com.kairos.enums.Gender;
 import lombok.*;
@@ -37,6 +39,8 @@ public class StaffShiftDetailsDTO {
     private String profilePic;
     private String user_id;
     private String province;
+    private List<ExpertiseDTO> expertiseList;
+    private List<SkillDTO> skillList;
 
     public String toString(){
         return this.firstName + this.getUserId();
