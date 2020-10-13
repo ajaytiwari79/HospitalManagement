@@ -645,6 +645,7 @@ public class ShiftService extends MongoBaseService {
             boolean valid = isNotNull(shiftAction) && !shiftAction.equals(ShiftActionType.CANCEL) && shift.getActivities().stream().anyMatch(activity -> !activity.getStatus().contains(ShiftStatus.PUBLISH)) && UserContext.getUserDetails().isManagement();
 
             ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateRuleCheck(shift, ruleCheckRequired, staffAdditionalInfoDTO, activityWrapperMap, phase, valid, wtaQueryResultDTO, shiftWithActivityDTO, oldStateOfShift);
+            shiftWithViolatedInfoDTO.getViolatedRules().setOverlapWithShiftId((BigInteger) shiftOverlapInfo[1]);
             List<ShiftDTO> shiftDTOS = newArrayList(shiftDTO);
             if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty())) {
                 shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, true, functionId, phase, shiftAction, oldShift);
