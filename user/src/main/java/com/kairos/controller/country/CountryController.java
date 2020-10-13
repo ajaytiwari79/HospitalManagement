@@ -13,7 +13,6 @@ import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
-import com.kairos.service.country.CountryHolidayCalenderService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.CompanyCreationService;
@@ -49,8 +48,6 @@ public class CountryController {
     private CountryService countryService;
     @Inject
     private SkillCategoryService skillCategoryService;
-    @Inject
-    private CountryHolidayCalenderService countryHolidayCalenderService;
     @Inject
     private OrganizationTypeService organizationTypeService;
     @Inject

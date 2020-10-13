@@ -1,7 +1,6 @@
 package com.kairos.dto.user.country.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.user.country.day_type.DayType;
 import lombok.Getter;
 import lombok.Setter;
 

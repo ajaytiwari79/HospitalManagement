@@ -55,115 +55,117 @@ public class DayTypeService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(DayTypeService.class);
 
-    public DayTypeDTO createDayType(DayTypeDTO dayTypeDTO, long countryId) {
+    //TODO All 9 below Integrated
+//    public DayTypeDTO createDayType(DayTypeDTO dayTypeDTO, long countryId) {
+//
+//        Boolean dayTypeExistInCountryByNameOrCode = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(countryId, "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), -1L);
+//        if (dayTypeExistInCountryByNameOrCode) {
+//            exceptionService.duplicateDataException(MESSAGE_DAYTYPE_NAME_CODE_EXIST);
+//        }
+//        Country country = countryGraphRepository.findOne(countryId);
+//        if (country == null) {
+//            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
+//        }
+//        DayType dayType = new DayType(dayTypeDTO.getName(), dayTypeDTO.getCode(), dayTypeDTO.getDescription(), dayTypeDTO.getColorCode(), country, dayTypeDTO.getValidDays(), dayTypeDTO.isHolidayType(), true, dayTypeDTO.isAllowTimeSettings());
+//        dayTypeGraphRepository.save(dayType);
+//        dayTypeDTO.setId(dayType.getId());
+//        return dayTypeDTO;
+//    }
 
-        Boolean dayTypeExistInCountryByNameOrCode = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(countryId, "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), -1L);
-        if (dayTypeExistInCountryByNameOrCode) {
-            exceptionService.duplicateDataException(MESSAGE_DAYTYPE_NAME_CODE_EXIST);
-        }
-        Country country = countryGraphRepository.findOne(countryId);
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-        }
-        DayType dayType = new DayType(dayTypeDTO.getName(), dayTypeDTO.getCode(), dayTypeDTO.getDescription(), dayTypeDTO.getColorCode(), country, dayTypeDTO.getValidDays(), dayTypeDTO.isHolidayType(), true, dayTypeDTO.isAllowTimeSettings());
-        dayTypeGraphRepository.save(dayType);
-        dayTypeDTO.setId(dayType.getId());
-        return dayTypeDTO;
-    }
 
-    public List<DayTypeDTO> getAllDayTypeByCountryId(long countryId) {
-        List<DayType> dayTypes =dayTypeGraphRepository.findByCountryId(countryId);
-        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
-        for(DayTypeDTO dayTypeDTO :dayTypeDTOS){
-            dayTypeDTO.setTranslations(TranslationUtil.getTranslatedData(dayTypeDTO.getTranslatedNames(),dayTypeDTO.getTranslatedDescriptions()));
-            dayTypeDTO.setCountryId(countryId);
-        }
-        return dayTypeDTOS;
-    }
+//    public List<DayTypeDTO> getAllDayTypeByCountryId(long countryId) {
+//        List<DayType> dayTypes =dayTypeGraphRepository.findByCountryId(countryId);
+//        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
+//        for(DayTypeDTO dayTypeDTO :dayTypeDTOS){
+//            dayTypeDTO.setTranslations(TranslationUtil.getTranslatedData(dayTypeDTO.getTranslatedNames(),dayTypeDTO.getTranslatedDescriptions()));
+//            dayTypeDTO.setCountryId(countryId);
+//        }
+//        return dayTypeDTOS;
+//    }
 
-    public List<DayType> getAllDayTypeForUnit(long unitId) {
-        Long countryId = UserContext.getUserDetails().getCountryId();
-        return dayTypeGraphRepository.findByCountryId(countryId);
-    }
+//    public List<DayType> getAllDayTypeForUnit(long unitId) {
+//        Long countryId = UserContext.getUserDetails().getCountryId();
+//        return dayTypeGraphRepository.findByCountryId(countryId);
+//    }
 
-    public DayTypeDTO updateDayType(DayTypeDTO dayTypeDTO) {
-        DayType dayType = dayTypeGraphRepository.findOne(dayTypeDTO.getId());
-        if (dayType != null) {
-            //If there's a change in DayType name or in DayType then only verify existing DayTypes
-            if (!dayTypeDTO.getName().equalsIgnoreCase(dayType.getName()) || dayTypeDTO.getCode() != dayType.getCode()) {
-                Boolean dayTypeExistInCountryByNameOrCode = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(dayType.getCountry().getId(), "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), dayType.getId());
-                if (dayTypeExistInCountryByNameOrCode) {
-                    exceptionService.duplicateDataException(MESSAGE_DAYTYPE_NAME_CODE_EXIST);
-                }
-            }
-            dayType.setName(dayTypeDTO.getName());
-            dayType.setCode(dayTypeDTO.getCode());
-            dayType.setColorCode(dayTypeDTO.getColorCode());
-            dayType.setDescription(dayTypeDTO.getDescription());
-            dayType.setAllowTimeSettings(dayTypeDTO.isAllowTimeSettings());
-            dayType.setValidDays(dayTypeDTO.getValidDays());
-            dayType.setHolidayType(dayTypeDTO.isHolidayType());
-            dayTypeGraphRepository.save(dayType);
-        } else {
-            exceptionService.dataNotFoundByIdException(MESSAGE_DAYTYPE_NOTFOUND);
-        }
-        return dayTypeDTO;
-    }
+//    public DayTypeDTO updateDayType(DayTypeDTO dayTypeDTO) {
+//        DayType dayType = dayTypeGraphRepository.findOne(dayTypeDTO.getId());
+//        if (dayType != null) {
+//            //If there's a change in DayType name or in DayType then only verify existing DayTypes
+//            if (!dayTypeDTO.getName().equalsIgnoreCase(dayType.getName()) || dayTypeDTO.getCode() != dayType.getCode()) {
+//                Boolean dayTypeExistInCountryByNameOrCode = dayTypeGraphRepository.dayTypeExistInCountryByNameOrCode(dayType.getCountry().getId(), "(?i)" + dayTypeDTO.getName(), dayTypeDTO.getCode(), dayType.getId());
+//                if (dayTypeExistInCountryByNameOrCode) {
+//                    exceptionService.duplicateDataException(MESSAGE_DAYTYPE_NAME_CODE_EXIST);
+//                }
+//            }
+//            dayType.setName(dayTypeDTO.getName());
+//            dayType.setCode(dayTypeDTO.getCode());
+//            dayType.setColorCode(dayTypeDTO.getColorCode());
+//            dayType.setDescription(dayTypeDTO.getDescription());
+//            dayType.setAllowTimeSettings(dayTypeDTO.isAllowTimeSettings());
+//            dayType.setValidDays(dayTypeDTO.getValidDays());
+//            dayType.setHolidayType(dayTypeDTO.isHolidayType());
+//            dayTypeGraphRepository.save(dayType);
+//        } else {
+//            exceptionService.dataNotFoundByIdException(MESSAGE_DAYTYPE_NOTFOUND);
+//        }
+//        return dayTypeDTO;
+//    }
 
-    public boolean deleteDayType(long dayTypeId) {
-        DayType dayType = dayTypeGraphRepository.findOne(dayTypeId);
-        if (dayType != null) {
-            dayType.setEnabled(false);
-            dayTypeGraphRepository.save(dayType);
-        } else {
-            exceptionService.dataNotFoundByIdException(MESSAGE_DAYTYPE_NOTFOUND);
-        }
-        return true;
-    }
+//    public boolean deleteDayType(long dayTypeId) {
+//        DayType dayType = dayTypeGraphRepository.findOne(dayTypeId);
+//        if (dayType != null) {
+//            dayType.setEnabled(false);
+//            dayTypeGraphRepository.save(dayType);
+//        } else {
+//            exceptionService.dataNotFoundByIdException(MESSAGE_DAYTYPE_NOTFOUND);
+//        }
+//        return true;
+//    }
 
     /**
      * @param
      * @return
      * @auther anil maurya
      */
-    public List<DayType> getDayTypeByDate(Long countryId, Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        Date startDate = calendar.getTime();
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        Date endDate = calendar.getTime();
-        CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryHolidayCalenderGraphRepository.
-                findByIdAndHolidayDateBetween(countryId, DateUtils.asLocalDate(startDate).toString(), DateUtils.asLocalDate(endDate).toString());
+//    public List<DayType> getDayTypeByDate(Long countryId, Date date) {
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTime(date);
+//        calendar.set(Calendar.HOUR_OF_DAY, 0);
+//        calendar.set(Calendar.MINUTE, 0);
+//        calendar.set(Calendar.SECOND, 0);
+//        Date startDate = calendar.getTime();
+//        calendar.set(Calendar.HOUR_OF_DAY, 23);
+//        calendar.set(Calendar.MINUTE, 59);
+//        calendar.set(Calendar.SECOND, 59);
+//        Date endDate = calendar.getTime();
+//        CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryHolidayCalenderGraphRepository.
+//                findByIdAndHolidayDateBetween(countryId, DateUtils.asLocalDate(startDate).toString(), DateUtils.asLocalDate(endDate).toString());
+//
+//        if (Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()) {
+//            List<DayType> dayTypes = new ArrayList<>();
+//            dayTypes.add(countryHolidayCalendarQueryResult.getDayType());
+//            dayTypes.addAll(getDayTypes(date));
+//            return dayTypes;
+//        } else {
+//            List<DayType> dayTypes = getDayTypes(date);
+//            return dayTypes;
+//        }
+//
+//    }
 
-        if (Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()) {
-            List<DayType> dayTypes = new ArrayList<>();
-            dayTypes.add(countryHolidayCalendarQueryResult.getDayType());
-            dayTypes.addAll(getDayTypes(date));
-            return dayTypes;
-        } else {
-            List<DayType> dayTypes = getDayTypes(date);
-            return dayTypes;
-        }
+//    private List<DayType> getDayTypes(Date date) {
+//        Instant instant = Instant.ofEpochMilli(date.getTime());
+//        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+//        LocalDate localDate = localDateTime.toLocalDate();
+//        String day = localDate.getDayOfWeek().name();
+//        Day dayEnum = Day.valueOf(day);
+//        return dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+//    }
 
-    }
-
-    private List<DayType> getDayTypes(Date date) {
-        Instant instant = Instant.ofEpochMilli(date.getTime());
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        LocalDate localDate = localDateTime.toLocalDate();
-        String day = localDate.getDayOfWeek().name();
-        Day dayEnum = Day.valueOf(day);
-        return dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
-    }
-
-    public List<DayType> getDayTypes(List<Long> dayTypeIds) {
-        return dayTypeGraphRepository.getDayTypes(dayTypeIds);
-    }
+//    public List<DayType> getDayTypes(List<Long> dayTypeIds) {
+//        return dayTypeGraphRepository.getDayTypes(dayTypeIds);
+//    }
 
 
     public List<DayType> getCurrentApplicableDayType(Long countryId) {

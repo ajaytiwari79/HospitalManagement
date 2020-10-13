@@ -10,8 +10,11 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.ApplicableKPI;
+import com.kairos.persistence.repository.day_type.CountryHolidayCalenderRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.day_type.CountryHolidayCalenderService;
 import com.kairos.utils.counter.KPIUtils;
+import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -33,6 +36,10 @@ public class CounterHelperService {
 
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private CountryHolidayCalenderService countryHolidayCalenderService;
+    @Inject
+    private CountryHolidayCalenderRepository countryHolidayCalenderRepository;
 
     public Object[] getKPIdata(Map<FilterType, List> filterBasedCriteria,ApplicableKPI applicableKPI, List<LocalDate> filterDates, List<Long> staffIds, List<Long> employmentTypeIds, List<Long> unitIds, Long organizationId){
         List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), isNull(applicableKPI) ? 0 : applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates,applicableKPI.getDateForKPISetCalculation());
@@ -49,6 +56,7 @@ public class CounterHelperService {
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString(),tagIds,filterBasedCriteria,true);
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiAllDefaultData(UserContext.getUserDetails().getCountryId(), staffEmploymentTypeDTO);
         defaultKpiDataDTO.setDateTimeIntervals(dateTimeIntervals);
+        defaultKpiDataDTO.setHolidayCalenders(countryHolidayCalenderRepository.getAllByCountryIdAndHolidayDateBetween(UserContext.getUserDetails().getCountryId(),LocalDate.parse(staffEmploymentTypeDTO.getStartDate()), LocalDate.parse(staffEmploymentTypeDTO.getEndDate())));
         return defaultKpiDataDTO;
     }
 

@@ -710,12 +710,13 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getVehicleList(unitId));
     }
 
-    @GetMapping(UNIT_URL + "/dayTypebydate")
-    @ApiOperation("get dayType in country")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getDayType(@PathVariable Long unitId, @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDayType(date));
-    }
+    //TODO Integrated
+//    @GetMapping(UNIT_URL + "/dayTypebydate")
+//    @ApiOperation("get dayType in country")
+//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> getDayType(@PathVariable Long unitId, @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDayType(date));
+//    }
 
     @PostMapping(UNIT_URL + "/addStaffFavouriteFilters")
     @ApiOperation("verify staff has unit employment in unit or not ")
@@ -952,12 +953,13 @@ public class OrganizationController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, organizationService.getPublicHolidaysReasonCodeAndDayTypeUnitId(unitId));
     }
 
-    @ApiOperation(value = "Get DayType for unit")
-    @GetMapping(value = UNIT_URL + "/day_type")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getDayTypeForUnit(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeForUnit(unitId));
-    }
+    //TODO Integrated
+//    @ApiOperation(value = "Get DayType for unit")
+//    @GetMapping(value = UNIT_URL + "/day_type")
+//    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> getDayTypeForUnit(@PathVariable long unitId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeForUnit(unitId));
+//    }
 
     @ApiOperation(value = "get cuntry id by unit id ")
     @GetMapping(value = UNIT_URL + "/country_id")

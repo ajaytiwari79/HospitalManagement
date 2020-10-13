@@ -3,6 +3,7 @@ package com.kairos.dto.user.country.agreement.cta.cta_response;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -14,7 +15,7 @@ import java.time.LocalTime;
 @Setter
 public class CountryHolidayCalenderDTO {
 
-    private Long id;
+    private BigInteger id;
     private boolean reOccuring;
     private String holidayType;
     private boolean isEnabled = true;
@@ -25,6 +26,6 @@ public class CountryHolidayCalenderDTO {
     private LocalTime startTime;
     private LocalTime endTime;
     private String description;
-    private Long dayTypeId;
+    private BigInteger dayTypeId;
     private String colorCode;
 }

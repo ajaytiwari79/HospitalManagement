@@ -77,11 +77,12 @@ public class CountryDefaultDataController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotsOfCountry());
     }
 
-    @ApiOperation(value = "Get day types by id")
-    @RequestMapping(value = "/day_types", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> getDayTypesById(@RequestBody List<Long> dayTypeIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypes(dayTypeIds));
-    }
+    // TODO Integrated
+//    @ApiOperation(value = "Get day types by id")
+//    @RequestMapping(value = "/day_types", method = RequestMethod.POST)
+//    public ResponseEntity<Map<String, Object>> getDayTypesById(@RequestBody List<Long> dayTypeIds) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypes(dayTypeIds));
+//    }
 
     @RequestMapping(value = COUNTRY_URL + "/level", method = RequestMethod.POST)
     @ApiOperation("Add level in country")
@@ -554,35 +555,35 @@ public class CountryDefaultDataController {
     public ResponseEntity<Map<String, Object>> deleteVatType(@PathVariable long vatTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, vatTypeService.deleteVatType(vatTypeId));
     }
+     //TODO All 4 below Integrated
+//    @ApiOperation(value = "Get DayType by countryId")
+//    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.GET)
+//    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> getDayType(@PathVariable long countryId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeByCountryId(countryId));
+//    }
 
-    @ApiOperation(value = "Get DayType by countryId")
-    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.GET)
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getDayType(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeByCountryId(countryId));
-    }
+//    @ApiOperation(value = "Add DayType by countryId")
+//    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.POST)
+//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> addDayType(@PathVariable long countryId, @Validated @RequestBody DayTypeDTO dayTypeDTO) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.createDayType(dayTypeDTO, countryId));
+//    }
 
-    @ApiOperation(value = "Add DayType by countryId")
-    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addDayType(@PathVariable long countryId, @Validated @RequestBody DayTypeDTO dayTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.createDayType(dayTypeDTO, countryId));
-    }
+//    @ApiOperation(value = "Update DayType")
+//    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.PUT)
+//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> updateDayType(@Validated @RequestBody DayTypeDTO dayTypeDTO) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.updateDayType(dayTypeDTO));
+//    }
 
-    @ApiOperation(value = "Update DayType")
-    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.PUT)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateDayType(@Validated @RequestBody DayTypeDTO dayTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.updateDayType(dayTypeDTO));
-    }
-
-    @ApiOperation(value = "Delete DayType by dayTypeId")
-    @RequestMapping(value = COUNTRY_URL + "/dayType/{dayTypeId}", method = RequestMethod.DELETE)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteDayType(@PathVariable long dayTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.deleteDayType(dayTypeId));
-
-    }
+//    @ApiOperation(value = "Delete DayType by dayTypeId")
+//    @RequestMapping(value = COUNTRY_URL + "/dayType/{dayTypeId}", method = RequestMethod.DELETE)
+//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> deleteDayType(@PathVariable long dayTypeId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.deleteDayType(dayTypeId));
+//
+//    }
 
     @ApiOperation(value = "Get DayType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/clinicType", method = RequestMethod.GET)

@@ -627,11 +627,11 @@ public class OrganizationService {
         OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = this.getOrganizationTypeAndSubTypes(unitId);
         return new OrganizationSkillAndOrganizationTypesDTO(organizationTypeAndSubTypeDTO, skillService.getSkillsOfOrganization(unitId));
     }
-
-    public List<DayType> getDayType(Date date) {
-        Long countryId = UserContext.getUserDetails().getCountryId();
-        return dayTypeService.getDayTypeByDate(countryId, date);
-    }
+   // TODO Integrated
+//    public List<DayType> getDayType(Date date) {
+//        Long countryId = UserContext.getUserDetails().getCountryId();
+//        return dayTypeService.getDayTypeByDate(countryId, date);
+//    }
 
     public List<DayType> getAllDayTypeofOrganization() {
         Long countryId = UserContext.getUserDetails().getCountryId();

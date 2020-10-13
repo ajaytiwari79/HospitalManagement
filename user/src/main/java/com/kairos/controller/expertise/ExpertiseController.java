@@ -7,6 +7,7 @@ import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.user.expertise.response.FunctionalPaymentDTO;
 import com.kairos.persistence.model.user.expertise.response.ProtectedDaysOffSettingDTO;
 import com.kairos.service.employment.EmploymentCTAWTAService;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ApiConstants.*;
 
 
@@ -244,9 +246,9 @@ public class ExpertiseController {
 
 
     @ApiOperation(value = "create protected Days off Setting")
-    @GetMapping(value =  "/protected_days_setting")
-    public ResponseEntity<Map<String, Object>> findAllExpertiseAndLinkProtectedDaysOfSetting() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.linkProtectedDaysOffSetting(new ArrayList<>(),new ArrayList<>()));
+    @PutMapping(value =  "/protected_days_setting")
+    public ResponseEntity<Map<String, Object>> findAllExpertiseAndLinkProtectedDaysOfSetting(@RequestBody(required = false) List<CountryHolidayCalendarQueryResult> countryHolidayCalendarQueryResults) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.linkProtectedDaysOffSetting(isNull(countryHolidayCalendarQueryResults)?new ArrayList<>():countryHolidayCalendarQueryResults,new ArrayList<>()));
     }
 
     @PutMapping(value = UNIT_URL+"/expertise/{id}/languageSettings")

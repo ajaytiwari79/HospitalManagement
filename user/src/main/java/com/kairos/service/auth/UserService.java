@@ -41,6 +41,7 @@ import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.UnitService;
@@ -129,6 +130,8 @@ public class UserService {
 
     @Inject
     private KMailService kMailService;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
 
 
     /**
@@ -499,7 +502,7 @@ public class UserService {
         List<UserPermissionQueryResult> unitWisePermissions;
         Long countryId = UserContext.getUserDetails().getCountryId();
         List<DayType> dayTypes = dayTypeService.getCurrentApplicableDayType(countryId);
-        Set<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
+        Set<Long> dayTypeIds = activi
         boolean checkDayType = true;
         List<AccessGroup> accessGroups = accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
         for (AccessGroup currentAccessGroup : accessGroups) {

@@ -1,6 +1,5 @@
 package com.kairos.dto.user.organization;
 
-import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
