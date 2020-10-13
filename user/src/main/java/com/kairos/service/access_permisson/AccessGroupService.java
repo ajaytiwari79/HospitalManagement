@@ -74,6 +74,7 @@ import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.SUPER_ADMIN;
 import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.enums.OrganizationCategory.HUB;
 
 
 /**
@@ -590,6 +591,9 @@ public class AccessGroupService {
     }
 
     private void validateDetails(long countryId, CountryAccessGroupDTO accessGroupDTO) {
+        if (HUB.equals(accessGroupDTO.getOrganizationCategory()) && AccessGroupRole.STAFF.equals(accessGroupDTO.getRole())) {
+            exceptionService.duplicateDataException("error.org.access.management.notnull");
+        }
         if ((accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isEmpty(accessGroupDTO.getDayTypeIds()))) {
             exceptionService.actionNotPermittedException(ERROR_DAY_TYPE_ABSENT);
         } else if ((!accessGroupDTO.isAllowedDayTypes() && CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds()))) {
@@ -690,8 +694,8 @@ public class AccessGroupService {
     public List<AccessGroupsByCategoryDTO> getCountryAccessGroupsOfAllCategories(Long countryId) {
 
         List<AccessGroupsByCategoryDTO> accessGroupsData = new ArrayList<>();
-        accessGroupsData.add(new AccessGroupsByCategoryDTO(OrganizationCategory.HUB,
-                accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, OrganizationCategory.HUB.toString())));
+        accessGroupsData.add(new AccessGroupsByCategoryDTO(HUB,
+                accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, HUB.toString())));
 
         accessGroupsData.add(new AccessGroupsByCategoryDTO(OrganizationCategory.ORGANIZATION,
                 accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, OrganizationCategory.ORGANIZATION.toString())));
@@ -762,7 +766,7 @@ public class AccessGroupService {
     public Map<String, List<AccessGroupQueryResult>> getCountryAccessGroupsForOrganizationCreation(Long countryId) {
         Map<String, List<AccessGroupQueryResult>> accessGroupForParentOrganizationCreation = new HashMap<>();
         accessGroupForParentOrganizationCreation.put("hub",
-                accessGroupRepository.getCountryAccessGroupByOrgCategoryAndRole(countryId, OrganizationCategory.HUB.toString(), AccessGroupRole.MANAGEMENT.toString()));
+                accessGroupRepository.getCountryAccessGroupByOrgCategoryAndRole(countryId, HUB.toString(), AccessGroupRole.MANAGEMENT.toString()));
         accessGroupForParentOrganizationCreation.put("organization",
                 accessGroupRepository.getCountryAccessGroupByOrgCategoryAndRole(countryId, OrganizationCategory.ORGANIZATION.toString(), AccessGroupRole.MANAGEMENT.toString()));
         accessGroupForParentOrganizationCreation.put("union",
