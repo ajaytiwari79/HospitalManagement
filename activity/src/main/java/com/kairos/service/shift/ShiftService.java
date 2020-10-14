@@ -647,7 +647,7 @@ public class ShiftService extends MongoBaseService {
             ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateRuleCheck(shift, ruleCheckRequired, staffAdditionalInfoDTO, activityWrapperMap, phase, valid, wtaQueryResultDTO, shiftWithActivityDTO, oldStateOfShift);
             shiftWithViolatedInfoDTO.getViolatedRules().setOverlapWithShiftId((BigInteger) shiftOverlapInfo[1]);
             List<ShiftDTO> shiftDTOS = newArrayList(shiftDTO);
-            if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty())) {
+            if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || (isNotNull((BigInteger) shiftOverlapInfo[1]) && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty())) {
                 shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, true, functionId, phase, shiftAction, oldShift);
                 wtaRuleTemplateCalculationService.updateWTACounter(shift, staffAdditionalInfoDTO);
                 shiftDTO = UserContext.getUserDetails().isManagement() ? ObjectMapperUtils.copyPropertiesByMapper(isNotNull(shift.getDraftShift()) ? shift.getDraftShift() : shift, ShiftDTO.class) : ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
