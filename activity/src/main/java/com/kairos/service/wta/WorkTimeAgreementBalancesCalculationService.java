@@ -17,6 +17,7 @@ import com.kairos.dto.activity.wta.templates.ActivityCutOffCount;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.shift.ShiftStatus;
@@ -38,6 +39,7 @@ import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMo
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.counter.KPIService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
@@ -86,6 +88,8 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private DayTypeService dayTypeService;
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
@@ -183,6 +187,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
 
     public WorkTimeAgreementBalance getWorkTimeAgreementBalance(Long unitId, Long employmentId, LocalDate startDate, LocalDate endDate, Set<WTATemplateType> wtaTemplateTypes, BigInteger activityId) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, startDate, ORGANIZATION, employmentId, new HashSet<>(),endDate);
+        staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         if (staffAdditionalInfoDTO == null) {
             exceptionService.invalidRequestException(MESSAGE_STAFF_NOTFOUND);
         }
@@ -214,7 +219,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
     private List<ShiftWithActivityDTO> getShiftWithActivityDTOS(Long employmentId, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Set<BigInteger> activityIds, Map<BigInteger, ActivityWrapper> activityWrapperMap, DateTimeInterval dateTimeInterval) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentAndActivityIds(employmentId, dateTimeInterval.getStartDate(), dateTimeInterval.getEndDate(), activityIds);
         List<ShiftWithActivityDTO> validShiftActivityDTOSByDayType =new ArrayList<>();
-        Map<Long , DayTypeDTO> dayTypeDTOMap =staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, dayTypeDTO -> dayTypeDTO));
+        Map<BigInteger , DayTypeDTO> dayTypeDTOMap =staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, dayTypeDTO -> dayTypeDTO));
         for(ShiftWithActivityDTO shiftWithActivityDTO :shiftWithActivityDTOS){
             for(ShiftActivityDTO shiftActivityDTO :shiftWithActivityDTO.getActivities()) {
                 if (activityWrapperMap.containsKey(shiftActivityDTO.getActivityId()) && isDayTypeValid(shiftWithActivityDTO.getStartDate(), activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getActivityTimeCalculationSettings().getDayTypes(),dayTypeDTOMap)) {
@@ -267,6 +272,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
 
     public boolean isLeaveCountAvailable(Map<BigInteger, ActivityWrapper> activityWrapperMap, BigInteger activityId, ShiftWithActivityDTO shift, DateTimeInterval dateTimeInterval, LocalDate lastPlanningPeriodEndDat, WTATemplateType wtaTemplateType, long leaveCount,LocalDate endDateOfActivityCutOff) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(shift.getUnitId(), dateTimeInterval.getStartLocalDate().plusDays(1), ORGANIZATION, shift.getEmploymentId(), new HashSet<>(),endDateOfActivityCutOff);
+        staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         boolean isLeaveCountAvailable = false;
         List<WTAQueryResultDTO> workingTimeAgreements = wtaRepository.getWTAByEmploymentIdAndDatesWithRuleTemplateType(shift.getEmploymentId(), shift.getStartDate(), shift.getEndDate(), wtaTemplateType);
         List<WTABaseRuleTemplate> ruleTemplates = workingTimeAgreements.get(0).getRuleTemplates();
@@ -808,7 +814,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
         return shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate()) && shiftWithActivityDTO.getActivities().stream().anyMatch(shiftActivityDTO -> shiftActivityDTO.getActivityId().equals(activityId))).collect(Collectors.toList());
     }
 
-    public static boolean isDayTypeValid(Date shiftDate, List<Long> daytypeIds, Map<Long, DayTypeDTO> dayTypeDTOMap) {
+    public static boolean isDayTypeValid(Date shiftDate, List<Long> daytypeIds, Map<BigInteger, DayTypeDTO> dayTypeDTOMap) {
         List<DayTypeDTO> dayTypeDTOS = daytypeIds.stream().map(dayTypeDTOMap::get).collect(Collectors.toList());
         boolean valid = false;
         for (DayTypeDTO dayTypeDTO : dayTypeDTOS) {

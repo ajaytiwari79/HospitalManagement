@@ -1,5 +1,6 @@
 package com.kairos.controller.day_type;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.service.day_type.DayTypeService;
@@ -33,7 +34,7 @@ public class DayTypeController {
     }
 
     @ApiOperation(value = "Get DayType by countryId")
-    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.GET)
+    @GetMapping(value = COUNTRY_URL + "/dayType")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDayType(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeByCountryId(countryId));
@@ -60,5 +61,22 @@ public class DayTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.deleteDayType(dayTypeId));
 
     }
+
+    @ApiOperation(value = "Delete DayType by dayTypeId")
+    @GetMapping(value = COUNTRY_URL + "/active_dayTypes")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteDayType(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getCurrentApplicableDayType(countryId));
+
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/day_type/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfDayType(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.updateTranslation(id,translations));
+    }
+
+
 
 }

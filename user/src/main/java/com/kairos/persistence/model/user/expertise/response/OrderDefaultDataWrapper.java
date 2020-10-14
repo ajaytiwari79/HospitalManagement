@@ -34,7 +34,7 @@ public class OrderDefaultDataWrapper {
 
     public OrderDefaultDataWrapper(List<OrderResponseDTO> orders, List<ActivityDTO> activities, List<Skill> skills, List<Expertise> expertise, List<StaffPersonalDetailQueryResult> staffList,
                                    List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes,
-                                   List<DayType> dayTypes, Integer minOpenShiftHours, List<CounterDTO> counters) {
+                                    Integer minOpenShiftHours, List<CounterDTO> counters) {
         this.orders = orders;
         this.activities = activities;
         this.skills = skills;
@@ -43,7 +43,6 @@ public class OrderDefaultDataWrapper {
         this.plannedTime = plannedTime;
         this.functions = functions;
         this.reasonCodes = reasonCodes;
-        this.dayTypes = dayTypes;
         this.minOpenShiftHours=minOpenShiftHours;
         this.counters=counters;
     }

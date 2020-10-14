@@ -15,8 +15,10 @@ import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
 import static com.kairos.constants.UserMessagesConstants.ERROR_STARTDATE_NOTNULL;
@@ -48,6 +50,7 @@ public class AccessGroup extends UserBaseEntity {
     private LocalDate endDate;
     private boolean allowedDayTypes;
     private List<DayType> dayTypes;
+    private Set<BigInteger> dayTypeIds;
     @Relationship(type = HAS_PARENT_ACCESS_GROUP)
     private AccessGroup parentAccessGroup;
 
@@ -57,21 +60,21 @@ public class AccessGroup extends UserBaseEntity {
         this.role = role;
     }
 
-    public AccessGroup(String name, String description, AccessGroupRole role, List<DayType> dayTypes,LocalDate startDate,LocalDate endDate) {
+    public AccessGroup(String name, String description, AccessGroupRole role, Set<BigInteger> dayTypeIds,LocalDate startDate,LocalDate endDate) {
         this.name = name;
         this.description = description;
         this.role = role;
-        this.dayTypes=dayTypes;
+        this.dayTypeIds=dayTypeIds;
         this.startDate=startDate;
         this.endDate=endDate;
     }
 
-    public AccessGroup(@NotBlank(message = ERROR_NAME_NOTNULL) @NotNull(message = ERROR_NAME_NOTNULL) String name, String description, AccessGroupRole role, List<AccountType> accountType,List<DayType> dayTypes,LocalDate startDate,LocalDate endDate) {
+    public AccessGroup(@NotBlank(message = ERROR_NAME_NOTNULL) @NotNull(message = ERROR_NAME_NOTNULL) String name, String description, AccessGroupRole role, List<AccountType> accountType,Set<BigInteger> dayTypeIds,LocalDate startDate,LocalDate endDate) {
         this.name = name;
         this.description = description;
         this.role = role;
         this.accountType = accountType;
-        this.dayTypes=dayTypes;
+        this.dayTypeIds=dayTypeIds;
         this.startDate=startDate;
         this.endDate=endDate;
     }

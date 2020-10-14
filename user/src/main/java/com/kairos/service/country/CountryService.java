@@ -8,9 +8,7 @@ import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
-import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.dto.user.country.LevelDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
@@ -18,7 +16,9 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.Currency;
-import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.CurrencyDTO;
+import com.kairos.persistence.model.country.default_data.RelationType;
+import com.kairos.persistence.model.country.default_data.RelationTypeDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Level;
@@ -29,7 +29,6 @@ import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepos
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
-import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.RelationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.VehicalGraphRepository;
 import com.kairos.persistence.repository.user.region.LevelGraphRepository;
@@ -38,6 +37,7 @@ import com.kairos.rest_client.PlannedTimeTypeRestClient;
 import com.kairos.rest_client.activity_types.ActivityTypesRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
@@ -75,16 +75,12 @@ public class CountryService {
     @Inject
     private UnitGraphRepository unitGraphRepository;
     @Inject
-    private DayTypeGraphRepository dayTypeGraphRepository;
-    @Inject
     private
     OrganizationTypeGraphRepository organizationTypeGraphRepository;
     private @Inject
     CurrencyService currencyService;
     private @Inject
     TimeTypeRestClient timeTypeRestClient;
-    private @Inject
-    DayTypeService dayTypeService;
     private @Inject
     PhaseRestClient phaseRestClient;
     private @Inject
@@ -105,6 +101,8 @@ public class CountryService {
     private VehicalGraphRepository vehicalGraphRepository;
     @Inject
     private GenericRestClient genericRestClient;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
 
     /**
      * @param country
@@ -463,23 +461,15 @@ public class CountryService {
         List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId, false);
         List<TimeTypeDTO> timeType = timeTypeRestClient.getAllTimeTypes(countryId);
         List<PresenceTypeDTO> plannedTime = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
-        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
+        List<DayTypeDTO> dayTypes = activityIntegrationService.getDayTypesByCountryId(countryId);
         List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
         //wrap data into wrapper class
         CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper = new CTARuleTemplateDefaultDataWrapper();
         List<EmploymentTypeDTO> employmentTypeDTOS = getEmploymentTypeDTOS(employmentTypes);
-        List<DayTypeDTO> dayTypeDTOS = getDayTypeDTOS(dayTypes);
-        setDefaultData(countryId, activityTypeDTOS, phases, activityCategories, currencies, timeType, plannedTime, functions, ctaRuleTemplateDefaultDataWrapper, employmentTypeDTOS, dayTypeDTOS);
+        setDefaultData(countryId, activityTypeDTOS, phases, activityCategories, currencies, timeType, plannedTime, functions, ctaRuleTemplateDefaultDataWrapper, employmentTypeDTOS, dayTypes);
         return ctaRuleTemplateDefaultDataWrapper;
     }
 
-    private List<DayTypeDTO> getDayTypeDTOS(List<DayType> dayTypes) {
-        return dayTypes.stream().map(dayType -> {
-                DayTypeDTO dayTypeDTO = new DayTypeDTO();
-                BeanUtils.copyProperties(dayType, dayTypeDTO);
-                return dayTypeDTO;
-            }).collect(Collectors.toList());
-    }
 
     private List<EmploymentTypeDTO> getEmploymentTypeDTOS(List<EmploymentType> employmentTypes) {
         return employmentTypes.stream().map(employmentType -> {
@@ -509,12 +499,13 @@ public class CountryService {
         return new OrganizationLevelAndUnionWrapper(unions, organizationLevels);
     }
 
-    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId) {
-        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
-        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
-        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS, getDefaultTimeSlot(), countryId);
-    }
+    //TODO Integrated
+//    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId) {
+//        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
+//        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
+//        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
+//        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS, getDefaultTimeSlot(), countryId);
+//    }
 
     public List<TimeSlotDTO> getDefaultTimeSlot() {
         List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>(3);

@@ -7,6 +7,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user_context.UserContext;
@@ -24,6 +25,7 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.wrapper.activity.ActivitySettingsWrapper;
@@ -47,6 +49,8 @@ public class TimeTypeService extends MongoBaseService {
     public static final String ABSENCE = "Absence";
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject
+    private DayTypeService dayTypeService;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
@@ -460,7 +464,7 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public ActivitySettingsWrapper getTimeCalculationTabOfTimeType(BigInteger timeTypeId, Long countryId) {
-        List<DayType> dayTypes = userIntegrationService.getDayTypesByCountryId(countryId);
+        List<DayTypeDTO> dayTypes = dayTypeService.getDayTypeWithCountryHolidayCalender(countryId);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         ActivityTimeCalculationSettings activityTimeCalculationSettings = timeType.getActivityTimeCalculationSettings();
         List<Long> rulesTabDayTypes = timeType.getActivityRulesSettings().getDayTypes();
@@ -498,7 +502,7 @@ public class TimeTypeService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
         }
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
-        List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<DayTypeDTO> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
         ActivityPhaseSettings activityPhaseSettings = timeType.getActivityPhaseSettings();
@@ -517,7 +521,7 @@ public class TimeTypeService extends MongoBaseService {
 
     public ActivitySettingsWrapper getRulesTabOfTimeType(BigInteger timeTypeId, Long countryId) {
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
-        List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<DayTypeDTO> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         ActivityRulesSettings activityRulesSettings = timeType.getActivityRulesSettings();

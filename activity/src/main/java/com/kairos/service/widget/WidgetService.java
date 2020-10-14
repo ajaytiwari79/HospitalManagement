@@ -8,6 +8,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.widget.DashboardWidgetDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.organization.OrganizationDTO;
@@ -23,6 +24,7 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.widget.WidgetMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
@@ -67,6 +69,8 @@ public class WidgetService {
     private ExceptionService exceptionService;
     @Inject
     private NightWorkerService nightWorkerService;
+    @Inject
+    private DayTypeService dayTypeService;
 
     public DashboardWidgetDTO getWidgetData(Long unitId) {
         DashboardWidgetDTO dashBoardWidgetDTO = null;
@@ -81,6 +85,8 @@ public class WidgetService {
         requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
         requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
+        List<DayTypeDTO> dayTypeDTOS=dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId());
+        staffAdditionalInfoDTOS.forEach(staff-> staff.setDayTypes(dayTypeDTOS));
         Phase realTimePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, organizationDTO.getCountryId());
         if (isNull(realTimePhase) || isNull(realTimePhase.getRealtimeDuration())) {

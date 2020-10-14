@@ -7,6 +7,8 @@ import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import lombok.Getter;
@@ -25,7 +27,7 @@ import java.util.Map;
 public class PhaseActivityDTO {
     private List<ActivityWithCompositeDTO> activities;
     private List<PhaseWeeklyDTO> phases;
-    private List<DayType> dayTypes= new ArrayList<>();
+    private List<DayTypeDTO> dayTypes= new ArrayList<>();
     private UserAccessRoleDTO staffAccessRole;
     private List<ShiftTemplateDTO> shiftTemplates;
     private List<PhaseDTO> applicablePhases;
@@ -33,7 +35,7 @@ public class PhaseActivityDTO {
     private List<ReasonCodeDTO> reasonCodes;
     private LocalDate planningPeriodStartDate;
     private LocalDate planningPeriodEndDate;
-    private List<Map<String, Object>> publicHolidays;
+    private List<CountryHolidayCalenderDTO> publicHolidays;
     private LocalDate firstRequestPhasePlanningPeriodEndDate;
     private List<PresenceTypeDTO> plannedTimes;
     private List<ActivityPhaseSettings> activityPhaseSettings;
@@ -44,8 +46,8 @@ public class PhaseActivityDTO {
         //Default Constructor
     }
 
-    public PhaseActivityDTO(List<ActivityWithCompositeDTO> activities, List<PhaseWeeklyDTO> phases, List<DayType> dayTypes,
-                            UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases, List<PhaseDTO> actualPhases, List<ReasonCodeDTO> reasonCodes, LocalDate planningPeriodStartDate, LocalDate planningPeriodEndDate, List<Map<String,Object>> publicHolidays,
+    public PhaseActivityDTO(List<ActivityWithCompositeDTO> activities, List<PhaseWeeklyDTO> phases, List<DayTypeDTO> dayTypes,
+                            UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases, List<PhaseDTO> actualPhases, List<ReasonCodeDTO> reasonCodes, LocalDate planningPeriodStartDate, LocalDate planningPeriodEndDate, List<CountryHolidayCalenderDTO> publicHolidays,
                             LocalDate firstRequestPhasePlanningPeriodEndDate, List<PresenceTypeDTO> plannedTimes, List<ActivityPhaseSettings> activityPhaseSettings, List<ActivityConfigurationDTO> activityConfigurations, LocalDate gracePeriodEndDate) {
         this.activities=activities;
         this.phases = phases;

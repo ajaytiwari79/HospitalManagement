@@ -98,8 +98,7 @@ public final class ApiConstants {
     public static final String CURRENT_TIME_SLOTS = "/current/time_slots";
     public static final String GET_CTA_BY_EMPLOYMENT_ID = "/cta_by_employment/{employmentId}";
     public static final String WTA_RULE_INFO = "/WTARelatedInfo";
-    public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO = "/getWtaTemplateDefaultDataInfo";
-    public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO_BY_UNIT_ID = GET_WTA_TEMPLATE_DEFAULT_DATA_INFO + "ByUnitId";
+    public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO_BY_UNIT_ID = "/getWtaTemplateDefaultDataInfoByUnitId";
     public static final String CLIENT_ID_URL = "/client/{clientId}";
     public static final String UPDATE_CLIENT_TEMP_ADDRESS_BY_CLIENT_ID = CLIENT_ID_URL + "/updateClientTempAddress";
     public static final String CLIENT_CITIZEN_ID = "/client/{citizenId}";

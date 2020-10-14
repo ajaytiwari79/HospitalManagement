@@ -10,7 +10,4 @@ public interface CustomCountryHolidayCalenderRepository {
 
     List<CountryHolidayCalenderDTO> getCountryAllHolidays(Long countryId);
 
-    CountryHolidayCalenderDTO getCurrentlyActiveByCountryId(Long countryId, LocalDate holidayDate, LocalTime currentTime);
-
-
 }

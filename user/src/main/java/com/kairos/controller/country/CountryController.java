@@ -397,13 +397,14 @@ public class CountryController {
 
     }
 
-    @ApiOperation(value = "Get DayType and Presence Type")
-    @GetMapping(value = COUNTRY_URL + "/getWtaTemplateDefaultDataInfo")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getWtaTemplateDefaultDataInfo(countryId));
-
-    }
+    //TODO Integrated
+//    @ApiOperation(value = "Get DayType and Presence Type")
+//    @GetMapping(value = COUNTRY_URL + "/getWtaTemplateDefaultDataInfo")
+//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long countryId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getWtaTemplateDefaultDataInfo(countryId));
+//
+//    }
 
     @ApiOperation(value = "Map Selected Payroll Types to country ")
     @PutMapping(value = COUNTRY_URL + "/map_pay_rolls_country")

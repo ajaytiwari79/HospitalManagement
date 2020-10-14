@@ -43,7 +43,6 @@ public class PlannedTimeTypeService{
     }
 
     public PresenceTypeDTO addPresenceType(PresenceTypeDTO presenceTypeDTO, Long countryId) {
-        verifyCountry(countryId);
         PlannedTimeType plannedTimeType = plannedTimeTypeRepository.findByNameAndDeletedAndCountryId("(?i)" + presenceTypeDTO.getName(), false, countryId);
         if (Optional.ofNullable(plannedTimeType).isPresent()) {
             LOGGER.error("Planned Time type already exist in country By Name {}" , presenceTypeDTO.getName());
@@ -57,7 +56,6 @@ public class PlannedTimeTypeService{
     }
 
     public List<PresenceTypeDTO> getAllPresenceTypeByCountry(Long countryId) {
-        verifyCountry(countryId);
         return plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
     }
 

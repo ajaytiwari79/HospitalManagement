@@ -53,7 +53,7 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 public class RuletemplateUtils {
 
 
-    public static List<ShiftWithActivityDTO> getShiftsByIntervalAndActivityIds(Activity activity, Date shiftStartDate, List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds, Map<Long, DayTypeDTO> dayTypeMap) {
+    public static List<ShiftWithActivityDTO> getShiftsByIntervalAndActivityIds(Activity activity, Date shiftStartDate, List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds, Map<BigInteger, DayTypeDTO> dayTypeMap) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         LocalDate shiftStartLocalDate = DateUtils.asLocalDate(shiftStartDate);
         Optional<CutOffInterval> cutOffIntervalOptional = activity.getActivityRulesSettings().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate)) && (interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getEndDate().isEqual(shiftStartLocalDate)))).findAny();
@@ -374,7 +374,7 @@ public class RuletemplateUtils {
     }
 
 
-    public static Set<DayOfWeek> getValidDays(Map<Long, DayTypeDTO> dayTypeMap, List<Long> dayTypeIds, LocalDate startDate) {
+    public static Set<DayOfWeek> getValidDays(Map<BigInteger, DayTypeDTO> dayTypeMap, List<Long> dayTypeIds, LocalDate startDate) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         List<Day> days = new ArrayList<>();
         for (Long dayTypeId : dayTypeIds) {
@@ -631,12 +631,12 @@ public class RuletemplateUtils {
 
 
     public static void setDayTypeToCTARuleTemplate(StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        Map<Long, List<Day>> daytypesMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
+        Map<BigInteger, List<Day>> daytypesMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
         staffAdditionalInfoDTO.getEmployment().getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> updateDayTypeDetailInCTARuletemplate(daytypesMap, ctaRuleTemplateDTO));
     }
 
 
-    public static void updateDayTypeDetailInCTARuletemplate(Map<Long, List<Day>> daytypesMap, CTARuleTemplateDTO ctaRuleTemplateDTO) {
+    public static void updateDayTypeDetailInCTARuletemplate(Map<BigInteger, List<Day>> daytypesMap, CTARuleTemplateDTO ctaRuleTemplateDTO) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         List<LocalDate> publicHolidays = new ArrayList<>();
         for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {

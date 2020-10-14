@@ -502,10 +502,10 @@ public class UserIntegrationService {
         });
     }
 
-    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId) {
-        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, GET_WTA_TEMPLATE_DEFAULT_DATA_INFO, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>>() {
-        });
-    }
+//    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId) {
+//        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, GET_WTA_TEMPLATE_DEFAULT_DATA_INFO, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>>() {
+//        });
+//    }
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId() {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_WTA_TEMPLATE_DEFAULT_DATA_INFO_BY_UNIT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTADefaultDataInfoDTO>>() {
@@ -694,7 +694,7 @@ public class UserIntegrationService {
         });
     }
 
-    //TODO Integrated
+    //TODO 3 Below Integrated
 //    public List<DayTypeDTO> getDayType(Date date) {
 //        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 //        String dateString = dateFormatter.format(date);
@@ -702,15 +702,15 @@ public class UserIntegrationService {
 //        });
 //    }
 
-    public List<DayTypeDTO> getDayTypes(Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, DAY_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayTypeDTO>>>() {
-        });
-    }
+//    public List<DayTypeDTO> getDayTypes(Long unitId) {
+//        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, DAY_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayTypeDTO>>>() {
+//        });
+//    }
 
-    public List<DayTypeDTO> getDayTypesByCountryId(Long countryId) {
-        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, DAY_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayTypeDTO>>>() {
-        });
-    }
+//    public List<DayTypeDTO> getDayTypesByCountryId(Long countryId) {
+//        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, DAY_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayTypeDTO>>>() {
+//        });
+//    }
 
     public boolean showCountryTagForOrganization(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, SHOW_COUNTRY_TAGS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {

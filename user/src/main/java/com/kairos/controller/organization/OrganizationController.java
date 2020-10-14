@@ -22,7 +22,6 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.country.CountryService;
-import com.kairos.service.country.DayTypeService;
 import com.kairos.service.language.LanguageService;
 import com.kairos.service.organization.*;
 import com.kairos.service.resources.ResourceService;
@@ -36,7 +35,6 @@ import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdR
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -45,7 +43,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -84,8 +85,6 @@ public class OrganizationController {
     private CountryService countryService;
     @Inject
     private UnitService unitService;
-    @Inject
-    private DayTypeService dayTypeService;
     @Inject
     private StaffFilterService staffFilterService;
     @Inject
@@ -746,12 +745,13 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffFavouriteFilters(moduleId, unitId));
     }
 
-    @ApiOperation(value = "Get DayType by unitID")
-    @GetMapping(UNIT_URL + "/dayType")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getDayTypeByOrganization(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllDayTypeofOrganization());
-    }
+    //TODO Replaced with activity micro service API
+//    @ApiOperation(value = "Get DayType by unitID")
+//    @GetMapping(UNIT_URL + "/dayType")
+//    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> getDayTypeByOrganization(@PathVariable Long unitId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllDayTypeofOrganization());
+//    }
 
     @ApiOperation(value = "Get DayType by unitID")
     @GetMapping(UNIT_URL + "/units")

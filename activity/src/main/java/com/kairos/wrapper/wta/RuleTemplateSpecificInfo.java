@@ -40,7 +40,7 @@ public class RuleTemplateSpecificInfo {
     private BigInteger phaseId;
     private DateTimeInterval planningPeriod;
     private Map<BigInteger,Integer> counterMap;
-    private Map<Long, DayTypeDTO> dayTypeMap;
+    private Map<BigInteger, DayTypeDTO> dayTypeMap;
     private UserAccessRoleDTO user;
     private long totalTimeBank;
     @Builder.Default
@@ -57,7 +57,7 @@ public class RuleTemplateSpecificInfo {
     private ShiftOperationType shiftOperationType;
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum, List<Integer> staffChildAges, ShiftOperationType shiftOperationType) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<BigInteger, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum, List<Integer> staffChildAges, ShiftOperationType shiftOperationType) {
         this.shifts = isNullOrElse(shifts,new ArrayList<>());
         Collections.sort(this.shifts);
         this.shift = shift;
@@ -80,7 +80,7 @@ public class RuleTemplateSpecificInfo {
         this.shiftOperationType=shiftOperationType;
     }
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<BigInteger, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum) {
         this.shifts = isNullOrElse(shifts,new ArrayList<>());
         Collections.sort(this.shifts);
         this.shift = shift;

@@ -15,6 +15,7 @@ import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.cta.ActivityTypeForCostCalculation;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -31,6 +32,7 @@ import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryR
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.cta_compensation_settings.CTACompensationSettingService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -87,6 +89,8 @@ public class CostTimeAgreementService {
     @Inject
     private TimeBankService timeBankService;
     @Inject private CTACompensationSettingService ctaCompensationSettingService;
+    @Inject
+    private DayTypeService dayTypeService;
 
 
     /**
@@ -261,6 +265,7 @@ public class CostTimeAgreementService {
 
     public StaffEmploymentDetails updateCostTimeAgreementForEmployment(Long unitId, Long employmentId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO,Boolean save) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>(),null);
+        staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         validateEmploymentCTAWhileUpdate(ctaDTO,staffAdditionalInfoDTO,oldCTA);
         CTAResponseDTO responseCTA = null;

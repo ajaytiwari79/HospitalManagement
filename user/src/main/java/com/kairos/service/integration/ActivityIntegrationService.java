@@ -18,6 +18,7 @@ import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -237,6 +238,14 @@ public class ActivityIntegrationService {
 
     public List<CTACompensationSettingDTO> getCTACompensationSettingByCountryId(Long countryId) {
         return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/cta_compensations", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CTACompensationSettingDTO>>>(){});
+    }
+
+    public Set<BigInteger> getApplicableDayTypes(Long countryId) {
+        return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/active_dayTypes", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>(){});
+    }
+
+    public List<DayTypeDTO> getDayTypesByCountryId(Long countryId) {
+        return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/dayType", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayTypeDTO>>>(){});
     }
 }
 

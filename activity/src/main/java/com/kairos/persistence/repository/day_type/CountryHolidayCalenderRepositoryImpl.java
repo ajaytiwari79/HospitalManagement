@@ -31,8 +31,4 @@ public class CountryHolidayCalenderRepositoryImpl implements CustomCountryHolida
         return result.getMappedResults();
     }
 
-    @Override
-    public CountryHolidayCalenderDTO getCurrentlyActiveByCountryId(Long countryId, LocalDate holidayDate, LocalTime currentTime) {
-
-    }
 }

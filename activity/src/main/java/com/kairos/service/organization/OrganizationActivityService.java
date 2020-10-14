@@ -25,6 +25,7 @@ import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.tag.TagDTO;
@@ -60,6 +61,8 @@ import com.kairos.service.activity.*;
 import com.kairos.service.counter.CounterDistService;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.service.cta.CostTimeAgreementService;
+import com.kairos.service.day_type.CountryHolidayCalenderService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.open_shift.OpenShiftRuleTemplateService;
 import com.kairos.service.open_shift.OrderService;
@@ -72,6 +75,7 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftTemplateService;
 import com.kairos.service.unit_settings.*;
 import com.kairos.service.wta.WorkTimeAgreementService;
+import com.kairos.utils.user_context.User;
 import com.kairos.wrapper.activity.ActivitySettingsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
@@ -181,6 +185,10 @@ public class OrganizationActivityService extends MongoBaseService {
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
     private ActivitySettingsService activitySettingsService;
+    @Inject
+    private DayTypeService dayTypeService;
+    @Inject
+    private CountryHolidayCalenderService countryHolidayCalenderService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -444,7 +452,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
 
     public ActivitySettingsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long unitId) {
-        List<DayType> dayTypes = userIntegrationService.getDayTypes(unitId);
+        List<DayTypeDTO> dayTypes = dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId());
         Activity activity = activityMongoRepository.findOne(activityId);
         ActivityTimeCalculationSettings activityTimeCalculationSettings = activity.getActivityTimeCalculationSettings();
         List<Long> rulesTabDayTypes = activity.getActivityRulesSettings().getDayTypes();
@@ -453,7 +461,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public ActivitySettingsWrapper getRulesTabOfActivity(BigInteger activityId, Long unitId) {
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypesAtUnit(unitId);
-        List<DayType> dayTypes = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypeEmploymentTypeWrapper.getDayTypes(), DayType.class);
+        List<DayTypeDTO> dayTypes = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypeEmploymentTypeWrapper.getDayTypes(), DayTypeDTO.class);
         Activity activity = activityMongoRepository.findOne(activityId);
         ActivityRulesSettings activityRulesSettings = activity.getActivityRulesSettings();
         TimeType timeType = timeTypeMongoRepository.findOneById(activity.getActivityBalanceSettings().getTimeTypeId());
@@ -466,7 +474,7 @@ public class OrganizationActivityService extends MongoBaseService {
     public ActivitySettingsWrapper getPhaseSettingTabOfActivity(BigInteger activityId, Long unitId) {
         Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypesAtUnit(unitId);
-        List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<DayTypeDTO> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Activity activity = activityMongoRepository.findOne(activityId);
         ActivityPhaseSettings activityPhaseSettings = activity.getActivityPhaseSettings();
@@ -648,7 +656,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId) {
         SelfRosteringMetaData publicHolidayDayTypeWrapper = getSelfRosteringMetaData(unitId);
-        List<DayType> dayTypes = publicHolidayDayTypeWrapper.getDayTypes();
+        List<DayTypeDTO> dayTypes = publicHolidayDayTypeWrapper.getDayTypes();
         LocalDate date = LocalDate.now();
         int year = date.getYear();
         TemporalField weekOfWeekBasedYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
@@ -668,6 +676,8 @@ public class OrganizationActivityService extends MongoBaseService {
         if (!Optional.ofNullable(publicHolidayDayTypeWrapper).isPresent()) {
             exceptionService.internalServerError(MESSAGE_SELFROSTERING_METADATA_NULL);
         }
+        publicHolidayDayTypeWrapper.setDayTypes(dayTypeService.getAllDayTypeByCountryId(UserContext.getUserDetails().getCountryId()));
+        publicHolidayDayTypeWrapper.setPublicHolidays(countryHolidayCalenderService.getAllCountryAllHolidaysByCountryId(UserContext.getUserDetails().getCountryId()));
         return publicHolidayDayTypeWrapper;
     }
 
@@ -706,7 +716,7 @@ public class OrganizationActivityService extends MongoBaseService {
         }
     }
 
-    private PhaseActivityDTO getPhaseActivityDTO(long unitId, SelfRosteringMetaData publicHolidayDayTypeWrapper, List<DayType> dayTypes, ReasonCodeWrapper reasonCodeWrapper, List<PhaseDTO> phaseDTOs, List<PhaseWeeklyDTO> phaseWeeklyDTOS) {
+    private PhaseActivityDTO getPhaseActivityDTO(long unitId, SelfRosteringMetaData publicHolidayDayTypeWrapper, List<DayTypeDTO> dayTypes, ReasonCodeWrapper reasonCodeWrapper, List<PhaseDTO> phaseDTOs, List<PhaseWeeklyDTO> phaseWeeklyDTOS) {
         List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
         List<ActivityPhaseSettings> activityPhaseSettings = activityMongoRepository.findActivityIdAndStatusByUnitAndAccessGroupIds(unitId, new ArrayList<>(reasonCodeWrapper.getUserAccessRoleDTO().getAccessGroupIds()));
         List<ShiftTemplateDTO> shiftTemplates = shiftTemplateService.getAllShiftTemplates(unitId);

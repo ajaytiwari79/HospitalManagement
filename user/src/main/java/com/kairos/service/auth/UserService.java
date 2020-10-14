@@ -64,6 +64,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigInteger;
 import java.nio.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -101,8 +102,6 @@ public class UserService {
     private ExceptionService exceptionService;
     @Inject
     private SystemLanguageGraphRepository systemLanguageGraphRepository;
-    @Inject
-    private DayTypeService dayTypeService;
     @Inject
     private SendGridMailService sendGridMailService;
     @Inject
@@ -501,8 +500,7 @@ public class UserService {
     private void loadUnitPermissions(Long organizationId, long currentUserId, UnitWiseStaffPermissionsDTO permissionData) {
         List<UserPermissionQueryResult> unitWisePermissions;
         Long countryId = UserContext.getUserDetails().getCountryId();
-        List<DayType> dayTypes = dayTypeService.getCurrentApplicableDayType(countryId);
-        Set<Long> dayTypeIds = activi
+        Set<BigInteger> dayTypeIds = activityIntegrationService.getApplicableDayTypes(countryId);
         boolean checkDayType = true;
         List<AccessGroup> accessGroups = accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
         for (AccessGroup currentAccessGroup : accessGroups) {

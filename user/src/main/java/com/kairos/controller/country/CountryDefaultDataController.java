@@ -1,7 +1,6 @@
 package com.kairos.controller.country;
 
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.language.Language;
@@ -34,8 +33,6 @@ public class CountryDefaultDataController {
 
     @Inject
     private CountryService countryService;
-    @Inject
-    private DayTypeService dayTypeService;
     @Inject
     private ClinicTypeService clinicTypeService;
     @Inject
@@ -650,12 +647,13 @@ public class CountryDefaultDataController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateTranslation(id,translations));
     }
 
-    @PutMapping(value = COUNTRY_URL + "/day_type/{id}/language_settings")
-    @ApiOperation("Add translated data")
-        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateTranslationsOfDayType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.updateTranslation(id,translations));
-    }
+    //TODO Integrated
+//    @PutMapping(value = COUNTRY_URL + "/day_type/{id}/language_settings")
+//    @ApiOperation("Add translated data")
+//        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    ResponseEntity<Map<String, Object>> updateTranslationsOfDayType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.updateTranslation(id,translations));
+//    }
 
     @PutMapping(value = COUNTRY_URL + "/industry_type/{id}/language_settings")
     @ApiOperation("Add translated data")

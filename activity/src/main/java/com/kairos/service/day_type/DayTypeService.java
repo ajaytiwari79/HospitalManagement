@@ -6,6 +6,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.enums.Day;
@@ -13,6 +14,7 @@ import com.kairos.persistence.model.day_type.DayType;
 import com.kairos.persistence.repository.day_type.CountryHolidayCalenderRepository;
 import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.FormatUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,10 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
+import static com.kairos.commons.utils.DateUtils.getCurrentLocalTime;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 
 @Service
 public class DayTypeService {
@@ -109,7 +115,7 @@ public class DayTypeService {
     }
 
     public List<BigInteger> getCurrentApplicableDayType(Long countryId) {
-        CountryHolidayCalenderDTO countryHolidayCalenderDTO = countryHolidayCalenderRepository.getCurrentlyActiveByCountryId(countryId,);
+        CountryHolidayCalenderDTO countryHolidayCalenderDTO = countryHolidayCalenderRepository.getCurrentlyActiveByCountryId(countryId,getCurrentLocalDate(),getCurrentLocalTime());
         List<BigInteger> dayTypes=new ArrayList<>();
         Day dayEnum = Day.valueOf(LocalDate.now().getDayOfWeek().name());
         List<DayTypeDTO> dayTypeList = dayTypeRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
@@ -121,5 +127,21 @@ public class DayTypeService {
         }
         return dayTypes;
 
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger dayTypeId, Map<String,TranslationInfo> translations) {
+        DayType dayType =dayTypeRepository.findOne(dayTypeId);
+        dayType.setTranslations(translations);
+        dayTypeRepository.save(dayType);
+        return dayType.getTranslations();
+    }
+
+    public List<DayTypeDTO> getDayTypeWithCountryHolidayCalender(Long countryId) {
+        List<CountryHolidayCalenderDTO> publicHolidaysResult = countryHolidayCalenderRepository.getCountryAllHolidays(countryId);
+        Map<BigInteger, List<CountryHolidayCalenderDTO>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.getDayTypeId() != null).collect(Collectors.groupingBy(CountryHolidayCalenderDTO::getDayTypeId, Collectors.toList()));
+        List<DayTypeDTO> dayTypes = dayTypeRepository.findAllByCountryIdAndDeletedFalse(countryId);
+        return dayTypes.stream().map(dayType ->
+                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), copyCollectionPropertiesByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings())
+        ).collect(Collectors.toList());
     }
 }

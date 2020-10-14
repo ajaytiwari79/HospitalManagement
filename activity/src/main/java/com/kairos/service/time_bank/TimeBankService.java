@@ -16,6 +16,7 @@ import com.kairos.dto.activity.time_bank.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
@@ -38,6 +39,7 @@ import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.counter.KPIService;
 import com.kairos.service.cta.CostTimeAgreementService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutService;
@@ -77,8 +79,7 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFFEMPLOY
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 /*
  * Created By Pradeep singh rajawat
@@ -120,6 +121,8 @@ public class TimeBankService implements KPIService {
     @Inject private PayOutRepository payOutRepository;
     @Inject private ActivityService activityService;
     @Inject private MongoSequenceRepository mongoSequenceRepository;
+    @Inject
+    private DayTypeService dayTypeService;
 
 
 
@@ -357,6 +360,7 @@ public class TimeBankService implements KPIService {
             exceptionService.dataNotFoundException(MESSAGE_CTA_NOTFOUND,asLocalDate(startDate));
         }
         staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
+        staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         renewDailyTimeBank(staffAdditionalInfoDTO, startDate, endDate);
         return true;
@@ -391,6 +395,7 @@ public class TimeBankService implements KPIService {
             if(isNull(ctaResponseDTO)) {
                 exceptionService.dataNotFoundException(MESSAGE_CTA_NOTFOUND,shiftDate);
             }
+            staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
             staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             dailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, false));
@@ -581,6 +586,8 @@ public class TimeBankService implements KPIService {
         requestParam.add(new BasicNameValuePair("staffIds", new ArrayList<>().toString()));
         requestParam.add(new BasicNameValuePair("employmentIds", new ArrayList<>().toString()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(shifts.get(0).getUnitId(), requestParam);
+        List<DayTypeDTO> dayTypeDTOS=dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId());
+        staffAdditionalInfoDTOS.forEach(staff-> staff.setDayTypes(dayTypeDTOS));
         Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap = staffAdditionalInfoDTOS.stream().filter(distinctByKey(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getEmployment().getId())).collect(Collectors.toMap(s -> s.getEmployment().getId(), v -> v));
         if(isCollectionNotEmpty(shifts)) {
             Date startDateTime = new DateTime(shifts.get(0).getStartDate()).withTimeAtStartOfDay().toDate();
@@ -632,6 +639,7 @@ public class TimeBankService implements KPIService {
 
     public <T> T getAccumulatedTimebankAndDelta(Long employmentId, Long unitId, Boolean includeActualTimebank) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>(),null);
+        staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getEmploymentDetailDTO(staffAdditionalInfoDTO, unitId);
         T object;
         DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
@@ -656,6 +664,7 @@ public class TimeBankService implements KPIService {
         List<Shift> shifts = shiftMongoRepository.findAllByUnitId(unitId);
         for (Shift shift : shifts) {
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), shift.getEmploymentId(), new HashSet<>());
+            staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
             CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate());
             if(isNotNull(ctaResponseDTO) && isCollectionNotEmpty(ctaResponseDTO.getRuleTemplates()) && isNotNull(staffAdditionalInfoDTO) && isNotNull(staffAdditionalInfoDTO.getEmployment())) {
                 staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
@@ -772,7 +781,7 @@ public class TimeBankService implements KPIService {
         ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
         shiftActivity.setTimeType(activityWrapper.getTimeType());
         if (CollectionUtils.isNotEmpty(staffAdditionalInfoDTO.getDayTypes())) {
-            Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
+            Map<BigInteger, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
             Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, activityWrapper.getActivity().getActivityTimeCalculationSettings().getDayTypes(), asLocalDate(shiftActivity.getStartDate()));
             if (activityDayTypes.contains(DateUtils.asLocalDate(shiftActivity.getStartDate()).getDayOfWeek())) {
                 timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activityWrapper.getActivity(), staffAdditionalInfoDTO.getEmployment(), false);

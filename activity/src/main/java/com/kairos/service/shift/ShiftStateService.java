@@ -6,7 +6,9 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
@@ -21,6 +23,7 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.attendence_setting.TimeAndAttendanceService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
@@ -67,6 +70,7 @@ public class ShiftStateService {
     @Inject private ShiftService shiftService;
     @Inject private TimeAndAttendanceService timeAndAttendanceService;
     @Inject private ShiftValidatorService shiftValidatorService;
+    @Inject private DayTypeService dayTypeService;
 
 
     public boolean sendShiftInTimeAndAttendancePhase(Long unitId, Date startDate,Long staffId){
@@ -231,6 +235,8 @@ public class ShiftStateService {
         requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
         requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
+        List<DayTypeDTO> dayTypeDTOS=dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId());
+        staffAdditionalInfoDTOS.forEach(staff-> staff.setDayTypes(dayTypeDTOS));
         shifts.sort(Comparator.comparing(Shift::getStartDate));
         shiftsList.sort((shift, shiftSecond) -> shift.getStartDate().compareTo(shiftSecond.getStartDate()));
         Date startDate = shifts.get(0).getStartDate();
@@ -239,16 +245,6 @@ public class ShiftStateService {
         Date shiftEndDate = shiftsList.get(shiftsList.size() - 1).getEndDate();
         startDate = startDate.before(shiftStartDate) ? startDate : shiftStartDate;
         endDate = endDate.after(shiftEndDate) ? endDate : shiftEndDate;
-        /*List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(employmentIds, startDate, endDate);
-        Map<Long, List<CTAResponseDTO>> employmentAndCTAResponseMap = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getEmploymentId));
-        staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
-            if (employmentAndCTAResponseMap.get(staffAdditionalInfoDTO.getEmployment().getId()) != null) {
-                List<CTAResponseDTO> ctaResponseDTOSList = employmentAndCTAResponseMap.get(staffAdditionalInfoDTO.getEmployment().getId());
-                List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ctaResponseDTOSList.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
-                staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaRuleTemplateDTOS);
-                setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-            }
-        });*/
         timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, startDate, endDate);
 
     }

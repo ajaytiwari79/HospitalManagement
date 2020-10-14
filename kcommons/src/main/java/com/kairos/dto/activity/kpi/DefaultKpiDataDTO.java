@@ -34,10 +34,9 @@ public class DefaultKpiDataDTO {
         this.timeSlotDTOS = timeSlotDTOS;
     }
 
-    public DefaultKpiDataDTO(Long countryId, List<StaffKpiFilterDTO> staffKpiFilterDTOs, List<DayTypeDTO> dayTypeDTOS, List<TimeSlotDTO> timeSlotDTOS, List<OrganizationCommonDTO> organizationCommonDTOS, List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS, List<ReasonCodeDTO> reasonCodeDTOS, List<TagDTO> tags) {
+    public DefaultKpiDataDTO(Long countryId, List<StaffKpiFilterDTO> staffKpiFilterDTOs, List<TimeSlotDTO> timeSlotDTOS, List<OrganizationCommonDTO> organizationCommonDTOS, List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS, List<ReasonCodeDTO> reasonCodeDTOS, List<TagDTO> tags) {
         this.countryId = countryId;
         this.staffKpiFilterDTOs = staffKpiFilterDTOs;
-        this.dayTypeDTOS = dayTypeDTOS;
         this.timeSlotDTOS = timeSlotDTOS;
         this.organizationCommonDTOS = organizationCommonDTOS;
         this.employmentTypeKpiDTOS = employmentTypeKpiDTOS;

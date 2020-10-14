@@ -12,6 +12,7 @@ import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -26,6 +27,7 @@ import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepo
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
@@ -92,6 +94,8 @@ public class ShiftCopyService extends MongoBaseService {
     private PayOutService payOutService;
     @Inject
     private PhaseService phaseService;
+    @Inject
+    private DayTypeService dayTypeService;
 
 
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
@@ -103,6 +107,7 @@ public class ShiftCopyService extends MongoBaseService {
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(activityIds));
         Map<BigInteger, ActivityWrapper> activityMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         StaffEmploymentUnitDataWrapper dataWrapper = userIntegrationService.getStaffsEmployment(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
+        dataWrapper.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         List<StaffEmploymentDetails> staffDataList = dataWrapper.getStaffEmploymentDetails();
         List<Long> employmentIds = staffDataList.stream().map(StaffEmploymentDetails::getId).collect(Collectors.toList());
         findAndAddCTAInEmployments(staffDataList, copyShiftDTO, dataWrapper, employmentIds);
@@ -293,7 +298,7 @@ public class ShiftCopyService extends MongoBaseService {
             }
             ActivityWrapper currentActivityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
             if (CollectionUtils.isNotEmpty(dataWrapper.getDayTypes())) {
-                Map<Long, DayTypeDTO> dayTypeDTOMap = dataWrapper.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+                Map<BigInteger, DayTypeDTO> dayTypeDTOMap = dataWrapper.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
                 Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, currentActivityWrapper.getActivity().getActivityTimeCalculationSettings().getDayTypes(),asLocalDate(shiftActivity.getStartDate()));
                 if (activityDayTypes.contains(asLocalDate(shiftActivity.getStartDate()).getDayOfWeek())) {
                     timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, currentActivityWrapper.getActivity(), staffEmployment,false);

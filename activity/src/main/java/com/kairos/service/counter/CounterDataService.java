@@ -50,6 +50,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
 import org.slf4j.Logger;
@@ -86,6 +87,8 @@ public class CounterDataService {
     private ExceptionService exceptionService;
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private DayTypeService dayTypeService;
     @Inject
     private CounterRepository counterRepository;
     @Inject
@@ -208,6 +211,7 @@ public class CounterDataService {
         List<FilterCriteria> criteriaList = new ArrayList<>();
         KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
+        defaultKpiDataDTO.setDayTypeDTOS(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         getSelectedFilterDefaultData(level, criteriaList, kpi, defaultKpiDataDTO);
         setKpiProperty(applicableKPIS.get(0), criteriaList, kpi);
         return kpi;
