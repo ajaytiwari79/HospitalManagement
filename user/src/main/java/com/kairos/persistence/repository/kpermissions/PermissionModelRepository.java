@@ -89,7 +89,7 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "OPTIONAL MATCH(staff:Staff)<-[:"+BELONGS_TO+"]-(position:Position)-["+HAS_UNIT_PERMISSIONS+"]->(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit) WHERE ID(staff)={3} AND ID(unit)={4} " +
             "OPTIONAL MATCH(up)-[customRel:"+HAS_CUSTOMIZED_PERMISSION_FOR_ACTION+"]->(kPermissionAction) WHERE customRel.accessGroupId=id(accessGroup) " +
             "RETURN CASE WHEN customRel IS NULL THEN  rel.hasPermission ELSE customRel.hasPermission END AS result \n" )
-    boolean hasActionPermission(String modelName, PermissionAction action, Set<Long> accessGroupIds, Long loggedInStaffId, Long staffId);
+    Set<Boolean> hasActionPermission(String modelName, PermissionAction action, Set<Long> accessGroupIds, Long loggedInStaffId, Long staffId);
 
     @Query(value ="MATCH (kPermissionAction:KPermissionAction),(accessGroup:AccessGroup) where id(accessGroup)={0} AND id(kPermissionAction) IN {1} " +
             "CREATE UNIQUE (kPermissionAction)-[r:"+HAS_ACTION_PERMISSION+"]->(accessGroup) " +
