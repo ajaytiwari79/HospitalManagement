@@ -91,16 +91,18 @@ public class ActionService {
         return actionRepository.saveAll(actions);
     }
 
-    public Map<String,Object> getAvailabilityUnavailabilityBeforeAfterShift(Long unitId, Long staffId, Date ShiftDate) {
-        Map<String,Boolean> beforeMap = new HashMap<String,Boolean>(){{put(AVAILABILITY,false);put(UNAVAILABILITY,false);}};
-        Map<String,Boolean> afterMap = new HashMap<>(beforeMap);
-        List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId,getStartOfDay(ShiftDate),getEndOfDay(ShiftDate));
+    public Map<String,Object> getAvailabilityUnavailabilityBeforeAfterShift(Long unitId, Long staffId, Date shiftStartDate) {
+        Map<String,Integer> beforeMap = new HashMap<String,Integer>(){{put(AVAILABILITY,0);put(UNAVAILABILITY,0);}};
+        Map<String,Integer> afterMap = new HashMap<>(beforeMap);
+        List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId,getStartOfDay(shiftStartDate),getEndOfDay(shiftStartDate));
         shifts.forEach(shift -> {
-            List<TimeTypeEnum> timeTypeEnums = shift.getActivities().stream().map(ShiftActivity::getSecondLevelTimeType).collect(Collectors.toList());
-            if(shift.getStartDate().before(ShiftDate)){
-                updateMap(beforeMap, timeTypeEnums);
-            } else {
-                updateMap(afterMap, timeTypeEnums);
+            if(!shift.getEndDate().after(getEndOfDay(shiftStartDate))) {
+                List<TimeTypeEnum> timeTypeEnums = shift.getActivities().stream().map(ShiftActivity::getSecondLevelTimeType).collect(Collectors.toList());
+                if (shift.getStartDate().before(shiftStartDate)) {
+                    updateMap(beforeMap, timeTypeEnums);
+                } else {
+                    updateMap(afterMap, timeTypeEnums);
+                }
             }
         });
         Map<String,Object> response = new HashMap<>();
@@ -110,11 +112,11 @@ public class ActionService {
         return response;
     }
 
-    private void updateMap(Map<String, Boolean> map, List<TimeTypeEnum> timeTypeEnums) {
+    private void updateMap(Map<String, Integer> map, List<TimeTypeEnum> timeTypeEnums) {
         if (timeTypeEnums.contains(TimeTypeEnum.AVAILABLE_TIME)) {
-            map.put(AVAILABILITY, true);
+            map.put(AVAILABILITY, map.get(AVAILABILITY)+1);
         } else if (timeTypeEnums.contains(TimeTypeEnum.UNAVAILABLE_TIME)) {
-            map.put(UNAVAILABILITY, true);
+            map.put(UNAVAILABILITY, map.get(UNAVAILABILITY)+1);
         }
     }
 

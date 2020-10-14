@@ -638,7 +638,6 @@ public class RuletemplateUtils {
 
     public static void updateDayTypeDetailInCTARuletemplate(Map<Long, List<Day>> daytypesMap, CTARuleTemplateDTO ctaRuleTemplateDTO) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        List<LocalDate> publicHolidays = new ArrayList<>();
         for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
             List<Day> applicableDaysOfWeek = daytypesMap.get(dayTypeId);
             if (applicableDaysOfWeek == null) {
@@ -650,7 +649,7 @@ public class RuletemplateUtils {
                 }
             });
         }
-        ctaRuleTemplateDTO.setPublicHolidays(publicHolidays);
+        ctaRuleTemplateDTO.setPublicHolidays(new ArrayList<>());
         ctaRuleTemplateDTO.setDays(new ArrayList<>(dayOfWeeks));
     }
 
