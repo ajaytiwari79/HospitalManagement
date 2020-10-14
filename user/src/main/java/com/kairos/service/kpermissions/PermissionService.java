@@ -640,7 +640,7 @@ public class PermissionService {
         unitAccessGroupIds.addAll(accessGroups.stream().map(UserBaseEntity::getId).collect(Collectors.toSet()));
         Organization organization=organizationService.fetchParentOrganization(unitId);
         Long loggedInStaffId=staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
-        return permissionModelRepository.hasActionPermission(modelName,action,unitAccessGroupIds,loggedInStaffId,unitId);
+        return permissionModelRepository.hasActionPermission(modelName,action,unitAccessGroupIds,loggedInStaffId,unitId).contains(true);
     }
 
     public void createActions(List<KPermissionAction> permissionActions) {
