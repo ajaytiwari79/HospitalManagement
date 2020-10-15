@@ -528,19 +528,6 @@ public class ClientController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getClientAddressInfo(citizenId));
     }
 
-    /**
-     * @auther anil maurya
-     * this endpoint is called from task micro service
-     * @param taskDemandWrapper
-
-     * @return
-     */
-    @RequestMapping(method = RequestMethod.POST, value = "/getClientInfo")
-    @ApiOperation("get client and staff info")
-    private ResponseEntity<Map<String, Object>> getClientDetailsForTaskDemandVisit(@RequestBody TaskDemandRequestWrapper taskDemandWrapper){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.getClientDetailsForTaskDemandVisit(taskDemandWrapper));
-    }
 
 
     /**

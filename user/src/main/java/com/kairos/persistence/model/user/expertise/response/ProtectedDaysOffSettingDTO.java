@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 @Getter
 @Setter
@@ -15,5 +16,5 @@ public class ProtectedDaysOffSettingDTO {
     private Long holidayId;
     private LocalDate publicHolidayDate;
     private boolean protectedDaysOff;
-    private Long dayTypeId;
+    private BigInteger dayTypeId;
 }

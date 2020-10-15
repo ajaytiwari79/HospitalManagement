@@ -65,20 +65,6 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "MATCH (c:Country)-[:"+ HAS_ORGANIZATION_SERVICES +"]->(os) RETURN c limit 1")
     Country getCountryByOrganizationService(Long subServiceId);
 
-    @Query("MATCH (c:Country)-[:"+ HAS_HOLIDAY +"]-(ch:CountryHolidayCalender) " +
-            "where id(c) = {0}   AND date(ch.holidayDate) >={1} AND  date(ch.holidayDate) <={2}  " +
-            "AND ch.isEnabled = true WITH  ch as ch  " +
-            "OPTIONAL MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
-            "RETURN ch.holidayDate as result")
-    List<LocalDate> getAllCountryHolidaysBetweenDates(Long countryId, LocalDate start, LocalDate end);
-
-    @Query("MATCH (c:Country)-[:"+ HAS_HOLIDAY +"]-(ch:CountryHolidayCalender) " +
-            "where id(c) = {0}   AND date(ch.holidayDate) >={1} AND  date(ch.holidayDate) <={2}  " +
-            "AND ch.isEnabled = true WITH  ch as ch  " +
-            "MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
-            "RETURN ch.holidayDate as holidayDate, dt as dayType ")
-    List<CountryHolidayCalendarQueryResult> getCountryHolidayCalendarBetweenDates(Long countryId, LocalDate start, LocalDate end);
-
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level)={1} RETURN level")
     Level getLevel(Long countryId, Long levelId);
 

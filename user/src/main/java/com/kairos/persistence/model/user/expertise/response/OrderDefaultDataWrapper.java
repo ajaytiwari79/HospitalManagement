@@ -4,7 +4,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.open_shift.OrderResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
-import com.kairos.persistence.model.country.default_data.DayType;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
@@ -28,7 +28,7 @@ public class OrderDefaultDataWrapper {
     private List<PresenceTypeDTO> plannedTime;
     private List<FunctionDTO> functions;
     private List<ReasonCodeResponseDTO> reasonCodes;
-    private List<DayType> dayTypes;
+    private List<DayTypeDTO> dayTypes;
     private Integer minOpenShiftHours;
     private List<CounterDTO> counters;
 

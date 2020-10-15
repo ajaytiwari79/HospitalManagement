@@ -3,7 +3,6 @@ package com.kairos.persistence.model.access_permission;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,7 +48,6 @@ public class AccessGroup extends UserBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean allowedDayTypes;
-    private List<DayType> dayTypes;
     private Set<BigInteger> dayTypeIds;
     @Relationship(type = HAS_PARENT_ACCESS_GROUP)
     private AccessGroup parentAccessGroup;
