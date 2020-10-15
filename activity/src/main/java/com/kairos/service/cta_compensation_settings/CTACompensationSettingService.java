@@ -16,7 +16,11 @@ import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjuster;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +67,7 @@ public class CTACompensationSettingService {
     }
 
     public void validateInterval(List<CTACompensationConfiguration> configurations){
-        ZonedDateTime zonedDateTime = ZonedDateTime.now();
+        ZonedDateTime zonedDateTime = ZonedDateTime.now().with(LocalTime.MIN);
         configurations.forEach(ctaCompensationConfiguration -> {
             configurations.forEach(ctaCompensationConfiguration1 -> {
                 DateTimeInterval interval = ctaCompensationConfiguration.getInterval(zonedDateTime);
