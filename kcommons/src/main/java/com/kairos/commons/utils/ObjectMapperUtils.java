@@ -78,6 +78,7 @@ public class ObjectMapperUtils {
 
     public static <E extends Object,T extends Object> T copyPropertiesByMapper(E object, Class<T> valueType){
         try {
+
             String json = mapper.writeValueAsString(object);
             return mapper.readValue(json, valueType);
         } catch (IOException e) {

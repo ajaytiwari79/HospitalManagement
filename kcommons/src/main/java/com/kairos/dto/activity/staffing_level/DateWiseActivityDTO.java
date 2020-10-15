@@ -13,6 +13,6 @@ import java.util.Set;
 @Getter
 @Setter
 public class DateWiseActivityDTO {
-    private LocalDate localDate;
+    private LocalDate date;
     private Set<BigInteger> activityIds;
 }
