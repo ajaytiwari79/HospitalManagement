@@ -1,10 +1,12 @@
 package com.kairos.service.unit_settings;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.ActivityMessagesConstants;
 import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
-import com.kairos.persistence.model.unit_settings.ProtectedDaysOffSetting;
+import com.kairos.persistence.model.unit_settings.ProtectedDaysOff;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ProtectedDaysOffRepository;
@@ -16,6 +18,9 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
+
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.constants.AppConstants.DAY;
 
 /**
  * Created By G.P.Ranjan on 1/7/19
@@ -34,42 +39,56 @@ public class ProtectedDaysOffService extends MongoBaseService {
 
     public ProtectedDaysOffSettingDTO saveProtectedDaysOff(Long unitId, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
         ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO = new ProtectedDaysOffSettingDTO(unitId, protectedDaysOffUnitSettings);
-        ProtectedDaysOffSetting protectedDaysOffSetting =protectedDaysOffRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
-        if(!Optional.ofNullable(protectedDaysOffSetting).isPresent()) {
-            protectedDaysOffSetting = new ProtectedDaysOffSetting(protectedDaysOffSettingDTO.getId(), protectedDaysOffSettingDTO.getUnitId(), protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings());
-            protectedDaysOffRepository.save(protectedDaysOffSetting);
+        ProtectedDaysOff protectedDaysOff =protectedDaysOffRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
+        if(!Optional.ofNullable(protectedDaysOff).isPresent()) {
+            protectedDaysOff = new ProtectedDaysOff(protectedDaysOffSettingDTO.getId(), protectedDaysOffSettingDTO.getUnitId(), protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings());
+            protectedDaysOffRepository.save(protectedDaysOff);
         }
-        protectedDaysOffSettingDTO.setId(protectedDaysOffSetting.getId());
+        protectedDaysOffSettingDTO.setId(protectedDaysOff.getId());
         return protectedDaysOffSettingDTO;
     }
 
     public ProtectedDaysOffSettingDTO updateProtectedDaysOffByUnitId(Long unitId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO){
-        ProtectedDaysOffSetting protectedDaysOffSetting =protectedDaysOffRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
-        if(!Optional.ofNullable(protectedDaysOffSetting).isPresent()) {
+        ProtectedDaysOff protectedDaysOff =protectedDaysOffRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
+        if(!Optional.ofNullable(protectedDaysOff).isPresent()) {
             exceptionService.dataNotFoundException(ActivityMessagesConstants.MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF, protectedDaysOffSettingDTO.getId());
         }
-        protectedDaysOffSetting.setProtectedDaysOffUnitSettings(protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings());
-        protectedDaysOffRepository.save(protectedDaysOffSetting);
-        return ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOffSetting,ProtectedDaysOffSettingDTO.class);
+        protectedDaysOff.setProtectedDaysOffUnitSettings(protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings());
+        protectedDaysOffRepository.save(protectedDaysOff);
+        return ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOff,ProtectedDaysOffSettingDTO.class);
     }
 
     public ProtectedDaysOffSettingDTO getProtectedDaysOffByUnitId(Long unitId){
-        ProtectedDaysOffSetting protectedDaysOffSetting =protectedDaysOffRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
-        if(!Optional.ofNullable(protectedDaysOffSetting).isPresent()) {
+        ProtectedDaysOff protectedDaysOff =protectedDaysOffRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
+        if(!Optional.ofNullable(protectedDaysOff).isPresent()) {
             exceptionService.dataNotFoundException(ActivityMessagesConstants.MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF,unitId);
         }
-        return new ProtectedDaysOffSettingDTO(protectedDaysOffSetting.getId(), protectedDaysOffSetting.getUnitId(), protectedDaysOffSetting.getProtectedDaysOffUnitSettings());
+        return new ProtectedDaysOffSettingDTO(protectedDaysOff.getId(), protectedDaysOff.getUnitId(), protectedDaysOff.getProtectedDaysOffUnitSettings());
     }
 
     public List<ProtectedDaysOffSettingDTO> getAllProtectedDaysOffByUnitIds(List<Long> unitIds){
-        List<ProtectedDaysOffSetting> protectedDaysOffSettings =protectedDaysOffRepository.getAllProtectedDaysOffByUnitIdsAndDeletedFalse(unitIds);
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(protectedDaysOffSettings,ProtectedDaysOffSettingDTO.class);
+        List<ProtectedDaysOff> protectedDaysOffs =protectedDaysOffRepository.getAllProtectedDaysOffByUnitIdsAndDeletedFalse(unitIds);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(protectedDaysOffs,ProtectedDaysOffSettingDTO.class);
     }
 
     public Boolean createAutoProtectedDaysOffOfAllUnits(Long countryId){
         List<Long> units=userIntegrationService.getUnitIds(countryId);
         units.forEach(unit-> saveProtectedDaysOff(unit,ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR));
         return true;
+    }
+
+    public ProtectedDaysOffSettingDTO addOrUpdateProtectedDaysOffSetting(Long expertiseId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO) {
+        CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryGraphRepository.findByCalendarHolidayId(protectedDaysOffSettingDTO.getHolidayId());
+        if (isNull(countryHolidayCalendarQueryResult)) {
+            exceptionService.dataNotMatchedException(MESSAGE_DATANOTFOUND, DAY, DAY_TYPE, protectedDaysOffSettingDTO.getHolidayId());
+        }
+        protectedDaysOffSettingDTO.setDayTypeId(countryHolidayCalendarQueryResult.getDayType().getId());
+        protectedDaysOffSettingDTO.setPublicHolidayDate(countryHolidayCalendarQueryResult.getHolidayDate());
+        expertise.getProtectedDaysOffSettings().add(ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOffSettingDTO, ProtectedDaysOffSetting.class));
+        expertiseGraphRepository.save(expertise);
+        ProtectedDaysOffSetting protectedDaysOffSettings = expertise.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.getHolidayId().equals(protectedDaysOffSettingDTO.getHolidayId())).findAny().orElse(new ProtectedDaysOffSetting());
+        protectedDaysOffSettingDTO.setId(protectedDaysOffSettings.getId());
+        return protectedDaysOffSettingDTO;
     }
 
 

@@ -14,11 +14,11 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProtectedDaysOffSetting extends MongoBaseEntity {
+public class ProtectedDaysOff extends MongoBaseEntity {
     private Long unitId;
     private ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings;
 
-    public ProtectedDaysOffSetting(BigInteger id, Long unitId, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
+    public ProtectedDaysOff(BigInteger id, Long unitId, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
         super.id=id;
         this.unitId=unitId;
         this.protectedDaysOffUnitSettings=protectedDaysOffUnitSettings;
