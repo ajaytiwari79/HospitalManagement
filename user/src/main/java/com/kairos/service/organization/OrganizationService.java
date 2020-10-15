@@ -69,7 +69,6 @@ import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
-import com.kairos.service.country.DayTypeService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.country.tag.TagService;

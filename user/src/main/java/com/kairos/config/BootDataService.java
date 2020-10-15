@@ -50,6 +50,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffTeamRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.organization.OpenningHourService;
 import com.kairos.utils.CPRUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

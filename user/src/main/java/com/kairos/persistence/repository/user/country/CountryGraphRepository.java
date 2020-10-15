@@ -34,26 +34,6 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "RETURN {isEnabled:ch.isEnabled,description:ch.description,startTime:ch.startTime,endTime:ch.endTime,holidayTitle:ch.holidayTitle,holidayDate:ch.holidayDate} as result")
     List<Map<String,Object>> getAllCountryHolidays(Long countryId);
 
-    @Query("MATCH (c:Country)-[:"+HAS_HOLIDAY+"]-(ch:CountryHolidayCalender) " +
-            "where id(c) = {0}   AND ch.holidayDate >={1} AND  ch.holidayDate <={2}  " +
-            "AND ch.isEnabled = true WITH  ch as ch  " +
-            "OPTIONAL MATCH (ch)-[:"+DAY_TYPE+"]-(dt:DayType{isEnabled:true}) " +
-            "RETURN {holidayTitle: ch.holidayTitle,holidayDate: ch.holidayDate, description:ch.description,startTime:ch.startTime,id:id(ch),endTime:ch.endTime, " +
-            "dayType:dt.name, " +
-            "dayTypeId:id(dt)} as result")
-    List<Map<String,Object>> getAllCountryHolidaysByYear(Long countryId, Long start, Long end);
-
-    @Query("MATCH (c:Country)-[:"+HAS_HOLIDAY+"]-(ch:CountryHolidayCalender{isEnabled :true}) " +
-            "where id(c) = {0}  " +
-            " MATCH (ch)-[:"+DAY_TYPE+"]-(dt:DayType{isEnabled:true}) " +
-            "RETURN {holidayTitle: ch.holidayTitle,isEnabled :ch.isEnabled  ,holidayDate: ch.holidayDate, description:ch.description,startTime:ch.startTime,id:id(ch),endTime:ch.endTime, " +
-            "dayType:dt.name, allowTimeSettings:dt.allowTimeSettings, colorCode:dt.colorCode," +
-            "dayTypeId:id(dt)} as result order by  ch.holidayDate asc ")
-    List<Map<String,Object>> getCountryAllHolidays(Long countryId);
-
-    //query written for meta data of general tab of task type
-    @Query("MATCH (c:Country),(o:OrganizationType)  where  c.isEnabled = true AND o.isEnable = true  RETURN {countries: collect( DISTINCT{id:id(c),name:c.name}),types:collect( DISTINCT {id:id(o),name:o.name})} as data")
-    List<Map<String,Object>> getCountryAndOrganizationTypes();
 
     @Query("MATCH (country:Country{name:{0}}) RETURN country")
     Country getCountryByName(String name);
