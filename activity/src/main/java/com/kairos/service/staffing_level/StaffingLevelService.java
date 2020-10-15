@@ -5,14 +5,11 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityValidationError;
-import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.StaffingLevelHelper;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
@@ -52,7 +49,6 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.utils.service_util.StaffingLevelUtil;
-import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -848,7 +844,7 @@ public class StaffingLevelService  {
         Map<BigInteger, ActivityValidationError> activityValidationErrorMap = activityValidationErrors.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         List<DateWiseActivityDTO> dateWiseActivityDTOS = staffingLevelFromTemplateDTO.getActivitiesByDate();
         filterIncorrectDataByDates(dateWiseActivityDTOS, staffingLevelTemplate.getValidity().getStartDate(), staffingLevelTemplate.getValidity().getEndDate(), activityValidationErrors);
-        Set<LocalDate> dates = dateWiseActivityDTOS.stream().map(DateWiseActivityDTO::getLocalDate).collect(Collectors.toSet());
+        Set<LocalDate> dates = dateWiseActivityDTOS.stream().map(DateWiseActivityDTO::getDate).collect(Collectors.toSet());
         List<StaffingLevel> allStaffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, dates);
         Map<LocalDate, StaffingLevel> dateStaffingLevelMap = allStaffingLevels.stream().collect(Collectors.toMap(k -> asLocalDate(k.getCurrentDate()), v -> v));
         List<StaffingLevel> staffingLevels = getStaffingLevelsByTemplate(unitId, staffingLevelTemplate, parentActivityIds, activityValidationErrorMap, dateWiseActivityDTOS, dateStaffingLevelMap);
@@ -897,27 +893,27 @@ public class StaffingLevelService  {
         Iterator<DateWiseActivityDTO> iterator = dateWiseActivityDTOS.iterator();
         while (iterator.hasNext()) {
             DateWiseActivityDTO dateWiseActivityDTO = iterator.next();
-            if (dateWiseActivityDTO.getLocalDate().isBefore(startDate) || dateWiseActivityDTO.getLocalDate().isAfter(endDate) || dateWiseActivityDTO.getLocalDate().isBefore(DateUtils.getCurrentLocalDate())) {
+            if (dateWiseActivityDTO.getDate().isBefore(startDate) || dateWiseActivityDTO.getDate().isAfter(endDate) || dateWiseActivityDTO.getDate().isBefore(DateUtils.getCurrentLocalDate())) {
                 iterator.remove();
-                activityValidationErrors.add(new ActivityValidationError(Arrays.asList(exceptionService.getLanguageSpecificText(DATE_OUT_OF_RANGE, dateWiseActivityDTO.getLocalDate()))));
+                activityValidationErrors.add(new ActivityValidationError(Arrays.asList(exceptionService.getLanguageSpecificText(DATE_OUT_OF_RANGE, dateWiseActivityDTO.getDate()))));
             }
         }
     }
 
 
     private StaffingLevel getStaffingLevelIfExist(Map<LocalDate, StaffingLevel> localDateStaffingLevelMap, DateWiseActivityDTO currentDate, List<StaffingLevelInterval> staffingLevelIntervals, StaffingLevelTemplate staffingLevelTemplate, Long unitId) {
-        StaffingLevel staffingLevel = localDateStaffingLevelMap.get(currentDate.getLocalDate());
+        StaffingLevel staffingLevel = localDateStaffingLevelMap.get(currentDate.getDate());
         if (staffingLevel != null) {
             staffingLevel.setPresenceStaffingLevelInterval(staffingLevelIntervals);
         } else {
             staffingLevel = ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate, StaffingLevel.class);
             staffingLevel.setId(null);
             staffingLevel.setPresenceStaffingLevelInterval(staffingLevelIntervals);
-            staffingLevel.setWeekCount(getWeekNumberByLocalDate(currentDate.getLocalDate()));
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, DateUtils.asDate(currentDate.getLocalDate()), null);
+            staffingLevel.setWeekCount(getWeekNumberByLocalDate(currentDate.getDate()));
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, DateUtils.asDate(currentDate.getDate()), null);
             staffingLevel.setPhaseId(phase.getId());
             staffingLevel.setUnitId(unitId);
-            staffingLevel.setCurrentDate(DateUtils.asDate(currentDate.getLocalDate()));
+            staffingLevel.setCurrentDate(DateUtils.asDate(currentDate.getDate()));
         }
         return staffingLevel;
     }
