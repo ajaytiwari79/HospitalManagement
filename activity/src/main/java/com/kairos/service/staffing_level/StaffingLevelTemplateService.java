@@ -132,7 +132,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         if(!holidayDayType.isPresent()) {
             return staffingLevelTemplateRepository.findByUnitIdDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
         }else {
-            return staffingLevelTemplateRepository.findByUnitIdHolidayDayTypeAndDate(unitId,proposedDate, proposedDate, dayTypeIds);
+            return staffingLevelTemplateRepository.findByUnitIdDayTypeAndDate(unitId,proposedDate, proposedDate, dayTypeIds,null);
         }
         }
 
