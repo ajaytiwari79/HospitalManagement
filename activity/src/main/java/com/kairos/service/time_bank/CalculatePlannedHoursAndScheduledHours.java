@@ -132,7 +132,7 @@ public class CalculatePlannedHoursAndScheduledHours {
             ZonedDateTime todayDate = asZonedDateTime(LocalDate.now()).with(LocalTime.MIN);
             for (CTACompensationConfiguration ctaCompensationConfiguration : ruleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations()) {
                 ZonedDateTime startDate = getDateByIntervalType(ctaCompensationConfiguration.getIntervalType(), ctaCompensationConfiguration.getFrom(), todayDate);
-                ZonedDateTime endDate = getDateByIntervalType(ctaCompensationConfiguration.getIntervalType(), ctaCompensationConfiguration.getTo(), todayDate);
+                ZonedDateTime endDate = getDateByIntervalType(ctaCompensationConfiguration.getIntervalType(), ctaCompensationConfiguration.getTo(), todayDate).with(LocalTime.MAX);
                 DateTimeInterval dateTimeInterval = new DateTimeInterval(ctaCompensationConfiguration.getFrom()==0 ? todayDate.minusDays(2) : startDate, ctaCompensationConfiguration.getTo()==0 ? asZonedDateTime(shift.getEndDate()) : endDate);
                 if (dateTimeInterval.contains(shift.getStartDate())) {
                     if (CompensationType.HOURS.equals(ctaCompensationConfiguration.getCompensationType())) {
