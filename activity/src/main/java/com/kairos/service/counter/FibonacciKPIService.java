@@ -204,10 +204,10 @@ public class FibonacciKPIService implements CounterService{
     }
 
     public Map<String, TranslationInfo> updateTranslationData(BigInteger fibonacciKpiId,Map<String,TranslationInfo> translations){
-       ApplicableKPI applicableKPI = applicableKPIRepository.findOne(fibonacciKpiId);
-       applicableKPI.setTranslations(translations);
-       applicableKPIRepository.save(applicableKPI);
-       return applicableKPI.getTranslations();
+       FibonacciKPI fibonacciKPI = fibonacciKPIRepository.findOne(fibonacciKpiId);
+       fibonacciKPI.setTranslations(translations);
+       fibonacciKPIRepository.save(fibonacciKPI);
+       return fibonacciKPI.getTranslations();
     }
 
 }
