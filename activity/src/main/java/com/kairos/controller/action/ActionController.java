@@ -73,8 +73,8 @@ public class ActionController {
 
     @ApiOperation("Remove availability unavailability before after shift")
     @DeleteMapping("/staff/{staffId}/availability_unavailability_before_after_shift")
-    ResponseEntity<Map<String, Object>> removeAvailabilityUnavailabilityBeforeAfterShift(@PathVariable Long staffId,@RequestParam boolean isAvailability,@RequestParam boolean isBefore,@RequestParam("shift_date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date ShiftDate){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.removeAvailabilityUnavailabilityBeforeAfterShift(staffId, isAvailability, isBefore, ShiftDate));
+    ResponseEntity<Map<String, Object>> removeAvailabilityUnavailabilityBeforeAfterShift(@PathVariable Long staffId,@RequestParam boolean availability,@RequestParam boolean before, @RequestParam boolean removeNearestOne, @RequestParam("shift_date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date ShiftDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.removeAvailabilityUnavailabilityBeforeAfterShift(staffId, availability, before, removeNearestOne, ShiftDate));
     }
 
     @ApiOperation("Update action count of staff")
