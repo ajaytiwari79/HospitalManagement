@@ -130,13 +130,16 @@ public class ActionService {
         response.put(UNAVAILABILITY_NAME, unavailabilityName);
     }
 
-    public List<ShiftWithViolatedInfoDTO> removeAvailabilityUnavailabilityBeforeAfterShift(Long staffId, boolean isAvailability, boolean isBefore, Date ShiftDate) {
+    public List<ShiftWithViolatedInfoDTO> removeAvailabilityUnavailabilityBeforeAfterShift(Long staffId, boolean isAvailability, boolean isBefore, boolean isRemoveOneNearest, Date ShiftDate) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId, isBefore ? getStartOfDay(ShiftDate) : ShiftDate, isBefore ? ShiftDate : getEndOfDay(ShiftDate));
         for (Shift shift : shifts) {
             List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS1 = removeAvailabilityUnavailabilityActivity(shift, isAvailability ? TimeTypeEnum.AVAILABLE_TIME : TimeTypeEnum.UNAVAILABLE_TIME);
             if(isCollectionNotEmpty(shiftWithViolatedInfoDTOS1)){
                 shiftWithViolatedInfoDTOS.addAll(shiftWithViolatedInfoDTOS1);
+                if(isRemoveOneNearest){
+                    break;
+                }
             }
         }
         return shiftWithViolatedInfoDTOS;
