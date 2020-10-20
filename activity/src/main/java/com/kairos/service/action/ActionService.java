@@ -40,12 +40,14 @@ import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 public class ActionService {
     private static final String AVAILABILITY = "AVAILABILITY";
     private static final String UNAVAILABILITY = "UNAVAILABILITY";
+    private static final String STOP_BRICK = "STOP_BRICK";
     private static final String BEFORE = "BEFORE";
     private static final String AFTER = "AFTER";
     private static final String DELETE = "DELETE";
     private static final String UPDATE = "UPDATE";
     private static final String AVAILABILITY_NAME = "AVAILABILITY_NAME";
     private static final String UNAVAILABILITY_NAME = "UNAVAILABILITY_NAME";
+    private static final String STOP_BRICK_NAME = "STOP_BRICK_NAME";
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -91,14 +93,14 @@ public class ActionService {
         return actionRepository.saveAll(actions);
     }
 
-    public Map<String,Object> getAvailabilityUnavailabilityBeforeAfterShift(Long unitId, Long staffId, Date shiftStartDate) {
-        Map<String,Integer> beforeMap = new HashMap<String,Integer>(){{put(AVAILABILITY,0);put(UNAVAILABILITY,0);}};
+    public Map<String,Object> getCountBeforeAfterDate(Long unitId, Long staffId, Date shiftDate) {
+        Map<String,Integer> beforeMap = new HashMap<String,Integer>(){{put(AVAILABILITY,0);put(UNAVAILABILITY,0);put(STOP_BRICK,0);}};
         Map<String,Integer> afterMap = new HashMap<>(beforeMap);
-        List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId,getStartOfDay(shiftStartDate),getEndOfDay(shiftStartDate));
+        List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId,getStartOfDay(shiftDate),getEndOfDay(shiftDate));
         shifts.forEach(shift -> {
-            if(!shift.getEndDate().after(getEndOfDay(shiftStartDate))) {
+            if(!shift.getEndDate().after(getEndOfDay(shiftDate))) {
                 List<TimeTypeEnum> timeTypeEnums = shift.getActivities().stream().map(ShiftActivity::getSecondLevelTimeType).collect(Collectors.toList());
-                if (shift.getStartDate().before(shiftStartDate)) {
+                if (shift.getStartDate().before(shiftDate)) {
                     updateMap(beforeMap, timeTypeEnums);
                 } else {
                     updateMap(afterMap, timeTypeEnums);
@@ -108,7 +110,7 @@ public class ActionService {
         Map<String,Object> response = new HashMap<>();
         response.put(BEFORE,beforeMap);
         response.put(AFTER,afterMap);
-        setAvailabilityUnavailabilityNameInMap(unitId, response);
+        setTimeTypeActivityNameInMap(unitId, response);
         return response;
     }
 
@@ -117,24 +119,26 @@ public class ActionService {
             map.put(AVAILABILITY, map.get(AVAILABILITY)+1);
         } else if (timeTypeEnums.contains(TimeTypeEnum.UNAVAILABLE_TIME)) {
             map.put(UNAVAILABILITY, map.get(UNAVAILABILITY)+1);
+        } else if (timeTypeEnums.contains(TimeTypeEnum.STOP_BRICK)) {
+            map.put(STOP_BRICK, map.get(STOP_BRICK)+1);
         }
     }
 
-    private void setAvailabilityUnavailabilityNameInMap(Long unitId, Map<String,Object> response){
+    private void setTimeTypeActivityNameInMap(Long unitId, Map<String,Object> response){
         //TODO As discuss with priya configure only one activity of availability and unavailability at unit
         List<Activity> availabilityActivities = activityService.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.AVAILABLE_TIME, newHashSet(unitId));
-        String availabilityName = isCollectionNotEmpty(availabilityActivities) ? availabilityActivities.get(0).getName() : "";
+        response.put(AVAILABILITY_NAME, isCollectionNotEmpty(availabilityActivities) ? availabilityActivities.get(0).getName() : "");
         List<Activity> unavailabilityActivities = activityService.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.UNAVAILABLE_TIME, newHashSet(unitId));
-        String unavailabilityName = isCollectionNotEmpty(unavailabilityActivities) ? unavailabilityActivities.get(0).getName() : "";
-        response.put(AVAILABILITY_NAME, availabilityName);
-        response.put(UNAVAILABILITY_NAME, unavailabilityName);
+        response.put(UNAVAILABILITY_NAME, isCollectionNotEmpty(unavailabilityActivities) ? unavailabilityActivities.get(0).getName() : "");
+        List<Activity> stopBrickActivities = activityService.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.STOP_BRICK, newHashSet(unitId));
+        response.put(STOP_BRICK_NAME, isCollectionNotEmpty(stopBrickActivities) ? stopBrickActivities.get(0).getName() : "");
     }
 
-    public List<ShiftWithViolatedInfoDTO> removeAvailabilityUnavailabilityBeforeAfterShift(Long staffId, boolean availability, boolean before, boolean removeNearestOne, Date ShiftDate) {
+    public List<ShiftWithViolatedInfoDTO> removeAvailabilityUnavailabilityBeforeAfterShift(Long staffId, TimeTypeEnum timeTypeEnum, boolean before, boolean removeNearestOne, Date ShiftDate) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId, before ? getStartOfDay(ShiftDate) : ShiftDate, before ? ShiftDate : getEndOfDay(ShiftDate));
         for (Shift shift : shifts) {
-            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS1 = removeAvailabilityUnavailabilityActivity(shift, availability ? TimeTypeEnum.AVAILABLE_TIME : TimeTypeEnum.UNAVAILABLE_TIME);
+            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS1 = removeAvailabilityUnavailabilityActivity(shift, timeTypeEnum);
             if(isCollectionNotEmpty(shiftWithViolatedInfoDTOS1)){
                 shiftWithViolatedInfoDTOS.addAll(shiftWithViolatedInfoDTOS1);
                 if(removeNearestOne){
