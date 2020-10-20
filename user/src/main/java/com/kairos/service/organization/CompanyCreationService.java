@@ -49,7 +49,6 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
-import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -132,8 +131,6 @@ public class CompanyCreationService {
     private UnitTypeGraphRepository unitTypeGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
-    @Inject
-    private ReasonCodeService reasonCodeService;
     @Inject
     private SchedulerServiceRestClient schedulerRestClient;
     @Inject
@@ -454,7 +451,6 @@ public class CompanyCreationService {
         if (organizationBasicDTO.getContactAddress() != null) {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
-        reasonCodeService.createReasonCodeForUnit(unit, country.getId());
         unitGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         setCompanyData(unit, organizationBasicDTO);
         if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {

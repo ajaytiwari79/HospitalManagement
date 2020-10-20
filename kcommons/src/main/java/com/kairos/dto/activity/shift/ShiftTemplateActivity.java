@@ -38,6 +38,6 @@ public class ShiftTemplateActivity {
     private BigInteger plannedTimeId;
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.REQUEST));
     private List<ShiftTemplateActivity> childActivities;
-    private Long absenceReasonCodeId;
+    private BigInteger absenceReasonCodeId;
 
 }

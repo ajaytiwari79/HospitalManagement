@@ -28,4 +28,6 @@ public class CountryHolidayCalenderDTO {
     private String description;
     private BigInteger dayTypeId;
     private String colorCode;
+    private boolean allowTimeSettings;
+    private DayTypeDTO dayTypeDTO;
 }

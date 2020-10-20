@@ -301,14 +301,9 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     @Query("MATCH(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]-(organization)\n" +
             "WHERE id(organization)={0} AND id(staff)={1}\n" +
             "MATCH (unitPermission)-[:" + HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(organization)\n" +
-            "OPTIONAL MATCH(accessGroup)-[:" + DAY_TYPES + "]->(dayType:DayType)\n" +
-            "OPTIONAL MATCH(dayType)-[:" + DAY_TYPE + "]-(chc:CountryHolidayCalender)\n" +
-            "WITH organization,id(staff) AS staffId,accessGroup,dayType,\n" +
-            "COLLECT(DISTINCT {id:id(chc),holidayDate:chc.holidayDate,holidayType:chc.holidayType,startTime:chc.startTime,endTime:chc.endTime}) AS countryHolidayCalender\n" +
-            "WITH organization, staffId,accessGroup,countryHolidayCalender,\n" +
-            "COLLECT(DISTINCT {id:id(dayType),holidayType:dayType.holidayType,validDays:dayType.validDays,name:dayType.name,allowTimeSettings:dayType.allowTimeSettings,countryHolidayCalenders:countryHolidayCalender}) AS dayType\n" +
+            "WITH organization,id(staff) AS staffId,accessGroup\n" +
             "RETURN\n" +
-            "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes},dayTypes:dayType}) AS dayTypesByAccessGroup")
+            "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes,dayTypeIds:accessGroup.dayTypeIds}}) AS dayTypesByAccessGroup")
     AccessGroupStaffQueryResult getAccessGroupDayTypesAndStaffId(Long unitId, Long staffId);
 
 
@@ -358,11 +353,6 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             " ON MATCH SET r.hasPermission={4}  RETURN distinct true ")
     void setActionPermissions(Long staffId, Long unitId, Long accessGroupId, Set<Long> actionIds,boolean hasPermission);
 
-    @Query("MATCH (staff:Staff) WHERE  id(staff)={0}  with staff " +
-            "MATCH(kPermissionModel:KPermissionModel)-[:"+HAS_ACTION+"]-(action:KPermissionAction) WHERE id(kPermissionModel) ={3} WITH staff,action " +
-            "MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={1} WITH unitPermission,action  " +
-            "MATCH (unitPermission)-[r:"+ HAS_CUSTOMIZED_PERMISSION_FOR_ACTION +"{accessGroupId:{2}}]->(action) SET r.hasPermission=FALSE ")
-    void disableActionPermissions(Long staffId, Long unitId, Long accessGroupId,Long modelId);
 
 
 

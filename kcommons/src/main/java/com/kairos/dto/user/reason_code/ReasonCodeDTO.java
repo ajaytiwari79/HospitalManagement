@@ -21,7 +21,7 @@ import java.math.BigInteger;
 @Setter
 @NoArgsConstructor
 public class ReasonCodeDTO {
-    private Long id;
+    private BigInteger id;
     @NotBlank(message = "message.reasonCode.name.notEmpty")
     private String name;
     private String code;
@@ -29,20 +29,30 @@ public class ReasonCodeDTO {
     private ReasonCodeType reasonCodeType;
     //this is only persist when we create any Absence type reason code
     private BigInteger timeTypeId;
+    private Long unitId;
+    private Long countryId;
 
 
-    public ReasonCodeDTO(Long id, @NotBlank(message = "message.reasonCode.name.notEmpty") String name) {
+    public ReasonCodeDTO(BigInteger id, @NotBlank(message = "message.reasonCode.name.notEmpty") String name) {
         this.id = id;
         this.name = name;
     }
 
-    public ReasonCodeDTO(Long id,String name, String code, String description, ReasonCodeType reasonCodeType,BigInteger timeTypeId) {
+    public ReasonCodeDTO(BigInteger id,String name, String code, String description, ReasonCodeType reasonCodeType,BigInteger timeTypeId) {
         this.id=id;
         this.name = name;
         this.code = code;
         this.description = description;
         this.reasonCodeType = reasonCodeType;
         this.timeTypeId=timeTypeId;
+    }
+
+    public ReasonCodeDTO(BigInteger id, String name, String code, String description, ReasonCodeType reasonCodeType) {
+        this.id=id;
+        this.name = name;
+        this.code = code;
+        this.description = description;
+        this.reasonCodeType = reasonCodeType;
     }
 
 

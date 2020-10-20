@@ -3,8 +3,7 @@ package com.kairos.controller.country;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.reason_code.ReasonCodeType;
-import com.kairos.service.country.ReasonCodeService;
-import com.kairos.service.region.RegionService;
+import com.kairos.service.reason_code.ReasonCodeService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,8 +27,6 @@ import static com.kairos.constants.ApiConstants.*;
 public class ReasonCodeController {
     @Inject
     private ReasonCodeService reasonCodeService;
-    @Inject
-    private RegionService regionService;
 
     @ApiOperation(value = "Add ReasonCode by countryId")
     @RequestMapping(value = COUNTRY_URL + "/reason_code", method = RequestMethod.POST)
@@ -56,8 +53,8 @@ public class ReasonCodeController {
     @ApiOperation(value = "Delete ReasonCode by reasonCodeId")
     @RequestMapping(value = COUNTRY_URL + "/reason_code/{reasonCodeId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteReasonCodeForCountry(@PathVariable long countryId, @PathVariable long reasonCodeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.deleteReasonCodeForCountry(countryId, reasonCodeId));
+    public ResponseEntity<Map<String, Object>> deleteReasonCodeForCountry(@PathVariable long countryId, @PathVariable BigInteger reasonCodeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.deleteReasonCode(reasonCodeId));
     }
 
     //
@@ -78,8 +75,8 @@ public class ReasonCodeController {
     @ApiOperation(value = "Delete ReasonCode by unitId")
     @RequestMapping(value = UNIT_URL + "/reason_code/{reasonCodeId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteReasonCodeForUnit(@PathVariable long unitId, @PathVariable long reasonCodeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.deleteReasonCodeForUnit(unitId, reasonCodeId));
+    public ResponseEntity<Map<String, Object>> deleteReasonCodeForUnit(@PathVariable long unitId, @PathVariable BigInteger reasonCodeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.deleteReasonCode(reasonCodeId));
     }
 
     @ApiOperation(value = "Get ReasonCodes by UnitId")
@@ -98,24 +95,19 @@ public class ReasonCodeController {
 
     }
 
-    @GetMapping(UNIT_URL + "/zipcode/{zipCodeId}/address")
-    @ApiOperation("get location of organization")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAddressByZipCode(@PathVariable long zipCodeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.getAllZipCodesData(zipCodeId));
-    }
+
 
     @PutMapping(value = UNIT_URL + "/reason_code/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateTranslationsOfReasonCodesOfUnit(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+    ResponseEntity<Map<String, Object>> updateTranslationsOfReasonCodesOfUnit(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/reason_code/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateTranslationsOfReasonCodesOfCountry(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+    ResponseEntity<Map<String, Object>> updateTranslationsOfReasonCodesOfCountry(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.updateTranslation(id,translations));
     }
 

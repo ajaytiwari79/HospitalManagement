@@ -18,7 +18,7 @@ public class ProtectedDaysOffSettingDTO {
     private BigInteger id;
     private Long unitId;
     private ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings;
-    private Long holidayId;
+    private BigInteger holidayId;
     private LocalDate publicHolidayDate;
     private boolean protectedDaysOff;
     private BigInteger dayTypeId;

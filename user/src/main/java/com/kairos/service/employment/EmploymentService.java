@@ -22,7 +22,6 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
-import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
@@ -33,19 +32,16 @@ import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQu
 import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.staff.position.PositionQueryResult;
-import com.kairos.persistence.model.staff.position.PositionReasonCodeQueryResult;
 import com.kairos.persistence.model.user.employment.*;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseLine;
-import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.user.expertise.response.ExpertisePlannedTimeQueryResult;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentAndEmploymentTypeRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentLineFunctionRelationShipGraphRepository;
@@ -124,8 +120,6 @@ public class EmploymentService {
     @Inject
     private EmploymentAndEmploymentTypeRelationShipGraphRepository employmentAndEmploymentTypeRelationShipGraphRepository;
     @Inject
-    private ReasonCodeGraphRepository reasonCodeGraphRepository;
-    @Inject
     private PayGradeGraphRepository payGradeGraphRepository;
     @Inject
     private PositionService positionService;
@@ -176,7 +170,7 @@ public class EmploymentService {
         employmentGraphRepository.save(employment);
         initialTimeBankLogService.saveInitialTimeBankLog(employment.getId(), employment.getAccumulatedTimebankMinutes());
         assignCTAAndWTAToEmployment(employment, employmentDTO);
-        Long reasonCodeId = updateEmploymentEndDate(parentUnit, employmentDTO, position,saveAsDraft);
+        BigInteger reasonCodeId = updateEmploymentEndDate(parentUnit, employmentDTO, position,saveAsDraft);
         List<EmploymentLineEmploymentTypeRelationShip> employmentLineEmploymentTypeRelationShips = new ArrayList<>();
         employment.getEmploymentLines().forEach(line -> employmentLineEmploymentTypeRelationShips.add(new EmploymentLineEmploymentTypeRelationShip(line, employmentType, employmentDTO.getEmploymentTypeCategory())));
         employmentAndEmploymentTypeRelationShipGraphRepository.saveAll(employmentLineEmploymentTypeRelationShips);
@@ -213,8 +207,8 @@ public class EmploymentService {
                 employmentDTO.setAccessGroupId(position.getAccessGroupIdOnPositionEnd());
             }
             if(employmentDTO.getReasonCodeId()==null){
-                if(isNotNull(position.getReasonCode())) {
-                    employmentDTO.setReasonCodeId(position.getReasonCode().getId());
+                if(isNotNull(position.getReasonCodeId())) {
+                    employmentDTO.setReasonCodeId(position.getReasonCodeId());
                 }
             }
         }
@@ -243,10 +237,10 @@ public class EmploymentService {
         }
     }
 
-    private Long updateEmploymentEndDate(Organization organization, EmploymentDTO employmentDTO, Position position,Boolean saveAsDraft) throws Exception {
+    private BigInteger updateEmploymentEndDate(Organization organization, EmploymentDTO employmentDTO, Position position,Boolean saveAsDraft) throws Exception {
         Long endDateMillis = saveAsDraft?position.getEndDateMillis():employmentDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(employmentDTO.getEndDate()) : null;
         Position position1 = positionService.updatePositionEndDate(organization, employmentDTO.getStaffId(), endDateMillis, employmentDTO.getReasonCodeId(), employmentDTO.getAccessGroupId(),saveAsDraft);
-        return Optional.ofNullable(position.getReasonCode()).isPresent() ? position1.getReasonCode().getId() : null;
+        return Optional.ofNullable(position.getReasonCodeId()).isPresent() ? position1.getReasonCodeId() : null;
 
     }
 
@@ -268,12 +262,8 @@ public class EmploymentService {
             if (!Optional.ofNullable(employmentDTO.getReasonCodeId()).isPresent()) {
                 exceptionService.actionNotPermittedException(MESSAGE_REGION_ENDDATE);
             }
-            if (oldEmployment.getReasonCode() == null || !oldEmployment.getReasonCode().getId().equals(employmentDTO.getReasonCodeId())) {
-                Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(employmentDTO.getReasonCodeId(), 0);
-                if (!Optional.ofNullable(reasonCode).isPresent()) {
-                    exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, employmentDTO.getReasonCodeId());
-                }
-                oldEmployment.setReasonCode(reasonCode.get());
+            if (oldEmployment.getReasonCodeId() == null || !oldEmployment.getReasonCodeId().equals(employmentDTO.getReasonCodeId())) {
+                oldEmployment.setReasonCodeId(employmentDTO.getReasonCodeId());
             }
         }
         return employmentLine;
@@ -396,8 +386,7 @@ public class EmploymentService {
         initialTimeBankLogService.saveInitialTimeBankLog(oldEmployment.getId(), oldEmployment.getAccumulatedTimebankMinutes());
         Position position = positionService.updatePositionEndDate(organization, employmentDTO.getStaffId(),
                 employmentDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(employmentDTO.getEndDate()) : null, employmentDTO.getReasonCodeId(), employmentDTO.getAccessGroupId(),false);
-        Long reasonCodeId = Optional.ofNullable(position.getReasonCode()).isPresent() ? position.getReasonCode().getId() : null;
-        PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnPositionEnd());
+        PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCodeId(), position.getAccessGroupIdOnPositionEnd());
         // Deleting All shifts after position end date
         if (employmentDTO.getEndDate() != null) {
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentId(employmentDTO.getEndDate(), employmentId, employmentDTO.getUnitId(), null,null);
@@ -539,10 +528,8 @@ public class EmploymentService {
             exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_STAFF_NOTFOUND, staffId);
         }
         User user = userGraphRepository.getUserByStaffId(staffId);
-        PositionReasonCodeQueryResult employmentReasonCode = positionGraphRepository.findEmploymentreasonCodeByStaff(staffId);
-        Position position = employmentReasonCode.getPosition();
-        Long reasonCodeId = Optional.ofNullable(employmentReasonCode.getReasonCode()).isPresent() ? employmentReasonCode.getReasonCode().getId() : null;
-        PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnPositionEnd());
+        Position position = positionGraphRepository.findPositionOfStaff(staffId);
+        PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCodeId(), position.getAccessGroupIdOnPositionEnd());
         List<EmploymentQueryResult> employmentQueryResults = (allOrganization) ? employmentGraphRepository.getAllEmploymentsByUser(user.getId()) : employmentGraphRepository.getAllEmploymentsForCurrentOrganization(staffId, unitId);
         List<Long> employmentIds = employmentQueryResults.stream().map(EmploymentQueryResult::getId).collect(Collectors.toList());
         List<EmploymentLinesQueryResult> employmentLines = employmentGraphRepository.findAllEmploymentLines(employmentIds);
@@ -593,10 +580,10 @@ public class EmploymentService {
     private EmploymentQueryResult getBasicDetails(EmploymentType employmentType, EmploymentDTO employmentDTO, Employment employment, EmploymentLineEmploymentTypeRelationShip relationShip,
                                                   Long parentOrganizationId, WTAResponseDTO wtaResponseDTO, EmploymentLine employmentLine) {
         Map<String, Object> reasonCode = null;
-        if (Optional.ofNullable(employment.getReasonCode()).isPresent()) {
+        if (Optional.ofNullable(employment.getReasonCodeId()).isPresent()) {
             reasonCode = new HashMap();
-            reasonCode.put("name", employment.getReasonCode().getName());
-            reasonCode.put("id", employment.getReasonCode().getId());
+            reasonCode.put("name", "");
+            reasonCode.put("id", employment.getReasonCodeId());
         }
         Map<String, Object> employmentTypes = setEmploymentTypeDetails(employmentType, employmentDTO, relationShip);
         Map<String, Object> unitInfo = setUnitInfo(employment);
@@ -620,7 +607,7 @@ public class EmploymentService {
         expertiseDTO.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
         return new EmploymentQueryResult(employment.getExpertise(), employment.getStartDate(),
                 employment.getEndDate(), employment.getId(), employment.getUnion(), employment.getLastWorkingDate()
-                , wtaResponseDTO, employment.getUnit().getId(), parentOrganizationId, employment.isPublished(), reasonCode, unitInfo, employment.getEmploymentSubType(),
+                , wtaResponseDTO, employment.getUnit().getId(), parentOrganizationId, employment.isPublished(), employment.getReasonCodeId(), unitInfo, employment.getEmploymentSubType(),
                 Collections.singletonList(employmentLinesQueryResult), employmentDTO.getTaxDeductionPercentage(), employment.getAccumulatedTimebankMinutes(), employment.getAccumulatedTimebankDate());
     }
 
@@ -676,8 +663,6 @@ public class EmploymentService {
         EmploymentQueryResult employment = employmentGraphRepository.getEmploymentById(employmentId);
         com.kairos.dto.activity.shift.StaffEmploymentDetails employmentDetails = null;
         if (employment != null) {
-            List<ProtectedDaysOffSetting> protectedDaysOffSettings = expertiseGraphRepository.findProtectedDaysOffSettingByExpertiseId(employment.getExpertise().getId());
-            employment.getExpertise().setProtectedDaysOffSettings(ObjectMapperUtils.copyCollectionPropertiesByMapper(protectedDaysOffSettings, com.kairos.dto.activity.shift.ProtectedDaysOffSetting.class));
             employmentDetails = convertEmploymentObject(employment);
             List<EmploymentLinesQueryResult> employmentLinesQueryResults = employmentGraphRepository.findFunctionalHourlyCost(Arrays.asList(employmentId));
             Map<Long, BigDecimal> hourlyCostMap = employmentLinesQueryResults.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));

@@ -13,7 +13,6 @@ import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.EmploymentTypeService;
-import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.GdprIntegrationService;
 import org.springframework.stereotype.Service;
@@ -41,8 +40,6 @@ public class CompanyDefaultDataService {
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
-    private ReasonCodeService reasonCodeService;
-    @Inject
     private GdprIntegrationService gdprIntegrationService;
     @Inject private EmploymentTypeService employmentTypeService;
     @Inject private CountryGraphRepository countryGraphRepository;
@@ -67,7 +64,6 @@ public class CompanyDefaultDataService {
             timeSlotService.createDefaultTimeSlots(unit, timeSlots);
             vrpClientService.createDefaultPreferredTimeWindow(unit);
             activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId());
-            reasonCodeService.createReasonCodeForUnit(unit, parentId);
             gdprIntegrationService.createDefaultDataForOrganization(countryId, unit.getId());
 
         });

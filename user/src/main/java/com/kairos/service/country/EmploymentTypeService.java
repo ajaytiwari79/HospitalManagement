@@ -106,8 +106,6 @@ public class EmploymentTypeService {
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
-    private ReasonCodeService reasonCodeService;
-    @Inject
     private ExceptionService exceptionService;
     @Inject private TimeSlotGraphRepository timeSlotGraphRepository;
     @Inject private StaffRetrievalService  staffRetrievalService;
@@ -405,8 +403,7 @@ public class EmploymentTypeService {
         List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(isCollectionNotEmpty(unitIds)?unitIds:Arrays.asList(unitId), TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
         List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(countryGraphRepository.getEmploymentTypes(countryId,false),EmploymentTypeKpiDTO.class);
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffGraphRepository.getAllStaffIdAndNameByUnitId(isNull(staffId)?Arrays.asList(unitId):unitIds), StaffKpiFilterDTO.class);
-        List<ReasonCodeDTO> reasonCodeDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeService.getReasonCodesByUnitIds(isCollectionNotEmpty(unitIds)?unitIds:Arrays.asList(unitId), ReasonCodeType.FORCEPLAN),ReasonCodeDTO.class);
-        return new DefaultKpiDataDTO(countryId,staffKpiFilterDTOS, timeSlotSetDTOS,organizationCommonDTO,employmentTypeKpiDTOS,reasonCodeDTOS,tagDTOS);
+        return new DefaultKpiDataDTO(countryId,staffKpiFilterDTOS, timeSlotSetDTOS,organizationCommonDTO,employmentTypeKpiDTOS,tagDTOS);
     }
 
     public DefaultKpiDataDTO getKpiAllDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {

@@ -121,7 +121,6 @@ public class UserMessagesConstants {
     public static final String ERROR_CLINICTYPE_NAME_NOTEMPTY  = "error.ClinicType.name.notEmpty ";
     public static final String ERROR_CLINICTYPE_NOTFOUND  = "error.ClinicType.notfound ";
     public static final String ERROR_CLINICTYPE_NAME_EXIST  = "error.ClinicType.name.exist ";
-    public static final String ERROR_DAYTYPE_NAME_NOTEMPTY  = "error.DayType.name.notEmpty ";
     public static final String ERROR_COUNTRY_NAME_NOTEMPTY  = "error.Country.name.notEmpty ";
     public static final String ERROR_COUNTRY_CODE_NOTEMPTY  = "error.Country.code.notEmpty ";
     public static final String ERROR_SKILLCATEGORY_NAME_NOTEMPTY  = "error.SkillCategory.name.notEmpty ";

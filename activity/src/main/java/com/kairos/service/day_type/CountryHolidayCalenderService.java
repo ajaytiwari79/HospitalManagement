@@ -8,6 +8,7 @@ import com.kairos.persistence.model.day_type.DayType;
 import com.kairos.persistence.repository.day_type.CountryHolidayCalenderRepository;
 import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -31,6 +33,8 @@ public class CountryHolidayCalenderService {
     private DayTypeRepository dayTypeRepository;
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private ProtectedDaysOffService protectedDaysOffService;
     private static final Logger LOGGER = LoggerFactory.getLogger(CountryHolidayCalenderService.class);
 
     public List<CountryHolidayCalenderDTO> getAllCountryHolidaysByCountryIdAndYear(int year, Long countryId) {
@@ -47,7 +51,7 @@ public class CountryHolidayCalenderService {
         CountryHolidayCalender countryHolidayCalender = ObjectMapperUtils.copyPropertiesByMapper(countryHolidayCalenderDTO, CountryHolidayCalender.class);
         countryHolidayCalender.setCountryId(countryId);
         countryHolidayCalenderRepository.save(countryHolidayCalender);
-        userIntegrationService.linkProtectedDaysOffSetting(Arrays.asList(countryHolidayCalender));
+        protectedDaysOffService.linkProtectedDaysOffSetting(Arrays.asList(countryHolidayCalenderDTO),null,countryId);
         return countryHolidayCalenderDTO;
     }
 

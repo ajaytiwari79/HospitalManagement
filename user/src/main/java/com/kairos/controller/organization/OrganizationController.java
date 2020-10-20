@@ -753,7 +753,7 @@ public class OrganizationController {
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllDayTypeofOrganization());
 //    }
 
-    @ApiOperation(value = "Get DayType by unitID")
+    @ApiOperation(value = "Get unit hierarchy by unitID")
     @GetMapping(UNIT_URL + "/units")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getUnitsByOrganizationID(@PathVariable Long unitId) {
@@ -855,7 +855,7 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDefaultDataForOrder(unitId));
     }
 
-    @ApiOperation(value = "Get DayType and Presence Type")
+    @ApiOperation(value = "Get default data for wta")
     @GetMapping(UNIT_URL + "/getWtaTemplateDefaultDataInfoByUnitId")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long unitId) {

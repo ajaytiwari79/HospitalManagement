@@ -8,7 +8,6 @@ import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.todo.Todo;
@@ -18,9 +17,8 @@ import com.kairos.persistence.repository.todo.TodoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.reason_code.ReasonCodeService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +26,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
@@ -57,6 +54,8 @@ public class ShiftDetailsService extends MongoBaseService {
     private TodoRepository todoRepository;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
+    @Inject
+    private ReasonCodeService reasonCodeService;
 
     public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds, boolean showDraft) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS;
@@ -93,8 +92,10 @@ public class ShiftDetailsService extends MongoBaseService {
     }
 
     private void setReasonCodeAndRuleViolationsInShifts(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId, List<BigInteger> shiftIds, boolean showDraft) {
-        ReasonCodeWrapper reasonCodeWrapper = findReasonCodes(shiftWithActivityDTOS, unitId);
-        Map<Long, ReasonCodeDTO> reasonCodeDTOMap = reasonCodeWrapper.getReasonCodes().stream().collect(toMap(ReasonCodeDTO::getId, Function.identity()));
+        Set<BigInteger> absenceReasonCodeIds = shiftWithActivityDTOS.stream().flatMap(shifts -> shifts.getActivities().stream().filter(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId() != null).map(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId())).collect(Collectors.toSet());
+        List<ReasonCodeDTO> reasonCodeDTOS=reasonCodeService.findAllByIds(absenceReasonCodeIds);
+        ReasonCodeWrapper reasonCodeWrapper = findUnitAddress(unitId);
+        Map<BigInteger, ReasonCodeDTO> reasonCodeDTOMap = reasonCodeDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         for (ShiftWithActivityDTO shift : shiftWithActivityDTOS) {
             for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
                 if (!shiftActivityDTO.isBreakShift()) {
@@ -108,11 +109,8 @@ public class ShiftDetailsService extends MongoBaseService {
         }
     }
 
-    private ReasonCodeWrapper findReasonCodes(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId) {
-        Set<Long> absenceReasonCodeIds = shiftWithActivityDTOS.stream().flatMap(shifts -> shifts.getActivities().stream().filter(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId() != null).map(shiftActivityDTO -> shiftActivityDTO.getAbsenceReasonCodeId())).collect(Collectors.toSet());
-        List<NameValuePair> requestParam = new ArrayList<>();
-        requestParam.add(new BasicNameValuePair("absenceReasonCodeIds", absenceReasonCodeIds.toString()));
-        return userIntegrationService.getUnitInfoAndReasonCodes(unitId, requestParam);
+    private ReasonCodeWrapper findUnitAddress(Long unitId) {
+        return userIntegrationService.getUnitInfoAndReasonCodes(unitId);
     }
 
     public void setLayerInShifts(Map<LocalDate, List<ShiftDTO>> shiftsMap) {

@@ -18,6 +18,7 @@ import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.CompanyCreationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationTypeService;
+import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.utils.response.ResponseHandler;
@@ -37,8 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 @RequestMapping(API_V1)
 @Api(API_V1)
@@ -59,6 +59,8 @@ public class CountryController {
     @Inject
     private CompanyCreationService companyCreationService;
     @Inject private BootDataService bootDataService;
+    @Inject
+    private RegionService regionService;
 
     @PostMapping(value = "/country")
     @ApiOperation("Create a new Country")
@@ -82,6 +84,14 @@ public class CountryController {
                 return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
+    }
+
+
+    @GetMapping(UNIT_URL + "/zipcode/{zipCodeId}/address")
+    @ApiOperation("get location of organization")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAddressByZipCode(@PathVariable long zipCodeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.getAllZipCodesData(zipCodeId));
     }
 
     @GetMapping(value = "/country")

@@ -3,7 +3,6 @@ package com.kairos.persistence.repository.user.expertise;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseLine;
-import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseBasicDetails;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseLineQueryResult;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseQueryResult;
@@ -148,12 +147,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "RETURN id(expertise) as id,expertise.name as name, collect(id(unit)) as supportedUnitIds")
     List<ExpertiseQueryResult> findAllExpertiseWithUnitIds();
 
-
-    @Query("MATCH(expertise:Expertise{deleted:false,published:true}) WHERE id(expertise) = {0}" +
-            "MATCH(expertise)-[:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]->(protectedSetting:ProtectedDaysOffSetting)\n" +
-            "RETURN protectedSetting")
-    List<ProtectedDaysOffSetting> findProtectedDaysOffSettingByExpertiseId(Long expertiseId);
-
     @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(expertise) = {0} AND (DATE(exl.startDate)<=DATE({1}) AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE({1})))" +
             "RETURN exl LIMIT 1")
     ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, String startDate);
@@ -161,11 +154,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH (e:Expertise{deleted:false,published:true})-[:" + BELONGS_TO + "]->(country:Country) WHERE id(country) = {0} RETURN e")
     List<Expertise> getExpertiesOfCountry(Long countryId);
 
-    @Query("MATCH(expertise:Expertise)-[r:"+HAS_SENIOR_DAYS+"]-(careDays:CareDays) WHERE id(expertise) = {0} DETACH DELETE r RETURN COUNT(r)>0")
-    boolean removeSeniorDays(Long expertiseId);
-
-    @Query("MATCH(expertise:Expertise)-[r:"+HAS_CHILD_CARE_DAYS+"]-(careDays:CareDays) WHERE id(expertise) = {0} DETACH DELETE r RETURN COUNT(r)>0")
-    boolean removeChildCareDays(Long expertiseId);
 
     @Query("MATCH (expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE  (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE()))  " +
             "MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {0}\n" +
@@ -176,4 +164,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "Match(employment:Employment)-[r:HAS_EXPERTISE_IN]-(et:Expertise) where id(employment)={1} Detach delete r\n" +
             "CREATE UNIQUE(employment)-[r1:HAS_EXPERTISE_IN]->(expertise)")
     void updateExpertiseByExpertiseIdAndEmploymentId(Long expertiseId,Long employmentId);
+
+    @Query("MATCH (e:Expertise{deleted:false,published:true})-[:" + BELONGS_TO + "]->(country:Country) WHERE id(country) = {0} RETURN id(e)")
+    Set<Long> getExpertiseIdsByCountryId(Long countryId);
  }

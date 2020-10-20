@@ -38,8 +38,6 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (country:Country{name:{0}}) RETURN country")
     Country getCountryByName(String name);
 
-    @Query("MATCH (ot:OrganizationType)-[:"+BELONGS_TO+"]->(c:Country) WHERE id(c)= {0} RETURN ot")
-    List<OrganizationType> getOrganizationTypes(Long countryId);
 
     @Query("MATCH (organization) where id(organization)={0} with organization  " +
             "MATCH (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
@@ -135,15 +133,5 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN country")
     Country getCountryByUnitId(Long unitId);
 
-    @Query("MATCH (ch:CountryHolidayCalender{isEnabled:true})-[:"+DAY_TYPE+"]->(dt:DayType{isEnabled:true}) " +
-            "WHERE id(ch) ={0}"  +
-            "RETURN ch.holidayDate as holidayDate, dt as dayType ")
-    CountryHolidayCalendarQueryResult findByCalendarHolidayId(Long calendarHolidayId);
-
-
-
-    @Query("MATCH (ch:CountryHolidayCalender{isEnabled:true})-[:"+DAY_TYPE+"]->(dt:DayType{isEnabled:true}) " +
-            "RETURN ch.holidayDate as holidayDate, dt as dayType ,id(ch) as id")
-    List<CountryHolidayCalendarQueryResult> findAllCalendarHoliday();
 
 }

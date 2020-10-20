@@ -21,11 +21,13 @@ import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
-import com.kairos.persistence.model.user.expertise.response.OrderAndActivityDTO;
+import com.kairos.dto.activity.common.OrderAndActivityDTO;
 import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.apache.http.NameValuePair;
@@ -251,6 +253,20 @@ public class ActivityIntegrationService {
 
     public List<CountryHolidayCalenderDTO> getCountryHolidaysByCountryId(Long countryId){
         return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/holiday/all", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CountryHolidayCalenderDTO>>>(){});
+    }
+
+    public void linkProtectedDaysOff(HashSet<Long> expertiseId,Long countryId) {
+        BasicNameValuePair expertiseParam = new BasicNameValuePair("expertiseId", expertiseId + "");
+        List<NameValuePair> param = new ArrayList<>();
+        param.add(expertiseParam);
+        genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.UPDATE, "/link_protected_days_off", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
+    }
+
+    public List<ReasonCodeDTO> getReasonCodeByType(Long unitId, ReasonCodeType reasonCodeType) {
+        BasicNameValuePair expertiseParam = new BasicNameValuePair("reasonCodeType", reasonCodeType + "");
+        List<NameValuePair> param = new ArrayList<>();
+        param.add(expertiseParam);
+       return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/reason_codes", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ReasonCodeDTO>>>(){});
     }
 }
 

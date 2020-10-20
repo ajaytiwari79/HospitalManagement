@@ -22,20 +22,17 @@ import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
-import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.TimeSlotType;
-import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
-import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
@@ -44,7 +41,7 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.response.OrderAndActivityDTO;
+import com.kairos.dto.activity.common.OrderAndActivityDTO;
 import com.kairos.persistence.model.user.expertise.response.OrderDefaultDataWrapper;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.model.user.open_shift.RuleTemplateDefaultData;
@@ -67,7 +64,6 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.EmploymentTypeService;
-import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -168,8 +164,6 @@ public class OrganizationService {
     @Inject
     private FunctionGraphRepository functionGraphRepository;
     @Inject
-    private ReasonCodeGraphRepository reasonCodeGraphRepository;
-    @Inject
     private PlannedTimeTypeRestClient plannedTimeTypeRestClient;
     @Inject
     private EmploymentTypeService employmentTypeService;
@@ -182,8 +176,6 @@ public class OrganizationService {
     @Inject private UnitService unitService;
     @Inject
     private TagService tagService;
-    @Inject
-    private ReasonCodeService reasonCodeService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationService.class);
 
@@ -775,10 +767,8 @@ public class OrganizationService {
             LOGGER.info("Organization Services or Level is not present for Unit id {}", unitId);
         }
         List<StaffPersonalDetailQueryResult> staffList = staffGraphRepository.getAllStaffWithMobileNumber(unitId);
-        List<PresenceTypeDTO> plannedTypes = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<FunctionDTO> functions = functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
-        List<ReasonCodeResponseDTO> reasonCodes = reasonCodeService.getReasonCodesByUnitId(unitId, ReasonCodeType.ORDER);
-        return new OrderDefaultDataWrapper(orderAndActivityDTO.getOrders(), orderAndActivityDTO.getActivities(), skills, expertise, staffList, plannedTypes, functions, reasonCodes, orderAndActivityDTO.getMinOpenShiftHours(), orderAndActivityDTO.getCounters());
+        return new OrderDefaultDataWrapper(orderAndActivityDTO.getOrders(), orderAndActivityDTO.getActivities(), skills, expertise, staffList, orderAndActivityDTO.getPlannedTypes(), functions, orderAndActivityDTO.getReasonCodeDTOS(), orderAndActivityDTO.getMinOpenShiftHours(), orderAndActivityDTO.getCounters());
     }
 
     public RuleTemplateDefaultData getDefaultDataForRuleTemplate(long countryId) {
@@ -913,8 +903,7 @@ public class OrganizationService {
 
     public SelfRosteringMetaData getPublicHolidaysReasonCodeAndDayTypeUnitId(long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
-        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeGraphRepository.findReasonCodeByUnitId(unitId), ReasonCodeDTO.class);
-        return new SelfRosteringMetaData(new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO));
+        return new SelfRosteringMetaData(new ReasonCodeWrapper( userAccessRoleDTO));
     }
 
     public boolean isUnit(Long unitId) {

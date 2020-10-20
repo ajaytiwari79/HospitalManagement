@@ -28,6 +28,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.period.PlanningPeriodService;
+import com.kairos.service.reason_code.ReasonCodeService;
 import com.kairos.wrapper.activity.ActivitySettingsWrapper;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +64,7 @@ public class TimeTypeService extends MongoBaseService {
     @Inject private ActivityService activityService;
     @Inject private ExecutorService executorService;
     @Inject private PlanningPeriodService planningPeriodService;
+    @Inject private ReasonCodeService reasonCodeService;
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
         List<String> timeTypeLabels = timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
@@ -350,7 +352,7 @@ public class TimeTypeService extends MongoBaseService {
     public boolean deleteTimeType(BigInteger timeTypeId, Long countryId) {
         List<Activity> activity = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllChildByParentId(timeTypeId, countryId);
-        boolean reasonCodeExists = userIntegrationService.isReasonCodeLinkedToTimeType(countryId, timeTypeId);
+        boolean reasonCodeExists = reasonCodeService.anyReasonCodeLinkedWithTimeType(timeTypeId);
         if (reasonCodeExists) {
             exceptionService.actionNotPermittedException(MESSAGE_TIMETYPE_LINKED_REASON_CODE);
         }

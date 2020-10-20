@@ -92,4 +92,5 @@ public class UnitSettingController {
     public ResponseEntity<Map<String,Object>> getAllTimeTypes(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,unitSettingService.getAllTimeTypes(unitId));
     }
+
 }

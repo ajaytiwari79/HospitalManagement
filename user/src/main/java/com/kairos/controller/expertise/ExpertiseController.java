@@ -3,13 +3,11 @@ package com.kairos.controller.expertise;
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.user.expertise.response.FunctionalPaymentDTO;
-import com.kairos.persistence.model.user.expertise.response.ProtectedDaysOffSettingDTO;
 import com.kairos.service.employment.EmploymentCTAWTAService;
 import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.expertise.ExpertiseService;
@@ -173,17 +171,18 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, expertiseDTO));
     }
 
-    @ApiOperation(value = "add proteched days off setting")
-    @PostMapping(value =   "/expertise/{expertiseId}/protected_days_off")
-    public ResponseEntity<Map<String, Object>> addProtechedDaysOffSetting(@PathVariable Long expertiseId, @RequestBody ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.addOrUpdateProtectedDaysOffSetting(expertiseId, protectedDaysOffSettingDTO));
-    }
+    //TODO 2 Below Integrated
+//    @ApiOperation(value = "add proteched days off setting")
+//    @PostMapping(value =   "/expertise/{expertiseId}/protected_days_off")
+//    public ResponseEntity<Map<String, Object>> addProtechedDaysOffSetting(@PathVariable Long expertiseId, @RequestBody ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.addOrUpdateProtectedDaysOffSetting(expertiseId, protectedDaysOffSettingDTO));
+//    }
 
-    @ApiOperation(value = "add proteched days off setting")
-    @GetMapping(value =   "/expertise/{expertiseId}/protected_days_off")
-    public ResponseEntity<Map<String, Object>> getProtechedDaysOffSetting(@PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getProtectedDaysOffSetting(expertiseId));
-    }
+//    @ApiOperation(value = "add proteched days off setting")
+//    @GetMapping(value =   "/expertise/{expertiseId}/protected_days_off")
+//    public ResponseEntity<Map<String, Object>> getProtechedDaysOffSetting(@PathVariable Long expertiseId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getProtectedDaysOffSetting(expertiseId));
+//    }
 
 
 
@@ -245,11 +244,7 @@ public class ExpertiseController {
     }
 
 
-    @ApiOperation(value = "create protected Days off Setting")
-    @PutMapping(value =  "/protected_days_setting")
-    public ResponseEntity<Map<String, Object>> findAllExpertiseAndLinkProtectedDaysOfSetting(@RequestBody(required = false) List<CountryHolidayCalendarQueryResult> countryHolidayCalendarQueryResults) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.linkProtectedDaysOffSetting(isNull(countryHolidayCalendarQueryResults)?new ArrayList<>():countryHolidayCalendarQueryResults,new ArrayList<>()));
-    }
+
 
     @PutMapping(value = UNIT_URL+"/expertise/{id}/languageSettings")
     @ApiOperation("Add translated data")
@@ -257,5 +252,14 @@ public class ExpertiseController {
     ResponseEntity<Map<String, Object>> updateTranslationsOfExpertise(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateTranslation(id,translations));
     }
+
+    @PutMapping(value = COUNTRY_URL+"/all_expertise_by_country")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> getAllCountryExpertiseIds(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseIdsByCountryId(countryId));
+    }
+
+
 
 }

@@ -26,6 +26,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
+import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +63,8 @@ public class PayOutService extends MongoBaseService {
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private ShiftMongoRepository shiftMongoRepository;
     @Inject private ShiftService shiftService;
+    @Inject private ProtectedDaysOffService protectedDaysOffService;
+
 
 
     /**
@@ -109,6 +112,7 @@ public class PayOutService extends MongoBaseService {
         if (employmentWithCtaDetailsDTO == null) {
             exceptionService.invalidRequestException(MESSAGE_EMPLOYMENT_ABSENT);
         }
+        employmentWithCtaDetailsDTO.getExpertise().setProtectedDaysOffSettings(protectedDaysOffService.getProtectedDaysOffByExpertiseId(employmentWithCtaDetailsDTO.getExpertise().getId()));
         PayOutTransaction requestPayOutTransaction = new PayOutTransaction(staffId, employmentId, PayOutTrasactionStatus.REQUESTED, amount, LocalDate.now());
         save(requestPayOutTransaction);
         return true;
