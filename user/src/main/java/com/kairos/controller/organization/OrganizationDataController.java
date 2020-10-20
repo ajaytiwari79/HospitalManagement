@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
-import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -129,10 +128,10 @@ public class OrganizationDataController {
     }
 
     @ApiOperation(value = "get organization Location and reason code by Ids for shift details")
-    @GetMapping(value = UNIT_URL + UNIT_LOCATION_AND_REASON_CODE)
+    @GetMapping(value = UNIT_URL + UNIT_LOCATION)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAddressAndReasonCodeOfOrganization(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationAddressService.getAddressAndReasonCodeOfOrganization(unitId ));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationAddressService.getAddressOfOrganization(unitId ));
     }
 
 

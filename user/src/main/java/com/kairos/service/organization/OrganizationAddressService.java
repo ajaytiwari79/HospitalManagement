@@ -271,7 +271,7 @@ public class OrganizationAddressService {
         return null;
     }
 
-    public ReasonCodeWrapper getAddressAndReasonCodeOfOrganization(Long unitId) {
+    public ReasonCodeWrapper getAddressOfOrganization(Long unitId) {
         Map<String, Object> contactAddressData = unitGraphRepository.getContactAddressOfParentOrganization(unitId);
         return new ReasonCodeWrapper(null,contactAddressData);
     }

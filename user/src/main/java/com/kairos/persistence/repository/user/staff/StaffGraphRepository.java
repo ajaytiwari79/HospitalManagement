@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.enums.SkillLevel;
-import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.organization.Unit;
@@ -374,7 +373,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "MATCH(employment)-[: " + IN_UNIT + " ]-(org:Unit{deleted:false}) WITH staff,employment,org\n" +
             "MATCH (employment)-[: " + HAS_EXPERTISE_IN + "]-(exp:Expertise) WITH staff,employment,org,exp \n" +
             "RETURN id(staff) AS staffId,id(org) AS unitId,org.name AS unitName,org.timeZone AS timeZone,COLLECT(DISTINCT {id:id(employment),expertiseName:exp.name}) AS employment")
-    List<StaffInformationQueryResult> getStaffAndUnitTimezoneByUserIdAndReasonCode(Long id);
+    List<StaffInformationQueryResult> getStaffAndUnitTimezoneByUserId(Long id);
 
     @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) WHERE id(user)={0} WITH staff\n" +
             "MATCH(staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true}) WITH staff,employment \n" +

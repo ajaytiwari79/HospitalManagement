@@ -153,7 +153,7 @@ public final class ApiConstants {
 
     public static final String STAFF_EMPLOYMENT_BY_EMPLOYMENT_ID = STAFF_URL + "/staff_employment/{employmentId}";
 
-    public static final String UNIT_LOCATION_AND_REASON_CODE = "/unit_location_and_reason_codes";
+    public static final String UNIT_LOCATION = "/unit_location";
     public static final String GET_UNIT_BY_EMPLOYMENT = GET_EMPLOYMENT + "/get_unit";
 
     // /staff_by_employment_type

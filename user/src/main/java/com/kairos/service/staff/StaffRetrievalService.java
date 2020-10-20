@@ -96,7 +96,6 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -262,8 +261,8 @@ public class StaffRetrievalService {
         return copyCollectionPropertiesByMapper(staffs, StaffDTO.class);
     }
 
-    public List<StaffResultDTO> getStaffIdsAndReasonCodeByUserId(Long userId) {
-        List<StaffInformationQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserIdAndReasonCode(userId);
+    public List<StaffResultDTO> getStaffDetailsByUserId(Long userId) {
+        List<StaffInformationQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserId(userId);
         return copyCollectionPropertiesByMapper(staffUnitWrappers, StaffResultDTO.class);
 
     }
