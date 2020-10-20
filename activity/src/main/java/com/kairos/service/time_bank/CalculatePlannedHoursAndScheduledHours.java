@@ -85,6 +85,7 @@ public class CalculatePlannedHoursAndScheduledHours {
 
     public CalculatePlannedHoursAndScheduledHours(TimeBankCalculationService timeBankCalculationService) {
         this.timeBankCalculationService = timeBankCalculationService;
+        this.ctaTimeBankMinMap = new HashMap<>();
     }
 
     public CalculatePlannedHoursAndScheduledHours calculate() {
