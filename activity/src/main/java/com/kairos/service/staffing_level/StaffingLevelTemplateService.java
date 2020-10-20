@@ -134,9 +134,9 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         String day = localDate.getDayOfWeek().name();
         Day dayEnum = Day.valueOf(day);
         if(!holidayDayType.isPresent()) {
-            return staffingLevelTemplateRepository.findByUnitIdDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+            return staffingLevelTemplateRepository.findByUnitIdAndDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
         }else {
-            return staffingLevelTemplateRepository.findByUnitIdHolidayDayTypeAndDate(unitId,proposedDate, proposedDate, dayTypeIds);
+            return staffingLevelTemplateRepository.findByUnitIdAndDayTypeAndDate(unitId,proposedDate, proposedDate, dayTypeIds,null);
         }
         }
 

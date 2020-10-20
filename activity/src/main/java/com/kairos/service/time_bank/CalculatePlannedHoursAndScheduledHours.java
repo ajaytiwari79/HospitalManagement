@@ -35,6 +35,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -128,10 +129,10 @@ public class CalculatePlannedHoursAndScheduledHours {
         boolean ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, staffAdditionalInfoDTO.getEmployment(), shift.getPhaseId(), shift.getActivityIds(), shift.getActivitiesTimeTypeIds(), shift.getActivitiesPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(accountType);
         double compensation = 0;
         if(ruleTemplateValid && ruleTemplate.getConditionalCompensation().getConditionalCompensationTypes().contains(ConditionalCompensationType.MANUAL_PLANNING) && CollectionUtils.containsAny(ruleTemplate.getCalculateValueIfPlanned(),staffAdditionalInfoDTO.getCalculateValueIfPlanneds())) {
-            ZonedDateTime todayDate = asZonedDateTime(LocalDate.now());
+            ZonedDateTime todayDate = asZonedDateTime(LocalDate.now()).with(LocalTime.MIN);
             for (CTACompensationConfiguration ctaCompensationConfiguration : ruleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations()) {
                 ZonedDateTime startDate = getDateByIntervalType(ctaCompensationConfiguration.getIntervalType(), ctaCompensationConfiguration.getFrom(), todayDate);
-                ZonedDateTime endDate = getDateByIntervalType(ctaCompensationConfiguration.getIntervalType(), ctaCompensationConfiguration.getTo(), todayDate);
+                ZonedDateTime endDate = getDateByIntervalType(ctaCompensationConfiguration.getIntervalType(), ctaCompensationConfiguration.getTo(), todayDate).with(LocalTime.MAX);
                 DateTimeInterval dateTimeInterval = new DateTimeInterval(ctaCompensationConfiguration.getFrom()==0 ? todayDate.minusDays(2) : startDate, ctaCompensationConfiguration.getTo()==0 ? asZonedDateTime(shift.getEndDate()) : endDate);
                 if (dateTimeInterval.contains(shift.getStartDate())) {
                     if (CompensationType.HOURS.equals(ctaCompensationConfiguration.getCompensationType())) {

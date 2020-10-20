@@ -286,19 +286,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN staff,id(contactAddress) AS contactAddressId,id(contactDetail) AS contactDetailId LIMIT 1")
     StaffQueryResult getStaffByExternalIdInOrganization(Long organizationId, Long externalId);
 
-
-    //TODO unable to find the exact usage of this Query and relationships
-    @Query("MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit) WHERE id(organization)={0} WITH unitPermission ,organization\n" +
-            "MATCH (o:Unit) - [r:" + BELONGS_TO + "] -> (c:Country)-[r1:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType) WHERE id(o)={0} WITH et\n" +
-            "OPTIONAL MATCH (o)-[r:" + EMPLOYMENT_TYPE_SETTINGS + "]->(et) WITH \n" +
-            "COLLECT(CASE WHEN r IS NULL AND  et.allowedForContactPerson =true THEN  {id:id(et),allowedForContactPerson:et.allowedForContactPerson} \n" +
-            "ELSE {id:id(et),allowedForContactPerson:r.allowedForContactPerson} END) AS employmentTypeSettings WITH filter\n" +
-            "(x IN employmentTypeSettings WHERE x.allowedForContactPerson=true) AS filteredEmploymentType WITH extract(n IN filteredEmploymentType| n.id) AS extractedEmploymentTypeId \n" +
-            "MATCH (staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Position)-[:HAS_UNIT_PERMISSIONS]->(unitPermission)\n" +
-            "MATCH (unitPermission)-[:HAS_UNIT_EMPLOYMENT_POSITION]->(p:Position)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType) WHERE id(et) IN extractedEmploymentTypeId\n" +
-            "RETURN distinct id(staff) AS id, staff.firstName AS firstName,staff.lastName AS lastName")
-    List<StaffPersonalDetailQueryResult> getAllMainEmploymentStaffDetailByUnitId(long unitId);
-
     @Query("MATCH (staff:Staff)-[:" + HAS_FAVOURITE_FILTERS + "]->(staffFavouriteFilters:StaffFavouriteFilter{deleted:false}) WHERE id(staff)={0} WITH staffFavouriteFilters \n" +
             "MATCH (staffFavouriteFilters)-[:HAS_FILTER_GROUP]->(filterGroup:FilterGroup)-[:APPLICABLE_FOR]-(accessPage:AccessPage) WHERE accessPage.moduleId={1} \n" +
             "MATCH (staffFavouriteFilters)-[:FILTER_DETAIL]-(filterDetail:FilterSelection) WITH staffFavouriteFilters, COLLECT({id:id(filterDetail), name:filterDetail.name, value:filterDetail.value,sequence:filterDetail.sequence}) AS filterDetails\n" +

@@ -1,5 +1,6 @@
 package com.kairos.controller.action;
 
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.service.action.ActionService;
 import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.action.ActionDTO;
@@ -65,16 +66,16 @@ public class ActionController {
     }
 
     @ApiOperation("Get availability unavailability before after shift")
-    @GetMapping("/staff/{staffId}/availability_unavailability_before_after_shift")
+    @GetMapping("/staff/{staffId}/count_before_after_shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAvailabilityUnavailabilityBeforeAfterShift(@PathVariable Long unitId, @PathVariable Long staffId,@RequestParam("shift_date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date ShiftDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.getAvailabilityUnavailabilityBeforeAfterShift(unitId, staffId, ShiftDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.getCountBeforeAfterDate(unitId, staffId, ShiftDate));
     }
 
     @ApiOperation("Remove availability unavailability before after shift")
-    @DeleteMapping("/staff/{staffId}/availability_unavailability_before_after_shift")
-    ResponseEntity<Map<String, Object>> removeAvailabilityUnavailabilityBeforeAfterShift(@PathVariable Long staffId,@RequestParam boolean isAvailability,@RequestParam boolean isBefore,@RequestParam("shift_date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date ShiftDate){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.removeAvailabilityUnavailabilityBeforeAfterShift(staffId, isAvailability, isBefore, ShiftDate));
+    @DeleteMapping("/staff/{staffId}/before_after_shift")
+    ResponseEntity<Map<String, Object>> removeAvailabilityUnavailabilityBeforeAfterShift(@PathVariable Long staffId, @RequestParam TimeTypeEnum timeTypeEnum, @RequestParam boolean before, @RequestParam boolean removeNearestOne, @RequestParam("shift_date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date ShiftDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.removeAvailabilityUnavailabilityBeforeAfterShift(staffId, timeTypeEnum, before, removeNearestOne, ShiftDate));
     }
 
     @ApiOperation("Update action count of staff")
