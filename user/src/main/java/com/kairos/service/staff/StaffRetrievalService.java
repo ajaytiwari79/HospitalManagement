@@ -1,10 +1,7 @@
 package com.kairos.service.staff;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
-import com.kairos.commons.utils.CommonsExceptionUtil;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.commons.utils.*;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.TranslationInfo;
@@ -110,6 +107,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -213,6 +211,9 @@ public class StaffRetrievalService {
         Staff staff = staffGraphRepository.findById(staffId,2).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_STAFF_IDANDUNITID_NOTFOUND, staffId, unitId)));
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = copyCollectionPropertiesByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staff.getId()), SectorAndStaffExpertiseQueryResult.class);
         StaffDTO staffDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, StaffDTO.class);
+        staffDTO.getStaffChildDetails().forEach(staffChildDetailDTO -> {
+            staffChildDetailDTO.setTranslations(TranslationUtil.getTranslatedData(staffChildDetailDTO.getTranslatedNames(),staffChildDetailDTO.getTranslatedDescriptions()));
+        });
         staffDTO.setProfilePic((isNotNull(staff.getProfilePic())) ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic() : staff.getProfilePic());
         staffDTO.setSectorWiseExpertise(copyCollectionPropertiesByMapper(getSectorWiseStaffAndExpertise(staffExpertiseQueryResults), SectorAndStaffExpertiseDTO.class));
         staffDTO.setTeams(copyCollectionPropertiesByMapper(teamGraphRepository.getTeamDetailsOfStaff(staff.getId(), unitId), TeamDTO.class));
@@ -1040,5 +1041,30 @@ public class StaffRetrievalService {
         organizationBaseEntity.setTranslatedDescriptions(translatedDescriptios);
         organizationBaseRepository.save(organizationBaseEntity);
         return organizationBaseEntity.getTranslatedData();
+    }
+
+    public Map<String, TranslationInfo> updateStaffChildTranslatedData(Long staffChildId,Map<String,TranslationInfo> translations,Long staffId,Long unitId){
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptions = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptions.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Staff staff = staffGraphRepository.findById(staffId,2).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_STAFF_IDANDUNITID_NOTFOUND, staffId, unitId)));
+        staff.getStaffChildDetails().forEach(staffChildDetail -> {
+            if(staffChildDetail.getId().equals(staffChildId)){
+                staffChildDetail.setTranslatedNames(translatedNames);
+                staffChildDetail.setTranslatedDescriptions(translatedDescriptions);
+            }
+        });
+        staffGraphRepository.save(staff);
+        List<StaffChildDetailDTO> staffChildDetailDTOS = copyCollectionPropertiesByMapper(staff.getStaffChildDetails(),StaffChildDetailDTO.class);
+        staffChildDetailDTOS.forEach(staffChildDetailDTO -> {
+            if(staffChildDetailDTO.getId().equals(staffChildId)) {
+                staffChildDetailDTO.setTranslations(translations);
+            }
+        });
+        Map<Long,Map<String,TranslationInfo>> staffChildTranslationMap = staffChildDetailDTOS.stream().collect(Collectors.toMap(StaffChildDetailDTO::getId,StaffChildDetailDTO::getTranslations));
+        return staffChildTranslationMap.get(staffChildId);
     }
 }

@@ -685,4 +685,12 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.updateStaffOrganizationTranslatedData(unitId,translations));
     }
 
+    @PutMapping(value ="/{staffId}/staff_child/{staffChildId}/language_settings" )
+    @ApiOperation("update staff child translation data")
+    public ResponseEntity<Map<String, Object>>  updateStaffChildTranslations(@PathVariable Long unitId,@PathVariable Long staffId,@PathVariable Long staffChildId,@RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.updateStaffChildTranslatedData(staffChildId,translations,staffId,unitId));
+    }
+
+
+
 }
