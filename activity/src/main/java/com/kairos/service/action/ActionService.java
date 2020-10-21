@@ -134,15 +134,27 @@ public class ActionService {
         response.put(STOP_BRICK_NAME, isCollectionNotEmpty(stopBrickActivities) ? stopBrickActivities.get(0).getName() : "");
     }
 
-    public List<ShiftWithViolatedInfoDTO> removeAvailabilityUnavailabilityBeforeAfterShift(Long staffId, TimeTypeEnum timeTypeEnum, boolean before, boolean removeNearestOne, Date ShiftDate) {
+    public List<ShiftWithViolatedInfoDTO> removeAvailabilityUnavailabilityBeforeAfterShift(Long staffId, TimeTypeEnum timeTypeEnum, boolean before, boolean removeNearestOne, Date shiftDate) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
-        List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId, before ? getStartOfDay(ShiftDate) : ShiftDate, before ? ShiftDate : getEndOfDay(ShiftDate));
+        Date startDate = before ? getStartOfDay(shiftDate) : shiftDate;
+        Date endDate = before ? shiftDate : getEndOfDay(shiftDate);
+        List<Shift> shifts = shiftService.findShiftBetweenDurationByStaffId(staffId, startDate, endDate);
+        if(removeNearestOne) {
+            Collections.sort(shifts, new Comparator<Shift>() {
+                @Override
+                public int compare(Shift s1, Shift s2) {
+                    return before ? s2.getStartDate().compareTo(s1.getStartDate()) : s1.getStartDate().compareTo(s2.getStartDate());
+                }
+            });
+        }
         for (Shift shift : shifts) {
-            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS1 = removeAvailabilityUnavailabilityActivity(shift, timeTypeEnum);
-            if(isCollectionNotEmpty(shiftWithViolatedInfoDTOS1)){
-                shiftWithViolatedInfoDTOS.addAll(shiftWithViolatedInfoDTOS1);
-                if(removeNearestOne){
-                    break;
+            if(!shift.getEndDate().after(endDate)) {
+                List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS1 = removeAvailabilityUnavailabilityActivity(shift, timeTypeEnum);
+                if (isCollectionNotEmpty(shiftWithViolatedInfoDTOS1)) {
+                    shiftWithViolatedInfoDTOS.addAll(shiftWithViolatedInfoDTOS1);
+                    if (removeNearestOne) {
+                        break;
+                    }
                 }
             }
         }
