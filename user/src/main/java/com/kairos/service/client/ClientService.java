@@ -59,7 +59,6 @@ import com.kairos.rest_client.*;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.CPRUtil;
@@ -101,7 +100,6 @@ public class ClientService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Inject private EnvConfig envConfig;
     @Inject private TimeSlotGraphRepository timeSlotGraphRepository;
-    @Inject private IntegrationService integrationService;
     @Inject private TaskServiceRestClient taskServiceRestClient;
     @Inject private PlannerRestClient plannerRestClient;
     @Inject private TaskTypeRestClient taskTypeRestClient;
@@ -770,19 +768,6 @@ public class ClientService {
         TaskDemandVisitWrapper taskDemandVisitWrapper = new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(client,forbiddenStaff, preferredStaff, taskAddress).timeSlotMap(timeSlotMap).countryId(countryId).publicHolidayList(publicHolidayList).build();
         taskDemandVisitWrapper.setCountryHolidayCalenderList(countryHolidayCalenderList);
         return taskDemandVisitWrapper;
-    }
-
-    public TaskDemandVisitWrapper getPrerequisitesForTaskCreation(String userName, long unitId, long citizenId) {
-        Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Client citizen = clientGraphRepository.findOne(Long.valueOf(citizenId), 0);
-        ClientHomeAddressQueryResult clientHomeAddressQueryResult = clientGraphRepository.getHomeAddress(citizen.getId());
-        ZipCode zipCode = clientHomeAddressQueryResult.getZipCode();
-        ContactAddress homeAddress = clientHomeAddressQueryResult.getHomeAddress();
-        TaskAddress taskAddress = new TaskAddress("DK",zipCode.getZipCode(),homeAddress.getCity(),homeAddress.getStreet(),homeAddress.getHouseNumber());
-        Staff loggedInUser = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(userName).getId());
-        List<Long> preferredStaffIds = getPreferredStaffVisitourIds(citizen.getId());
-        List<Long> forbiddenStaffIds = getForbiddenStaffVisitourIds(citizen.getId());
-        return new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(citizen, preferredStaffIds, forbiddenStaffIds, taskAddress).staffId(loggedInUser.getId()).flsCredentials(flsCredentials).build();
     }
 
     public List<Long> getClientIds(long unitId) {

@@ -542,22 +542,6 @@ public class ClientController {
                 clientService.getClientDetailsForTaskDemandVisit(taskDemandWrapper));
     }
 
-
-    /**
-     * called this endpoints from task micro service
-     * @param citizenId
-     * @param unitId
-     * @return
-     */
-    @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}/{unitId}/task_prerequisites")
-    @ApiOperation("get required data for task creation")
-    private ResponseEntity<Map<String, Object>> generateIndividualTask(@PathVariable Long  citizenId
-            , @PathVariable Long  unitId, OAuth2Authentication authentication){
-                    return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.getPrerequisitesForTaskCreation(authentication.getUserAuthentication().getPrincipal().toString(),unitId,citizenId));
-    }
-
-
     /**
      * this method will be called from  task micro service in planner service
      * @param unitId
@@ -645,12 +629,6 @@ public class ClientController {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrgnizationClients(organizationId,citizenId));
 
-    }
-
-
-    @RequestMapping(value = "/clientAggregation",method = RequestMethod.GET)
-    public ResponseEntity<Map<String,Object>> getClientAggregation(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,clientExtendedService.getClientAggregation(unitId));
     }
 
     @RequestMapping(value = "/clientsByIds",method = RequestMethod.POST)
