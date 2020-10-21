@@ -432,16 +432,20 @@ public class StaffingLevelUtil {
         } else {
             Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMap = staffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.toMap(StaffingLevelActivity::getActivityId, Function.identity()));
             Map<Long, StaffingLevelSkill> staffingLevelSkillMap = staffingLevelInterval.getStaffingLevelSkills().stream().collect(Collectors.toMap(StaffingLevelSkill::getSkillId, Function.identity()));
-            staffingLevelInterval.getStaffingLevelIntervalLogs().forEach(log -> {
-                staffingLevelActivities.forEach(activity -> {
-                    log.getStaffingLevelActivities().remove(activity);
-                    log.getStaffingLevelActivities().add(staffingLevelActivityMap.get(activity.getActivityId()));
-                });
-                staffingLevelSkills.forEach(skill -> {
-                    log.getStaffingLevelSkills().remove(skill);
-                    log.getStaffingLevelSkills().add(staffingLevelSkillMap.get(skill.getSkillId()));
-                });
-            });
+            for (StaffingLevelIntervalLog staffingLevelIntervalLog : staffingLevelInterval.getStaffingLevelIntervalLogs()) {
+                Iterator<StaffingLevelActivity> staffingLevelActivityIterator = staffingLevelActivities.iterator();
+                Iterator<StaffingLevelSkill> staffingLevelSkillIterator = staffingLevelSkills.iterator();
+                while (staffingLevelActivityIterator.hasNext()) {
+                    StaffingLevelActivity staffingLevelActivity = staffingLevelActivityIterator.next();
+                    staffingLevelIntervalLog.getStaffingLevelActivities().remove(staffingLevelActivity);
+                    staffingLevelIntervalLog.getStaffingLevelActivities().add(staffingLevelActivityMap.get(staffingLevelActivity.getActivityId()));
+                }
+                while (staffingLevelSkillIterator.hasNext()) {
+                    StaffingLevelSkill staffingLevelSkill = staffingLevelSkillIterator.next();
+                    staffingLevelIntervalLog.getStaffingLevelSkills().remove(staffingLevelSkill);
+                    staffingLevelIntervalLog.getStaffingLevelSkills().add(staffingLevelSkillMap.get(staffingLevelSkill.getSkillId()));
+                }
+            }
         }
         staffingLevelInterval.setMinNoOfStaff(staffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMinNoOfStaff())));
         staffingLevelInterval.setMaxNoOfStaff(staffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMaxNoOfStaff())));

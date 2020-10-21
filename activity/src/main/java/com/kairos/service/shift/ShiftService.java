@@ -97,6 +97,7 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToC
  */
 @Service
 public class ShiftService extends MongoBaseService {
+    public static final int MULTIPLE_ACTIVITY_COUNT = 1;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
@@ -209,7 +210,7 @@ public class ShiftService extends MongoBaseService {
         List<ReasonCodeDTO> reasonCodes=reasonCodeRepository.findAllByIdAndDeletedFalse(reasonCodeIds);
         Map<BigInteger, ReasonCodeDTO> reasonCodeDTOMap = reasonCodes.stream().collect(Collectors.toMap(ReasonCodeDTO::getId, v -> v));
         for (ShiftDTO shift : shiftDTOS) {
-            shift.setMultipleActivity(shift.getActivities().size()>1);
+            shift.setMultipleActivity(shift.getActivities().size()> MULTIPLE_ACTIVITY_COUNT);
             for (ShiftActivityDTO activity : shift.getActivities()) {
                 activity.setReasonCode(reasonCodeDTOMap.get(activity.getAbsenceReasonCodeId()));
             }

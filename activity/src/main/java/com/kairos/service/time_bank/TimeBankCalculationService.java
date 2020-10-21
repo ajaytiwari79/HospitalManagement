@@ -210,7 +210,9 @@ public class TimeBankCalculationService {
             functionId = appliedFunctionDTO.isPresent() ? appliedFunctionDTO.get().getId() : null;
         }
         if (ctaRuleTemplateDTO.getStaffFunctions().contains(isNotNull(staffEmploymentDetails.getFunctionId()) ? staffEmploymentDetails.getFunctionId() : functionId)) {
-            value = !getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate()).equals(BigDecimal.valueOf(0)) ? BigDecimal.valueOf(ctaRuleTemplateDTO.getCalculateValueAgainst().getFixedValue().getAmount()).divide(staffEmploymentDetails.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(60)).intValue() : 0;
+            BigDecimal hourlyCostByDate = getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate());
+            BigDecimal functionValue = BigDecimal.valueOf(ctaRuleTemplateDTO.getCalculateValueAgainst().getFixedValue().getAmount());
+            value = !hourlyCostByDate.equals(BigDecimal.valueOf(0)) ? functionValue.divide(staffEmploymentDetails.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(60)).intValue() : 0;
         }
         return value;
     }
