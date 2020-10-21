@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.organization;
 
-import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;

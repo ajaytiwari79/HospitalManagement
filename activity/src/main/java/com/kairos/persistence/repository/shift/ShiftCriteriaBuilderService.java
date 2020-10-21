@@ -1,18 +1,13 @@
 package com.kairos.persistence.repository.shift;
 
-import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
-import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
-import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
-import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.RealTimeStatus;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
-import com.kairos.utils.counter.KPIUtils;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.*;
-import static com.kairos.enums.FilterType.TIME_SLOT;
 @Service
 public class ShiftCriteriaBuilderService {
 

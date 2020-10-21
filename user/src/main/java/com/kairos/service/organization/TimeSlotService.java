@@ -62,7 +62,7 @@ public class TimeSlotService {
 
     public Map<String, Object> getTimeSlots(long unitId) {
 
-        Unit unit = unitGraphRepository.findById(unitId, 0).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANISATION_NOTFOUND)));
+        OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId, 0).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANISATION_NOTFOUND)));
         return prepareTimeSlotResponse(unit);
     }
 
@@ -238,7 +238,7 @@ public class TimeSlotService {
         return true;
     }
 
-    private Map<String, Object> prepareTimeSlotResponse(Unit unit) {
+    private Map<String, Object> prepareTimeSlotResponse(OrganizationBaseEntity unit) {
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode());
         Map<String, Object> response = new HashMap<>();
         response.put("timeSlots", timeSlotWrappers);

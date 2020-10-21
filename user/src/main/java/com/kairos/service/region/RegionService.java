@@ -3,7 +3,6 @@ package com.kairos.service.region;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.Province;
 import com.kairos.persistence.model.user.region.Region;

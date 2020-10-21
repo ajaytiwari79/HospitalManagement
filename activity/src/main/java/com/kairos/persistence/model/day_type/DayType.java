@@ -4,7 +4,6 @@ import com.kairos.enums.Day;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.Setter;
-import org.neo4j.ogm.annotation.Relationship;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;

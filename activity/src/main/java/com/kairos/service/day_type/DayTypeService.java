@@ -3,9 +3,6 @@ package com.kairos.service.day_type;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -14,7 +11,6 @@ import com.kairos.persistence.model.day_type.DayType;
 import com.kairos.persistence.repository.day_type.CountryHolidayCalenderRepository;
 import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.FormatUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 

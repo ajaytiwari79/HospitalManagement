@@ -39,7 +39,6 @@ import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
-import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.model.activity.TimeType;

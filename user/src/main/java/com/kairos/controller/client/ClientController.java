@@ -1,7 +1,6 @@
 package com.kairos.controller.client;
 
 import com.kairos.commons.service.mail.SendGridMailService;
-import com.kairos.dto.activity.task.TaskDemandRequestWrapper;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.staff.ContactPersonDTO;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;

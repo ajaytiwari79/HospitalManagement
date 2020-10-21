@@ -20,7 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 
 /**

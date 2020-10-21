@@ -2,7 +2,6 @@ package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -44,7 +43,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_SHIFT_IDS;
 import static com.kairos.constants.ActivityMessagesConstants.PAST_DATE_ALLOWED;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
-import static java.util.stream.Collectors.groupingBy;
 
 /*
  *Created By Pavan on 21/12/18

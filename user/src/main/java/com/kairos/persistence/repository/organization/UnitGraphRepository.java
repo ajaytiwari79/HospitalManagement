@@ -10,7 +10,6 @@ import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
-import com.kairos.persistence.model.user.skill.SelectedSkillQueryResults;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

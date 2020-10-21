@@ -4,7 +4,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.day_type.CountryHolidayCalender;
-import com.kairos.persistence.model.day_type.DayType;
 import com.kairos.persistence.repository.day_type.CountryHolidayCalenderRepository;
 import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -16,12 +15,9 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 @Service

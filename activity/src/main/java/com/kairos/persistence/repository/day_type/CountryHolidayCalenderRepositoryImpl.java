@@ -8,8 +8,6 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.inject.Inject;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import static com.kairos.constants.CommonConstants.DELETED;

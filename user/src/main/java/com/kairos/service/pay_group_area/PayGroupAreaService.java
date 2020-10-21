@@ -7,7 +7,6 @@ import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.pay_group_area.PayGroupAreaDTO;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.pay_group_area.PayGroupAreaResponse;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;

@@ -11,7 +11,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCOUNT_TYPE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.IN_COUNTRY;
 
 @Repository
 public interface AccountTypeGraphRepository extends Neo4jBaseRepository<AccountType, Long> {

@@ -1,7 +1,6 @@
 package com.kairos.commons.utils;
 
 import com.kairos.dto.TranslationInfo;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;

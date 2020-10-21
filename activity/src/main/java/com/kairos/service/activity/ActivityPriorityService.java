@@ -1,7 +1,6 @@
 package com.kairos.service.activity;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityPriorityDTO;
 import com.kairos.enums.PriorityFor;

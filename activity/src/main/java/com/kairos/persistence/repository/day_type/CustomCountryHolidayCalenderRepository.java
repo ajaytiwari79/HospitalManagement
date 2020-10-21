@@ -2,8 +2,6 @@ package com.kairos.persistence.repository.day_type;
 
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 public interface CustomCountryHolidayCalenderRepository {

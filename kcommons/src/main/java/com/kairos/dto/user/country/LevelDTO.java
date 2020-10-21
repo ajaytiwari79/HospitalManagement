@@ -3,7 +3,6 @@ package com.kairos.dto.user.country;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
-import org.neo4j.ogm.annotation.Properties;
 
 import java.util.HashMap;
 import java.util.Map;

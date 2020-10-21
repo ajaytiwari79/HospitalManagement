@@ -36,7 +36,6 @@ import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
-import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;

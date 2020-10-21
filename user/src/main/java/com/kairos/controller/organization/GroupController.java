@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 /**
  * Created By G.P.Ranjan on 19/11/19

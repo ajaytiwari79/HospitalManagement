@@ -6,7 +6,6 @@ import com.kairos.dto.user.country.tag.PenaltyScoreDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

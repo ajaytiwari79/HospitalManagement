@@ -17,7 +17,7 @@
     import java.util.Map;
     import java.util.Set;
 
-    import static com.kairos.constants.ApiConstants.*;
+    import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
     /**
      * Created by oodles on 18/10/16.

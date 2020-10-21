@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftType;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.constants.AppConstants.DELETED;
-import static com.kairos.enums.FilterType.*;
+import static com.kairos.enums.FilterType.ABSENCE_ACTIVITY;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 

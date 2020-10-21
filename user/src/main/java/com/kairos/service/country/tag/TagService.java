@@ -7,7 +7,6 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.country.tag.PenaltyScore;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.country.tag.TagQueryResult;

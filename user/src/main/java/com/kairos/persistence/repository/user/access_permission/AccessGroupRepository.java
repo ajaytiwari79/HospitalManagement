@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.user.access_permission;
 
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
-import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;

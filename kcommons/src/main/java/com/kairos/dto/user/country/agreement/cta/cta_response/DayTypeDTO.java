@@ -1,6 +1,5 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.Day;
 import lombok.Getter;
@@ -10,7 +9,6 @@ import lombok.Setter;
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotBlank;
-import java.util.HashMap;
 import java.util.Map;
 
 @QueryResult

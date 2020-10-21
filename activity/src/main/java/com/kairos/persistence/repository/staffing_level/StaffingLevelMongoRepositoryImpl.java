@@ -1,8 +1,6 @@
 package com.kairos.persistence.repository.staffing_level;
 
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
-import com.kairos.enums.TimeTypeEnum;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import org.bson.Document;
@@ -10,18 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepository{

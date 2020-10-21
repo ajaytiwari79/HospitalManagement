@@ -6,7 +6,6 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
-import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.user.expertise.response.FunctionalPaymentDTO;
 import com.kairos.service.employment.EmploymentCTAWTAService;
 import com.kairos.service.employment.EmploymentService;
@@ -24,11 +23,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ApiConstants.*;
 
 

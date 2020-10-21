@@ -1,20 +1,6 @@
 
 package com.kairos.shiftplanning.executioner;
 
-import com.kairos.dto.planner.solverconfig.ConstraintDTO;
-import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
-import com.kairos.enums.constraint.ConstraintSubType;
-import com.kairos.enums.constraint.ConstraintType;
-import com.kairos.enums.constraint.ScoreLevel;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.kairos.enums.constraint.ConstraintSubType.*;
-
-
 //@PropertySource("/media/pradeep/bak/multiOpta/task-shiftplanning/src/main/resources/taskplanner.properties")
 public class ShiftPlanningSolverTest {
 

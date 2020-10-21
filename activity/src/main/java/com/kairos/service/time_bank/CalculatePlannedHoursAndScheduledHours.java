@@ -8,14 +8,16 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationConfiguration;
-import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.shift.PlannedTime;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.DurationType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.cta.AccountType;
 import com.kairos.enums.cta.CompensationType;
@@ -40,17 +42,15 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.DateUtils.getLocalDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.MINIMUM_VALUE;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
-import static com.kairos.dto.user.country.agreement.cta.CalculationFor.UNUSED_DAYOFF_LEAVES;
 import static com.kairos.enums.cta.AccountType.PAID_OUT;
 import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
 import static com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService.getCutoffInterval;
 import static java.util.stream.Collectors.*;
-import static java.util.stream.Collectors.groupingBy;
 
 @Getter
 @Setter

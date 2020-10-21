@@ -4,7 +4,6 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.reason_code.ReasonCode;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;

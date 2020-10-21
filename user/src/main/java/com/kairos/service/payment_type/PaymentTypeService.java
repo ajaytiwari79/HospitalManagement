@@ -4,7 +4,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.EmployeeLimit;
 import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.country.default_data.PaymentTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

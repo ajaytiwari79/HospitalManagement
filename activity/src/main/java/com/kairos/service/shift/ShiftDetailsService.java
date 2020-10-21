@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.shift.ShiftType.SICK;
-import static java.util.stream.Collectors.toMap;
 
 
 /**

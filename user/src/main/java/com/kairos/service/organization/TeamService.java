@@ -13,7 +13,6 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDT
 import com.kairos.enums.team.LeaderType;
 import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.StaffTeamRelationShipQueryResult;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;

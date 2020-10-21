@@ -1,7 +1,6 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
@@ -17,7 +16,6 @@ import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.day_type.CountryHolidayCalenderService;
 import com.kairos.utils.counter.KPIUtils;
-import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
