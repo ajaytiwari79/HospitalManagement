@@ -647,7 +647,7 @@ public class KPIBuilderCalculationService implements CounterService {
             for (ShiftWithActivityDTO shift : shifts) {
                 List<ShiftActivityDTO> shiftActivitys = shift.getActivities();
                 if (excludeBreak) {
-                    shiftActivitys = new CalculatePlannedHoursAndScheduledHours(timeBankCalculationService).getShiftActivityByBreak(shift.getActivities(), shift.getBreakActivities());
+                    shiftActivitys = new CalculatePlannedHoursAndScheduledHours(timeBankCalculationService,new HashMap<>(),null).getShiftActivityByBreak(shift.getActivities(), shift.getBreakActivities());
                 }
                 shiftActivityDTOS.addAll(shiftActivitys.stream().filter(shiftActivityDTO -> isShiftActivityValid(shiftActivityDTO)).collect(Collectors.toList()));
             }

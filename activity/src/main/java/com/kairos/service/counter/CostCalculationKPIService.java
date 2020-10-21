@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ public class CostCalculationKPIService {
                   boolean valid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, new StaffEmploymentDetails(new EmploymentType(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentTypeId())), shiftActivityDTO.getPhaseId(), newHashSet(shiftActivityDTO.getActivityId()), newHashSet(shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeTypeId()), shiftActivityDTO.getPlannedTimes());
                   boolean dayTypeValid = timeBankCalculationService.isDayTypeValid(shiftActivityDTO.getStartDate(), ruleTemplate, dayTypeDTOMap);
                   if (valid && dayTypeValid) {
-                      totalCtaBonus += new CalculatePlannedHoursAndScheduledHours(timeBankCalculationService).getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivityDTO, new StaffEmploymentDetails(employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getCtaRuleTemplates(), BigDecimal.valueOf(employmentWithCtaDetailsDTO.getHourlyCost()), employmentWithCtaDetailsDTO.getEmploymentLines()),dayTypeDTOMap).intValue();
+                      totalCtaBonus += new CalculatePlannedHoursAndScheduledHours(timeBankCalculationService,new HashMap<>(),null).getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivityDTO, new StaffEmploymentDetails(employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getCtaRuleTemplates(), BigDecimal.valueOf(employmentWithCtaDetailsDTO.getHourlyCost()), employmentWithCtaDetailsDTO.getEmploymentLines()),dayTypeDTOMap).intValue();
                   }
               }
           }

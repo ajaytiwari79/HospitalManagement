@@ -4,8 +4,6 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.dto.activity.task.EscalateTaskWrapper;
-import com.kairos.dto.activity.task.EscalatedTasksWrapper;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.auth.User;
@@ -681,25 +679,5 @@ public class ClientExtendedService {
         clientGraphRepository.save(currentClient);
         return false;
     }
-
-    public List<EscalateTaskWrapper> getClientAggregation(Long unitId) {
-        List<EscalateTaskWrapper> escalatedTaskData = new ArrayList<>();
-        List<EscalatedTasksWrapper> escalatedTasksWrappers = taskServiceRestClient.getStaffNotAssignedTasks(unitId);
-        for (EscalatedTasksWrapper escalatedTasksWrapper : escalatedTasksWrappers) {
-            Client client = clientGraphRepository.findOne(escalatedTasksWrapper.getId());
-            for (EscalateTaskWrapper escalateTaskWrapper : escalatedTasksWrapper.getTasks()) {
-                escalateTaskWrapper.setCitizenName(client.getFullName());
-                if (Optional.ofNullable(client.getUser()).isPresent()) {
-                    if (client.getUser().getGender() != null)
-                        escalateTaskWrapper.setGender(client.getUser().getGender().name());
-                    escalateTaskWrapper.setAge(client.getUser().getAge());
-                }
-                escalateTaskWrapper.setCitizenId(client.getId());
-                escalatedTaskData.add(escalateTaskWrapper);
-            }
-        }
-        return escalatedTaskData;
-    }
-
 
 }

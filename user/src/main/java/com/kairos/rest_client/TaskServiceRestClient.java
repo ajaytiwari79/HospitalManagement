@@ -1,7 +1,6 @@
 package com.kairos.rest_client;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.dto.activity.task.EscalatedTasksWrapper;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import com.kairos.dto.user.staff.ImportShiftDTO;
@@ -95,33 +94,6 @@ public class TaskServiceRestClient {
                 throw new RuntimeException(response.getMessage());
             }
         } catch (HttpClientErrorException e) {
-            logger.info(STATUS,e.getStatusCode());
-            logger.info(RESPONSE,e.getResponseBodyAsString());
-            exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
-
-        }
-        return null;
-    }
-
-    public List<EscalatedTasksWrapper> getStaffNotAssignedTasks(Long unitId){
-
-        final String baseUrl=getBaseUrl(true);
-
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EscalatedTasksWrapper>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EscalatedTasksWrapper>>>(){};
-            ResponseEntity<RestTemplateResponseEnvelope<List<EscalatedTasksWrapper>>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/getStaffNotAssignedTasks",
-                            HttpMethod.GET,null, typeReference);
-
-            RestTemplateResponseEnvelope<List<EscalatedTasksWrapper>> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        }catch (HttpClientErrorException e) {
-
             logger.info(STATUS,e.getStatusCode());
             logger.info(RESPONSE,e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
