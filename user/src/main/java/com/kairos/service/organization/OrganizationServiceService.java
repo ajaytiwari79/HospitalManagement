@@ -6,8 +6,10 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
@@ -15,7 +17,10 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
+import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.GdprIntegrationService;
@@ -63,6 +68,10 @@ public class OrganizationServiceService {
     private ExceptionService exceptionService;
     @Inject
     private GdprIntegrationService gdprIntegrationService;
+    @Inject
+    private UserGraphRepository userGraphRepository;
+    @Inject
+    private SystemLanguageGraphRepository systemLanguageGraphRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationServiceService.class);
 
@@ -101,9 +110,10 @@ public class OrganizationServiceService {
                 organizationServiceDTO.setTranslations(TranslationUtil.getTranslatedData(organizationServiceDTO.getTranslatedNames(),organizationServiceDTO.getTranslatedDescriptions()));
             });
             result.setTranslations(result.getTranslatedData());
+
             data.put("id", result.getId());
             data.put("name", result.getName());
-            data.put("description", result.getDescription());
+            data.put("description",result.getDescription());
             data.put("children", result.getOrganizationSubService());
             data.put("translations", result.getTranslations());
             mapList.add(data);
@@ -111,7 +121,6 @@ public class OrganizationServiceService {
         }
         return mapList;
     }
-
 
     public boolean deleteOrganizationServiceById(Long id) {
         OrganizationService organizationService = organizationServiceRepository.findOne(id);

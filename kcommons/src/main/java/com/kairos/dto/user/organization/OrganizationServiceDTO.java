@@ -1,6 +1,7 @@
 package com.kairos.dto.user.organization;
 
 import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user_context.UserContext;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 /**
  * Created by prerna on 15/11/17.
@@ -38,5 +41,21 @@ public class OrganizationServiceDTO {
             this.organizationSubService=new ArrayList<>();
         }
         return organizationSubService;
+    }
+
+    public String getName() {
+        if(isNotNull(translatedNames.get(UserContext.getUserDetails().getLanguage().toLowerCase())) && !translatedNames.get(UserContext.getUserDetails().getLanguage().toLowerCase()).equals("")) {
+            return translatedNames.getOrDefault(UserContext.getUserDetails().getLanguage().toLowerCase(), name);
+        }else {
+            return name;
+        }
+    }
+
+    public String getDescription() {
+        if(isNotNull(translatedDescriptions.get(UserContext.getUserDetails().getLanguage().toLowerCase())) && !translatedDescriptions.get(UserContext.getUserDetails().getLanguage().toLowerCase()).equals("")) {
+            return translatedDescriptions.getOrDefault(UserContext.getUserDetails().getLanguage().toLowerCase(), description);
+        }else{
+            return description;
+        }
     }
 }
