@@ -29,7 +29,7 @@ public class AuthService {
     private long lastUpdated ;
     private static final long ONE_HOUR_MS = 3100000;
     public void kmdAuth()  {
-        if( DateUtils.getCurrentDate().getTime()-lastUpdated < ONE_HOUR_MS){
+        if( DateUtils.getDate().getTime()-lastUpdated < ONE_HOUR_MS){
             return;
         }
         dokmdAuth();
@@ -61,6 +61,6 @@ public class AuthService {
         JacksonJsonParser jsonParser = new JacksonJsonParser();
         Map<String,Object> parsedData = jsonParser.parseMap(responseEntity);
         AppConstants.KMD_NEXUS_ACCESS_TOKEN = parsedData.get("access_token")+"";
-        lastUpdated = DateUtils.getCurrentDate().getTime();
+        lastUpdated = DateUtils.getDate().getTime();
     }
 }

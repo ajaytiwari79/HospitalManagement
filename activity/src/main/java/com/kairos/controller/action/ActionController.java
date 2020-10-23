@@ -6,7 +6,6 @@ import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.action.ActionDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,17 +64,17 @@ public class ActionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.getAllActionByUnitId(unitId));
     }
 
-    @ApiOperation("Get availability unavailability before after shift")
+    @ApiOperation("Get count before after shift")
     @GetMapping("/staff/{staffId}/count_before_after_shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAvailabilityUnavailabilityBeforeAfterShift(@PathVariable Long unitId, @PathVariable Long staffId,@RequestParam("shift_date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date ShiftDate) {
+    public ResponseEntity<Map<String, Object>> getCountBeforeAfterDate(@PathVariable Long unitId, @PathVariable Long staffId,@RequestParam("shift_date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date ShiftDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.getCountBeforeAfterDate(unitId, staffId, ShiftDate));
     }
 
-    @ApiOperation("Remove availability unavailability before after shift")
+    @ApiOperation("Remove before after shift by time type")
     @DeleteMapping("/staff/{staffId}/before_after_shift")
-    ResponseEntity<Map<String, Object>> removeAvailabilityUnavailabilityBeforeAfterShift(@PathVariable Long staffId, @RequestParam("remove_time_type") TimeTypeEnum timeTypeEnum, @RequestParam boolean before, @RequestParam("remove_nearest_one") boolean removeNearestOne, @RequestParam("shift_date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date ShiftDate){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.removeAvailabilityUnavailabilityBeforeAfterShift(staffId, timeTypeEnum, before, removeNearestOne, ShiftDate));
+    ResponseEntity<Map<String, Object>> removeBeforeAfterShiftByTimeType(@PathVariable Long staffId, @RequestParam("remove_time_type") TimeTypeEnum timeTypeEnum, @RequestParam boolean before, @RequestParam("remove_nearest_one") boolean removeNearestOne, @RequestParam("shift_date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date ShiftDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, actionService.removeBeforeAfterShiftByTimeType(staffId, timeTypeEnum, before, removeNearestOne, ShiftDate));
     }
 
     @ApiOperation("Update action count of staff")

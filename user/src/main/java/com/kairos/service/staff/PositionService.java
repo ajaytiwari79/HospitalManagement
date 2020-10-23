@@ -237,7 +237,7 @@ public class PositionService {
             } else {
                 unitPermission.setUnit((Unit) unit);
             }
-            unitPermission.setStartDate(DateUtils.getCurrentDate().getTime());
+            unitPermission.setStartDate(DateUtils.getDate().getTime());
             unitPermission.setAccessGroup(accessGroup);
             position.getUnitPermissions().add(unitPermission);
             positionGraphRepository.save(position, 2);

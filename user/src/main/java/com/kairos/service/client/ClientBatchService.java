@@ -343,7 +343,7 @@ public class ClientBatchService {
                 if (connectToOrganization) {
                     if (client != null) {
                         logger.info("Creating relationship : " + client.getId());
-                        relation = new ClientOrganizationRelation(client, currentUnit, DateUtils.getCurrentDate().getTime());
+                        relation = new ClientOrganizationRelation(client, currentUnit, DateUtils.getDate().getTime());
                         relationService.createRelation(relation);
 
                         Map<String, Object> clientInfo = new HashMap<>();

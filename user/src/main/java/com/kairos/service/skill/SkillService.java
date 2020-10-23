@@ -8,7 +8,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationSkillDTO;
 import com.kairos.enums.MasterDataTypeEnum;
@@ -19,7 +18,6 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
-import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.StaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
@@ -27,7 +25,6 @@ import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQu
 import com.kairos.persistence.model.time_care.TimeCareSkill;
 import com.kairos.persistence.model.user.expertise.response.SkillLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.response.SkillQueryResult;
-import com.kairos.persistence.model.user.skill.SelectedSkillQueryResults;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -208,12 +205,12 @@ public class SkillService {
 
         if (isSelected) {
             if (unitGraphRepository.isSkillAlreadyExist(id, skillId) == 0) {
-                unitGraphRepository.addSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                unitGraphRepository.addSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
             } else {
-                unitGraphRepository.updateSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                unitGraphRepository.updateSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
             }
         } else {
-            unitGraphRepository.removeSkillFromOrganization(id, skillId, DateUtils.getCurrentDate().getTime());
+            unitGraphRepository.removeSkillFromOrganization(id, skillId, DateUtils.getDate().getTime());
         }
         return getAllAvailableSkills(id);
 
@@ -307,7 +304,7 @@ public class SkillService {
 
         }
 
-        long lastModificationDate = DateUtils.getCurrentDate().getTime();
+        long lastModificationDate = DateUtils.getDate().getTime();
         if (isSelected) {
             staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), getCurrentLocalDate().toString(), lastModificationDate, BASIC, true);
         } else {
@@ -440,10 +437,10 @@ public class SkillService {
             if(isStaffAndSkillRelationshipExistMoreThenOne){
                 staffGraphRepository.deleteSkill(staffId,removedSkillIds);
             }
-            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getCurrentDate().getTime(), BASIC, true);
+            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getDate().getTime(), BASIC, true);
             response = prepareSelectedSkillResponse(staffId, removedSkillIds, unitId);
         } else {
-            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime());
+            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getDate().getTime());
             response =Collections.emptyList();
 
         }
