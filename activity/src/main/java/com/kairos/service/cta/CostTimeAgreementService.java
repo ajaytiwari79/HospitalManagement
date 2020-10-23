@@ -393,6 +393,7 @@ public class CostTimeAgreementService {
                     ctaCompensationSettingService.validateInterval(ctaRuleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations());
                 }
                 ctaRuleTemplate.setId(null);
+                ctaRuleTemplate.setCountryId(null);
             });
             ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
             List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
