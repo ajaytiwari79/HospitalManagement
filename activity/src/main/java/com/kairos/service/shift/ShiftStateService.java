@@ -130,7 +130,7 @@ public class ShiftStateService {
             }else {
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
             }
-            shiftMongoRepository.updateValidateDetailsOfShift(timeAndAttendanceShiftState.getShiftId(),timeAndAttendanceShiftState.getAccessGroupRole(),timeAndAttendanceShiftState.getValidatedOn());
+            shiftMongoRepository.updateValidateDetailsOfShift(timeAndAttendanceShiftState.getShiftId(),timeAndAttendanceShiftState.getAccessGroupRole(),timeAndAttendanceShiftState.getValidated());
             if(isNotNull(timeAndAttendanceShiftState.getId())) {
                 timeAndAttendanceShiftStateMap.remove(timeAndAttendanceShiftState.getShiftId());
             }
@@ -150,8 +150,8 @@ public class ShiftStateService {
                 newshiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
                 newshiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
                 newshiftState.getBreakActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
-                timeAndAttendanceShiftState.setValidatedOn(getLocalDate());
-                shiftMongoRepository.updateValidateDetailsOfShift(timeAndAttendanceShiftState.getShiftId(),timeAndAttendanceShiftState.getAccessGroupRole(),timeAndAttendanceShiftState.getValidatedOn());
+                timeAndAttendanceShiftState.setValidated(getLocalDate());
+                shiftMongoRepository.updateValidateDetailsOfShift(timeAndAttendanceShiftState.getShiftId(),timeAndAttendanceShiftState.getAccessGroupRole(),timeAndAttendanceShiftState.getValidated());
                 timeAndAttendanceShiftStates.add(newshiftState);
             }
         }
@@ -199,7 +199,7 @@ public class ShiftStateService {
         if (shiftState != null) {
             shiftDTO.setId(shiftState.getId());
             shiftDTO.setAccessGroupRole(shiftState.getAccessGroupRole());
-            shiftDTO.setValidatedOn(shiftState.getValidatedOn());
+            shiftDTO.setValidated(shiftState.getValidated());
             shiftDTO.setShiftId(shiftState.getShiftId());
             shiftDTO.setPhaseId(shiftState.getPhaseId());
             shiftDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());

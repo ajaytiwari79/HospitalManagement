@@ -61,7 +61,7 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     protected int durationMinutes;
     protected BigInteger plannedTimeId;
     protected Long expertiseId;
-    protected LocalDate validatedOn;
+    protected LocalDate validated;
     protected LocalDateTime clockIn;
     protected LocalDateTime clockOut;
     protected BigInteger shiftId;
