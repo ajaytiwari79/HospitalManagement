@@ -3,7 +3,6 @@ package com.kairos.service.wta;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
@@ -39,7 +38,6 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
@@ -683,7 +681,7 @@ public class WorkTimeAgreementService{
         logger.info("Inside wtaservice");
         List<Long> oldEmploymentIds = employmentIds.stream().map(employmentIdDTO -> employmentIdDTO.getOldEmploymentId()).collect(Collectors.toList());
         Map<Long, Long> newOldemploymentIdMap = employmentIds.stream().collect(toMap(k -> k.getOldEmploymentId(), v -> v.getNewEmploymentId()));
-        List<WTAQueryResultDTO> oldWtas = wtaRepository.getWTAByEmploymentIds(oldEmploymentIds, DateUtils.getCurrentDate());
+        List<WTAQueryResultDTO> oldWtas = wtaRepository.getWTAByEmploymentIds(oldEmploymentIds, DateUtils.getDate());
         List<WorkingTimeAgreement> newWtas = new ArrayList<>();
         for (WTAQueryResultDTO wta : oldWtas) {
             List<WTABaseRuleTemplate> ruleTemplates = wta.getRuleTemplates();

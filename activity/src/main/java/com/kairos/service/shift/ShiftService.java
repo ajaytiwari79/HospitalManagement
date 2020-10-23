@@ -1081,7 +1081,7 @@ public class ShiftService extends MongoBaseService {
         plannerValidatedShifts = shiftFilterService.getShiftsByFilters(plannerValidatedShifts, staffFilterDTO, new ArrayList<>());
         //change id because id was same and issue on FE side and this is only for show FE side
         for (ShiftDTO shiftDTO : plannerValidatedShifts) {
-            if (shiftDTO.getValidated() == null) {
+            if (shiftDTO.getValidatedOn() == null) {
                 shiftDTO.setEditable(true);
             }
         }
@@ -1093,7 +1093,7 @@ public class ShiftService extends MongoBaseService {
         DateTimeInterval graceInterval;
         List<ShiftDTO> updateRealTime = new ArrayList<>();
         for (ShiftDTO shiftDTO : realTimeShift) {
-            if (!Optional.ofNullable(staffAndShiftMap.get(shiftDTO.getStaffId() + "" + shiftDTO.getId())).isPresent() && shiftDTO.getValidated() == null && phaseService.shiftEditableInRealtime(timeZone, phaseMap, shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate())) {
+            if (!Optional.ofNullable(staffAndShiftMap.get(shiftDTO.getStaffId() + "" + shiftDTO.getId())).isPresent() && shiftDTO.getValidatedOn() == null && phaseService.shiftEditableInRealtime(timeZone, phaseMap, shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate())) {
                 shiftDTO.setEditable(true);
             }
             updateRealTime.add(shiftDTO);
@@ -1103,7 +1103,7 @@ public class ShiftService extends MongoBaseService {
             Phase phase = phaseMongoRepository.findByUnitIdAndPhaseEnum(staffValidatedShifts.get(0).getUnitId(), PhaseDefaultName.TIME_ATTENDANCE.toString());
             graceInterval = shiftValidatorService.getGracePeriodInterval(phase, staffValidatedShifts.get(0).getStartDate(), false);
             for (ShiftDTO staffValidatedShift : staffValidatedShifts) {
-                if (staffValidatedShift.getValidated() == null && graceInterval.contains(staffValidatedShift.getStartDate())) {
+                if (staffValidatedShift.getValidatedOn() == null && graceInterval.contains(staffValidatedShift.getStartDate())) {
                     staffValidatedShift.setEditable(true);
                 }
             }

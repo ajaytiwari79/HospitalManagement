@@ -36,7 +36,6 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.*;
-import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.*;
@@ -81,7 +80,6 @@ import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import org.apache.commons.collections.CollectionUtils;
-import org.aspectj.weaver.ast.Or;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -216,7 +214,7 @@ public class OrganizationService {
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
         if (!baseOrganization) {
             accessGroupService.createDefaultAccessGroups(organization);
-            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
         }
         return organization;
     }

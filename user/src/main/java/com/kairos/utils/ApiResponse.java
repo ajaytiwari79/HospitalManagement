@@ -21,7 +21,7 @@ public class ApiResponse {
         this.httpStatus = httpStatus;
         this.status = httpStatus.value();
         this.isSuccess = isSuccess;
-        this.timeStamp = DateUtils.getCurrentDate().getTime();
+        this.timeStamp = DateUtils.getDate().getTime();
         this.data = data;
         return new ResponseEntity<ApiResponse>(this, httpStatus);
     }

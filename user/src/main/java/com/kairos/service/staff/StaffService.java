@@ -184,7 +184,7 @@ public class StaffService {
             return null;
         }
         createDirectory(IMAGES_PATH);
-        String fileName = DateUtils.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtils.getDate().getTime() + multipartFile.getOriginalFilename();
         final String path = IMAGES_PATH + File.separator + fileName;
         FileUtil.writeFile(path, multipartFile);
         staff.setProfilePic(fileName);
@@ -283,7 +283,7 @@ public class StaffService {
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
         }
         List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
-        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), SkillLevel.ADVANCE);
+        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getDate().getTime(), DateUtils.getDate().getTime(), SkillLevel.ADVANCE);
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = copyCollectionPropertiesByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffDTO.setSectorWiseExpertise(copyCollectionPropertiesByMapper(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults), SectorAndStaffExpertiseDTO.class));
         teamService.assignStaffInTeams(staff, staffDTO.getTeams(), unitId);

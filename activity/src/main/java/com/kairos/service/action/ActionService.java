@@ -134,7 +134,7 @@ public class ActionService {
         response.put(STOP_BRICK_NAME, isCollectionNotEmpty(stopBrickActivities) ? stopBrickActivities.get(0).getName() : "");
     }
 
-    public List<ShiftWithViolatedInfoDTO> removeAvailabilityUnavailabilityBeforeAfterShift(Long staffId, TimeTypeEnum timeTypeEnum, boolean before, boolean removeNearestOne, Date shiftDate) {
+    public List<ShiftWithViolatedInfoDTO> removeBeforeAfterShiftByTimeType(Long staffId, TimeTypeEnum timeTypeEnum, boolean before, boolean removeNearestOne, Date shiftDate) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         Date startDate = before ? getStartOfDay(shiftDate) : shiftDate;
         Date endDate = before ? shiftDate : getEndOfDay(shiftDate);

@@ -76,7 +76,7 @@ public class Shift extends MongoBaseEntity {
     protected RequestAbsence requestAbsence;
     protected List<ShiftActivity> breakActivities;
     protected AccessGroupRole accessGroupRole;
-    protected LocalDate validated;
+    protected LocalDate validatedOn;
     private ShiftViolatedRules shiftViolatedRules;
     private transient String oldShiftTimeSlot;//it is only for conditional CTA calculation
     private boolean planningPeriodPublished;

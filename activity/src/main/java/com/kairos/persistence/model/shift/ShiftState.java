@@ -23,7 +23,7 @@ public class ShiftState extends Shift {
     public ShiftState(BigInteger shiftId,AccessGroupRole accessGroupRole,String actualPhaseState, LocalDate validated,Date startDate,Date endDate,Long unitId,Long staffId) {
         this.shiftId = shiftId;
         this.accessGroupRole = accessGroupRole;
-        this.validated = validated;
+        this.validatedOn = validated;
         super.setStartDate(startDate) ;
         super.setEndDate(endDate);
         super.setUnitId(unitId);
@@ -54,11 +54,11 @@ public class ShiftState extends Shift {
         this.accessGroupRole = accessGroupRole;
     }
 
-    public LocalDate getValidated() {
-        return validated;
+    public LocalDate getValidatedOn() {
+        return validatedOn;
     }
 
-    public void setValidated(LocalDate validated) {
-        this.validated = validated;
+    public void setValidatedOn(LocalDate validatedOn) {
+        this.validatedOn = validatedOn;
     }
 }

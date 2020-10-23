@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getCurrentDate;
+import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto.StaffingLevelAction.REMOVE;
 import static com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto.StaffingLevelAction.UPDATE;
@@ -82,12 +82,12 @@ public class StaffingLevelUtil {
                 staffingLevelActivityNew.setAvailableNoOfStaff(staffingLevelActivityMap.get(staffingLevelActivity.getActivityId()).getAvailableNoOfStaff());
             }
             if (isEmpty(staffingLevelActivityMapOfLogs) || !staffingLevelActivityMapOfLogs.containsKey(staffingLevelActivity.getActivityId()) || staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMaxNoOfStaff() != staffingLevelActivity.getMaxNoOfStaff()) {
-                staffingLevelActivityNew.setMaxUpdatedAt(getCurrentDate());
+                staffingLevelActivityNew.setMaxUpdatedAt(getDate());
             } else {
                 staffingLevelActivityNew.setMaxUpdatedAt(staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMaxUpdatedAt());
             }
             if (isEmpty(staffingLevelActivityMapOfLogs) || !staffingLevelActivityMapOfLogs.containsKey(staffingLevelActivity.getActivityId()) || staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMinNoOfStaff() != staffingLevelActivity.getMinNoOfStaff()) {
-                staffingLevelActivityNew.setMinUpdatedAt(getCurrentDate());
+                staffingLevelActivityNew.setMinUpdatedAt(getDate());
             } else {
                 staffingLevelActivityNew.setMinUpdatedAt(staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMinUpdatedAt());
             }
@@ -170,7 +170,7 @@ public class StaffingLevelUtil {
             staffingLevelIntervalLog.setMinNoOfStaff(staffingLevelIntervalLog.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMinNoOfStaff())));
             staffingLevelIntervalLog.setMaxNoOfStaff(staffingLevelIntervalLog.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMaxNoOfStaff())));
             staffingLevelIntervalLog.setUserInfo(new UserInfo(UserContext.getUserDetails().getId(), UserContext.getUserDetails().getEmail(), UserContext.getUserDetails().getFullName(), UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
-            staffingLevelIntervalLog.setUpdatedAt(getCurrentDate());
+            staffingLevelIntervalLog.setUpdatedAt(getDate());
             staffingLevelIntervalLog.setActivityRemoveLogs(activityRemoveLogs);
             staffingLevelIntervalLog.setSkillRemoveLogs(skillRemoveLogs);
             staffingLevelIntervalLog.setNewlyAddedActivityIds(newlyAddedActivities);
@@ -319,19 +319,19 @@ public class StaffingLevelUtil {
         staffingLevelIntervalLog.setUserInfo(new UserInfo(UserContext.getUserDetails().getId(), UserContext.getUserDetails().getEmail(), UserContext.getUserDetails().getFullName(), UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
         staffingLevelIntervalLog.setActivityRemoveLogs(activityRemoveLogs);
         staffingLevelIntervalLog.setNewlyAddedActivityIds(newlyAddedActivities);
-        staffingLevelIntervalLog.setUpdatedAt(getCurrentDate());
+        staffingLevelIntervalLog.setUpdatedAt(getDate());
         staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelIntervalLogs().add(staffingLevelIntervalLog);
     }
 
     private static Set<StaffingLevelActivity> getActivities(Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMapOfLogs, Set<StaffingLevelActivity> staffingLevelActivities) {
         for (StaffingLevelActivity staffingLevelActivity : staffingLevelActivities) {
             if (isEmpty(staffingLevelActivityMapOfLogs) || !staffingLevelActivityMapOfLogs.containsKey(staffingLevelActivity.getActivityId()) || staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMaxNoOfStaff() != staffingLevelActivity.getMaxNoOfStaff()) {
-                staffingLevelActivity.setMaxUpdatedAt(getCurrentDate());
+                staffingLevelActivity.setMaxUpdatedAt(getDate());
             } else {
                 staffingLevelActivity.setMaxUpdatedAt(staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMaxUpdatedAt());
             }
             if (isEmpty(staffingLevelActivityMapOfLogs) || !staffingLevelActivityMapOfLogs.containsKey(staffingLevelActivity.getActivityId()) || staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMinNoOfStaff() != staffingLevelActivity.getMinNoOfStaff()) {
-                staffingLevelActivity.setMinUpdatedAt(getCurrentDate());
+                staffingLevelActivity.setMinUpdatedAt(getDate());
             } else {
                 staffingLevelActivity.setMinUpdatedAt(staffingLevelActivityMapOfLogs.get(staffingLevelActivity.getActivityId()).getMinUpdatedAt());
             }
@@ -485,7 +485,7 @@ public class StaffingLevelUtil {
             Map<SkillLevel, Integer> skillLevelIntegerMap = staffingLevelSkill.getSkillLevelSettings().stream().collect(toMap(k -> k.getSkillLevel(), v -> v.getNoOfStaff()));
             for (SkillLevelSetting skillLevelSetting : staffingLevelSkill.getSkillLevelSettings()) {
                 if (isEmpty(staffingLevelSkillMapOfLogs) || !staffingLevelSkillMapOfLogs.containsKey(staffingLevelSkill.getSkillId()) || !skillLevelIntegerMap.get(skillLevelSetting.getSkillLevel()).equals(staffingLevelSkillMapOfLogs.get(staffingLevelSkill.getSkillId()).get(skillLevelSetting.getSkillLevel()).getNoOfStaff())) {
-                    skillLevelSetting.setUpdatedAt(getCurrentDate());
+                    skillLevelSetting.setUpdatedAt(getDate());
                 } else {
                     skillLevelSetting.setUpdatedAt(staffingLevelSkillMapOfLogs.get(staffingLevelSkill.getSkillId()).get(skillLevelSetting.getSkillLevel()).getUpdatedAt());
                 }

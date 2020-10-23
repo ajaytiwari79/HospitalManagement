@@ -848,7 +848,7 @@ public class ShiftValidatorService {
         if (shiftState != null) {
             shiftDTO.setId(shiftStateId);
             shiftDTO.setAccessGroupRole(shiftState.getAccessGroupRole());
-            shiftDTO.setValidated(shiftState.getValidated());
+            shiftDTO.setValidatedOn(shiftState.getValidatedOn());
             shiftDTO.setShiftStatePhaseId(shiftState.getShiftStatePhaseId());
             shiftDTO.setShiftId(shiftState.getShiftId());
         }
@@ -859,7 +859,7 @@ public class ShiftValidatorService {
         shiftState.setShiftId(shiftDTO.getShiftId());
         shiftState.setStartDate(shiftState.getActivities().get(0).getStartDate());
         shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
-        shiftState.setValidated(LocalDate.now());
+        shiftState.setValidatedOn(LocalDate.now());
         shiftState.setShiftStatePhaseId(actualPhases.getId());
         shiftState.getActivities().forEach(activity -> {
             activity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
@@ -870,11 +870,11 @@ public class ShiftValidatorService {
             shiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
             shiftState.setShiftStatePhaseId(actualPhases.getId());
             shiftState.setId(null);
-            shiftState.setValidated(null);
+            shiftState.setValidatedOn(null);
             shiftState.getActivities().forEach(activity -> activity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
             shiftStateMongoRepository.save(shiftState);
         }
-        shiftMongoRepository.updateValidateDetailsOfShift(shiftState.getShiftId(), shiftState.getAccessGroupRole(), shiftState.getValidated());
+        shiftMongoRepository.updateValidateDetailsOfShift(shiftState.getShiftId(), shiftState.getAccessGroupRole(), shiftState.getValidatedOn());
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
         if (validatedByStaff) {
             shiftDTO.setEditable(true);

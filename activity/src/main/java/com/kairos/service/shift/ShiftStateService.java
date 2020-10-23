@@ -2,7 +2,6 @@ package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -131,7 +130,7 @@ public class ShiftStateService {
             }else {
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
             }
-            shiftMongoRepository.updateValidateDetailsOfShift(timeAndAttendanceShiftState.getShiftId(),timeAndAttendanceShiftState.getAccessGroupRole(),timeAndAttendanceShiftState.getValidated());
+            shiftMongoRepository.updateValidateDetailsOfShift(timeAndAttendanceShiftState.getShiftId(),timeAndAttendanceShiftState.getAccessGroupRole(),timeAndAttendanceShiftState.getValidatedOn());
             if(isNotNull(timeAndAttendanceShiftState.getId())) {
                 timeAndAttendanceShiftStateMap.remove(timeAndAttendanceShiftState.getShiftId());
             }
@@ -151,8 +150,8 @@ public class ShiftStateService {
                 newshiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
                 newshiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
                 newshiftState.getBreakActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
-                timeAndAttendanceShiftState.setValidated(getLocalDate());
-                shiftMongoRepository.updateValidateDetailsOfShift(timeAndAttendanceShiftState.getShiftId(),timeAndAttendanceShiftState.getAccessGroupRole(),timeAndAttendanceShiftState.getValidated());
+                timeAndAttendanceShiftState.setValidatedOn(getLocalDate());
+                shiftMongoRepository.updateValidateDetailsOfShift(timeAndAttendanceShiftState.getShiftId(),timeAndAttendanceShiftState.getAccessGroupRole(),timeAndAttendanceShiftState.getValidatedOn());
                 timeAndAttendanceShiftStates.add(newshiftState);
             }
         }
@@ -200,7 +199,7 @@ public class ShiftStateService {
         if (shiftState != null) {
             shiftDTO.setId(shiftState.getId());
             shiftDTO.setAccessGroupRole(shiftState.getAccessGroupRole());
-            shiftDTO.setValidated(shiftState.getValidated());
+            shiftDTO.setValidatedOn(shiftState.getValidatedOn());
             shiftDTO.setShiftId(shiftState.getShiftId());
             shiftDTO.setPhaseId(shiftState.getPhaseId());
             shiftDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());
