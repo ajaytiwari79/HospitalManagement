@@ -199,7 +199,7 @@ public class OrganizationService {
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
         if (!baseOrganization) {
             accessGroupService.createDefaultAccessGroups(organization);
-            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
         }
         return organization;
     }

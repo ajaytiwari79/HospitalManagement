@@ -234,14 +234,14 @@ public class TeamService {
         int countOfRel = teamGraphRepository.countRelBetweenStaffAndTeam(teamId, staffId);
         if (countOfRel == 0) {
 
-            int countOfRelCreated = teamGraphRepository.linkOfTeamAndStaff(teamId, staffId, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+            int countOfRelCreated = teamGraphRepository.linkOfTeamAndStaff(teamId, staffId, DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
             if (countOfRelCreated > 0) {
                 return true;
             } else {
                 exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_SOMETHINGWRONG);
             }
         } else {
-            int countOfRelCreated = teamGraphRepository.updateStaffTeamRelationship(teamId, staffId, DateUtils.getCurrentDate().getTime(), isAssigned);
+            int countOfRelCreated = teamGraphRepository.updateStaffTeamRelationship(teamId, staffId, DateUtils.getDate().getTime(), isAssigned);
             if (countOfRelCreated > 0) {
                 if (!isAssigned) {
                     staffGraphRepository.save(staff);

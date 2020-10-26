@@ -196,7 +196,7 @@ public class OrganizationServiceService {
         if (isSelected) {
             LOGGER.info("check if already exist-------> ");
             if (unitGraphRepository.isServiceAlreadyExist(id, organizationService.getId()) == 0) {
-                unitGraphRepository.addOrganizationServiceInUnit(id, Arrays.asList(organizationService.getId()), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                unitGraphRepository.addOrganizationServiceInUnit(id, Arrays.asList(organizationService.getId()), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
             } else {
                 unitGraphRepository.updateServiceFromOrganization(id, organizationService.getId());
             }

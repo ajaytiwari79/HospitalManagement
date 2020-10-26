@@ -357,8 +357,8 @@ public class AccessGroupService {
 
             }
         }
-        long creationDate = DateUtils.getCurrentDate().getTime();
-        long lastModificationDate = DateUtils.getCurrentDate().getTime();
+        long creationDate = DateUtils.getDate().getTime();
+        long lastModificationDate = DateUtils.getDate().getTime();
         Boolean read = isSelected;
         Boolean write = isSelected;
 

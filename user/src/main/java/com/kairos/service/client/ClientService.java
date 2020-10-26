@@ -57,7 +57,6 @@ import com.kairos.rest_client.*;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.CPRUtil;
@@ -98,7 +97,6 @@ public class ClientService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Inject private EnvConfig envConfig;
     @Inject private TimeSlotGraphRepository timeSlotGraphRepository;
-    @Inject private IntegrationService integrationService;
     @Inject private TaskServiceRestClient taskServiceRestClient;
     @Inject private PlannerRestClient plannerRestClient;
     @Inject private TaskTypeRestClient taskTypeRestClient;
@@ -563,7 +561,7 @@ public class ClientService {
     }
 
     public boolean assignStaffToCitizen(long citizenId, long staffId, ClientStaffRelation.StaffType staffType) {
-        clientGraphRepository.assignStaffToClient(citizenId, staffId, staffType, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+        clientGraphRepository.assignStaffToClient(citizenId, staffId, staffType, DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
         return true;
     }
 
@@ -574,7 +572,7 @@ public class ClientService {
         for (StaffPersonalDetailQueryResult staffPersonalDetailQueryResult : staffQueryData) {
             staffIds.add(staffPersonalDetailQueryResult.getId());
         }
-        clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+        clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
         long endTime = System.currentTimeMillis();
         logger.info("time taken, client>>assignStaffToCitizen {}" , (endTime - startTime) + "  ms");
         return true;
@@ -749,6 +747,7 @@ public class ClientService {
         return citizenPlanningMap;
     }
 
+<<<<<<< HEAD
     public TaskDemandVisitWrapper getPrerequisitesForTaskCreation(String userName, long unitId, long citizenId) {
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         Client citizen = clientGraphRepository.findOne(Long.valueOf(citizenId), 0);
@@ -760,6 +759,26 @@ public class ClientService {
         List<Long> preferredStaffIds = getPreferredStaffVisitourIds(citizen.getId());
         List<Long> forbiddenStaffIds = getForbiddenStaffVisitourIds(citizen.getId());
         return new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(citizen, preferredStaffIds, forbiddenStaffIds, taskAddress).staffId(loggedInUser.getId()).flsCredentials(flsCredentials).build();
+=======
+    public TaskDemandVisitWrapper getClientDetailsForTaskDemandVisit(TaskDemandRequestWrapper taskDemandWrapper) {
+        Client client = clientGraphRepository.findOne(taskDemandWrapper.getCitizenId());
+        List<Long> forbiddenStaff = getForbiddenStaffVisitourIds(taskDemandWrapper.getCitizenId());
+        List<Long> preferredStaff = getPreferredStaffVisitourIds(taskDemandWrapper.getCitizenId());
+        ClientHomeAddressQueryResult clientHomeAddressQueryResult = clientGraphRepository.getHomeAddress(client.getId());
+        if (clientHomeAddressQueryResult == null) {
+            return null;
+        }
+        ZipCode zipCode = clientHomeAddressQueryResult.getZipCode();
+        ContactAddress homeAddress = clientHomeAddressQueryResult.getHomeAddress();
+        TaskAddress taskAddress = new TaskAddress("DK",zipCode.getZipCode(),homeAddress.getCity(),homeAddress.getStreet(),homeAddress.getHouseNumber());
+        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId());
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(taskDemandWrapper.getUnitId());
+        List<LocalDate> publicHolidayList = countryGraphRepository.getAllCountryHolidaysBetweenDates(countryId, DateUtils.asLocalDate(taskDemandWrapper.getStartDate()), DateUtils.asLocalDate(taskDemandWrapper.getEndDate()));
+        List<CountryHolidayCalendarQueryResult> countryHolidayCalenderList = countryGraphRepository.getCountryHolidayCalendarBetweenDates(countryId, DateUtils.asLocalDate(taskDemandWrapper.getStartDate()), DateUtils.asLocalDate(taskDemandWrapper.getEndDate()));
+        TaskDemandVisitWrapper taskDemandVisitWrapper = new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(client,forbiddenStaff, preferredStaff, taskAddress).timeSlotMap(timeSlotMap).countryId(countryId).publicHolidayList(publicHolidayList).build();
+        taskDemandVisitWrapper.setCountryHolidayCalenderList(countryHolidayCalenderList);
+        return taskDemandVisitWrapper;
+>>>>>>> 79ec90147e34f49bb6ae01ba0d302cb7a4f9e78d
     }
 
     public List<Long> getClientIds(long unitId) {

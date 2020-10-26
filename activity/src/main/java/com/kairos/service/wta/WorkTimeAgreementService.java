@@ -695,7 +695,7 @@ public class WorkTimeAgreementService{
         logger.info("Inside wtaservice");
         List<Long> oldEmploymentIds = employmentIds.stream().map(employmentIdDTO -> employmentIdDTO.getOldEmploymentId()).collect(Collectors.toList());
         Map<Long, Long> newOldemploymentIdMap = employmentIds.stream().collect(toMap(k -> k.getOldEmploymentId(), v -> v.getNewEmploymentId()));
-        List<WTAQueryResultDTO> oldWtas = wtaRepository.getWTAByEmploymentIds(oldEmploymentIds, DateUtils.getCurrentDate());
+        List<WTAQueryResultDTO> oldWtas = wtaRepository.getWTAByEmploymentIds(oldEmploymentIds, DateUtils.getDate());
         List<WorkingTimeAgreement> newWtas = new ArrayList<>();
         for (WTAQueryResultDTO wta : oldWtas) {
             List<WTABaseRuleTemplate> ruleTemplates = wta.getRuleTemplates();

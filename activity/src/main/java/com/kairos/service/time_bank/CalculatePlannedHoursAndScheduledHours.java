@@ -83,9 +83,11 @@ public class CalculatePlannedHoursAndScheduledHours {
         this.timeBankCalculationService = timeBankCalculationService;
     }
 
-    public CalculatePlannedHoursAndScheduledHours(TimeBankCalculationService timeBankCalculationService) {
+    public CalculatePlannedHoursAndScheduledHours(TimeBankCalculationService timeBankCalculationService,Map<Long, DayTypeDTO> dayTypeDTOMap,StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         this.timeBankCalculationService = timeBankCalculationService;
         this.ctaTimeBankMinMap = new HashMap<>();
+        this.dayTypeDTOMap = dayTypeDTOMap;
+        this.staffAdditionalInfoDTO = staffAdditionalInfoDTO;
     }
 
     public CalculatePlannedHoursAndScheduledHours calculate() {
@@ -127,7 +129,7 @@ public class CalculatePlannedHoursAndScheduledHours {
     }
 
     public double calculateConditionalBonus(CTARuleTemplateDTO ruleTemplate, StaffEmploymentDetails employment, ShiftWithActivityDTO shift, AccountType accountType) {
-        boolean ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, staffAdditionalInfoDTO.getEmployment(), shift.getPhaseId(), shift.getActivityIds(), shift.getActivitiesTimeTypeIds(), shift.getActivitiesPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(accountType);
+        boolean ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, staffAdditionalInfoDTO.getEmployment(), shift.getPhaseId(), shift.getActivityIds(), shift.getActivitiesTimeTypeIds(), shift.getActivitiesPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(accountType) && timeBankCalculationService.isDayTypeValid(shift.getStartDate(),ruleTemplate,dayTypeDTOMap);
         double compensation = 0;
         if(ruleTemplateValid && ruleTemplate.getConditionalCompensation().getConditionalCompensationTypes().contains(ConditionalCompensationType.MANUAL_PLANNING) && CollectionUtils.containsAny(ruleTemplate.getCalculateValueIfPlanned(),staffAdditionalInfoDTO.getCalculateValueIfPlanneds())) {
             ZonedDateTime todayDate = asZonedDateTime(LocalDate.now()).with(LocalTime.MIN);

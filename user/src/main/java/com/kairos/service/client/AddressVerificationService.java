@@ -10,7 +10,6 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.country.HousingTypeService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +38,6 @@ public class AddressVerificationService {
 
     @Inject
     private HousingTypeService housingTypeService;
-    @Inject
-    IntegrationService integrationService;
 
     @Inject
     private ClientGraphRepository clientGraphRepository;

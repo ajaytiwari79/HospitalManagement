@@ -270,6 +270,7 @@ public class TimeSlotService {
             timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
             timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
         }
+
         timeSlotRelationshipGraphRepository.saveAll(timeSlotSetTimeSlotRelationships);
         List<TimeSlotSet> timeSlotSets = organization.getTimeSlotSets();
         timeSlotSets.add(timeSlotSet);

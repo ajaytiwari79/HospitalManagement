@@ -221,7 +221,7 @@ public class EmploymentTypeService {
         Boolean settingUpdated = employmentTypeGraphRepository.setEmploymentTypeSettingsForOrganization(unitId, employmentTypeId,
                 organizationEmploymentTypeDTO.isAllowedForContactPerson(),
                 organizationEmploymentTypeDTO.isAllowedForShiftPlan(),
-                organizationEmploymentTypeDTO.isAllowedForFlexPool(), organizationEmploymentTypeDTO.getPaymentFrequency(), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                organizationEmploymentTypeDTO.isAllowedForFlexPool(), organizationEmploymentTypeDTO.getPaymentFrequency(), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
         if (settingUpdated) {
             return organizationEmploymentTypeDTO;
         } else {

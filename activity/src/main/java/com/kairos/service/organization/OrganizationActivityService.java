@@ -738,7 +738,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     private LocalDate getGracePeriodExpireDate(Phase phase,boolean management) {
-        ZonedDateTime startDate = DateUtils.asZonedDateTime(DateUtils.getStartOfDay(DateUtils.getCurrentDate()));
+        ZonedDateTime startDate = DateUtils.asZonedDateTime(DateUtils.getStartOfDay(DateUtils.getDate()));
         ZonedDateTime endDate;
         if (management) {
             endDate = startDate.minusDays(phase.getGracePeriodByStaff() + phase.getGracePeriodByManagement()).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusDays(1);

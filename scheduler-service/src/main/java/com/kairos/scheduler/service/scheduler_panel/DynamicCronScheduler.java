@@ -143,7 +143,7 @@ public class DynamicCronScheduler{
     private Runnable getTask(SchedulerPanel schedulerPanel, CronTrigger trigger, TimeZone timeZone) {
         return () -> {
             logger.info("control pannel exist--> " + schedulerPanel.getId());
-            schedulerPanel.setLastRunTime(DateUtils.getCurrentDate());
+            schedulerPanel.setLastRunTime(DateUtils.getDate());
             if (!schedulerPanel.isOneTimeTrigger()) {
                 schedulerPanel.setNextRunTime(getNextExecutionTime(trigger, schedulerPanel.getLastRunTime(), timeZone));
             } else {

@@ -206,12 +206,12 @@ public class SkillService {
 
         if (isSelected) {
             if (unitGraphRepository.isSkillAlreadyExist(id, skillId) == 0) {
-                unitGraphRepository.addSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                unitGraphRepository.addSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
             } else {
-                unitGraphRepository.updateSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                unitGraphRepository.updateSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
             }
         } else {
-            unitGraphRepository.removeSkillFromOrganization(id, skillId, DateUtils.getCurrentDate().getTime());
+            unitGraphRepository.removeSkillFromOrganization(id, skillId, DateUtils.getDate().getTime());
         }
         return getAllAvailableSkills(id);
 
@@ -305,7 +305,7 @@ public class SkillService {
 
         }
 
-        long lastModificationDate = DateUtils.getCurrentDate().getTime();
+        long lastModificationDate = DateUtils.getDate().getTime();
         if (isSelected) {
             staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), getCurrentLocalDate().toString(), lastModificationDate, BASIC, true);
         } else {
@@ -438,10 +438,10 @@ public class SkillService {
             if(isStaffAndSkillRelationshipExistMoreThenOne){
                 staffGraphRepository.deleteSkill(staffId,removedSkillIds);
             }
-            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getCurrentDate().getTime(), BASIC, true);
+            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getDate().getTime(), BASIC, true);
             response = prepareSelectedSkillResponse(staffId, removedSkillIds, unitId);
         } else {
-            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime());
+            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getDate().getTime());
             response =Collections.emptyList();
 
         }
