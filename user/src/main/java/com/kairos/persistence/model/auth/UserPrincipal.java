@@ -77,6 +77,7 @@ public class UserPrincipal implements UserDetails, Authentication {
         details.setSystemAdmin(this.user.getSystemAdmin());
         details.setLastSelectedOrganizationCategory(this.user.getLastSelectedOrganizationCategory());
         details.setProfilePic(this.user.getProfilePic());
+        details.setLanguage(this.user.getUserLanguage().getName().toLowerCase());
         return details;
     }
 

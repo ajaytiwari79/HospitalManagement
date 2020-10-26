@@ -1,9 +1,11 @@
 package com.kairos.wrapper.activity;
 
 import com.kairos.commons.annotation.PermissionClass;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.CompositeShiftActivityDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.Activity;
@@ -13,10 +15,13 @@ import com.kairos.persistence.model.activity.tabs.ActivityTimeCalculationSetting
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 /**
  * Created by prerna on 16/12/17.
@@ -70,5 +75,22 @@ public class ActivityTagDTO {
         this.tags = tags;
         this.state = activity.getState();
         return this;
+    }
+
+
+    public String getName() {
+        if(TranslationUtil.isVerifyTranslationDataOrNotForName(translations)) {
+            return translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName();
+        }else {
+            return name;
+        }
+    }
+
+    public String getDescription() {
+        if(TranslationUtil.isVerifyTranslationDataOrNotForDescription(translations)) {
+                return translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getDescription();
+            }else {
+                return description;
+        }
     }
 }
