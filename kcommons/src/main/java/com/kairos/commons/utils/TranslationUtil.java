@@ -30,7 +30,7 @@ public class TranslationUtil {
     }
 
     public static String getName(Map<String, TranslationInfo> translations, String name) {
-        Boolean isNullOrEmptyString = isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName());
+        Boolean isNullOrEmptyString = isNotNull(translations) && isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName());
         if(isNullOrEmptyString) {
             return translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName();
         }else {
@@ -39,7 +39,7 @@ public class TranslationUtil {
     }
 
     public static String getDescription(Map<String, TranslationInfo> translations, String description) {
-        Boolean isNullOrEmptyString = isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getDescription());
+        Boolean isNullOrEmptyString = isNotNull(translations) && isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getDescription());
         if(isNullOrEmptyString) {
             return translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName();
         }else {
