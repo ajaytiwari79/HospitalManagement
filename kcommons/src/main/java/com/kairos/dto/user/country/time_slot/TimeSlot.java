@@ -22,7 +22,10 @@ public class TimeSlot {
         this.endHour = endHour;
     }
 
-
-
-
+    public TimeSlot(String name, int startHour, int endHour, boolean shiftStartTime) {
+        this.name = name;
+        this.startHour = startHour;
+        this.endHour = endHour;
+        this.shiftStartTime = shiftStartTime;
+    }
 }

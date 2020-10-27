@@ -34,6 +34,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.kpi.YAxisConfig;
@@ -46,6 +47,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.persistence.repository.time_slot.TimeSlotRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.PlannedTimeTypeService;
@@ -54,6 +56,7 @@ import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.reason_code.ReasonCodeService;
 import com.kairos.service.shift.ShiftService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -93,6 +96,8 @@ public class CounterDataService {
     private DayTypeService dayTypeService;
     @Inject
     private ReasonCodeService reasonCodeService;
+    @Inject
+    private TimeSlotRepository timeSlotRepository;
     @Inject
     private CounterRepository counterRepository;
     @Inject
@@ -217,6 +222,7 @@ public class CounterDataService {
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
         defaultKpiDataDTO.setDayTypeDTOS(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         defaultKpiDataDTO.setReasonCodeDTOS(reasonCodeService.getReasonCodesByUnitId(refId, FORCEPLAN));
+        defaultKpiDataDTO.setTimeSlotDTOS(timeSlotRepository.findByUnitIdInAndTimeSlotTypeOrderByStartDate(Arrays.asList(refId), TimeSlotType.SHIFT_PLANNING));
         getSelectedFilterDefaultData(level, criteriaList, kpi, defaultKpiDataDTO);
         setKpiProperty(applicableKPIS.get(0), criteriaList, kpi);
         return kpi;

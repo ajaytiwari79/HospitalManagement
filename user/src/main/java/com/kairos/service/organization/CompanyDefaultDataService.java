@@ -45,7 +45,7 @@ public class CompanyDefaultDataService {
     @Inject private CountryGraphRepository countryGraphRepository;
 
 
-    public void createDefaultDataInUnit(Long parentId, List<Unit> units, Long countryId, List<TimeSlot> timeSlots) {
+    public void createDefaultDataInUnit(Long parentId, List<Unit> units, Long countryId) {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId, parentId);
         List<EmploymentType> employmentTypes = countryGraphRepository.getEmploymentTypeByCountry(countryId,false);
         List<Long> employmentTypeIds = employmentTypes.stream().map(UserBaseEntity::getId).collect(Collectors.toList());
@@ -61,7 +61,6 @@ public class CompanyDefaultDataService {
             activityIntegrationService.createDefaultKPISetting(
                     new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()),
                             null, parentId, null), unit.getId());
-            timeSlotService.createDefaultTimeSlots(unit, timeSlots);
             vrpClientService.createDefaultPreferredTimeWindow(unit);
             activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId());
             gdprIntegrationService.createDefaultDataForOrganization(countryId, unit.getId());
@@ -69,13 +68,12 @@ public class CompanyDefaultDataService {
         });
     }
 
-    public void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap, List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
+    public void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap,  OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
             orgTypeAndSubTypeDTO.setSubTypeId(organization.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
             orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
             activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), orgTypeAndSubTypeDTO);
             unitGraphRepository.linkWithRegionLevelOrganization(organization.getId());
             activityIntegrationService.createDefaultKPISetting(new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(), organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap), organization.getId());
-            timeSlotService.createDefaultTimeSlots(organization, timeSlots);
             organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
             organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
             gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());

@@ -1,7 +1,6 @@
 package com.kairos.service.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.commons.config.ApplicationContextProviderNonManageBean;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
@@ -10,8 +9,6 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.activity.task.StaffTaskDTO;
 import com.kairos.dto.activity.task_type.TaskTypeAggregateResult;
-import com.kairos.dto.planner.vrp.TaskAddress;
-import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
 import com.kairos.dto.user.staff.ContactPersonDTO;
 import com.kairos.dto.user.staff.client.ClientExceptionTypesDTO;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
@@ -27,7 +24,6 @@ import com.kairos.persistence.model.client.query_results.ClientStaffQueryResult;
 import com.kairos.persistence.model.client.relationships.ClientContactPersonRelationship;
 import com.kairos.persistence.model.client.relationships.ClientLanguageRelation;
 import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
-import com.kairos.persistence.model.country.default_data.CitizenStatusDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
@@ -40,7 +36,6 @@ import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQu
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
-import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
@@ -57,27 +52,20 @@ import com.kairos.rest_client.*;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.ClientPersonalCalenderPrerequisiteDTO;
-import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
@@ -628,56 +616,6 @@ public class ClientService {
         citizenStaffList.add(clientMap);
     }
 
-    public Map<String, Object> getOrganizationClientsWithPlanning(Long organizationId) {
-        Map<String, Object> response = new HashMap<>();
-        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
-        if (timeSlotData != null) {
-            response.put("timeSlotList", timeSlotData);
-        }
-        return response;
-    }
-
-     public CompletableFuture<Boolean> getPreRequisiteData(Long organizationId, Map<String, Object> clientData, List<Map<String, Object>> clientList) throws InterruptedException, ExecutionException {
-        Callable<Map<String, Object>> callableTaskDemand = () -> taskDemandRestClient.getOrganizationClientsInfo(organizationId, clientList);
-        Future<Map<String, Object>> futureTaskDemand = asynchronousService.executeAsynchronously(callableTaskDemand);
-        if (futureTaskDemand.get() != null) {
-            clientData.putAll(futureTaskDemand.get());
-        }
-        Callable<Map<String, Object>> callableTimeSlotData = () -> timeSlotService.getTimeSlots(organizationId);
-        Future<Map<String, Object>> futureTimeSlotData = asynchronousService.executeAsynchronously(callableTimeSlotData);
-        if (futureTimeSlotData.get() != null) {
-            clientData.put("timeSlotList", futureTimeSlotData.get());
-        }
-        Callable<List<OrganizationServiceQueryResult>> callableOrganizationServices = () -> organizationServiceRepository.getOrganizationServiceByOrgId(organizationId);
-        Future<List<OrganizationServiceQueryResult>> futureOrganizationServices = asynchronousService.executeAsynchronously(callableOrganizationServices);
-        if (futureOrganizationServices.get() != null) {
-            clientData.put("serviceTypes", futureOrganizationServices.get());
-        }
-        Callable<List<Map<String, Object>>> callableTagLists = () -> organizationMetadataRepository.findAllByIsDeletedAndUnitId(organizationId);
-        Future<List<Map<String, Object>>> futureTagLists = asynchronousService.executeAsynchronously(callableTagLists);
-        if (futureTagLists.get() != null) {
-            List<Object> localAreaTagsList = new ArrayList<>();
-            for (Map<String, Object> map : futureTagLists.get()) {
-                localAreaTagsList.add(map.get("tags"));
-            }
-            clientData.put("localAreaTags", localAreaTagsList);
-        }
-        return CompletableFuture.completedFuture(true);
-    }
-
-    public Map<String, Object> getOrganizationClients(Long organizationId) throws InterruptedException, ExecutionException {
-        Map<String, Object> clientData = new HashMap<>();
-        List<Map<String, Object>> clientList = unitGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        if (clientList.isEmpty()) {
-            return null;
-        }
-        Long countryId = countryGraphRepository.getCountryIdByUnitId(organizationId);
-        List<CitizenStatusDTO> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
-        clientData.put("clientStatusList", clientStatusList);
-        CompletableFuture<Boolean> allBasicDetails = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(ClientService.class).getPreRequisiteData(organizationId, clientData, clientList);
-        CompletableFuture.allOf(allBasicDetails).join();
-        return clientData;
-    }
 
     public Map<String, Object> getOrganizationAllClients(long unitId, long staffId) {
         List<Map<String, Object>> mapList = unitGraphRepository.getAllClientsOfOrganization(unitId);
@@ -691,9 +629,6 @@ public class ClientService {
         return response;
     }
 
-    public List<Map<String, Object>> getOrganizationClientsExcludeDead(Long organizationId) {
-        return unitGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-    }
 
     public ClientStaffInfoDTO getStaffClientInfo(Long clientId, String loggedInUserName) {
         Client client = getCitizenById(clientId);
@@ -747,39 +682,6 @@ public class ClientService {
         return citizenPlanningMap;
     }
 
-<<<<<<< HEAD
-    public TaskDemandVisitWrapper getPrerequisitesForTaskCreation(String userName, long unitId, long citizenId) {
-        Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Client citizen = clientGraphRepository.findOne(Long.valueOf(citizenId), 0);
-        ClientHomeAddressQueryResult clientHomeAddressQueryResult = clientGraphRepository.getHomeAddress(citizen.getId());
-        ZipCode zipCode = clientHomeAddressQueryResult.getZipCode();
-        ContactAddress homeAddress = clientHomeAddressQueryResult.getHomeAddress();
-        TaskAddress taskAddress = new TaskAddress("DK",zipCode.getZipCode(),homeAddress.getCity(),homeAddress.getStreet(),homeAddress.getHouseNumber());
-        Staff loggedInUser = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(userName).getId());
-        List<Long> preferredStaffIds = getPreferredStaffVisitourIds(citizen.getId());
-        List<Long> forbiddenStaffIds = getForbiddenStaffVisitourIds(citizen.getId());
-        return new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(citizen, preferredStaffIds, forbiddenStaffIds, taskAddress).staffId(loggedInUser.getId()).flsCredentials(flsCredentials).build();
-=======
-    public TaskDemandVisitWrapper getClientDetailsForTaskDemandVisit(TaskDemandRequestWrapper taskDemandWrapper) {
-        Client client = clientGraphRepository.findOne(taskDemandWrapper.getCitizenId());
-        List<Long> forbiddenStaff = getForbiddenStaffVisitourIds(taskDemandWrapper.getCitizenId());
-        List<Long> preferredStaff = getPreferredStaffVisitourIds(taskDemandWrapper.getCitizenId());
-        ClientHomeAddressQueryResult clientHomeAddressQueryResult = clientGraphRepository.getHomeAddress(client.getId());
-        if (clientHomeAddressQueryResult == null) {
-            return null;
-        }
-        ZipCode zipCode = clientHomeAddressQueryResult.getZipCode();
-        ContactAddress homeAddress = clientHomeAddressQueryResult.getHomeAddress();
-        TaskAddress taskAddress = new TaskAddress("DK",zipCode.getZipCode(),homeAddress.getCity(),homeAddress.getStreet(),homeAddress.getHouseNumber());
-        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId());
-        Long countryId = countryGraphRepository.getCountryIdByUnitId(taskDemandWrapper.getUnitId());
-        List<LocalDate> publicHolidayList = countryGraphRepository.getAllCountryHolidaysBetweenDates(countryId, DateUtils.asLocalDate(taskDemandWrapper.getStartDate()), DateUtils.asLocalDate(taskDemandWrapper.getEndDate()));
-        List<CountryHolidayCalendarQueryResult> countryHolidayCalenderList = countryGraphRepository.getCountryHolidayCalendarBetweenDates(countryId, DateUtils.asLocalDate(taskDemandWrapper.getStartDate()), DateUtils.asLocalDate(taskDemandWrapper.getEndDate()));
-        TaskDemandVisitWrapper taskDemandVisitWrapper = new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(client,forbiddenStaff, preferredStaff, taskAddress).timeSlotMap(timeSlotMap).countryId(countryId).publicHolidayList(publicHolidayList).build();
-        taskDemandVisitWrapper.setCountryHolidayCalenderList(countryHolidayCalenderList);
-        return taskDemandVisitWrapper;
->>>>>>> 79ec90147e34f49bb6ae01ba0d302cb7a4f9e78d
-    }
 
     public List<Long> getClientIds(long unitId) {
         return clientGraphRepository.getCitizenIds(unitId);
@@ -787,25 +689,6 @@ public class ClientService {
 
     public List<ClientOrganizationIdsDTO> getCitizenIdsByUnitIds(List<Long> unitIds) {
         return clientGraphRepository.getCitizenIdsByUnitIds(unitIds);
-    }
-
-    public OrganizationClientWrapper getOrgnizationClients(Long organizationId, OAuth2Authentication auth2Authentication) {
-        logger.debug("Finding citizen with Id: {}" , organizationId);
-        List<Map<String, Object>> mapList = unitGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        logger.debug("CitizenList Size: {}" , mapList.size());
-        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(auth2Authentication.getUserAuthentication().getPrincipal().toString()).getId());
-        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
-        OrganizationClientWrapper organizationClientWrapper = new OrganizationClientWrapper(mapList, timeSlotData);
-        organizationClientWrapper.setStaffId(staff.getId());
-        return organizationClientWrapper;
-    }
-
-    public OrganizationClientWrapper getOrgnizationClients(Long organizationId, List<Long> citizenId) {
-        logger.info("Finding citizen with Id:{} " , citizenId);
-        List<Map<String, Object>> mapList = unitGraphRepository.getClientsByClintIdList(citizenId);
-        logger.info("CitizenList Size: {}" , mapList.size());
-        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
-        return new OrganizationClientWrapper(mapList, timeSlotData);
     }
 
     public List<Client> getClientsByIdsInList(List<Long> citizenIds) {

@@ -11,6 +11,7 @@ import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 import lombok.Getter;
 import lombok.Setter;
@@ -58,6 +59,8 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject private TimeTypeService timeTypeService;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
     @Override
     public <T> List<StaffShiftDetailsDTO> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate, boolean includeDateComparison) {
@@ -190,7 +193,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     }
 
     private void prepareTimeSlotCriteria(final Criteria criteria, final Set<String> values, final List<Criteria> criteriaArrayList, final Long unitId) {
-        List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlotByNames(unitId, values);
+        List<TimeSlotDTO> timeSlotDTOS = timeSlotSetService.getUnitTimeSlotByNames(unitId, values);
         Criteria timeslotCriteria;
         for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
             timeslotCriteria = new Criteria();

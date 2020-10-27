@@ -5,7 +5,9 @@ import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,6 +18,8 @@ import java.util.List;
 @Document
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TimeSlotSet extends MongoBaseEntity {
     private String name;
     private LocalDate startDate;
@@ -34,8 +38,5 @@ public class TimeSlotSet extends MongoBaseEntity {
 
     }
 
-    public void updateTimeSlotSet(TimeSlotSetDTO timeSlotSetDTO){
-        this.endDate = timeSlotSetDTO.getEndDate();
-        this.name = timeSlotSetDTO.getName();
-    }
+
 }

@@ -83,7 +83,7 @@ public class CalculatePlannedHoursAndScheduledHours {
         this.timeBankCalculationService = timeBankCalculationService;
     }
 
-    public CalculatePlannedHoursAndScheduledHours(TimeBankCalculationService timeBankCalculationService,Map<Long, DayTypeDTO> dayTypeDTOMap,StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public CalculatePlannedHoursAndScheduledHours(TimeBankCalculationService timeBankCalculationService,Map<BigInteger, DayTypeDTO> dayTypeDTOMap,StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         this.timeBankCalculationService = timeBankCalculationService;
         this.ctaTimeBankMinMap = new HashMap<>();
         this.dayTypeDTOMap = dayTypeDTOMap;

@@ -8,6 +8,7 @@ import com.kairos.enums.FilterType;
 import com.kairos.enums.RealTimeStatus;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -34,12 +35,14 @@ public class ShiftCriteriaBuilderService {
     private static final String PLANNED_TIME_IDS = "activities.plannedTimes.plannedTimeId";
     private static final String VALIDATED_BY_ROLES = "accessGroupRole";
     private static final String START_TIME = "shiftStartTime";
-    private Set<FilterType> FILTER_WHICH_REQUIRED_DATA = newHashSet(TIME_SLOT, TEAM,FUNCTIONS);
+    private Set<FilterType> FILTER_WHICH_REQUIRED_DATA = newHashSet(TEAM,FUNCTIONS);
 
     @Inject
     private TimeTypeService timeTypeService;
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
 
     public <T> void updateCriteria(Long unitId,Map<FilterType, Set<T>> filterTypeMap, Criteria criteria,RequiredDataForFilterDTO requiredDataForFilterDTO){
@@ -49,6 +52,7 @@ public class ShiftCriteriaBuilderService {
             if(requiredDataFromUserService) {
                 requiredDataForFilterDTO = userIntegrationService.getRequiredDataForFilter(unitId, filterTypeMap);
             }
+            requiredDataForFilterDTO.setTimeSlotDTOS(timeSlotSetService.getUnitTimeSlotByNames(unitId,(Set<String>) filterTypeMap.get(TIME_SLOT)));
         }
         updateTimeTypeCriteria(filterTypeMap,criteria,requiredDataForFilterDTO);
         updateFunctionCriteria(filterTypeMap,criteria,requiredDataForFilterDTO);

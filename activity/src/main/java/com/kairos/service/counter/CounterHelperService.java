@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.day_type.CountryHolidayCalenderReposito
 import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.day_type.CountryHolidayCalenderService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.utils.counter.KPIUtils;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,8 @@ public class CounterHelperService {
     private CountryHolidayCalenderRepository countryHolidayCalenderRepository;
     @Inject
     private DayTypeRepository dayTypeRepository;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
     public Object[] getKPIdata(Map<FilterType, List> filterBasedCriteria,ApplicableKPI applicableKPI, List<LocalDate> filterDates, List<Long> staffIds, List<Long> employmentTypeIds, List<Long> unitIds, Long organizationId){
         List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), isNull(applicableKPI) ? 0 : applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates,applicableKPI.getDateForKPISetCalculation());
@@ -69,6 +72,7 @@ public class CounterHelperService {
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiAllDefaultData(UserContext.getUserDetails().getCountryId(), staffEmploymentTypeDTO);
         defaultKpiDataDTO.setDateTimeIntervals(dateTimeIntervals);
         defaultKpiDataDTO.setHolidayCalenders(countryHolidayCalenderRepository.getAllByCountryIdAndHolidayDateBetween(UserContext.getUserDetails().getCountryId(),LocalDate.parse(staffEmploymentTypeDTO.getStartDate()), LocalDate.parse(staffEmploymentTypeDTO.getEndDate())));
+        defaultKpiDataDTO.setTimeSlotDTOS(timeSlotSetService.getUnitTimeSlot(staffEmploymentTypeDTO.getOrganizationId()));
         return defaultKpiDataDTO;
     }
 

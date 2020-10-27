@@ -48,7 +48,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffRetrievalService;
@@ -109,8 +108,6 @@ public class EmploymentTypeService {
     @Inject
     private ExpertiseService expertiseService;
     @Inject private TagGraphRepository tagGraphRepository;
-    @Inject
-    private TimeSlotService timeSlotService;
     @Inject
     private SkillService skillService;
     @Inject
@@ -373,17 +370,8 @@ public class EmploymentTypeService {
 
     public DefaultKpiDataDTO getKpiDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
-        Long countryId = countryGraphRepository.getCountryIdByUnitId(staffEmploymentTypeDTO.getOrganizationId());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), organizationBaseEntity instanceof Organization,staffEmploymentTypeDTO.getTagIds()), StaffKpiFilterDTO.class);
-        List<CountryHolidayCalenderDTO> publicHolidaysResult = activityIntegrationService.getCountryHolidaysByCountryId(countryId);
-        Map<BigInteger, List<CountryHolidayCalenderDTO>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.getDayTypeId() != null).collect(Collectors.groupingBy(CountryHolidayCalenderDTO::getDayTypeId, Collectors.toList()));
-        List<DayTypeDTO> dayTypes = activityIntegrationService.getDayTypesByCountryId(countryId);
-        List<DayTypeDTO> dayTypeDTOS = dayTypes.stream().map(dayType ->
-                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), ObjectMapperUtils.copyCollectionPropertiesByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings(),dayType.getColorCode())
-        ).collect(Collectors.toList());
-        List<Long> unitIds = ObjectUtils.isCollectionNotEmpty(staffEmploymentTypeDTO.getUnitIds()) ? staffEmploymentTypeDTO.getUnitIds() : Arrays.asList(staffEmploymentTypeDTO.getOrganizationId());
-        List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(unitIds, TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
-        return new DefaultKpiDataDTO(staffKpiFilterDTOS, dayTypeDTOS, timeSlotSetDTOS);
+        return new DefaultKpiDataDTO(staffKpiFilterDTOS);
     }
 
     public DefaultKpiDataDTO getKpiFilterDefaultData(Long unitId) {
@@ -405,11 +393,7 @@ public class EmploymentTypeService {
 
     public DefaultKpiDataDTO getKpiAllDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = getStaffByKpiFilter(staffEmploymentTypeDTO);
-        List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getUnitTimeSlot(staffEmploymentTypeDTO.getOrganizationId());
-//        LocalDate startDate = asLocalDate(staffEmploymentTypeDTO.getStartDate());
-//        LocalDate endDate = asLocalDate(staffEmploymentTypeDTO.getEndDate());
-        //List<CountryHolidayCalenderDTO> holidayCalenders = ObjectMapperUtils.copyCollectionPropertiesByMapper(countryHolidayCalenderService.getCountryHolidayCalenders(UserContext.getUserDetails().getCountryId(), startDate, endDate), CountryHolidayCalenderDTO.class);
-        return DefaultKpiDataDTO.builder().staffKpiFilterDTOs(staffKpiFilterDTOS).timeSlotDTOS(timeSlotDTOS).build();
+        return DefaultKpiDataDTO.builder().staffKpiFilterDTOs(staffKpiFilterDTOS).build();
     }
 
     public Map<String, TranslationInfo> updateTranslationOfEmploymentType(Long employmentTypeId, Map<String,TranslationInfo> translations) {

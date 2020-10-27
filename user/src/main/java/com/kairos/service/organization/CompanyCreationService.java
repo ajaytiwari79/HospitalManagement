@@ -587,11 +587,10 @@ public class CompanyCreationService {
         userSchedulerJobService.createJobForAddPlanningPeriod(organization);
         addStaffsInChatServer(staffPersonalDetailQueryResults.stream().map(StaffPersonalDetailQueryResult::getStaff).collect(Collectors.toList()));
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(parent.getId());
-        List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(UserBaseEntity::getId).collect(Collectors.toList());
         List<Long> employmentIds = employmentTypeGraphRepository.getEmploymentTypeIdsByCountryId(countryId);
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds, countryId, organization instanceof Organization, employmentIds);
-        createDefaultDataForOrganizationAndUnit(countryId, parentOrganizationId, organization, parent, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO);
+        createDefaultDataForOrganizationAndUnit(countryId, parentOrganizationId, organization, parent, countryAndOrgAccessGroupIdsMap,  orgTypeAndSubTypeDTO);
         QueryResult organizationQueryResult = generateOrgHierarchyQueryResult(organization, parent);
         createDefaultKPISettings(staffPersonalDetailQueryResults, unitIds);
         organizationQueryResult.setHubId(unitGraphRepository.getHubIdByOrganizationId(organizationId));
@@ -618,12 +617,12 @@ public class CompanyCreationService {
         return units;
     }
 
-    private void createDefaultDataForOrganizationAndUnit(Long countryId, Long parentOrganizationId, OrganizationBaseEntity organization, Organization parent, Map<Long, Long> countryAndOrgAccessGroupIdsMap, List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
+    private void createDefaultDataForOrganizationAndUnit(Long countryId, Long parentOrganizationId, OrganizationBaseEntity organization, Organization parent, Map<Long, Long> countryAndOrgAccessGroupIdsMap,  OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
         if (parentOrganizationId == null) {
-            companyDefaultDataService.createDefaultDataForParentOrganization(parent, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
-            companyDefaultDataService.createDefaultDataInUnit(organization.getId(), parent.getUnits(), countryId, timeSlots);
+            companyDefaultDataService.createDefaultDataForParentOrganization(parent, countryAndOrgAccessGroupIdsMap,  orgTypeAndSubTypeDTO, countryId);
+            companyDefaultDataService.createDefaultDataInUnit(organization.getId(), parent.getUnits(), countryId);
         } else {
-            companyDefaultDataService.createDefaultDataInUnit(parentOrganizationId, Arrays.asList((Unit) organization), countryId, timeSlots);
+            companyDefaultDataService.createDefaultDataInUnit(parentOrganizationId, Arrays.asList((Unit) organization), countryId);
         }
     }
 

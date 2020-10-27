@@ -31,7 +31,6 @@ import com.kairos.service.client.ExternalClientService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
-import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffCreationService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.system_setting.SystemLanguageService;
@@ -268,25 +267,6 @@ public class CitizenService {
         return staffGraphRepository.save(staff);
     }
 
-    public void getTimeSlots(Long unitId) {
-        RestTemplate loginTemplate = new RestTemplate();
-        HttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
-        HttpMessageConverter stringHttpMessageConverterNew = new StringHttpMessageConverter();
-        loginTemplate.getMessageConverters().add(formHttpMessageConverter);
-        loginTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-        loginTemplate.getMessageConverters().add(stringHttpMessageConverterNew);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(AUTHORIZATION, BEARER + " " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
-        Map map = new HashMap<String, String>();
-        map.put("Content-Type", "application/json");
-        HttpEntity<String> headersElements = new HttpEntity<>(headers);
-        ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_GET_TIME_SLOTS), HttpMethod.GET, headersElements, String.class);
-        JSONObject jsonObject = new JSONObject();
-        JSONArray jsonArray = new JSONArray(responseEntity.getBody());
-        jsonObject.put("kmdTimeSlotDTOList", jsonArray);
-        timeSlotService.updateTimeSlotType(unitId, false);
-    }
 
 
 }

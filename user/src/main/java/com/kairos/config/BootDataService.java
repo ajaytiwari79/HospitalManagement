@@ -176,7 +176,7 @@ public class BootDataService {
 
             userBaseRepository.createFirstDBNode();
 
-            createStandardTimeSlots();
+            //createStandardTimeSlots();
             createMasterSkills();
             createOrganizationServices();
             createCountries();
@@ -270,17 +270,6 @@ public class BootDataService {
 
     }*/
 
-    private void createStandardTimeSlots() {
-        String timeSlotsNames[] = new String[]{"Day", "Evening", "Night"};
-        List<TimeSlot> standardTimeSlots = new ArrayList<>();
-        for (String timeSlotName : timeSlotsNames) {
-            TimeSlot timeSlot = new TimeSlot();
-            timeSlot.setName(timeSlotName);
-            timeSlot.setSystemGeneratedTimeSlots(true);
-            standardTimeSlots.add(timeSlot);
-        }
-        timeSlotGraphRepository.saveAll(standardTimeSlots);
-    }
 
     private void createGeoGraphicalData() {
         createRegion();
@@ -430,7 +419,6 @@ public class BootDataService {
          ContactAddress contactAddress = createContactAddress();
          kairosCountryLevel.setContactAddress(contactAddress);
 
-        organizationService.createOrganization(kairosCountryLevel,  true);
 
         createSuperAdminAccessGroup();
         createPosition(adminAsStaff);
@@ -568,9 +556,6 @@ public class BootDataService {
         kairosRegionLevel.setBoardingCompleted(true);
         ContactAddress contactAddress = getContactAddress();
         kairosRegionLevel.setContactAddress(contactAddress);
-        OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
-        organizationService.createOrganization(kairosRegionLevel,  true);
-
         //organizationGraphRepository.addOrganizationServiceInUnit(kairosRegionLevel.getId(),Arrays.asList(privateOrganization.getOrganizationServiceList().get(0).getId()),DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
     }
 

@@ -74,6 +74,7 @@ import com.kairos.service.reason_code.ReasonCodeService;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftTemplateService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.service.unit_settings.*;
 import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.wrapper.activity.ActivitySettingsWrapper;
@@ -192,6 +193,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private CountryHolidayCalenderService countryHolidayCalenderService;
     @Inject
     private ReasonCodeService reasonCodeService;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -553,6 +556,7 @@ public class OrganizationActivityService extends MongoBaseService {
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
         unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
         activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases, orgTypeAndSubTypeDTO.getEmploymentTypeIds());
+        timeSlotSetService.createDefaultTimeSlots(unitId);
         createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
         TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
         timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);

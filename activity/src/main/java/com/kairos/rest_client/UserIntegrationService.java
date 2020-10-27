@@ -213,18 +213,6 @@ public class UserIntegrationService {
         }, employmentId);
     }
 
-    public Boolean restoreFunctionFromEmploymentByDate(Long unitId, Long employmentId, Map<Long, Set<LocalDate>> dateAndFunctionIdMap) {
-
-        return genericRestClient.publishRequest(dateAndFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTIONS_BY_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        }, employmentId);
-
-    }
-
-    public Map<LocalDate, Long> removeFunctionFromEmploymentByDates(Long unitId, Long employmentId, Set<LocalDate> dates) {
-        return genericRestClient.publishRequest(dates, unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, REMOVE_FUNCTIONS_BY_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate, Long>>>() {
-        }, employmentId);
-    }
-
     public Boolean applyFunction(Long unitId, Long employmentId, Map<LocalDate, Long> requestBody,HttpMethod httpMethod,List<NameValuePair>  queryParams) {
         return genericRestClient.publishRequest(requestBody, unitId, RestClientUrlType.UNIT, httpMethod, APPLY_FUNCTION, queryParams, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         }, employmentId);
@@ -297,31 +285,14 @@ public class UserIntegrationService {
         }, title);
     }
 
-    //CountryRestClient
-    public Object getAllContractType(Long countryId) {
-        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, CONTRACT_TYPE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {
-        });
-    }
 
-    public CountryDTO getCountryByOrganizationService(Long organizationServiceId) {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, COUNTRY_ORGANIZATION_SERVICE_URL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>>() {
-        }, organizationServiceId);
-    }
 
     public OrganizationTypeHierarchyQueryResult getOrgTypesHierarchy(Long countryId, Set<Long> organizationSubTypes) {
         return genericRestClient.publishRequest(organizationSubTypes, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, ORGANIZATION_TYPES_HIERARCHY, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationTypeHierarchyQueryResult>>() {
         });
     }
 
-    public List<Map<String, Object>> getSkillsByCountryForTaskType(Long countryId) {
-        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, TASK_TYPES_SKILLS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>>() {
-        });
-    }
 
-    public List<TimeSlot> getTimeSlotSetsOfCountry(Long countryId) {
-        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, TIME_SLOTS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlot>>>() {
-        });
-    }
 
     public CountryDTO getCountryById(long countryId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, COUNTRY_COUNTRY_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>>() {
@@ -548,36 +519,14 @@ public class UserIntegrationService {
         });
     }
 
-    public OrganizationClientWrapper getClientsByIds(List<Long> clientIds) {
-        return genericRestClient.publishRequest(clientIds, null, RestClientUrlType.UNIT, HttpMethod.POST, ORGANIZATION_CLIENTS_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationClientWrapper>>() {
-        });
-    }
 
     public List<Long> getCitizenIds() {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CLIENT_CLIENT_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {
         });
     }
 
-    public ClientStaffInfoDTO getClientStaffInfo(Long clientId) {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_CLIENT_STAFF_INFO_BY_CLIENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ClientStaffInfoDTO>>() {
-        }, clientId);
-    }
 
-    public Map<String, Object> getStaffAndCitizenHouseholds(Long citizenId, Long staffId) {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_STAFF_CITIZEN_HOUSEHOLDS_BY_CITIZEN_ID_AND_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
-        }, citizenId, staffId);
-    }
 
-    public List<Client> getCitizensByIdsInList(List<Long> citizenIds) {
-        return genericRestClient.publishRequest(citizenIds, null, RestClientUrlType.UNIT, HttpMethod.POST, CLIENT_BY_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Client>>>() {
-        });
-    }
-
-    //Note here 2nd argument is taken just because of unitId(might not present in UserContext) not null in url
-    public List<ClientOrganizationIds> getCitizenIdsByUnitIds(List<Long> unitIds) {
-        return genericRestClient.publishRequestWithoutAuth(unitIds, null, RestClientUrlType.UNIT, HttpMethod.POST, GET_UNIT_IDS_BY_CLIENT_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ClientOrganizationIds>>>() {
-        });
-    }
 
 
     //OrganizationRestClient
@@ -591,64 +540,20 @@ public class UserIntegrationService {
         });
     }
 
-    public Map<String, Object> getCommonDataOfOrganization(Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, COMMON_DATA, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
-        });
-    }
-
-    //TODO Testing
-    public boolean setOneTimeSyncPerformed(Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.PUT, ONE_TIME_SYNC, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        });
-    }
-
-    public boolean updateAutoGenerateTaskSettings(Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.PUT, AUTO_GENERATE_TASK_SETTINGS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        });
-    }
-
-    public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotName(Long unitId, Long timeSlotExternalId) {
-        return genericRestClient.publishRequestWithoutAuth(timeSlotExternalId, unitId, RestClientUrlType.UNIT, HttpMethod.POST, TIME_SLOT_NAME, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
-        });
-    }
-
-    public OrganizationDTO getOrganizationByTeamId(Long teamId) {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, GET_ORGANIZATION_BY_TEAM_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {
-        }, teamId);
-    }
-    public OrganizationDTO getParentOrganizationOfCityLevel(Long unitId) {
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_PARENT_ORGANIZATION_OF_CITY_LEVEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {
-        });
-    }
-
     public OrganizationDTO getParentOfOrganization(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_PARENT_OF_ORGANIZATION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {
         });
     }
 
 
-    public OrganizationStaffWrapper getOrganizationAndStaffByExternalId(String externalId, String staffTimeCare, String staffTimeCareEmploymentId) {
-        List<NameValuePair> queryParamList = new ArrayList<>();
-        queryParamList.add(new BasicNameValuePair("staffTimeCareId", staffTimeCare));
-        queryParamList.add(new BasicNameValuePair("staffTimeCareEmploymentId", staffTimeCareEmploymentId));
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, EXTERNAL_ID_URL, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationStaffWrapper>>() {
-        }, externalId);
-    }
 
     //TODO write implementation previously inside OrganizationRestClient this implementation was written only(here added so as not to break current functionality )
     public boolean isExistOrganization(Long orgId) {
         return getOrganizationDTO(orgId)!=null;
     }
 
-    public Map<String, Object> getTaskDemandSupplierInfo() {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_TASK_DEMAND_SUPPLIER_INFO, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
-        });
-    }
 
-    public Map<String, Object> getUnitVisitationInfo() {
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, UNIT_VISITATION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
-        });
-    }
+
 
     public boolean verifyOrganizationExpertizeAndRegions(OrganizationMappingDTO organizationMappingDTO) {
         return genericRestClient.publishRequest(organizationMappingDTO, null, RestClientUrlType.ORGANIZATION, HttpMethod.POST, VERIFY_ORGANIZATION_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {

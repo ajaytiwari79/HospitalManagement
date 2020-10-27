@@ -684,9 +684,6 @@ public class StaffFilterService {
             List<BigInteger> teamActivityIds = teamGraphRepository.getTeamActivityIdsByTeamIds(filterTypeMap.get(TEAM).stream().map(value -> new Long((String) value)).collect(Collectors.toList()));
             requiredDataForFilterDTO.setTeamActivityIds(teamActivityIds);
         }
-        if(filterTypeMap.containsKey(TIME_SLOT) && isCollectionNotEmpty(filterTypeMap.get(TIME_SLOT))) {
-            requiredDataForFilterDTO.setTimeSlotDTOS(timeSlotService.getUnitTimeSlotByNames(unitId,(Set<String>) filterTypeMap.get(TIME_SLOT)));
-        }
         return requiredDataForFilterDTO;
     }
 }

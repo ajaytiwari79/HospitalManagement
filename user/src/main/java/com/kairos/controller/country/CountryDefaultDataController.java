@@ -8,7 +8,6 @@ import com.kairos.persistence.model.user.language.LanguageLevel;
 import com.kairos.service.country.*;
 import com.kairos.service.language.LanguageLevelService;
 import com.kairos.service.language.LanguageService;
-import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -68,11 +67,6 @@ public class CountryDefaultDataController {
     @Inject
     private TimeSlotService timeSlotService;
 
-    @ApiOperation(value = "Get day types by id")
-    @RequestMapping(value = COUNTRY_URL + "/time_slots", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getTimeSlotOfCountry() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotsOfCountry());
-    }
 
     // TODO Integrated
 //    @ApiOperation(value = "Get day types by id")

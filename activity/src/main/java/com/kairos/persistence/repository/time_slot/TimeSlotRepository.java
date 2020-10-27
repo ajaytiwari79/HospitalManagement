@@ -1,5 +1,7 @@
 package com.kairos.persistence.repository.time_slot;
 
+import com.kairos.dto.user.country.time_slot.TimeSlot;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.time_slot.TimeSlotMode;
@@ -23,9 +25,9 @@ public interface TimeSlotRepository extends MongoBaseRepository<TimeSlotSet, Big
 
     TimeSlotSetDTO findById(Long timeSlotSetId);
 
-    List<TimeSlotSetDTO> findBySystemGeneratedTimeSlotsIsTrue();
+    List<TimeSlot> findBySystemGeneratedTimeSlotsTrue();
 
-    List<TimeSlotSetDTO> findByUnitIdInAndTimeSlotTypeOrderByStartDate(List<Long> unitId, TimeSlotType timeSlotType);
+    List<TimeSlotDTO> findByUnitIdInAndTimeSlotTypeOrderByStartDate(List<Long> unitId, TimeSlotType timeSlotType);
 
     List<TimeSlotSetDTO> findByUnitIdAndTimeSlotModeAndTimeSlotTypeOrderByStartDate(Long unitId, TimeSlotMode timeSlotMode, TimeSlotType timeSlotType);
 

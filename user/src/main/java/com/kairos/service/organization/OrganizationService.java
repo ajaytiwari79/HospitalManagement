@@ -193,16 +193,6 @@ public class OrganizationService {
     }
 
 
-    public Organization createOrganization(Organization organization, boolean baseOrganization) {
-        organizationGraphRepository.save(organization);
-        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
-        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
-        if (!baseOrganization) {
-            accessGroupService.createDefaultAccessGroups(organization);
-            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
-        }
-        return organization;
-    }
 
     public boolean deleteOrganization(long organizationId) {
         OrganizationBaseEntity organization = organizationBaseRepository.findOne(organizationId);
@@ -461,30 +451,6 @@ public class OrganizationService {
         return data;
     }
 
-    public Map<String, Object> getUnitVisitationInfo(long unitId) {
-        Map<String, Object> organizationResult = new HashMap();
-        Map<String, Object> unitData = new HashMap();
-        Map<String, Object> organizationTimeSlotList = timeSlotService.getTimeSlots(unitId);
-        unitData.put("organizationTimeSlotList", organizationTimeSlotList.get("timeSlots"));
-        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-        List<CitizenStatusDTO> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
-        unitData.put("clientStatusList", clientStatusList);
-        List<Object> localAreaTagsList = new ArrayList<>();
-        List<Map<String, Object>> tagList = organizationMetadataRepository.findAllByIsDeletedAndUnitId(unitId);
-        for (Map<String, Object> map : tagList) {
-            localAreaTagsList.add(map.get("tags"));
-        }
-        unitData.put("localAreaTags", localAreaTagsList);
-        unitData.put("serviceTypes", organizationServiceRepository.getOrganizationServiceByOrgId(unitId));
-        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(unitId);
-        if (timeSlotData != null) {
-            unitData.put("timeSlotList", timeSlotData);
-        }
-        organizationResult.put("unitData", unitData);
-        List<Map<String, Object>> citizenList = clientService.getOrganizationClientsExcludeDead(unitId);
-        organizationResult.put("citizenList", citizenList);
-        return organizationResult;
-    }
 
     public Map<String, Object> getTaskDemandSupplierInfo(Long unitId) {
         Map<String, Object> supplierInfo = new HashMap();
@@ -779,14 +745,6 @@ public class OrganizationService {
         return new RuleTemplateDefaultData(organizationTypeAndSubTypes, skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(), activityWithTimeTypeDTOS.getIntervals(), priorityGroupDefaultData1.getEmploymentTypes(), priorityGroupDefaultData1.getExpertises(), activityWithTimeTypeDTOS.getCounters());
     }
 
-    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId) {
-        Long countryId = UserContext.getUserDetails().getCountryId();
-        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
-        OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(unitId);
-        List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(organizationBaseEntity);
-        return new WTADefaultDataInfoDTO(presenceTypeDTOS, timeSlotDTOS, countryId);
-    }
-
     public RuleTemplateDefaultData getDefaultDataForRuleTemplateByUnit(Long unitId) {
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
         List<Skill> skills = skillGraphRepository.findAllSkillsByCountryId(countryId);
@@ -923,9 +881,8 @@ public class OrganizationService {
 
 
     public ShiftFilterDefaultData getFilterDataBySelfRosteringFilter(SelfRosteringFilterDTO selfRosteringFilterDTO) {
-        List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getUnitTimeSlot(selfRosteringFilterDTO.getUnitId());
         List<BigInteger> teamActivityIds = teamGraphRepository.getTeamActivityIdsByTeamIds(selfRosteringFilterDTO.getTeamIds().stream().map(value -> new Long(value)).collect(Collectors.toList()));
-        return new ShiftFilterDefaultData(timeSlotDTOS,teamActivityIds);
+        return new ShiftFilterDefaultData(null,teamActivityIds);
     }
 
     public List<Long> getAllUnitIdsByCountryId(Long countryId) {

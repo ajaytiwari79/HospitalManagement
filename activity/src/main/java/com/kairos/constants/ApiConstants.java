@@ -73,8 +73,6 @@ public final class ApiConstants {
     public static final String CONTRACT_TYPE = "/contractType";
     public static final String COUNTRY_ORGANIZATION_SERVICE_URL = "/country/organizaton_service/{organizationServiceId}";
     public static final String ORGANIZATION_TYPES_HIERARCHY = "/organization_types/hierarchy";
-    public static final String TASK_TYPES_SKILLS = "/task_type/skills";
-    public static final String TIME_SLOTS = "/time_slots";
     public static final String DAY_TYPES = "/day_types";
     public static final String INTEGRATION_UNIT_CITIZEN_UNIT_ID_FLSCRED = "/integration/unit/{citizenUnitId}/flsCred";
     public static final String COUNTRY_COUNTRY_ID = COUNTRY_ID + "/{countryId}";
@@ -107,7 +105,6 @@ public final class ApiConstants {
     public static final String GET_CLIENT_INFO = "/client/getClientInfo";
     public static final String CLIENT_CITIZEN_ID_UNIT_ID_TASK_PREREQUISITES = CLIENT_CITIZEN_ID + "/{unitId}/task_prerequisites";
     public static final String CLIENT_ORGANIZATION_CLIENTS = "/client/organization_clients";
-    public static final String ORGANIZATION_CLIENTS_IDS = "/client/organization_clients/ids";
     public static final String CLIENT_CLIENT_IDS = "/client/client_ids";
     public static final String GET_CLIENT_STAFF_INFO_BY_CLIENT_ID = CLIENT_ID_URL + "/getClientStaffInfo";
     public static final String GET_STAFF_CITIZEN_HOUSEHOLDS_BY_CITIZEN_ID_AND_STAFF_ID = CLIENT_CITIZEN_ID + STAFF_WITH_STAFF_ID + "/getStaffCitizenHouseholds";
@@ -128,7 +125,6 @@ public final class ApiConstants {
     public static final String GET_PARENT_OF_ORGANIZATION = "/getParentOfOrganization";
     public static final String EXTERNAL_ID_URL = "/external/{externalId}";
     public static final String GET_TASK_DEMAND_SUPPLIER_INFO = "/getTaskDemandSupplierInfo";
-    public static final String UNIT_VISITATION = "/unit_visitation";
     public static final String VERIFY_ORGANIZATION_EXPERTISE = "/verifyOrganizationExpertise";
     public static final String ORGANIZATION_TYPE_URL_ORGANIZATIONS = "/organization_type/{organizationTypeId}/organizations";
     public static final String ORGANIZATION_TYPE_AND_SUB_TYPES = "/organizationTypeAndSubTypes";

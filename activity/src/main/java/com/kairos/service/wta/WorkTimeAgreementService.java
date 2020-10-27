@@ -25,6 +25,7 @@ import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
@@ -66,6 +67,7 @@ import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.tag.TagService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -161,6 +163,8 @@ public class WorkTimeAgreementService{
     private PlannedTimeTypeService plannedTimeTypeService;
     @Inject
     private DayTypeService dayTypeService;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
@@ -461,10 +465,14 @@ public class WorkTimeAgreementService{
     public WTADefaultDataInfoDTO getDefaultWtaInfoForUnit(Long unitId) {
         WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = userIntegrationService.getWtaTemplateDefaultDataInfoByUnitId();
         List<ActivityDTO> activities = activityMongoRepository.findByDeletedFalseAndUnitId(unitId);
+        List<PresenceTypeDTO> presenceTypeDTOS=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, wtaDefaultDataInfoDTO.getCountryID());
+        List<TimeSlotDTO> timeSlotDTOS=timeSlotSetService.getShiftPlanningTimeSlotByUnit(unitId);
         wtaDefaultDataInfoDTO.setDayTypes(dayTypeService.getAllDayTypeByCountryId(UserContext.getUserDetails().getCountryId()));
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);
         wtaDefaultDataInfoDTO.setActivityList(activities);
+        wtaDefaultDataInfoDTO.setTimeSlots(timeSlotDTOS);
+        wtaDefaultDataInfoDTO.setPresenceTypes(presenceTypeDTOS);
         return wtaDefaultDataInfoDTO;
     }
 
