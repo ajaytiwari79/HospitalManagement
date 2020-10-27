@@ -3,7 +3,6 @@ package com.kairos.service.organization;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
@@ -12,23 +11,18 @@ import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.dto.activity.common.OrderAndActivityDTO;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
-import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
 import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
-import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.OrganizationCategory;
-import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
@@ -127,8 +121,6 @@ public class OrganizationService {
     private RegionService regionService;
     @Inject
     private KairosStatusGraphRepository kairosStatusGraphRepository;
-    @Inject
-    private TimeSlotService timeSlotService;
     @Inject
     private TeamGraphRepository teamGraphRepository;
     @Inject
@@ -288,10 +280,7 @@ public class OrganizationService {
         organizationBaseEntity.setClientSince(parseDate(organizationGeneral.getClientSince()).getTime());
         organizationBaseEntity.setKairosStatus(kairosStatus);
         organizationBaseEntity.setExternalId(organizationGeneral.getExternalId());
-        organizationBaseEntity.setEndTimeDeduction(organizationGeneral.getPercentageWorkDeduction());
         organizationBaseEntity.setKmdExternalId(organizationGeneral.getKmdExternalId());
-        organizationBaseEntity.setDayShiftTimeDeduction(organizationGeneral.getDayShiftTimeDeduction());
-        organizationBaseEntity.setNightShiftTimeDeduction(organizationGeneral.getNightShiftTimeDeduction());
     }
 
     private KairosStatus getKairosStatus(OrganizationGeneral organizationGeneral) {
@@ -534,14 +523,6 @@ public class OrganizationService {
 
     }
 
-    public TimeSlotsDeductionDTO saveTimeSlotPercentageDeduction(Long unitId, TimeSlotsDeductionDTO timeSlotsDeductionDTO) {
-        Unit unit = unitGraphRepository.findOne(unitId);
-        unit.setDayShiftTimeDeduction(timeSlotsDeductionDTO.getDayShiftTimeDeduction());
-        unit.setNightShiftTimeDeduction(timeSlotsDeductionDTO.getNightShiftTimeDeduction());
-        unitGraphRepository.save(unit);
-        return timeSlotsDeductionDTO;
-
-    }
 
     public OrganizationExternalIdsDTO getKMDExternalId(Long unitId) {
         Unit unit = unitGraphRepository.findOne(unitId);
@@ -552,14 +533,7 @@ public class OrganizationService {
 
     }
 
-    public TimeSlotsDeductionDTO getTimeSlotPercentageDeduction(Long unitId) {
-        OrganizationBaseEntity unit = organizationBaseRepository.findOne(unitId);
-        TimeSlotsDeductionDTO timeSlotsDeductionDTO = new TimeSlotsDeductionDTO();
-        timeSlotsDeductionDTO.setNightShiftTimeDeduction(unit.getNightShiftTimeDeduction());
-        timeSlotsDeductionDTO.setDayShiftTimeDeduction(unit.getDayShiftTimeDeduction());
-        return timeSlotsDeductionDTO;
 
-    }
 
     public List<VehicleQueryResult> getVehicleList(long unitId) {
         Unit unit = unitGraphRepository.findOne(unitId);

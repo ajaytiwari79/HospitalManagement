@@ -599,12 +599,6 @@ public class ClientController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.updateContactPerson(clientId,contactPersonDTO));
     }
 
-    //Prefer Staff
-    @ApiOperation("Get personal_calander_prerequisite of citizen")
-    @RequestMapping(value = "/{clientId}/personal_calander_prerequisite",method = RequestMethod.GET)
-    ResponseEntity<Map<String,Object>> getPrerequisiteForPersonalCalender(@PathVariable Long unitId,@PathVariable Long clientId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getPrerequisiteForPersonalCalender(unitId,clientId));
-    }
 
     @PostMapping("/upload")
     @ApiOperation("Upload XLSX file ")

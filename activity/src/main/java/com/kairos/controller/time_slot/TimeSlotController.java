@@ -2,6 +2,7 @@ package com.kairos.controller.time_slot;
 
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
@@ -110,6 +111,20 @@ public class TimeSlotController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotSetsByUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotSetsByUnit(unitId));
+    }
+
+    @PostMapping(UNIT_URL + "/saveTimeSlotDeduction")
+    @ApiOperation("Save KMD External of unitId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> saveTimeSlotDeduction(@PathVariable long unitId, @RequestBody TimeSlotsDeductionDTO timeSlotsDeductionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.saveTimeSlotPercentageDeduction(unitId, timeSlotsDeductionDTO));
+    }
+
+    @GetMapping(UNIT_URL + "/saveTimeSlotDeduction")
+    @ApiOperation("Save KMD External of unitId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTimeSlotDeduction(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotPercentageDeduction(unitId));
     }
 
 

@@ -13,6 +13,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -23,6 +24,7 @@ import com.kairos.persistence.repository.break_settings.BreakSettingMongoReposit
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.time_slot.TimeSlotRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -96,6 +98,8 @@ public class ShiftCopyService extends MongoBaseService {
     private PhaseService phaseService;
     @Inject
     private DayTypeService dayTypeService;
+    @Inject
+    private TimeSlotRepository timeSlotRepository;
 
 
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
@@ -108,6 +112,7 @@ public class ShiftCopyService extends MongoBaseService {
         Map<BigInteger, ActivityWrapper> activityMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         StaffEmploymentUnitDataWrapper dataWrapper = userIntegrationService.getStaffsEmployment(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
         dataWrapper.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
+        dataWrapper.setTimeSlotWrappers(timeSlotRepository.findByUnitIdInAndTimeSlotTypeOrderByStartDate(Collections.singletonList(unitId), TimeSlotType.SHIFT_PLANNING));
         List<StaffEmploymentDetails> staffDataList = dataWrapper.getStaffEmploymentDetails();
         List<Long> employmentIds = staffDataList.stream().map(StaffEmploymentDetails::getId).collect(Collectors.toList());
         findAndAddCTAInEmployments(staffDataList, copyShiftDTO, dataWrapper, employmentIds);

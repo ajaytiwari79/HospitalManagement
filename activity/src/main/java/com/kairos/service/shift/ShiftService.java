@@ -20,6 +20,7 @@ import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffAccessRoleDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -49,6 +50,7 @@ import com.kairos.persistence.repository.reason_code.ReasonCodeRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
+import com.kairos.persistence.repository.time_slot.TimeSlotRepository;
 import com.kairos.persistence.repository.todo.TodoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -162,6 +164,7 @@ public class ShiftService extends MongoBaseService {
     @Inject private StaffActivityDetailsService staffActivityDetailsService;
     @Inject
     private ReasonCodeRepository reasonCodeRepository;
+    @Inject private TimeSlotRepository timeSlotRepository;
 
     public List<ShiftWithViolatedInfoDTO> createShifts(Long unitId, List<ShiftDTO> shiftDTOS, ShiftActionType shiftActionType) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>(shiftDTOS.size());
@@ -173,8 +176,8 @@ public class ShiftService extends MongoBaseService {
 
     public List<ShiftWithViolatedInfoDTO> createShift(Long unitId, ShiftDTO shiftDTO, ShiftActionType shiftActionType) {
         shiftDTO.setUnitId(unitId);
-        Set<BigInteger> reasonCodeIds = shiftDTO.getActivities().stream().filter(shiftActivity -> shiftActivity.getAbsenceReasonCodeId() != null).map(ShiftActivityDTO::getAbsenceReasonCodeId).collect(Collectors.toSet());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(shiftDTO.getShiftDate(), shiftDTO.getStaffId(), shiftDTO.getEmploymentId());
+        staffAdditionalInfoDTO.setTimeSlotSets(timeSlotRepository.findByUnitIdInAndTimeSlotTypeOrderByStartDate(Arrays.asList(shiftDTO.getUnitId()), TimeSlotType.SHIFT_PLANNING));
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivities().get(0).getActivityId());
         updateCTADetailsOfEmployement(shiftDTO.getShiftDate(), staffAdditionalInfoDTO);
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS;
@@ -411,6 +414,7 @@ public class ShiftService extends MongoBaseService {
             //reason code will be sanem for all shifts.
 
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftStartDate), shiftDTO.getStaffId(), shift.getEmploymentId());
+            staffAdditionalInfoDTO.setTimeSlotSets(timeSlotRepository.findByUnitIdInAndTimeSlotTypeOrderByStartDate(Collections.singletonList(unitId),TimeSlotType.SHIFT_PLANNING));
             Shift oldShift = null;
             if (isNotNull(shift.getId())) {
                 oldShift = shiftMongoRepository.findOne(shift.getId());
@@ -595,6 +599,7 @@ public class ShiftService extends MongoBaseService {
         Date currentShiftStartDate = shift.getStartDate();
         Date currentShiftEndDate = shift.getEndDate();
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(shiftDTO.getShiftDate(), shiftDTO.getStaffId(), shiftDTO.getEmploymentId());
+        staffAdditionalInfoDTO.setTimeSlotSets(timeSlotRepository.findByUnitIdInAndTimeSlotTypeOrderByStartDate(Arrays.asList(shiftDTO.getUnitId()), TimeSlotType.SHIFT_PLANNING));
         if (UserContext.getUserDetails().isManagement() && isNotNull(shift.getDraftShift()) && !byTAndAView) {
             shift = shift.getDraftShift();
         }

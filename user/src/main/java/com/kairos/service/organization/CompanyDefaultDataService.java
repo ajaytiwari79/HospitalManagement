@@ -7,7 +7,6 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
-import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -29,8 +28,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class CompanyDefaultDataService {
-    @Inject
-    private TimeSlotService timeSlotService;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
     @Inject

@@ -4,9 +4,6 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
@@ -658,13 +655,6 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.saveKMDExternalId(unitId, organizationExternalIdsDTO));
     }
 
-    @PostMapping(UNIT_URL + "/saveTimeSlotDeduction")
-    @ApiOperation("Save KMD External of unitId")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveTimeSlotDeduction(@PathVariable long unitId, @RequestBody TimeSlotsDeductionDTO timeSlotsDeductionDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.saveTimeSlotPercentageDeduction(unitId, timeSlotsDeductionDTO));
-    }
-
     @GetMapping(UNIT_URL + "/saveKMDExternal")
     @ApiOperation("Save KMD External of unitId")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -672,12 +662,6 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getKMDExternalId(unitId));
     }
 
-    @GetMapping(UNIT_URL + "/saveTimeSlotDeduction")
-    @ApiOperation("Save KMD External of unitId")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getTimeSlotDeduction(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getTimeSlotPercentageDeduction(unitId));
-    }
 
     @ApiOperation(value = "Get skills and organizationTypes of organization")
     @GetMapping(UNIT_URL + "/skill/orgTypes")

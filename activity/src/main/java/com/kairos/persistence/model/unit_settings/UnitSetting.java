@@ -18,7 +18,10 @@ public class UnitSetting extends MongoBaseEntity {
     private FlexibleTimeSettings flexibleTimeSettings;
     private Long unitId;
     private TimeSlotMode timeSlotMode = STANDARD;
-    protected ZoneId timeZone;
+    private ZoneId timeZone;
+    private int dayShiftTimeDeduction = 4;
+    private int nightShiftTimeDeduction = 7; //in percentage
+    private int endTimeDeduction = 5; //in percentage
 
     public UnitSetting(OpenShiftPhaseSetting openShiftPhaseSetting, Long unitId) {
         this.openShiftPhaseSetting = openShiftPhaseSetting;

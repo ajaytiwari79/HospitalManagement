@@ -28,7 +28,6 @@ import com.kairos.shiftplanning.domain.staff.EmploymentLine;
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelActivityType;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelPlannerEntity;
-import com.kairos.shiftplanning.domain.unit.TimeSlot;
 import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.move.helper.ActivityLineIntervalWrapper;

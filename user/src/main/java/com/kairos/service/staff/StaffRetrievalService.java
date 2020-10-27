@@ -13,7 +13,6 @@ import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.skill.SkillDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.filter.FilteredStaffsAndRequiredDataFilterDTO;
 import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
@@ -27,8 +26,6 @@ import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.FilterType;
-import com.kairos.enums.TimeSlotType;
-import com.kairos.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupDayTypesQueryResult;
@@ -39,7 +36,6 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.*;
@@ -55,7 +51,6 @@ import com.kairos.persistence.model.user.filter.FilterSelection;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.*;
-import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.repository_impl.StaffGraphRepositoryImpl;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -523,11 +518,6 @@ public class StaffRetrievalService {
             setFunction(shiftDate, employmentId, staffAdditionalInfoDTO, employment);
             employment.setCountryId(countryId);
             employment.setUnitTimeZone(unit.getTimeZone());
-            List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(Arrays.asList(unit.getId()), TimeSlotType.SHIFT_PLANNING);
-            if (isCollectionEmpty(timeSlotWrappers)) {
-                exceptionService.actionNotPermittedException("timeslot.not.found");
-            }
-            staffAdditionalInfoDTO.setTimeSlotSets(copyCollectionPropertiesByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));
             UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unit.getId());
             Organization parent = organizationService.fetchParentOrganization(unit.getId());
             Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(parent.getId(), UserContext.getUserDetails().getId());
@@ -570,8 +560,6 @@ public class StaffRetrievalService {
 //    }
 
     public void setRequiredDataForShiftCreationInWrapper(StaffEmploymentUnitDataWrapper staffEmploymentUnitDataWrapper, Unit unit, Long countryId, Long expertiseId) {
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(Arrays.asList(unit.getId()), TimeSlotType.SHIFT_PLANNING);
-        staffEmploymentUnitDataWrapper.setTimeSlotWrappers(copyCollectionPropertiesByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));
         staffEmploymentUnitDataWrapper.setUnitTimeZone(unit.getTimeZone());
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unit.getId());
         SeniorAndChildCareDaysDTO seniorAndChildCareDaysDTO = expertiseService.getSeniorAndChildCareDays(expertiseId,getLocalDate());
@@ -596,7 +584,6 @@ public class StaffRetrievalService {
     public List<StaffAdditionalInfoDTO> getStaffsEmploymentData(List<Long> staffIds, List<Long> employmentIds, long id, String type) {
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(id);
         Long countryId = countryService.getCountryIdByUnitId(id);
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(Arrays.asList(organizationBaseEntity.getId()), TimeSlotType.SHIFT_PLANNING);
         if (isCollectionEmpty(staffIds)) {
             Organization parentOrganization = organizationService.getParentOfOrganization(id);
             staffIds = staffGraphRepository.getAllStaffIdsByOrganisationId(isNotNull(parentOrganization) ? parentOrganization.getId() : id);
@@ -608,7 +595,7 @@ public class StaffRetrievalService {
         }
         List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(employmentIds, organizationBaseEntity, countryId);
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(organizationBaseEntity.getId());
-        setStaffAdditionalDetails(organizationBaseEntity, timeSlotWrappers, staffAdditionalInfoDTOS, userAccessRoleDTO);
+        setStaffAdditionalDetails(organizationBaseEntity, staffAdditionalInfoDTOS, userAccessRoleDTO);
         Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoDTOMap = staffAdditionalInfoDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOList = new ArrayList<>();
         for (StaffEmploymentDetails employmentDetail : employmentDetails) {
@@ -621,10 +608,9 @@ public class StaffRetrievalService {
         return staffAdditionalInfoDTOList;
     }
 
-    private void setStaffAdditionalDetails(OrganizationBaseEntity organizationBaseEntity, List<TimeSlotWrapper> timeSlotWrappers, List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, UserAccessRoleDTO userAccessRoleDTO) {
+    private void setStaffAdditionalDetails(OrganizationBaseEntity organizationBaseEntity, List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, UserAccessRoleDTO userAccessRoleDTO) {
         staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
             staffAdditionalInfoDTO.setUnitId(organizationBaseEntity.getId());
-            staffAdditionalInfoDTO.setTimeSlotSets(copyCollectionPropertiesByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));
             staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
         });
     }
@@ -754,10 +740,7 @@ public class StaffRetrievalService {
             staffDTO.getEmployments().add(employmentDTO);
             staffDTOMap.put(employment.getStaff().getId(), staffDTO);
         }
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unitId, TimeSlotMode.STANDARD);
-        Collection<TimeSlotDTO> timelots = copyCollectionPropertiesByMapper(timeSlotWrappers, TimeSlotDTO.class);
-        Map<String, TimeSlotDTO> timeSlotMap = timelots.stream().collect(Collectors.toMap(k->k.getName(), v->v));
-        return ShiftPlanningProblemSubmitDTO.builder().staffs(new ArrayList(staffDTOMap.values())).expertiseNightWorkerSettingMap(shiftPlanningProblemSubmitDTO.getExpertiseNightWorkerSettingMap()).breakSettingMap(shiftPlanningProblemSubmitDTO.getBreakSettingMap()).timeSlotMap(timeSlotMap).build();
+        return ShiftPlanningProblemSubmitDTO.builder().staffs(new ArrayList(staffDTOMap.values())).expertiseNightWorkerSettingMap(shiftPlanningProblemSubmitDTO.getExpertiseNightWorkerSettingMap()).breakSettingMap(shiftPlanningProblemSubmitDTO.getBreakSettingMap()).timeSlotMap(new HashMap<>()).build();
     }
 
     private StaffDTO getStaffDTO(Employment employment) {

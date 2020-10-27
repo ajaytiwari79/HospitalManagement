@@ -1,6 +1,5 @@
 package com.kairos.service.time_slot;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -8,6 +7,7 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.unit_settings.UnitSetting;
@@ -28,7 +28,6 @@ import static com.kairos.enums.TimeSlotType.SHIFT_PLANNING;
 import static com.kairos.enums.TimeSlotType.TASK_PLANNING;
 import static com.kairos.enums.time_slot.TimeSlotMode.ADVANCE;
 import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
-import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 @Service
 public class TimeSlotSetService {
@@ -182,6 +181,23 @@ public class TimeSlotSetService {
     public List<TimeSlotDTO> getShiftPlanningTimeSlotByUnit(Long unitId) {
         UnitSetting unitSetting=unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
         return timeSlotRepository.findByUnitIdAndTimeSlotModeAndTimeSlotTypeOrderByStartDate(unitSetting.getUnitId(), unitSetting.getTimeSlotMode(), SHIFT_PLANNING).get(0).getTimeSlots();
+    }
+
+    public TimeSlotsDeductionDTO saveTimeSlotPercentageDeduction(Long unitId, TimeSlotsDeductionDTO timeSlotsDeductionDTO) {
+        UnitSetting unitSetting = unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
+        unitSetting.setDayShiftTimeDeduction(timeSlotsDeductionDTO.getDayShiftTimeDeduction());
+        unitSetting.setNightShiftTimeDeduction(timeSlotsDeductionDTO.getNightShiftTimeDeduction());
+        unitSettingRepository.save(unitSetting);
+        return timeSlotsDeductionDTO;
+
+    }
+
+    public TimeSlotsDeductionDTO getTimeSlotPercentageDeduction(Long unitId) {
+        UnitSetting unitSetting = unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
+        TimeSlotsDeductionDTO timeSlotsDeductionDTO = new TimeSlotsDeductionDTO();
+        timeSlotsDeductionDTO.setNightShiftTimeDeduction(unitSetting.getNightShiftTimeDeduction());
+        timeSlotsDeductionDTO.setDayShiftTimeDeduction(unitSetting.getDayShiftTimeDeduction());
+        return timeSlotsDeductionDTO;
     }
 
 

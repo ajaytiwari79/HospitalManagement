@@ -2,7 +2,6 @@ package com.kairos.service.country;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
@@ -11,16 +10,13 @@ import com.kairos.dto.activity.kpi.EmploymentTypeKpiDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
-import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.enums.MasterDataTypeEnum;
-import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.persistence.model.country.default_data.OrganizationMappingDTO;
@@ -36,7 +32,6 @@ import com.kairos.persistence.model.user.expertise.response.ExpertiseBasicDetail
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
-import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
@@ -59,7 +54,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -385,10 +379,9 @@ public class EmploymentTypeService {
         List<com.kairos.dto.user.country.tag.TagDTO> tagDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(tags,com.kairos.dto.user.country.tag.TagDTO.class);
         List<OrganizationCommonDTO>  organizationCommonDTO=ObjectMapperUtils.copyCollectionPropertiesByMapper(unitGraphRepository.getAllOrganizaionByStaffid(staffId),OrganizationCommonDTO.class);
         List<Long> unitIds=organizationCommonDTO.stream().map(organizationCommonDto -> organizationCommonDto.getId()).collect(Collectors.toList());
-        List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(isCollectionNotEmpty(unitIds)?unitIds:Arrays.asList(unitId), TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
         List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(countryGraphRepository.getEmploymentTypes(countryId,false),EmploymentTypeKpiDTO.class);
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffGraphRepository.getAllStaffIdAndNameByUnitId(isNull(staffId)?Arrays.asList(unitId):unitIds), StaffKpiFilterDTO.class);
-        return new DefaultKpiDataDTO(countryId,staffKpiFilterDTOS, timeSlotSetDTOS,organizationCommonDTO,employmentTypeKpiDTOS,tagDTOS);
+        return new DefaultKpiDataDTO(countryId,staffKpiFilterDTOS, new ArrayList<>(),organizationCommonDTO,employmentTypeKpiDTOS,tagDTOS);
     }
 
     public DefaultKpiDataDTO getKpiAllDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {

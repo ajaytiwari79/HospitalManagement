@@ -10,7 +10,6 @@ import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.activity.task.StaffTaskDTO;
 import com.kairos.dto.activity.task_type.TaskTypeAggregateResult;
 import com.kairos.dto.user.staff.ContactPersonDTO;
-import com.kairos.dto.user.staff.client.ClientExceptionTypesDTO;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -28,7 +27,6 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.staff.StaffClientData;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -36,26 +34,20 @@ import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQu
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
-import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
-import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.*;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
-import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageLevelGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.*;
-import com.kairos.service.AsynchronousService;
-import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FormatUtil;
-import com.kairos.wrapper.ClientPersonalCalenderPrerequisiteDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -84,7 +76,6 @@ public class ClientService {
     public static final String PROFILE_PIC = "profilePic";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Inject private EnvConfig envConfig;
-    @Inject private TimeSlotGraphRepository timeSlotGraphRepository;
     @Inject private TaskServiceRestClient taskServiceRestClient;
     @Inject private PlannerRestClient plannerRestClient;
     @Inject private TaskTypeRestClient taskTypeRestClient;
@@ -98,19 +89,12 @@ public class ClientService {
     @Inject private StaffGraphRepository staffGraphRepository;
     @Inject private UnitGraphRepository unitGraphRepository;
     @Inject private OrganizationServiceRepository organizationServiceRepository;
-    @Inject private ClientTeamRelationGraphRepository staffTeamRelationGraphRepository;
     @Inject private TeamGraphRepository teamGraphRepository;
     @Inject private ClientOrganizationRelationGraphRepository relationGraphRepository;
     @Inject private LanguageGraphRepository languageGraphRepository;
     @Inject private LanguageLevelGraphRepository languageLevelGraphRepository;
-    @Inject private CountryGraphRepository countryGraphRepository;
-    @Inject private CitizenStatusService citizenStatusService;
     @Inject private ClientOrganizationRelationService relationService;
-    @Inject private TimeSlotService timeSlotService;
-    @Inject private OrganizationMetadataRepository organizationMetadataRepository;
-    @Inject private ClientExceptionRestClient clientExceptionRestClient;
     @Inject private ExceptionService exceptionService;
-    @Inject private AsynchronousService asynchronousService;
     @Inject private ClientContactPersonRelationshipRepository clientContactPersonRelationshipRepository;
     @Inject private ClientContactPersonGraphRepository clientContactPersonGraphRepository;
     @Inject private StaffRetrievalService staffRetrievalService;
@@ -802,13 +786,6 @@ public class ClientService {
         clientGraphRepository.deleteContactPersonForService(organizationServiceId, clientId);
     }
 
-    public ClientPersonalCalenderPrerequisiteDTO getPrerequisiteForPersonalCalender(Long unitId, Long clientId) {
-        Unit unit = unitGraphRepository.findById(unitId, 0).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, unitId)));
-        List<Map<String, Object>> temporaryAddressList = FormatUtil.formatNeoResponse(clientGraphRepository.getClientTemporaryAddressById(clientId));
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode());
-        List<ClientExceptionTypesDTO> clientExceptionTypesDTOS = clientExceptionRestClient.getClientExceptionTypes();
-        return new ClientPersonalCalenderPrerequisiteDTO(clientExceptionTypesDTOS, temporaryAddressList, timeSlotWrappers);
-    }
 
     public List<StaffTaskDTO> getAssignedTasksOfStaff(long unitId, long staffId, String date) {
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
