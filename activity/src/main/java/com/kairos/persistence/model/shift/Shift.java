@@ -214,7 +214,7 @@ public class Shift extends MongoBaseEntity {
                 shiftActivitiesForCheckingStaffingLevel.add(new ShiftActivity(activityLineInterval.getActivityId(),activityLineInterval.getStartDate(),activityLineInterval.getEndDate(),activityLineInterval.getActivityName()));
             }
         }
-        if(isCollectionNotEmpty(shiftActivitiesForCheckingStaffingLevel))
+        if(shiftActivitiesForCheckingStaffingLevel.size()>1)
             shiftActivitiesForCheckingStaffingLevel= mergeShiftActivityList(shiftActivitiesForCheckingStaffingLevel);
         return shiftActivitiesForCheckingStaffingLevel;
     }
