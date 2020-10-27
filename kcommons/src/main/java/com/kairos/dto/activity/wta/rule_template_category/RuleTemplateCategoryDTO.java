@@ -52,12 +52,9 @@ public class RuleTemplateCategoryDTO {
     private List<TagDTO> tags = new ArrayList<>();
 
     public String getName() {
-        if(TranslationUtil.isVerifyTranslationDataOrNotForName(translations)) {
-            return translations.get(UserContext.getUserDetails().getLanguage()).getName();
-        }else {
-            return name;
-        }
+        return TranslationUtil.getName(translations,name);
     }
+
 
     @JsonSetter("categoryName")
     public void setCategoryategoryName(String name) {

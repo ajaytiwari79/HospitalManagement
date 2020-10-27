@@ -28,11 +28,6 @@ public class ProvinceQueryResult {
     private Map<String, TranslationInfo> translations;
 
     public String getName() {
-        Map<String,TranslationInfo> modifiableMap =  TranslationUtil.convertUnmodifiableMapToModifiableMap(translations);
-        if(TranslationUtil.isVerifyTranslationDataOrNotForName(modifiableMap)) {
-            return modifiableMap.get(UserContext.getUserDetails().getLanguage()).getName();
-        }else {
-            return name;
-        }
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
     }
 }

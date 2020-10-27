@@ -30,11 +30,7 @@ public class RuleTemplateCategoryTagDTO {
     private Long countryId;
 
     public String getName() {
-        if(TranslationUtil.isVerifyTranslationDataOrNotForName(translations)) {
-            return translations.get(UserContext.getUserDetails().getLanguage()).getName();
-        }else {
-            return name;
-        }
+        return TranslationUtil.getName(translations,name);
     }
-    
+
 }

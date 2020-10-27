@@ -1,5 +1,6 @@
 package com.kairos.dto.user.country;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user_context.UserContext;
 import lombok.Getter;
@@ -29,19 +30,11 @@ public class LevelDTO {
     }
 
     public String getName() {
-        if(isNotNull(translatedNames.get(UserContext.getUserDetails().getLanguage().toLowerCase())) && !translatedNames.get(UserContext.getUserDetails().getLanguage().toLowerCase()).equals("")) {
-            return translatedNames.getOrDefault(UserContext.getUserDetails().getLanguage().toLowerCase(), name);
-        }else {
-            return name;
-        }
+        return TranslationUtil.getName(translations,name);
     }
 
     public String getDescription() {
-        if(isNotNull(translatedDescriptions.get(UserContext.getUserDetails().getLanguage().toLowerCase())) && !translatedDescriptions.get(UserContext.getUserDetails().getLanguage().toLowerCase()).equals("")) {
-            return translatedDescriptions.getOrDefault(UserContext.getUserDetails().getLanguage().toLowerCase(), description);
-        }else{
-            return description;
-        }
+        return TranslationUtil.getDescription(translations,description);
     }
 
 

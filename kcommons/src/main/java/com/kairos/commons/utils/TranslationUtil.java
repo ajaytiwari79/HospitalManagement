@@ -29,12 +29,22 @@ public class TranslationUtil {
         return infoMap;
     }
 
-    public static boolean isVerifyTranslationDataOrNotForName(Map<String, TranslationInfo> translations) {
-        return isNotNull(translations.get(UserContext.getUserDetails().getLanguage())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getLanguage()).getName());
+    public static String getName(Map<String, TranslationInfo> translations, String name) {
+        Boolean isNullOrEmptyString = isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName());
+        if(isNullOrEmptyString) {
+            return translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName();
+        }else {
+            return name;
+        }
     }
 
-    public static boolean isVerifyTranslationDataOrNotForDescription(Map<String, TranslationInfo> translations) {
-        return isNotNull(translations.get(UserContext.getUserDetails().getLanguage())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getLanguage()).getDescription());
+    public static String getDescription(Map<String, TranslationInfo> translations, String description) {
+        Boolean isNullOrEmptyString = isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getDescription());
+        if(isNullOrEmptyString) {
+            return translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName();
+        }else {
+            return description;
+        }
     }
 
     public static Map<String,TranslationInfo> convertUnmodifiableMapToModifiableMap(Map<String, TranslationInfo> translations){

@@ -29,18 +29,10 @@ public class SkillCategoryQueryResults {
     private Map<String, TranslationInfo> translations;
 
     public String getName() {
-        if(TranslationUtil.isVerifyTranslationDataOrNotForName(translations)) {
-            return translations.get(UserContext.getUserDetails().getLanguage()).getName();
-        }else {
-            return name;
-        }
+        return TranslationUtil.getName(translations,name);
     }
 
     public String getDescription() {
-        if(TranslationUtil.isVerifyTranslationDataOrNotForDescription(translations)) {
-            return translations.get(UserContext.getUserDetails().getLanguage()).getDescription();
-        }else {
-            return description;
-        }
+        return  TranslationUtil.getDescription(translations,description);
     }
 }

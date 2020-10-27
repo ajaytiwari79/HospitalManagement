@@ -47,7 +47,6 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
     private void getCurrentUserDetails() {
         try {
             CurrentUserDetails userDetails = userIntegrationService.getCurrentUser();
-            userDetails.setLanguage(userDetails.getUserLanguage().getName().toLowerCase());
             if(isNotNull(UserContext.getUserDetails()) && isNotNull(userDetails)) {
                 UserContext.setUserDetails(userDetails);
             }

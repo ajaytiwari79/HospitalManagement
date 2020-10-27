@@ -78,21 +78,11 @@ public class ExpertiseQueryResult {
     }
 
     public String getName() {
-        Map<String,TranslationInfo> modifiableMap =  TranslationUtil.convertUnmodifiableMapToModifiableMap(translations);
-        if(TranslationUtil.isVerifyTranslationDataOrNotForName(modifiableMap)) {
-            return modifiableMap.get(UserContext.getUserDetails().getLanguage()).getName();
-        }else {
-            return name;
-        }
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
     }
 
     public String getDescription() {
-        Map<String,TranslationInfo> modifiableMap = TranslationUtil.convertUnmodifiableMapToModifiableMap(translations);
-        if(TranslationUtil.isVerifyTranslationDataOrNotForDescription(modifiableMap)) {
-            return modifiableMap.get(UserContext.getUserDetails().getLanguage()).getDescription();
-        }else {
-            return description;
-        }
+        return  TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
     }
 
 }
