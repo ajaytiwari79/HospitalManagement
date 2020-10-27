@@ -4,9 +4,11 @@ package com.kairos.dto.activity.wta.basic_details;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.kairos.commons.planning_setting.ConstraintSetting;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.activity.wta.templates.*;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.wta.WTATemplateType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -73,4 +75,13 @@ public class WTABaseRuleTemplateDTO{
         this.name = name;
         this.description = description;
     }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+    public String getDescription() {
+        return  TranslationUtil.getDescription(translations,description);
+    }
+
 }

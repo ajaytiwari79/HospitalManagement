@@ -1,13 +1,14 @@
 package com.kairos.service.region;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.organization.RegionDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.region.Municipality;
-import com.kairos.persistence.model.user.region.Province;
-import com.kairos.persistence.model.user.region.Region;
-import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.model.user.region.*;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
@@ -101,12 +102,9 @@ public class RegionService {
         return true;
     }
 
-    public List<Object> getRegionByCountryId(Long countryId) {
-        List<Object> response = new ArrayList<>();
-        List<Map<String,Object>> data = regionGraphRepository.findAllRegionsByCountryId(countryId);
-
-        return formatNeoResponse(response, data);
-
+    public List<RegionQueryResult> getRegionByCountryId(Long countryId) {
+        List<RegionQueryResult> data = regionGraphRepository.findAllRegionsByCountryId(countryId);
+        return data;
     }
 
     public List<Object> formatNeoResponse(List<Object> response, List<Map<String, Object>> data) {
