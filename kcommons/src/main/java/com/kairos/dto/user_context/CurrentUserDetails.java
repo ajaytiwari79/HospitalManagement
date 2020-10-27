@@ -2,6 +2,7 @@ package com.kairos.dto.user_context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.enums.OrganizationCategory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,7 @@ public class CurrentUserDetails {
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
     private String profilePic;
     private boolean systemAdmin;
+    private SystemLanguageDTO userLanguage;
 
 
     public CurrentUserDetails(Long id, String userName, String nickName,

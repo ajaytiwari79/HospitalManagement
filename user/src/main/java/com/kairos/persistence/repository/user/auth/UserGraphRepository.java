@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.user.auth;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
+import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -62,6 +63,14 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("MATCH(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) WHERE id(user)={0} RETURN id(userLanguage) LIMIT 1")
     Long getUserSelectedLanguageId(Long userId);
 
+    @Query("MATCH(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) WHERE id(user)={0} RETURN userLanguage LIMIT 1")
+    SystemLanguage getUserSystemLanguage(Long userId);
+
+    @Query("Match (language:SystemLanguage{deleted:false}) where id(language)={1}\n" +
+            "MATCH (user:User)-[r: SELECTED_LANGUAGE ]->(userLanguage:SystemLanguage{deleted:false}) WHERE id(user)={0}\n" +
+            "detach delete r \n" +
+            "CREATE UNIQUE (user)-[:SELECTED_LANGUAGE]->(language)")
+    void updateUserSystemLanguage(Long userId, Long languageId);
     // This is used to get the very first user of the organization
     @Query("MATCH (org) WHERE id(org)={0}" +
             "OPTIONAL MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission,position\n" +
