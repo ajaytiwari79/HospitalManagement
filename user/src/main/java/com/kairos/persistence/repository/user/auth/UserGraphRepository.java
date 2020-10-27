@@ -63,10 +63,13 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("MATCH(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) WHERE id(user)={0} RETURN id(userLanguage) LIMIT 1")
     Long getUserSelectedLanguageId(Long userId);
 
+    @Query("MATCH(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) WHERE id(user)={0} RETURN userLanguage LIMIT 1")
+    SystemLanguage getUserSystemLanguage(Long userId);
+
     @Query("Match (language:SystemLanguage{deleted:false}) where id(language)={1}\n" +
             "MATCH (user:User)-[r: SELECTED_LANGUAGE ]->(userLanguage:SystemLanguage{deleted:false}) WHERE id(user)={0}\n" +
             "detach delete r \n" +
-            "CREATE (user)-[:SELECTED_LANGUAGE]->(language)")
+            "CREATE UNIQUE (user)-[:SELECTED_LANGUAGE]->(language)")
     void updateUserSystemLanguage(Long userId, Long languageId);
     // This is used to get the very first user of the organization
     @Query("MATCH (org) WHERE id(org)={0}" +

@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.organization;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.organization.CompanyType;
@@ -53,19 +54,11 @@ public class OrganizationBasicResponse {
     private Map<String, TranslationInfo> translations;
 
     public String getName() {
-        if(!StringUtils.isEmpty(translatedNames.get(UserContext.getUserDetails().getLanguage().toLowerCase()))) {
-            return translatedNames.getOrDefault(UserContext.getUserDetails().getLanguage().toLowerCase(), name);
-        }else {
-            return name;
-        }
+        return TranslationUtil.getName(translations,name);
     }
 
     public String getDescription() {
-        if(!StringUtils.isEmpty(translatedDescriptions.get(UserContext.getUserDetails().getLanguage().toLowerCase()))) {
-            return translatedDescriptions.getOrDefault(UserContext.getUserDetails().getLanguage().toLowerCase(), description);
-        }else{
-            return description;
-        }
+        return TranslationUtil.getDescription(translations,description);
     }
 
 }

@@ -29,7 +29,6 @@ public class CurrentUserDetails {
     private  int age;
     private Long countryId;
     private Long languageId;
-    private String language;
     private Long lastSelectedOrganizationId;
     private OrganizationCategory lastSelectedOrganizationCategory;
     private Map<String, String> unitWiseAccessRole=new HashMap<>();

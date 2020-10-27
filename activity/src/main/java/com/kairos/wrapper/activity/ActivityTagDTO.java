@@ -15,13 +15,10 @@ import com.kairos.persistence.model.activity.tabs.ActivityTimeCalculationSetting
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
-
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 /**
  * Created by prerna on 16/12/17.
@@ -79,18 +76,10 @@ public class ActivityTagDTO {
 
 
     public String getName() {
-        if(TranslationUtil.isVerifyTranslationDataOrNotForName(translations)) {
-            return translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName();
-        }else {
-            return name;
-        }
+        return TranslationUtil.getName(translations,name);
     }
 
     public String getDescription() {
-        if(TranslationUtil.isVerifyTranslationDataOrNotForDescription(translations)) {
-                return translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getDescription();
-            }else {
-                return description;
-        }
+        return TranslationUtil.getDescription(translations,description);
     }
 }

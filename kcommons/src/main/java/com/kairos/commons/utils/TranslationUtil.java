@@ -3,6 +3,7 @@ package com.kairos.commons.utils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.dto.user_context.UserContext;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -28,12 +29,32 @@ public class TranslationUtil {
         return infoMap;
     }
 
-    public static boolean isVerifyTranslationDataOrNotForName(Map<String, TranslationInfo> translations) {
-        return isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName());
+    public static String getName(Map<String, TranslationInfo> translations, String name) {
+        Boolean isNullOrEmptyString = isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName());
+        if(isNullOrEmptyString) {
+            return translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName();
+        }else {
+            return name;
+        }
     }
 
-    public static boolean isVerifyTranslationDataOrNotForDescription(Map<String, TranslationInfo> translations) {
-        return isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getDescription());
+    public static String getDescription(Map<String, TranslationInfo> translations, String description) {
+        Boolean isNullOrEmptyString = isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getDescription());
+        if(isNullOrEmptyString) {
+            return translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName();
+        }else {
+            return description;
+        }
+    }
+
+    public static Map<String,TranslationInfo> convertUnmodifiableMapToModifiableMap(Map<String, TranslationInfo> translations){
+        Map<String,Map> translationInfoMap = ObjectMapperUtils.copyPropertiesByMapper(translations, HashedMap.class);
+        Map<String,TranslationInfo> translationMap = new HashMap<>();
+        for(Map.Entry<String,Map> translationInfoEntry : translationInfoMap.entrySet()){
+            TranslationInfo translationInfo = new TranslationInfo((String)translationInfoEntry.getValue().get("name"),(String)translationInfoEntry.getValue().get("description"));
+            translationMap.put(translationInfoEntry.getKey(),translationInfo);
+        }
+        return translationMap;
     }
 
 }
