@@ -55,12 +55,12 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     void deleteRelOrganizationTypeWithService(Set<Long> orgTypeId, long serviceId);
 
     @Query("MATCH (pot:OrganizationType {isEnable:true})-[:HAS_SUB_TYPE]-(ot:OrganizationType{isEnable:true}) WHERE id(pot)={0} return " +
-            "{ translations :{english :{name: CASE WHEN ot.`translatedNames.english` IS NULL THEN '' ELSE ot.`translatedNames.english` END, description : CASE WHEN ot.`translatedDescriptions.english` IS NULL THEN '' ELSE ot.`translatedDescriptions.english` END},\n" +
+            "{english :{name: CASE WHEN ot.`translatedNames.english` IS NULL THEN '' ELSE ot.`translatedNames.english` END, description : CASE WHEN ot.`translatedDescriptions.english` IS NULL THEN '' ELSE ot.`translatedDescriptions.english` END},\n" +
             "hindi:{name: CASE WHEN ot.`translatedNames.hindi` IS NULL THEN '' ELSE ot.`translatedNames.hindi` END, description : CASE WHEN ot.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ot.`translatedDescriptions.hindi` END},\n" +
             "danish:{name: CASE WHEN ot.`translatedNames.danish` IS NULL THEN '' ELSE ot.`translatedNames.danish` END, description : CASE WHEN ot.`translatedDescriptions.danish` IS NULL THEN '' ELSE ot.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN ot.`translatedNames.britishenglish` IS NULL THEN '' ELSE ot.`translatedNames.britishenglish` END, description : CASE WHEN ot.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ot.`translatedDescriptions.britishenglish` END}},\n" +
-            "name:ot.name,id:id(ot),description:ot.description } as result")
-    List<Map<String, Object>> getOrganizationSubTypeByTypeId(Long organizationTypeId);
+            "britishenglish:{name: CASE WHEN ot.`translatedNames.britishenglish` IS NULL THEN '' ELSE ot.`translatedNames.britishenglish` END, description : CASE WHEN ot.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ot.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "ot.name as name,id(ot) as id,ot.description as description")
+    List<OrgTypeLevelWrapper> getOrganizationSubTypeByTypeId(Long organizationTypeId);
 
     @Query("MATCH (pot:OrganizationType),(ot:OrganizationType) WHERE id(ot)={0} AND id(pot)={1} Create (pot)-[:HAS_SUB_TYPE]->(ot) return ot")
     OrganizationType createSubTypeRelation(Long subTypeId, Long parentTypeId);
