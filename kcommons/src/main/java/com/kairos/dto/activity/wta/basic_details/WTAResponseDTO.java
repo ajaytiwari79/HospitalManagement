@@ -2,10 +2,12 @@ package com.kairos.dto.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
+import com.kairos.dto.user_context.UserContext;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -78,6 +80,22 @@ public class WTAResponseDTO {
         this.organizationType = organizationType;
         this.organizationSubType = organizationSubType;
         this.tags = tags;
+    }
+
+    public String getName() {
+        if(TranslationUtil.isVerifyTranslationDataOrNotForName(translations)) {
+            return translations.get(UserContext.getUserDetails().getLanguage()).getName();
+        }else {
+            return name;
+        }
+    }
+
+    public String getDescription() {
+        if(TranslationUtil.isVerifyTranslationDataOrNotForDescription(translations)) {
+            return translations.get(UserContext.getUserDetails().getLanguage()).getDescription();
+        }else {
+            return description;
+        }
     }
 
     public boolean isValidWorkTimeAgreement(LocalDate localDate){

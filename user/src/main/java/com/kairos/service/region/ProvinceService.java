@@ -1,6 +1,7 @@
 package com.kairos.service.region;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.user.region.Province;
+import com.kairos.persistence.model.user.region.ProvinceQueryResult;
 import com.kairos.persistence.model.user.region.Region;
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
@@ -69,8 +70,8 @@ public class ProvinceService {
     }
 
 
-    public List<Map<String,Object>> getProvinceToRegion(Long regionId) {
-        return FormatUtil.formatNeoResponse(provinceGraphRepository.findAllProvinceByRegionId(regionId));
+    public List<ProvinceQueryResult> getProvinceToRegion(Long regionId) {
+        return provinceGraphRepository.findAllProvinceByRegionId(regionId);
 
     }
 
