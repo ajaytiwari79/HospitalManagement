@@ -221,9 +221,9 @@ public class OrganizationServiceService {
 
 
     public List<Map<String,Object>> getOrgServicesByOrgType(long orgType) {
-        List<Long> organizationServiceIds = organizationServiceRepository.getAllOrganizationServiceId(orgType);
-        List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(organizationServiceIds));
-        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
+        List<OrganizationService> organizationServices = organizationServiceRepository.getAllOrganizationServices(orgType);
+        List<OrganizationService> updateOrganizationService = organizationServices.stream().filter(orgService-> isNotNull(orgService.getOrganizationSubService())).collect(Collectors.toList());
+        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(updateOrganizationService, OrganizationServiceDTO.class);
         List<Map<String,Object>> mapList =new ArrayList<>();
         Map<String,Object> data = new HashMap<>();
         for (OrganizationServiceDTO result : organizationServiceDTOS) {
