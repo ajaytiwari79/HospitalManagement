@@ -985,7 +985,7 @@ public class StaffingLevelService  {
             staffingLevelIntervalLog.getActivityRemoveLogs().removeIf(k->k.getActivityId().equals(activityId));
             staffingLevelIntervalLog.getNewlyAddedActivityIds().remove(activityId);
             staffingLevelIntervalLog.setMinNoOfStaff(staffingLevelIntervalLog.getStaffingLevelActivities().stream().mapToInt(StaffingLevelActivity::getMinNoOfStaff).sum());
-            staffingLevelIntervalLog.setMaxNoOfStaff(staffingLevelIntervalLog.getStaffingLevelActivities().stream().mapToInt(StaffingLevelActivity::getMaxNoOfStaff).sum());
+            staffingLevelIntervalLog.setMaxNoOfStaff(staffingLevelIntervalLog.getStaffingLevelActivities().stream().mapToInt(k -> k.getMaxNoOfStaff()).sum());
         });
         Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
         int minNoOfStaff = 0;
