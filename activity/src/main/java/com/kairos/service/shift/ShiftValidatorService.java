@@ -15,6 +15,7 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
@@ -484,7 +485,7 @@ public class ShiftValidatorService {
         }
         shifts = updateFullDayAndFullWeekActivityShifts(shifts);
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, StaffWTACounter::getCount));
-        Map<String, TimeSlotWrapper> timeSlotWrapperMap = staffAdditionalInfoDTO.getTimeSlotSets().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
+        Map<String, TimeSlotDTO> timeSlotMap = staffAdditionalInfoDTO.getTimeSlotSets().stream().collect(Collectors.toMap(TimeSlotDTO::getName, v -> v));
         Map<BigInteger, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         shift = updateFullDayAndFullWeekActivityShifts(newArrayList(shift)).get(0);
         shift.setTimeType(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getTimeType());
@@ -497,7 +498,7 @@ public class ShiftValidatorService {
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(shift.getStaffId());
         staffAdditionalInfoDTO.setStaffAge(getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(), asLocalDate(shift.getStartDate())));
         List<Integer> staffChildAges = getChildAges(shift.getStartDate(), staffAdditionalInfoDTO);
-        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, expectedTimebank, activityWrapperMap, staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate(), expertiseNightWorkerSetting, isNotNull(nightWorker) ? nightWorker.isNightWorker() : false, phase.getPhaseEnum(), staffChildAges, shiftOperationType);
+        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, expectedTimebank, activityWrapperMap, staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate(), expertiseNightWorkerSetting, isNotNull(nightWorker) ? nightWorker.isNightWorker() : false, phase.getPhaseEnum(), staffChildAges, shiftOperationType);
     }
 
     public List<Integer> getChildAges(Date shiftStartDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
@@ -522,7 +523,7 @@ public class ShiftValidatorService {
         }
         shifts = updateFullDayAndFullWeekActivityShifts(shifts);
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, StaffWTACounter::getCount));
-        Map<String, TimeSlotWrapper> timeSlotWrapperMap = dataWrapper.getTimeSlotWrappers().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
+        Map<String, TimeSlotDTO> timeSlotWrapperMap = dataWrapper.getTimeSlotWrappers().stream().collect(Collectors.toMap(TimeSlotDTO::getName, v -> v));
         Map<BigInteger, DayTypeDTO> dayTypeDTOMap = dataWrapper.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         shift = updateFullDayAndFullWeekActivityShifts(newArrayList(shift)).get(0);
         wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts);

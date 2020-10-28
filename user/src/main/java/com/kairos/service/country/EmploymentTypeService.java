@@ -97,7 +97,6 @@ public class EmploymentTypeService {
     private StaffGraphRepository staffGraphRepository;
     @Inject
     private ExceptionService exceptionService;
-    @Inject private TimeSlotGraphRepository timeSlotGraphRepository;
     @Inject private StaffRetrievalService  staffRetrievalService;
     @Inject
     private ExpertiseService expertiseService;

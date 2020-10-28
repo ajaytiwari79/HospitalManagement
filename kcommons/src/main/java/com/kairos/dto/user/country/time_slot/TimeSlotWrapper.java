@@ -29,22 +29,4 @@ public class TimeSlotWrapper {
     private int endMinute;
     private boolean shiftStartTime;
     private String name;
-
-    public ZonedDateTime getStartZoneDateTime(LocalDate localDate) {
-        return DateUtils.asZonedDateTime(localDate, LocalTime.of(startHour,startMinute));
-    }
-
-    public ZonedDateTime getEndZoneDateTime(LocalDate localDate) {
-        if(endHour<startHour){
-            localDate = localDate.plusDays(1);
-        }
-        return DateUtils.asZonedDateTime(localDate, LocalTime.of(endHour,endMinute));
-    }
-
-    public DateTimeInterval getTimeSlotInterval(LocalDate startLocalDate) {
-        ZonedDateTime startZonedDateTime = this.getStartZoneDateTime(startLocalDate);
-        ZonedDateTime endZonedDateTime = this.getEndZoneDateTime(startLocalDate);
-        List<DateTimeInterval> timeIntervals = new ArrayList<>();
-        return new DateTimeInterval(startZonedDateTime,endZonedDateTime);
-    }
 }
