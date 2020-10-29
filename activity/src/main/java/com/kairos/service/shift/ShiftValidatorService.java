@@ -834,10 +834,9 @@ public class ShiftValidatorService {
         return shiftWithViolatedInfoDTOS;
     }
 
-    public ShiftDTO validateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, Boolean
-            validatedByStaff, Phase actualPhases) {
+    public ShiftDTO validateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, Boolean validatedByStaff, Phase actualPhases) {
         BigInteger shiftStateId = shiftDTO.getId();
-        ShiftState shiftState = shiftStateMongoRepository.findOne(shiftStateId);
+        ShiftState shiftState = shiftStateMongoRepository.findOne(shiftDTO.getId());
         if (shiftState == null) {
             Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
             if (shift != null) {
@@ -852,6 +851,17 @@ public class ShiftValidatorService {
             shiftDTO.setShiftId(shiftState.getShiftId());
         }
         shiftState = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftState.class);
+        prepareShiftStateDataAndSave(shiftDTO, validatedByStaff, actualPhases, shiftState);
+        shiftMongoRepository.updateValidateDetailsOfShift(shiftState.getShiftId(), shiftState.getAccessGroupRole(), shiftState.getValidated());
+        shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
+        if (validatedByStaff) {
+            shiftDTO.setEditable(true);
+        }
+        shiftDTO.setDurationMinutes((int) shiftDTO.getInterval().getMinutes());
+        return shiftDTO;
+    }
+
+    private void prepareShiftStateDataAndSave(ShiftDTO shiftDTO, Boolean validatedByStaff, Phase actualPhases, ShiftState shiftState) {
         List<BigInteger> activityIds = shiftState.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList());
         List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
@@ -873,15 +883,6 @@ public class ShiftValidatorService {
             shiftState.getActivities().forEach(activity -> activity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
             shiftStateMongoRepository.save(shiftState);
         }
-        shiftMongoRepository.updateValidateDetailsOfShift(shiftState.getShiftId(), shiftState.getAccessGroupRole(), shiftState.getValidated());
-        shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
-        if (validatedByStaff) {
-            shiftDTO.setEditable(true);
-        }
-        shiftDTO.setDurationMinutes((int) shiftDTO.getInterval().getMinutes());
-
-        return shiftDTO;
-
     }
 
     public void validateRealTimeShift(Long unitId, ShiftDTO shiftDTO, Map<String, Phase> phaseMap) {
