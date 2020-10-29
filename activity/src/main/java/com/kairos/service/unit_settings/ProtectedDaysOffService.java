@@ -82,7 +82,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
     }
 
     public ProtectedDaysOffSettingDTO addOrUpdateProtectedDaysOffSetting(Long expertiseId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO) {
-        ProtectedDaysOff protectedDaysOff=protectedDaysOffRepository.findByExpertiseIdAndHolidayIdDeletedFalse(expertiseId,protectedDaysOffSettingDTO.getHolidayId());
+        ProtectedDaysOff protectedDaysOff=protectedDaysOffRepository.findByExpertiseIdAndHolidayIdAndDeletedFalse(expertiseId,protectedDaysOffSettingDTO.getHolidayId());
         protectedDaysOff=ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOffSettingDTO,ProtectedDaysOff.class);
         protectedDaysOffRepository.save(protectedDaysOff);
         protectedDaysOffSettingDTO.setId(protectedDaysOff.getId());

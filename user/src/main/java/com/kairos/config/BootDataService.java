@@ -111,8 +111,6 @@ public class BootDataService {
     @Inject
     CurrencyGraphRepository currencyGraphRepository;
     @Inject
-    TimeSlotGraphRepository timeSlotGraphRepository;
-      @Inject
     private OpenningHourService openningHourService;
     @Inject
     private EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;

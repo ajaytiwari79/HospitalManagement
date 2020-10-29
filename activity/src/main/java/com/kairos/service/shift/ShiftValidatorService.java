@@ -834,8 +834,7 @@ public class ShiftValidatorService {
         return shiftWithViolatedInfoDTOS;
     }
 
-    public ShiftDTO validateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, Boolean
-            validatedByStaff, Phase actualPhases) {
+    public ShiftDTO validateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, Boolean validatedByStaff, Phase actualPhases) {
         BigInteger shiftStateId = shiftDTO.getId();
         ShiftState shiftState = shiftStateMongoRepository.findOne(shiftStateId);
         if (shiftState == null) {

@@ -111,7 +111,7 @@ public class ReasonCodeService {
 
 
     public void createReasonCodeForUnit(Long unitId, long countryId) {
-        List<ReasonCodeDTO> reasonCodeDTO = reasonCodeRepository.findReasonCodeByCountryIdAndDeletedFalseOrderByCreationDateASC(countryId);
+        List<ReasonCodeDTO> reasonCodeDTO = reasonCodeRepository.findReasonCodeByCountryIdAndDeletedFalseOrderByCreatedAt(countryId);
         createDefaultData(reasonCodeDTO, unitId);
     }
 

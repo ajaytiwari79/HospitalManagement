@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface ProtectedDaysOffRepository extends MongoBaseRepository<ProtectedDaysOff, BigInteger> {
 
-    ProtectedDaysOff findByExpertiseIdAndHolidayIdDeletedFalse(Long expertiseId,BigInteger holidayId);
+    ProtectedDaysOff findByExpertiseIdAndHolidayIdAndDeletedFalse(Long expertiseId, BigInteger holidayId);
 
     List<ProtectedDaysOffSettingDTO> findAllByExpertiseIdAndDeletedFalse(Long expertiseId);
 }

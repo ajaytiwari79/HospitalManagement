@@ -25,13 +25,11 @@ public interface TimeSlotRepository extends MongoBaseRepository<TimeSlotSet, Big
 
     TimeSlotSetDTO findById(Long timeSlotSetId);
 
-    List<TimeSlot> findBySystemGeneratedTimeSlotsTrue();
+    //List<TimeSlot> findBySystemGeneratedTimeSlotsTrue();
 
     List<TimeSlotDTO> findByUnitIdInAndTimeSlotTypeOrderByStartDate(List<Long> unitId, TimeSlotType timeSlotType);
 
     List<TimeSlotSetDTO> findByUnitIdAndTimeSlotModeAndTimeSlotTypeOrderByStartDate(Long unitId, TimeSlotMode timeSlotMode, TimeSlotType timeSlotType);
 
-    TimeSlotSetDTO findOneByUnitIdAfterStartDateLimitOne(Long unitId, LocalDate endDate);
-
-    List<TimeSlotSet> findTimeSlotByUnitIdAndBetweenStartDateAndEndDateAndTimeSlotType(Long unitId, LocalDate startDate, LocalDate endDate, TimeSlotType timeSlotType);
+    //TimeSlotSetDTO findOneByUnitIdAfterStartDateLimitOne(Long unitId, LocalDate endDate);
 }

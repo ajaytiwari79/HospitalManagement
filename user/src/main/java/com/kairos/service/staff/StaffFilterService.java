@@ -137,7 +137,6 @@ public class StaffFilterService {
     private UnitService unitService;
     @Inject
     private TeamService teamService;
-    @Inject private TimeSlotService timeSlotService;
     @Inject private FunctionGraphRepository functionGraphRepository;
     @Inject private SickConfigurationService sickConfigurationService;
 

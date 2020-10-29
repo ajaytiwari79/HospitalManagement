@@ -61,8 +61,6 @@ public class OrganizationController {
     @Inject
     private SkillService skillService;
     @Inject
-    private TimeSlotService timeSlotService;
-    @Inject
     private IntegrationConfigurationService integrationConfigurationService;
     @Inject
     private OpenningHourService openningHourService;

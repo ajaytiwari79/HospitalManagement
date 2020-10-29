@@ -21,17 +21,17 @@ public interface ReasonCodeRepository extends MongoBaseRepository<ReasonCode,Big
 
     List<ReasonCodeDTO> findByUnitIdInAndReasonCodeType(List<Long> unitId, ReasonCodeType reasonCodeType);
 
-    List<ReasonCodeDTO> findAllByUnitIdAndDeletedFalseOrderByCreationDate(long orgId);
+    //List<ReasonCodeDTO> findAllByUnitIdAndDeletedFalseOrderByCreatedAt(long orgId);
 
     boolean existsByUnitIdAndNameOrReasonCodeTypeOrCodeAndIdNotIn(Long unitId,  String name, ReasonCodeType reasonCodeType,String code,BigInteger reasonCodeId);
 
-    ReasonCode findByUnitIdAndReasonCodeAndDeletedFalse(long unitId, long reasonCodeId);
+    //ReasonCode findByUnitIdAndReasonCodeAndDeletedFalse(long unitId, long reasonCodeId);
 
-    List<ReasonCode> findByIdInAndDeletedFalse(Set<Long> reasonCodeIds);
+    //List<ReasonCode> findByIdInAndDeletedFalse(Set<Long> reasonCodeIds);
 
     boolean existsByTimeTypeIdAndDeletedFalse(BigInteger timeTypeId);
 
-    List<ReasonCodeDTO> findReasonCodeByCountryIdAndDeletedFalseOrderByCreationDateASC(Long countryId);
+    List<ReasonCodeDTO> findReasonCodeByCountryIdAndDeletedFalseOrderByCreatedAt(Long countryId);
 
     List<ReasonCodeDTO> findAllByIdAndDeletedFalse(Set<BigInteger> ids);
 

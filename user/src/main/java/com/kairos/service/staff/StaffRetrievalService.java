@@ -145,8 +145,6 @@ public class StaffRetrievalService {
     @Inject
     private EmploymentService employmentService;
     @Inject
-    private TimeSlotGraphRepository timeSlotGraphRepository;
-    @Inject
     private OrganizationBaseRepository organizationBaseRepository;
     @Inject
     private EmploymentFunctionRelationshipRepository employmentFunctionRelationshipRepository;

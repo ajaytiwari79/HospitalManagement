@@ -88,9 +88,6 @@ public class CitizenService {
     private OrganizationServiceRepository organizationServiceRepository;
 
     @Inject
-    private TimeSlotGraphRepository timeSlotGraphRepository;
-
-    @Inject
     private UnitGraphRepository unitGraphRepository;
 
     @Inject
@@ -115,8 +112,6 @@ public class CitizenService {
     TaskServiceRestClient taskServiceRestClient;
     @Autowired
     TaskDemandRestClient taskDemandRestClient;
-    @Inject
-    private TimeSlotService timeSlotService;
     @Inject
     private StaffCreationService staffCreationService;
     @Inject

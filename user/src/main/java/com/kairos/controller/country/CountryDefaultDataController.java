@@ -64,9 +64,6 @@ public class CountryDefaultDataController {
     private LanguageLevelService languageLevelService;
     @Inject
     private CitizenStatusService citizenStatusService;
-    @Inject
-    private TimeSlotService timeSlotService;
-
 
     // TODO Integrated
 //    @ApiOperation(value = "Get day types by id")

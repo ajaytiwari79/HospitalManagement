@@ -20,9 +20,6 @@ public interface CountryHolidayCalenderRepository extends MongoBaseRepository<Co
 
     CountryHolidayCalender findByCountryId(Long countryId);
 
-
-    List<CountryHolidayCalender> findAllByCountryIdAndHolidayDateBetweenStartDateAndEndDate(Long countryId, String startDate, String endDate);
-
     List<CountryHolidayCalenderDTO> getAllByCountryIdAndHolidayDateBetween(Long countryId, LocalDate startDate, LocalDate endDate);
 
     CountryHolidayCalenderDTO getByCountryIdAndHolidayDateBetween(Long countryId, LocalDate startDate, LocalDate endDate);

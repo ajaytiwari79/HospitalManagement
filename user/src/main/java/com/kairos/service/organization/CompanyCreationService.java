@@ -120,11 +120,7 @@ public class CompanyCreationService {
     @Inject
     private AccessGroupService accessGroupService;
     @Inject
-    private TimeSlotService timeSlotService;
-    @Inject
     private ActivityIntegrationService activityIntegrationService;
-    @Inject
-    private TimeSlotGraphRepository timeSlotGraphRepository;
     @Inject
     private UnitTypeGraphRepository unitTypeGraphRepository;
     @Inject
