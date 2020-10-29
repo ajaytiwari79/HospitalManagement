@@ -836,7 +836,7 @@ public class ShiftValidatorService {
 
     public ShiftDTO validateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, Boolean validatedByStaff, Phase actualPhases) {
         BigInteger shiftStateId = shiftDTO.getId();
-        ShiftState shiftState = shiftStateMongoRepository.findOne(shiftDTO.getId());
+        ShiftState shiftState = shiftStateMongoRepository.findOne(shiftStateId);
         if (shiftState == null) {
             Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
             if (shift != null) {
