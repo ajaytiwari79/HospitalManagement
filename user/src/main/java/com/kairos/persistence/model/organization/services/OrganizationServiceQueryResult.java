@@ -22,5 +22,6 @@ public class OrganizationServiceQueryResult {
     private String customName;
     private String description;
     private List<OrganizationServiceQueryResult> organizationSubServices;
+    private Map<String,TranslationInfo> translations;
 
 }

@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.country.default_data;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,5 +35,13 @@ public class VatTypeDTO {
         this.code = code;
         this.description = description;
         this.percentage = percentage;
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+    public String getDescription() {
+        return TranslationUtil.getDescription(translations,description);
     }
 }
