@@ -4,6 +4,7 @@ package com.kairos.dto.activity.payroll;
  *
  */
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,4 +27,8 @@ public class PayRollDTO {
 
     private boolean applicableForCountry;
     private Map<String, TranslationInfo> translations;
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
 }
