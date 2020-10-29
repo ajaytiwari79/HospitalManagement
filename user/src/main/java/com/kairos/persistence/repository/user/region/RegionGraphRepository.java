@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.region;
 
 import com.kairos.persistence.model.user.region.Region;
+import com.kairos.persistence.model.user.region.RegionQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -20,13 +21,13 @@ public interface RegionGraphRepository extends Neo4jBaseRepository<Region,Long> 
     @Query("Match (region:Region{isEnable:true}) return region")
     List<Region> findAll();
 
-    @Query("MATCH (r:Region{isEnable:true})-[:BELONGS_TO]->(c:Country) where id(c)={0} return {" +
-            "translations :{english :{name: CASE WHEN r.`translatedNames.english` IS NULL THEN '' ELSE r.`translatedNames.english` END, description : CASE WHEN r.`translatedDescriptions.english` IS NULL THEN '' ELSE r.`translatedDescriptions.english` END},\n" +
+    @Query("MATCH (r:Region{isEnable:true})-[:BELONGS_TO]->(c:Country) where id(c)={0}" +
+            " return {english :{name: CASE WHEN r.`translatedNames.english` IS NULL THEN '' ELSE r.`translatedNames.english` END, description : CASE WHEN r.`translatedDescriptions.english` IS NULL THEN '' ELSE r.`translatedDescriptions.english` END},\n" +
             "hindi:{name: CASE WHEN r.`translatedNames.hindi` IS NULL THEN '' ELSE r.`translatedNames.hindi` END, description : CASE WHEN r.`translatedDescriptions.hindi` IS NULL THEN '' ELSE r.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN r.`translatedNames.danish` IS NULL THEN '' ELSE r.`translatedNames.danish` END, description : CASE WHEN r.`translatedDescriptions.danish` IS NULL THEN '' ELSE r.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN r.`translatedNames.britishenglish` IS NULL THEN '' ELSE r.`translatedNames.britishenglish` END, description : CASE WHEN r.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE r.`translatedDescriptions.britishenglish` END}},\n" +
-            "name:r.name, code:r.code, geoFence:r.geoFence, latitude:r.latitude, longitude:r.longitude ,id: id(r)} as result")
-    List<Map<String,Object>> findAllRegionsByCountryId(Long countryId);
+            "danish:{name: CASE WHEN r.`translatedNames.danish` IS NULL THEN '' ELSE r.`translatedNames.danish` END, description : CASE WHEN r.`translatedDescriptions.danish` IS NULL THEN '' ELSE r.`translatedDescriptions.danish` END} ,\n" +
+            "britishenglish:{name: CASE WHEN r.`translatedNames.britishenglish` IS NULL THEN '' ELSE r.`translatedNames.britishenglish` END, description : CASE WHEN r.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE r.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "r.name as name, r.code as code, r.geoFence as geoFence, r.latitude   as latitude, r.longitude as longitude ,id(r) as id")
+    List<RegionQueryResult> findAllRegionsByCountryId(Long countryId);
 
     @Query("MATCH (n:Region)  WITH n as r  " +
             "OPTIONAL MATCH (r)-[:MUNICIPALITY_LIST]->(m:Municipality) return { " +

@@ -1,5 +1,6 @@
 package com.kairos.service.tag;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.controller.staffing_level.StaffingLevelController;
 import com.kairos.dto.TranslationInfo;
@@ -90,15 +91,18 @@ public class TagService extends MongoBaseService {
 
         HashMap<String,Object> tagsData = new HashMap<>();
         List<Tag> tags;
+        List<TagDTO> tagDTOS ;
         if(masterDataType == null){
             tags = tagMongoRepository.findAllTagByCountryIdAndNameAndDeletedAndCountryTagTrue(countryId, filterText, false);
         } else {
             tags = tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeletedAndCountryTagTrue(countryId, filterText, masterDataType.toString(), false);
         }
+
         if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.equals(masterDataType)){
             tags.addAll(userIntegrationService.getAllStaffTagsByCountryIdOrOrganizationId(countryId, filterText, true));
         }
-        tagsData.put("tags",tags);
+        tagDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(tags, com.kairos.dto.activity.tags.TagDTO.class);
+        tagsData.put("tags",tagDTOS);
         return tagsData;
     }
 

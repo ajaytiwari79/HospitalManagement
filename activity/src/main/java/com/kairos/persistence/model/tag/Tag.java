@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.tag;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
@@ -59,5 +60,6 @@ public class Tag extends MongoBaseEntity {
             this.organizationId = countryOrOrgId;
         }
     }
+
 
 }

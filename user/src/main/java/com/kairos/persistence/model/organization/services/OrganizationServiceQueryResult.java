@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.organization.services;
 
+import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,4 +21,5 @@ public class OrganizationServiceQueryResult {
     private String customName;
     private String description;
     private List<OrganizationServiceQueryResult> organizationSubServices;
+
 }

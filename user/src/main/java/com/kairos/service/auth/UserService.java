@@ -559,8 +559,7 @@ public class UserService {
     public boolean updateSelectedLanguageOfUser(Long userLanguageId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(userLanguageId);
-        currentUser.setUserLanguage(systemLanguage);
-        userGraphRepository.save(currentUser);
+        userGraphRepository.updateUserSystemLanguage(currentUser.getId(),userLanguageId);
         return true;
     }
 

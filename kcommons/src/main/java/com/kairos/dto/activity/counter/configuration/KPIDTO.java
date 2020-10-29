@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.counter.configuration;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ChartType;
@@ -55,5 +56,9 @@ public class KPIDTO {
     public KPIDTO(BigInteger id, CounterSize size) {
         this.id = id;
         this.size = size;
+    }
+
+    public String getTitle() {
+        return TranslationUtil.getName(translations,title);
     }
 }

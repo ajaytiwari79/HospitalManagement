@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.country.tag;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,4 +36,9 @@ public class TagQueryResult {
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
     private Map<String, TranslationInfo> translations;
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
 }

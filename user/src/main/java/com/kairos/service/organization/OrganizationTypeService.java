@@ -139,16 +139,9 @@ public class OrganizationTypeService{
         return null;
     }
 
-    public List<Object> getOrgSubTypesByTypeId(Long organizationTypeId) {
-        List<Object> response = new ArrayList<>();
-        List<Map<String, Object>> queryResponse = organizationTypeGraphRepository.getOrganizationSubTypeByTypeId(organizationTypeId);
-        if (!queryResponse.isEmpty()) {
-            for (Map<String, Object> map : queryResponse) {
-                Object o = map.get("result");
-                response.add(o);
-            }
-        }
-        return response;
+    public List<OrgTypeLevelWrapper> getOrgSubTypesByTypeId(Long organizationTypeId) {
+        List<OrgTypeLevelWrapper> organizationSubTypes = organizationTypeGraphRepository.getOrganizationSubTypeByTypeId(organizationTypeId);
+        return organizationSubTypes;
     }
 
     /**

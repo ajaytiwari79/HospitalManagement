@@ -1,14 +1,11 @@
 package com.kairos.service.region;
 
 import com.kairos.dto.TranslationInfo;
-import com.kairos.persistence.model.user.region.Municipality;
-import com.kairos.persistence.model.user.region.Province;
-import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.model.user.region.*;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.FormatUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,8 +112,8 @@ public class MunicipalityService {
         return false;
     }
 
-    public List<Map<String,Object>> getAllZipCodeToMunicipality(Long municipalityId) {
-        return FormatUtil.formatNeoResponse( municipalityGraphRepository.getAllZipCodes(municipalityId));
+    public List<ZipCodeQueryResult> getAllZipCodeToMunicipality(Long municipalityId) {
+        return municipalityGraphRepository.getAllZipCodes(municipalityId);
     }
 
 
@@ -131,9 +128,8 @@ public class MunicipalityService {
         return null;
     }
 
-    public List<Map<String,Object>> getMunicipalityToProvince(Long provinceId) {
-        return FormatUtil.formatNeoResponse(municipalityGraphRepository.getAllMunicipalitiesOfProvince(provinceId));
-
+    public List<MunicipalityQueryResults> getMunicipalityToProvince(Long provinceId) {
+        return municipalityGraphRepository.getAllMunicipalitiesOfProvince(provinceId);
     }
 
     public List<Municipality> getMunicipalitiesByZipCode(int zipcode){

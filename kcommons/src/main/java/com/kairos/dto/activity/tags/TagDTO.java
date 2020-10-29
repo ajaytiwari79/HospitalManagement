@@ -2,6 +2,8 @@ package com.kairos.dto.activity.tags;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.tag.PenaltyScoreDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import lombok.Getter;
@@ -10,6 +12,7 @@ import lombok.Setter;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,4 +33,9 @@ public class TagDTO {
     private String shortName;
     private String ultraShortName;
     private String color;
+    private Map<String, TranslationInfo> translations;
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
 }
