@@ -3,8 +3,10 @@ package com.kairos.service.pay_group_area;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.country.LevelDTO;
 import com.kairos.dto.user.country.pay_group_area.PayGroupAreaDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
@@ -14,6 +16,7 @@ import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaMunicipalityRelationship;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
+import com.kairos.persistence.model.user.region.MunicipalityQueryResults;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaRelationshipRepository;
@@ -222,8 +225,16 @@ public class PayGroupAreaService {
 
         }
         List<Level> organizationLevels = countryGraphRepository.getLevelsByCountry(countryId);
+        List<LevelDTO> levelDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationLevels,LevelDTO.class);
+        levelDTOS.forEach(levelDTO -> {
+            levelDTO.setTranslations(TranslationUtil.getTranslatedData(levelDTO.getTranslatedNames(),levelDTO.getTranslatedDescriptions()));
+        });
         List<Municipality> municipalities = municipalityGraphRepository.getMunicipalityByCountryId(countryId);
-        return new PayGroupAreaResponse(organizationLevels, municipalities);
+        List<MunicipalityQueryResults> municipalityQueryResults =ObjectMapperUtils.copyCollectionPropertiesByMapper(municipalities,MunicipalityQueryResults.class);
+        municipalityQueryResults.forEach(municipality->{
+            municipality.setTranslations(TranslationUtil.getTranslatedData(municipality.getTranslatedNames(),municipality.getTranslatedDescriptions()));
+        });
+        return new PayGroupAreaResponse(levelDTOS, municipalityQueryResults);
     }
 
 

@@ -2,6 +2,7 @@ package com.kairos.persistence.model.country.functions;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
@@ -54,5 +55,13 @@ public class FunctionDTO {
         this.organizationLevels = organizationLevels;
         this.icon = icon;
         this.code=code;
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+    public String getDescription() {
+        return TranslationUtil.getDescription(translations,description);
     }
 }
