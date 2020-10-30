@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.presence_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,10 @@ public class PresenceTypeDTO {
     public PresenceTypeDTO(@NotBlank(message = "error.PresenceTypeDTO.name.notEmpty") String name, BigInteger id) {
         this.name = name;
         this.id = id;
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
     }
 
 

@@ -1,5 +1,6 @@
 package com.kairos.dto.user.country;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,5 +23,13 @@ public class LanguageDTO {
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
     private Map<String, TranslationInfo> translations ;
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+    public String getDescription() {
+        return TranslationUtil.getDescription(translations,description);
+    }
 
 }

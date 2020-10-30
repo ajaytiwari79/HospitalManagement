@@ -4,6 +4,7 @@ import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
 import com.kairos.persistence.model.organization_type.OrganizationTypeSubTypeAndServicesQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
+import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -109,8 +110,10 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
 
     @Query("Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_SKILL{deleted:false}]->(skill{isEnabled:true}) where id(orgType)={0} " +
             "MATCH (skillCategory:SkillCategory)<-[:HAS_CATEGORY]-(skill) \n" +
-            "return  case when skill is NULL then [] else collect({id:id(skill),name:skill.name}) END as  skillList  ,skillCategory.name as name ,id(skillCategory) as id,skillCategory.description as description")
-    List<OrgTypeSkillQueryResult> getSkillsOfOrganizationType(long orgTypeId);
+            "return  case when skill is NULL then [] else collect(skill) END as  skillList  ,skillCategory.name as name ,id(skillCategory) as id,skillCategory.description as description," +
+            "{english: CASE WHEN skillCategory.`translatedNames.english` IS NULL THEN '' ELSE skillCategory.`translatedNames.english` END,danish: CASE WHEN skillCategory.`translatedNames.danish` IS NULL THEN '' ELSE skillCategory.`translatedNames.danish` END,hindi: CASE WHEN skillCategory.`translatedNames.hindi` IS NULL THEN '' ELSE skillCategory.`translatedNames.hindi` END,britishenglish: CASE WHEN skillCategory.`translatedNames.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN skillCategory.`translatedDescriptions.english` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.english` END,danish: CASE WHEN skillCategory.`translatedDescriptions.danish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.danish` END,hindi: CASE WHEN skillCategory.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN skillCategory.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.britishenglish` END} as translatedDescriptions")
+    List<SkillCategoryQueryResults> getSkillsOfOrganizationType(long orgTypeId);
 
     @Query("Match (n:Unit{isEnable:true,union:false,boardingCompleted:true,isKairosHub:false,gdprUnit:false})-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) where id(organizationType)={0} return DISTINCT n")
     List<Unit> getOrganizationsByOrganizationType(long orgTypeId);

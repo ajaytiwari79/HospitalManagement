@@ -1,5 +1,6 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.Day;
 import lombok.Getter;
@@ -50,6 +51,14 @@ public class DayTypeDTO {
         this.holidayType = holidayType;
         this.allowTimeSettings = allowTimeSettings;
         this.colorCode=colorCode;
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+    public String getDescription() {
+        return TranslationUtil.getDescription(translations,description);
     }
 
 }

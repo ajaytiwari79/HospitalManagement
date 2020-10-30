@@ -220,16 +220,27 @@ public class OrganizationServiceService {
     }
 
 
-    public List<Object> getOrgServicesByOrgType(long orgType) {
-        List<Object> objectList = new ArrayList<>();
-        List<Map<String, Object>> organizationServices = organizationServiceRepository.getOrgServicesByOrgType(orgType);
-        if (organizationServices != null) {
-            for (Map<String, Object> map : organizationServices) {
-                Object o = map.get(RESULT);
-                objectList.add(o);
-            }
+    public List<Map<String,Object>> getOrgServicesByOrgType(long orgType) {
+        List<Long> organizationServiceIds = organizationServiceRepository.getAllOrganizationServiceId(orgType);
+        List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(organizationServiceIds));
+        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
+        List<Map<String,Object>> mapList =new ArrayList<>();
+        Map<String,Object> data = new HashMap<>();
+        for (OrganizationServiceDTO result : organizationServiceDTOS) {
+            result.getOrganizationSubService().forEach(organizationServiceDTO -> {
+                organizationServiceDTO.setTranslations(TranslationUtil.getTranslatedData(organizationServiceDTO.getTranslatedNames(),organizationServiceDTO.getTranslatedDescriptions()));
+            });
+            result.setTranslations(result.getTranslatedData());
+
+            data.put("id", result.getId());
+            data.put("name", result.getName());
+            data.put("description",result.getDescription());
+            data.put("children", result.getOrganizationSubService());
+            data.put("translations", result.getTranslations());
+            mapList.add(data);
+            data = new HashMap<>();
         }
-        return objectList;
+        return mapList;
     }
 
     public List<Object> linkOrgServiceWithOrgType(long orgTypeId, long serviceId) {

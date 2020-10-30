@@ -51,7 +51,7 @@ public class OrganizationTypeController {
     @RequestMapping(value = "/organization_type/{orgTypeId}/organization_service", method = RequestMethod.GET)
     @ApiOperation("get organization sub services by organization type")
     public ResponseEntity<Map<String, Object>> getOrganizationServices(@PathVariable long orgTypeId) {
-        List<Object> organizationServices = organizationServiceService.getOrgServicesByOrgType(orgTypeId);
+            List<Map<String,Object>> organizationServices = organizationServiceService.getOrgServicesByOrgType(orgTypeId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServices);
     }
 
