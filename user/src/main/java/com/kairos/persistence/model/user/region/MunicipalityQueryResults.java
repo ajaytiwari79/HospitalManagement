@@ -25,6 +25,8 @@ public class MunicipalityQueryResults {
     private String code;
     private Double latitude;
     private Double Longitude;
+    private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
     private Map<String, TranslationInfo> translations;
 
     public String getName() {

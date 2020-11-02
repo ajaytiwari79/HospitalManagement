@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -67,6 +68,14 @@ public class PhaseDTO {
 
     public PhaseWeeklyDTO buildWeekDTO() {
         return new PhaseWeeklyDTO(id, name, description, duration, sequence, organizationId);
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+    public String getDescription() {
+        return TranslationUtil.getDescription(translations,description);
     }
 
 
