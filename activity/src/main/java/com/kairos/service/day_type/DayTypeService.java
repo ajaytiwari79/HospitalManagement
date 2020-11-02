@@ -76,7 +76,7 @@ public class DayTypeService {
 
     public boolean deleteDayType(BigInteger dayTypeId) {
         DayType dayType = dayTypeRepository.findById(dayTypeId).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage("MESSAGE_EXPERTISE_ID_NOTFOUND")));
-        dayType.setEnabled(false);
+        dayType.setDeleted(true);
         dayTypeRepository.save(dayType);
         return true;
     }

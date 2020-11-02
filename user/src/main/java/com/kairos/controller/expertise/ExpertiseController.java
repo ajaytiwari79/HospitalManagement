@@ -249,7 +249,7 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateTranslation(id,translations));
     }
 
-    @PutMapping(value = COUNTRY_URL+"/all_expertise_by_country")
+    @GetMapping(value = COUNTRY_URL+"/all_expertise_by_country")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getAllCountryExpertiseIds(@PathVariable Long countryId) {

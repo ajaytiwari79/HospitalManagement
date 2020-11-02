@@ -23,7 +23,8 @@ public class CountryHolidayCalenderRepositoryImpl implements CustomCountryHolida
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").is(countryId).and(DELETED).is(false)),
                 lookup("DayType", "dayTypeId", "_id", "dayTypes"),
-                project("dayTypes.name","dayTypes.allowTimeSettings","dayTypes.colorCode","dayTypes._id")
+                project("holidayTitle","description","startTime","endTime","holidayDate").and("dayTypes.name").as("dayTYpe").and("dayTypes.allowTimeSettings").as("allowTimeSettings").and("dayTypes._id").as("dayTypeId")
+                .and("dayTypes.colorCode").as("colorCode")
         );
         AggregationResults<CountryHolidayCalenderDTO> result = mongoTemplate.aggregate(aggregation, CountryHolidayCalender.class, CountryHolidayCalenderDTO.class);
         return result.getMappedResults();
