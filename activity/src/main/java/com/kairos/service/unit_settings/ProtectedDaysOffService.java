@@ -82,8 +82,8 @@ public class ProtectedDaysOffService extends MongoBaseService {
     }
 
     public ProtectedDaysOffSettingDTO addOrUpdateProtectedDaysOffSetting(Long expertiseId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO) {
-        ProtectedDaysOff protectedDaysOff=protectedDaysOffRepository.findByExpertiseIdAndHolidayIdAndDeletedFalse(expertiseId,protectedDaysOffSettingDTO.getHolidayId());
-        protectedDaysOff=ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOffSettingDTO,ProtectedDaysOff.class);
+        ProtectedDaysOff protectedDaysOff=ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOffSettingDTO,ProtectedDaysOff.class);
+        protectedDaysOff.setExpertiseId(expertiseId);
         protectedDaysOffRepository.save(protectedDaysOff);
         protectedDaysOffSettingDTO.setId(protectedDaysOff.getId());
         return protectedDaysOffSettingDTO;
@@ -103,8 +103,8 @@ public class ProtectedDaysOffService extends MongoBaseService {
         List<ProtectedDaysOff> protectedDaysOffs = new ArrayList<>();
         for (CountryHolidayCalenderDTO countryHolidayCalendarQueryResult : countryHolidayCalendarQueryResults) {
             for (Long expertiseId : expertises) {
-                if (!countryHolidayCalendarQueryResult.getDayTypeDTO().isAllowTimeSettings() && countryHolidayCalendarQueryResult.getDayTypeDTO().isHolidayType()) {
-                    protectedDaysOffs.add(new ProtectedDaysOff(countryHolidayCalendarQueryResult.getId(), countryHolidayCalendarQueryResult.getHolidayDate(), true, countryHolidayCalendarQueryResult.getDayTypeDTO().getId(), expertiseId));
+                if (!countryHolidayCalendarQueryResult.isAllowTimeSettings() && countryHolidayCalendarQueryResult.isHolidayType()) {
+                    protectedDaysOffs.add(new ProtectedDaysOff(countryHolidayCalendarQueryResult.getId(), countryHolidayCalendarQueryResult.getHolidayDate(), true, countryHolidayCalendarQueryResult.getDayTypeId(), expertiseId));
                 }
             }
 

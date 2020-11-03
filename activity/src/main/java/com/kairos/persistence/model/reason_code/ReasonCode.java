@@ -36,12 +36,12 @@ public class ReasonCode extends MongoBaseEntity {
         this.timeTypeId=timeTypeId;
     }
 
-    public ReasonCode(String name, String code, String description, ReasonCodeType reasonCodeType,  BigInteger timeTypeId,Long countryId) {
+    public ReasonCode(String name, String code, String description, ReasonCodeType reasonCodeType,  BigInteger timeTypeId,Long unitId) {
         this.name = name;
         this.code = code;
         this.description = description;
         this.reasonCodeType = reasonCodeType;
-        this.countryId = countryId;
+        this.unitId = unitId;
         this.timeTypeId=timeTypeId;
     }
 }

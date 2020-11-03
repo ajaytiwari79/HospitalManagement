@@ -26,6 +26,7 @@ import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
@@ -298,8 +299,9 @@ public class OrganizationActivityService extends MongoBaseService {
             activityTagDTO.setActivityCanBeCopied(activityCanBeCopied);
         }
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
+        List<ActivityCategoryDTO> activityCategoryDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(activityCategories,ActivityCategoryDTO.class);
         response.put("activities", activities);
-        response.put("activityCategories", activityCategories);
+        response.put("activityCategories", activityCategoryDTOS);
         return response;
     }
 

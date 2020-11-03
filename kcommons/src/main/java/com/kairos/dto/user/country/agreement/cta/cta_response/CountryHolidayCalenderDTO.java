@@ -17,7 +17,7 @@ public class CountryHolidayCalenderDTO {
 
     private BigInteger id;
     private boolean reOccuring;
-    private String holidayType;
+    private boolean holidayType;
     private boolean isEnabled = true;
     private String googleCalId;
     private String holidayTitle;

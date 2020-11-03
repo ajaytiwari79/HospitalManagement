@@ -44,14 +44,18 @@ public class TranslationUtil {
         }
     }
 
-    public static Map<String,TranslationInfo> convertUnmodifiableMapToModifiableMap(Map<String, TranslationInfo> translations){
-        Map<String,Map> translationInfoMap = ObjectMapperUtils.copyPropertiesByMapper(translations, HashedMap.class);
-        Map<String,TranslationInfo> translationMap = new HashMap<>();
-        for(Map.Entry<String,Map> translationInfoEntry : translationInfoMap.entrySet()){
-            TranslationInfo translationInfo = new TranslationInfo((String)translationInfoEntry.getValue().get("name"),(String)translationInfoEntry.getValue().get("description"));
-            translationMap.put(translationInfoEntry.getKey(),translationInfo);
+    public static Map<String,TranslationInfo> convertUnmodifiableMapToModifiableMap(Map<String, TranslationInfo> translations) {
+        if (isNotNull(translations)) {
+            Map<String, Map> translationInfoMap = ObjectMapperUtils.copyPropertiesByMapper(translations, HashedMap.class);
+            Map<String, TranslationInfo> translationMap = new HashMap<>();
+            for (Map.Entry<String, Map> translationInfoEntry : translationInfoMap.entrySet()) {
+                TranslationInfo translationInfo = new TranslationInfo((String) translationInfoEntry.getValue().get("name"), (String) translationInfoEntry.getValue().get("description"));
+                translationMap.put(translationInfoEntry.getKey(), translationInfo);
+            }
+            return translationMap;
+        }else{
+            return new HashMap<>();
         }
-        return translationMap;
     }
 
 }

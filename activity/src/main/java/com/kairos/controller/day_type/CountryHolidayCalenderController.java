@@ -36,6 +36,8 @@ public class CountryHolidayCalenderController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,countryHolidayCalenderService.getAllCountryHolidaysByCountryIdAndYear(year,countryId));
     }
 
+
+
     // CountryHolidayCalender based on countryId
     @RequestMapping(value =COUNTRY_URL+"/holiday/all",method = RequestMethod.GET)
     @ApiOperation("Get all CountryHolidayCalenderController holiday All")

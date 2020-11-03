@@ -4,6 +4,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.day_type.CountryHolidayCalender;
+import com.kairos.persistence.model.day_type.DayType;
 import com.kairos.persistence.repository.day_type.CountryHolidayCalenderRepository;
 import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -47,6 +48,9 @@ public class CountryHolidayCalenderService {
         CountryHolidayCalender countryHolidayCalender = ObjectMapperUtils.copyPropertiesByMapper(countryHolidayCalenderDTO, CountryHolidayCalender.class);
         countryHolidayCalender.setCountryId(countryId);
         countryHolidayCalenderRepository.save(countryHolidayCalender);
+        DayType dayType=dayTypeRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
+        countryHolidayCalenderDTO.setHolidayType(dayType.isHolidayType());
+        countryHolidayCalenderDTO.setId(countryHolidayCalender.getId());
         protectedDaysOffService.linkProtectedDaysOffSetting(Arrays.asList(countryHolidayCalenderDTO),null,countryId);
         return countryHolidayCalenderDTO;
     }

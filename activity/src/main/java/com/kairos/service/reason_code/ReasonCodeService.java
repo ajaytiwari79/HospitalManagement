@@ -39,7 +39,7 @@ public class ReasonCodeService {
     }
 
     public ReasonCodeDTO createReasonCodeForUnit(long unitId, ReasonCodeDTO reasonCodeDTO) {
-        boolean isAlreadyExists = reasonCodeRepository.existsByUnitIdAndNameOrReasonCodeTypeOrCodeAndIdNotIn(unitId,  "(?i)" + reasonCodeDTO.getName().trim(), reasonCodeDTO.getReasonCodeType(),reasonCodeDTO.getCode(),new BigInteger("-1"));
+        boolean isAlreadyExists = reasonCodeRepository.existsByUnitIdAndNameOrReasonCodeTypeOrCodeAndIdNotIn(unitId,  reasonCodeDTO.getName().trim(), reasonCodeDTO.getReasonCodeType(),reasonCodeDTO.getCode(),new BigInteger("-1"));
         if (isAlreadyExists) {
             exceptionService.duplicateDataException("MESSAGE_REASONCODE_NAME_ALREADYEXIST", reasonCodeDTO.getName());
         }

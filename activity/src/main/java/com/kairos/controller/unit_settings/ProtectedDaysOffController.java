@@ -60,5 +60,11 @@ public class ProtectedDaysOffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, protectedDaysOffService.getProtectedDaysOffByExpertiseId(expertiseId));
     }
 
+    @ApiOperation(value = "add proteched days off setting")
+    @PostMapping(value =  "/expertise/{expertiseId}/protected_days_off")
+    public ResponseEntity<Map<String, Object>> addProtechedDaysOffSetting(@PathVariable Long expertiseId, @RequestBody ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, protectedDaysOffService.addOrUpdateProtectedDaysOffSetting(expertiseId, protectedDaysOffSettingDTO));
+    }
+
 
 }
