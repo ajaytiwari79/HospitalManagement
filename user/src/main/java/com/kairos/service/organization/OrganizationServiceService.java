@@ -311,6 +311,18 @@ public class OrganizationServiceService {
             }
         }
 
+        getAllOrganizationServices(avialableService, selectedService, availableServiceDTOS, availableSubServiceDTOS, selectedServiceDTOS, selectedSubServiceDTOS);
+
+        Map<String,List<OrganizationServiceDTO>> organizationServiceMap = new HashMap<>();
+        organizationServiceMap.put(AVAILABLE_SERVICES,availableServiceDTOS);
+        organizationServiceMap.put(SELECTED_SERVICES,selectedServiceDTOS);
+
+
+        return organizationServiceMap;
+
+    }
+
+    private void getAllOrganizationServices(List<Map<String, Object>> avialableService, List<Map<String, Object>> selectedService, List<OrganizationServiceDTO> availableServiceDTOS, List<OrganizationServiceDTO> availableSubServiceDTOS, List<OrganizationServiceDTO> selectedServiceDTOS, List<OrganizationServiceDTO> selectedSubServiceDTOS) {
         avialableService.forEach(as->{
             List<Map<String,Object>> availableSubServices =(List<Map<String,Object>>)as.get("children");
             availableSubServices.forEach(ass->{
@@ -333,14 +345,6 @@ public class OrganizationServiceService {
             selectedServiceDTOS.add(organizationSelectedServiceDTO);
 
         });
-
-        Map<String,List<OrganizationServiceDTO>> organizationServiceMap = new HashMap<>();
-        organizationServiceMap.put(AVAILABLE_SERVICES,availableServiceDTOS);
-        organizationServiceMap.put(SELECTED_SERVICES,selectedServiceDTOS);
-
-
-        return organizationServiceMap;
-
     }
 
     private Map<String, Object> filterSkillData(List<Map<String, Object>> skillData) {
