@@ -3,7 +3,9 @@ package com.kairos.dto.user.organization;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user_context.UserContext;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -20,6 +22,8 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
  */
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrganizationServiceDTO {
     @NotEmpty(message = "error.Organization.Service.customName.notEmptyOrNotNull") @NotNull(message = "error.Organization.Service.customName.notEmptyOrNotNull")
     private String customName;
@@ -30,11 +34,17 @@ public class OrganizationServiceDTO {
     private Map<String,String>  translatedNames ;
     private Map<String,String>  translatedDescriptions ;
     private Map<String, TranslationInfo> translations ;
+    private Long unitId;
+    private List<OrganizationServiceDTO> children;
 
     public Map<String, TranslationInfo> getTranslatedData() {
-        Map<String, TranslationInfo> infoMap=new HashMap<>();
-        translatedNames.forEach((k,v)-> infoMap.put(k,new TranslationInfo(v,translatedDescriptions.get(k))));
-        return infoMap;
+        if(isNotNull(translatedNames) && isNotNull(translatedDescriptions)) {
+            Map<String, TranslationInfo> infoMap = new HashMap<>();
+            translatedNames.forEach((k, v) -> infoMap.put(k, new TranslationInfo(v, translatedDescriptions.get(k))));
+            return infoMap;
+        }else {
+            return new HashMap<>();
+        }
     }
 
     public List<OrganizationServiceDTO> getOrganizationSubService() {
@@ -44,11 +54,21 @@ public class OrganizationServiceDTO {
         return organizationSubService;
     }
 
+    public OrganizationServiceDTO(@NotEmpty(message = "error.Organization.Service.customName.notEmptyOrNotNull") @NotNull(message = "error.Organization.Service.customName.notEmptyOrNotNull") String customName, Long id, String name, String description, Map<String, TranslationInfo> translations, Long unitId, List<OrganizationServiceDTO> children) {
+        this.customName = customName;
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.translations = translations;
+        this.unitId = unitId;
+        this.children = children;
+    }
+
     public String getName() {
-       return TranslationUtil.getName(translations,name);
+       return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
     }
 
     public String getDescription() {
-       return TranslationUtil.getDescription(translations,description);
+       return TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
     }
 }

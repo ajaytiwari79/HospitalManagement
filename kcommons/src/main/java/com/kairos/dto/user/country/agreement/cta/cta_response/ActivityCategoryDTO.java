@@ -19,6 +19,8 @@ public class ActivityCategoryDTO {
 
     private String name;
     private BigInteger id;
+    private Long countryId;
+    private BigInteger timeTypeId;
 
     public ActivityCategoryDTO(BigInteger id, String name) {
         this.name = name;
