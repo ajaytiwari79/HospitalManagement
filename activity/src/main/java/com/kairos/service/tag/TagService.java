@@ -171,7 +171,8 @@ public class TagService extends MongoBaseService {
         if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.equals(masterDataType)){
             tags.addAll(userIntegrationService.getAllStaffTagsByCountryIdOrOrganizationId(organizationId, filterText, false));
         }
-        tagsData.put("tags",tags);
+        List<com.kairos.dto.activity.tags.TagDTO> tagDTOS =ObjectMapperUtils.copyCollectionPropertiesByMapper(tags, com.kairos.dto.activity.tags.TagDTO.class);
+        tagsData.put("tags",tagDTOS);
         return tagsData;
     }
 
