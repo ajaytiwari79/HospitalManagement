@@ -850,7 +850,8 @@ public class ActivityService {
         });
     }
     public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
-        return activityMongoRepository.findAllActivityByUnitId(unitId, false);
+        List<ActivityDTO> activityDTOS = activityMongoRepository.findAllActivityByUnitId(unitId, false);
+        return activityDTOS;
     }
     public void validateActivityTimeRules( Short shortestTime, Short longestTime) {
         if (shortestTime != null && longestTime != null && shortestTime > longestTime) {
