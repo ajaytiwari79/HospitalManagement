@@ -92,6 +92,7 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     protected UserInfo createdBy;
     private boolean disabled;
     private ShiftViolatedRules shiftViolatedRules;
+    private Map<String,Object> changes;
 
     public ShiftDTO(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivityDTO> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
         this.startDate = startDate;

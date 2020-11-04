@@ -675,6 +675,7 @@ public class ShiftService extends MongoBaseService {
             }
             shiftValidatorService.escalationCorrectionInShift(shiftDTO, currentShiftStartDate, currentShiftEndDate, shift);
         }
+        shiftDetailsService.updateTimingChanges(oldShift,shiftDTO);
         return shiftWithViolatedInfoDTOS;
     }
 
