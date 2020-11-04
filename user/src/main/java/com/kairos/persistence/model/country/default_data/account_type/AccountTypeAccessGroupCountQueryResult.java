@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.country.default_data.account_type;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,27 +20,7 @@ public class AccountTypeAccessGroupCountQueryResult {
     private short count;
     private Map<String, TranslationInfo> translations;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public short getCount() {
-        return count;
-    }
-
-    public void setCount(short count) {
-        this.count = count;
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
     }
 }
