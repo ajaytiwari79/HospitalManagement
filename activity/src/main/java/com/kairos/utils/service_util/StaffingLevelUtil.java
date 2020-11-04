@@ -440,11 +440,15 @@ public class StaffingLevelUtil {
                 List<StaffingLevelSkill> staffingLevelSkillIterator = new CopyOnWriteArrayList<>(staffingLevelSkills);
                 for (StaffingLevelActivity staffingLevelActivity : staffingLevelActivityIterator) {
                     staffingLevelIntervalLog.getStaffingLevelActivities().remove(staffingLevelActivity);
-                    staffingLevelIntervalLog.getStaffingLevelActivities().add(staffingLevelActivityMap.get(staffingLevelActivity.getActivityId()));
+                    if(staffingLevelActivityMap.containsKey(staffingLevelActivity.getActivityId())) {
+                        staffingLevelIntervalLog.getStaffingLevelActivities().add(staffingLevelActivityMap.get(staffingLevelActivity.getActivityId()));
+                    }
                 }
                 for (StaffingLevelSkill staffingLevelSkill : staffingLevelSkillIterator) {
                     staffingLevelIntervalLog.getStaffingLevelSkills().remove(staffingLevelSkill);
-                    staffingLevelIntervalLog.getStaffingLevelSkills().add(staffingLevelSkillMap.get(staffingLevelSkill.getSkillId()));
+                    if(staffingLevelSkillMap.containsKey(staffingLevelSkill.getSkillId())) {
+                        staffingLevelIntervalLog.getStaffingLevelSkills().add(staffingLevelSkillMap.get(staffingLevelSkill.getSkillId()));
+                    }
                 }
             }
         }
