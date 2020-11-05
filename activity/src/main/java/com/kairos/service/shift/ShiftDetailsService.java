@@ -1,8 +1,6 @@
 package com.kairos.service.shift;
 
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.enums.shift.ShiftStatus;
@@ -31,7 +29,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getMinutesBetweenDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.shift.ShiftType.SICK;
 import static java.util.stream.Collectors.toMap;
@@ -154,25 +152,34 @@ public class ShiftDetailsService extends MongoBaseService {
         return activity;
     }
 
-    public void updateTimingChanges(Shift oldShift, ShiftDTO shiftDTO) {
-        Map<String,Object> map=new HashMap<>();
-        if(!oldShift.getStartDate().equals(shiftDTO.getStartDate())){
-            Date startDate=shiftDTO.getStartDate().before(oldShift.getStartDate())?shiftDTO.getStartDate():oldShift.getStartDate();
-            Date endDate=shiftDTO.getStartDate().before(oldShift.getStartDate())?oldShift.getStartDate():shiftDTO.getStartDate();
-            boolean shiftExtends=shiftDTO.getStartDate().before(oldShift.getStartDate());
-            map.put("startDate",startDate);
-            map.put("endDate",endDate);
-            map.put("shiftExtend",shiftExtends);
-            map.put("minutes",getMinutesBetweenDate(startDate,endDate));
-        } else if(!oldShift.getEndDate().equals(shiftDTO.getEndDate())){
-            Date startDate=shiftDTO.getEndDate().before(oldShift.getEndDate())?shiftDTO.getEndDate():oldShift.getEndDate();
-            Date endDate=shiftDTO.getEndDate().before(oldShift.getEndDate())?oldShift.getEndDate():shiftDTO.getEndDate();
-            boolean shiftExtends=shiftDTO.getEndDate().after(oldShift.getStartDate());
-            map.put("startDate",startDate);
-            map.put("endDate",endDate);
-            map.put("shiftExtend",shiftExtends);
-            map.put("minutes",getMinutesBetweenDate(startDate,endDate));
+    public void updateTimingChanges(Shift oldShift, ShiftDTO shiftDTO, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO) {
+        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().stream().filter(k -> "Minimum shift’s length".equals(k.getName()) || "Maximum shift’s length".equals(k.getName())).findAny().orElse(null);
+        if (isNotNull(workTimeAgreementRuleViolation)) {
+            Map<String, Object> map = new HashMap<>();
+            if (!oldShift.getStartDate().equals(shiftDTO.getStartDate())) {
+                Date startDate = shiftDTO.getStartDate().before(oldShift.getStartDate()) ? shiftDTO.getStartDate() : oldShift.getStartDate();
+                Date endDate = shiftDTO.getStartDate().before(oldShift.getStartDate()) ? oldShift.getStartDate() : shiftDTO.getStartDate();
+                boolean shiftExtends = shiftDTO.getStartDate().before(oldShift.getStartDate());
+                int minutes = getMinutesFromTime(workTimeAgreementRuleViolation.getUnitValue());
+                map.put("escalatedStartDate", shiftExtends ? asZonedDateTime(shiftDTO.getStartDate()) : asZonedDateTime(oldShift.getStartDate()));
+                map.put("escalatedEndDate", shiftExtends?asZonedDateTime(shiftDTO.getEndDate()).minusMinutes(minutes):asZonedDateTime(shiftDTO.getEndDate()).minusMinutes(minutes));
+                map.put("startDate", startDate);
+                map.put("endDate", endDate);
+                map.put("shiftExtend", shiftExtends);
+                map.put("minutes", getMinutesBetweenDate(startDate, endDate));
+            } else if (!oldShift.getEndDate().equals(shiftDTO.getEndDate())) {
+                Date startDate = shiftDTO.getEndDate().before(oldShift.getEndDate()) ? shiftDTO.getEndDate() : oldShift.getEndDate();
+                Date endDate = shiftDTO.getEndDate().before(oldShift.getEndDate()) ? oldShift.getEndDate() : shiftDTO.getEndDate();
+                boolean shiftExtends = shiftDTO.getEndDate().after(oldShift.getStartDate());
+                int minutes = getMinutesFromTime(workTimeAgreementRuleViolation.getUnitValue());
+                map.put("escalatedStartDate", shiftExtends ? asZonedDateTime(shiftDTO.getStartDate()).plusMinutes(minutes) : asZonedDateTime(shiftDTO.getStartDate()));
+                map.put("escalatedEndDate", shiftExtends?asZonedDateTime(shiftDTO.getEndDate()).minusMinutes(minutes):asZonedDateTime(shiftDTO.getEndDate()).minusMinutes(minutes));
+                map.put("startDate", startDate);
+                map.put("endDate", endDate);
+                map.put("shiftExtend", shiftExtends);
+                map.put("minutes", getMinutesBetweenDate(startDate, endDate));
+            }
+            shiftDTO.setChanges(map);
         }
-        shiftDTO.setChanges(map);
     }
 }
