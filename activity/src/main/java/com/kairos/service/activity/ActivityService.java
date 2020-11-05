@@ -276,6 +276,7 @@ public class ActivityService {
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         Activity activity = findActivityById(activityId);
         ActivityGeneralSettings generalTab = activity.getActivityGeneralSettings();
+        generalTab.setTranslations(activity.getTranslations());
         generalTab.setTags(null);
         GeneralActivityWithTagDTO generalActivityWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityWithTagDTO.class);
         generalActivityWithTagDTO.setTags(null);
