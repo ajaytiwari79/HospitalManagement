@@ -611,4 +611,22 @@ public class StaffingLevelUtil {
         }
         return staffingLevelInterval;
     }
+
+    public static  void setStaffingLevelDetails(StaffingLevel staffingLevel,boolean publish){
+        staffingLevel.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+            if(publish){
+                staffingLevelInterval.getStaffingLevelActivities().forEach(StaffingLevelActivity::setInitialStaffingLevelDetails);
+            } else {
+                staffingLevelInterval.getStaffingLevelActivities().forEach(StaffingLevelActivity::setStaffingLevelDetails);
+            }
+
+        });
+        staffingLevel.getAbsenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+            if(publish){
+                staffingLevelInterval.getStaffingLevelActivities().forEach(StaffingLevelActivity::setInitialStaffingLevelDetails);
+            } else {
+                staffingLevelInterval.getStaffingLevelActivities().forEach(StaffingLevelActivity::setStaffingLevelDetails);
+            }
+        });
+    }
 }

@@ -23,6 +23,13 @@ public class StaffingLevelActivity {
     private int availableNoOfStaff;
     private Date minUpdatedAt;
     private Date maxUpdatedAt;
+    private int initialUnderStaffing;
+    private int initialOverStaffing;
+    private int remainingUnderStaffingToResolve;
+    private int remainingOverStaffingToResolve;
+    private int resolvedUnderStaffingAfterPublish;
+    private int resolvedOverStaffingAfterPublish;
+
 
 
     public StaffingLevelActivity(String name, int minNoOfStaff, int maxNoOfStaff) {
@@ -44,6 +51,22 @@ public class StaffingLevelActivity {
         this.maxNoOfStaff = maxNoOfStaff;
     }
 
+    public void setInitialStaffingLevelDetails(){
+        this.initialUnderStaffing = Math.max(this.minNoOfStaff-this.availableNoOfStaff,0);
+        this.initialOverStaffing =  Math.min(this.availableNoOfStaff-this.maxNoOfStaff,0);
+        this.remainingUnderStaffingToResolve=0;
+        this.remainingOverStaffingToResolve=0;
+        this.resolvedUnderStaffingAfterPublish=0;
+        this.resolvedOverStaffingAfterPublish=0;
+
+    }
+
+    public void setStaffingLevelDetails(){
+        this.remainingUnderStaffingToResolve=Math.max(minNoOfStaff-availableNoOfStaff,0);
+        this.remainingOverStaffingToResolve=Math.max(availableNoOfStaff-maxNoOfStaff,0);
+        this.resolvedUnderStaffingAfterPublish=Math.min(availableNoOfStaff+initialUnderStaffing-minNoOfStaff,initialUnderStaffing);
+        this.resolvedOverStaffingAfterPublish=Math.min(maxNoOfStaff+initialOverStaffing-availableNoOfStaff,initialOverStaffing);
+    }
 
     @Override
     public boolean equals(Object o) {
