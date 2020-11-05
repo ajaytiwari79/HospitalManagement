@@ -61,7 +61,10 @@ public class StaffingLevelActivity {
     }
 
     public int getResolvedUnderStaffingAfterPublish(){
-        return Math.min(availableNoOfStaff+initialUnderStaffing-minNoOfStaff,initialUnderStaffing);
+        /*
+              0,0,1
+         */
+        return Math.max(availableNoOfStaff+initialUnderStaffing-minNoOfStaff,initialUnderStaffing);
     }
 
     public int getResolvedOverStaffingAfterPublish(){
