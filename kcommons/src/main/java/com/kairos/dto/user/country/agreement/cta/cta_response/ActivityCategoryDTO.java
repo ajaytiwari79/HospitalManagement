@@ -1,5 +1,6 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,6 +38,9 @@ public class ActivityCategoryDTO {
         ActivityCategoryDTO that = (ActivityCategoryDTO) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(id, that.id);
+    }
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
     }
 
     @Override
