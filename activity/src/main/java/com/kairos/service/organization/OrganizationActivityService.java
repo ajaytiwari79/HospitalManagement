@@ -277,6 +277,9 @@ public class OrganizationActivityService extends MongoBaseService {
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         List<ActivityTagDTO> activities = includeTeamActivity ? activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false) : activityMongoRepository.findAllActivityByUnitIdAndNotPartOfTeam(unitId);
         for (ActivityTagDTO activityTagDTO : activities) {
+            if(isNull(activityTagDTO.getTranslations())){
+                activityTagDTO.setTranslations(new HashMap<>());
+            }
             boolean activityCanBeCopied = false;
             Set<OrganizationHierarchy> hierarchies = activityTagDTO.getActivityCanBeCopiedForOrganizationHierarchy();
             if ((isCollectionNotEmpty(hierarchies)) && ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
@@ -286,6 +289,11 @@ public class OrganizationActivityService extends MongoBaseService {
             activityTagDTO.setActivityCanBeCopied(activityCanBeCopied);
         }
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
+        activityCategories.forEach(activityCategory -> {
+            if(isNull(activityCategory.getTranslations())){
+                activityCategory.setTranslations(new HashMap<>());
+            }
+        });
         List<ActivityCategoryDTO> activityCategoryDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(activityCategories,ActivityCategoryDTO.class);
         response.put("activities", activities);
         response.put("activityCategories", activityCategoryDTOS);
