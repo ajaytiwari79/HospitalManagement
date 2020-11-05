@@ -31,5 +31,7 @@ public interface TimeSlotRepository extends MongoBaseRepository<TimeSlotSet, Big
 
     List<TimeSlotSetDTO> findByUnitIdAndTimeSlotModeAndTimeSlotTypeOrderByStartDate(Long unitId, TimeSlotMode timeSlotMode, TimeSlotType timeSlotType);
 
+    boolean existsByUnitId(Long unitId);
+
     //TimeSlotSetDTO findOneByUnitIdAfterStartDateLimitOne(Long unitId, LocalDate endDate);
 }

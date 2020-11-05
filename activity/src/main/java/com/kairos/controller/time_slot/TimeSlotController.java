@@ -5,6 +5,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.utils.response.ResponseHandler;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
 
+@RequestMapping(API_V1)
+@Api(API_V1)
 @RestController
 public class TimeSlotController {
 
@@ -125,6 +129,13 @@ public class TimeSlotController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTimeSlotDeduction(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotPercentageDeduction(unitId));
+    }
+
+    @ApiOperation(value = "Get current time slots of organization")
+    @GetMapping("/time_slots_in_existing")
+    public ResponseEntity<Map<String, Object>> createTimeSlotsInOrganizations() {
+        timeSlotService.createTimeSlotsInAllUnits();
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
 

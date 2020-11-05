@@ -2,12 +2,15 @@ package com.kairos.dto.user.country.time_slot;
 
 import lombok.*;
 
+import java.math.BigInteger;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class TimeSlot {
+    private BigInteger id;
     private String name;
     private int startHour;
     private int startMinute;
@@ -20,7 +23,8 @@ public class TimeSlot {
         this.endHour = endHour;
     }
 
-    public TimeSlot(String name, int startHour, int endHour, boolean shiftStartTime) {
+    public TimeSlot(BigInteger id,String name, int startHour, int endHour, boolean shiftStartTime) {
+        this.id=id;
         this.name = name;
         this.startHour = startHour;
         this.endHour = endHour;
