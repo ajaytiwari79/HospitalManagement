@@ -611,4 +611,9 @@ public class StaffingLevelUtil {
         }
         return staffingLevelInterval;
     }
+
+    public static  void setStaffingLevelDetails(StaffingLevel staffingLevel){
+        staffingLevel.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> staffingLevelInterval.getStaffingLevelActivities().forEach(StaffingLevelActivity::setInitialStaffingLevelDetails));
+        staffingLevel.getAbsenceStaffingLevelInterval().forEach(staffingLevelInterval -> staffingLevelInterval.getStaffingLevelActivities().forEach(StaffingLevelActivity::setInitialStaffingLevelDetails));
+    }
 }
