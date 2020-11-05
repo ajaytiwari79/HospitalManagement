@@ -284,7 +284,6 @@ public class ShiftService extends MongoBaseService {
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
         shiftMongoRepository.save(shift);
         List<StaffingLevel> staffingLevels=staffingLevelMongoRepository.findByUnitIdAndDates(shift.getUnitId(),shift.getStartDate(),shift.getEndDate());
-        staffingLevelService.updateDetailsInStaffingLevel(shift.getUnitId(),staffingLevels,false);
         staffActivityDetailsService.updateStaffActivityDetails(shift.getStaffId(), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()), (isNull(shift.getId()) || isNull(oldShift) || isCollectionEmpty(oldShift.getActivities())) ? null : oldShift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
         shiftStateService.createShiftStateByPhase(Arrays.asList(shift), phase);
         return shift;
@@ -916,8 +915,6 @@ public class ShiftService extends MongoBaseService {
         List<BigInteger> jobIds = shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
         shiftReminderService.deleteReminderTrigger(jobIds, shift.getUnitId());
         staffActivityDetailsService.decreaseActivityCount(shift.getStaffId(), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
-        List<StaffingLevel> staffingLevels=staffingLevelMongoRepository.findByUnitIdAndDates(shift.getUnitId(),shift.getStartDate(),shift.getEndDate());
-        staffingLevelService.updateDetailsInStaffingLevel(shift.getUnitId(),staffingLevels,false);
         return shiftDTO;
     }
 

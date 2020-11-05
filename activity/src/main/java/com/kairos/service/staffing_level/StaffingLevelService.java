@@ -1009,7 +1009,7 @@ public class StaffingLevelService {
             StaffingLevelUtil.updateStaffingLevelToPublish(staffingLevelPublishDTO, staffingLevel);
         }
         staffingLevelMongoRepository.saveEntities(staffingLevels);
-        updateDetailsInStaffingLevel(unitId, staffingLevels, true);
+        updateDetailsInStaffingLevel(unitId, staffingLevels);
         DateTimeInterval presenceInterval = new DateTimeInterval(staffingLevelPublishDTO.getSelectedDateForPresence(), staffingLevelPublishDTO.getSelectedEndDateForPresence());
         DateTimeInterval absenceInterval = new DateTimeInterval(staffingLevelPublishDTO.getSelectedDateForAbsence(), staffingLevelPublishDTO.getSelectedEndDateForAbsence());
         for (StaffingLevel staffingLevel : staffingLevels) {
@@ -1030,12 +1030,12 @@ public class StaffingLevelService {
         return new StaffingLevelDto(presenceStaffingLevelMap, absenceStaffingLevelMap);
     }
 
-    public void updateDetailsInStaffingLevel(Long unitId, List<StaffingLevel> staffingLevels, boolean publish) {
+    public void updateDetailsInStaffingLevel(Long unitId, List<StaffingLevel> staffingLevels) {
         for (StaffingLevel staffingLevel : staffingLevels) {
             List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(getStartOfDay(staffingLevel.getCurrentDate()), getEndOfDay(staffingLevel.getCurrentDate()), newArrayList(unitId));
             List<ShiftDTO> shiftDTOS = shiftService.updateDraftShiftToShift(ObjectMapperUtils.copyCollectionPropertiesByMapper(shifts, ShiftDTO.class));
             updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftDTOS, Shift.class), null);
-            StaffingLevelUtil.setStaffingLevelDetails(staffingLevel,publish);
+            StaffingLevelUtil.setStaffingLevelDetails(staffingLevel);
         }
         staffingLevelMongoRepository.saveEntities(staffingLevels);
     }
