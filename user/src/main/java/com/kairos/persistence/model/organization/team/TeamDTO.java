@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.organization.team;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.team.LeaderType;
 import com.kairos.enums.team.TeamType;
@@ -56,5 +57,13 @@ public class TeamDTO {
             return true;
         }
         return !CollectionUtils.containsAny(mainTeamLeaderIds,actingTeamLeaderIds);
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
+    }
+
+    public String getDescription() {
+        return  TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
     }
 }
