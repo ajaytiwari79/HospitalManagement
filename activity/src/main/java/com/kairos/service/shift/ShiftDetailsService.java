@@ -167,13 +167,14 @@ public class ShiftDetailsService extends MongoBaseService {
                 map.put("endDate", endDate);
                 map.put("shiftExtend", shiftExtends);
                 map.put("minutes", getMinutesBetweenDate(startDate, endDate));
+
             } else if (!oldShift.getEndDate().equals(shiftDTO.getEndDate())) {
                 Date startDate = shiftDTO.getEndDate().before(oldShift.getEndDate()) ? shiftDTO.getEndDate() : oldShift.getEndDate();
                 Date endDate = shiftDTO.getEndDate().before(oldShift.getEndDate()) ? oldShift.getEndDate() : shiftDTO.getEndDate();
                 boolean shiftExtends = shiftDTO.getEndDate().after(oldShift.getEndDate());
                 int minutes = getMinutesFromTime(workTimeAgreementRuleViolation.getUnitValue());
-                map.put("escalatedStartDate", shiftExtends ? asZonedDateTime(shiftDTO.getStartDate()).plusMinutes(minutes) : asZonedDateTime(shiftDTO.getStartDate()));
-                map.put("escalatedEndDate", shiftExtends?asZonedDateTime(shiftDTO.getEndDate()).minusMinutes(minutes):asZonedDateTime(shiftDTO.getEndDate()).minusMinutes(minutes));
+                map.put("escalatedStartDate", shiftExtends ? asZonedDateTime(shiftDTO.getStartDate()).plusMinutes(minutes) : asZonedDateTime(shiftDTO.getStartDate()).plusMinutes(minutes));
+                map.put("escalatedEndDate", shiftExtends?asZonedDateTime(shiftDTO.getEndDate()):asZonedDateTime(oldShift.getEndDate()));
                 map.put("startDate", startDate);
                 map.put("endDate", endDate);
                 map.put("shiftExtend", shiftExtends);
