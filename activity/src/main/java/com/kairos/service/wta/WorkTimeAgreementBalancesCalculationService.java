@@ -814,8 +814,8 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
         return shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate()) && shiftWithActivityDTO.getActivities().stream().anyMatch(shiftActivityDTO -> shiftActivityDTO.getActivityId().equals(activityId))).collect(Collectors.toList());
     }
 
-    public static boolean isDayTypeValid(Date shiftDate, List<Long> daytypeIds, Map<BigInteger, DayTypeDTO> dayTypeDTOMap) {
-        List<DayTypeDTO> dayTypeDTOS = daytypeIds.stream().map(dayTypeDTOMap::get).collect(Collectors.toList());
+    public static boolean isDayTypeValid(Date shiftDate, List<BigInteger> daytypeIds, Map<BigInteger, DayTypeDTO> dayTypeDTOMap) {
+        List<DayTypeDTO> dayTypeDTOS =dayTypeDTOMap.values().stream().filter(k->daytypeIds.contains(k.getId())).collect(Collectors.toList());
         boolean valid = false;
         for (DayTypeDTO dayTypeDTO : dayTypeDTOS) {
             if (dayTypeDTO.isHolidayType()) {

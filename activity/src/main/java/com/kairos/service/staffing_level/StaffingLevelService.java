@@ -252,16 +252,9 @@ public class StaffingLevelService {
     public StaffingLevel updateStaffingLevelAvailableStaffCount(LocalDate localDate, Long unitId) {
         Date startDate = asDate(localDate);
         Date endDate = getEndOfDay(startDate);
-
-<<<<<<< HEAD
-        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse( startDate, endDate, newArrayList(unitId));
-        List<ShiftDTO>  shiftDTOS = shiftService.updateDraftShiftToShift(ObjectMapperUtils.copyCollectionPropertiesByMapper(shifts, ShiftDTO.class));
-        StaffingLevel staffingLevel=staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(UserContext.getUnitId(),startDate);
-=======
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate, endDate, newArrayList(unitId));
         List<ShiftDTO> shiftDTOS = shiftService.updateDraftShiftToShift(ObjectMapperUtils.copyCollectionPropertiesByMapper(shifts, ShiftDTO.class));
         StaffingLevel staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(UserContext.getUnitId(), startDate);
->>>>>>> f995b96cc2cba868b580d14c3aed89dad1994d99
         if (isNull(staffingLevel)) {
             staffingLevel = createDefaultStaffingLevel(unitId, startDate);
             staffingLevelMongoRepository.save(staffingLevel);
@@ -326,13 +319,8 @@ public class StaffingLevelService {
     }
 
     public Map<String, Object> getPhaseAndDayTypesForStaffingLevel(Long unitId, Date proposedDate) {
-<<<<<<< HEAD
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, proposedDate,null);
         List<DayTypeDTO> dayTypes = dayTypeService.getDayTypeByDate(UserContext.getUserDetails().getCountryId(),proposedDate);
-=======
-        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, proposedDate, null);
-        List<DayType> dayTypes = userIntegrationService.getDayType(proposedDate);
->>>>>>> f995b96cc2cba868b580d14c3aed89dad1994d99
         Map<String, Object> mapOfPhaseAndDayType = new HashMap<>();
         mapOfPhaseAndDayType.put("phase", phase);
         mapOfPhaseAndDayType.put("dayType", dayTypes.isEmpty() ? dayTypes.get(0) : Collections.EMPTY_LIST);

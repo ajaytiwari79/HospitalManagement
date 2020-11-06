@@ -27,6 +27,7 @@ import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.reason_code.ReasonCodeType;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
 import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
@@ -40,6 +41,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -267,6 +269,10 @@ public class ActivityIntegrationService {
         List<NameValuePair> param = new ArrayList<>();
         param.add(expertiseParam);
        return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/reason_codes", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ReasonCodeDTO>>>(){});
+    }
+
+    public void updateTimeZoneInUnitSettings(Long unitId, ZoneId zoneIdString) {
+        genericRestClient.publishRequest(zoneIdString, unitId, true, IntegrationOperation.UPDATE, "/update_time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
     }
 }
 

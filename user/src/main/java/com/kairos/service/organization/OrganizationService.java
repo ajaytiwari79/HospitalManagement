@@ -589,6 +589,7 @@ public class OrganizationService {
         Unit unit = unitGraphRepository.findOne(unitId);
         schedulerServiceRestClient.publishRequest(zoneId, unitId, true, IntegrationOperation.CREATE, "/scheduler_panel/time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
+        activityIntegrationService.updateTimeZoneInUnitSettings(unitId,zoneId);
         unit.setTimeZone(zoneId);
         unitGraphRepository.save(unit);
         return true;

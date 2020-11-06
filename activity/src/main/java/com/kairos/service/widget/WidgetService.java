@@ -10,16 +10,17 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.widget.DashboardWidgetDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.widget.DashboardWidget;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.time_slot.TimeSlotRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.widget.WidgetMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -71,6 +72,8 @@ public class WidgetService {
     private NightWorkerService nightWorkerService;
     @Inject
     private DayTypeService dayTypeService;
+    @Inject
+    private TimeSlotRepository timeSlotRepository;
 
     public DashboardWidgetDTO getWidgetData(Long unitId) {
         DashboardWidgetDTO dashBoardWidgetDTO = null;
@@ -86,7 +89,8 @@ public class WidgetService {
         requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
         List<DayTypeDTO> dayTypeDTOS=dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId());
-        staffAdditionalInfoDTOS.forEach(staff-> staff.setDayTypes(dayTypeDTOS));
+        List<TimeSlotDTO> timeSlotDTOS=timeSlotRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(unitId, TimeSlotType.SHIFT_PLANNING).getTimeSlots();
+        staffAdditionalInfoDTOS.forEach(staff-> {staff.setDayTypes(dayTypeDTOS);staff.setTimeSlotSets(timeSlotDTOS);});
         Phase realTimePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, organizationDTO.getCountryId());
         if (isNull(realTimePhase) || isNull(realTimePhase.getRealtimeDuration())) {

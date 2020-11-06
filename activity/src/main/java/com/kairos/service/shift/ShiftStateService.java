@@ -239,7 +239,7 @@ public class ShiftStateService {
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
         List<DayTypeDTO> dayTypeDTOS=dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId());
         staffAdditionalInfoDTOS.forEach(staff-> staff.setDayTypes(dayTypeDTOS));
-        List<TimeSlotDTO> timeSlotDTOS= timeSlotRepository.findByUnitIdInAndTimeSlotTypeOrderByStartDate(Arrays.asList(unitId), TimeSlotType.SHIFT_PLANNING);
+        List<TimeSlotDTO> timeSlotDTOS= timeSlotRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(unitId, TimeSlotType.SHIFT_PLANNING).getTimeSlots();
         staffAdditionalInfoDTOS.forEach(staff-> staff.setTimeSlotSets(timeSlotDTOS));
         shifts.sort(Comparator.comparing(Shift::getStartDate));
         shiftsList.sort((shift, shiftSecond) -> shift.getStartDate().compareTo(shiftSecond.getStartDate()));

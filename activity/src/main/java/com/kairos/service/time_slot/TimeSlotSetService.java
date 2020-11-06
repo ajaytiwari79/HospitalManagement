@@ -3,6 +3,7 @@ package com.kairos.service.time_slot;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
@@ -30,6 +31,7 @@ import static com.kairos.enums.TimeSlotType.SHIFT_PLANNING;
 import static com.kairos.enums.TimeSlotType.TASK_PLANNING;
 import static com.kairos.enums.time_slot.TimeSlotMode.ADVANCE;
 import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
+import static java.util.Collections.*;
 
 @Service
 public class TimeSlotSetService {
@@ -46,8 +48,8 @@ public class TimeSlotSetService {
 
 
 
-    public List<TimeSlotDTO> getTimeSlotByTimeSlotSet(Long timeSlotSetId) {
-        return timeSlotRepository.findById(timeSlotSetId).getTimeSlots();
+    public List<TimeSlot> getTimeSlotByTimeSlotSet(BigInteger timeSlotSetId) {
+        return timeSlotRepository.findById(timeSlotSetId).get().getTimeSlots();
     }
 
     public Map<String, Object> getTimeSlotSets(Long unitId) {
@@ -178,7 +180,11 @@ public class TimeSlotSetService {
     }
 
     public List<TimeSlotDTO> getUnitTimeSlotByNames(Long unitId, Set<String> timeslotNames) {
-        return  timeSlotRepository.getByUnitIdAndNameInAndAndTimeSlotModeAndTimeSlotType(unitId, timeslotNames, STANDARD, SHIFT_PLANNING).get(0).getTimeSlots();
+        if(ObjectUtils.isCollectionNotEmpty(timeslotNames)){
+            return  timeSlotRepository.getByUnitIdAndNameInAndAndTimeSlotModeAndTimeSlotType(unitId, timeslotNames, STANDARD, SHIFT_PLANNING).get(0).getTimeSlots();
+        }
+        return Collections.emptyList();
+
     }
 
 
@@ -187,8 +193,8 @@ public class TimeSlotSetService {
         return timeSlotRepository.findByUnitIdAndTimeSlotModeAndTimeSlotTypeOrderByStartDate(unitId, unitSetting.getTimeSlotMode(), SHIFT_PLANNING);
     }
 
-    public List<TimeSlotDTO> getShiftPlanningTimeSlotsById(Long timeSlotSetId) {
-        return timeSlotRepository.findById(timeSlotSetId).getTimeSlots();
+    public List<TimeSlot> getShiftPlanningTimeSlotsById(BigInteger timeSlotSetId) {
+        return timeSlotRepository.findById(timeSlotSetId).get().getTimeSlots();
     }
 
     public List<TimeSlotDTO> getShiftPlanningTimeSlotByUnit(Long unitId) {

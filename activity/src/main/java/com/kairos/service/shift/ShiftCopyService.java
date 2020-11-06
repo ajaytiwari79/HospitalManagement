@@ -112,7 +112,7 @@ public class ShiftCopyService extends MongoBaseService {
         Map<BigInteger, ActivityWrapper> activityMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         StaffEmploymentUnitDataWrapper dataWrapper = userIntegrationService.getStaffsEmployment(unitId, copyShiftDTO.getStaffIds(), copyShiftDTO.getExpertiseId());
         dataWrapper.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
-        dataWrapper.setTimeSlotWrappers(timeSlotRepository.findByUnitIdInAndTimeSlotTypeOrderByStartDate(Collections.singletonList(unitId), TimeSlotType.SHIFT_PLANNING));
+        dataWrapper.setTimeSlotWrappers(timeSlotRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(unitId, TimeSlotType.SHIFT_PLANNING).getTimeSlots());
         List<StaffEmploymentDetails> staffDataList = dataWrapper.getStaffEmploymentDetails();
         List<Long> employmentIds = staffDataList.stream().map(StaffEmploymentDetails::getId).collect(Collectors.toList());
         findAndAddCTAInEmployments(staffDataList, copyShiftDTO, dataWrapper, employmentIds);

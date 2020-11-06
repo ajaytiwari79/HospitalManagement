@@ -32,7 +32,7 @@ public class TimeSlotController {
     @ApiOperation(value = "Get Organization Time Slots")
     @GetMapping(UNIT_URL + "/time_slot_set/{timeSlotSetId}/time_slot")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getTimeSlots(@PathVariable Long timeSlotSetId) {
+    public ResponseEntity<Map<String, Object>> getTimeSlots(@PathVariable BigInteger timeSlotSetId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByTimeSlotSet(timeSlotSetId));
     }
 
@@ -106,7 +106,7 @@ public class TimeSlotController {
     @ApiOperation(value = "Get Organization Time Slots")
     @GetMapping(UNIT_URL + "/time_slot_set/{timeSlotSetId}/shift_planning/time_slot")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotsByUnit(@PathVariable Long timeSlotSetId) {
+    public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotsByUnit(@PathVariable BigInteger timeSlotSetId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotsById(timeSlotSetId));
     }
 

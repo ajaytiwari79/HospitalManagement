@@ -56,7 +56,6 @@ import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.reason_code.ReasonCodeService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.service.time_slot.TimeSlotSetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -222,7 +221,7 @@ public class CounterDataService {
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
         defaultKpiDataDTO.setDayTypeDTOS(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         defaultKpiDataDTO.setReasonCodeDTOS(reasonCodeService.getReasonCodesByUnitId(refId, FORCEPLAN));
-        defaultKpiDataDTO.setTimeSlotDTOS(timeSlotRepository.findByUnitIdInAndTimeSlotTypeOrderByStartDate(Arrays.asList(refId), TimeSlotType.SHIFT_PLANNING));
+        defaultKpiDataDTO.setTimeSlotDTOS(timeSlotRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(refId, TimeSlotType.SHIFT_PLANNING).getTimeSlots());
         getSelectedFilterDefaultData(level, criteriaList, kpi, defaultKpiDataDTO);
         setKpiProperty(applicableKPIS.get(0), criteriaList, kpi);
         return kpi;

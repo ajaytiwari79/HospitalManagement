@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -145,5 +146,14 @@ public class UnitSettingService{
     public List<TimeTypeDTO> getAllTimeTypes(Long unitId) {
         Long countryId=userIntegrationService.getCountryId(unitId);
         return timeTypeService.getAllTimeType(null,countryId);
+    }
+
+    public void updateTimeZone(Long unitId, ZoneId timeZone) {
+        UnitSetting unitSetting = unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
+        if (unitSetting == null) {
+            exceptionService.dataNotFoundException(MESSAGE_UNIT_SETTING_NOTFOUND);
+        }
+        unitSetting.setTimeZone(timeZone);
+        unitSettingRepository.save(unitSetting);
     }
 }
