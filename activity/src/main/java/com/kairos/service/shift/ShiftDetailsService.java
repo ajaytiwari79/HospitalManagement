@@ -170,7 +170,7 @@ public class ShiftDetailsService extends MongoBaseService {
             } else if (!oldShift.getEndDate().equals(shiftDTO.getEndDate())) {
                 Date startDate = shiftDTO.getEndDate().before(oldShift.getEndDate()) ? shiftDTO.getEndDate() : oldShift.getEndDate();
                 Date endDate = shiftDTO.getEndDate().before(oldShift.getEndDate()) ? oldShift.getEndDate() : shiftDTO.getEndDate();
-                boolean shiftExtends = shiftDTO.getEndDate().after(oldShift.getStartDate());
+                boolean shiftExtends = shiftDTO.getEndDate().after(oldShift.getEndDate());
                 int minutes = getMinutesFromTime(workTimeAgreementRuleViolation.getUnitValue());
                 map.put("escalatedStartDate", shiftExtends ? asZonedDateTime(shiftDTO.getStartDate()).plusMinutes(minutes) : asZonedDateTime(shiftDTO.getStartDate()));
                 map.put("escalatedEndDate", shiftExtends?asZonedDateTime(shiftDTO.getEndDate()).minusMinutes(minutes):asZonedDateTime(shiftDTO.getEndDate()).minusMinutes(minutes));
