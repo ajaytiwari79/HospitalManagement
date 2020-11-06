@@ -1,16 +1,13 @@
 package com.kairos.commons.utils;
 
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.collections.map.HashedMap;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 
