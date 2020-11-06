@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.access_permission;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import lombok.Getter;
@@ -32,4 +33,10 @@ public class AccessGroupQueryResult {
     private boolean allowedDayTypes;
     private AccessGroup parentAccessGroup;
     private Map<String, TranslationInfo> translations;
+
+    public String getName() {
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.TimeTypeEnum;
@@ -48,4 +49,12 @@ public class GeneralActivityWithTagDTO {
     private String originalDocumentName;
     private String modifiedDocumentName;
     private Map<String, TranslationInfo> translations;
+
+    public String getName() {
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
+    }
+
+    public String getDescription() {
+        return TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
+    }
 }

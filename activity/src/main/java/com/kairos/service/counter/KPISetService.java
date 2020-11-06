@@ -102,7 +102,13 @@ public class KPISetService {
 
 
     public List<KPISetDTO> getAllKPISetByReferenceId(Long referenceId) {
-        return kpiSetRepository.findAllByReferenceIdAndDeletedFalse(referenceId);
+        List<KPISetDTO> kpiSetDTOS = kpiSetRepository.findAllByReferenceIdAndDeletedFalse(referenceId);
+        kpiSetDTOS.forEach(kpiSetDTO -> {
+            if(isNull(kpiSetDTO.getTranslations())){
+                kpiSetDTO.setTranslations(new HashMap<>());
+            }
+        });
+        return kpiSetDTOS;
     }
 
     public KPISetDTO findById(BigInteger kpiSetId) {

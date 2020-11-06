@@ -328,6 +328,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         List<AggregationOperation> customAgregationForCompositeActivity = new ArrayList<>();
         customAgregationForCompositeActivity.add(match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(deleted)));
         customAgregationForCompositeActivity.add(lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE_INFO));
+        customAgregationForCompositeActivity.add(lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID, ACTIVITY_PRIORITY));
         customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(false));
         customAgregationForCompositeActivity.add(match(Criteria.where("timeTypeInfo.partOfTeam").is(true)));
         Aggregation aggregation = Aggregation.newAggregation(customAgregationForCompositeActivity);

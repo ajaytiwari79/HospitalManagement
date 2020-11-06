@@ -1,11 +1,14 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -21,6 +24,7 @@ public class ActivityCategoryDTO {
     private BigInteger id;
     private Long countryId;
     private BigInteger timeTypeId;
+    private Map<String, TranslationInfo> translations;
 
     public ActivityCategoryDTO(BigInteger id, String name) {
         this.name = name;
@@ -34,6 +38,9 @@ public class ActivityCategoryDTO {
         ActivityCategoryDTO that = (ActivityCategoryDTO) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(id, that.id);
+    }
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
     }
 
     @Override

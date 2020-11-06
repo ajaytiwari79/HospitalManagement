@@ -937,4 +937,11 @@ public  class DateUtils {
         }
     }
 
+    public  static  int getMinutesFromTime(String time){
+        int indexOfDot=time.indexOf(".");
+        String hrs=time.substring(0,indexOfDot);
+        int minutes=Integer.parseInt(hrs)*60;
+        return minutes+Integer.parseInt(time.substring(indexOfDot+1));
+    }
+
 }

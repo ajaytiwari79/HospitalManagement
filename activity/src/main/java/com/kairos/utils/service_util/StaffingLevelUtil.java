@@ -439,11 +439,15 @@ public class StaffingLevelUtil {
                 List<StaffingLevelSkill> staffingLevelSkillIterator = new CopyOnWriteArrayList<>(staffingLevelSkills);
                 for (StaffingLevelActivity staffingLevelActivity : staffingLevelActivityIterator) {
                     staffingLevelIntervalLog.getStaffingLevelActivities().remove(staffingLevelActivity);
-                    staffingLevelIntervalLog.getStaffingLevelActivities().add(staffingLevelActivityMap.get(staffingLevelActivity.getActivityId()));
+                    if(staffingLevelActivityMap.containsKey(staffingLevelActivity.getActivityId())) {
+                        staffingLevelIntervalLog.getStaffingLevelActivities().add(staffingLevelActivityMap.get(staffingLevelActivity.getActivityId()));
+                    }
                 }
                 for (StaffingLevelSkill staffingLevelSkill : staffingLevelSkillIterator) {
                     staffingLevelIntervalLog.getStaffingLevelSkills().remove(staffingLevelSkill);
-                    staffingLevelIntervalLog.getStaffingLevelSkills().add(staffingLevelSkillMap.get(staffingLevelSkill.getSkillId()));
+                    if(staffingLevelSkillMap.containsKey(staffingLevelSkill.getSkillId())) {
+                        staffingLevelIntervalLog.getStaffingLevelSkills().add(staffingLevelSkillMap.get(staffingLevelSkill.getSkillId()));
+                    }
                 }
             }
         }
@@ -605,5 +609,10 @@ public class StaffingLevelUtil {
                 break;
         }
         return staffingLevelInterval;
+    }
+
+    public static  void setStaffingLevelDetails(StaffingLevel staffingLevel){
+        staffingLevel.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> staffingLevelInterval.getStaffingLevelActivities().forEach(StaffingLevelActivity::setInitialStaffingLevelDetails));
+        staffingLevel.getAbsenceStaffingLevelInterval().forEach(staffingLevelInterval -> staffingLevelInterval.getStaffingLevelActivities().forEach(StaffingLevelActivity::setInitialStaffingLevelDetails));
     }
 }

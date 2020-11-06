@@ -667,11 +667,11 @@ public class RuletemplateUtils {
 
     public static String getHoursByMinutes(Integer hour,String name){
         if(isNull(hour) || hour==0){
-            throwException(MESSAGE_RULETEMPLATE_HOURS_NOTZERO,name);
+            throwException(MESSAGE_RULETEMPLATE_HOURS_NOTZERO,name); // 12.34
         }
         int hours = hour / 60; //since both are ints, you get an int
         int minutes = hour % 60;
-        return String.valueOf(hours+"."+minutes);
+        return hours + "." + minutes;
     }
 
     public static int getValueAccordingShiftLengthAndAverageSetting(ShiftLengthAndAverageSetting shiftLengthAndAverageSetting, ShiftWithActivityDTO shift){

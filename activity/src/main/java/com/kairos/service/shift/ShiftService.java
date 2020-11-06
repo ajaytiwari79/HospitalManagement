@@ -61,6 +61,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
+import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.todo.TodoService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
@@ -288,6 +289,7 @@ public class ShiftService extends MongoBaseService {
         payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
         shiftMongoRepository.save(shift);
+        List<StaffingLevel> staffingLevels=staffingLevelMongoRepository.findByUnitIdAndDates(shift.getUnitId(),shift.getStartDate(),shift.getEndDate());
         staffActivityDetailsService.updateStaffActivityDetails(shift.getStaffId(), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()), (isNull(shift.getId()) || isNull(oldShift) || isCollectionEmpty(oldShift.getActivities())) ? null : oldShift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
         shiftStateService.createShiftStateByPhase(Arrays.asList(shift), phase);
         return shift;
@@ -682,6 +684,7 @@ public class ShiftService extends MongoBaseService {
             }
             shiftValidatorService.escalationCorrectionInShift(shiftDTO, currentShiftStartDate, currentShiftEndDate, shift);
         }
+        shiftDetailsService.updateTimingChanges(oldShift,shiftDTO,shiftWithViolatedInfoDTOS.get(0));
         return shiftWithViolatedInfoDTOS;
     }
 
