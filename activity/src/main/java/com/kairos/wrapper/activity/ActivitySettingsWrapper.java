@@ -48,7 +48,7 @@ public class ActivitySettingsWrapper {
     private List<TimeTypeDTO> timeTypes;
     private ActivityLocationSettings activityLocationSettings;
     private List<EmploymentTypeDTO> employmentTypes;
-    private List<Long> rulesTabDayTypes= new ArrayList<>();
+    private List<BigInteger> rulesTabDayTypes= new ArrayList<>();
     private ActivityPhaseSettings activityPhaseSettings;
     private Set<AccessGroupRole> roles;
     private boolean sicknessSettingValid;
@@ -122,7 +122,7 @@ public class ActivitySettingsWrapper {
         this.activityCategories=activityCategories;
     }
 
-    public ActivitySettingsWrapper(ActivityTimeCalculationSettings activityTimeCalculationSettings, List<DayTypeDTO> dayTypes, List<Long> rulesTabDayTypes) {
+    public ActivitySettingsWrapper(ActivityTimeCalculationSettings activityTimeCalculationSettings, List<DayTypeDTO> dayTypes, List<BigInteger> rulesTabDayTypes) {
         this.activityTimeCalculationSettings = activityTimeCalculationSettings;
         this.dayTypes = dayTypes;
         this.rulesTabDayTypes=rulesTabDayTypes;

@@ -469,7 +469,7 @@ public class TimeTypeService extends MongoBaseService {
         List<DayTypeDTO> dayTypes = dayTypeService.getDayTypeWithCountryHolidayCalender(countryId);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         ActivityTimeCalculationSettings activityTimeCalculationSettings = timeType.getActivityTimeCalculationSettings();
-        List<Long> rulesTabDayTypes = timeType.getActivityRulesSettings().getDayTypes();
+        List<BigInteger> rulesTabDayTypes = timeType.getActivityRulesSettings().getDayTypes();
         return new ActivitySettingsWrapper(activityTimeCalculationSettings, dayTypes, rulesTabDayTypes);
     }
 

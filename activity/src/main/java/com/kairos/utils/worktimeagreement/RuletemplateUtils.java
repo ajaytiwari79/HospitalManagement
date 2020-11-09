@@ -375,10 +375,10 @@ public class RuletemplateUtils {
     }
 
 
-    public static Set<DayOfWeek> getValidDays(Map<BigInteger, DayTypeDTO> dayTypeMap, List<Long> dayTypeIds, LocalDate startDate) {
+    public static Set<DayOfWeek> getValidDays(Map<BigInteger, DayTypeDTO> dayTypeMap, List<BigInteger> dayTypeIds, LocalDate startDate) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         List<Day> days = new ArrayList<>();
-        for (Long dayTypeId : dayTypeIds) {
+        for (BigInteger dayTypeId : dayTypeIds) {
             if(dayTypeMap.containsKey(dayTypeId)){
                 DayTypeDTO dayTypeDTO = dayTypeMap.get(dayTypeId);
                 if(dayTypeDTO.getValidDays().contains(Day.EVERYDAY)){
@@ -611,7 +611,7 @@ public class RuletemplateUtils {
     }
 
 
-    public static boolean isValidForDay(List<Long> dayTypeIds, RuleTemplateSpecificInfo infoWrapper) {
+    public static boolean isValidForDay(List<BigInteger> dayTypeIds, RuleTemplateSpecificInfo infoWrapper) {
         DayOfWeek shiftDay = DateUtils.asLocalDate(infoWrapper.getShift().getStartDate()).getDayOfWeek();
         return getValidDays(infoWrapper.getDayTypeMap(), dayTypeIds, asLocalDate(infoWrapper.getShift().getStartDate())).stream().anyMatch(day -> day.equals(shiftDay));
     }

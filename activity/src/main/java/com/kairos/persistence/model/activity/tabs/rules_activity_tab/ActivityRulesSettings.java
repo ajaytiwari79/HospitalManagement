@@ -28,7 +28,7 @@ public class ActivityRulesSettings {
     private boolean lockLengthPresent;
     private boolean eligibleToBeForced;
     @KPermissionField
-    private List<Long> dayTypes= new ArrayList<>();
+    private List<BigInteger> dayTypes= new ArrayList<>();
     @KPermissionField
     private boolean eligibleForStaffingLevel;
     @KPermissionField
