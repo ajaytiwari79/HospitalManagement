@@ -49,7 +49,7 @@ public class StaffingLevelActivity {
 
     public void setInitialStaffingLevelDetails(){
         this.initialUnderStaffing = Math.max(this.minNoOfStaff-this.availableNoOfStaff,0);
-        this.initialOverStaffing =  Math.min(this.availableNoOfStaff-this.maxNoOfStaff,0);
+        this.initialOverStaffing =  Math.max(this.availableNoOfStaff-this.maxNoOfStaff,0);
     }
 
     public int getRemainingUnderStaffingToResolve(){

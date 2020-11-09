@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.staffing_level;
 
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.apache.tomcat.jni.Local;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -37,4 +36,6 @@ public interface StaffingLevelMongoRepository extends MongoBaseRepository<Staffi
 
     @Query("{deleted:false,unitId:?0,currentDate:{$gte:?1,$lte:?2}}")
     List<StaffingLevel> findByUnitIdBetweenDates(Long unitId, LocalDate startDate, LocalDate endDate);
+
+    List<StaffingLevel> findAllByDeletedFalse();
 }
