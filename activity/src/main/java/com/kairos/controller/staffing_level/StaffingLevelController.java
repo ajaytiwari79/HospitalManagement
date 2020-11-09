@@ -206,4 +206,10 @@ public class StaffingLevelController {
     public ResponseEntity<Map<String, Object>> updateOrCreateStaffingLevelConfiguration(@PathVariable Long unitId, @RequestBody @Valid StaffingLevelGraphConfigurationDTO staffingLevelGraphConfigurationDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelGraphConfigurationService.updateOrCreateStaffingLevelConfiguration(unitId, UserContext.getUserDetails().getId(),staffingLevelGraphConfigurationDTO));
     }
+
+    @PutMapping(value = "/set_initial")
+    @ApiOperation("update staffing level graph configuration")
+    public ResponseEntity<Map<String, Object>> updateInitialInStaffingLevel(@PathVariable Long unitId, @RequestBody @Valid StaffingLevelGraphConfigurationDTO staffingLevelGraphConfigurationDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.updateInitialInStaffingLevel());
+    }
 }
