@@ -1,5 +1,6 @@
 package com.kairos.utils.service_util;
 
+import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.custom_exception.InvalidRequestException;
@@ -24,8 +25,11 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_MIN_GREATER_THAN_MAX;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_RULETEMPLATE_HOURS_NOTZERO;
 import static com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto.StaffingLevelAction.REMOVE;
 import static com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto.StaffingLevelAction.UPDATE;
+import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static java.util.stream.Collectors.toMap;
 
 
@@ -107,7 +111,7 @@ public class StaffingLevelUtil {
         BigInteger parentActivityId = childAndParentActivityIdMap.getOrDefault(staffingLevelActivity.getActivityId(), null);
         StaffingLevelStaffMinMax staffingLevelStaffMinMax;
         if (staffingLevelActivity.getMinNoOfStaff() > staffingLevelActivity.getMaxNoOfStaff()) {
-            throw new InvalidRequestException("Min should be less than max");
+            throwException(MESSAGE_MIN_GREATER_THAN_MAX);
         }
         if (parentActivityId == null) {
             staffingLevelStaffMinMax = activityIdStaffMinMaxMap.getOrDefault(staffingLevelActivity.getActivityId(), new StaffingLevelStaffMinMax());
@@ -558,8 +562,8 @@ public class StaffingLevelUtil {
                 skillRemoveLogs.addAll(staffingLevelIntervalLog.getSkillRemoveLogs());
                 newlyAddedActivities.addAll(staffingLevelIntervalLog.getNewlyAddedActivityIds());
                 newlyAddedSkills.addAll(staffingLevelIntervalLog.getNewlyAddedSkillIds());
-                newlyAddedActivities.remove(activityId);
-                newlyAddedSkills.remove(skillId);
+                //newlyAddedActivities.remove(activityId);
+                //newlyAddedSkills.remove(skillId);
             }
             interval.setMinNoOfStaff(interval.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMinNoOfStaff())));
             interval.setMaxNoOfStaff(interval.getStaffingLevelActivities().stream().collect(Collectors.summingInt(k -> k.getMaxNoOfStaff())));
