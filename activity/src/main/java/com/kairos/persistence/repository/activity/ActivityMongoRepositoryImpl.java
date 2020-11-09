@@ -967,7 +967,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         String activityIdString = getBigIntegerString(activityIds.iterator());
         AggregationOperation[] aggregations = new AggregationOperation[10];
         int i=0;
-        aggregations[i++] = match(Criteria.where("staffId").is(staffId).and(DELETED).is(false));
+        aggregations[i++] = match(Criteria.where("staffId").in(newArrayList(staffId,0)).and(DELETED).is(false));
         aggregations[i++] = group("staffId").addToSet("activityId").as("activityIds");
         aggregations[i++] = getCustomLookUpForActivityAggregationOperation(activityIdString,isActivityType);
         aggregations[i++] = getCustomAggregationOperationForChildActivitiyIds();
