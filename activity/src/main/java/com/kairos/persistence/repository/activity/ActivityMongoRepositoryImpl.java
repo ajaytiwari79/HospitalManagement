@@ -959,7 +959,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         String activityIdString = getBigIntegerString(activityIds.iterator());
         AggregationOperation[] aggregations = new AggregationOperation[10];
         int i=0;
-        if(mongoTemplate.exists(new Query(Criteria.where("staffId").is(staffId).and(DELETED).is(false)),
+        if(!mongoTemplate.exists(new Query(Criteria.where("staffId").is(staffId).and(DELETED).is(false)),
                 StaffActivitySetting.class)){
             staffId = 0l;
         }
