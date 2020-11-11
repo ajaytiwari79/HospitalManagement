@@ -160,7 +160,8 @@ public class RequestAbsenceService {
     }
 
     private Collection<BigInteger> getShiftIds(List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS) {
-        return shiftWithViolatedInfoDTOS.stream().flatMap(shiftWithViolatedInfoDTO -> shiftWithViolatedInfoDTO.getShifts().stream()).filter(shiftDTO1->isNotNull(shiftDTO1.getId())).map(shiftDTO1->shiftDTO1.getId()).collect(Collectors.toList());
+        shiftWithViolatedInfoDTOS.removeIf(k->k.getShifts()==null);
+        return shiftWithViolatedInfoDTOS.stream().filter(k->isCollectionNotEmpty(k.getShifts())).flatMap(shiftWithViolatedInfoDTO -> shiftWithViolatedInfoDTO.getShifts().stream()).filter(shiftDTO1->isNotNull(shiftDTO1.getId())).map(shiftDTO1->shiftDTO1.getId()).collect(Collectors.toList());
     }
 
     private <T> T updateStatusAfterUpdateShift(Todo todo, List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS) {
