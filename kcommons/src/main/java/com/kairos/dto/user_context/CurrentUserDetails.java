@@ -11,6 +11,7 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.STAFF;
 
@@ -56,7 +57,7 @@ public class CurrentUserDetails {
 
     @JsonIgnore
     public boolean isManagement(){
-        return MANAGEMENT.name().equalsIgnoreCase(unitWiseAccessRole.get(lastSelectedOrganizationId.toString()));
+        return this.systemAdmin || (isNotNull(unitWiseAccessRole) && isNotNull(lastSelectedOrganizationId) && MANAGEMENT.name().equalsIgnoreCase(unitWiseAccessRole.get(lastSelectedOrganizationId.toString())));
     }
 
     @JsonIgnore

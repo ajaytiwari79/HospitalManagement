@@ -21,18 +21,16 @@ private EnvConfigCommon envConfigCommon;
 private UserRestClientAuth userRestClientAuth;
 
     public String getAuthToken() {
-
         String authToken;
         if(BeanFactoryUtil.getDefaultListableBeanFactory().containsBean(CommonConstants.AUTH_TOKEN)) {
             authToken = BeanFactoryUtil.getDefaultListableBeanFactory()
                     .getBean(CommonConstants.AUTH_TOKEN, String.class);
             return authToken;
-
         }
         else {
                 authToken = getAuthTokenFromUser();
                 BeanFactoryUtil.registerSingleton(CommonConstants.AUTH_TOKEN,authToken);
-            }
+        }
         return authToken;
     }
 
