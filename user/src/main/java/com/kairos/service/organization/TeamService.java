@@ -13,7 +13,6 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDT
 import com.kairos.enums.team.LeaderType;
 import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.StaffTeamRelationShipQueryResult;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
@@ -235,14 +234,14 @@ public class TeamService {
         int countOfRel = teamGraphRepository.countRelBetweenStaffAndTeam(teamId, staffId);
         if (countOfRel == 0) {
 
-            int countOfRelCreated = teamGraphRepository.linkOfTeamAndStaff(teamId, staffId, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+            int countOfRelCreated = teamGraphRepository.linkOfTeamAndStaff(teamId, staffId, DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
             if (countOfRelCreated > 0) {
                 return true;
             } else {
                 exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_SOMETHINGWRONG);
             }
         } else {
-            int countOfRelCreated = teamGraphRepository.updateStaffTeamRelationship(teamId, staffId, DateUtils.getCurrentDate().getTime(), isAssigned);
+            int countOfRelCreated = teamGraphRepository.updateStaffTeamRelationship(teamId, staffId, DateUtils.getDate().getTime(), isAssigned);
             if (countOfRelCreated > 0) {
                 if (!isAssigned) {
                     staffGraphRepository.save(staff);

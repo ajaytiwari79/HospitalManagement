@@ -23,6 +23,9 @@ public class StaffingLevelActivity {
     private int availableNoOfStaff;
     private Date minUpdatedAt;
     private Date maxUpdatedAt;
+    private int initialUnderStaffing;
+    private int initialOverStaffing;
+
 
 
     public StaffingLevelActivity(String name, int minNoOfStaff, int maxNoOfStaff) {
@@ -42,6 +45,27 @@ public class StaffingLevelActivity {
         this.activityId = activityId;
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;
+    }
+
+    public void setInitialStaffingLevelDetails(){
+        this.initialUnderStaffing = Math.max(this.minNoOfStaff-this.availableNoOfStaff,0);
+        this.initialOverStaffing =  Math.max(this.availableNoOfStaff-this.maxNoOfStaff,0);
+    }
+
+    public int getRemainingUnderStaffingToResolve(){
+        return Math.max(minNoOfStaff-availableNoOfStaff,0);
+    }
+
+    public int getRemainingOverStaffingToResolve(){
+        return Math.max(availableNoOfStaff-maxNoOfStaff,0);
+    }
+
+    public int getResolvedUnderStaffingAfterPublish(){
+        return Math.min(availableNoOfStaff+initialUnderStaffing-minNoOfStaff,initialUnderStaffing);
+    }
+
+    public int getResolvedOverStaffingAfterPublish(){
+        return Math.min(maxNoOfStaff+initialOverStaffing-availableNoOfStaff,initialOverStaffing);
     }
 
 

@@ -26,9 +26,10 @@ public class RedisService extends CommonsExceptionUtil {
 
     @Inject
     private RedisTemplate<String, Map<String, String>> valueOperations;
-    @Inject private EnvConfigCommon envConfigCommon;
-    @Inject private
-    ExceptionService exceptionService;
+    @Inject
+    private EnvConfigCommon envConfigCommon;
+    @Inject
+    private ExceptionService exceptionService;
 
     public boolean verifyTokenInRedisServer(String userName, String accessToken) {
         if(!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {

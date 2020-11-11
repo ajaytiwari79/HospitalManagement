@@ -2,11 +2,13 @@ package com.kairos.dto.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.cta.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -127,6 +129,14 @@ public class CTARuleTemplateDTO {
 
     public boolean isRuleTemplateValid(Long employmentTypeId,BigInteger shiftPhaseId,Set<BigInteger> activityIds,Set<BigInteger> timeTypeIds,List<PlannedTime> plannedTimes){
         return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentTypeId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityIds,timeTypeIds,plannedTimes) || this.getCalculationFor().equals(FUNCTIONS));
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+    public String getDescription() {
+        return  TranslationUtil.getDescription(translations,description);
     }
 
     @Override

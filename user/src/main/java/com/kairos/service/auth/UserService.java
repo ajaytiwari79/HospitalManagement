@@ -72,6 +72,7 @@ import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
+import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 
 /**
  * Calls UserGraphRepository to perform CRUD operation on  User
@@ -556,9 +557,8 @@ public class UserService {
 
     public boolean updateSelectedLanguageOfUser(Long userLanguageId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(userLanguageId);
-        currentUser.setUserLanguage(systemLanguage);
-        userGraphRepository.save(currentUser);
+        userGraphRepository.updateUserSystemLanguage(currentUser.getId(),userLanguageId);
+        UserContext.getUserDetails().setUserLanguage(ObjectMapperUtils.copyPropertiesByMapper(currentUser.getUserLanguage(),SystemLanguageDTO.class));
         return true;
     }
 

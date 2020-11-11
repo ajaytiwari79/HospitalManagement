@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.country.default_data;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,28 +28,11 @@ public class IndustryTypeDTO {
     public IndustryTypeDTO() {
         //Default Constructor
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return TranslationUtil.getName(translations,name);
     }
 
     public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+        return TranslationUtil.getDescription(translations,description);
     }
 }

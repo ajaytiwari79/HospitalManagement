@@ -564,7 +564,7 @@ public class ClientService {
     }
 
     public boolean assignStaffToCitizen(long citizenId, long staffId, ClientStaffRelation.StaffType staffType) {
-        clientGraphRepository.assignStaffToClient(citizenId, staffId, staffType, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+        clientGraphRepository.assignStaffToClient(citizenId, staffId, staffType, DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
         return true;
     }
 
@@ -575,7 +575,7 @@ public class ClientService {
         for (StaffPersonalDetailQueryResult staffPersonalDetailQueryResult : staffQueryData) {
             staffIds.add(staffPersonalDetailQueryResult.getId());
         }
-        clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+        clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
         long endTime = System.currentTimeMillis();
         logger.info("time taken, client>>assignStaffToCitizen {}" , (endTime - startTime) + "  ms");
         return true;

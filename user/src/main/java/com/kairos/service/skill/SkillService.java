@@ -8,7 +8,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationSkillDTO;
 import com.kairos.enums.MasterDataTypeEnum;
@@ -19,7 +18,6 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
-import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.StaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
@@ -27,9 +25,9 @@ import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQu
 import com.kairos.persistence.model.time_care.TimeCareSkill;
 import com.kairos.persistence.model.user.expertise.response.SkillLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.response.SkillQueryResult;
-import com.kairos.persistence.model.user.skill.SelectedSkillQueryResults;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
+import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
@@ -57,7 +55,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.DateUtils.getDate;
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.enums.SkillLevel.BASIC;
@@ -68,6 +67,8 @@ import static com.kairos.enums.SkillLevel.BASIC;
 @Service
 @Transactional
 public class SkillService {
+    private static final String AVAILABLE_SKILLS = "availableSkills" ;
+    private static final String SELECTED_SKILLS = "selectedSkills" ;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -171,9 +172,7 @@ public class SkillService {
      * this method returns all skills based on type of node{all skills of organization or team it depends on type parameter} and relationship of staff and skills
      */
     public HashMap<String, Object> getAllAvailableSkills(long id) {
-
         HashMap<String, Object> response = new HashMap<>();
-
         Organization parent = organizationService.fetchParentOrganization(id);
         List<Map<String, Object>> organizationSkills;
         if(parent.getId().equals(id)){
@@ -181,17 +180,58 @@ public class SkillService {
         }else {
             organizationSkills=unitGraphRepository.getSkillsOfChildUnit(parent.getId(), id);
         }
-        List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
-        for (Map<String, Object> map : organizationSkills) {
-            orgSkillRel.add((Map<String, Object>) map.get("data"));
+        List<Map<String, Object>> avialableSkillsCategory = null;
+        List<Map<String, Object>> selectedSkillsCategory = null;
+        List<SkillCategoryQueryResults> availableSkillCategory = new ArrayList<>();
+        List<SkillCategoryQueryResults> selectedSkillCategory = new ArrayList<>();
+        for(Map<String,Object> map : organizationSkills){
+            if(isNotNull(((Map<String, Object>) map.get("data")).get(AVAILABLE_SKILLS))){
+                avialableSkillsCategory = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(AVAILABLE_SKILLS);
+            }
+            if(isNotNull(((Map<String, Object>) map.get("data")).get(SELECTED_SKILLS))){
+                selectedSkillsCategory = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(SELECTED_SKILLS);
+            }
         }
-
+        getAllSkills(avialableSkillsCategory, selectedSkillsCategory, availableSkillCategory, selectedSkillCategory);
+        Map<String,List<SkillCategoryQueryResults>> stringSkillCategoryQueryResultsMap = new HashMap<>();
+        stringSkillCategoryQueryResultsMap.put(AVAILABLE_SKILLS,availableSkillCategory);
+        stringSkillCategoryQueryResultsMap.put(SELECTED_SKILLS,selectedSkillCategory);
+        List<Map.Entry<String, List<SkillCategoryQueryResults>>> orgSkillRel = new ArrayList<>(organizationSkills.size());
+        for (Map.Entry<String, List<SkillCategoryQueryResults>> map : stringSkillCategoryQueryResultsMap.entrySet()) {
+            orgSkillRel.add(map);
+        }
         response.put("orgData", orgSkillRel);
         response.put("skillLevels", SkillLevel.values());
         response.put("teamList", teamService.getAllTeamsInOrganization(id));
-
         return response;
+    }
 
+    private void getAllSkills(List<Map<String, Object>> avialableSkillsCategory, List<Map<String, Object>> selectedSkillsCategory,  List<SkillCategoryQueryResults> availableSkillCategory,  List<SkillCategoryQueryResults> selectedSkillCategory) {
+        avialableSkillsCategory.forEach(asc->{
+            List<SkillDTO> availableSKillDTOS=new ArrayList<>();
+            List<Map<String,Object>> availableSkills =(List<Map<String,Object>>)asc.get("children");
+            availableSkills.forEach(ass->{
+                SkillDTO organizationAvailableSubSkillDTO = new SkillDTO((Long)ass.get("id"),(String)ass.get("name"),(String)ass.get("description"),(List<Long>)ass.get("tags"),(Long)ass.get("visitourId"),(boolean)ass.get("isEdited"),(Map<String, TranslationInfo>) ass.get("translations"),(String)ass.get("customName"));
+                availableSKillDTOS.add(organizationAvailableSubSkillDTO);
+            });
+
+            SkillCategoryQueryResults skillCategoryQueryResults = new SkillCategoryQueryResults((Long)asc.get("id"),(String) asc.get("name"),(String)asc.get("description"),availableSKillDTOS,(Map<String, TranslationInfo>) asc.get("translations"));
+            availableSkillCategory.add(skillCategoryQueryResults);
+
+        });
+
+        selectedSkillsCategory.forEach(ssc->{
+            List<SkillDTO> selectedSkillDTOS=new ArrayList<>();
+            List<Map<String,Object>> selectedSkillsData =(List<Map<String,Object>>)ssc.get("children");
+            selectedSkillsData.forEach(ss->{
+            SkillDTO organizationSelectedSkillDTO = new SkillDTO((Long)ss.get("id"),(String)ss.get("name"),(String)ss.get("description"),(List<Long>)ss.get("tags"),(Long)ss.get("visitourId"),(boolean)ss.get("isEdited"),(Map<String, TranslationInfo>) ss.get("translations"),(String)ss.get("customName"));
+            selectedSkillDTOS.add(organizationSelectedSkillDTO);
+        });
+
+        SkillCategoryQueryResults skillCategoryQueryResults = new SkillCategoryQueryResults((Long)ssc.get("id"),(String) ssc.get("name"),(String)ssc.get("description"),selectedSkillDTOS,(Map<String, TranslationInfo>) ssc.get("translations"));
+        selectedSkillCategory.add(skillCategoryQueryResults);
+
+        });
     }
 
 
@@ -208,12 +248,12 @@ public class SkillService {
 
         if (isSelected) {
             if (unitGraphRepository.isSkillAlreadyExist(id, skillId) == 0) {
-                unitGraphRepository.addSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                unitGraphRepository.addSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
             } else {
-                unitGraphRepository.updateSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                unitGraphRepository.updateSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
             }
         } else {
-            unitGraphRepository.removeSkillFromOrganization(id, skillId, DateUtils.getCurrentDate().getTime());
+            unitGraphRepository.removeSkillFromOrganization(id, skillId, DateUtils.getDate().getTime());
         }
         return getAllAvailableSkills(id);
 
@@ -307,7 +347,7 @@ public class SkillService {
 
         }
 
-        long lastModificationDate = DateUtils.getCurrentDate().getTime();
+        long lastModificationDate = DateUtils.getDate().getTime();
         if (isSelected) {
             staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), getCurrentLocalDate().toString(), lastModificationDate, BASIC, true);
         } else {
@@ -440,10 +480,10 @@ public class SkillService {
             if(isStaffAndSkillRelationshipExistMoreThenOne){
                 staffGraphRepository.deleteSkill(staffId,removedSkillIds);
             }
-            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getCurrentDate().getTime(), BASIC, true);
+            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getDate().getTime(), BASIC, true);
             response = prepareSelectedSkillResponse(staffId, removedSkillIds, unitId);
         } else {
-            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime());
+            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getDate().getTime());
             response =Collections.emptyList();
 
         }

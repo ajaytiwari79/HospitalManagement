@@ -56,5 +56,10 @@ public class StaffingLevelIntervalLog implements Comparable<StaffingLevelInterva
         return this.getUpdatedAt().compareTo(staffingLevelIntervalLog.getUpdatedAt());
     }
 
+    public Set<StaffingLevelSkill> getStaffingLevelSkills() {
+        staffingLevelSkills.removeIf(Objects::isNull);
+        return staffingLevelSkills;
+    }
+
 
 }

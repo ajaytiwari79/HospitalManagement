@@ -44,8 +44,8 @@ public class OrganizationServiceController {
     // PUT by id
     @RequestMapping(value = COUNTRY_URL+"/organization_service/{id}", method = RequestMethod.PUT)
     @ApiOperation("Update a  organization_service by id")
-    public ResponseEntity<Map<String, Object>> updateOrganizationService(@PathVariable long id, @PathVariable Long countryId,@RequestBody Map<String, String> data) {
-        Map<String,Object> organizationService = organizationServiceService.updateOrganizationService(id, data.get("name"), data.get("description"),countryId);
+    public ResponseEntity<Map<String, Object>> updateOrganizationService(@PathVariable long id, @PathVariable Long countryId,@RequestBody Map<String, Object> data) {
+        Map<String,Object> organizationService = organizationServiceService.updateOrganizationService(id, data.get("name").toString(), data.get("description").toString(),countryId);
         if (organizationService == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
@@ -70,7 +70,7 @@ public class OrganizationServiceController {
     @RequestMapping(value = COUNTRY_URL+"/organization_type/{orgTypeId}/organization_service", method = RequestMethod.GET)
     @ApiOperation("get organization sub services by organization type")
     public ResponseEntity<Map<String, Object>> getOrganizationServices(@PathVariable long orgTypeId) {
-        List<Object> organizationServices = organizationServiceService.getOrgServicesByOrgType(orgTypeId);
+        List<Map<String,Object>> organizationServices = organizationServiceService.getOrgServicesByOrgType(orgTypeId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServices);
     }
 

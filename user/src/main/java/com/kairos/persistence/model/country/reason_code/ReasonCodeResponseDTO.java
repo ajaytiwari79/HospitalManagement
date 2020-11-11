@@ -2,6 +2,7 @@ package com.kairos.persistence.model.country.reason_code;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import lombok.Getter;
@@ -44,53 +45,11 @@ public class ReasonCodeResponseDTO {
         this.description = description;
         this.reasonCodeType = reasonCodeType;
     }
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
+        return TranslationUtil.getName(translations,name);
     }
 
     public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public ReasonCodeType getReasonCodeType() {
-        return reasonCodeType;
-    }
-
-    public void setReasonCodeType(ReasonCodeType reasonCodeType) {
-        this.reasonCodeType = reasonCodeType;
-    }
-
-    public BigInteger getTimeTypeId() {
-        return timeTypeId;
-    }
-
-    public void setTimeTypeId(BigInteger timeTypeId) {
-        this.timeTypeId = timeTypeId;
+        return TranslationUtil.getDescription(translations,description);
     }
 }

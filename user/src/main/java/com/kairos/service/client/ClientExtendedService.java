@@ -579,7 +579,7 @@ public class ClientExtendedService {
         if (accessToLocation == null) {
             return null;
         }
-        String fileName = DateUtils.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtils.getDate().getTime() + multipartFile.getOriginalFilename();
         createDirectory(IMAGES_PATH);
         final String path = IMAGES_PATH + File.separator + fileName.trim();
         if (new File(IMAGES_PATH).isDirectory()) {
@@ -609,7 +609,7 @@ public class ClientExtendedService {
     }
 
     private String writeFile(MultipartFile multipartFile) {
-        String fileName = DateUtils.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtils.getDate().getTime() + multipartFile.getOriginalFilename();
         createDirectory(IMAGES_PATH);
         final String path = IMAGES_PATH + File.separator + fileName.trim();
         if (new File(IMAGES_PATH).isDirectory()) {
@@ -641,7 +641,7 @@ public class ClientExtendedService {
             return null;
         }
 
-        String fileName = DateUtils.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtils.getDate().getTime() + multipartFile.getOriginalFilename();
         createDirectory(IMAGES_PATH);
         final String path = IMAGES_PATH + File.separator + fileName.trim();
         if (new File(IMAGES_PATH).isDirectory()) {

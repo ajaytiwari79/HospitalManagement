@@ -51,6 +51,12 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
             "id:id(ss),name:ss.name,description:ss.description}) END, id:id(os),name:os.name,description:os.description} as result ")
     List<Map<String,Object>> getOrgServicesByOrgType(long organizationType);
 
+    @Query("MATCH  (o:OrganizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]->(ss:OrganizationService{isEnabled:true}) where id(o)={0}\n" +
+            " MATCH (ss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService {isEnabled:true} )  \n" +
+            " RETURN distinct id(os)")
+    List<Long> getAllOrganizationServiceId(long organizationType);
+
+
     @Override
     OrganizationService findOne(Long aLong);
 

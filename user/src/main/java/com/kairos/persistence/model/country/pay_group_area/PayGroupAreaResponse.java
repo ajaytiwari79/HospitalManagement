@@ -2,8 +2,14 @@ package com.kairos.persistence.model.country.pay_group_area;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.country.LevelDTO;
+import com.kairos.persistence.model.address.MunicipalityQueryResult;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.region.Municipality;
+import com.kairos.persistence.model.user.region.MunicipalityQueryResults;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,36 +19,15 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
+@AllArgsConstructor
 public class PayGroupAreaResponse {
-    private List<Level> organizationLevels = new ArrayList<>();
-    private List<Municipality> municipalities = new ArrayList<>();
+    private List<LevelDTO> organizationLevels = new ArrayList<>();
+    private List<MunicipalityQueryResults> municipalities = new ArrayList<>();
 
     public PayGroupAreaResponse() {
         // default constructor
     }
-
-    public List<Level> getOrganizationLevels() {
-        return organizationLevels;
-    }
-
-    public void setOrganizationLevels(List<Level> organizationLevels) {
-        this.organizationLevels = organizationLevels;
-    }
-
-    public List<Municipality> getMunicipalities() {
-        return municipalities;
-    }
-
-    public void setMunicipalities(List<Municipality> municipalities) {
-        this.municipalities = municipalities;
-    }
-
-
-    public PayGroupAreaResponse(List<Level> organizationLevels, List<Municipality> municipalities) {
-        this.organizationLevels = organizationLevels;
-        this.municipalities = municipalities;
-
-    }
-
 
 }

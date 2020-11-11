@@ -2,6 +2,7 @@ package com.kairos.persistence.model.open_shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.open_shift.ActivitiesPerTimeType;
 import com.kairos.dto.activity.open_shift.PlannerNotificationInfo;
@@ -48,4 +49,10 @@ public class OpenShiftRuleTemplateDTO {
     public OpenShiftRuleTemplateDTO() {
         //Default Constructor
     }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+
 }

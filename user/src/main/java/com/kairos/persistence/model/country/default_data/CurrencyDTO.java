@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.country.default_data;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +31,10 @@ public class CurrencyDTO {
 
     public CurrencyDTO() {
         //Default Constructor
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
     }
 
 }

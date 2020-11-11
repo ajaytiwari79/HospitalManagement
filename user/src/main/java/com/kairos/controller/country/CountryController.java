@@ -8,6 +8,7 @@ import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.organization.OrgTypeLevelWrapper;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -162,7 +163,7 @@ public class CountryController {
     @GetMapping(value = COUNTRY_URL + "/organization_type/sub_type/{organizationTypeId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrgTypesSubByCountryId(@PathVariable Long countryId, @PathVariable long organizationTypeId) {
-        List<Object> response = organizationTypeService.getOrgSubTypesByTypeId(organizationTypeId);
+        List<OrgTypeLevelWrapper> response = organizationTypeService.getOrgSubTypesByTypeId(organizationTypeId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
     }
 

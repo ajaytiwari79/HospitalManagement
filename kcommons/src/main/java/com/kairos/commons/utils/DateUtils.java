@@ -187,7 +187,7 @@ public  class DateUtils {
         return TimeUnit.MILLISECONDS.toMinutes(duration);
     }
 
-    public static Date getCurrentDate() {
+    public static Date getDate() {
         return new Date();
     }
 
@@ -315,9 +315,6 @@ public  class DateUtils {
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR));
     }
 
-    public static Date getDate() {
-        return new Date();
-    }
 
     public static LocalDate getLocalDate(){
         return LocalDate.now();
@@ -938,6 +935,13 @@ public  class DateUtils {
             case YEAR:return zonedDateTime.plusYears(value).with(LocalTime.MIN);
             default: return null;
         }
+    }
+
+    public  static  int getMinutesFromTime(String time){
+        int indexOfDot=time.indexOf(".");
+        String hrs=time.substring(0,indexOfDot);
+        int minutes=Integer.parseInt(hrs)*60;
+        return minutes+Integer.parseInt(time.substring(indexOfDot+1));
     }
 
 }
