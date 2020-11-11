@@ -16,6 +16,7 @@ import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.QueryResult;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
@@ -59,6 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
@@ -601,6 +603,7 @@ public class PositionService {
     }
 
     public void createPosition(Organization organization, Staff staff, Long accessGroupId, Long employedSince, Long unitId) {
+        accessGroupId =organization.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toList()).contains(accessGroupId)?accessGroupId: accessGroupRepository.accessGroupByOrganizationIdAndParentAccessGroupId(organization.getId(),accessGroupId);
         Position staffPosition =positionGraphRepository.findByStaffId(staff.getId());
         if(isNull(staffPosition)) {
             Position position = new Position();
@@ -621,7 +624,7 @@ public class PositionService {
 
 
     private void createStaffPermission(Organization organization, Long accessGroupId, Position position, Long unitId) {
-        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+        AccessGroup accessGroup =  accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             exceptionService.dataNotFoundByIdException(ERROR_STAFF_ACCESSGROUP_NOTFOUND, accessGroupId);
         }

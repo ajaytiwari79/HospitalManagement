@@ -142,7 +142,6 @@ public class AbsenceShiftService {
         List<ShiftWithViolatedInfoDTO>  shiftWithViolatedInfoDTOS = new ArrayList<>();
         if (!shiftDTOS.isEmpty()) {
             shiftWithViolatedInfoDTOS = saveShifts(activity, staffAdditionalInfoDTO, shiftDTOS, shiftActionType);
-
         }
         return shiftWithViolatedInfoDTOS;
     }
