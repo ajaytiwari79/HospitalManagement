@@ -356,7 +356,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     void setCustomPermissionForSubModelAndFields(Long staffId, Long unitId, Long accessGroupId, Set<Long> kPermissionTabIds, Set<FieldLevelPermission> permissions);
 
 
-    @Query("MATCH(o:Organization)-[r:ORGANIZATION_HAS_ACCESS_GROUPS]->(a:AccessGroup)-[r1:HAS_PARENT_ACCESS_GROUP]->(accessGroup:AccessGroup) where id(accessGroup)={1} and id(o)={0} return id(a)")
+    @Query("MATCH(o:Organization)-[r:ORGANIZATION_HAS_ACCESS_GROUPS]->(a:AccessGroup)-[r1:HAS_PARENT_ACCESS_GROUP]->(accessGroup:AccessGroup) where id(accessGroup)={1} and id(o)={0} return  id(a) limit 1")
     Long accessGroupByOrganizationIdAndParentAccessGroupId(Long organizationId,Long accessGroupId);
 
 
