@@ -60,7 +60,11 @@ public class UserOauth2Service implements UserDetailsService {
         }
         user.setHubMember(accessPageService.isHubMember(user.getId()));
         user.setSystemAdmin(userGraphRepository.isSystemAdmin(user.getId()));
-        user.setUserLanguage(userGraphRepository.getUserSystemLanguage(user.getId()));
+        SystemLanguage systemLanguage = userGraphRepository.getUserSystemLanguage(user.getId());
+        if(isNull(systemLanguage)){
+            systemLanguage = new SystemLanguage("English","en",true,true);
+        }
+        user.setUserLanguage(systemLanguage);
         updateLastSelectedOrganization(user);
         Optional<User> loggedUser = Optional.ofNullable(user);
         String otpString = HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");
