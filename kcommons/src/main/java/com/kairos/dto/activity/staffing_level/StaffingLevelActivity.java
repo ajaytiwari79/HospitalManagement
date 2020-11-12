@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.data.annotation.Transient;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -20,7 +21,8 @@ public class StaffingLevelActivity {
     private boolean includeInMin;
     private int minNoOfStaff;
     private int maxNoOfStaff;
-    private int availableNoOfStaff;
+    @Transient
+    private  int availableNoOfStaff;
     private Date minUpdatedAt;
     private Date maxUpdatedAt;
     private int initialUnderStaffing;
