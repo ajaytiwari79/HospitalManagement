@@ -57,7 +57,7 @@ public class CurrentUserDetails {
 
     @JsonIgnore
     public boolean isManagement(){
-        return this.systemAdmin || (isNotNull(unitWiseAccessRole) && isNotNull(lastSelectedOrganizationId) && MANAGEMENT.name().equalsIgnoreCase(unitWiseAccessRole.get(lastSelectedOrganizationId.toString())));
+        return (isNotNull(unitWiseAccessRole) && isNotNull(lastSelectedOrganizationId) && MANAGEMENT.name().equalsIgnoreCase(unitWiseAccessRole.get(lastSelectedOrganizationId.toString()))) || this.systemAdmin;
     }
 
     @JsonIgnore
