@@ -1,9 +1,11 @@
 package com.kairos.persistence.model.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -17,6 +19,7 @@ import java.util.Map;
 @QueryResult
 @Getter
 @Setter
+@NoArgsConstructor
 public class OrganizationLevelPayGroupAreaDTO {
 
     private Long id;
@@ -26,47 +29,11 @@ public class OrganizationLevelPayGroupAreaDTO {
     private List<PayGroupArea> payGroupAreas;
     private Map<String, TranslationInfo> translations;
 
-    public OrganizationLevelPayGroupAreaDTO() {
-        //Default Constructor
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
     }
 
     public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getPayTablesCount() {
-        return payTablesCount;
-    }
-
-    public void setPayTablesCount(Integer payTablesCount) {
-        this.payTablesCount = payTablesCount;
-    }
-
-    public List<PayGroupArea> getPayGroupAreas() {
-        return payGroupAreas;
-    }
-
-    public void setPayGroupAreas(List<PayGroupArea> payGroupAreas) {
-        this.payGroupAreas = payGroupAreas;
+        return TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
     }
 }

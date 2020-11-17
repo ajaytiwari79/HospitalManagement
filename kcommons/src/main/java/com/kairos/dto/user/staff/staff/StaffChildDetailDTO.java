@@ -1,6 +1,7 @@
 package com.kairos.dto.user.staff.staff;
 
 import com.kairos.commons.annotation.CPRValidation;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.Gender;
 import com.kairos.utils.CPRUtil;
@@ -33,5 +34,9 @@ public class StaffChildDetailDTO {
 
     public LocalDate getDateOfBirth(){
         return CPRUtil.fetchDateOfBirthFromCPR(this.getCprNumber());
+    }
+
+    public String getName(){
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
     }
 }
