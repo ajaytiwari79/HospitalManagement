@@ -76,10 +76,10 @@ public class ActivityTagDTO {
 
 
     public String getName() {
-        return TranslationUtil.getName(translations,name);
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
     }
 
     public String getDescription() {
-        return TranslationUtil.getDescription(translations,description);
+        return TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
     }
 }
