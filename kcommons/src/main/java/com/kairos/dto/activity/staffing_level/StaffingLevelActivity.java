@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.data.annotation.Transient;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -20,7 +21,8 @@ public class StaffingLevelActivity {
     private boolean includeInMin;
     private int minNoOfStaff;
     private int maxNoOfStaff;
-    private int availableNoOfStaff;
+    @Transient
+    private  int availableNoOfStaff;
     private Date minUpdatedAt;
     private Date maxUpdatedAt;
     private int initialUnderStaffing;
@@ -49,7 +51,7 @@ public class StaffingLevelActivity {
 
     public void setInitialStaffingLevelDetails(){
         this.initialUnderStaffing = Math.max(this.minNoOfStaff-this.availableNoOfStaff,0);
-        this.initialOverStaffing =  Math.min(this.availableNoOfStaff-this.maxNoOfStaff,0);
+        this.initialOverStaffing =  Math.max(this.availableNoOfStaff-this.maxNoOfStaff,0);
     }
 
     public int getRemainingUnderStaffingToResolve(){
@@ -61,7 +63,7 @@ public class StaffingLevelActivity {
     }
 
     public int getResolvedUnderStaffingAfterPublish(){
-        return Math.max(availableNoOfStaff+initialUnderStaffing-minNoOfStaff,initialUnderStaffing);
+        return Math.min(availableNoOfStaff+initialUnderStaffing-minNoOfStaff,initialUnderStaffing);
     }
 
     public int getResolvedOverStaffingAfterPublish(){

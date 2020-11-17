@@ -36,4 +36,6 @@ public interface StaffingLevelMongoRepository extends MongoBaseRepository<Staffi
 
     @Query("{deleted:false,unitId:?0,currentDate:{$gte:?1,$lte:?2}}")
     List<StaffingLevel> findByUnitIdBetweenDates(Long unitId, LocalDate startDate, LocalDate endDate);
+
+    List<StaffingLevel> findAllByDeletedFalse();
 }

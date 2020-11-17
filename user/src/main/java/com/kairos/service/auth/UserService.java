@@ -676,6 +676,11 @@ public class UserService {
             user = userRepository.findOne(UserContext.getUserDetails().getId());
             user.setHubMember(accessPageService.isHubMember(user.getId()));
             user.setSystemAdmin(userGraphRepository.isSystemAdmin(user.getId()));
+            SystemLanguage systemLanguage = userGraphRepository.getUserSystemLanguage(user.getId());
+            if(isNull(systemLanguage)){
+                systemLanguage = new SystemLanguage("English","en",true,true);
+            }
+            user.setUserLanguage(systemLanguage);
         }
         return user;
     }

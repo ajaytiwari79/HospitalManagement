@@ -15,7 +15,6 @@ import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDetailsByTimeSlotDTO;
-import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
@@ -1294,5 +1293,18 @@ public class StaffingLevelService {
         }
         unityStaffingLevelRelatedDetails.setActivities(staffingLevelMongoRepository.getStaffingLevelActivities(unitId, startDate, endDate));
         return unityStaffingLevelRelatedDetails;
+    }
+
+    //TODO just for setting the data in exisiting
+    public boolean updateInitialInStaffingLevel() {
+        List<StaffingLevel> staffingLevels=staffingLevelMongoRepository.findAllByDeletedFalse();
+        for (StaffingLevel staffingLevel : staffingLevels) {
+            List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(getStartOfDay(staffingLevel.getCurrentDate()), getEndOfDay(staffingLevel.getCurrentDate()), newArrayList(staffingLevel.getUnitId()));
+            List<ShiftDTO> shiftDTOS = shiftService.updateDraftShiftToShift(ObjectMapperUtils.copyCollectionPropertiesByMapper(shifts, ShiftDTO.class));
+            updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftDTOS, Shift.class), null);
+            StaffingLevelUtil.setStaffingLevelDetails(staffingLevel);
+        }
+        staffingLevelMongoRepository.saveEntities(staffingLevels);
+        return true;
     }
 }

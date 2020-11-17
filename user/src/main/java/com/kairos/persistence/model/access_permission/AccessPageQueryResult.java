@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.access_permission;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.OrganizationCategory;
 import lombok.Getter;
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static com.kairos.commons.utils.ObjectUtils.isEmpty;
 
 
 /**
@@ -48,6 +51,14 @@ public class AccessPageQueryResult {
 
     @JsonIgnore
     private AccessPage accessPage;
+
+
+    public void setTranslatedNames(Map<String, String> translatedNames) {
+        if(isEmpty(translatedNames)){
+            translatedNames.put("english",this.name);
+        }
+        this.translatedNames = translatedNames;
+    }
 
     @Override
     public String toString() {

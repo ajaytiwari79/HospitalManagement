@@ -9,7 +9,6 @@ import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
-import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.dto.user.organization.OrganizationSkillDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.SkillLevel;
@@ -183,9 +182,7 @@ public class SkillService {
         }
         List<Map<String, Object>> avialableSkillsCategory = null;
         List<Map<String, Object>> selectedSkillsCategory = null;
-        List<SkillDTO> availableSKillDTOS = new ArrayList<>();
         List<SkillCategoryQueryResults> availableSkillCategory = new ArrayList<>();
-        List<SkillDTO> selectedSkillDTOS = new ArrayList<>();
         List<SkillCategoryQueryResults> selectedSkillCategory = new ArrayList<>();
         for(Map<String,Object> map : organizationSkills){
             if(isNotNull(((Map<String, Object>) map.get("data")).get(AVAILABLE_SKILLS))){
@@ -195,7 +192,7 @@ public class SkillService {
                 selectedSkillsCategory = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(SELECTED_SKILLS);
             }
         }
-        getAllSkills(avialableSkillsCategory, selectedSkillsCategory, availableSKillDTOS, availableSkillCategory, selectedSkillDTOS, selectedSkillCategory);
+        getAllSkills(avialableSkillsCategory, selectedSkillsCategory, availableSkillCategory, selectedSkillCategory);
         Map<String,List<SkillCategoryQueryResults>> stringSkillCategoryQueryResultsMap = new HashMap<>();
         stringSkillCategoryQueryResultsMap.put(AVAILABLE_SKILLS,availableSkillCategory);
         stringSkillCategoryQueryResultsMap.put(SELECTED_SKILLS,selectedSkillCategory);
@@ -209,8 +206,9 @@ public class SkillService {
         return response;
     }
 
-    private void getAllSkills(List<Map<String, Object>> avialableSkillsCategory, List<Map<String, Object>> selectedSkillsCategory, List<SkillDTO> availableSKillDTOS, List<SkillCategoryQueryResults> availableSkillCategory, List<SkillDTO> selectedSkillDTOS, List<SkillCategoryQueryResults> selectedSkillCategory) {
+    private void getAllSkills(List<Map<String, Object>> avialableSkillsCategory, List<Map<String, Object>> selectedSkillsCategory,  List<SkillCategoryQueryResults> availableSkillCategory,  List<SkillCategoryQueryResults> selectedSkillCategory) {
         avialableSkillsCategory.forEach(asc->{
+            List<SkillDTO> availableSKillDTOS=new ArrayList<>();
             List<Map<String,Object>> availableSkills =(List<Map<String,Object>>)asc.get("children");
             availableSkills.forEach(ass->{
                 SkillDTO organizationAvailableSubSkillDTO = new SkillDTO((Long)ass.get("id"),(String)ass.get("name"),(String)ass.get("description"),(List<Long>)ass.get("tags"),(Long)ass.get("visitourId"),(boolean)ass.get("isEdited"),(Map<String, TranslationInfo>) ass.get("translations"),(String)ass.get("customName"));
@@ -223,6 +221,7 @@ public class SkillService {
         });
 
         selectedSkillsCategory.forEach(ssc->{
+            List<SkillDTO> selectedSkillDTOS=new ArrayList<>();
             List<Map<String,Object>> selectedSkillsData =(List<Map<String,Object>>)ssc.get("children");
             selectedSkillsData.forEach(ss->{
             SkillDTO organizationSelectedSkillDTO = new SkillDTO((Long)ss.get("id"),(String)ss.get("name"),(String)ss.get("description"),(List<Long>)ss.get("tags"),(Long)ss.get("visitourId"),(boolean)ss.get("isEdited"),(Map<String, TranslationInfo>) ss.get("translations"),(String)ss.get("customName"));

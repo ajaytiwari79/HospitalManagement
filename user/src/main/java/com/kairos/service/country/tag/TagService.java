@@ -4,6 +4,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.tag.TagDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.persistence.model.country.Country;
@@ -270,7 +271,7 @@ public class TagService {
         }else {
             List<TagQueryResult> tagQueryResults = tagGraphRepository.getListOfOrganizationTagsByMasterDataType(organizationId, false, filterText, masterDataType.toString());
             tagQueryResults.forEach(tagQueryResult -> {
-                tagQueryResult.setCountryId(unit.getId());
+                tagQueryResult.setCountryId(UserContext.getUserDetails().getCountryId());
                 tagQueryResult.setTranslations(TranslationUtil.getTranslatedData(tagQueryResult.getTranslatedNames(),tagQueryResult.getTranslatedDescriptions()));
             });
             tagsData.put("tags", tagQueryResults);

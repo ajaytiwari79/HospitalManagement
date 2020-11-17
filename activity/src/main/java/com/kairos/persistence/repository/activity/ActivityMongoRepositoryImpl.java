@@ -15,6 +15,7 @@ import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
+import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityTimeTypeWrapper;
@@ -967,7 +968,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         String activityIdString = getBigIntegerString(activityIds.iterator());
         AggregationOperation[] aggregations = new AggregationOperation[10];
         int i=0;
-        aggregations[i++] = match(Criteria.where("staffId").is(staffId).and(DELETED).is(false));
+        if(!mongoTemplate.exists(new Query(Criteria.where("staffId").is(staffId).and(DELETED).is(false)),
+                StaffActivitySetting.class)){
+            staffId = 0l;
+        }
+        aggregations[i++] = match(Criteria.where("staffId").in(staffId).and(DELETED).is(false));
         aggregations[i++] = group("staffId").addToSet("activityId").as("activityIds");
         aggregations[i++] = getCustomLookUpForActivityAggregationOperation(activityIdString,isActivityType);
         aggregations[i++] = getCustomAggregationOperationForChildActivitiyIds();
