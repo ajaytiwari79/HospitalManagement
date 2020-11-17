@@ -4,7 +4,7 @@ import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseLine;
 import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
-import com.kairos.persistence.model.user.expertise.response.ExpertiseDTO;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseBasicDetails;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseLineQueryResult;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseTagDTO;
@@ -59,7 +59,12 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "with expertise,level,union,sector, " +
             "CASE when seniorDays IS NULL THEN [] ELSE collect(DISTINCT {id:id(seniorDays),from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) END as seniorDays, " +
             "CASE when childCareDays IS NULL THEN [] ELSE collect(DISTINCT {id:id(childCareDays),from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) END as childCareDays " +
-            "RETURN expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate , " +
+            "RETURN " +
+            "{english :{name: CASE WHEN expertise.`translatedNames.english` IS NULL THEN '' ELSE expertise.`translatedNames.english` END, description : CASE WHEN expertise.`translatedDescriptions.english` IS NULL THEN '' ELSE expertise.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN expertise.`translatedNames.hindi` IS NULL THEN '' ELSE expertise.`translatedNames.hindi` END, description : CASE WHEN expertise.`translatedDescriptions.hindi` IS NULL THEN '' ELSE expertise.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN expertise.`translatedNames.danish` IS NULL THEN '' ELSE expertise.`translatedNames.danish` END, description : CASE WHEN expertise.`translatedDescriptions.danish` IS NULL THEN '' ELSE expertise.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN expertise.`translatedNames.britishenglish` IS NULL THEN '' ELSE expertise.`translatedNames.britishenglish` END, description : CASE WHEN expertise.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE expertise.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate , " +
             "expertise.endDate as endDate ,expertise.description as description ,expertise.breakPaymentSetting as breakPaymentSetting,expertise.published as published,level as organizationLevel,union,sector, " +
             "seniorDays,childCareDays ORDER BY expertise.name")
     List<ExpertiseQueryResult> getAllExpertise(long countryId, boolean[] published);
@@ -106,12 +111,12 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "MATCH(organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService)\n" +
             " MATCH(os)<-[:"+SUPPORTS_SERVICES+"]-(exl:ExpertiseLine)-["+HAS_EXPERTISE_LINES+"]-(expertise:Expertise{deleted:false}) WHERE expertise.published AND  (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE())\n" +
             "RETURN distinct id(expertise) as id,expertise.name as name")
-    List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId);
+    List<ExpertiseBasicDetails> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId);
 
     @Query("MATCH (country:Country) WHERE id(country)={0}  " +
             "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE  (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE()) " +
             "RETURN id(expertise) as id , expertise.name as name")
-    List<ExpertiseDTO> getAllExpertiseByCountryAndDate(long countryId);
+    List<ExpertiseBasicDetails> getAllExpertiseByCountryAndDate(long countryId);
 
     @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE id(country) = {0} AND (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE()))  " +
             "MATCH(expertise)-[:" + BELONGS_TO_SECTOR + "]-(sector:Sector)\n" +
@@ -125,12 +130,17 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "with expertise,exl,seniorityLevel,sector,organizationLevel,union , " +
             "CASE WHEN seniorDays IS NULL THEN [] ELSE COLLECT(DISTINCT {id:id(seniorDays),from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) END as seniorDays, " +
             "CASE WHEN childCareDays IS NULL THEN [] ELSE COLLECT(DISTINCT {id:id(childCareDays),from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) END as childCareDays ORDER BY  seniorityLevel.from \n" +
-            "RETURN DISTINCT expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate ," +
+            "RETURN DISTINCT " +
+            "{english :{name: CASE WHEN expertise.`translatedNames.english` IS NULL THEN '' ELSE expertise.`translatedNames.english` END, description : CASE WHEN expertise.`translatedDescriptions.english` IS NULL THEN '' ELSE expertise.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN expertise.`translatedNames.hindi` IS NULL THEN '' ELSE expertise.`translatedNames.hindi` END, description : CASE WHEN expertise.`translatedDescriptions.hindi` IS NULL THEN '' ELSE expertise.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN expertise.`translatedNames.danish` IS NULL THEN '' ELSE expertise.`translatedNames.danish` END, description : CASE WHEN expertise.`translatedDescriptions.danish` IS NULL THEN '' ELSE expertise.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN expertise.`translatedNames.britishenglish` IS NULL THEN '' ELSE expertise.`translatedNames.britishenglish` END, description : CASE WHEN expertise.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE expertise.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate ," +
             "expertise.endDate as endDate ,exl.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,exl.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek," +
              " seniorDays,childCareDays,sector,organizationLevel,union  order by expertise.name")
     List<ExpertiseQueryResult> findExpertiseByOrganizationServicesForUnit(Long countryId, Set<Long> organizationServicesIds);
 
-    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false})  WHERE id(expertise)={0}" +
+    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false})  WHERE id(expertise)={0}" +
             " RETURN location as name ORDER BY location.name ASC" )
     List<Location> findAllLocationsOfUnionInExpertise(Long expertiseId);
 
@@ -156,4 +166,14 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
     @Query("MATCH(expertise:Expertise)-[r:"+HAS_CHILD_CARE_DAYS+"]-(careDays:CareDays) WHERE id(expertise) = {0} DETACH DELETE r RETURN COUNT(r)>0")
     boolean removeChildCareDays(Long expertiseId);
+
+    @Query("MATCH (expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE  (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE()))  " +
+            "MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {0}\n" +
+            "RETURN id(expertise) ")
+    List<Long> getExpertiseIdsByServices(Set<Long> organizationServicesIds);
+
+    @Query("Match(expertise:Expertise) where id(expertise)={0}\n" +
+            "Match(employment:Employment)-[r:HAS_EXPERTISE_IN]-(et:Expertise) where id(employment)={1} Detach delete r\n" +
+            "CREATE UNIQUE(employment)-[r1:HAS_EXPERTISE_IN]->(expertise)")
+    void updateExpertiseByExpertiseIdAndEmploymentId(Long expertiseId,Long employmentId);
  }

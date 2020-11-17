@@ -1,5 +1,6 @@
 package com.kairos.controller.system_setting;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.utils.response.ResponseHandler;
@@ -72,6 +73,21 @@ public class SystemLanguageController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getSystemLanguageAndCounryMapping(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.getSystemLanguageAndCountryMapping(countryId));
+    }
+
+
+    @PutMapping(value = "system_language/{id}/language_settings")
+    @ApiOperation("update translation data")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfSystemLanguage(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL+ "/system_language/{id}/language_settings")
+    @ApiOperation("update translation data")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfSystemLanguageOnCountryLevel(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, systemLanguageService.updateTranslation(id,translations));
     }
 
 

@@ -1,0 +1,20 @@
+//Update tab details
+MATCH (accessPage:AccessPage) WHERE accessPage.moduleId="module_1"
+SET accessPage.editable = true
+RETURN accessPage
+
+MATCH (accessPage:AccessPage) WHERE accessPage.moduleId="tab_413"
+SET accessPage.active=true,accessPage.deleted=false,accessPage.name="Unity Graph"
+RETURN accessPage
+
+MATCH (accessPage:AccessPage) WHERE accessPage.moduleId="tab_412"
+SET accessPage.active=true,accessPage.deleted=false,accessPage.name="Staffing Levels"
+RETURN accessPage
+
+//set english name
+MATCH(accessPage:AccessPage)
+SET accessPage.`translatedNames.english` = accessPage.name
+
+//new tab
+Match(ap:AccessPage) where ap.moduleId="tab_82" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Open Shift Interval",isModule:false,moduleId:"tab_446",active:true,`translatedNames.english`:"Open Shift Interval"});
+

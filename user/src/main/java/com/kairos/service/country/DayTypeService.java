@@ -1,6 +1,9 @@
 package com.kairos.service.country;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
@@ -68,13 +71,19 @@ public class DayTypeService {
         return dayTypeDTO;
     }
 
-    public List<DayType> getAllDayTypeByCountryId(long countryId) {
-        return dayTypeGraphRepository.findByCountryId(countryId);
+    public List<DayTypeDTO> getAllDayTypeByCountryId(long countryId) {
+        List<DayType> dayTypes =dayTypeGraphRepository.findByCountryId(countryId);
+        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
+        for(DayTypeDTO dayTypeDTO :dayTypeDTOS){
+            dayTypeDTO.setTranslations(TranslationUtil.getTranslatedData(dayTypeDTO.getTranslatedNames(),dayTypeDTO.getTranslatedDescriptions()));
+            dayTypeDTO.setCountryId(countryId);
+        }
+        return dayTypeDTOS;
     }
 
     public List<DayType> getAllDayTypeForUnit(long unitId) {
         Long countryId = UserContext.getUserDetails().getCountryId();
-        return getAllDayTypeByCountryId(countryId);
+        return dayTypeGraphRepository.findByCountryId(countryId);
     }
 
     public DayTypeDTO updateDayType(DayTypeDTO dayTypeDTO) {
@@ -134,17 +143,22 @@ public class DayTypeService {
         if (Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()) {
             List<DayType> dayTypes = new ArrayList<>();
             dayTypes.add(countryHolidayCalendarQueryResult.getDayType());
+            dayTypes.addAll(getDayTypes(date));
             return dayTypes;
         } else {
-            Instant instant = Instant.ofEpochMilli(date.getTime());
-            LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-            LocalDate localDate = localDateTime.toLocalDate();
-            String day = localDate.getDayOfWeek().name();
-            Day dayEnum = Day.valueOf(day);
-            List<DayType> dayTypes = dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
-            return dayTypes.isEmpty() ? Collections.EMPTY_LIST : dayTypes;
+            List<DayType> dayTypes = getDayTypes(date);
+            return dayTypes;
         }
 
+    }
+
+    private List<DayType> getDayTypes(Date date) {
+        Instant instant = Instant.ofEpochMilli(date.getTime());
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        LocalDate localDate = localDateTime.toLocalDate();
+        String day = localDate.getDayOfWeek().name();
+        Day dayEnum = Day.valueOf(day);
+        return dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
     }
 
     public List<DayType> getDayTypes(List<Long> dayTypeIds) {
@@ -165,6 +179,16 @@ public class DayTypeService {
         }
         return dayTypes;
 
+    }
+    public Map<String, TranslationInfo> updateTranslation(Long dayTypeId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
+        DayType dayType =dayTypeGraphRepository.findOne(dayTypeId);
+        dayType.setTranslatedNames(translatedNames);
+        dayType.setTranslatedDescriptions(translatedDescriptios);
+        dayTypeGraphRepository.save(dayType);
+        return dayType.getTranslatedData();
     }
 
 

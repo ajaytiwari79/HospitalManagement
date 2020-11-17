@@ -165,7 +165,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         if(!activityConfigurationRepository.existsByCountryIdAndDeletedFalse(countryId)) {
             List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
             if (phases == null || phases.isEmpty()) {
-                phases = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(phaseMongoRepository.getPhasesByCountryId(countryId, Sort.Direction.ASC), Phase.class);
+                phases = ObjectMapperUtils.copyCollectionPropertiesByMapper(phaseMongoRepository.getPhasesByCountryId(countryId, Sort.Direction.ASC), Phase.class);
             }
             List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
             Optional<PresenceTypeDTO> normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny();
@@ -224,7 +224,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         Map<DateTimeInterval, PlannedTime> plannedTimeMap = plannedTimeList.stream().filter(distinctByKey(plannedTime -> new DateTimeInterval(plannedTime.getStartDate(), plannedTime.getEndDate()))).collect(toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()), Function.identity()));
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             List<BigInteger> plannedTimeIds = addPlannedTimeInShift(shift.getUnitId(), phase.getId(), activityWrappers.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO);
-            BigInteger plannedTimeId = null;
+            BigInteger plannedTimeId;
             if(!asLocalDate(shiftActivity.getStartDate()).isAfter(LocalDate.now()) && plannedTimeIds.contains(shiftActivity.getPlannedTimeId())){
                 plannedTimeId = shiftActivity.getPlannedTimeId();
             }else {
@@ -241,7 +241,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     public List<BigInteger> addPlannedTimeInShift(Long unitId, BigInteger phaseId, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         boolean managementPerson = UserContext.getUserDetails().isManagement();
         List<BigInteger> plannedTimes;
-        switch (activity.getBalanceSettingsActivityTab().getTimeType()){
+        switch (activity.getActivityBalanceSettings().getTimeType()){
             case ABSENCE :
                 plannedTimes = getAbsencePlannedTime(unitId, phaseId, activity);
                 break;
@@ -262,7 +262,7 @@ public class ActivityConfigurationService extends MongoBaseService {
             if (!Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
                 exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
             }
-            if (activityConfiguration.getAbsencePlannedTime().isException() && activity.getBalanceSettingsActivityTab().getTimeTypeId().equals(activityConfiguration.getAbsencePlannedTime().getTimeTypeId())) {
+            if (activityConfiguration.getAbsencePlannedTime().isException() && activity.getActivityBalanceSettings().getTimeTypeId().equals(activityConfiguration.getAbsencePlannedTime().getTimeTypeId())) {
                 plannedTimeIds = activityConfiguration.getAbsencePlannedTime().getPlannedTimeIds();
                 break;
             } else {
@@ -316,11 +316,9 @@ public class ActivityConfigurationService extends MongoBaseService {
         List<PlannedTime> plannedTimes = new ArrayList<>();
         final boolean endDateInside = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().containsStartOrEnd(endDate));
         final boolean activityIntervalOverLapped = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().overlaps(activityInterval));
-
         if (!activityIntervalOverLapped) {
             plannedTimes.add(new PlannedTime(plannedTimeId, startDate, endDate));
         } else {
-
             if (plannedTimeMap.size() != 0) {
                 DateTimeInterval lastInterval = plannedTimeMap.keySet().stream().skip(plannedTimeMap.keySet().size() - 1).findFirst().get();
                 boolean addedAtLeading = false;
@@ -346,14 +344,9 @@ public class ActivityConfigurationService extends MongoBaseService {
                 if (!endDateInside) {
                     plannedTimes.add(new PlannedTime(plannedTimeId, lastInterval.getEndDate(), endDate));
                 }
-
             }
         }
         return plannedTimes;
-    }
-
-    public boolean existsByUnitIdAndDeletedFalse(Long unitId){
-        return activityConfigurationRepository.existsByUnitIdAndDeletedFalse(unitId);
     }
 
     public List<ActivityConfiguration> findAllByUnitIdAndDeletedFalse(Long unitId){
@@ -362,26 +355,6 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     public ActivityConfiguration findPresenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId){
         return activityConfigurationRepository.findPresenceConfigurationByUnitIdAndPhaseId(unitId,phaseId);
-    }
-
-    public List<ActivityConfigurationDTO> findPresenceConfigurationByUnitId(Long unitId){
-        return activityConfigurationRepository.findPresenceConfigurationByUnitId(unitId);
-    }
-
-    public List<ActivityConfigurationDTO> findAbsenceConfigurationByUnitId(Long unitId){
-        return activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
-    }
-
-    public List<ActivityConfiguration> findAllAbsenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId){
-        return activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(unitId,phaseId);
-    }
-
-    public ActivityConfiguration findPresenceConfigurationByCountryIdAndPhaseId(Long countryId,BigInteger phaseId){
-        return activityConfigurationRepository.findPresenceConfigurationByCountryIdAndPhaseId(countryId,phaseId);
-    }
-
-    public List<ActivityConfigurationDTO> findAbsenceConfigurationByCountryIdAndPhaseId(Long unitId,BigInteger phaseId){
-        return activityConfigurationRepository.findAbsenceConfigurationByCountryIdAndPhaseId(unitId,phaseId);
     }
 
     public BigInteger createNonWorkingExceptionActivityConfiguration(Long unitOrCountryId, NonWorkingPlannedTime nonWorkingPlannedTime, boolean forCountry) {

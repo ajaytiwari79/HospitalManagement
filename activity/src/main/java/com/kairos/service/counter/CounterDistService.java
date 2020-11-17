@@ -301,6 +301,21 @@ public class CounterDistService extends MongoBaseService {
         List<String> tabIds = tabKPIMappingDTOS.stream().map(TabKPIMappingDTO::getTabId).collect(toList());
         List<BigInteger> kpiIds = tabKPIMappingDTOS.stream().map(TabKPIMappingDTO::getKpiId).collect(toList());
         Map<String, Map<BigInteger, BigInteger>> tabKpiMap = setTabKPIEntries(tabIds, kpiIds, null, unitId, accessGroupPermissionCounterDTO.getStaffId(), level, accessGroupPermissionCounterDTO.isCountryAdmin());
+        List<ApplicableKPI> applicableKPIS = getApplicableKPIS(tabKPIMappingDTOS, unitId, level, accessGroupPermissionCounterDTO, entriesToSave, kpiIds, tabKpiMap);
+        Map<BigInteger, String> kpiIdAndTitleMap = applicableKPIS.stream().collect(Collectors.toMap(ApplicableKPI::getActiveKpiId, ApplicableKPI::getTitle));
+        List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffId(tabIds, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), unitId, level);
+        FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(unitId, staffId, kpiIds, accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin());
+        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+        tabKPIDTOS.forEach(tabKPIDTO -> {
+            tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
+            if (kpiIdAndTitleMap.get(tabKPIDTO.getKpi().getId()) != null) {
+                tabKPIDTO.getKpi().setTitle(kpiIdAndTitleMap.get(tabKPIDTO.getKpi().getId()));
+            }
+        });
+        return tabKPIDTOS;
+    }
+
+    private List<ApplicableKPI> getApplicableKPIS(List<TabKPIMappingDTO> tabKPIMappingDTOS, Long unitId, ConfLevel level, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, List<TabKPIConf> entriesToSave, List<BigInteger> kpiIds, Map<String, Map<BigInteger, BigInteger>> tabKpiMap) {
         tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
             if (tabKpiMap.get(tabKPIMappingDTO.getTabId()).get(tabKPIMappingDTO.getKpiId()) == null) {
                 entriesToSave.add(new TabKPIConf(tabKPIMappingDTO.getTabId(), tabKPIMappingDTO.getKpiId(), null, unitId, accessGroupPermissionCounterDTO.getStaffId(), level, tabKPIMappingDTO.getPosition(), KPIValidity.BASIC, LocationType.FIX, calculatePriority(ConfLevel.UNIT, KPIValidity.BASIC, LocationType.FIX)));
@@ -316,16 +331,7 @@ public class CounterDistService extends MongoBaseService {
         } else {
             applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(kpiIds), ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId());
         }
-        Map<BigInteger, String> kpiIdAndTitleMap = applicableKPIS.stream().collect(Collectors.toMap(ApplicableKPI::getActiveKpiId, ApplicableKPI::getTitle));
-        List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffId(tabIds, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), unitId, level);
-        Map<BigInteger, CommonRepresentationData> data = counterDataService.generateKPIData(new FilterCriteriaDTO(unitId, staffId, kpiIds, accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin()), unitId, accessGroupPermissionCounterDTO.getStaffId());
-        tabKPIDTOS.forEach(tabKPIDTO -> {
-            tabKPIDTO.setData(data.get(tabKPIDTO.getKpi().getId()));
-            if (kpiIdAndTitleMap.get(tabKPIDTO.getKpi().getId()) != null) {
-                tabKPIDTO.getKpi().setTitle(kpiIdAndTitleMap.get(tabKPIDTO.getKpi().getId()));
-            }
-        });
-        return tabKPIDTOS;
+        return applicableKPIS;
     }
 
     public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries, Long countryId, Long unitId, Long staffId, ConfLevel level) {
@@ -562,7 +568,7 @@ public class CounterDistService extends MongoBaseService {
     }
 
     private void createApplicableKpiAndCategoryKPIConfiguraionOfUnits(OrgTypeKPIConfDTO orgTypeKPIConf, Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKpi, List<OrgTypeMappingDTO> orgTypeMappingDTOS) {
-        List<ApplicableKPI> applicableKPISToSave = new ArrayList<>();
+
         Map<Long, Map<BigInteger, BigInteger>> unitIdKpiMap = new HashMap<>();
         List<OrgTypeDTO> orgTypeDTOS = userIntegrationService.getOrganizationIdsBySubOrgId(orgTypeKPIConf.getOrgTypeIds());
         List<Long> unitIds = orgTypeDTOS.stream().map(OrgTypeDTO::getUnitId).collect(toList());
@@ -572,6 +578,11 @@ public class CounterDistService extends MongoBaseService {
         List<CategoryKPIConf> categoryKPIConfs = new ArrayList<>();
         List<KPICategory> kpiCategories = counterRepository.getKPICategoryByRefIds(ConfLevel.UNIT, unitIds, UNCATEGORIZED);
         Map<Long, KPICategory> kpiCategoryUnitWiseMap = kpiCategories.stream().collect(Collectors.toMap(KPICategory::getUnitId, Function.identity()));
+        List<ApplicableKPI> applicableKPISToSave = new ArrayList<>();
+        createApplicableKPISForUnit(orgTypeKPIConf, kpiIdAndApplicableKpi, unitIdKpiMap, unitIds, categoryKPIConfs, kpiCategoryUnitWiseMap, applicableKPISToSave);
+    }
+
+    private void createApplicableKPISForUnit(OrgTypeKPIConfDTO orgTypeKPIConf, Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKpi, Map<Long, Map<BigInteger, BigInteger>> unitIdKpiMap, List<Long> unitIds, List<CategoryKPIConf> categoryKPIConfs, Map<Long, KPICategory> kpiCategoryUnitWiseMap, List<ApplicableKPI> applicableKPISToSave) {
         unitIds.forEach(unitId -> orgTypeKPIConf.getKpiIds().forEach(kpiId -> {
             if (unitIdKpiMap.get(unitId).get(kpiId) == null) {
                 ApplicableFilter applicableFilter = null;
@@ -613,6 +624,10 @@ public class CounterDistService extends MongoBaseService {
                 }
             }
         }));
+        removeLinkingOfKPIFromUnits(orgTypeMappingDTO, orgTypeKPIEntry, unitIdOrKpiMap, unitIds);
+    }
+
+    private void removeLinkingOfKPIFromUnits(OrgTypeMappingDTO orgTypeMappingDTO, OrgTypeKPIEntry orgTypeKPIEntry, Map<Long, Set<BigInteger>> unitIdOrKpiMap, List<Long> unitIds) {
         unitIdOrKpiMap.entrySet().forEach(k -> {
             if (unitIdOrKpiMap.get(k.getKey()).contains(orgTypeMappingDTO.getKpiId())) {
                 unitIds.remove(k.getKey());
@@ -634,23 +649,10 @@ public class CounterDistService extends MongoBaseService {
         List<ApplicableKPI> applicableKpis = counterRepository.getApplicableKPIByReferenceId(new ArrayList<>(), Arrays.asList(unitId), ConfLevel.UNIT);
         List<BigInteger> applicableKpiIds = applicableKpis.stream().map(ApplicableKPI::getActiveKpiId).collect(toList());
         Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKpi = applicableKpis.stream().collect(Collectors.toMap(ApplicableKPI::getActiveKpiId, v -> v));
-        applicableKpis.forEach(applicableKPI -> defaultKPISettingDTO.getStaffIds().forEach(staffId -> {
-            ApplicableFilter applicableFilter = null;
-            if (kpiIdAndApplicableKpi.containsKey(applicableKPI) && isNotNull(kpiIdAndApplicableKpi.get(applicableKPI).getApplicableFilter())) {
-                applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(applicableKPI).getApplicableFilter().getCriteriaList(), false);
-            }
-            applicableKPIS.add(new ApplicableKPI(applicableKPI.getActiveKpiId(), applicableKPI.getBaseKpiId(), null, unitId, staffId, ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getTitle(), false, kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getKpiRepresentation(), kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getInterval(), kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getValue(), kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getFrequencyType(), kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getFibonacciKPIConfigs()));
-        }));
+        createApplicableKPIForDashBoardTab(unitId, defaultKPISettingDTO, applicableKPIS, applicableKpis, kpiIdAndApplicableKpi);
         List<DashboardKPIConf> dashboardKPIConfToSave = new ArrayList<>();
         List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, ConfLevel.UNIT, defaultKPISettingDTO.getParentUnitId());
-        List<KPIDashboard> kpiDashboardsTosave = new ArrayList<>();
-        defaultKPISettingDTO.getStaffIds().forEach(staffId -> {
-            List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(), dashboard.getModuleId(), dashboard.getName(), null, defaultKPISettingDTO.getParentUnitId(), staffId, ConfLevel.STAFF, dashboard.isDefaultTab())).collect(Collectors.toList());
-            kpiDashboardsTosave.addAll(kpiDashboards);
-        });
-        if (!kpiDashboardsTosave.isEmpty()) {
-            counterRepository.saveEntities(kpiDashboardsTosave);
-        }
+        updateDashBoardConfig(defaultKPISettingDTO, kpiDashboardDTOS);
         List<String> oldDashboardsIds = kpiDashboardDTOS.stream().map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
         List<DashboardKPIConf> dashboardKPIConfList = counterRepository.getDashboardKPIConfs(applicableKpiIds, oldDashboardsIds, unitId, ConfLevel.UNIT);
         List<TabKPIConf> tabKPIConfKPIEntries = new ArrayList<>();
@@ -664,6 +666,27 @@ public class CounterDistService extends MongoBaseService {
         if (!applicableKpiIds.isEmpty()) counterRepository.saveEntities(applicableKPIS);
         if (!dashboardKPIConfToSave.isEmpty()) counterRepository.saveEntities(dashboardKPIConfToSave);
         if (!tabKPIConfKPIEntries.isEmpty()) counterRepository.saveEntities(tabKPIConfKPIEntries);
+    }
+
+    private void createApplicableKPIForDashBoardTab(Long unitId, DefaultKPISettingDTO defaultKPISettingDTO, List<ApplicableKPI> applicableKPIS, List<ApplicableKPI> applicableKpis, Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKpi) {
+        applicableKpis.forEach(applicableKPI -> defaultKPISettingDTO.getStaffIds().forEach(staffId -> {
+            ApplicableFilter applicableFilter = null;
+            if (kpiIdAndApplicableKpi.containsKey(applicableKPI) && isNotNull(kpiIdAndApplicableKpi.get(applicableKPI).getApplicableFilter())) {
+                applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(applicableKPI).getApplicableFilter().getCriteriaList(), false);
+            }
+            applicableKPIS.add(new ApplicableKPI(applicableKPI.getActiveKpiId(), applicableKPI.getBaseKpiId(), null, unitId, staffId, ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getTitle(), false, kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getKpiRepresentation(), kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getInterval(), kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getValue(), kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getFrequencyType(), kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getFibonacciKPIConfigs()));
+        }));
+    }
+
+    private void updateDashBoardConfig(DefaultKPISettingDTO defaultKPISettingDTO, List<KPIDashboardDTO> kpiDashboardDTOS) {
+        List<KPIDashboard> kpiDashboardsTosave = new ArrayList<>();
+        defaultKPISettingDTO.getStaffIds().forEach(staffId -> {
+            List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(), dashboard.getModuleId(), dashboard.getName(), null, defaultKPISettingDTO.getParentUnitId(), staffId, ConfLevel.STAFF, dashboard.isDefaultTab())).collect(Collectors.toList());
+            kpiDashboardsTosave.addAll(kpiDashboards);
+        });
+        if (!kpiDashboardsTosave.isEmpty()) {
+            counterRepository.saveEntities(kpiDashboardsTosave);
+        }
     }
 
     public void createDefaultKpiSetting(Long unitId, DefaultKPISettingDTO defaultKPISettingDTO) {
@@ -685,7 +708,6 @@ public class CounterDistService extends MongoBaseService {
     }
 
     public void setDefaultSettingUnit(DefaultKPISettingDTO defalutKPISettingDTO, List<BigInteger> kpiIds, Long unitId, ConfLevel level) {
-        List<AccessGroupMappingDTO> accessGroupMappingDTOS;
         Long refId = ConfLevel.COUNTRY.equals(level) ? defalutKPISettingDTO.getCountryId() : defalutKPISettingDTO.getParentUnitId();
         List<CategoryKPIConf> categoryKPIConfToSave = new ArrayList<>();
         List<DashboardKPIConf> dashboardKPIConfToSave = new ArrayList<>();
@@ -695,17 +717,24 @@ public class CounterDistService extends MongoBaseService {
         List<BigInteger> applicableKpiIds = applicableKpis.stream().map(ApplicableKPI::getActiveKpiId).collect(toList());
         Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKpi = applicableKpis.stream().collect(Collectors.toMap(ApplicableKPI::getActiveKpiId, v -> v));
         //TODO code update for parent child access group fetching
-        if (!Optional.ofNullable(defalutKPISettingDTO.getParentUnitId()).isPresent()) {
-            List<Long> countryAccessGroupIds = defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().keySet().stream().collect(Collectors.toList());
-            accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(countryAccessGroupIds, applicableKpiIds, level, refId);
-            accessGroupMappingDTOS.forEach(accessGroupMappingDTO -> accessGroupKPIEntries.add(new AccessGroupKPIEntry(defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().get(accessGroupMappingDTO.getAccessGroupId()), accessGroupMappingDTO.getKpiId(), null, unitId, ConfLevel.UNIT)));
-        } else {
-            accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(new ArrayList<>(), applicableKpiIds, level, refId);
-            accessGroupMappingDTOS.forEach(accessGroupMappingDTO -> accessGroupKPIEntries.add(new AccessGroupKPIEntry(accessGroupMappingDTO.getAccessGroupId(), accessGroupMappingDTO.getKpiId(), null, unitId, ConfLevel.UNIT)));
-        }
+        createAccessGroupKPIEntry(defalutKPISettingDTO, unitId, level, refId, accessGroupKPIEntries, applicableKpiIds);
         List<TabKPIConf> tabKPIConf = counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds, refId, level);
         tabKPIConf.stream().forEach(tabKPIConfKPI -> tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, unitId, null, ConfLevel.UNIT, null, KPIValidity.BASIC, LocationType.FIX, calculatePriority(ConfLevel.UNIT, KPIValidity.BASIC, LocationType.FIX))));
         List<KPICategoryDTO> kpiCategoryDTOS = counterRepository.getKPICategory(null, level, refId);
+        Map<BigInteger, BigInteger> categoriesOldAndNewIds = getKPICategoryByUnitMap(unitId, kpiCategoryDTOS);
+        List<BigInteger> oldCategoriesIds = kpiCategoryDTOS.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
+        List<CategoryKPIConf> categoryKPIConfList = counterRepository.getCategoryKPIConfs(applicableKpiIds, oldCategoriesIds);
+        categoryKPIConfList.stream().forEach(categoryKPIConf -> categoryKPIConfToSave.add(new CategoryKPIConf(categoryKPIConf.getKpiId(), categoriesOldAndNewIds.get(categoryKPIConf.getCategoryId()), null, unitId, ConfLevel.UNIT)));
+        List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
+        List<String> oldDashboardsIds = kpiDashboardDTOS.stream().map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
+        List<DashboardKPIConf> dashboardKPIConfList = counterRepository.getDashboardKPIConfs(applicableKpiIds, oldDashboardsIds, refId, level);
+        dashboardKPIConfList.stream().forEach(dashboardKPIConf -> dashboardKPIConfToSave.add(new DashboardKPIConf(dashboardKPIConf.getKpiId(), dashboardKPIConf.getModuleId(), null, unitId, null, ConfLevel.UNIT, dashboardKPIConf.getPosition())));
+        List<ApplicableKPI> applicableKPISToSave = getOrUpdateApplicableKPISForUnit(unitId, applicableKpiIds, kpiIdAndApplicableKpi);
+        //due to avoid exception and entity may be blank here so I using multiple conditional statements harish
+        saveKPIDetailsForUnits(categoryKPIConfToSave, dashboardKPIConfToSave, accessGroupKPIEntries, tabKPIConfKPIEntries, applicableKPISToSave);
+    }
+
+    private Map<BigInteger, BigInteger> getKPICategoryByUnitMap(Long unitId, List<KPICategoryDTO> kpiCategoryDTOS) {
         Map<String, BigInteger> categoriesNameMap = new HashMap<>();
         Map<BigInteger, BigInteger> categoriesOldAndNewIds = new HashMap<>();
         kpiCategoryDTOS.stream().forEach(kpiCategoryDTO -> categoriesNameMap.put(kpiCategoryDTO.getName(), kpiCategoryDTO.getId()));
@@ -714,13 +743,22 @@ public class CounterDistService extends MongoBaseService {
             counterRepository.saveEntities(kpiCategories);
         }
         kpiCategories.stream().forEach(kpiCategory -> categoriesOldAndNewIds.put(categoriesNameMap.get(kpiCategory.getName()), kpiCategory.getId()));
-        List<BigInteger> oldCategoriesIds = kpiCategoryDTOS.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
-        List<CategoryKPIConf> categoryKPIConfList = counterRepository.getCategoryKPIConfs(applicableKpiIds, oldCategoriesIds);
-        categoryKPIConfList.stream().forEach(categoryKPIConf -> categoryKPIConfToSave.add(new CategoryKPIConf(categoryKPIConf.getKpiId(), categoriesOldAndNewIds.get(categoryKPIConf.getCategoryId()), null, unitId, ConfLevel.UNIT)));
-        List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
-        List<String> oldDashboardsIds = kpiDashboardDTOS.stream().map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
-        List<DashboardKPIConf> dashboardKPIConfList = counterRepository.getDashboardKPIConfs(applicableKpiIds, oldDashboardsIds, refId, level);
-        dashboardKPIConfList.stream().forEach(dashboardKPIConf -> dashboardKPIConfToSave.add(new DashboardKPIConf(dashboardKPIConf.getKpiId(), dashboardKPIConf.getModuleId(), null, unitId, null, ConfLevel.UNIT, dashboardKPIConf.getPosition())));
+        return categoriesOldAndNewIds;
+    }
+
+    private void createAccessGroupKPIEntry(DefaultKPISettingDTO defalutKPISettingDTO, Long unitId, ConfLevel level, Long refId, List<AccessGroupKPIEntry> accessGroupKPIEntries, List<BigInteger> applicableKpiIds) {
+        List<AccessGroupMappingDTO> accessGroupMappingDTOS;
+        if (!Optional.ofNullable(defalutKPISettingDTO.getParentUnitId()).isPresent()) {
+            List<Long> countryAccessGroupIds = defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().keySet().stream().collect(Collectors.toList());
+            accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(countryAccessGroupIds, applicableKpiIds, level, refId);
+            accessGroupMappingDTOS.forEach(accessGroupMappingDTO -> accessGroupKPIEntries.add(new AccessGroupKPIEntry(defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().get(accessGroupMappingDTO.getAccessGroupId()), accessGroupMappingDTO.getKpiId(), null, unitId, ConfLevel.UNIT)));
+        } else {
+            accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(new ArrayList<>(), applicableKpiIds, level, refId);
+            accessGroupMappingDTOS.forEach(accessGroupMappingDTO -> accessGroupKPIEntries.add(new AccessGroupKPIEntry(accessGroupMappingDTO.getAccessGroupId(), accessGroupMappingDTO.getKpiId(), null, unitId, ConfLevel.UNIT)));
+        }
+    }
+
+    private List<ApplicableKPI> getOrUpdateApplicableKPISForUnit(Long unitId, List<BigInteger> applicableKpiIds, Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKpi) {
         List<ApplicableKPI> applicableKPISToSave = new ArrayList<>();
         applicableKpiIds.forEach(kpiId -> {
             ApplicableFilter applicableFilter = null;
@@ -729,7 +767,10 @@ public class CounterDistService extends MongoBaseService {
             }
             applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, null, ConfLevel.UNIT, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false, kpiIdAndApplicableKpi.get(kpiId).getKpiRepresentation(), kpiIdAndApplicableKpi.get(kpiId).getInterval(), kpiIdAndApplicableKpi.get(kpiId).getValue(), kpiIdAndApplicableKpi.get(kpiId).getFrequencyType(), kpiIdAndApplicableKpi.get(kpiId).getFibonacciKPIConfigs()));
         });
-        //due to avoid exception and entity may be blank here so I using multiple conditional statements harish
+        return applicableKPISToSave;
+    }
+
+    private void saveKPIDetailsForUnits(List<CategoryKPIConf> categoryKPIConfToSave, List<DashboardKPIConf> dashboardKPIConfToSave, List<AccessGroupKPIEntry> accessGroupKPIEntries, List<TabKPIConf> tabKPIConfKPIEntries, List<ApplicableKPI> applicableKPISToSave) {
         if (!applicableKPISToSave.isEmpty()) {
             counterRepository.saveEntities(applicableKPISToSave);
         }

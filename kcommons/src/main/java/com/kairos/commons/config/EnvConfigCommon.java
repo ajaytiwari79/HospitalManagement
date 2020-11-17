@@ -10,9 +10,9 @@ import org.springframework.context.annotation.PropertySource;
  * Created by anil on 27/7/17.
  */
 @PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
-@Configuration
 @Getter
 @Setter
+@Configuration
 public class EnvConfigCommon {
 
     @Value("${gateway.userservice.url}")
@@ -42,6 +42,9 @@ public class EnvConfigCommon {
 
     @Value("${kpermissions.model.package.path}")
     private String modelPackagePath;
+
+    @Value("${kpermissions.controller.package.path}")
+    private String controllerPackagePath;
 
     @Value("${spring.profiles.active}")
     private  String currentProfile;

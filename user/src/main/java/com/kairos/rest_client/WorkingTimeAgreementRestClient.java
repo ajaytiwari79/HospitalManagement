@@ -3,14 +3,11 @@ package com.kairos.rest_client;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
-import com.kairos.dto.activity.wta.basic_details.WTADTO;
-import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.ResponseEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -90,29 +87,4 @@ public class WorkingTimeAgreementRestClient {
         }
     }
 
-    public WTAResponseDTO updateWTAOfEmployment(WTADTO wtadto, boolean employmentPublished) {
-        String baseUrl = getBaseUrl(true);
-        try {
-            HttpEntity<WTADTO> request = new HttpEntity<>(wtadto);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<WTAResponseDTO>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/wta?employmentPublished=" + employmentPublished,
-                            HttpMethod.PUT, request, typeReference);
-
-            RestTemplateResponseEnvelope<WTAResponseDTO> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
-            } else {
-                exceptionService.exceptionWithoutConvertInRestClient(response.getMessage());
-            }
-        } catch (HttpClientErrorException e) {
-
-            logger.info(STATUS, e.getStatusCode());
-            logger.info(RESPONSE, e.getResponseBodyAsString());
-            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
-        }
-        return null;
-    }
 }

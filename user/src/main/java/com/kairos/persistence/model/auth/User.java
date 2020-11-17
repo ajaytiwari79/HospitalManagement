@@ -70,7 +70,6 @@ public class User extends UserBaseEntity {
     private String password;
 
     protected int age;
-    private String accessToken;
     private List<String> roles;
     private ContactDetail contactDetail;
     private ContactAddress homeAddress;
@@ -98,6 +97,9 @@ public class User extends UserBaseEntity {
 
     @Transient
     private Boolean hubMember;
+
+    @Transient
+    private Boolean systemAdmin;
 
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private UserPersonalizedSettings userPersonalizedSettings;
@@ -186,7 +188,7 @@ public class User extends UserBaseEntity {
 
     public int getAge() {
         int age = 0;
-        if(cprNumber == null) {
+        if(StringUtils.isEmpty(cprNumber)) {
             return this.age;
 
         }
@@ -238,6 +240,6 @@ public class User extends UserBaseEntity {
 
     @Override
     public String toString() {
-        return "{User={" + "cprNumber='" + cprNumber + '\'' + ", userName='" + userName + '\'' + ", nickName='" + nickName + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", gender=" + gender + ", email='" + email + '\'' + ", age=" + age + ", accessToken='" + accessToken + '\'' + ", otp=" + otp + ", isPasswordUpdated=" + isPasswordUpdated + '}' + '}';
+        return "{User={" + "cprNumber='" + cprNumber + '\'' + ", userName='" + userName + '\'' + ", nickName='" + nickName + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", gender=" + gender + ", email='" + email + '\'' + ", age=" + age + ", otp=" + otp + ", isPasswordUpdated=" + isPasswordUpdated + '}' + '}';
     }
 }

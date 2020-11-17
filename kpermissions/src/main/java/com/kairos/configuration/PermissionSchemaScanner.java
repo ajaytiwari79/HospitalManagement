@@ -1,12 +1,17 @@
 package com.kairos.configuration;
 
 import com.kairos.annotations.*;
+import com.kairos.dto.kpermissions.ActionDTO;
+import com.kairos.enums.kpermissions.PermissionAction;
 import org.reflections.Reflections;
+import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -96,18 +101,20 @@ public class PermissionSchemaScanner {
                         for (Type fieldArgType : fieldArgTypes) {
                             Class fieldArgClass = (Class) fieldArgType;
                             subModelMetaData.put(MODEL_CLASS, fieldArgClass.toString());
+                            subModelMetaData.put(MODEL_NAME, fieldArgClass.getSimpleName());
                             getFieldsOFModelAndSubModel(fieldArgClass.getDeclaredFields(), subModelFields);
                         }
                     } else {
                         subModelMetaData.put(MODEL_CLASS, permissionField.getType().toString());
+                        subModelMetaData.put(MODEL_NAME, permissionField.getType().getSimpleName());
                         getFieldsOFModelAndSubModel(permissionField.getType().getDeclaredFields(), subModelFields);
                     }
                     if (isCollectionNotEmpty(subModelFields)) {
                         subModelMetaData.put(MODEL_NAME, permissionField.getName());
                         subModelMetaData.put(FIELDS, subModelFields);
                         subModelMetaData.put(IS_PERMISSION_SUB_MODEL, true);
-                        subModelData.add(subModelMetaData);
                     }
+                    subModelData.add(subModelMetaData);
                 });
         return subModelData;
     }
@@ -120,6 +127,25 @@ public class PermissionSchemaScanner {
                 subModelFields.add(fieldsData);
             }
         }
+    }
+
+    public List<ActionDTO> createActionPermissions(String packagePath) {
+        Map<String,List<PermissionAction>> map = new HashMap<>();
+        Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage(packagePath)).setScanners(new MethodAnnotationsScanner()));
+        Set<Method> controllers =reflections.getMethodsAnnotatedWith(KPermissionActions.class);
+        for(Method method:controllers){
+            KPermissionActions annotation=method.getAnnotation(KPermissionActions.class);
+            if(!map.containsKey(annotation.modelName())){
+                List<PermissionAction> permissionActions=new ArrayList<>();
+                permissionActions.add(annotation.action());
+                map.put(annotation.modelName(),permissionActions);
+            }else {
+                map.get(annotation.modelName()).add(annotation.action());
+            }
+        }
+        List<ActionDTO> permissionActions = new ArrayList<>();
+        map.forEach((modelName,actions)-> actions.forEach(action-> permissionActions.add(new ActionDTO(modelName,action))));
+        return permissionActions;
     }
 
 }

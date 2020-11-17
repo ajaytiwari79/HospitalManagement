@@ -1,7 +1,5 @@
 package com.kairos.enums.constraint;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 public enum ConstraintSubType {
     //For Activity
     ACTIVITY_LONGEST_DURATION_RELATIVE_TO_SHIFT_LENGTH("Activity Longest Duration Relative To Shift Length"),
@@ -15,30 +13,32 @@ public enum ConstraintSubType {
     ACTIVITY_REQUIRED_TAG("Activity Required Tag"),
     PRESENCE_AND_ABSENCE_SAME_TIME("Presence and Absence at same time"),
     MAX_SHIFT_OF_STAFF("Maximum shift of staff"),
+    FIX_ACTIVITY_SHOULD_NOT_CHANGE("Fix Activity Should not change"),
+    MAX_LENGTH_OF_SHIFT_IN_NIGHT_TIMESLOT("Max length of shift in night time slot"),
+    DISLIKE_NIGHT_SHIFS_FOR_NON_NIGHT_WORKERS("Dislike night shifts for non night workers"),
 
-    //For Shifts
-
-    //For WTA
-    AVERAGE_SCHEDULED_TIME("Average Scheduled Time"),
-    CONSECUTIVE_WORKING_PARTOFDAY("Consecutive Working Part Of Day"),
-    DAYS_OFF_IN_PERIOD("Day Of In Period"),
-    NUMBER_OF_PARTOFDAY("Number Of Part Of Day"),
-    SHIFT_LENGTH("Shift Length"),
-    NUMBER_OF_SHIFTS_IN_INTERVAL("Number Of Shifts In Interval"),
+    AVERAGE_SHEDULED_TIME("Average Sheduled Time"),
+    CONSECUTIVE_WORKING_PARTOFDAY("Consecutive Working"),
+    DAYS_OFF_IN_PERIOD("Days Off In Period"),
+    NUMBER_OF_PARTOFDAY("Number Of Nights And Days"),
+    SHIFT_LENGTH("Shift length"),
+    NUMBER_OF_SHIFTS_IN_INTERVAL("Shifts in Interval"),
     TIME_BANK("Time Bank"),
-    VETO_PER_PERIOD("Veto Per Period"),
+    VETO_AND_STOP_BRICKS("Veto and stop bricks"),
     DAILY_RESTING_TIME("Daily Resting Time"),
     DURATION_BETWEEN_SHIFTS("Duration Between Shifts"),
-    REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS("Rest In Consecutive Days And Nights"),
+    REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS("Rest In Consecutive Days and nights"),
     WEEKLY_REST_PERIOD("Weekly Rest Period"),
     NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD("Number Of Weekend Shift In Period"),
     SHORTEST_AND_AVERAGE_DAILY_REST("Shortest And Average Daily Rest"),
-    SENIOR_DAYS_PER_YEAR("Senior Days Per Year"),
-    CHILD_CARE_DAYS_CHECK("Child Care Days Check"),
-    DAYS_OFF_AFTER_A_SERIES("Days Off After A Series"),
-    NO_OF_SEQUENCE_SHIFT("No Of Sequence Shift"),
-    EMPLOYEES_WITH_INCREASE_RISK("Employee With Increase Risk"),
-    WTA_FOR_CARE_DAYS("Wta For Care Days");
+    SENIOR_DAYS_PER_YEAR("Maximum Senior Days Per Year"),
+    CHILD_CARE_DAYS_CHECK("Child Care Day Check"),
+    DAYS_OFF_AFTER_A_SERIES("days off after a series"),
+    NO_OF_SEQUENCE_SHIFT("no of sequence shift"),
+    EMPLOYEES_WITH_INCREASE_RISK("employees with increase risk"),
+    WTA_FOR_CARE_DAYS("WTA for Care days"),
+    PROTECTED_DAYS_OFF("WTA for Protected Days Off"),
+    WTA_FOR_BREAKS_IN_SHIFT("WTA for breaks in shift");
 
     private String value;
 
@@ -46,7 +46,7 @@ public enum ConstraintSubType {
         this.value = value;
     }
 
-    @JsonValue
+//    @JsonValue
     public String toValue() {
         return value;
     }

@@ -48,6 +48,7 @@ import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_RUN_ON
 @Transactional
 public class SchedulerPanelService extends MongoBaseService {
 
+    public static final String MESSAGE_SCHEDULERPANEL_NOTFOUND = "message.schedulerpanel.notfound";
     @Inject
     private SchedulerPanelRepository schedulerPanelRepository;
 
@@ -169,7 +170,7 @@ public class SchedulerPanelService extends MongoBaseService {
             dynamicCronScheduler.setCronScheduling(schedulerPanel, timezone);
         }
         //      System.out.println("log-----> "+logger.toString());
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(schedulerPanels, SchedulerPanelDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(schedulerPanels, SchedulerPanelDTO.class);
     }
 
 
@@ -182,7 +183,7 @@ public class SchedulerPanelService extends MongoBaseService {
         Optional<SchedulerPanel> panelOpt = schedulerPanelRepository.findById(schedulerPanelId);
 
         if (!panelOpt.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound", schedulerPanelId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_SCHEDULERPANEL_NOTFOUND, schedulerPanelId);
         }
         SchedulerPanel panel = panelOpt.get();
         String interval;
@@ -307,7 +308,7 @@ public class SchedulerPanelService extends MongoBaseService {
         Optional<SchedulerPanel> schedulerPanelOpt = schedulerPanelRepository.findById(schedulerPanelId);
         SchedulerPanelDTO schedulerPanelDTO;
         if (!schedulerPanelOpt.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound", schedulerPanelId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_SCHEDULERPANEL_NOTFOUND, schedulerPanelId);
         }
         schedulerPanelDTO = ObjectMapperUtils.copyPropertiesByMapper(schedulerPanelOpt.get(), SchedulerPanelDTO.class);
 
@@ -322,7 +323,7 @@ public class SchedulerPanelService extends MongoBaseService {
     public List<SchedulerPanelDTO> getSchedulerPanelByUnitId(long unitId) {
         //List<Map<String, Object>> controlPanels = schedulerPanelRepository.findByUnitId(unitId);
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByUnitIdAndDeletedFalse(unitId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(schedulerPanels, SchedulerPanelDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(schedulerPanels, SchedulerPanelDTO.class);
 
     }
 
@@ -471,7 +472,7 @@ public class SchedulerPanelService extends MongoBaseService {
             Set<BigInteger> schedulerPanelIdsDB = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getId()).collect(Collectors.toSet());
             for (BigInteger schedulerPanelId : schedulerPanelIds) {
                 if (!schedulerPanelIdsDB.contains(schedulerPanelId)) {
-                    exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound", schedulerPanelId);
+                    exceptionService.dataNotFoundByIdException(MESSAGE_SCHEDULERPANEL_NOTFOUND, schedulerPanelId);
                 }
             }
 
@@ -495,7 +496,7 @@ public class SchedulerPanelService extends MongoBaseService {
     public Boolean deleteJob(BigInteger schedulerPanelId) {
 
         if (!Optional.ofNullable(schedulerPanelRepository.safeDeleteById(schedulerPanelId)).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound", schedulerPanelId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_SCHEDULERPANEL_NOTFOUND, schedulerPanelId);
         }
 
         dynamicCronScheduler.stopCronJob(SCHEDULER + schedulerPanelId);

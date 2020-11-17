@@ -1,5 +1,6 @@
 package com.kairos.controller.phase;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.utils.response.ResponseHandler;
@@ -16,6 +17,7 @@ import java.util.Date;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 /**
  * Created by vipul on 25/9/17.
@@ -64,16 +66,17 @@ public class PhaseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.removePhase(phaseId));
     }
 
-    @ApiOperation(value = "get ongoing phase based on a date ")
-    @GetMapping(value = "/byDate")
-    public ResponseEntity<Map<String, Object>> getUnitPhaseByDate(@PathVariable Long unitId,@RequestParam(value = "date",required = false)Date date) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getUnitPhaseByDate(unitId,date));
-    }
-
     @ApiOperation(value = "get Unit Default Phases ")
     @GetMapping(value = "/all")
     public ResponseEntity<Map<String, Object>> getDefaultPhasesByUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getDefaultPhasesByUnit(unitId));
+    }
+
+    @RequestMapping(value = "phase/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationPhase(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.updateTranslations(id,translations));
     }
 }
 

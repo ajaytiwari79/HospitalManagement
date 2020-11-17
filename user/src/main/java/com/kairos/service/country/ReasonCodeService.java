@@ -1,5 +1,8 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.country.Country;
@@ -16,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -74,12 +79,24 @@ public class ReasonCodeService {
 
 
     public List<ReasonCodeResponseDTO> getReasonCodesForCountry(long countryId, ReasonCodeType reasonCodeType) {
-        return reasonCodeGraphRepository.findReasonCodesByCountry(countryId, reasonCodeType);
+        List<ReasonCode> reasonCodes =reasonCodeGraphRepository.findReasonCodesByCountry(countryId, reasonCodeType);
+        List<ReasonCodeResponseDTO> reasonCodeResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodes,ReasonCodeResponseDTO.class);
+        reasonCodeResponseDTOS.forEach(reasonCodeResponseDTO -> {
+            reasonCodeResponseDTO.setCountryId(countryId);
+            reasonCodeResponseDTO.setTranslations(TranslationUtil.getTranslatedData(reasonCodeResponseDTO.getTranslatedNames(),reasonCodeResponseDTO.getTranslatedDescriptions()));
+        });
+        return reasonCodeResponseDTOS;
     }
 
 
     public List<ReasonCodeResponseDTO> getReasonCodesByUnitId(long unitId, ReasonCodeType reasonCodeType) {
-        return reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, reasonCodeType);
+        List<ReasonCode> reasonCodes = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, reasonCodeType);
+        List<ReasonCodeResponseDTO> reasonCodeResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodes, ReasonCodeResponseDTO.class);
+        for(ReasonCodeResponseDTO reasonCodeResponseDTO :reasonCodeResponseDTOS){
+            reasonCodeResponseDTO.setUnitId(unitId);
+            reasonCodeResponseDTO.setTranslations(TranslationUtil.getTranslatedData(reasonCodeResponseDTO.getTranslatedNames(),reasonCodeResponseDTO.getTranslatedDescriptions()));
+        }
+        return reasonCodeResponseDTOS;
     }
 
     public List<ReasonCodeResponseDTO> getReasonCodesByUnitIds(List<Long> unitIds, ReasonCodeType reasonCodeType) {
@@ -169,6 +186,17 @@ public class ReasonCodeService {
 
     public boolean anyReasonCodeLinkedWithTimeType(BigInteger timeTypeId){
         return reasonCodeGraphRepository.existsByTimeTypeIdAndDeletedFalse(timeTypeId);
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long reasonCodeId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
+        ReasonCode reasonCode =reasonCodeGraphRepository.findOne(reasonCodeId);
+        reasonCode.setTranslatedNames(translatedNames);
+        reasonCode.setTranslatedDescriptions(translatedDescriptios);
+        reasonCodeGraphRepository.save(reasonCode);
+        return reasonCode.getTranslatedData();
     }
 
 }

@@ -44,59 +44,63 @@ public class WTABuilderService extends MongoBaseService {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
         for (WTABaseRuleTemplateDTO ruleTemplate : WTARuleTemplateDTOS) {
             WTABaseRuleTemplate wtaBaseRuleTemplate = copyRuleTemplate(ruleTemplate, ignoreId);
-            switch (ruleTemplate.getWtaTemplateType()) {
-                case VETO_AND_STOP_BRICKS:
-                    updateActivityInVetoAndStopBricks(activitiesIdsAndUnitIdsMap, unitId, (VetoAndStopBricksWTATemplate) wtaBaseRuleTemplate);
-                    break;
-                case SENIOR_DAYS_PER_YEAR:
-                    updateActivityInSeniorDays(activitiesIdsAndUnitIdsMap, unitId, (SeniorDaysPerYearWTATemplate) wtaBaseRuleTemplate);
-                    break;
-                case CHILD_CARE_DAYS_CHECK:
-                    updateActivityInChildCareDays(activitiesIdsAndUnitIdsMap, unitId, (ChildCareDaysCheckWTATemplate) wtaBaseRuleTemplate);
-                    break;
-                case WTA_FOR_CARE_DAYS:
-                    updateActivityInWTACareDays(activitiesIdsAndUnitIdsMap, unitId, (WTAForCareDays) wtaBaseRuleTemplate);
-                    break;
-                case PROTECTED_DAYS_OFF:
-                    updateActivityInProtectedDaysOff(activitiesIdsAndUnitIdsMap, unitId, (ProtectedDaysOffWTATemplate) wtaBaseRuleTemplate);
-                    break;
-                default:
-                    break;
-            }
+            mapOrganisationActivity(activitiesIdsAndUnitIdsMap, unitId, wtaBaseRuleTemplate);
             wtaBaseRuleTemplates.add(wtaBaseRuleTemplate);
 
         }
         return wtaBaseRuleTemplates;
     }
 
-    private void updateActivityInChildCareDays(Map<String, BigInteger> activitiesIdsAndUnitIdsMap, Long unitId, ChildCareDaysCheckWTATemplate wtaBaseRuleTemplate) {
+    public static void mapOrganisationActivity(Map<String, BigInteger> activitiesIdsAndUnitIdsMap, Long unitId,WTABaseRuleTemplate wtaBaseRuleTemplate) {
+        switch (wtaBaseRuleTemplate.getWtaTemplateType()) {
+            case VETO_AND_STOP_BRICKS:
+                updateActivityInVetoAndStopBricks(activitiesIdsAndUnitIdsMap, unitId, (VetoAndStopBricksWTATemplate) wtaBaseRuleTemplate);
+                break;
+            case SENIOR_DAYS_PER_YEAR:
+                updateActivityInSeniorDays(activitiesIdsAndUnitIdsMap, unitId, (SeniorDaysPerYearWTATemplate) wtaBaseRuleTemplate);
+                break;
+            case CHILD_CARE_DAYS_CHECK:
+                updateActivityInChildCareDays(activitiesIdsAndUnitIdsMap, unitId, (ChildCareDaysCheckWTATemplate) wtaBaseRuleTemplate);
+                break;
+            case WTA_FOR_CARE_DAYS:
+                updateActivityInWTACareDays(activitiesIdsAndUnitIdsMap, unitId, (WTAForCareDays) wtaBaseRuleTemplate);
+                break;
+            case PROTECTED_DAYS_OFF:
+                updateActivityInProtectedDaysOff(activitiesIdsAndUnitIdsMap, unitId, (ProtectedDaysOffWTATemplate) wtaBaseRuleTemplate);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private static void updateActivityInChildCareDays(Map<String, BigInteger> activitiesIdsAndUnitIdsMap, Long unitId, ChildCareDaysCheckWTATemplate wtaBaseRuleTemplate) {
         List<BigInteger> activityIds;
         ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = wtaBaseRuleTemplate;
         activityIds = getActivityIdsByCountryActvityIds(activitiesIdsAndUnitIdsMap,unitId,childCareDaysCheckWTATemplate.getActivityIds());
         childCareDaysCheckWTATemplate.setActivityIds(activityIds);
     }
 
-    private void updateActivityInSeniorDays(Map<String, BigInteger> activitiesIdsAndUnitIdsMap, Long unitId, SeniorDaysPerYearWTATemplate wtaBaseRuleTemplate) {
+    private static void updateActivityInSeniorDays(Map<String, BigInteger> activitiesIdsAndUnitIdsMap, Long unitId, SeniorDaysPerYearWTATemplate wtaBaseRuleTemplate) {
         List<BigInteger> activityIds;
         SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = wtaBaseRuleTemplate;
         activityIds = getActivityIdsByCountryActvityIds(activitiesIdsAndUnitIdsMap,unitId,seniorDaysPerYearWTATemplate.getActivityIds());
         seniorDaysPerYearWTATemplate.setActivityIds(activityIds);
     }
 
-    private void updateActivityInVetoAndStopBricks(Map<String, BigInteger> activitiesIdsAndUnitIdsMap, Long unitId, VetoAndStopBricksWTATemplate wtaBaseRuleTemplate) {
+    private static void updateActivityInVetoAndStopBricks(Map<String, BigInteger> activitiesIdsAndUnitIdsMap, Long unitId, VetoAndStopBricksWTATemplate wtaBaseRuleTemplate) {
         VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = wtaBaseRuleTemplate;
         vetoAndStopBricksWTATemplate.setStopBrickActivityId(activitiesIdsAndUnitIdsMap.get(vetoAndStopBricksWTATemplate.getStopBrickActivityId()+"-"+unitId));
         vetoAndStopBricksWTATemplate.setVetoActivityId(activitiesIdsAndUnitIdsMap.get(vetoAndStopBricksWTATemplate.getVetoActivityId()+"-"+unitId));
     }
 
-    private void updateActivityInProtectedDaysOff(Map<String, BigInteger> activitiesIdsAndUnitIdsMap, Long unitId, ProtectedDaysOffWTATemplate wtaBaseRuleTemplate) {
+    private static void updateActivityInProtectedDaysOff(Map<String, BigInteger> activitiesIdsAndUnitIdsMap, Long unitId, ProtectedDaysOffWTATemplate wtaBaseRuleTemplate) {
         List<BigInteger> activityIds;
         ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = wtaBaseRuleTemplate;
         activityIds = getActivityIdsByCountryActvityIds(activitiesIdsAndUnitIdsMap,unitId, Arrays.asList(protectedDaysOffWTATemplate.getActivityId()));
         protectedDaysOffWTATemplate.setActivityId(activityIds.get(0));
     }
 
-    private void updateActivityInWTACareDays(Map<String, BigInteger> activitiesIdsAndUnitIdsMap, Long unitId, WTAForCareDays wtaBaseRuleTemplate) {
+    private static void updateActivityInWTACareDays(Map<String, BigInteger> activitiesIdsAndUnitIdsMap, Long unitId, WTAForCareDays wtaBaseRuleTemplate) {
         WTAForCareDays wtaForCareDays = wtaBaseRuleTemplate;
         for (ActivityCareDayCount careDayCount : wtaForCareDays.getCareDayCounts()) {
             BigInteger activityId = activitiesIdsAndUnitIdsMap.get(careDayCount.getActivityId()+"-"+unitId);
@@ -104,7 +108,7 @@ public class WTABuilderService extends MongoBaseService {
         }
     }
 
-    private List<BigInteger> getActivityIdsByCountryActvityIds(Map<String,BigInteger> activitiesIdsAndUnitIdsMap,Long unitId,List<BigInteger> activityIds){
+    private static List<BigInteger> getActivityIdsByCountryActvityIds(Map<String,BigInteger> activitiesIdsAndUnitIdsMap,Long unitId,List<BigInteger> activityIds){
         List<BigInteger> activityIdList = new ArrayList<>();
         for (BigInteger activityId : activityIds) {
             activityIdList.add(activitiesIdsAndUnitIdsMap.get(activityId+"-"+unitId));

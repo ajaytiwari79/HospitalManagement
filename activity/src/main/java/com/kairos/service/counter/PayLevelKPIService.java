@@ -1,5 +1,6 @@
 package com.kairos.service.counter;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
@@ -12,12 +13,20 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
-import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Service
-public class PayLevelKPIService {
+public class PayLevelKPIService implements KPIService{
+
+    public double getPayLevelGradeOfMainEmploymentOfStaff(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        if(isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())){
+            LocalDate startDate =kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
+            return getPayLevelOfMainEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,startDate);
+        }else {
+            return getPayLevelOfMainEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
+        }
+    }
 
     public double getPayLevelOfMainEmploymentOfStaff(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo,LocalDate selectedDate){
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = isNotNull(staffId) ? Arrays.asList(kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().getOrDefault(staffId, new StaffKpiFilterDTO())) : kpiCalculationRelatedInfo.getStaffKpiFilterDTOS();
@@ -78,4 +87,8 @@ public class PayLevelKPIService {
         return currentEmploymentLine;
     }
 
+    @Override
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+        return getPayLevelGradeOfMainEmploymentOfStaff(staffId, kpiCalculationRelatedInfo);
+    }
 }

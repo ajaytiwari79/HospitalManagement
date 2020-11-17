@@ -24,7 +24,7 @@ public class KMailService {
         this.templateEngine = templateEngine;
     }
 
-    public void sendMail(final String from,final String subject,final String textBody,final String htmlBody,final Map<String,Object> templateParam,String templatePath,String... to){
+    public void sendMail(final String from,final String subject,final String textBody,final Map<String,Object> templateParam,String templatePath,String... to){
         String htmlContent = getContent(templatePath,templateParam);
         emailService.sendMail(from,  subject, htmlContent, textBody,to);
     }

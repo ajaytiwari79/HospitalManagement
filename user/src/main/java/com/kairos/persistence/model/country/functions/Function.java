@@ -2,6 +2,7 @@ package com.kairos.persistence.model.country.functions;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.KPermissionModel;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Level;
@@ -33,7 +34,6 @@ public class Function extends UserBaseEntity {
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
-
     @Relationship(type = HAS_UNION)
     private List<Organization> unions;
 
@@ -43,5 +43,5 @@ public class Function extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     private Country country;
     private String icon;
-    private int code;
+    private String code;
 }

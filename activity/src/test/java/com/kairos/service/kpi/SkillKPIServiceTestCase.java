@@ -3,8 +3,8 @@ package com.kairos.service.kpi;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.counter.SkillKPIService;
@@ -19,10 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
@@ -42,7 +39,8 @@ public class SkillKPIServiceTestCase {
     private Long unitId;
     private DateTimeInterval dateTimeInterval;
     private KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo;
-    private List<StaffPersonalDetail> staffPersonalDetails;
+    private List<StaffKpiFilterDTO> staffKpiFilterDTOS;
+    private Map<Long,StaffKpiFilterDTO> staffKpiFilterDTOMap = new HashMap<>();
 
     static {
         java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
@@ -56,8 +54,10 @@ public class SkillKPIServiceTestCase {
         this.staffIds.add(2364l);
         this.unitId =1172l;
         this.dateTimeInterval = new DateTimeInterval(asDate(asLocalDate("2020-02-01")),asDate(asLocalDate("2020-02-29")));
+        this.staffKpiFilterDTOS = getStaffKPIFilterDTOS();
+        this.staffKpiFilterDTOMap =getStaffKpiFilterDTOMap();
         this.kpiCalculationRelatedInfo = getKpiCalculationRelatedInfo();
-        this.staffPersonalDetails = getStaffPersonalDetails();
+
     }
 
 
@@ -65,20 +65,28 @@ public class SkillKPIServiceTestCase {
         KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo = new KPIBuilderCalculationService().new KPICalculationRelatedInfo();
         kpiCalculationRelatedInfo.setCalculationTypes(Arrays.asList(STAFF_SKILLS_COUNT));
         kpiCalculationRelatedInfo.setUnitId(unitId);
+        kpiCalculationRelatedInfo.setStaffKpiFilterDTOS(staffKpiFilterDTOS);
+        kpiCalculationRelatedInfo.setStaffIdAndStaffKpiFilterMap(staffKpiFilterDTOMap);
         kpiCalculationRelatedInfo.setDateTimeIntervals(Arrays.asList(dateTimeInterval));
         return kpiCalculationRelatedInfo;
     }
 
-    private List<StaffPersonalDetail> getStaffPersonalDetails(){
-        return ObjectUtils.newArrayList(getStaffPersonalDetail());
+    private Map<Long,StaffKpiFilterDTO> getStaffKpiFilterDTOMap(){
+        Map<Long,StaffKpiFilterDTO> staffKpiFilterDTOMap = new HashMap<>();
+        staffKpiFilterDTOMap.put(staffIds.get(0),staffKpiFilterDTOS.get(0));
+        return staffKpiFilterDTOMap;
+    }
+
+    private List<StaffKpiFilterDTO> getStaffKPIFilterDTOS(){
+        return ObjectUtils.newArrayList(getStaffKPIFilterDTO());
     }
 
 
-    private StaffPersonalDetail getStaffPersonalDetail(){
-        StaffPersonalDetail staffPersonalDetail = new StaffPersonalDetail();
-        staffPersonalDetail.setId(staffIds.get(0));
-        staffPersonalDetail.setSkills(ObjectMapperUtils.jsonStringToList(getSkill(),SkillLevelDTO.class));
-        return  staffPersonalDetail;
+    private StaffKpiFilterDTO getStaffKPIFilterDTO(){
+        StaffKpiFilterDTO staffKpiFilterDTO = new StaffKpiFilterDTO();
+        staffKpiFilterDTO.setId(staffIds.get(0));
+        staffKpiFilterDTO.setSkills(ObjectMapperUtils.jsonStringToList(getSkill(),SkillLevelDTO.class));
+        return  staffKpiFilterDTO;
     }
 
     private String getSkill() {
@@ -92,7 +100,8 @@ public class SkillKPIServiceTestCase {
 
     @Test
     public void testTotalSkillOfStaffBetweenInterval(){
-        int totalSkill = skillKPIService.getCountOfSkillByMonth(staffIds.get(0),staffPersonalDetails,dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate());
-        Assert.assertEquals(1,totalSkill);
+        double totalSkill = skillKPIService.getCountOfSkillOfStaffIdOnSelectedDate(staffIds.get(0),dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate(),kpiCalculationRelatedInfo);
+        Assert.assertEquals(1.0d,totalSkill,1.0d);
     }
+
 }

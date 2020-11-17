@@ -6,11 +6,9 @@ import org.springframework.stereotype.Component;
 public class UserContext {
     public static final String CORRELATION_ID = "correlation-id";
     public static final String AUTH_TOKEN     = "Authorization";
-    public static final String USER_ID        = "user-id";
 
     private static final ThreadLocal<String> correlationId=  new InheritableThreadLocal<>();
     private static final ThreadLocal<String> authToken= new InheritableThreadLocal<>();
-    private static final ThreadLocal<String> userId =new InheritableThreadLocal<>();
     private static final ThreadLocal<Long> orgId =new InheritableThreadLocal<>();
     private static final ThreadLocal<Long> unitId =new InheritableThreadLocal<>();
     private static final ThreadLocal<String> tabId =new InheritableThreadLocal<>();
@@ -23,10 +21,6 @@ public class UserContext {
 
     public static String getAuthToken() { return authToken.get(); }
     public static void setAuthToken(String aToken) {authToken.set(aToken);}
-
-    public static String getUserId() { return userId.get(); }
-    public static void setUserId(String aUser) {userId.set(aUser);}
-
     public static Long getOrgId() { return orgId.get(); }
     public static void setOrgId(Long aOrg) {orgId.set(aOrg);}
 

@@ -1,13 +1,17 @@
 package com.kairos.persistence.model.shift;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivityLineInterval;
+import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,13 +20,14 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.time.temporal.ChronoField;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.addMinutes;
+import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.enums.shift.ShiftType.SICK;
 
 /**
  * Created by vipul on 30/8/17.
@@ -31,10 +36,13 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = "shifts")
+@NoArgsConstructor
 public class Shift extends MongoBaseEntity {
 
     protected Date startDate;
     protected Date endDate;
+    protected Integer shiftStartTime;//In Second
+    protected Integer shiftEndTime;//In Second
     protected boolean disabled = false;
     @NotNull(message = "error.ShiftDTO.staffId.notnull")
     protected Long staffId;
@@ -69,17 +77,17 @@ public class Shift extends MongoBaseEntity {
     protected List<ShiftActivity> breakActivities;
     protected AccessGroupRole accessGroupRole;
     protected LocalDate validated;
-
-    public Shift() {
-        //Default Constructor
-    }
-
+    private ShiftViolatedRules shiftViolatedRules;
+    private transient String oldShiftTimeSlot;//it is only for conditional CTA calculation
+    private boolean planningPeriodPublished;
 
     public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.employmentId = employmentId;
         this.activities = shiftActivities;
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
     }
 
     // This is used in absance shift
@@ -90,9 +98,10 @@ public class Shift extends MongoBaseEntity {
         this.activities = activities;
         this.employmentId = employmentId;
         this.unitId = unitId;
-        this.sickShift = true;
         this.phaseId = phaseId;
         this.planningPeriodId = planningPeriodId;
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
 
     }
 
@@ -113,6 +122,8 @@ public class Shift extends MongoBaseEntity {
         this.planningPeriodId = planningPeriodId;
         this.staffUserId = staffUserId;
         this.shiftType = shiftType;
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
     }
 
     public void setBreakActivities(List<ShiftActivity> breakActivities) {
@@ -129,6 +140,9 @@ public class Shift extends MongoBaseEntity {
         this.activities = activities;
     }
 
+    public List<ShiftActivity> getActivities() {
+        return isNullOrElse(activities,new ArrayList<>());
+    }
 
     public int getMinutes() {
         DateTimeInterval interval = getInterval();
@@ -200,7 +214,7 @@ public class Shift extends MongoBaseEntity {
                 shiftActivitiesForCheckingStaffingLevel.add(new ShiftActivity(activityLineInterval.getActivityId(),activityLineInterval.getStartDate(),activityLineInterval.getEndDate(),activityLineInterval.getActivityName()));
             }
         }
-        if(isCollectionNotEmpty(shiftActivitiesForCheckingStaffingLevel))
+        if(shiftActivitiesForCheckingStaffingLevel.size()>1)
             shiftActivitiesForCheckingStaffingLevel= mergeShiftActivityList(shiftActivitiesForCheckingStaffingLevel);
         return shiftActivitiesForCheckingStaffingLevel;
     }
@@ -229,12 +243,45 @@ public class Shift extends MongoBaseEntity {
 
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
     }
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
     }
 
+
+    public boolean isSickShift() {
+        return SICK.equals(this.shiftType);
+    }
+
+    public Set<ShiftStatus> getShiftStatuses() {
+        return getActivities().stream().flatMap(shiftActivity -> shiftActivity.getStatus().stream()).collect(Collectors.toSet());
+    }
+
+    @JsonIgnore
+    public boolean isActivityMatch(BigInteger activityId,boolean includeDraftShift){
+        boolean activityMatch;
+        if (!includeDraftShift && this.draft) {
+            activityMatch = false;
+        } else {
+            activityMatch = this.getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getActivityId().equals(activityId));
+            if (!activityMatch && includeDraftShift) {
+                activityMatch = isNotNull(this.getDraftShift()) ? this.getDraftShift().getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getActivityId().equals(activityId)) : false;
+            }
+        }
+        return activityMatch;
+    }
+
+    public void updateShiftTimeValues() {
+        this.shiftStartTime = timeInSeconds(this.getStartDate());
+        this.shiftEndTime = timeInSeconds(this.getEndDate());
+    }
+
+    private Integer timeInSeconds(Date date) {
+        return asZonedDateTime(date).get(ChronoField.SECOND_OF_DAY);
+    }
 
     @Override
     public String toString() {

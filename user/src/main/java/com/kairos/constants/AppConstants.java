@@ -148,6 +148,7 @@ public class AppConstants {
     // Default data to import employments from time care
     public static final Integer FULL_TIME_WEEKLY_MINUTES = 2220;
     public static final Integer NUMBER_OF_WORKING_DAYS_IN_WEEK = 5;
+    public static  final Integer MAIN_TEAM_RANKING =1;
 
     // Staff
     public static final String UNIT_MANAGER_EMPLOYMENT_DESCRIPTION = "Working as Unit Manager";
@@ -158,6 +159,8 @@ public class AppConstants {
     public static final String MODULE_ID_PRFIX = "module_";
     public static final String TAB_ID_PRFIX = "tab_";
     public static final String ACCESS_PAGE_HAS_LANGUAGE ="ACCESS_PAGE_HAS_LANGUAGE";
+    public static final String TAB_119 = "tab_119";
+    public static final String MODULE_11 = "module_11";
 
     //Tomtom
     public static final String TOMTOM_KEY = "key";

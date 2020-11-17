@@ -2,6 +2,7 @@ package com.kairos.service;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.common.UserInfo;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -66,10 +67,10 @@ public class MongoBaseService {
                 className = entity.getClass().getSuperclass().getSimpleName();
             }
             entity.setCreatedAt(DateUtils.getDate());
-            entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+            entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName(),UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
             entity.setId(mongoSequenceRepository.nextSequence(className));
         }else {
-            entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+            entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName(),UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
         }
     }
 
@@ -114,7 +115,7 @@ public class MongoBaseService {
 
     private <T extends MongoBaseEntity> void updateBasicDBObject(BulkWriteOperation bulkWriteOperation, MongoConverter converter, T entity) {
         BasicDBObject dbObject;
-        entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+        entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName(),UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
         dbObject = new BasicDBObject();
         converter.write(entity, dbObject);
         BasicDBObject query = new BasicDBObject();
@@ -130,7 +131,7 @@ public class MongoBaseService {
             className = entity.getClass().getSuperclass().getSimpleName();
         }
         entity.setId(mongoSequenceRepository.nextSequence(className));
-        entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+        entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName(),UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
         dbObject = new BasicDBObject();
          converter.write(entity, dbObject);
         bulkWriteOperation.insert(dbObject);

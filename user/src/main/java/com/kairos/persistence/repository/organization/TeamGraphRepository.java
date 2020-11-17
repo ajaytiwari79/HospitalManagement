@@ -11,6 +11,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,30 +25,36 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
-    @Query("MATCH (org:Unit)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true}) WHERE id(org)={0} with DISTINCT team \n" +
-            "OPTIONAL MATCH (team)-[rel:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) WHERE EXISTS(rel.leaderType) \n" +
+    @Query("MATCH (org:Unit)-[:HAS_TEAMS]->(team:Team{isEnabled:true}) WHERE id(org)={0} with DISTINCT team \n" +
+            "OPTIONAL MATCH (team)-[rel:TEAM_HAS_MEMBER]->(teamMembers:Staff) WHERE EXISTS(rel.leaderType) \n" +
             "WITH team,COLLECT(teamMembers) as teamMembers,COLLECT(rel) as rel,\n" +
             "CASE when rel.leaderType='MAIN_LEAD' THEN COLLECT(id(teamMembers)) ELSE NULL END AS mainTeamLeaderIds,\n" +
             "CASE when rel.leaderType='ACTING_LEAD' THEN COLLECT(id(teamMembers)) ELSE NULL END AS actingTeamLeaderIds\n" +
             "WITH DISTINCT team,COLLECT(DISTINCT mainTeamLeaderIds) as mainTeamLeaderIds,COLLECT(DISTINCT actingTeamLeaderIds) as actingTeamLeaderIds\n" +
-            "RETURN COLLECT(DISTINCT{id:id(team),name:team.name,description:team.description,\n" +
-            "mainTeamLeaderIds:CASE WHEN mainTeamLeaderIds[0] IS NULL THEN [] ELSE  mainTeamLeaderIds[0] END, \n" +
-            "actingTeamLeaderIds:CASE WHEN actingTeamLeaderIds[0] IS NULL THEN [] ELSE  actingTeamLeaderIds[0] END}) AS teams")
-    List<Map<String,Object>> getTeams(long unitId);
+            "RETURN\n" +
+            "{english: CASE WHEN team.`translatedNames.english` IS NULL THEN '' ELSE team.`translatedNames.english` END,danish: CASE WHEN team.`translatedNames.danish` IS NULL THEN '' ELSE team.`translatedNames.danish` END,hindi: CASE WHEN team.`translatedNames.hindi` IS NULL THEN '' ELSE team.`translatedNames.hindi` END,britishenglish: CASE WHEN team.`translatedNames.britishenglish` IS NULL THEN '' ELSE team.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN team.`translatedDescriptions.english` IS NULL THEN '' ELSE team.`translatedDescriptions.english` END,danish: CASE WHEN team.`translatedDescriptions.danish` IS NULL THEN '' ELSE team.`translatedDescriptions.danish` END,hindi: CASE WHEN team.`translatedDescriptions.hindi` IS NULL THEN '' ELSE team.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN team.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE team.`translatedDescriptions.britishenglish` END}as translatedDescriptions,\n" +
+            "id(team) as id,team.name as name,team.description as descriptions,\n" +
+            "CASE WHEN mainTeamLeaderIds[0] IS NULL THEN [] ELSE  mainTeamLeaderIds[0] END as mainTeamLeaderIds, \n" +
+            "CASE WHEN actingTeamLeaderIds[0] IS NULL THEN [] ELSE  actingTeamLeaderIds[0] END AS actingTeamLeaderIds")
+    List<TeamDTO> getTeams(long unitId);
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
-            "OPTIONAL MATCH (team)-[staffRel:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) \n" +
-            "WITH team,COLLECT(DISTINCT{staffId:id(teamMembers),teamType:staffRel.teamType,startDate:staffRel.startDate,endDate:staffRel.endDate}) as staffDetails\n" +
+            "OPTIONAL MATCH (team)-[staffRel:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) where staffRel.teamMembership = true\n" +
+            "WITH team,COLLECT(DISTINCT{staffId:id(teamMembers),teamType:staffRel.teamType,startDate:staffRel.startDate,endDate:staffRel.endDate,sequence:staffRel.sequence,teamMembership:staffRel.teamMembership}) as staffDetails\n" +
             "OPTIONAL MATCH (team)-[:"+TEAM_HAS_SKILLS+"]->(skills:Skill) with team, COLLECT (id(skills)) as skillIds ,staffDetails\n" +
-            "RETURN id(team) as id, team.name as name, team.description as description, team.activityIds as activityIds, skillIds as skillIds,staffDetails as staffDetails")
+            "RETURN " +
+            "{english: CASE WHEN team.`translatedNames.english` IS NULL THEN '' ELSE team.`translatedNames.english` END,danish: CASE WHEN team.`translatedNames.danish` IS NULL THEN '' ELSE team.`translatedNames.danish` END,hindi: CASE WHEN team.`translatedNames.hindi` IS NULL THEN '' ELSE team.`translatedNames.hindi` END,britishenglish: CASE WHEN team.`translatedNames.britishenglish` IS NULL THEN '' ELSE team.`translatedNames.britishenglish` END} as translatedNames,\n" +
+            "{english: CASE WHEN team.`translatedDescriptions.english` IS NULL THEN '' ELSE team.`translatedDescriptions.english` END,danish: CASE WHEN team.`translatedDescriptions.danish` IS NULL THEN '' ELSE team.`translatedDescriptions.danish` END,hindi: CASE WHEN team.`translatedDescriptions.hindi` IS NULL THEN '' ELSE team.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN team.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE team.`translatedDescriptions.britishenglish` END}as translatedDescriptions,\n" +
+            "id(team) as id, team.name as name, team.description as description, team.activityIds as activityIds, skillIds as skillIds,staffDetails as staffDetails")
     TeamDTO getTeamDetailsById(long teamId);
 
     @Query(" MATCH (t:Team),(s:Skill) WHERE id(s) IN {1} AND id(t)={0}  " +
             " CREATE UNIQUE (t)-[:"+TEAM_HAS_SKILLS+"]->(s) RETURN s")
     List<Skill> saveSkill(Long teamId, Set<Long> skill);
 
-    @Query("MATCH (team:Team)-[skillTeamRel:"+TEAM_HAS_SKILLS+"]->(skill:Skill) WHERE id(team)={0} DETACH DELETE skillTeamRel")
-    void removeAllSkillsFromTeam(Long teamId);
+    @Query("MATCH (team:Team)-[skillTeamRel:"+TEAM_HAS_SKILLS+"]->(skill:Skill) WHERE id(team)={0} AND NOT id(skill) IN {1} DETACH DELETE skillTeamRel")
+    void removeAllSkillsFromTeam(Long teamId, Set<Long> skillIds);
 
     @Query(" MATCH (t:Team),(os:OrganizationService) WHERE id(t) IN {0} AND id(os)={1}  " +
             " CREATE (t)-[:"+TEAM_HAS_SERVICES+"]->(os) RETURN os")
@@ -79,8 +86,14 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "]->(staff) SET r.lastModificationDate={2},r.isEnabled={3} RETURN COUNT(r) as r")
     int updateStaffTeamRelationship(long teamId, long staffId, long lastModificationDate, boolean isEnabled);
 
-    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} AND EXISTS(staffTeamRel.leaderType) DETACH DELETE staffTeamRel")
-    void removeAllStaffsFromTeam(long teamId);
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} AND EXISTS(staffTeamRel.leaderType) AND staffTeamRel.teamMembership=false AND NOT id(staff) IN {1} DETACH DELETE staffTeamRel")
+    void removeAllStaffsFromTeam(long teamId, Set<Long> teamLeaderIds);
+
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} AND EXISTS(staffTeamRel.leaderType) SET staffTeamRel.leaderType = null")
+    void removeLeaderTypeFromTeam(long teamId);
+
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={0} RETURN {staffId:id(staff), leaderType:EXISTS(staffTeamRel.leaderType)} AS data")
+    List<Map<String,Object>> getStaffLeaderTypeMap(Long teamId);
 
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff) IN {0} DETACH DELETE staffTeamRel RETURN COUNT(staffTeamRel)>0")
     boolean removeStaffsFromTeam(List<Long> staffIds, Long teamId);
@@ -89,7 +102,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     void removeStaffFromAllTeams(long staffId);
 
     @Query("MATCH (organization:Unit)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} AND id(organization)={1} RETURN \n" +
-            "id(team) as id,team.name as name,staffTeamRel.teamType as teamType,staffTeamRel.leaderType as leaderType")
+            "id(team) as id,team.name as name,staffTeamRel.teamType as teamType,staffTeamRel.leaderType as leaderType,staffTeamRel.sequence as sequence,staffTeamRel.teamMembership as teamMembership")
     List<TeamDTO> getTeamDetailsOfStaff(Long staffId,Long unitId);
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
@@ -129,7 +142,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
     Boolean teamExistInOrganizationByName(Long organizationId, Long teamId, String teamName);
 
-    @Query("MATCH(staff:Staff)-[:TEAM_HAS_MEMBER]-(team:Team) WHERE id(staff)={0} \n" +
+    @Query("MATCH(staff:Staff)-[:TEAM_HAS_MEMBER]-(team:Team{isEnabled:true}) WHERE id(staff)={0} \n" +
             "WITH team.activityIds AS activityIds\n" +
             "UNWIND activityIds AS activities\n" +
             "RETURN DISTINCT activities")
@@ -140,4 +153,15 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     boolean activityExistInTeamByActivityId(BigInteger activityId);
 
     List<Team> findAllByDeletedFalseAndIsEnabledTrue();
+
+    @Query("MATCH (unit:Unit)-[:" + HAS_TEAMS + "]->(team:Team)-[:" + TEAM_HAS_MEMBER + "]->(teamMembers:Staff) \n" +
+            "WHERE id(unit) = {0} AND ANY(activityId IN team.activityIds WHERE toInteger(activityId) IN {1}) \n" +
+            "RETURN DISTINCT id(teamMembers)")
+    List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds);
+
+    @Query("MATCH(team:Team) WHERE ANY(activityId IN team.activityIds WHERE toInteger(activityId) IN {0}) return team ")
+    List<Team> findAllTeamByActivityId(BigInteger activityId);
+
+    @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff) IN {0} SET staffTeamRel.teamMembership=false")
+    void assignStaffAsTeamLeaderOnly(List<Long> staffIds, Long teamId);
 }

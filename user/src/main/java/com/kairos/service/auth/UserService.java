@@ -19,12 +19,11 @@ import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.user.ChatStatus;
-import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessPage;
-import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
+import com.kairos.enums.user.UserType;
+import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
@@ -73,6 +72,7 @@ import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
+import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 
 /**
  * Calls UserGraphRepository to perform CRUD operation on  User
@@ -83,6 +83,7 @@ import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 public class UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     public static final String ACCESS_TOKEN = "accessToken";
+    public static final String DESCRIPTION = "description";
 
     @Inject
     private UserGraphRepository userGraphRepository;
@@ -105,7 +106,7 @@ public class UserService {
     @Inject
     private SendGridMailService sendGridMailService;
     @Inject
-    private TokenService tokenService;
+    private ForgetPasswordTokenService forgetPasswordTokenService;
     @Inject
     private EnvConfig config;
     @Inject
@@ -121,21 +122,15 @@ public class UserService {
     private OrganizationService organizationService;
     @Inject private UnitService unitService;
     @Inject private PermissionService permissionService;
-    private static UserGraphRepository userRepository;
+    @Inject
+    private  UserGraphRepository userRepository;
 
-    private static AccessPageService accessPageService;
+    @Inject
+    private AccessPageService accessPageService;
 
     @Inject
     private KMailService kMailService;
 
-    @Inject
-    public void setUserRepository(UserGraphRepository userRepository) {
-        UserService.userRepository = userRepository;
-    }
-    @Inject
-    public void setAccessPageService(AccessPageService accessPageService) {
-        UserService.accessPageService = accessPageService;
-    }
 
     /**
      * Calls UserGraphRepository,
@@ -145,6 +140,7 @@ public class UserService {
      * @return User
      */
     public User createUser(User user) {
+        user.setUserType(UserType.USER_ACCOUNT);
         return userGraphRepository.save(user);
     }
 
@@ -228,37 +224,14 @@ public class UserService {
         map.put("email", currentUser.getEmail());
         map.put("userNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
+        map.put("userName", currentUser.getUserName());
         return map;
-    }
-
-    public User findByAccessToken(String token) {
-        return userGraphRepository.findByAccessToken(token);
     }
 
     public User findByForgotPasswordToken(String token) {
         return userGraphRepository.findByForgotPasswordToken(token);
     }
 
-    public User findAndRemoveAccessToken(String accessToken) {
-        return userGraphRepository.findAndRemoveAccessToken(accessToken);
-    }
-
-
-    public User generateTokenToUser(User currentUser) {
-        currentUser.setAccessToken(UUID.randomUUID().toString().toUpperCase());
-        userGraphRepository.save(currentUser);
-        return currentUser;
-    }
-
-    public boolean removeToken(String accessToken) {
-        User user = findByAccessToken(accessToken);
-        if (user == null) {
-            return false;
-        }
-        user.setAccessToken(null);
-        userGraphRepository.save(user);
-        return true;
-    }
 
     public boolean logout(boolean logoutFromAllMachine, HttpServletRequest request) {
         boolean logoutSuccessfull = false;
@@ -335,7 +308,7 @@ public class UserService {
         map.put("id", currentUser.getId());
         map.put("userName", currentUser.getUserName());
         map.put("email", currentUser.getEmail());
-        map.put(ACCESS_TOKEN, currentUser.getAccessToken());
+        /*map.put(ACCESS_TOKEN, currentUser.getAccessToken());*/
         if (currentUser.getCountryList() != null) {
             map.put("countryId", currentUser.getCountryList().get(0).getId());
         }
@@ -358,7 +331,6 @@ public class UserService {
         if (currentUser == null) {
             return null;
         }
-        currentUser = generateTokenToUser(currentUser);
         Unit org = staffGraphRepository.getStaffOrganization(currentUser.getId());
         if (org == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
@@ -366,7 +338,6 @@ public class UserService {
         }
         Map<String, Object> map = new HashMap<>();
         map.put("id", currentUser.getId());
-        map.put(ACCESS_TOKEN, currentUser.getAccessToken());
         map.put("name", currentUser.getFirstName());
         map.put("appId", org.getEstimoteAppId());
         map.put("appToken", org.getEstimoteAppToken());
@@ -389,7 +360,6 @@ public class UserService {
             if (currentUser == null) {
                 return null;
             }
-            currentUser = generateTokenToUser(currentUser);
             Unit org = staffGraphRepository.getStaffOrganization(currentUser.getId());
             if (org == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
@@ -397,7 +367,6 @@ public class UserService {
             }
             Map<String, Object> map = new HashMap<>();
             map.put("id", currentUser.getId());
-            map.put(ACCESS_TOKEN, currentUser.getAccessToken());
             map.put("name", currentUser.getFirstName());
             map.put("organization", org.getId());
             map.put("appId", org.getEstimoteAppId());
@@ -415,11 +384,15 @@ public class UserService {
         if (user == null) {
             LOGGER.error("User not found belongs to this email {}" , firstTimePasswordUpdateDTO.getEmail());
             exceptionService.dataNotFoundByIdException(MESSAGE_USER_EMAIL_NOTFOUND, firstTimePasswordUpdateDTO.getEmail());
-
+        }
+        if(userGraphRepository.existByUserName("(?i)" + firstTimePasswordUpdateDTO.getUserName(),"(?i)" + firstTimePasswordUpdateDTO.getEmail())){
+            exceptionService.actionNotPermittedException(MESSAGE_USER_USERNAME_ALREADY_USE);
         }
         CharSequence password = CharBuffer.wrap(firstTimePasswordUpdateDTO.getRepeatPassword());
         user.setPassword(new BCryptPasswordEncoder().encode(password));
         user.setPasswordUpdated(true);
+        user.setUserName(firstTimePasswordUpdateDTO.getUserName());
+        user.setUserNameUpdated(true);
         userGraphRepository.save(user);
         return true;
     }
@@ -428,6 +401,7 @@ public class UserService {
     public Map<String, AccessPageQueryResult> prepareUnitPermissions(List<AccessPageQueryResult> accessPageQueryResults, boolean parentOrganization) {
         List<AccessPage> accessPagesDetails = accessPageRepository.findAllById(accessPageQueryResults.stream().map(accessPageQueryResult -> accessPageQueryResult.getId()).collect(Collectors.toList()));
         Map<Long,List<Long>> accessPageIdAndChildrenId = accessPagesDetails.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getSubPages().stream().map(accessPage -> accessPage.getId()).collect(Collectors.toList())));
+        Map<Long,AccessPage> accessPageIdAndAccessPageMap = accessPagesDetails.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         Map<String, AccessPageQueryResult> unitPermissionMap = new HashMap<>();
         for (AccessPageQueryResult permission : accessPageQueryResults) {
             if (unitPermissionMap.containsKey(permission.getModuleId()) && parentOrganization) {
@@ -440,6 +414,7 @@ public class UserService {
                 permission.setRead(isAccessPageRead(permission, accessPageQueryResults, accessPageIdAndChildrenId));
                 permission.setWrite(isAccessPageWrite(permission, accessPageQueryResults, accessPageIdAndChildrenId));
                 permission.setActive(permission.isRead() || permission.isWrite());
+                permission.setTranslatedNames(accessPageIdAndAccessPageMap.get(permission.getId()).getTranslatedNames());
                 unitPermissionMap.put(permission.getModuleId(), permission);
             }
         }
@@ -486,49 +461,66 @@ public class UserService {
         long currentUserId = UserContext.getUserDetails().getId();
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
         permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
-        if (permissionData.isHub()) {
-            Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
-            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId());
-            HashMap<String, Object> unitPermissionMap = new HashMap<>();
-            for (AccessPageQueryResult permission : permissions) {
-                permission.setActive(permission.isRead() || permission.isWrite());
-                unitPermissionMap.put(permission.getModuleId(), permission);
-            }
-            permissionData.setHubPermissions(unitPermissionMap);
+        Set<Long> unitAccessGroupIds=new HashSet<>();
+        if(UserContext.getUserDetails().isSystemAdmin()){
+            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubSystemAdminPermissions();
+            preparePermission(permissionData, permissions);
+        }
+        else if (permissionData.isHub()) {
+             Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
+             unitAccessGroupIds=parentHub.getId().equals(organizationId)?parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet()):accessGroupService.getAccessGroupIdsOfUnit(organizationId);
+            //List<AccessGroupQueryResult> accessGroupQueryResults = accessGroupService.getCountryAccessGroupByOrgCategory(UserContext.getUserDetails().getCountryId(), OrganizationCategory.HUB.toString());
+            Set<Long> accessGroupIds = parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet());
+            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId(), accessGroupIds,accessGroupIds.equals(unitAccessGroupIds)?new HashSet<>():unitAccessGroupIds);
+            preparePermission(permissionData, permissions);
 
         } else {
-            List<UserPermissionQueryResult> unitWisePermissions;
-            Long countryId = UserContext.getUserDetails().getCountryId();
-            List<DayType> dayTypes = dayTypeService.getCurrentApplicableDayType(countryId);
-            Set<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
-            boolean checkDayType = true;
-            List<AccessGroup> accessGroups = accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
-            for (AccessGroup currentAccessGroup : accessGroups) {
-                if (!currentAccessGroup.isAllowedDayTypes()) {
-                    checkDayType = false;
-                    break;
-                }
-            }
-            if (checkDayType) {
-                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds, organizationId);
-            } else {
-                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, organizationId);
-            }
-            HashMap<Long, Object> unitPermission = new HashMap<>();
-
-            for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
-                unitPermission.put(userPermissionQueryResult.getUnitId(),
-                        prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), userPermissionQueryResult.isParentOrganization()));
-            }
-            permissionData.setOrganizationPermissions(unitPermission);
+            loadUnitPermissions(organizationId, currentUserId, permissionData);
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
-        permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
-        permissionData.setModelPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isHubMember()), ModelDTO.class));
+        permissionData.setRole((userAccessRoleDTO.isManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
+
+        permissionData.setModelPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isSystemAdmin(),userAccessRoleDTO.getStaffId(),unitAccessGroupIds), ModelDTO.class));
         Organization parent = organizationService.fetchParentOrganization(organizationId);
         permissionData.setStaffId(staffGraphRepository.getStaffIdByUserId(currentUserId,parent.getId()));
         updateChatStatus(ChatStatus.ONLINE);
-         return permissionData;
+        return permissionData;
+    }
+
+    private void preparePermission(UnitWiseStaffPermissionsDTO permissionData, List<AccessPageQueryResult> permissions) {
+        Map<String, AccessPageQueryResult> permissionMap = prepareUnitPermissions(permissions,true);
+        HashMap<String, Object> unitPermissionMap = new HashMap<>();
+        for (AccessPageQueryResult permission : permissions) {
+            unitPermissionMap.put(permission.getModuleId(), permissionMap.get(permission.getModuleId()));
+        }
+        permissionData.setHubPermissions(unitPermissionMap);
+    }
+
+    private void loadUnitPermissions(Long organizationId, long currentUserId, UnitWiseStaffPermissionsDTO permissionData) {
+        List<UserPermissionQueryResult> unitWisePermissions;
+        Long countryId = UserContext.getUserDetails().getCountryId();
+        List<DayType> dayTypes = dayTypeService.getCurrentApplicableDayType(countryId);
+        Set<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
+        boolean checkDayType = true;
+        List<AccessGroup> accessGroups = accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
+        for (AccessGroup currentAccessGroup : accessGroups) {
+            if (!currentAccessGroup.isAllowedDayTypes()) {
+                checkDayType = false;
+                break;
+            }
+        }
+        if (checkDayType) {
+            unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds, organizationId);
+        } else {
+            unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, organizationId);
+        }
+        HashMap<Long, Object> unitPermission = new HashMap<>();
+
+        for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
+            unitPermission.put(userPermissionQueryResult.getUnitId(),
+                    prepareUnitPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), userPermissionQueryResult.isParentOrganization()));
+        }
+        permissionData.setOrganizationPermissions(unitPermission);
     }
 
 
@@ -565,9 +557,8 @@ public class UserService {
 
     public boolean updateSelectedLanguageOfUser(Long userLanguageId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(userLanguageId);
-        currentUser.setUserLanguage(systemLanguage);
-        userGraphRepository.save(currentUser);
+        userGraphRepository.updateUserSystemLanguage(currentUser.getId(),userLanguageId);
+        UserContext.getUserDetails().setUserLanguage(ObjectMapperUtils.copyPropertiesByMapper(currentUser.getUserLanguage(),SystemLanguageDTO.class));
         return true;
     }
 
@@ -590,14 +581,14 @@ public class UserService {
             }
         }
 
-            String token = tokenService.createForgotPasswordToken(currentUser);
+            String token = forgetPasswordTokenService.createForgotPasswordToken(currentUser);
             Map<String, Object> templateParam = new HashMap<>();
             templateParam.put("receiverName", EMAIL_GREETING + currentUser.getFullName());
-            templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName())));
+            templateParam.put(DESCRIPTION, AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName())));
             templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
             templateParam.put("hyperLinkName", RESET_PASSCODE);
 //            sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
-            kMailService.sendMail(null,AppConstants.MAIL_SUBJECT,templateParam.get("description").toString(),templateParam.get("description").toString(),templateParam,DEFAULT_EMAIL_TEMPLATE,currentUser.getEmail());
+            kMailService.sendMail(null,AppConstants.MAIL_SUBJECT,templateParam.get(DESCRIPTION).toString(),templateParam,DEFAULT_EMAIL_TEMPLATE,currentUser.getEmail());
             return true;
         }
 
@@ -677,11 +668,17 @@ public class UserService {
         return true;
     }
 
-    public static User getCurrentUser(){
+    public User getCurrentUser(){
         User user = null;
         if(isNotNull(UserContext.getUserDetails())) {
             user = userRepository.findOne(UserContext.getUserDetails().getId());
             user.setHubMember(accessPageService.isHubMember(user.getId()));
+            user.setSystemAdmin(userGraphRepository.isSystemAdmin(user.getId()));
+            SystemLanguage systemLanguage = userGraphRepository.getUserSystemLanguage(user.getId());
+            if(isNull(systemLanguage)){
+                systemLanguage = new SystemLanguage("English","en",true,true);
+            }
+            user.setUserLanguage(systemLanguage);
         }
         return user;
     }

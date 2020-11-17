@@ -5,8 +5,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.TimeTypeEnum;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
 import com.kairos.persistence.model.shift.ShiftTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -19,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -46,16 +45,6 @@ public class ShiftTemplateService{
 
         //Check for activity is absence type or not
         Set<BigInteger> activityIds = shiftTemplateDTO.getShiftList().stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toSet());
-        List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
-        activities.forEach(activity -> {
-            /*if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
-                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ABSENCETYPE, activity.getId());
-            }*/
-
-            if (TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType())){
-                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ABSENCETYPE, activity.getId());
-            }
-        });
 
         //Check for validating duplicate by name
         boolean alreadyExistsByName = shiftTemplateRepository.
@@ -84,7 +73,7 @@ public class ShiftTemplateService{
 
     public List<ShiftTemplateDTO> getAllShiftTemplates(Long unitId) {
         List<ShiftTemplate> shiftTemplates = shiftTemplateRepository.findAllByUnitIdAndCreatedByAndDeletedFalse(unitId, UserContext.getUserDetails().getId());
-        List<ShiftTemplateDTO> shiftTemplateDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftTemplates, ShiftTemplateDTO.class);
+        List<ShiftTemplateDTO> shiftTemplateDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftTemplates, ShiftTemplateDTO.class);
         Set<BigInteger> individualShiftTemplateIds = shiftTemplates.stream().flatMap(e -> e.getIndividualShiftTemplateIds().stream()).collect(Collectors.toSet());
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
         Set<BigInteger> activityIds = individualShiftTemplateDTOS.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toSet());
@@ -171,9 +160,9 @@ public class ShiftTemplateService{
         return true;
     }
 
-    public ShiftWithViolatedInfoDTO createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO) {
+    public List<ShiftWithViolatedInfoDTO> createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO) {
         List<ShiftDTO> shifts = new ArrayList<>();
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO();
+        List<ShiftWithViolatedInfoDTO>  shiftWithViolatedInfoDTOS = new ArrayList<>();
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftDTO.getTemplate().getId());
         Set<BigInteger> individualShiftTemplateIds = shiftTemplate.getIndividualShiftTemplateIds();
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
@@ -185,26 +174,39 @@ public class ShiftTemplateService{
             newShiftDTO.setEmploymentId(shiftDTO.getEmploymentId());
             newShiftDTO.setShiftDate(shiftDTO.getShiftDate());
             List<ShiftActivityDTO> shiftActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().size());
+            List<ShiftActivityDTO> childActivities = new ArrayList<>(individualShiftTemplateDTO.getActivities().get(0).getChildActivities().size());
             individualShiftTemplateDTO.getActivities().forEach(shiftTemplateActivity -> {
-                Date startDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(), shiftTemplateActivity.getStartTime());
-                Date endDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(), shiftTemplateActivity.getEndTime());
-                ShiftActivityDTO shiftActivity = new ShiftActivityDTO(shiftTemplateActivity.getActivityName(), startDate, endDate, shiftTemplateActivity.getActivityId(), shiftTemplateActivity.getAbsenceReasonCodeId());
+                shiftTemplateActivity.getChildActivities().forEach(shiftTemplateActivity1 -> {
+                    ShiftActivityDTO  shiftChildActivity =getShiftActivityDTO(shiftDTO,shiftTemplateActivity1);
+                    childActivities.add(shiftChildActivity);
+                });
+                ShiftActivityDTO shiftActivity = getShiftActivityDTO(shiftDTO, shiftTemplateActivity);
+                shiftActivity.setChildActivities(childActivities);
                 shiftActivities.add(shiftActivity);
             });
             newShiftDTO.setActivities(shiftActivities);
-            ShiftWithViolatedInfoDTO result = shiftService.createShift(unitId, newShiftDTO,null);
-            shiftWithViolatedInfoDTO.setShifts(result.getShifts());
+            List<ShiftWithViolatedInfoDTO> result = shiftService.createShift(unitId, newShiftDTO,null);
+            for (ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO : result) {
+                shiftWithViolatedInfoDTO.setShifts(shiftWithViolatedInfoDTO.getShifts());
 
-            if (CollectionUtils.isNotEmpty(result.getViolatedRules().getActivities())) {
-                shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(result.getViolatedRules().getActivities());
+                if (CollectionUtils.isNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())) {
+                    shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(shiftWithViolatedInfoDTO.getViolatedRules().getActivities());
+                }
+                if (CollectionUtils.isNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements())) {
+                    shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().addAll(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
+                }
+                //shifts.addAll(shiftWithViolatedInfoDTO.getShifts());
             }
-            if (CollectionUtils.isNotEmpty(result.getViolatedRules().getWorkTimeAgreements())) {
-                shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().addAll(result.getViolatedRules().getWorkTimeAgreements());
-            }
-            shifts.addAll(result.getShifts());
+            shiftWithViolatedInfoDTOS.addAll(result);
         });
-        shiftWithViolatedInfoDTO.setShifts(shifts);
-        return shiftWithViolatedInfoDTO;
+        return shiftWithViolatedInfoDTOS;
+    }
+
+    private ShiftActivityDTO getShiftActivityDTO(ShiftDTO shiftDTO, ShiftTemplateActivity shiftTemplateActivity) {
+        Date startDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(), shiftTemplateActivity.getStartTime());
+        LocalDate localEndDate =shiftTemplateActivity.getStartTime().isAfter(shiftTemplateActivity.getEndTime())?shiftDTO.getTemplate().getStartDate().plusDays(1):shiftDTO.getTemplate().getStartDate();
+        Date endDate = DateUtils.asDate(localEndDate, shiftTemplateActivity.getEndTime());
+        return new ShiftActivityDTO(shiftTemplateActivity.getActivityName(), startDate, endDate, shiftTemplateActivity.getActivityId(), shiftTemplateActivity.getAbsenceReasonCodeId());
     }
 
 

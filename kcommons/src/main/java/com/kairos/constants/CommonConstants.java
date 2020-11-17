@@ -4,7 +4,7 @@ public class CommonConstants {
 
     public static final String SEND_GRID_API_KEY="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";
     public static final String NO_REPLY_EMAIL="no-reply@kairosplanning.com";
-    public static final String DAYS = "Days";
+    public static final String CAMELCASE_DAYS = "Days";
     public static final String AUTH_TOKEN = "authToken";
 
     public static final String HTML_CONTENT_TYPE = "text/html";
@@ -45,5 +45,14 @@ public class CommonConstants {
     public static final String RED_COLOR_CODE = "#ff3b3b33";
     public static final String RED = "Red";
 
+    public static final String MONTHS = "MONTHS";
+    public static final String WEEKS = "WEEKS";
+    public static final String DAYS = "DAYS";
+    public static final String YEARS = "YEARS";
+    public static final String NIGHT = "Night";
+    public static final String DAY = "Day";
+    public static final String EVENING = "Evening";
+
+    public static final int DEFAULT_SEQUENCE = 2;
     public static final int ONE_MINUTE_MILLIS = 60000;
 }

@@ -22,7 +22,6 @@ public interface PublicLegalDocumentRepository extends JpaRepository<PublicLegal
 
     List<PublicLegalDocument> findAllByDeletedFalseOrderByCreatedAt();
 
-
     PublicLegalDocument findByNameIgnoreCaseAndDeletedFalse(String name);
 
     @Query(value = "Select p from PublicLegalDocument p where p.deleted = false")

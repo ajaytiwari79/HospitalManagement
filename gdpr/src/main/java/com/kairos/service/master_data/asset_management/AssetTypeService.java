@@ -67,7 +67,7 @@ public class AssetTypeService {
             assetType.setHasSubAssetType(true);
             assetType.setSubAssetTypes(subAssetTypeList);
         }
-        assetTypeRisks = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(assetTypeDto.getRisks(), Risk.class);
+        assetTypeRisks = ObjectMapperUtils.copyCollectionPropertiesByMapper(assetTypeDto.getRisks(), Risk.class);
         assetTypeRisks.forEach(risk -> risk.setCountryId(countryId));
         assetType.setRisks(assetTypeRisks);
         assetTypeRepository.save(assetType);
@@ -89,7 +89,7 @@ public class AssetTypeService {
             AssetType subAssetType = new AssetType(subAssetTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
             subAssetType.setSubAssetType(true);
             subAssetType.setAssetType(assetType);
-            subAssetRisks = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(subAssetTypeDto.getRisks(), Risk.class);
+            subAssetRisks = ObjectMapperUtils.copyCollectionPropertiesByMapper(subAssetTypeDto.getRisks(), Risk.class);
             subAssetRisks.forEach(risk -> risk.setCountryId(countryId));
             subAssetType.setRisks(subAssetRisks);
             subAssetTypes.add(subAssetType);
@@ -120,7 +120,7 @@ public class AssetTypeService {
                     }
                     subAssetType.setSubAssetType(true);
                     subAssetType.setName(subAssetTypeDTO.getName());
-                    subAssetRisks = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(subAssetTypeDTO.getRisks(), Risk.class);
+                    subAssetRisks = ObjectMapperUtils.copyCollectionPropertiesByMapper(subAssetTypeDTO.getRisks(), Risk.class);
                     subAssetRisks.forEach(risk -> risk.setCountryId(countryId));
                     subAssetType.setRisks(subAssetRisks);
                     subAssetTypes.add(subAssetType);
@@ -230,7 +230,7 @@ public class AssetTypeService {
      * @return List<RiskBasicResponseDTO> - List of RiskResponse DTO.
      */
     private List<RiskBasicResponseDTO> buildAssetTypeRisksResponse(List<Risk> risks) {
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(risks, RiskBasicResponseDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(risks, RiskBasicResponseDTO.class);
     }
 
     /**

@@ -2,10 +2,13 @@ package com.kairos.dto.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.cta.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS;
+import static org.apache.commons.collections.CollectionUtils.containsAny;
 
 /**
  * @author pradeep
@@ -60,7 +64,7 @@ public class CTARuleTemplateDTO {
     private boolean calculateScheduledHours;
     private CalculationFor calculationFor;
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
-    private List<BigInteger> activityIds;
+    private Set<BigInteger> activityIds;
 
     private Set<BigInteger> timeTypeIds;
     private Set<BigInteger> plannedTimeIds;
@@ -72,16 +76,11 @@ public class CTARuleTemplateDTO {
     private BigInteger ruleTemplateCategoryId;
     private String ruleTemplateCategoryName;
     private UserInfo lastModifiedBy;
+    private ConditionalCompensation conditionalCompensation;
+    private Long countryId;
+    private Long unitId;
+    private Map<String, TranslationInfo> translations;
 
-    public CTARuleTemplateDTO(String name,BigInteger id,List<CTARuleTemplatePhaseInfo> phaseInfo, List<Long> employmentTypes, List<BigInteger> activityIds, Set<BigInteger> timeTypeIds, Set<BigInteger> plannedTimeIds) {
-        this.name = name;
-        this.id = id;
-        this.phaseInfo = phaseInfo;
-        this.employmentTypes = employmentTypes;
-        this.activityIds = activityIds;
-        this.timeTypeIds = timeTypeIds;
-        this.plannedTimeIds = plannedTimeIds;
-    }
 
     public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
         this.phaseInfo = Optional.ofNullable(phaseInfo).orElse(new ArrayList<>());
@@ -96,12 +95,8 @@ public class CTARuleTemplateDTO {
         this.dayTypeIds = isNull(dayTypeIds) ? new ArrayList<>() : dayTypeIds;
     }
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
-
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = isNull(activityIds) ? new ArrayList<>() : activityIds;
+    public void setActivityIds(Set<BigInteger> activityIds) {
+        this.activityIds = isNull(activityIds) ? new HashSet<>() : activityIds;
     }
 
     public Set<BigInteger> getTimeTypeIds() {
@@ -124,16 +119,24 @@ public class CTARuleTemplateDTO {
         return this.getPhaseInfo().stream().filter(p -> shiftPhaseId.equals(p.getPhaseId())).findFirst().isPresent();
     }
 
-    private boolean isActivityAndTimeTypeAndPlannedTimeValid(BigInteger activityId,BigInteger timeTypeId,List<PlannedTime> plannedTimes){
-        return (this.getActivityIds().contains(activityId) || this.getTimeTypeIds().contains(timeTypeId)) && CollectionUtils.containsAny(this.getPlannedTimeIds(),plannedTimes.stream().map(plannedTime -> plannedTime.getPlannedTimeId()).collect(Collectors.toSet()));
+    private boolean isActivityAndTimeTypeAndPlannedTimeValid(Set<BigInteger> activityIds,Set<BigInteger> timeTypeIds,List<PlannedTime> plannedTimes){
+        return (containsAny(this.getActivityIds(),activityIds) || containsAny(this.getTimeTypeIds(),timeTypeIds)) && CollectionUtils.containsAny(this.getPlannedTimeIds(),plannedTimes.stream().map(plannedTime -> plannedTime.getPlannedTimeId()).collect(Collectors.toSet()));
     }
 
     private boolean isEmployementTypeValid(Long employmentId){
         return this.getEmploymentTypes().contains(employmentId);
     }
 
-    public boolean isRuleTemplateValid(Long employmentTypeId,BigInteger shiftPhaseId,BigInteger activityId,BigInteger timeTypeId,List<PlannedTime> plannedTimes){
-        return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentTypeId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityId,timeTypeId,plannedTimes) || this.getCalculationFor().equals(FUNCTIONS));
+    public boolean isRuleTemplateValid(Long employmentTypeId,BigInteger shiftPhaseId,Set<BigInteger> activityIds,Set<BigInteger> timeTypeIds,List<PlannedTime> plannedTimes){
+        return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentTypeId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityIds,timeTypeIds,plannedTimes) || this.getCalculationFor().equals(FUNCTIONS));
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+    public String getDescription() {
+        return  TranslationUtil.getDescription(translations,description);
     }
 
     @Override
@@ -194,7 +197,6 @@ public class CTARuleTemplateDTO {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(disabled, payrollType, payrollSystem, calculationUnit, compensationTable, calculateValueAgainst, approvalWorkFlow, phaseInfo, budgetType, calculateValueIfPlanned, employmentTypes, planningCategory, staffFunctions, plannedTimeWithFactor, calculateScheduledHours, calculationFor, activityTypeForCostCalculation, activityIds, timeTypeIds, plannedTimeIds, dayTypeIds, days, publicHolidays);
     }
 }

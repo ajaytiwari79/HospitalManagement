@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -20,6 +21,13 @@ SkillLevelSetting {
     private int noOfStaff;
     private SkillLevel skillLevel;
     private int availableNoOfStaff;
+    private Date updatedAt;
+
+    public SkillLevelSetting(int noOfStaff, SkillLevel skillLevel, int availableNoOfStaff) {
+        this.noOfStaff = noOfStaff;
+        this.skillLevel = skillLevel;
+        this.availableNoOfStaff = availableNoOfStaff;
+    }
 
     @Override
     public boolean equals(Object o) {

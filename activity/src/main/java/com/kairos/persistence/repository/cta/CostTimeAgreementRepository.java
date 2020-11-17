@@ -1,11 +1,13 @@
 package com.kairos.persistence.repository.cta;
 
 import com.kairos.persistence.model.cta.CostTimeAgreement;
+import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,12 +33,11 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name, BigInteger ctaId);
 
     @Query(value = "{name:?2,deleted:false,disabled:false,'organizationType._id':?0,'organizationSubType._id':?1}",exists = true)
-
     Boolean isCTAExistWithSameOrgTypeAndSubType(Long orgType,Long orgSubType, String name);
 
     @Query(value = "{name:?1,deleted:false,disabled:false,'organization._id':{$in:?0}}")
     List<CostTimeAgreement> findCTAByUnitIdAndOrgTypeAndName(List<Long> organizationIds,String name);
-
-
+    @Query(value = "{employmentId:{$in:?0},deleted:false}")
+    List<CostTimeAgreement> findCTAOfEmployments(Collection<Long> employmentIds);
 
 }

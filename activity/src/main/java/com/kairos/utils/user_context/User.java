@@ -6,16 +6,13 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 
 import static com.kairos.constants.ActivityMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User implements Serializable{
+public class User{
     protected Long id;
 
     protected String cprNumber;

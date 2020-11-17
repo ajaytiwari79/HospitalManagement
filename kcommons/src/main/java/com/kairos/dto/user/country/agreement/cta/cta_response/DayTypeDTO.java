@@ -1,5 +1,8 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.Day;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +10,9 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -23,8 +28,12 @@ public class DayTypeDTO {
     private boolean allowTimeSettings = false;
     private String description;
     private String country;
+    private Long countryId;
     private int code;
     private String colorCode;
+    private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
+    private Map<String, TranslationInfo> translations;
 
     public DayTypeDTO(Long id, String name, List<Day> validDays, List<CountryHolidayCalenderDTO> countryHolidayCalenderData, boolean holidayType, boolean allowTimeSettings) {
         this.id = id;
@@ -43,6 +52,14 @@ public class DayTypeDTO {
         this.holidayType = holidayType;
         this.allowTimeSettings = allowTimeSettings;
         this.colorCode=colorCode;
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+    public String getDescription() {
+        return TranslationUtil.getDescription(translations,description);
     }
 
 }

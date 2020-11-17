@@ -1,18 +1,23 @@
 package com.kairos.service.payment_type;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.EmployeeLimit;
 import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.country.default_data.PaymentTypeDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepository;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
-
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
+import java.util.Map;
 
 /**
  * Created by prabjot on 9/1/17.
@@ -27,32 +32,35 @@ public class PaymentTypeService {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private CountryService countryService;
 
     public PaymentTypeDTO createPaymentType(long countryId, PaymentTypeDTO paymentTypeDTO) {
-        Country country = countryGraphRepository.findOne(countryId);
-        PaymentType paymentType = null;
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-        } else {
-            Boolean paymentTypeExistInCountryByName = paymentTypeGraphRepository.paymentTypeExistInCountryByName(countryId, "(?i)" + paymentTypeDTO.getName(), -1L);
+        Country country = countryService.findById(countryId);
+            boolean paymentTypeExistInCountryByName = paymentTypeGraphRepository.paymentTypeExistInCountryByName(countryId, "(?i)" + paymentTypeDTO.getName(), -1L);
             if (paymentTypeExistInCountryByName) {
                 exceptionService.duplicateDataException("error.PaymentType.name.exist");
             }
-            paymentType = new PaymentType(paymentTypeDTO.getName(), paymentTypeDTO.getDescription());
+            PaymentType paymentType  = new PaymentType(paymentTypeDTO.getName(), paymentTypeDTO.getDescription());
             paymentType.setCountry(country);
             paymentTypeGraphRepository.save(paymentType);
-        }
         paymentTypeDTO.setId(paymentType.getId());
         return paymentTypeDTO;
 
     }
 
     public List<PaymentTypeDTO> getPaymentTypes(long countryId) {
-        return paymentTypeGraphRepository.findPaymentTypeByCountry(countryId);
+        List<PaymentType> paymentTypes = paymentTypeGraphRepository.findPaymentTypeByCountry(countryId);
+        List<PaymentTypeDTO> paymentTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(paymentTypes,PaymentTypeDTO.class);
+        for(PaymentTypeDTO paymentTypeDTO:paymentTypeDTOS){
+            paymentTypeDTO.setCountryId(countryId);
+            paymentTypeDTO.setTranslations(TranslationUtil.getTranslatedData(paymentTypeDTO.getTranslatedNames(),paymentTypeDTO.getTranslatedDescriptions()));
+        }
+        return  paymentTypeDTOS;
     }
 
     public PaymentTypeDTO updatePaymentType(long countryId, PaymentTypeDTO paymentTypeDTO) {
-        Boolean paymentTypeExistInCountryByName = paymentTypeGraphRepository.paymentTypeExistInCountryByName(countryId, "(?i)" + paymentTypeDTO.getName(), paymentTypeDTO.getId());
+        boolean paymentTypeExistInCountryByName = paymentTypeGraphRepository.paymentTypeExistInCountryByName(countryId, "(?i)" + paymentTypeDTO.getName(), paymentTypeDTO.getId());
         if (paymentTypeExistInCountryByName) {
             exceptionService.duplicateDataException("error.PaymentType.name.exist");
         }
@@ -74,5 +82,16 @@ public class PaymentTypeService {
             exceptionService.dataNotFoundByIdException("error.PaymentType.notfound");
         }
         return true;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long paymentTypeId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptions = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
+        PaymentType paymentType =paymentTypeGraphRepository.findOne(paymentTypeId);
+        paymentType.setTranslatedNames(translatedNames);
+        paymentType.setTranslatedDescriptions(translatedDescriptions);
+        paymentTypeGraphRepository.save(paymentType);
+        return paymentType.getTranslatedData();
     }
 }

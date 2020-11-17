@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.period.FlippingDateDTO;
@@ -13,6 +14,10 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
+import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeScheduledPanelIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
@@ -31,17 +36,21 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelState;
+import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelStateMongoRepository;
+import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
+import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
@@ -66,6 +75,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -110,6 +120,10 @@ public class PlanningPeriodService extends MongoBaseService {
     @Inject
     private TimeBankService timeBankService;
     @Inject private ActivitySchedulerJobService activitySchedulerJobService;
+    @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
+    @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject private ActivityService activityService;
 
     // To get list of phases with duration in days
     public Map<Long, List<PhaseDTO>> getPhasesWithDurationInDays(List<Long> unitIds) {
@@ -530,8 +544,8 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         Phase initialNextPhase = phaseMongoRepository.findOne(isNotNull(planningPeriod.getNextPhaseId()) ? planningPeriod.getNextPhaseId() : planningPeriod.getCurrentPhaseId());
         if (PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum()) && PlanningPeriodAction.PUBLISH.equals(planningPeriodAction)) {
-            publishPlanningPeriod(unitId, employmentTypeIds, planningPeriod);
             planningPeriod.getPublishEmploymentIds().addAll(employmentTypeIds);
+            publishPlanningPeriod(unitId, employmentTypeIds, planningPeriod);
         }
         if (PlanningPeriodAction.FLIP.equals(planningPeriodAction)) {
             if(PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())) {
@@ -542,7 +556,7 @@ public class PlanningPeriodService extends MongoBaseService {
             }
             flipPlanningPeriodToNextPhase(unitId, periodId, planningPeriod, initialNextPhase);
         }
-        save(planningPeriod);
+        planningPeriodMongoRepository.save(planningPeriod);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
@@ -830,8 +844,7 @@ public class PlanningPeriodService extends MongoBaseService {
         if (isCollectionNotEmpty(shifts)) {
             for (Shift shift : shifts) {
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
-                    if (!shiftActivity.getStatus().contains(ShiftStatus.PUBLISH))
-                        shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+                    shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
                 }
             }
             shiftMongoRepository.saveEntities(shifts);
@@ -940,4 +953,44 @@ public class PlanningPeriodService extends MongoBaseService {
         return planningPeriod;
     }
 
+    public boolean registerJobForExistingPlanningPeriod() {
+        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllAfterEndDateAndDeletedFalse(getLocalDate());
+        List<BigInteger> schedulerPanelIds = new ArrayList<>();
+        for (PlanningPeriod planningPeriod : planningPeriods) {
+            planningPeriod.getPhaseFlippingDate().forEach(periodPhaseFlippingDate -> {
+                if(isNotNull(periodPhaseFlippingDate.getSchedulerPanelId())){
+                    schedulerPanelIds.add(periodPhaseFlippingDate.getSchedulerPanelId());
+                }
+            });
+        }
+        if(isCollectionNotEmpty(schedulerPanelIds)) {
+            schedulerRestClient.publishRequest(schedulerPanelIds, -1l, true, IntegrationOperation.DELETE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
+        }
+        createScheduleJobOfPanningPeriod(planningPeriods);
+        return true;
+    }
+
+    public ShiftPlanningProblemSubmitDTO findDataForAutoPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
+        ShiftPlanningProblemSubmitDTO submitDTO =  planningPeriodMongoRepository.findDataForAutoPlanning(shiftPlanningProblemSubmitDTO);
+        List<Long> employmentIds = submitDTO.getStaffs().stream().flatMap(staffDTO -> staffDTO.getEmployments().stream()).map(employmentDTO -> employmentDTO.getId()).collect(Collectors.toList());
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(employmentIds, asDate(submitDTO.getPlanningPeriod().getStartDate()),asDate(submitDTO.getPlanningPeriod().getEndDate()));
+        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(workingTimeAgreementMongoRepository.getAllWTAByEmploymentIds(employmentIds),WTAResponseDTO.class);
+        Set<BigInteger> activityTimeTypeIds = submitDTO.getActivities().stream().map(activityDTO -> activityDTO.getActivityBalanceSettings().getTimeTypeId()).collect(Collectors.toSet());
+        Map<BigInteger,TimeTypeDTO> timeTypeMap = timeTypeMongoRepository.findAllByTimeTypeIds(activityTimeTypeIds).stream().collect(Collectors.toMap(k->k.getId(),v->ObjectMapperUtils.copyPropertiesByMapper(v, TimeTypeDTO.class)));
+        Map<Long,List<CTAResponseDTO>> ctaResponse = ctaResponseDTOS.stream().collect(Collectors.groupingBy(k->k.getEmploymentId()));
+        Map<Long,List<WTAResponseDTO>> wtaResponse = wtaResponseDTOS.stream().collect(Collectors.groupingBy(k->k.getEmploymentId()));
+        submitDTO.setEmploymentIdAndCTAResponseMap(ctaResponse);
+        submitDTO.setEmploymentIdAndWTAResponseMap(wtaResponse);
+        submitDTO.setTimeTypeMap(timeTypeMap);
+        return submitDTO;
+    }
+
+    public DefaultDataDTO getDefaultDataForPlanning(Long unitId) {
+        DefaultDataDTO defaultDataDTO = new DefaultDataDTO();
+        List<PlanningPeriodDTO> planningPeriodDTOS = planningPeriodMongoRepository.findAllPeriodsOfUnit(unitId);
+        List<PhaseDTO> phaseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId),PhaseDTO.class);
+        defaultDataDTO.setPhases(phaseDTOS);
+        defaultDataDTO.setPlanningPeriods(planningPeriodDTOS);
+        return defaultDataDTO;
+    }
 }

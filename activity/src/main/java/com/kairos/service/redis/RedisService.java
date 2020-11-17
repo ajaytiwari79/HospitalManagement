@@ -2,9 +2,11 @@ package com.kairos.service.redis;
 
 import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.commons.utils.CommonsExceptionUtil;
+import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -24,7 +26,10 @@ public class RedisService extends CommonsExceptionUtil {
 
     @Inject
     private RedisTemplate<String, Map<String, String>> valueOperations;
-    @Inject private EnvConfigCommon envConfigCommon;
+    @Inject
+    private EnvConfigCommon envConfigCommon;
+    @Inject
+    private ExceptionService exceptionService;
 
     public boolean verifyTokenInRedisServer(String userName, String accessToken) {
         if(!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
@@ -50,14 +55,14 @@ public class RedisService extends CommonsExceptionUtil {
                 if(userTokensFromDifferentMachine.size() == 1) valueOperations.delete(userName);
                 else {
                     if(!userTokensFromDifferentMachine.get(tokenKey).equalsIgnoreCase(accessToken)) {
-                        internalServerError("message.redis.perssistedtoken.notEqualToRequestedToken");
+                        throw new InvalidTokenException(exceptionService.convertMessage("message.redis.perssistedtoken.notEqualToRequestedToken"));
                     }
                     userTokensFromDifferentMachine.remove(tokenKey);
                     valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
                 }
                 tokenRemoved = true;
             } else {
-                internalServerError("message.user.notFoundInRedis");
+                throw new InvalidTokenException(exceptionService.convertMessage("message.user.notFoundInRedis"));
             }
             return tokenRemoved;
         }

@@ -2,6 +2,7 @@ package com.kairos.controller.data_inventory.processing_activity;
 
 
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityRiskResponseDTO;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
 import com.kairos.service.data_inventory.processing_activity.ProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
@@ -63,6 +64,12 @@ class ProcessingActivityController {
     public ResponseEntity<Object> updateProcessingActivityDetail(@PathVariable Long unitId, @PathVariable Long id, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.updateProcessingActivity(unitId, id, processingActivityDTO));
+    }
+
+    @ApiOperation(value = "update risk  detail")
+    @PutMapping("/processing_activity/{id}/risk")
+    public ResponseEntity<Object> updateRiskDetail(@PathVariable Long unitId, @PathVariable Long id, @RequestBody ProcessingActivityRiskResponseDTO processingActivityRiskResponseDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.updateRiskDetail(unitId, id, processingActivityRiskResponseDTO));
     }
 
     @ApiOperation(value = "get history of asset or changes done in Asset")

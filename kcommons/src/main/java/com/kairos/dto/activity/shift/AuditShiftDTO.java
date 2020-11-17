@@ -11,8 +11,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static java.lang.Math.abs;
 
 @Getter
@@ -35,7 +34,7 @@ public class AuditShiftDTO {
         }else {
             activities = isNullOrElse(activities, new ArrayList<>());
             old_activities = isNullOrElse(old_activities, new ArrayList<>());
-            isChanged = LoggingType.DELETED.equals(this.loggingType) || activities.size() != old_activities.size();
+            isChanged = newHashSet(LoggingType.DELETED,LoggingType.CREATED).contains(this.loggingType) || activities.size() != old_activities.size();
             for (int i = 0; i < activities.size(); i++) {
                 if (!isChanged) {
                     AuditShiftActivityDTO activityDTO = activities.get(i);

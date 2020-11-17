@@ -118,12 +118,13 @@ public abstract class RelationshipConstants {
     public static final  String LAT_LNG = "LAT_AND_LNG";
     public static final  String HAS_TIME_WINDOW = "HAS_TIME_WINDOW";
     public static final  String APPLICABLE_IN_UNIT = "APPLICABLE_IN_UNIT";
-    public static final  String APPLICABLE_IN_ORGANIZATION = "APPLICABLE_IN_ORGANIZATION";
     public static final  String HAS_UNIT_PERMISSIONS = "HAS_UNIT_PERMISSIONS";
     public static final  String HAS_PARTIAL_LEAVES= "HAS_PARTIAL_LEAVES";
     public static final  String HAS_ACCESS_PAGE_PERMISSION = "HAS_ACCESS_PAGE_PERMISSION";
     public static final  String HAS_ACCESS_GROUP = "HAS_ACCESS_GROUP";
     public static final  String HAS_CUSTOMIZED_PERMISSION = "HAS_CUSTOMIZED_PERMISSION";
+    public static final  String HAS_CUSTOMIZED_PERMISSION_FOR_FIELD = "HAS_CUSTOMIZED_PERMISSION_FOR_FIELD";
+    public static final  String HAS_CUSTOMIZED_PERMISSION_FOR_ACTION = "HAS_CUSTOMIZED_PERMISSION_FOR_ACTION";
     public static final  String HAS_ACCESS_PERMISSION = "HAS_ACCESS_PERMISSION";
     public static final  String HAS_SUB_TYPE = "HAS_SUB_TYPE";
     public static final  String HAS_CONTACT_ADDRESS = "HAS_CONTACT_ADDRESS";
@@ -234,6 +235,7 @@ public abstract class RelationshipConstants {
     public static final String HAS_FIELD = "HAS_FIELD";
     public static final String HAS_SUB_MODEL = "HAS_SUB_MODEL";
     public static final String HAS_PERMISSION = "HAS_PERMISSION";
+    public static final String HAS_ACTION_PERMISSION = "HAS_ACTION_PERMISSION";
     public static final String HAS_ACTION = "HAS_ACTION";
     public static final String OTHER_PERMISSION = "OTHER_PERMISSION";
     public static final String HAS_FILTERS = "HAS_FILTERS";

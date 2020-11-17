@@ -1,9 +1,15 @@
 package com.kairos.dto.activity.presence_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
+import java.util.Map;
 
 /**
  * @author pradeep
@@ -11,48 +17,26 @@ import java.math.BigInteger;
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class PresenceTypeDTO {
     @NotBlank(message = "error.PresenceTypeDTO.name.notEmpty")
     private String name;
     private BigInteger id;
     private String imageName;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
-    public PresenceTypeDTO() {
-    }
+    private Long countryId;
+    private Map<String,TranslationInfo> translations;
 
     public PresenceTypeDTO(@NotBlank(message = "error.PresenceTypeDTO.name.notEmpty") String name, BigInteger id) {
         this.name = name;
         this.id = id;
     }
 
-    public String getImageName() {
-        return imageName;
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
     }
 
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
-    }
-
-    public PresenceTypeDTO(String name) {
-        this.name = name;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
 
     @Override
     public String toString() {

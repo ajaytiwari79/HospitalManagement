@@ -1,6 +1,8 @@
 package com.kairos.shiftplanning.constraints.activityconstraint;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.kairos.enums.Day;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,10 +17,12 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 public class DayType {
     private Long id;
     private String name;
     private List<Day> validDays=new ArrayList<>();
+    @JsonAlias({"countryHolidayCalenderData","countryHolidayCalenders"})
     private List<CountryHolidayCalender> countryHolidayCalenders;
     private boolean holidayType;
     private boolean allowTimeSettings;

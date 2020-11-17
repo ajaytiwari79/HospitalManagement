@@ -83,7 +83,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.concurrent.TimeUnit;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_UNIT_ID;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.MERGED_TASK_NAME;
 import static com.kairos.persistence.model.constants.ClientExceptionConstant.SICK;
@@ -107,6 +107,8 @@ public class PlannerService extends MongoBaseService {
     public static final String TASK_LIST = "taskList";
     public static final String TIME_FROM = "timeFrom";
     public static final String DATE_FROM = "dateFrom";
+    public static final String TASKS_TO_CREATE = "tasksToCreate";
+    public static final String TASKS_TO_DELETE = "tasksToDelete";
     @Inject
     private RandomDateGeneratorService randomDateGeneratorService;
     @Inject
@@ -1187,7 +1189,7 @@ public class PlannerService extends MongoBaseService {
                 match(criteria),
                 new CustomAggregationOperation(projectionObject),
                 new CustomAggregationOperation(groupObject),
-                sort(Sort.Direction.DESC, "dateFrom")
+                sort(Sort.Direction.DESC, DATE_FROM)
         );
         LOGGER.debug("Merge Repetitions Query: " + aggregation.toString());
 
@@ -1500,8 +1502,8 @@ public class PlannerService extends MongoBaseService {
         taskService.save(mainTask);
 
         returnedData.put(TASK_LIST, taskList);
-        returnedData.put("tasksToCreate", tasksToCreate);
-        returnedData.put("tasksToDelete", tasksToDelete);
+        returnedData.put(TASKS_TO_CREATE, tasksToCreate);
+        returnedData.put(TASKS_TO_DELETE, tasksToDelete);
         return returnedData;
     }
 
@@ -1532,10 +1534,10 @@ public class PlannerService extends MongoBaseService {
         List<Task> unMergeTasksList = taskMongoRepository.getAllTasksByIdsIn(unMergeTaskIds);
         returnedData = unMergeTasks(mainTask, unMergeTasksList, isActualPlanningScreen);
         tasksToReturn.addAll((List<Task>) returnedData.get(TASK_LIST));
-        tasksToCreate.addAll((List<Task>) returnedData.get("tasksToCreate"));
-        tasksToDelete.addAll((List<Task>) returnedData.get("tasksToDelete"));
+        tasksToCreate.addAll((List<Task>) returnedData.get(TASKS_TO_CREATE));
+        tasksToDelete.addAll((List<Task>) returnedData.get(TASKS_TO_DELETE));
 
-        Criteria criteria = Criteria.where("joinEventId").in(jointEventsIds).and("dateFrom").gt(mainTask.getDateFrom()).and("isDeleted").is(false);
+        Criteria criteria = Criteria.where("joinEventId").in(jointEventsIds).and(DATE_FROM).gt(mainTask.getDateFrom()).and("isDeleted").is(false);
 
         String projection = "{   $project : { date : {$substr: ['$dateFrom', 0, 10] }}}";
 
@@ -1548,7 +1550,7 @@ public class PlannerService extends MongoBaseService {
                 match(criteria),
                 new CustomAggregationOperation(projectionObject),
                 new CustomAggregationOperation(groupObject),
-                sort(Sort.Direction.DESC, "dateFrom")
+                sort(Sort.Direction.DESC, DATE_FROM)
         );
 
         // Result
@@ -1574,8 +1576,8 @@ public class PlannerService extends MongoBaseService {
             if (mainTaskNew != null) {
                 returnedData = unMergeTasks(mainTaskNew, mergedTaskList, isActualPlanningScreen);
                 tasksToReturn.addAll((List<Task>) returnedData.get(TASK_LIST));
-                tasksToCreate.addAll((List<Task>) returnedData.get("tasksToCreate"));
-                tasksToDelete.addAll((List<Task>) returnedData.get("tasksToDelete"));
+                tasksToCreate.addAll((List<Task>) returnedData.get(TASKS_TO_CREATE));
+                tasksToDelete.addAll((List<Task>) returnedData.get(TASKS_TO_DELETE));
             }
         }
 

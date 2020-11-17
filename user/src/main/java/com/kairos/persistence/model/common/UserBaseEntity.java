@@ -12,7 +12,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +24,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public abstract class UserBaseEntity implements Serializable {
+public abstract class UserBaseEntity  {
 
     //@GeneratedValue
     @GraphId protected Long id;
@@ -47,6 +46,7 @@ public abstract class UserBaseEntity implements Serializable {
     protected Map<String,String> translatedNames;
     @Properties
     protected Map<String,String> translatedDescriptions;
+
 
 
     @JsonIgnore

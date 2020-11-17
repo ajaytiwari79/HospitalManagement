@@ -1,16 +1,17 @@
 package com.kairos.service.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.config.ApplicationContextProviderNonManageBean;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.dto.activity.task.EscalateTaskWrapper;
-import com.kairos.dto.activity.task.EscalatedTasksWrapper;
+import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
+import com.kairos.dto.activity.task.StaffTaskDTO;
 import com.kairos.dto.activity.task.TaskDemandRequestWrapper;
 import com.kairos.dto.activity.task_type.TaskTypeAggregateResult;
 import com.kairos.dto.planner.vrp.TaskAddress;
-import com.kairos.dto.user.client.ClientExceptionDTO;
-import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
 import com.kairos.dto.user.staff.ContactPersonDTO;
 import com.kairos.dto.user.staff.client.ClientExceptionTypesDTO;
@@ -32,9 +33,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
-import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.staff.StaffClientData;
@@ -43,7 +42,6 @@ import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQu
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
-import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -56,26 +54,21 @@ import com.kairos.persistence.repository.user.country.CitizenStatusGraphReposito
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageLevelGraphRepository;
-import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
-import com.kairos.persistence.repository.user.region.RegionGraphRepository;
-import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.*;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.ClientPersonalCalenderPrerequisiteDTO;
-import com.kairos.wrapper.ContactPersonTabDataDTO;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,19 +95,17 @@ import static com.kairos.enums.CitizenHealthStatus.TERMINATED;
 @Service
 @Transactional
 public class ClientService {
+    public static final String STAFF_LIST = "staffList";
+    public static final String PROFILE_PIC = "profilePic";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Inject EnvConfig envConfig;
-    @Inject MunicipalityGraphRepository municipalityGraphRepository;
-    @Inject RegionGraphRepository regionGraphRepository;
-    @Inject ContactAddressGraphRepository contactAddressGraphRepository;
-    @Inject TimeSlotGraphRepository timeSlotGraphRepository;
-    @Inject IntegrationService integrationService;
-    @Inject TaskServiceRestClient taskServiceRestClient;
-    @Inject PlannerRestClient plannerRestClient;
-    @Inject TaskTypeRestClient taskTypeRestClient;
-    @Inject TaskDemandRestClient taskDemandRestClient;
-    @Inject TableConfigRestClient tableConfigRestClient;
-    @Inject ClientAddressService clientAddressService;
+    @Inject private EnvConfig envConfig;
+    @Inject private TimeSlotGraphRepository timeSlotGraphRepository;
+    @Inject private TaskServiceRestClient taskServiceRestClient;
+    @Inject private PlannerRestClient plannerRestClient;
+    @Inject private TaskTypeRestClient taskTypeRestClient;
+    @Inject private TaskDemandRestClient taskDemandRestClient;
+    @Inject private TableConfigRestClient tableConfigRestClient;
+    @Inject private ClientAddressService clientAddressService;
     @Inject private CitizenStatusGraphRepository citizenStatusGraphRepository;
     @Inject private ClientLanguageRelationGraphRepository clientLanguageRelationGraphRepository;
     @Inject private ClientGraphRepository clientGraphRepository;
@@ -127,7 +118,6 @@ public class ClientService {
     @Inject private ClientOrganizationRelationGraphRepository relationGraphRepository;
     @Inject private LanguageGraphRepository languageGraphRepository;
     @Inject private LanguageLevelGraphRepository languageLevelGraphRepository;
-    @Inject private ZipCodeGraphRepository zipCodeGraphRepository;
     @Inject private CountryGraphRepository countryGraphRepository;
     @Inject private CitizenStatusService citizenStatusService;
     @Inject private ClientOrganizationRelationService relationService;
@@ -146,38 +136,15 @@ public class ClientService {
     }
 
     public Client createCitizen(ClientMinimumDTO clientMinimumDTO, Long unitId) {
-        Unit unit = unitGraphRepository.findOne(unitId, 0);
-        if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, unitId);
-        }
+        Unit unit = unitGraphRepository.findById(unitId, 0).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, unitId)));
         User user = userGraphRepository.findUserByCprNumber(clientMinimumDTO.getCprnumber());
         Client client;
         if (user != null) {
             client = clientGraphRepository.getClientByUserId(user.getId());
             if (Optional.ofNullable(client).isPresent()) {
-                if (client.isCitizenDead()) {
-                    exceptionService.duplicateDataException(MESSAGE_CLIENT_CRPNUMBER_DEADCITIZEN, clientMinimumDTO.getCprnumber());
-                }
-                int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
-                if (count != 0) {
-                    exceptionService.duplicateDataException(MESSAGE_CLIENT_CRPNUMBER_DUPLICATE);
-                }
-                logger.debug("Creating Existing Client relationship : " + client.getId());
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, unit, DateUtils.getCurrentDateMillis());
-                relationService.createRelation(relation);
-
+                validateAndCreateRelation(clientMinimumDTO, unitId, unit, client);
             } else {
-                client = new Client();
-                user.setFirstName(clientMinimumDTO.getFirstName());
-                user.setLastName(clientMinimumDTO.getLastName());
-                user.setCprNumber(clientMinimumDTO.getCprnumber());
-                user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
-                client.setProfilePic(generateAgeAndGenderFromCPR(user));
-                client.setUser(user);
-                client.setClientType(clientMinimumDTO.getClientType());
-                clientGraphRepository.save(client);
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, unit, DateUtils.getCurrentDateMillis());
-                relationService.createRelation(relation);
+                client = createClientAndRelation(clientMinimumDTO, unit, user);
             }
         } else {
             logger.debug("Creating New Client & user..........");
@@ -188,18 +155,47 @@ public class ClientService {
             client.setClientType(clientMinimumDTO.getClientType());
             clientGraphRepository.save(client);
             ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(client, unit, new DateTime().getMillis());
-            logger.debug("Creating Relation with Organization: " + unit.getName());
+            logger.debug("Creating Relation with Organization: {}" , unit.getName());
             relationGraphRepository.save(clientOrganizationRelation);
 
         }
         return client;
     }
 
+    private Client createClientAndRelation(ClientMinimumDTO clientMinimumDTO, Unit unit, User user) {
+        Client client;
+        client = new Client();
+        user.setFirstName(clientMinimumDTO.getFirstName());
+        user.setLastName(clientMinimumDTO.getLastName());
+        user.setCprNumber(clientMinimumDTO.getCprnumber());
+        user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
+        client.setProfilePic(generateAgeAndGenderFromCPR(user));
+        client.setUser(user);
+        client.setClientType(clientMinimumDTO.getClientType());
+        clientGraphRepository.save(client);
+        ClientOrganizationRelation relation = new ClientOrganizationRelation(client, unit, DateUtils.getCurrentDateMillis());
+        relationService.createRelation(relation);
+        return client;
+    }
+
+    private void validateAndCreateRelation(ClientMinimumDTO clientMinimumDTO, Long unitId, Unit unit, Client client) {
+        if (client.isCitizenDead()) {
+            exceptionService.duplicateDataException(MESSAGE_CLIENT_CRPNUMBER_DEADCITIZEN, clientMinimumDTO.getCprnumber());
+        }
+        int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
+        if (count != 0) {
+            exceptionService.duplicateDataException(MESSAGE_CLIENT_CRPNUMBER_DUPLICATE);
+        }
+        logger.debug("Creating Existing Client relationship : {}" , client.getId());
+        ClientOrganizationRelation relation = new ClientOrganizationRelation(client, unit, DateUtils.getCurrentDateMillis());
+        relationService.createRelation(relation);
+    }
+
     public String generateAgeAndGenderFromCPR(User user) {
         logger.debug("Generating Gender and Age from CPR....");
         String cpr = user.getCprNumber();
         String defaultPicUrl;
-        if (cpr == null || cpr == "") {
+        if (StringUtils.isBlank(cpr)) {
             logger.debug("CPR number not found");
             return null;
         }
@@ -222,35 +218,30 @@ public class ClientService {
     }
 
     public Map<String, Object> setGeneralDetails(ClientPersonalDto client) {
-        Client currentClient = clientGraphRepository.findOne(client.getId());
-        if (currentClient == null || currentClient.getUser() == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_CITIZEN_NOTFOUND, client.getId());
-        }
-        currentClient.getUser().setCprNumber(client.getCprNumber());
-        currentClient.getUser().setFirstName(client.getFirstName());
-        currentClient.getUser().setLastName(client.getLastName());
-        currentClient.setNameAmongStaff(client.getNameAmongStaff());
-        if (client.getCivilianStatus().getId() != null) {
-            currentClient.setCivilianStatus(citizenStatusGraphRepository.findOne(client.getCivilianStatus().getId()));
-        }
-        currentClient.getUser().setGender(client.getGender());
-        currentClient.setOccupation(client.getOccupation());
-        currentClient.setDoHaveFreeChoiceServices(client.isDoHaveFreeChoiceServices());
-        // Language Translation
-        currentClient.setDoRequireTranslationAssistance(client.isDoRequireTranslationAssistance());
-        currentClient.setVisitourTeamId(client.getVisitourTeamId());
-        currentClient.setNationalityType(client.getNationalityType());
-        currentClient.setCitizenship(client.getCitizenship());
-        currentClient.setPeopleInHousehold(client.isPeopleInHousehold());
-        currentClient.setLivesAlone(client.isLivesAlone());
+        Client currentClient = clientGraphRepository.findById(client.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_CLIENT_CITIZEN_NOTFOUND, client.getId())));
+        setClientDetails(client, currentClient);
         // Save Client
         Client updatedClient = clientGraphRepository.save(currentClient);
         logger.debug("Saved Client and Now Updating language preferences...");
         // Update LanguageDetails
         List<Language> languageList = client.getLanguageUnderstands();
-        logger.debug("Languages found: " + languageList.size());
-        ClientLanguageRelation clientLanguageRelation;
+        logger.debug("Languages found: {}" , languageList.size());
         languageGraphRepository.removeAllLanguagesFromClient(currentClient.getId());
+        setLanguageInfo(client, currentClient, languageList);
+        Map<String, Object> data = updatedClient.retrieveClientGeneralDetails();
+        // Profile Picture
+        String image = (String) data.get(PROFILE_PIC);
+        String imageUrl = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + image;
+        data.put(PROFILE_PIC, imageUrl);
+        List<Map<String, Object>> languageUnderstands = languagesKnownToCitizen(updatedClient.getId());
+        if (languageUnderstands != null) {
+            data.put("languageUnderstands", languageUnderstands);
+        }
+        return data;
+    }
+
+    private void setLanguageInfo(ClientPersonalDto client, Client currentClient, List<Language> languageList) {
+        ClientLanguageRelation clientLanguageRelation;
         for (Language language : languageList) {
             // Get All Level Id
             long readId = language.getReadLevel();
@@ -270,79 +261,39 @@ public class ClientService {
                 clientLanguageRelation.setReadLevel(readId);
                 clientLanguageRelation.setWriteLevel(writeId);
                 clientLanguageRelation.setSpeakLevel(speakId);
-                logger.debug("Saving Language : " + language.getName() + "levelId: " + language.getReadLevel());
                 clientLanguageRelationGraphRepository.save(clientLanguageRelation);
             } else {
                 logger.debug("Current Language is Null ");
             }
         }
-        Map<String, Object> data = updatedClient.retrieveClientGeneralDetails();
-        // Profile Picture
-        String image = (String) data.get("profilePic");
-        String imageUrl = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + image;
-        data.put("profilePic", imageUrl);
-        List<Map<String, Object>> languageUnderstands = languagesKnownToCitizen(updatedClient.getId());
-        if (languageUnderstands != null) {
-            data.put("languageUnderstands", languageUnderstands);
-        }
-        return data;
     }
 
-    public Map<String, Object> retrieveCompleteDetails(long clientId, long unitId) {
-        Map<String, Object> response = new HashMap<>();
-        Client currentClient = clientGraphRepository.findOne(clientId);
-        //Client currentClient = clientGraphRepository.getClientByClientIdAndUnitId(clientId, unitId);
-        if (!Optional.ofNullable(currentClient).isPresent() || !Optional.ofNullable(currentClient.getUser()).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ID_NOTFOUND, clientId);
+    private void setClientDetails(ClientPersonalDto client, Client currentClient) {
+        currentClient.getUser().setCprNumber(client.getCprNumber());
+        currentClient.getUser().setFirstName(client.getFirstName());
+        currentClient.getUser().setLastName(client.getLastName());
+        currentClient.setNameAmongStaff(client.getNameAmongStaff());
+        if (client.getCivilianStatus().getId() != null) {
+            currentClient.setCivilianStatus(citizenStatusGraphRepository.findOne(client.getCivilianStatus().getId()));
         }
-        // Client General Information
-        Map<String, Object> clientGeneralDetails = currentClient.retrieveClientGeneralDetails();
-        // Client Profile Picture
-        String url = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath();
-        clientGeneralDetails.put("profilePic", url + (String) clientGeneralDetails.get("profilePic"));
-        clientGeneralDetails.put("civilianStatus", clientGraphRepository.findCitizenCivilianStatus(clientId));
-        // Client Language Data
-        clientGeneralDetails.put("languageUnderstands", languagesKnownToCitizen(clientId));
-        clientGeneralDetails.put("hasHomeAddress", clientGraphRepository.isHomeAddressExists(clientId));
-        clientGeneralDetails.put("languageUnderstandsIds", clientLanguageRelationGraphRepository.findClientLanguagesId(clientId).toArray());
-        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-        if (countryId != null) {
-            logger.debug("Country Found");
-            List<Map<String, Object>> languageLevelData = languageLevelGraphRepository.getLanguageLevelByCountryId(countryId);
-            if (languageLevelData != null) {
-                clientGeneralDetails.put("languageLevelData", FormatUtil.formatNeoResponse(languageLevelData));
-            }
-            List<Map<String, Object>> zipCodeMapList = zipCodeGraphRepository.getAllZipCodeByCountryIdAnotherFormat(countryId);
-            if (zipCodeMapList != null) {
-                response.put("zipCodeData", FormatUtil.formatNeoResponse(zipCodeMapList));
-            }
-            List<Map<String, Object>> languageData = languageGraphRepository.getLanguageByCountryIdAnotherFormat(countryId);
-            if (languageData != null) {
-                response.put("languageData", FormatUtil.formatNeoResponse(languageData));
-            }
-            response.put("relationTypes", countryGraphRepository.getRelationTypesByCountry(countryId));
-            response.put("civilianStatus", citizenStatusService.getCitizenStatusByCountryIdAnotherFormat(countryId));
-        } else {
-            logger.debug("Country not found");
-        }
-        // NextToKin
-        List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        response.put("nextToKin", nextToKinDetails);
-        // Social Media Details
-        Map<String, Object> socialMediaDetails = getSocialMediaDetails(clientId);
-        response.put("socialMediaDetails", socialMediaDetails != null ? socialMediaDetails : Collections.EMPTY_MAP);
-        // client General
-        response.put("clientGeneral", clientGeneralDetails);
-        return response;
+        currentClient.getUser().setGender(client.getGender());
+        currentClient.setOccupation(client.getOccupation());
+        currentClient.setDoHaveFreeChoiceServices(client.isDoHaveFreeChoiceServices());
+        // Language Translation
+        currentClient.setDoRequireTranslationAssistance(client.isDoRequireTranslationAssistance());
+        currentClient.setVisitourTeamId(client.getVisitourTeamId());
+        currentClient.setNationalityType(client.getNationalityType());
+        currentClient.setCitizenship(client.getCitizenship());
+        currentClient.setPeopleInHousehold(client.isPeopleInHousehold());
+        currentClient.setLivesAlone(client.isLivesAlone());
     }
-
 
     private List<Map<String, Object>> languagesKnownToCitizen(long clientId) {
         List<Map<String, Object>> languageData = clientLanguageRelationGraphRepository.findClientLanguages(clientId);
         List<Map<String, Object>> responseMapList = new ArrayList<>();
         if (languageData != null && languageData.size() != 0) {
-            logger.debug("Client Understand languages: " + languageData.size());
-            Map<String, Object> languageUnderstand = new HashMap<>();
+            logger.debug("Client Understand languages: {}" , languageData.size());
+            Map<String, Object> languageUnderstand ;
             Map<String, Object> response;
             LanguageLevel languageReadLevel;
             LanguageLevel languageWriteLevel;
@@ -350,7 +301,7 @@ public class ClientService {
             for (Map<String, Object> map : languageData) {
                 response = new HashMap<>();
                 languageUnderstand = (Map<String, Object>) map.get("result");
-                logger.debug("Language Understand:    " + languageUnderstand);
+                logger.debug("Language Understand:    {}" , languageUnderstand);
                 languageReadLevel = languageLevelGraphRepository.findOne(Long.valueOf(String.valueOf(languageUnderstand.get("readLevel"))));
                 languageWriteLevel = languageLevelGraphRepository.findOne(Long.valueOf(String.valueOf(languageUnderstand.get("writeLevel"))));
                 languageSpeakLevel = languageLevelGraphRepository.findOne(Long.valueOf(String.valueOf(languageUnderstand.get("speakLevel"))));
@@ -360,16 +311,11 @@ public class ClientService {
                 response.put("name", languageUnderstand.get("name"));
                 response.put("id", languageUnderstand.get("id"));
                 response.put("description", languageUnderstand.get("description"));
-                logger.debug("adding Response: " + response);
+                logger.debug("adding Response: {}" , response);
                 responseMapList.add(response);
             }
         }
         return responseMapList;
-    }
-
-
-    public Map<String, Object> getSocialMediaDetails(Long clientId) {
-        return clientGraphRepository.findOne(clientId).retrieveSocialMediaDetails();
     }
 
     public boolean saveContactPersonForClient(long clientId, long staffId) {
@@ -400,57 +346,24 @@ public class ClientService {
     }
 
     public List<OrganizationServiceQueryResult> getClientServices(Long clientId, long orgId) {
-        logger.debug("Getting Demands  ClientId:" + clientId + " UnitId: " + orgId);
-        List<OrganizationServiceQueryResult> serviceList = new ArrayList<>();
         List<Long> serviceIdList = taskServiceRestClient.getClientTaskServices(clientId, orgId);
         return organizationServiceRepository.getOrganizationServiceByOrgIdAndServiceIds(orgId, serviceIdList);
     }
 
-    public Map<String, Object> getUnitData(Long clientId, long unitId) {
+    public Map<String, Object> getUnitData(Long clientId) {
         Map<String, Object> response = new HashMap<>();
         response.put("units", getOrganizationsByClient(clientId));
         return response;
-    }
-
-    public List<Team> setRestrictedTeam(Long clientId, Map<String, Long[]> teamIds) {
-        Client currentClient = clientGraphRepository.findOne(clientId);
-        Long[] longs = teamIds.get("data");
-        if (currentClient != null) {
-            for (long id : longs) {
-                Team currentTeam = teamGraphRepository.findOne(id);
-                if (currentTeam != null) {
-                    ClientTeamRelation clientTeamRelation = staffTeamRelationGraphRepository.checkRestrictedTeam(clientId, id);
-                    // check if Relation already exists
-                    if (clientTeamRelation != null) {
-                        // if Restricted
-                        if (clientTeamRelation.getType() == ClientStaffRelation.StaffType.PREFERRED) {
-                            clientTeamRelation.setType(ClientStaffRelation.StaffType.FORBIDDEN);
-                            staffTeamRelationGraphRepository.save(clientTeamRelation);
-                        } else {
-                            logger.debug("Team already restricted");
-                        }
-                    } else {
-                        logger.debug("Client Team relation is null");
-                        logger.debug("Team to Restricted: " + currentTeam.getName());
-                        ClientTeamRelation teamRelation = new ClientTeamRelation(currentClient, currentTeam, ClientStaffRelation.StaffType.FORBIDDEN);
-                        staffTeamRelationGraphRepository.save(teamRelation);
-                    }
-                } else {
-                    logger.debug("Team not found with provided id ");
-                }
-            }
-        }
-        return clientGraphRepository.findForbidTeam(clientId);
     }
 
     public List<Object> getAllUsers(Long teamID, Long clientId, Long unitId) {
         List<Map<String, Object>> data = clientGraphRepository.getTeamMembers(teamID, clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath(), unitId);
         List<Object> response = new ArrayList<>();
         if (data == null) {
-            return null;
+            return Collections.emptyList();
         }
         for (Map<String, Object> map : data) {
-            Map<String, Object> staffData = (Map<String, Object>) map.get("staffList");
+            Map<String, Object> staffData = (Map<String, Object>) map.get(STAFF_LIST);
             response.add(staffData);
         }
         return response;
@@ -466,9 +379,7 @@ public class ClientService {
     public ClientMinimumDTO addHouseholdMemberOfClient(ClientMinimumDTO minimumDTO, long unitId, long clientId) {
         Client client = clientGraphRepository.findOne(clientId);
         if (!Optional.ofNullable(client).isPresent() || !Optional.ofNullable(client.getUser()).isPresent()) {
-            logger.debug("Searching client with id " + clientId + " in unit " + unitId);
             exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ID_NOTFOUND, clientId);
-
         }
         // Check if assigning household member as himself
         if (minimumDTO.getCprnumber().equals(client.getUser().getCprNumber())) {
@@ -476,7 +387,7 @@ public class ClientService {
         }
         Client houseHold = getDetailsOfHouseHold(minimumDTO);
         Long addressIdOfHouseHold = null;
-        Boolean addHouseHoldInCitizenList = false;
+        boolean addHouseHoldInCitizenList = false;
         if (houseHold.getId() == null) {
             addHouseHoldInCitizenList = true;
         }
@@ -490,7 +401,6 @@ public class ClientService {
         }
         // Check and Update Address of all household members
         if (addressIdOfHouseHold != null && minimumDTO.getUpdateAddressOfAllHouseholdMembers()) {
-//            //  && minimumDTO.getUpdateAddressOfAllHouseholdMembers() == true
             clientAddressService.updateAddressOfAllHouseHoldMembers(client.getHomeAddress().getId(), addressIdOfHouseHold);
         }
         minimumDTO.setId(houseHold.getId());
@@ -582,7 +492,7 @@ public class ClientService {
         logger.debug("Preparing response");
         for (StaffClientData data : dataList) {
             int count = staffGraphRepository.createClientStaffPreferredRelation(data.getClientId(), data.getStaffIds());
-            logger.debug("No. of relationship created: " + count);
+            logger.debug("No. of relationship created: {}" , count);
             staffData = FormatUtil.formatNeoResponse(clientGraphRepository.findPreferredStaff(data.getClientId()));
             result = new HashMap<>();
             result.put(data.getClientId().toString(), staffData);
@@ -598,7 +508,7 @@ public class ClientService {
         logger.debug("Preparing response");
         for (StaffClientData data : dataList) {
             int count = staffGraphRepository.createClientStaffForbidRelation(data.getClientId(), data.getStaffIds());
-            logger.debug("No. of relationship created: " + count);
+            logger.debug("No. of relationship created: {}" , count);
             staffData = FormatUtil.formatNeoResponse(clientGraphRepository.findForbidStaff(data.getClientId()));
             result = new HashMap<>();
             result.put(data.getClientId().toString(), staffData);
@@ -626,12 +536,12 @@ public class ClientService {
         List<Map<String, Object>> response = new ArrayList<>();
         List<Map<String, Object>> staffData;
         Map<String, Object> result;
-        logger.debug("No. of citizens: " + clientIds.size());
+        logger.debug("No. of citizens: {}" , clientIds.size());
         for (Long id : clientIds) {
             result = new HashMap<>();
             staffData = FormatUtil.formatNeoResponse(clientGraphRepository.findForbidStaff(id));
             result.put("clientId", id.toString());
-            result.put("staffList", staffData);
+            result.put(STAFF_LIST, staffData);
             response.add(result);
         }
         return response;
@@ -641,20 +551,20 @@ public class ClientService {
         List<Map<String, Object>> response = new ArrayList<>();
         List<Map<String, Object>> staffData;
         Map<String, Object> result = null;
-        logger.debug("No. of citizens: " + clientIds.size());
-        logger.debug("Ids. of citizens: " + clientIds);
+        logger.debug("No. of citizens: {}" , clientIds.size());
+        logger.debug("Ids. of citizens: {}" , clientIds);
         for (Long id : clientIds) {
             result = new HashMap<>();
             staffData = FormatUtil.formatNeoResponse(clientGraphRepository.findPreferredStaff(id));
             result.put("clientId", id.toString());
-            result.put("staffList", staffData);
+            result.put(STAFF_LIST, staffData);
             response.add(result);
         }
         return response;
     }
 
     public boolean assignStaffToCitizen(long citizenId, long staffId, ClientStaffRelation.StaffType staffType) {
-        clientGraphRepository.assignStaffToClient(citizenId, staffId, staffType, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+        clientGraphRepository.assignStaffToClient(citizenId, staffId, staffType, DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
         return true;
     }
 
@@ -665,17 +575,15 @@ public class ClientService {
         for (StaffPersonalDetailQueryResult staffPersonalDetailQueryResult : staffQueryData) {
             staffIds.add(staffPersonalDetailQueryResult.getId());
         }
-        clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+        clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
         long endTime = System.currentTimeMillis();
-        logger.info("time taken, client>>assignStaffToCitizen " + (endTime - startTime) + "  ms");
+        logger.info("time taken, client>>assignStaffToCitizen {}" , (endTime - startTime) + "  ms");
         return true;
     }
 
     public HashMap<String, Object> getAssignedStaffOfCitizen(long unitId) {
-        long startTime = System.currentTimeMillis();
         List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResults = staffRetrievalService.getStaffWithAdditionalInfo(unitId);
         List<Long> staffIds = new ArrayList<>();
-        //TODO append or set image name from query itself than applying a loop here
         staffAdditionalInfoQueryResults.forEach(staff -> {
             staffIds.add(staff.getId());
             if (staff.getProfilePic() != null)
@@ -685,28 +593,8 @@ public class ClientService {
         List<Map<String, Object>> citizenStaffList = new ArrayList<>();
         List<Long> citizenIds = new ArrayList<>();
         clientStaffQueryResults.forEach(clientStaffQueryResult -> citizenIds.add(clientStaffQueryResult.getId()));
-        //List<TaskTypeAggregateResult> results = customTaskTypeRepository.getTaskTypesOfCitizens(citizenIds);
-        //anil maurya implements rest template here to call task service
         List<TaskTypeAggregateResult> results = taskDemandRestClient.getTaskTypesOfCitizens(citizenIds);
-        clientStaffQueryResults.forEach(client -> {
-            Optional<TaskTypeAggregateResult> taskTypeAggregateResult = results.stream().filter(citizenTaskType -> citizenTaskType.getId() == client.getId()).findFirst();
-            HashMap<String, Object> citizen = new HashMap<>();
-            HashMap<String, Object> clientMap = new HashMap<>();
-            citizen.put("id", client.getId());
-            citizen.put("name", client.getName());
-            citizen.put("gender", client.getGender());
-            citizen.put("age", client.getAge());
-            citizen.put("localAreaTag", client.getLocalAreaTag());
-            citizen.put("address", client.getAddress());
-            citizen.put("profilePic", (client.getProfilePic() == null) ? null : envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + client.getProfilePic());
-            citizen.put("taskTypes", (taskTypeAggregateResult.isPresent()) ? taskTypeAggregateResult.get().getTaskTypeIds() : Collections.emptyList());
-            Map<Long, Object> staffData = new HashMap<>();
-            client.getStaff().forEach(staff -> staffData.put((Long) staff.get("id"), staff.get("type")));
-            citizen.put("staff", staffData);
-            clientMap.put("Client", citizen);
-            citizenStaffList.add(clientMap);
-        });
-        //meta data preparation
+        clientStaffQueryResults.forEach(client -> setCitizenDetails(citizenStaffList, results, client));
         HashMap<String, Object> orgData = new HashMap<>();
         List<Map<String, Object>> skills = unitGraphRepository.getSkillsOfOrganization(unitId);
         List<Map<String, Object>> filterSkillData = new ArrayList<>();
@@ -714,17 +602,33 @@ public class ClientService {
             filterSkillData.add((Map<String, Object>) map.get("data"));
         }
         orgData.put("taskTypes", taskTypeRestClient.getTaskTypesOfUnit(unitId));
-        // orgData.put("taskTypes", customTaskTypeRepository.getTaskTypesOfUnit(unitId));
         orgData.put("skills", filterSkillData);
         orgData.put("teams", teamGraphRepository.getTeamsByOrganization(unitId));
-        long endTime = System.currentTimeMillis();
-        logger.info("Time taken by ClientService>>getAssignedStaffOfCitizen " + (endTime - startTime) + "  ms");
         Map<String, Object> clientInfo = taskDemandRestClient.getOrganizationClientsInfo(unitId, citizenStaffList);
         HashMap<String, Object> response = new HashMap<>();
-        response.put("staffList", staffAdditionalInfoQueryResults);
+        response.put(STAFF_LIST, staffAdditionalInfoQueryResults);
         response.put("organization", orgData);
         response.putAll(clientInfo);
         return response;
+    }
+
+    private void setCitizenDetails(List<Map<String, Object>> citizenStaffList, List<TaskTypeAggregateResult> results, ClientStaffQueryResult client) {
+        Optional<TaskTypeAggregateResult> taskTypeAggregateResult = results.stream().filter(citizenTaskType -> citizenTaskType.getId() == client.getId()).findFirst();
+        HashMap<String, Object> citizen = new HashMap<>();
+        HashMap<String, Object> clientMap = new HashMap<>();
+        citizen.put("id", client.getId());
+        citizen.put("name", client.getName());
+        citizen.put("gender", client.getGender());
+        citizen.put("age", client.getAge());
+        citizen.put("localAreaTag", client.getLocalAreaTag());
+        citizen.put("address", client.getAddress());
+        citizen.put(PROFILE_PIC, (client.getProfilePic() == null) ? null : envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + client.getProfilePic());
+        citizen.put("taskTypes", (taskTypeAggregateResult.isPresent()) ? taskTypeAggregateResult.get().getTaskTypeIds() : Collections.emptyList());
+        Map<Long, Object> staffData = new HashMap<>();
+        client.getStaff().forEach(staff -> staffData.put((Long) staff.get("id"), staff.get("type")));
+        citizen.put("staff", staffData);
+        clientMap.put("Client", citizen);
+        citizenStaffList.add(clientMap);
     }
 
     public Map<String, Object> getOrganizationClientsWithPlanning(Long organizationId) {
@@ -736,31 +640,23 @@ public class ClientService {
         return response;
     }
 
-    @Async public CompletableFuture<Boolean> getPreRequisiteData(Long organizationId, Map<String, Object> clientData, List<Map<String, Object>> clientList) throws InterruptedException, ExecutionException {
-        Callable<Map<String, Object>> callableTaskDemand = () -> {
-            return taskDemandRestClient.getOrganizationClientsInfo(organizationId, clientList);
-        };
+     public CompletableFuture<Boolean> getPreRequisiteData(Long organizationId, Map<String, Object> clientData, List<Map<String, Object>> clientList) throws InterruptedException, ExecutionException {
+        Callable<Map<String, Object>> callableTaskDemand = () -> taskDemandRestClient.getOrganizationClientsInfo(organizationId, clientList);
         Future<Map<String, Object>> futureTaskDemand = asynchronousService.executeAsynchronously(callableTaskDemand);
         if (futureTaskDemand.get() != null) {
             clientData.putAll(futureTaskDemand.get());
         }
-        Callable<Map<String, Object>> callableTimeSlotData = () -> {
-            return timeSlotService.getTimeSlots(organizationId);
-        };
+        Callable<Map<String, Object>> callableTimeSlotData = () -> timeSlotService.getTimeSlots(organizationId);
         Future<Map<String, Object>> futureTimeSlotData = asynchronousService.executeAsynchronously(callableTimeSlotData);
         if (futureTimeSlotData.get() != null) {
             clientData.put("timeSlotList", futureTimeSlotData.get());
         }
-        Callable<List<OrganizationServiceQueryResult>> callableOrganizationServices = () -> {
-            return organizationServiceRepository.getOrganizationServiceByOrgId(organizationId);
-        };
+        Callable<List<OrganizationServiceQueryResult>> callableOrganizationServices = () -> organizationServiceRepository.getOrganizationServiceByOrgId(organizationId);
         Future<List<OrganizationServiceQueryResult>> futureOrganizationServices = asynchronousService.executeAsynchronously(callableOrganizationServices);
         if (futureOrganizationServices.get() != null) {
             clientData.put("serviceTypes", futureOrganizationServices.get());
         }
-        Callable<List<Map<String, Object>>> callableTagLists = () -> {
-            return organizationMetadataRepository.findAllByIsDeletedAndUnitId(organizationId);
-        };
+        Callable<List<Map<String, Object>>> callableTagLists = () -> organizationMetadataRepository.findAllByIsDeletedAndUnitId(organizationId);
         Future<List<Map<String, Object>>> futureTagLists = asynchronousService.executeAsynchronously(callableTagLists);
         if (futureTagLists.get() != null) {
             List<Object> localAreaTagsList = new ArrayList<>();
@@ -773,7 +669,7 @@ public class ClientService {
     }
 
     public Map<String, Object> getOrganizationClients(Long organizationId) throws InterruptedException, ExecutionException {
-        Map<String, Object> clientData = new HashMap<String, Object>();
+        Map<String, Object> clientData = new HashMap<>();
         List<Map<String, Object>> clientList = unitGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         if (clientList.isEmpty()) {
             return null;
@@ -786,7 +682,7 @@ public class ClientService {
         return clientData;
     }
 
-    public HashMap<String, Object> getOrganizationAllClients(long unitId, long staffId) {
+    public Map<String, Object> getOrganizationAllClients(long unitId, long staffId) {
         List<Map<String, Object>> mapList = unitGraphRepository.getAllClientsOfOrganization(unitId);
         List<Object> clientList = new ArrayList<>();
         for (Map<String, Object> map : mapList) {
@@ -823,13 +719,13 @@ public class ClientService {
         Map<String, Object> citizenDetails = new HashMap<>();
         Client citizen = clientGraphRepository.findOne(citizenId);
         if (!Optional.ofNullable(citizen).isPresent() || !Optional.ofNullable(citizen.getUser()).isPresent()) {
-            logger.debug("Searching client in database by id " + citizenId);
+            logger.debug("Searching client in database by id {}" , citizenId);
             exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ID_NOTFOUND, citizenId);
         }
         citizenDetails.put("id", citizen.getId());
-        citizenDetails.put("name", citizen.getUser().getFirstName() + " " + citizen.getUser().getLastName());
+        citizenDetails.put("name", citizen.getUser().getFirstName() + citizen.getUser().getLastName());
         citizenDetails.put("age", citizen.getUser().getAge());
-        citizenDetails.put("profilePic", citizen.getProfilePic() != null ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + citizen.getProfilePic() : "");
+        citizenDetails.put(PROFILE_PIC, citizen.getProfilePic() != null ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + citizen.getProfilePic() : "");
         citizenDetails.put("phone", citizen.getContactDetail() != null ? citizen.getContactDetail().retreiveContactNumbers() : "");
         citizenDetails.put("address", citizen.getHomeAddress());
         citizenDetails.put("cprNumber", citizen.getUser().getCprNumber());
@@ -847,74 +743,11 @@ public class ClientService {
         }
         Map<String, Object> citizenPlanningMap = new HashMap<>();
         List<Map<String, Object>> temporaryAddressList = clientGraphRepository.getClientTemporaryAddressById(citizenId);
-        citizenPlanningMap.put("temporaryAddressList", !temporaryAddressList.isEmpty() ? FormatUtil.formatNeoResponse(temporaryAddressList) : Collections.EMPTY_LIST);
+        citizenPlanningMap.put("temporaryAddressList", !temporaryAddressList.isEmpty() ? FormatUtil.formatNeoResponse(temporaryAddressList) : Collections.emptyList());
         ContactAddress address = citizen.getHomeAddress();
         citizenPlanningMap.put("latitude", address.getLatitude());
         citizenPlanningMap.put("longitude", address.getLongitude());
         return citizenPlanningMap;
-    }
-
-    public ClientTemporaryAddress changeLocationUpdateClientAddress(ClientExceptionDTO clientExceptionDto, Long unitId, Long clientId) {
-        List<Long> citizensIncludedHouseHoldMembers = new ArrayList<>(clientExceptionDto.getHouseHoldMembers());
-        citizensIncludedHouseHoldMembers.add(clientId);
-        List<Client> citizens = clientGraphRepository.findByIdIn(citizensIncludedHouseHoldMembers);
-        ClientTemporaryAddress clientTemporaryAddress = null;
-        if (clientExceptionDto.getTempAddress() != null) {
-            clientTemporaryAddress = updateClientTemporaryAddress(clientExceptionDto, unitId);
-        }
-        if (clientExceptionDto.getTemporaryAddress() != null) {
-            clientTemporaryAddress = (ClientTemporaryAddress) contactAddressGraphRepository.findOne(clientExceptionDto.getTemporaryAddress());
-        }
-        for (Client citizen : citizens) {
-            List<ClientTemporaryAddress> temporaryAddress = citizen.getTemporaryAddress();
-            temporaryAddress.add(clientTemporaryAddress);
-            citizen.setTemporaryAddress(temporaryAddress);
-        }
-        clientGraphRepository.saveAll(citizens);
-        return clientTemporaryAddress;
-    }
-
-    private ClientTemporaryAddress updateClientTemporaryAddress(ClientExceptionDTO clientExceptionDto, long unitId) {
-        AddressDTO addressDTO = clientExceptionDto.getTempAddress();
-        ZipCode zipCode;
-        ClientTemporaryAddress clientTemporaryAddress = ClientTemporaryAddress.getInstance();
-        if (addressDTO.isVerifiedByGoogleMap()) {
-            clientTemporaryAddress.setLongitude(addressDTO.getLongitude());
-            clientTemporaryAddress.setLatitude(addressDTO.getLatitude());
-            zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCode().getId());
-        } else {
-            clientTemporaryAddress.setVerifiedByVisitour(false);
-            clientTemporaryAddress.setCountry("Denmark");
-            clientTemporaryAddress.setLongitude(clientTemporaryAddress.getLongitude());
-            clientTemporaryAddress.setLatitude(clientTemporaryAddress.getLatitude());
-            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCode().getZipCode());
-        }
-        if (zipCode == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
-        }
-        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId());
-        if (municipality == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
-        }
-        Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
-        if (geographyData == null) {
-            logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-            exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
-        }
-        logger.info("Geography Data: " + geographyData);
-        clientTemporaryAddress.setMunicipality(municipality);
-        clientTemporaryAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
-        clientTemporaryAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-        clientTemporaryAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
-        clientTemporaryAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-        clientTemporaryAddress.setStreet(addressDTO.getStreet());
-        clientTemporaryAddress.setHouseNumber(addressDTO.getHouseNumber());
-        clientTemporaryAddress.setFloorNumber(addressDTO.getFloorNumber());
-        clientTemporaryAddress.setCity(zipCode.getName());
-        clientTemporaryAddress.setZipCode(zipCode);
-        clientTemporaryAddress.setCity(zipCode.getName());
-        clientTemporaryAddress.setLocationName(addressDTO.getLocationName());
-        return contactAddressGraphRepository.save(clientTemporaryAddress);
     }
 
     public TaskDemandVisitWrapper getClientDetailsForTaskDemandVisit(TaskDemandRequestWrapper taskDemandWrapper) {
@@ -937,19 +770,6 @@ public class ClientService {
         return taskDemandVisitWrapper;
     }
 
-    public TaskDemandVisitWrapper getPrerequisitesForTaskCreation(String userName, long unitId, long citizenId) {
-        Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Client citizen = clientGraphRepository.findOne(Long.valueOf(citizenId), 0);
-        ClientHomeAddressQueryResult clientHomeAddressQueryResult = clientGraphRepository.getHomeAddress(citizen.getId());
-        ZipCode zipCode = clientHomeAddressQueryResult.getZipCode();
-        ContactAddress homeAddress = clientHomeAddressQueryResult.getHomeAddress();
-        TaskAddress taskAddress = new TaskAddress("DK",zipCode.getZipCode(),homeAddress.getCity(),homeAddress.getStreet(),homeAddress.getHouseNumber());
-        Staff loggedInUser = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(userName).getId());
-        List<Long> preferredStaffIds = getPreferredStaffVisitourIds(citizen.getId());
-        List<Long> forbiddenStaffIds = getForbiddenStaffVisitourIds(citizen.getId());
-        return new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(citizen, preferredStaffIds, forbiddenStaffIds, taskAddress).staffId(loggedInUser.getId()).flsCredentials(flsCredentials).build();
-    }
-
     public List<Long> getClientIds(long unitId) {
         return clientGraphRepository.getCitizenIds(unitId);
     }
@@ -959,9 +779,9 @@ public class ClientService {
     }
 
     public OrganizationClientWrapper getOrgnizationClients(Long organizationId, OAuth2Authentication auth2Authentication) {
-        logger.debug("Finding citizen with Id: " + organizationId);
+        logger.debug("Finding citizen with Id: {}" , organizationId);
         List<Map<String, Object>> mapList = unitGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        logger.debug("CitizenList Size: " + mapList.size());
+        logger.debug("CitizenList Size: {}" , mapList.size());
         Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(auth2Authentication.getUserAuthentication().getPrincipal().toString()).getId());
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
         OrganizationClientWrapper organizationClientWrapper = new OrganizationClientWrapper(mapList, timeSlotData);
@@ -970,31 +790,11 @@ public class ClientService {
     }
 
     public OrganizationClientWrapper getOrgnizationClients(Long organizationId, List<Long> citizenId) {
-        logger.info("Finding citizen with Id: " + citizenId);
+        logger.info("Finding citizen with Id:{} " , citizenId);
         List<Map<String, Object>> mapList = unitGraphRepository.getClientsByClintIdList(citizenId);
-        logger.info("CitizenList Size: " + mapList.size());
+        logger.info("CitizenList Size: {}" , mapList.size());
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
         return new OrganizationClientWrapper(mapList, timeSlotData);
-    }
-
-    public List<EscalateTaskWrapper> getClientAggregation(Long unitId) {
-        List<EscalateTaskWrapper> escalatedTaskData = new ArrayList<>();
-        // List<EscalatedTasksWrapper> escalatedTasksWrappers = taskMongoRepository.getStaffNotAssignedTasksGroupByCitizen(unitId);
-        List<EscalatedTasksWrapper> escalatedTasksWrappers = taskServiceRestClient.getStaffNotAssignedTasks(unitId);
-        for (EscalatedTasksWrapper escalatedTasksWrapper : escalatedTasksWrappers) {
-            Client client = clientGraphRepository.findOne(escalatedTasksWrapper.getId());
-            for (EscalateTaskWrapper escalateTaskWrapper : escalatedTasksWrapper.getTasks()) {
-                escalateTaskWrapper.setCitizenName(client.getFullName());
-                if (Optional.ofNullable(client.getUser()).isPresent()) {
-                    if (client.getUser().getGender() != null)
-                        escalateTaskWrapper.setGender(client.getUser().getGender().name());
-                    escalateTaskWrapper.setAge(client.getUser().getAge());
-                }
-                escalateTaskWrapper.setCitizenId(client.getId());
-                escalatedTaskData.add(escalateTaskWrapper);
-            }
-        }
-        return escalatedTaskData;
     }
 
     public List<Client> getClientsByIdsInList(List<Long> citizenIds) {
@@ -1004,7 +804,7 @@ public class ClientService {
     public ClientMinimumDTO findByCPRNumber(long clientId, long unitId, String cprNumber) {
         Client client = clientGraphRepository.findOne(clientId, unitId);
         if (!Optional.ofNullable(client).isPresent()) {
-            logger.debug("Finding client by id " + client.getId());
+            logger.debug("Finding client by id {}" , client.getId());
             exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ID_NOTFOUND, clientId);
         }
         Client houseHoldPerson = clientGraphRepository.getClientByCPR(cprNumber);
@@ -1030,17 +830,6 @@ public class ClientService {
         return hasSameAddress;
     }
 
-    public ContactPersonTabDataDTO getDetailsForContactPersonTab(Long unitId, Long clientId) {
-        List<OrganizationServiceQueryResult> organizationServices = organizationServiceRepository.getOrganizationServiceByOrgId(unitId);
-        // TODO Fetch list of staff according to employment type ( According to dynamic value of employmnet type )
-        List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = staffGraphRepository.getAllMainEmploymentStaffDetailByUnitId(unitId);
-        List<ClientMinimumDTO> clientMinimumDTOs = getPeopleInHousehold(clientId);
-        List<Long> houseHoldIds = clientGraphRepository.getPeopleInHouseholdIdList(clientId);
-        houseHoldIds.add(clientId);
-        List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refactorContactPersonList(clientId, clientGraphRepository.getClientContactPersonDataList(clientId));
-        return new ContactPersonTabDataDTO(organizationServices, staffPersonalDetailQueryResults,clientMinimumDTOs,clientContactPersonQueryResults);
-    }
-
     public ClientContactPersonStructuredData saveContactPerson(Long clientId, ContactPersonDTO contactPersonDTO) {
         ClientContactPersonStructuredData clientContactPersonStructuredData = ObjectMapperUtils.copyPropertiesByMapper(contactPersonDTO,ClientContactPersonStructuredData.class);
         try {
@@ -1057,7 +846,7 @@ public class ClientService {
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId3(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_THREE, contactPersonDTO.getHouseHoldMembers());
             }
         } catch (Exception exception) {
-            logger.error("Error occurs while save contact person for client : " + clientId, exception);
+            logger.error("Error occurs while save contact person for client : {}" , clientId, exception);
             clientContactPersonStructuredData = null;
         }
         return clientContactPersonStructuredData;
@@ -1093,44 +882,15 @@ public class ClientService {
         }
     }
 
-    public List<ClientContactPersonStructuredData> refactorContactPersonList(Long clientId, List<ClientContactPersonQueryResultByService> clientContactPersonQueryResultByServices) {
-        List<ClientContactPersonStructuredData> clientContactPersonStructuredDataList = new ArrayList<>();
-        for (ClientContactPersonQueryResultByService clientContactPersonQueryResultByService : clientContactPersonQueryResultByServices) {
-            ClientContactPersonStructuredData clientContactPersonStructuredData = new ClientContactPersonStructuredData();
-            clientContactPersonStructuredData.setServiceId(clientContactPersonQueryResultByService.getServiceId());
-            List<Long> houseHolds = new ArrayList();
-            for (Map<String, Object> clientContactPersonQueryResult : clientContactPersonQueryResultByService.getClientContactPersonQueryResults()) {
-                if (Optional.ofNullable(clientContactPersonQueryResult.get("primaryStaffId")).isPresent())
-                    clientContactPersonStructuredData.setPrimaryStaffId(Long.valueOf(clientContactPersonQueryResult.get("primaryStaffId").toString()));
-                if (Optional.ofNullable(clientContactPersonQueryResult.get("secondaryStaffId")).isPresent())
-                    clientContactPersonStructuredData.setSecondaryStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryStaffId").toString()));
-                if (Optional.ofNullable(clientContactPersonQueryResult.get("secondaryTwoStaffId")).isPresent())
-                    clientContactPersonStructuredData.setSecondaryTwoStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryTwoStaffId").toString()));
-                if (Optional.ofNullable(clientContactPersonQueryResult.get("secondaryThreeStaffId")).isPresent())
-                    clientContactPersonStructuredData.setSecondaryThreeStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryThreeStaffId").toString()));
-                if (Optional.ofNullable(clientContactPersonQueryResult.get("houseHold")).isPresent()) {
-                    Long houseHoldId = Long.valueOf(clientContactPersonQueryResult.get("houseHold").toString());
-                    if (!houseHoldId.equals(clientId) && !houseHolds.contains(houseHoldId))
-                        houseHolds.add(houseHoldId);
-                }
-            }
-            clientContactPersonStructuredData.setHouseHolds(houseHolds);
-            clientContactPersonStructuredDataList.add(clientContactPersonStructuredData);
-        }
-        return clientContactPersonStructuredDataList;
-    }
-
-    public Map<String, Object> getOrganizationClientsWithFilter(Long unitId, ClientFilterDTO clientFilterDTO, String skip, String moduleId) {
+    public Map<String, Object> getOrganizationClientsWithFilter(Long unitId, ClientFilterDTO clientFilterDTO, String moduleId) {
         Map<String, Object> response = new HashMap<>();
         List<Long> citizenIds = new ArrayList<>();
         if (!clientFilterDTO.getServicesTypes().isEmpty() || !clientFilterDTO.getTimeSlots().isEmpty() || !clientFilterDTO.getTaskTypes().isEmpty() || clientFilterDTO.isNewDemands()) {
             List<TaskTypeAggregateResult> taskTypeAggregateResults = taskDemandRestClient.getCitizensByFilters(unitId, clientFilterDTO);
-            citizenIds.addAll(taskTypeAggregateResults.stream().map(taskTypeAggregateResult -> taskTypeAggregateResult.getId()).collect(Collectors.toList()));
+            citizenIds.addAll(taskTypeAggregateResults.stream().map(TaskTypeAggregateResult::getId).collect(Collectors.toList()));
         }
-        logger.debug("Finding citizen with Id: " + unitId);
+        logger.debug("Finding citizen with Id: {}" , unitId);
         List<Map> mapList = new ArrayList<>();
-        String imagePath = envConfig.getServerHost() + FORWARD_SLASH;
-        mapList.addAll(unitGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, unitId, imagePath, skip, moduleId));
         Organization parent = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.getStaffByUserId(UserContext.getUserDetails().getId(), parent.getId());
         Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), unitId, mapList);
@@ -1139,11 +899,8 @@ public class ClientService {
     }
 
     public ClientContactPersonStructuredData updateContactPerson(Long clientId, ContactPersonDTO contactPersonDTO) {
-        Client client = clientGraphRepository.findOne(clientId);
-        if (!Optional.ofNullable(client).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ID_NOTFOUND, clientId);
-        }
-        deleteContactPersonForService(contactPersonDTO.getServiceTypeId(), clientId);
+        Client client = clientGraphRepository.findById(clientId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_CLIENT_ID_NOTFOUND, clientId)));
+        deleteContactPersonForService(contactPersonDTO.getServiceTypeId(), client.getId());
         return saveContactPerson(clientId, contactPersonDTO);
     }
 
@@ -1152,14 +909,41 @@ public class ClientService {
     }
 
     public ClientPersonalCalenderPrerequisiteDTO getPrerequisiteForPersonalCalender(Long unitId, Long clientId) {
-        Unit unit = unitGraphRepository.findOne(unitId, 0);
-        if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, unitId);
-        }
+        Unit unit = unitGraphRepository.findById(unitId, 0).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, unitId)));
         List<Map<String, Object>> temporaryAddressList = FormatUtil.formatNeoResponse(clientGraphRepository.getClientTemporaryAddressById(clientId));
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode());
         List<ClientExceptionTypesDTO> clientExceptionTypesDTOS = clientExceptionRestClient.getClientExceptionTypes();
-        return new ClientPersonalCalenderPrerequisiteDTO(clientExceptionTypesDTOS,
-                temporaryAddressList, timeSlotWrappers);
+        return new ClientPersonalCalenderPrerequisiteDTO(clientExceptionTypesDTOS, temporaryAddressList, timeSlotWrappers);
+    }
+
+    public List<StaffTaskDTO> getAssignedTasksOfStaff(long unitId, long staffId, String date) {
+        Organization parentUnit = organizationService.fetchParentOrganization(unitId);
+        Staff staff = staffGraphRepository.getStaffByUnitId(parentUnit.getId(), staffId);
+        if (staff == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_ID_NOTFOUND);
+        }
+        List<StaffAssignedTasksWrapper> tasks = taskServiceRestClient.getAssignedTasksOfStaff(staffId, date);
+        List<Long> citizenIds = tasks.stream().map(StaffAssignedTasksWrapper::getId).collect(Collectors.toList());
+        List<Client> clients = clientGraphRepository.findByIdIn(citizenIds);
+        ObjectMapper objectMapper = new ObjectMapper();
+        StaffTaskDTO staffTaskDTO;
+        List<StaffTaskDTO> staffTaskDTOS = new ArrayList<>(clients.size());
+        int taskIndex = 0;
+        for (Client client : clients) {
+            staffTaskDTO = objectMapper.convertValue(client, StaffTaskDTO.class);
+            staffTaskDTO.setTasks(tasks.get(taskIndex).getTasks());
+            staffTaskDTOS.add(staffTaskDTO);
+            taskIndex++;
+        }
+        return staffTaskDTOS;
+    }
+
+    public ClientStaffInfoDTO getStaffInfo(String loggedInUserName) {
+        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(loggedInUserName).getId());
+        if (staff == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_ID_NOTFOUND);
+
+        }
+        return new ClientStaffInfoDTO(staff.getId());
     }
 }

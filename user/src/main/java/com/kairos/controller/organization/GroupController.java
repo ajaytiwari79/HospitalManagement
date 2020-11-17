@@ -1,5 +1,6 @@
 package com.kairos.controller.organization;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistence.model.organization.group.GroupDTO;
 import com.kairos.service.organization.GroupService;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 /**
  * Created By G.P.Ranjan on 19/11/19
@@ -72,5 +74,12 @@ public class GroupController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllStaffByGroupIds(@PathVariable Long unitId, @RequestBody List<Long> groupIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.getAllStaffIdsByGroupIds(unitId, groupIds));
+    }
+
+    @PutMapping(value = "/group/{id}/language_settings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfRelationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.updateTranslationOfGroup(id,translations));
     }
 }

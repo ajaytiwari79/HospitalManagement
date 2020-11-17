@@ -1,13 +1,13 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.service.mail.SendGridMailService;
+import com.kairos.commons.service.mail.KMailService;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.wta.IntervalBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
-import com.kairos.dto.user.staff.EmploymentDTO;
+import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
@@ -35,13 +35,12 @@ import static com.kairos.enums.wta.WTATemplateType.WTA_FOR_CARE_DAYS;
 /**
  * Created By G.P.Ranjan on 7/2/20
  **/
+
 @Service
 public class ActivityReminderService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShiftReminderService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityReminderService.class);
 
-    @Inject
-    private SendGridMailService sendGridMailService;
     @Inject
     private EnvConfig envConfig;
     @Inject
@@ -52,6 +51,8 @@ public class ActivityReminderService {
     private StaffActivitySettingRepository staffActivitySettingRepository;
     @Inject
     private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
+    @Inject
+    private KMailService kMailService;
 
     public void sendActivityReminderViaEmail(Long unitId, BigInteger entityId) {
         Activity activity = activityMongoRepository.findOne(entityId);
@@ -60,32 +61,34 @@ public class ActivityReminderService {
         }
         List<StaffActivitySetting> staffActivitySettings = staffActivitySettingRepository.findByActivityIdAndDeletedFalse(activity.getId());
         Set<Long> staffIds = staffActivitySettings.stream().map(StaffActivitySetting::getStaffId).collect(Collectors.toSet());
-        List<StaffPersonalDetail> staffPersonalDetails = userIntegrationService.getStaffDetailByIds(unitId, staffIds);
-        for (StaffPersonalDetail staffPersonalDetail : staffPersonalDetails) {
-            if(isCollectionNotEmpty(staffPersonalDetail.getEmployments()) && isNotNull(staffPersonalDetail.getPrivateEmail())) {
+        List<StaffDTO> staffDTOS = userIntegrationService.getStaffDetailByIds(unitId, staffIds);
+        for (StaffDTO staffDTO : staffDTOS) {
+            if(isCollectionNotEmpty(staffDTO.getEmployments()) && isNotNull(staffDTO.getPrivateEmail())) {
                 try {
-                    for (EmploymentDTO employment : staffPersonalDetail.getEmployments()) {
+                    for (EmploymentDTO employment : staffDTO.getEmployments()) {
                         WorkTimeAgreementBalance workTimeAgreementBalance = workTimeAgreementBalancesCalculationService.getWorkTimeAgreementBalance(unitId, employment.getId(), getCurrentLocalDate(), getCurrentLocalDate(), newHashSet(WTATemplateType.SENIOR_DAYS_PER_YEAR,CHILD_CARE_DAYS_CHECK,WTA_FOR_CARE_DAYS), activity.getId());
                         List<IntervalBalance> intervalBalances = workTimeAgreementBalance.getWorkTimeAgreementRuleTemplateBalances().stream().flatMap(workTimeAgreementRuleTemplateBalancesDTO -> workTimeAgreementRuleTemplateBalancesDTO.getIntervalBalances().stream()).filter(intervalBalance -> (int) intervalBalance.getAvailable()>0).collect(Collectors.toList());
                         for (IntervalBalance intervalBalance : intervalBalances) {
-                            sendEmail(staffPersonalDetail, activity, intervalBalance);
+                            sendEmail(staffDTO, activity, intervalBalance);
                         }
                     }
                 }catch (Exception ex){
-                    ex.printStackTrace();
+                    LOGGER.info("Exception {}", ex.getMessage());
                 }
             }
         }
     }
 
-    public void sendEmail(StaffPersonalDetail staffPersonalDetail, Activity activity, IntervalBalance intervalBalance) {
+    public void sendEmail(StaffDTO staffDTO, Activity activity, IntervalBalance intervalBalance) {
         String description = String.format(ABSENCE_ACTIVITY_REMINDER_EMAIL_BODY, activity.getName(), intervalBalance.getEndDate(), intervalBalance.getAvailable());
         Map<String,Object> templateParam = new HashMap<>();
-        templateParam.put("receiverName",staffPersonalDetail.getFullName());
-        templateParam.put("description", description);
-        if(isNotNull(staffPersonalDetail.getProfilePic())) {
-            templateParam.put("receiverImage",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+staffPersonalDetail.getProfilePic());
+        templateParam.put("receiverName", staffDTO.getFullName());
+        templateParam.put(DESCRIPTION, description);
+        if(isNotNull(staffDTO.getProfilePic())) {
+            templateParam.put("receiverImage",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ staffDTO.getProfilePic());
         }
-        sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, ACTIVITY_REMINDER,staffPersonalDetail.getPrivateEmail());
+        //sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, ACTIVITY_REMINDER,staffPersonalDetail.getPrivateEmail());
+        kMailService.sendMail(null, ACTIVITY_REMINDER,templateParam.get(DESCRIPTION).toString(),templateParam,DEFAULT_EMAIL_TEMPLATE, staffDTO.getPrivateEmail());
+        LOGGER.info("Mail Send {}", staffDTO.getPrivateEmail());
     }
 }

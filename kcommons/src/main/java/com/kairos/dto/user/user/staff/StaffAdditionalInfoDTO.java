@@ -1,9 +1,11 @@
 package com.kairos.dto.user.user.staff;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
@@ -11,16 +13,20 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.enums.StaffStatusEnum;
+import com.kairos.utils.CPRUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalTime;
+
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.asLocalTime;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * Created by oodles on 28/11/17.
@@ -88,20 +94,50 @@ public class StaffAdditionalInfoDTO {
         return isNullOrElse(seniorAndChildCareDays,new SeniorAndChildCareDaysDTO());
     }
 
-    public Set<AccessGroupRole> getRoles() {
-            Set<AccessGroupRole> roles = new HashSet<>();
-            if(userAccessRoleDTO!=null) {
-                if (Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement()) {
-                    roles.add(AccessGroupRole.MANAGEMENT);
-                }
-                if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
-                    roles.add(AccessGroupRole.STAFF);
-                }
+    public String getTimeSlotByShiftStartTime(Date startDate){
+        LocalTime shiftTime = asLocalTime(startDate);
+        for (TimeSlotWrapper timeSlotSet : this.timeSlotSets) {
+            LocalTime startTime = LocalTime.of(timeSlotSet.getStartHour(),timeSlotSet.getStartMinute());
+            LocalTime endTime = LocalTime.of(timeSlotSet.getEndHour(),timeSlotSet.getEndMinute());
+            if(!shiftTime.isBefore(startTime) && shiftTime.isBefore(endTime) || (startTime.isAfter(endTime) && (!startTime.isAfter(shiftTime) || shiftTime.isBefore(endTime)))){
+                return timeSlotSet.getName();
             }
+        }
+        return null;
+    }
+
+    public Set<AccessGroupRole> getRoles() {
+        Set<AccessGroupRole> roles = new HashSet<>();
+        if(userAccessRoleDTO!=null) {
+            if (userAccessRoleDTO.isManagement()) {
+                roles.add(AccessGroupRole.MANAGEMENT);
+            }
+            if (userAccessRoleDTO.isStaff()) {
+                roles.add(AccessGroupRole.STAFF);
+            }
+        }
+        return roles;
+    }
+
+    public Set<CalculateValueIfPlanned> getCalculateValueIfPlanneds() {
+        Set<CalculateValueIfPlanned> roles = new HashSet<>();
+        if(userAccessRoleDTO!=null) {
+            if (userAccessRoleDTO.isManagement()) {
+                roles.add(CalculateValueIfPlanned.MANAGER);
+            }
+            if (userAccessRoleDTO.isStaff()) {
+                roles.add(CalculateValueIfPlanned.STAFF);
+            }
+        }
         return roles;
     }
 
     public Long getUnitId() {
         return isNull(unitId) ? this.employment.getUnitId() : unitId;
+    }
+
+    @JsonIgnore
+    public int getStaffAgeByDate(LocalDate localDate) {
+        return isNotNull(cprNumber) ? CPRUtil.getAgeByCPRNumberAndStartDate(this.cprNumber, localDate) : 0;
     }
 }

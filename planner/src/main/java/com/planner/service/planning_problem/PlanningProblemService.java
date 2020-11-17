@@ -4,7 +4,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.enums.planning_problem.PlanningProblemType;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
 import com.planner.domain.planning_problem.PlanningProblem;
 import com.planner.enums.PlanningProblemStatus;
 import com.planner.repository.planning_problem.PlanningProblemRepository;
@@ -38,7 +38,7 @@ public class PlanningProblemService {
 
     public List<PlanningProblemDTO> getAllPlanningProblem() {
         List<PlanningProblem> planningProblems = planningProblemRepository.findAll();
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(planningProblems, PlanningProblemDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(planningProblems, PlanningProblemDTO.class);
     }
 
     public void updatePlanningProblem(PlanningProblemDTO planningProblemDTO) {
@@ -71,7 +71,7 @@ public class PlanningProblemService {
         return planningProblemDTO;
     }
 
-    public BigInteger addProblemFileAndGetPlanningProblemID(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO, Date fromPlanningDate, Date toPlanningDate, ShiftRequestPhasePlanningSolution shiftRequestPhasePlanningSolution){
+    public BigInteger addProblemFileAndGetPlanningProblemID(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO, Date fromPlanningDate, Date toPlanningDate, ShiftPlanningSolution shiftPlanningSolution){
         PlanningProblem planningProblem;
         if(shiftPlanningProblemSubmitDTO.getPlanningProblemId() != null){
             planningProblem = planningProblemRepository.findByIdNotDeleted(shiftPlanningProblemSubmitDTO.getPlanningPeriodId());
@@ -84,7 +84,7 @@ public class PlanningProblemService {
         planningProblemRepository.save(planningProblem);
         BigInteger  planningProblemId = planningProblem.getId();
         String problemFile = planningProblemId+"_PROBLEM";
-        FileIOUtil.writeShiftPlanningXMLToFile(shiftRequestPhasePlanningSolution,problemFile);
+        FileIOUtil.writeShiftPlanningXMLToFile(shiftPlanningSolution,problemFile);
         planningProblem.setStatus(PlanningProblemStatus.IN_PROGRESS);
         planningProblem.setProblemFileName(problemFile);
         planningProblemRepository.save(planningProblem);
@@ -92,7 +92,7 @@ public class PlanningProblemService {
     }
 
 
-    public void addSolutionFile( ShiftRequestPhasePlanningSolution planningSolution,BigInteger  planningProblemId){
+    public void addSolutionFile(ShiftPlanningSolution planningSolution, BigInteger  planningProblemId){
       PlanningProblem planningProblem = planningProblemRepository.findByIdNotDeleted(planningProblemId);
         String solutionFile = planningProblemId+"_SOLUTION";
         FileIOUtil.writeShiftPlanningXMLToFile(planningSolution,solutionFile);

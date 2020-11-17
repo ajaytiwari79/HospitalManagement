@@ -8,8 +8,10 @@ import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -22,20 +24,27 @@ public interface TimeSlotGraphRepository extends Neo4jBaseRepository<TimeSlot,Lo
     @Query("MATCH (org:Unit)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1}}) where id(org)={0} AND (timeSlotSet.endDate is null OR DATE(timeSlotSet.endDate)>=DATE()) with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
             "MATCH (timeSlotSet)-[r:HAS_TIME_SLOT]->(timeSlot:TimeSlot) with timeSlot order by timeSlot.startHour,r\n" +
             "RETURN id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.shiftStartTime as shiftStartTime")
-    List<TimeSlotWrapper> getTimeSlots(Long unitId, TimeSlotMode timeSlotMode);
+    List<TimeSlotWrapper> getTimeSlots(@NotNull Long unitId, @NotNull TimeSlotMode timeSlotMode);
 
-    @Query("MATCH (org)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1},timeSlotType:{2}}) where id(org)={0} AND (timeSlotSet.endDate is null OR DATE(timeSlotSet.endDate)>=DATE()) with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
-            "MATCH (timeSlotSet)-[r:HAS_TIME_SLOT]->(timeSlot:TimeSlot) with timeSlot order by timeSlot.startHour,r\n" +
+    @Query("MATCH (org)-[:" + HAS_TIME_SLOT_SET + "]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1},timeSlotType:{2}}) where id(org)={0} AND (timeSlotSet.endDate is null OR DATE(timeSlotSet.endDate)>=DATE()) with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
+            "MATCH (timeSlotSet)-[r:HAS_TIME_SLOT]->(timeSlot:TimeSlot) with r,timeSlot order by timeSlot.startHour,r\n" +
             "RETURN id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.shiftStartTime as shiftStartTime")
-    List<TimeSlotWrapper> getUnitTimeSlotsByType(Long unitId, TimeSlotMode timeSlotMode,TimeSlotType timeSlotType);
+    List<TimeSlotWrapper> getUnitTimeSlotsByType(@NotNull Long unitId, @NotNull TimeSlotMode timeSlotMode, @NotNull TimeSlotType timeSlotType);
+
+
+    @Query("MATCH (org:Unit)-[:" + HAS_TIME_SLOT_SET + "]->(timeSlotSet:TimeSlotSet{timeSlotMode:{2},timeSlotType:{3}}) where id(org)={0} AND (timeSlotSet.endDate is null OR DATE(timeSlotSet.endDate)>=DATE()) with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
+            "MATCH (timeSlotSet)-[r:HAS_TIME_SLOT]->(timeSlot:TimeSlot) WHERE timeSlot.name in {1} with r,timeSlot order by timeSlot.startHour,r\n" +
+            "RETURN id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.shiftStartTime as shiftStartTime")
+    List<TimeSlotWrapper> getUnitTimeSlotsByIds(@NotNull Long unitId, @NotNull Set<String> timeslotNames, @NotNull TimeSlotMode timeSlotMode, @NotNull TimeSlotType timeSlotType);
+
 
     @Query("Match (timeSlotSet:TimeSlotSet),(timeSlot:TimeSlot) where id(timeSlotSet)={0} AND id(timeSlot)={1}\n" +
-            "Match (timeSlotSet)-[r:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot) set r.name={2},r.startHour={3},r.startMinute={4},r.endHour={5},r.endMinute={6},r.shiftStartTime={7} return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
-    Map<String,Object> updateTimeSlot(long timeSlotSetId, long timeSlotId, String name, int startHour, int startMinute, int endHour, int endMinute, boolean shiftStartTime);
+            "Match (timeSlotSet)-[r:" + HAS_TIME_SLOT + "]->(timeSlot:TimeSlot) set r.name={2},r.startHour={3},r.startMinute={4},r.endHour={5},r.endMinute={6},r.shiftStartTime={7} return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
+    Map<String, Object> updateTimeSlot(long timeSlotSetId, long timeSlotId, String name, int startHour, int startMinute, int endHour, int endMinute, boolean shiftStartTime);
 
-    @Query("Match (timeSlotSet:TimeSlotSet)-[r:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot)\n" +
+    @Query("Match (timeSlotSet:TimeSlotSet)-[r:" + HAS_TIME_SLOT + "]->(timeSlot:TimeSlot)\n" +
             "where id(timeSlotSet)={0} and id(timeSlot)={1} set r.deleted=true")
-    void deleteTimeSlot(Long timeSlotSetId,Long timeSlotId);
+    void deleteTimeSlot(Long timeSlotSetId, Long timeSlotId);
 
     @Query("Match (org:Unit) where id(org)={0}\n" +
             "Match (org)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:org.timeSlotMode}) where (timeSlotSet.endDate is null OR date(timeSlotSet.endDate)>=DATE()) with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
@@ -57,7 +66,7 @@ public interface TimeSlotGraphRepository extends Neo4jBaseRepository<TimeSlot,Lo
 
     @Query("MATCH (org)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org) IN {0} AND org.timeSlotMode=timeSlotSet.timeSlotMode" +
             " AND timeSlotSet.timeSlotType ={1} with org, timeSlotSet order by timeSlotSet.startDate limit 1\n" +
-            "MATCH (timeSlotSet)-[r:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot) with  org, timeSlot order by timeSlot.startHour,r\n" +
+            "MATCH (timeSlotSet)-[r:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot) with  org,r, timeSlot order by timeSlot.startHour \n" +
             "RETURN id(org) as unitId,id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.shiftStartTime as shiftStartTime ORDER BY  r.startHour")
     List<TimeSlotWrapper> getShiftPlanningTimeSlotsByUnitIds(List<Long> unitId,   TimeSlotType timeSlotType);
 

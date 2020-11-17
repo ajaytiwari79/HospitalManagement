@@ -4,6 +4,7 @@ package com.kairos.controller.payroll;
  *
  */
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.payroll.BankDTO;
 import com.kairos.dto.activity.payroll.OrganizationBankDetailsDTO;
 import com.kairos.dto.activity.payroll.StaffBankAndPensionProviderDetailsDTO;
@@ -82,6 +83,12 @@ public class BankDetailsController {
     @GetMapping(UNIT_URL+ORGANIZATION_BANK_DETAILS)
     public ResponseEntity<Map<String,Object>> getBankDetailsOfOrganization(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.getBankDetailsOfOrganization(unitId));
+    }
+
+    @ApiOperation("update translation data ")
+    @PutMapping(COUNTRY_URL+"/bank_details/{id}/language_settings")
+    public ResponseEntity<Map<String,Object>> updatePensionProviderTranslation(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,bankService.updateTranslation(id,translations));
     }
 
 }

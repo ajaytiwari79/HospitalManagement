@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solver>
   <!--<environmentMode>FULL_ASSERT</environmentMode>-->
-  <solutionClass>com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution</solutionClass>
+  <solutionClass>com.kairos.shiftplanning.solution.ShiftPlanningSolution</solutionClass>
   <entityClass>com.kairos.shiftplanning.domain.activity.ActivityLineInterval</entityClass>
   <entityClass>com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval</entityClass>
   <entityClass>com.kairos.shiftplanning.domain.shift.ShiftImp</entityClass>
@@ -17,7 +17,7 @@
       <scoreDrl>com/kairos/shiftplanning/rules/activityConstraintsRule.drl</scoreDrl>-->
       <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
   </scoreDirectorFactory>
-    <constructionHeuristic>
+    <!--<constructionHeuristic>
         <queuedEntityPlacer>
             <entitySelector id="activityLineIntervalSelector">
                 <entityClass>com.kairos.shiftplanning.domain.activity.ActivityLineInterval</entityClass>
@@ -42,7 +42,7 @@
                 </valueSelector>
             </changeMoveSelector>
         </queuedEntityPlacer>
-    </constructionHeuristic>
+    </constructionHeuristic>-->
     <localSearch>
     <unionMoveSelector>
         <moveIteratorFactory>
@@ -85,6 +85,6 @@
         </termination>
     </localSearch>-->
     <termination>
-        <secondsSpentLimit>300</secondsSpentLimit>
+        <secondsSpentLimit>900</secondsSpentLimit>
     </termination>
 </solver>

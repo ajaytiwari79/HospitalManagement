@@ -14,10 +14,9 @@ import java.util.Set;
  * Created by vipul on 2/11/17.
  */
 public class ArrayUtil {
-    private static final Logger logger = LoggerFactory.getLogger(ArrayUtil.class);
 
     public static List<Long> getUniqueElementWhichIsNotInFirst(List<Long> firstList, List<Long> secondList) {
-        List<Long> uniqueElement=new ArrayList<Long>();
+        List<Long> uniqueElement=new ArrayList<>();
         for (int i = 0; i < secondList.size(); i++) {
             if (firstList.contains(secondList.get(i))){
                 continue;

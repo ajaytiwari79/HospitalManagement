@@ -2,6 +2,7 @@ package com.kairos.controller.expertise;
 
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
@@ -90,11 +91,6 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId));
     }
 
-    @ApiOperation(value = "Update Age range in Expertise")
-    @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/set_age_range")
-    public ResponseEntity<Map<String, Object>> updateAgeRangeInExpertise(@PathVariable Long expertiseId, @RequestBody @Valid List<AgeRangeDTO> ageRangeDTO, @RequestParam("wtaType") String wtaType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateAgeRangeInExpertise(expertiseId, ageRangeDTO, wtaType));
-    }
 
     @ApiOperation(value = "save a functional payment settings for expertise")
     @PostMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/functional_payment")
@@ -111,7 +107,7 @@ public class ExpertiseController {
     @ApiOperation(value = "update a functional payment settings for expertise")
     @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/functional_payment")
     public ResponseEntity<Map<String, Object>> updateFunctionalPayment(@PathVariable Long expertiseId, @RequestBody @Valid FunctionalPaymentDTO functionalPaymentDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.updateFunctionalPayment(expertiseId, functionalPaymentDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionalPaymentService.updateFunctionalPayment(functionalPaymentDTO));
     }
 
     @ApiOperation(value = "Add a functional payment settings for functional_payment")
@@ -192,7 +188,7 @@ public class ExpertiseController {
     @ApiOperation(value = "Get senior Days and child Care days at country")
     @GetMapping(value = "/expertise/{expertiseId}/senior_and_child_care_days")
     public ResponseEntity<Map<String, Object>> getSeniorAndChildCareDaysAtCountry(@PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getSeniorAndChildCareDays(expertiseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getSeniorAndChildCareDays(expertiseId,null));
     }
     //-------------------UNIT LEVEL ----------------------\\
 
@@ -242,8 +238,8 @@ public class ExpertiseController {
 
     @ApiOperation(value = "get all expertise for multiple units")
     @GetMapping(value = UNIT_URL + "/units_expertise")
-    public ResponseEntity<Map<String, Object>> findAllExpertiseWithUnits() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.findAllExpertiseWithUnits());
+    public ResponseEntity<Map<String, Object>> findAllExpertiseWithUnits(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.findAllExpertiseWithUnits(unitId));
     }
 
 
@@ -251,6 +247,13 @@ public class ExpertiseController {
     @GetMapping(value =  "/protected_days_setting")
     public ResponseEntity<Map<String, Object>> findAllExpertiseAndLinkProtectedDaysOfSetting() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.linkProtectedDaysOffSetting(new ArrayList<>(),new ArrayList<>()));
+    }
+
+    @PutMapping(value = UNIT_URL+"/expertise/{id}/languageSettings")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfExpertise(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateTranslation(id,translations));
     }
 
 }

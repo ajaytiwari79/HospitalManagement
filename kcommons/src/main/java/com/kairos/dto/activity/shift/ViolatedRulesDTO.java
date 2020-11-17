@@ -1,12 +1,13 @@
 package com.kairos.dto.activity.shift;
 
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.enums.shift.ShiftEscalationReason;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigInteger;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
@@ -17,10 +18,17 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ViolatedRulesDTO {
 
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements = new ArrayList<>();
     private List<ActivityRuleViolation> activities = new ArrayList<>();
+    private Set<ShiftEscalationReason> escalationReasons;
+    private boolean escalationResolved;
+    private AccessGroupRole escalationCausedBy;
+    private boolean draft;
+    private BigInteger overlapWithShiftId;
+    private String overlapMessage;
 
     public List<WorkTimeAgreementRuleViolation> getWorkTimeAgreements() {
         workTimeAgreements=Optional.ofNullable(workTimeAgreements).orElse(new ArrayList<>());

@@ -1,12 +1,16 @@
 package com.kairos.service.employment;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
+import com.kairos.dto.activity.wta.templates.BreakWTATemplateDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.enums.IntegrationOperation;
@@ -49,7 +53,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
 import static com.kairos.constants.ApiConstants.GET_VERSION_WTA;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -66,8 +70,6 @@ public class EmploymentCTAWTAService {
     private EmploymentGraphRepository employmentGraphRepository;
     @Inject
     private OrganizationBaseRepository organizationBaseRepository;
-    @Inject
-    private CountryService countryService;
     @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
@@ -89,38 +91,50 @@ public class EmploymentCTAWTAService {
     @Inject private ActivityIntegrationService activityIntegrationService;
     @Inject
     private ExpertiseService expertiseService;
+    @Inject private SeniorityLevelService seniorityLevelService;
 
     public CtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId,LocalDate selectedDate,Long employmentId){
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = activityIntegrationService.getCTAWTAByExpertiseAndDate(expertiseId,unitId,selectedDate,employmentId);
-        Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId,2);
-        ExpertiseLine expertiseLine=currentExpertise.get().getCurrentlyActiveLine(selectedDate);
-        SeniorityLevel appliedSeniorityLevel = employmentService.getSeniorityLevelByStaffAndExpertise(staffId, expertiseLine,currentExpertise.get().getId());
+        Expertise currentExpertise = expertiseGraphRepository.findById(expertiseId,2).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_EXPERTISE_ID_NOTFOUND,expertiseId)));
+        if(selectedDate.isBefore(currentExpertise.getStartDate())){
+            exceptionService.actionNotPermittedException(EMPLOYMENT_START_DATE_CANNOT_BE_BEFORE_EXPERTISE_START_DATE);
+        }
+        ExpertiseLine expertiseLine=currentExpertise.getCurrentlyActiveLine(selectedDate);
+        SeniorityLevel appliedSeniorityLevel = seniorityLevelService.getSeniorityLevelByStaffAndExpertise(staffId, expertiseLine,currentExpertise.getId());
         SeniorityLevelQueryResult seniorityLevel = null;
         if (appliedSeniorityLevel != null) {
             seniorityLevel = seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId());
-            List<FunctionDTO> functionDTOs = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.get().getId(), selectedDate.toString(), appliedSeniorityLevel.getId(), unitId);
+            List<FunctionDTO> functionDTOs = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevel(currentExpertise.getId(), selectedDate.toString(), appliedSeniorityLevel.getId(), unitId);
             seniorityLevel.setFunctions(functionDTOs);
         }
         ExpertiseDTO expertiseDTO=ObjectMapperUtils.copyPropertiesByMapper(currentExpertise,ExpertiseDTO.class);
         expertiseDTO.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
         expertiseDTO.setNumberOfWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
 
-        return new CtaWtaQueryResult(ctawtaAndAccumulatedTimebankWrapper.getCta(),ctawtaAndAccumulatedTimebankWrapper.getWta(),expertiseDTO,seniorityLevel,currentExpertise.get().getUnion());
+        return new CtaWtaQueryResult(ctawtaAndAccumulatedTimebankWrapper.getCta(),ctawtaAndAccumulatedTimebankWrapper.getWta(),expertiseDTO,seniorityLevel,currentExpertise.getUnion());
     }
 
     //TODO this must be moved to activity
-    public EmploymentQueryResult updateEmploymentWTA(Long unitId, Long employmentId, BigInteger wtaId, WTADTO updateDTO) {
+    public EmploymentQueryResult updateEmploymentWTA(Long unitId, Long employmentId, BigInteger wtaId, WTADTO updateDTO,Boolean saveAsDraft){
         Employment employment = employmentGraphRepository.findOne(employmentId);
         if (!Optional.ofNullable(employment).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_INVALIDEMPLOYMENTID, employmentId);
 
         }
-        if (employment.getEndDate() != null && updateDTO.getEndDate() != null && updateDTO.getEndDate().isBefore(employment.getEndDate())) {
-            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE);
+        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateList=updateDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplateDTO -> WTATemplateType.WTA_FOR_BREAKS_IN_SHIFT.equals(wtaBaseRuleTemplateDTO.getWtaTemplateType()) && !wtaBaseRuleTemplateDTO.isDisabled()).collect(Collectors.toList());
+            if(isCollectionNotEmpty(wtaBaseRuleTemplateList)){
+                wtaBaseRuleTemplateList.forEach(wtaRuleTemplate->{
+                     if(WTATemplateType.WTA_FOR_BREAKS_IN_SHIFT.equals(wtaRuleTemplate.getWtaTemplateType()) && (wtaRuleTemplate instanceof BreakWTATemplateDTO)){
+                         BreakWTATemplateDTO breakWTATemplateDTO =(BreakWTATemplateDTO)wtaRuleTemplate;
+                        for(BreakAvailabilitySettings breakAvailabilitySettings :breakWTATemplateDTO.getBreakAvailability()){
+                            if(breakAvailabilitySettings.getShiftPercentage()<=0 || breakAvailabilitySettings.getShiftPercentage()>100){
+                                exceptionService.actionNotPermittedException(SHIFT_PERCENTAGE_CAN_NOT_BE_LESS_THEN_ZERO_OR_GREATER_THEN_HUNDRED);
+                            }
+                        }
+                     }
+                });
         }
-        if (employment.getEndDate() != null && updateDTO.getStartDate().isAfter(employment.getEndDate())) {
-            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE);
-        }
+
         if(!activityIntegrationService.isStaffNightWorker(unitId,employment.getStaff().getId())) {
             List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS=updateDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplateDTO -> WTATemplateType.DAYS_OFF_AFTER_A_SERIES.equals(wtaBaseRuleTemplateDTO.getWtaTemplateType()) && !wtaBaseRuleTemplateDTO.isDisabled()).collect(Collectors.toList());
             if(isCollectionNotEmpty(wtaBaseRuleTemplateDTOS)){
@@ -129,13 +143,12 @@ public class EmploymentCTAWTAService {
         }
         updateDTO.setId(wtaId);
         updateDTO.setEmploymentEndDate(employment.getEndDate());
-        WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfEmployment(updateDTO, employment.isPublished());
+        WTAResponseDTO wtaResponseDTO = activityIntegrationService.updateWTAOfEmployment(unitId,updateDTO, employment.isPublished(),saveAsDraft);
         return employmentService.getBasicDetails(employment, wtaResponseDTO, employment.getEmploymentLines().get(0));
     }
 
     public CTATableSettingWrapper getAllCTAOfStaff(Long unitId, Long staffId) {
-        User user = userGraphRepository.getUserByStaffId(staffId);
-        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsAndWTAByUser(user.getId());
+        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsByStaffId(staffId);
         List<Long> employmentIds = employmentQueryResults.stream().map(EmploymentQueryResult::getId).collect(Collectors.toList());
         List<NameValuePair> requestParam = Collections.singletonList(new BasicNameValuePair("employmentIds", employmentIds.toString().replace("[", "").replace("]", "")));
         CTATableSettingWrapper ctaTableSettingWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_CTA, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTATableSettingWrapper>>() {
@@ -151,8 +164,7 @@ public class EmploymentCTAWTAService {
         return ctaTableSettingWrapper;
     }
     public WTATableSettingWrapper getAllWTAOfStaff(Long unitId, Long staffId) {
-        User user = userGraphRepository.getUserByStaffId(staffId);
-        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsAndWTAByUser(user.getId());
+        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsByStaffId(staffId);
         List<Long> employmentIds = employmentQueryResults.stream().map(EmploymentQueryResult::getId).collect(Collectors.toList());
 
         List<NameValuePair> param = Collections.singletonList(new BasicNameValuePair("employmentIds", employmentIds.toString().replace("[", "").replace("]", "")));

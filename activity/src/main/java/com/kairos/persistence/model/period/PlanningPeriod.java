@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * Created by prerna on 6/4/18.
@@ -94,5 +95,8 @@ public class PlanningPeriod extends MongoBaseEntity {
 
         }
     }
-    
+
+    public Set<Long> getPublishEmploymentIds() {
+        return isNullOrElse(publishEmploymentIds,new HashSet<>());
+    }
 }

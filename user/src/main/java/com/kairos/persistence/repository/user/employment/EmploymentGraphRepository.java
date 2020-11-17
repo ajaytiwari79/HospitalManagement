@@ -55,7 +55,8 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query("MATCH (staff:Staff)-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) where id(staff) IN {0} " +
             "MATCH(staff)-[rel:"+STAFF_HAS_EXPERTISE+"]->(expertise:Expertise) " +
             "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(employment:Employment) " +
-            "RETURN id(staff) as id,staff.firstName as firstName,staff.lastName as lastName,contactDetail.privateEmail as privateEmail,staff.profilePic as profilePic,collect(id(expertise)) as expertiseIds,collect(employment) as employments")
+            "OPTIONAL MATCH (staff)-[:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skills:Skill{isEnabled:true})"+
+            "RETURN id(staff) as id,staff.firstName as firstName,staff.lastName as lastName,contactDetail.privateEmail as privateEmail,staff.profilePic as profilePic,collect(id(expertise)) as expertiseIds,collect(employment) as employments,COLLECT(id(skills)) AS skillIds")
     List<StaffPersonalDetailQueryResult> getStaffDetailByIds(Set<Long> staffIds, LocalDate currentDate);
 
     @Query("MATCH (employment:Employment{deleted:false}) where id(employment) IN {0} \n" +
@@ -113,7 +114,6 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query("MATCH(employmentLine:EmploymentLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)  where id(employmentLine)={0} return employmentLine,employmentRel,employmentType")
     EmploymentLineEmploymentTypeRelationShip findEmploymentTypeByEmploymentId(Long employmentId);
 
-
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment{deleted:false}) where id(staff)={0} AND ( employment.endDate IS NULL OR DATE(employment.endDate) > DATE({1}))  return employment")
     List<Employment> getEmploymentsFromEmploymentEndDate(Long staffId, String endDate);
 
@@ -145,12 +145,13 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     List<Map<Long, Long>> getMapOfEmploymentAndExpertiseId(Long unitId);
 
 
-    @Query("MATCH (user:User)-[:"+BELONGS_TO+"]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:"+HAS_POSITIONS+"]-(org:Organization) where id(user)={0}\n" +
+    @Query("MATCH (staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:"+HAS_POSITIONS+"]-(org:Organization) where id(staff)={0}\n" +
             "MATCH(org)-[:"+HAS_UNIT+"]->(subOrg:Unit)\n" +
             "MATCH(subOrg)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false,published:true})<-[:"+BELONGS_TO_STAFF+"]-(staff)\n" +
             "return  id(employment) as id,employment.history as history, \n" +
             "id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo ORDER BY employment.creationDate")
-    List<EmploymentQueryResult> getAllEmploymentsBasicDetailsAndWTAByUser(long userId);
+    List<EmploymentQueryResult> getAllEmploymentsBasicDetailsByStaffId(Long staffId);
+
 
     @Query( "MATCH(staff:Staff)-[expertise_from_date:STAFF_HAS_EXPERTISE]->(expertise:Expertise) \n" +
             "WITH staff,expertise,expertise_from_date.expertiseStartDate as expertise_from_date \n" +
@@ -370,6 +371,15 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query("MATCH(employmentLine:EmploymentLine)-[seniorityRel:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[payGradeRel:" + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) where id(employmentLine) IN  {0}\n" +
             "RETURN employmentLine,seniorityLevel,seniorityRel,payGrade,payGradeRel")
     List<EmploymentLine> getEmploymentLineByIds(List<Long> employmentLineIds);
+
+    @Query("match (e:Employment)<-[staffRel:BELONGS_TO_STAFF]-(s:Staff) where id(s) in {0} " +
+            "match(e)-[expRel:HAS_EXPERTISE_IN]-(ex:Expertise) match(e)-[empLineRel:HAS_EMPLOYMENT_LINES]-(em:EmploymentLine) \n" +
+            "match(s)-[userRel:BELONGS_TO]-(user:User)\n" +
+            "optional match(s)-[tagRel:BELONGS_TO_TAGS]-(tag:Tag) with e,staffRel,s,expRel,ex,empLineRel,em,tagRel,tag,userRel,user\n" +
+            "Optional Match(s)-[childRel:HAS_CHILDREN]-(child:StaffChildDetail) with e,staffRel,s,expRel,ex,empLineRel,em,tagRel,tag,userRel,user,childRel,child\n" +
+            "return e,staffRel,s,expRel,ex,empLineRel,em,tagRel,tag,userRel,user,childRel,child")
+    List<Employment> getEmploymentByStaffIds(List<Long> staffIds);
+
 
 }
 

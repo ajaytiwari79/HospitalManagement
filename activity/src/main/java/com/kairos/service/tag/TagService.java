@@ -1,6 +1,9 @@
 package com.kairos.service.tag;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.controller.staffing_level.StaffingLevelController;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.MasterDataTypeEnum;
@@ -21,6 +24,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -87,15 +92,18 @@ public class TagService extends MongoBaseService {
 
         HashMap<String,Object> tagsData = new HashMap<>();
         List<Tag> tags;
+        List<TagDTO> tagDTOS ;
         if(masterDataType == null){
             tags = tagMongoRepository.findAllTagByCountryIdAndNameAndDeletedAndCountryTagTrue(countryId, filterText, false);
         } else {
             tags = tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeletedAndCountryTagTrue(countryId, filterText, masterDataType.toString(), false);
         }
+
         if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.equals(masterDataType)){
             tags.addAll(userIntegrationService.getAllStaffTagsByCountryIdOrOrganizationId(countryId, filterText, true));
         }
-        tagsData.put("tags",tags);
+        tagDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(tags, com.kairos.dto.activity.tags.TagDTO.class);
+        tagsData.put("tags",tagDTOS);
         return tagsData;
     }
 
@@ -163,7 +171,8 @@ public class TagService extends MongoBaseService {
         if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.equals(masterDataType)){
             tags.addAll(userIntegrationService.getAllStaffTagsByCountryIdOrOrganizationId(organizationId, filterText, false));
         }
-        tagsData.put("tags",tags);
+        List<com.kairos.dto.activity.tags.TagDTO> tagDTOS =ObjectMapperUtils.copyCollectionPropertiesByMapper(tags, com.kairos.dto.activity.tags.TagDTO.class);
+        tagsData.put("tags",tagDTOS);
         return tagsData;
     }
 
@@ -197,10 +206,20 @@ public class TagService extends MongoBaseService {
     public boolean unlinkTagFromActivity(BigInteger tagId){
         List<Activity> activities = activityMongoRepository.findActivitiesByTagId(tagId);
         for (Activity activity : activities) {
-            activity.getGeneralActivityTab().setTags(activity.getGeneralActivityTab().getTags().stream().filter(t->!t.equals(tagId)).collect(Collectors.toList()));
+            activity.getActivityGeneralSettings().setTags(activity.getActivityGeneralSettings().getTags().stream().filter(t->!t.equals(tagId)).collect(Collectors.toList()));
             activity.setTags(activity.getTags().stream().filter(t->!t.equals(tagId)).collect(Collectors.toList()));
         }
         activityMongoRepository.saveAll(activities);
         return true;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger tagId, Map<String,TranslationInfo> translations) {
+        Tag tag =tagMongoRepository.findTagByIdAndEnabled(tagId);
+        if(ObjectUtils.isNull(tag)){
+            exceptionService.dataNotFoundByIdException(MESSAGE_TAG_ID,tagId);
+        }
+        tag.setTranslations(translations);
+        tagMongoRepository.save(tag);
+        return tag.getTranslations();
     }
 }

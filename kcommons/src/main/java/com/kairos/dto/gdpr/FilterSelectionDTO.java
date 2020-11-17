@@ -20,11 +20,10 @@ public class FilterSelectionDTO<T> {
 
     private Long id;
     @NotEmpty(message = "error.message.selection.list.notNull")
-    private List<FilterSelection> filtersData;
+    private List<FilterSelection> filtersDat3a;
     private FilterType name;
     private Set<T> value;
     private int sequence;
-
 
     private String moduleId;
 

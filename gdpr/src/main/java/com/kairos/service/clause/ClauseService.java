@@ -3,6 +3,8 @@ package com.kairos.service.clause;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.master_data.ClauseDTO;
 import com.kairos.dto.gdpr.master_data.MasterClauseDTO;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
@@ -17,6 +19,7 @@ import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
+import com.kairos.rest_client.GDPRToUserIntegrationService;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.exception.ExceptionService;
@@ -58,6 +61,9 @@ public class ClauseService {
     @Inject
     private TemplateTypeRepository templateTypeRepository;
 
+    @Inject
+    private GDPRToUserIntegrationService gdprToUserIntegrationService;
+
 
     /**
      * @param referenceId    country id or unit id
@@ -77,10 +83,22 @@ public class ClauseService {
             previousClause = prepareOrganizationClauseData(referenceId, clauseDto, new OrganizationClause());
         } else {
             previousClause = prepareMasterClauseData(referenceId, clauseDto, new MasterClause());
+            this.saveClauseForOrganization(referenceId, (MasterClauseDTO) clauseDto);
         }
         clauseRepository.save(previousClause);
         clauseDto.setId(previousClause.getId());
         return clauseDto;
+    }
+
+    private void saveClauseForOrganization(Long countryId, MasterClauseDTO clauseDto) {
+        List<Clause> clauses = new ArrayList<>();
+        List<Long> orgSubTypeIds = clauseDto.getOrganizationSubTypes().stream().map(OrganizationSubTypeDTO::getId).collect(Collectors.toList());
+        List<Long> serviceSubTypeIds = clauseDto.getOrganizationSubServices().stream().map(SubServiceCategoryDTO::getId).collect(Collectors.toList());
+        List<Long> orgIds = gdprToUserIntegrationService.getUnitIdsByOrgSubTypeId(countryId, orgSubTypeIds, serviceSubTypeIds);
+        for (Long orgId : orgIds) {
+            clauses.add(prepareOrganizationClauseData(orgId, clauseDto, new OrganizationClause()));
+        }
+        clauseRepository.saveAll(clauses);
     }
 
     private <E extends ClauseDTO> Clause prepareOrganizationClauseData(Long referenceId, E clauseDto, OrganizationClause clause) {
@@ -125,11 +143,11 @@ public class ClauseService {
      * @return
      */
     private void setMetadataOfMasterClause(MasterClauseDTO masterClauseDTO, MasterClause clause) {
-        clause.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(new ArrayList<>(masterClauseDTO.getOrganizationTypes()), OrganizationType.class));
-        clause.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(new ArrayList<>(masterClauseDTO.getOrganizationSubTypes()), OrganizationSubType.class));
-        clause.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(new ArrayList<>(masterClauseDTO.getOrganizationServices()), ServiceCategory.class));
-        clause.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(new ArrayList<>(masterClauseDTO.getOrganizationSubServices()), SubServiceCategory.class));
-        clause.setAccountTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(masterClauseDTO.getAccountTypes(), AccountType.class));
+        clause.setOrganizationTypes(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterClauseDTO.getOrganizationTypes()), OrganizationType.class));
+        clause.setOrganizationSubTypes(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterClauseDTO.getOrganizationSubTypes()), OrganizationSubType.class));
+        clause.setOrganizationServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterClauseDTO.getOrganizationServices()), ServiceCategory.class));
+        clause.setOrganizationSubServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterClauseDTO.getOrganizationSubServices()), SubServiceCategory.class));
+        clause.setAccountTypes(ObjectMapperUtils.copyCollectionPropertiesByMapper(masterClauseDTO.getAccountTypes(), AccountType.class));
 
     }
 
@@ -169,12 +187,12 @@ public class ClauseService {
      */
     public List<ClauseResponseDTO> getAllClauseByCountryId(Long countryId) {
         List<Clause> clauses = clauseRepository.findAllClauseByCountryId(countryId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(clauses, ClauseResponseDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(clauses, ClauseResponseDTO.class);
     }
 
     public List<ClauseResponseDTO> getAllClauseByUnitId(Long unitId) {
         List<Clause> clauses = clauseRepository.findAllClauseByUnitId(unitId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(clauses, ClauseResponseDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(clauses, ClauseResponseDTO.class);
     }
 
 

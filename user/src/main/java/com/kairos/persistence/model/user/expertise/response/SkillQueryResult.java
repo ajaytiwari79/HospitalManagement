@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.expertise.response;
 
+import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,6 +8,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -26,13 +28,15 @@ public class SkillQueryResult {
     private List<Long> tags;
     private Set<SkillLevelQueryResult> skillLevels;
     private String skillCategory;
+    private Map<String, TranslationInfo> translations;
 
 
-    public SkillQueryResult(Long id, Set<SkillLevelQueryResult> skillLevels,String name,String skillCategory) {
+    public SkillQueryResult(Long id, Set<SkillLevelQueryResult> skillLevels,String name,String skillCategory, Map<String, TranslationInfo> translations) {
         this.id = id;
         this.skillLevels = skillLevels;
         this.name=name;
         this.skillCategory=skillCategory;
+        this.translations=translations;
     }
 
 }

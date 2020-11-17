@@ -1,9 +1,10 @@
 package com.kairos.controller.wta;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
-import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.service.wta.WTAOrganizationService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
@@ -42,8 +43,6 @@ public class WTAController {
     private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
     @Inject
     private WTAOrganizationService wtaOrganizationService;
-    @Inject
-    private ActivitySchedulerJobService activitySchedulerJobService;
 
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value =   COUNTRY_URL + "/wta")
@@ -151,8 +150,8 @@ public class WTAController {
 
     @ApiOperation(value = "Update WTA of Employment")
     @PutMapping(value =  UNIT_URL + "/wta")
-    public ResponseEntity<Map<String, Object>> updateWtaOfEmployment(@PathVariable long unitId, @RequestBody @Valid WTADTO wtadto, @RequestParam Boolean employmentPublished) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updateWtaOfEmployment(unitId, wtadto, employmentPublished));
+    public ResponseEntity<Map<String, Object>> updateWtaOfEmployment(@PathVariable long unitId, @RequestBody @Valid WTADTO wtadto, @RequestParam Boolean employmentPublished,@RequestParam("save") Boolean save) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updateWtaOfEmployment(unitId, wtadto, employmentPublished,save));
     }
 
 
@@ -268,14 +267,6 @@ public class WTAController {
     }
 
 
-
-    @ApiOperation(value = "Update Phases in Ruletemplates")
-    @GetMapping(value =  UNIT_URL+ "/update_phases_in_ruletemplate")
-    public ResponseEntity<Map<String, Object>> updatePhasesInRuletemplate(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updatePhasesInRuletemplate());
-    }
-
-
     @ApiOperation(value = "Update Phases in Ruletemplates")
     @GetMapping(value =  UNIT_URL+ "/get_protected_days_off_count")
     public ResponseEntity<Map<String, Object>> getProtectedDaysOffCount(@PathVariable long unitId ,@RequestParam Long staffId,@RequestParam BigInteger activityId) {
@@ -288,6 +279,49 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementBalancesCalculationService.updateWTALeaveCountByJob(countryId));
     }
 
+    @ApiOperation(value = "get wta details for staff ids")
+    @PostMapping(value = UNIT_URL+"/get_wta_rules_for_staff")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffNightWorkerDetails(@RequestBody StaffFilterDTO staffFilterDTO,
+                                                                          @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                                          @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.getWorkTimeAgreement(staffFilterDTO,startDate,endDate));
+    }
+
+    @ApiOperation(value = "update StartDate and EndDate")
+    @PostMapping(value = UNIT_URL+"/update_startDate_endDate")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffNightWorkerDetails(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateDatesInCTAWTA(unitId));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = COUNTRY_URL+"/wta/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWta(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateTranslation(id,translations));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = COUNTRY_URL+"/wta/rule_template/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWtaTemplates(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateTranslationRuleTemplates(id,translations));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = UNIT_URL+"/wta/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWtaOfOrganization(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateTranslation(id,translations));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = UNIT_URL+"/wta/rule_template/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfWtaTemplatesOnUnitLevel(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,workTimeAgreementService.updateTranslationRuleTemplates(id,translations));
+    }
 
 
 

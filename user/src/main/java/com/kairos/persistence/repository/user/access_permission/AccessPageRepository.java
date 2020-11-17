@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.access_permission;
 
+import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -24,7 +25,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (org)-[:" + HAS_SUB_ORGANIZATION + "*]->(n)\n" +
             "MATCH (n)-[:" + HAS_TEAMS + "]->(team:Team)-[:" + TEAM_HAS_MEMBER + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={1} WITH staff\n" +
             "MATCH (staff)-[:" + STAFF_HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup)-[r:" + ACCESS_GROUP_HAS_ACCESS_TO_PAGE + "{read:false}]->(accessPage:AccessPage{isModule:true}) RETURN DISTINCT accessPage")
-    List<AccessPage> getAccessModulesForUnits(long parentOrganizationId, long userId);
+    List<AccessPage> getAccessModulesForUnits(Long parentOrganizationId, Long userId);
 
     // Fetch access page hierarchy show only selected access page
     @Query("MATCH (ag:AccessGroup) WHERE id(ag)={0} WITH ag \n" +
@@ -34,20 +35,36 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WHERE id(parent)=id(ps.p) WITH r2,ps,ag\n" +
             "OPTIONAL MATCH (child:AccessPage)<-[r:"+HAS_ACCESS_OF_TABS+"]-(ag)\n" +
             "WHERE id(child)=id(ps.c) WITH r,r2,ps,ag\n" +
-            "RETURN {name:ps.p.name,id:id(ps.p),sequence:ps.p.sequence,selected:case when r2.isEnabled then true else false end, read:r2.read, write:r2.write,module:ps.p.isModule,children:collect({name:ps.c.name,id:id(ps.c),sequence:ps.c.sequence,read:r.read, write:r.write,selected:case when r.isEnabled then true else false end})} as data\n" +
+            "RETURN {" +
+            "translations:{english :{name: CASE WHEN ps.p.`translatedNames.english` IS NULL THEN '' ELSE ps.p.`translatedNames.english` END, description : CASE WHEN ps.p.`translatedDescriptions.english` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN ps.p.`translatedNames.hindi` IS NULL THEN '' ELSE ps.p.`translatedNames.hindi` END, description : CASE WHEN ps.p.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN ps.p.`translatedNames.danish` IS NULL THEN '' ELSE ps.p.`translatedNames.danish` END, description : CASE WHEN ps.p.`translatedDescriptions.danish` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN ps.p.`translatedNames.britishenglish` IS NULL THEN '' ELSE ps.p.`translatedNames.britishenglish` END, description : CASE WHEN ps.p.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.britishenglish` END}},\n" +
+            "name:ps.p.name,id:id(ps.p),sequence:ps.p.sequence,selected:case when r2.isEnabled then true else false end, read:r2.read, write:r2.write,module:ps.p.isModule,children:collect({" +
+            "translations:{english :{name: CASE WHEN ps.c.`translatedNames.english` IS NULL THEN '' ELSE ps.c.`translatedNames.english` END, description : CASE WHEN ps.c.`translatedDescriptions.english` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN ps.c.`translatedNames.hindi` IS NULL THEN '' ELSE ps.c.`translatedNames.hindi` END, description : CASE WHEN ps.c.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN ps.c.`translatedNames.danish` IS NULL THEN '' ELSE ps.c.`translatedNames.danish` END, description : CASE WHEN ps.c.`translatedDescriptions.danish` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN ps.c.`translatedNames.britishenglish` IS NULL THEN '' ELSE ps.c.`translatedNames.britishenglish` END, description : CASE WHEN ps.c.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.britishenglish` END}},\n" +
+            "name:ps.c.name,id:id(ps.c),sequence:ps.c.sequence,read:r.read, write:r.write,selected:case when r.isEnabled then true else false end})} as data\n" +
             "UNION\n" +
             // Fetch modules which does not have child
             "MATCH (ag:AccessGroup) WHERE id(ag)={0} WITH ag \n" +
             "MATCH (accessPage:AccessPage{isModule:true,active:true}) WHERE not (accessPage)-[:"+SUB_PAGE+"]->() WITH accessPage, ag\n" +
             "MATCH (accessPage)<-[r:"+HAS_ACCESS_OF_TABS+"]-(ag) WITH accessPage, ag,r\n" +
-            "RETURN {name:accessPage.name,id:id(accessPage),sequence:accessPage.sequence,read:r.read, write:r.write,selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
+            "RETURN {" +
+            "translations:{english :{name: CASE WHEN accessPage.`translatedNames.english` IS NULL THEN '' ELSE accessPage.`translatedNames.english` END, description : CASE WHEN accessPage.`translatedDescriptions.english` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN accessPage.`translatedNames.hindi` IS NULL THEN '' ELSE accessPage.`translatedNames.hindi` END, description : CASE WHEN accessPage.`translatedDescriptions.hindi` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN accessPage.`translatedNames.danish` IS NULL THEN '' ELSE accessPage.`translatedNames.danish` END, description : CASE WHEN accessPage.`translatedDescriptions.danish` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN accessPage.`translatedNames.britishenglish` IS NULL THEN '' ELSE accessPage.`translatedNames.britishenglish` END, description : CASE WHEN accessPage.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.britishenglish` END}},\n" +
+            "name:accessPage.name,id:id(accessPage),sequence:accessPage.sequence,read:r.read, write:r.write,selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
     List<Map<String,Object>> getSelectedAccessPageHierarchy(Long accessGroupId);
 
 
     @Query("MATCH (accessGroup:AccessGroup),(accessPermission:AccessPermission) WHERE id(accessPermission)={0} AND id(accessGroup)={1}\n" +
             "MATCH (accessGroup)-[r:" + HAS_ACCESS_OF_TABS + "{isEnabled:true}]->(accessPage:AccessPage) WITH accessPage,r,accessPermission\n" +
             "Create unique (accessPermission)-[:" + HAS_ACCESS_PAGE_PERMISSION + "{isEnabled:r.isEnabled,isRead:true,isWrite:false}]->(accessPage) RETURN accessPermission")
-    List<AccessPage> setDefaultPermission(long accessPermissionId, long accessGroupId);
+    List<AccessPage> setDefaultPermission(Long accessPermissionId, Long accessGroupId);
+
 
     @Query("MATCH (accessGroup:AccessGroup{deleted:false})-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(accessPage:AccessPage) WHERE id(accessPage)={1} AND id(accessGroup)={0} RETURN r.read as read, r.write as write")
     AccessPageQueryResult getAccessPermissionForAccessPage(Long accessGroupId, Long accessPageId);
@@ -59,7 +76,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) WHERE id(unit)={2} WITH unitPermission,accessPage\n" +
             "MATCH (unitPermission)-[r:"+HAS_CUSTOMIZED_PERMISSION+"]->(accessPage) WHERE r.accessGroupId={4}\n" +
             "RETURN r.read as read, r.write as write")
-    AccessPageQueryResult getCustomPermissionOfTab(long organizationId, long staffId, long unitId, long accessPageId, long accessGroupId);
+    AccessPageQueryResult getCustomPermissionOfTab(Long organizationId, Long staffId, Long unitId, Long accessPageId, Long accessGroupId);
 
 
 
@@ -91,7 +108,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "RETURN {name:accessPage.name,id:id(accessPage),\n" +
             "read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END, write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,\n" +
             "selected:case when r.isEnabled then true else false end,module:accessPage.isModule,sequence:accessPage.sequence,children:[]} as data")
-    List<Map<String, Object>> getAccessPagePermissionOfStaff(long orgId, long unitId, long staffId, long accessGroupId);
+    List<Map<String, Object>> getAccessPagePermissionOfStaff(Long orgId, Long unitId, Long staffId, Long accessGroupId);
 
     AccessPage findByModuleId(String moduleId);
 
@@ -101,21 +118,21 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH(accessPage)-[subTabs:"+SUB_PAGE+"]-(sub:AccessPage) " +
             "WITH r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage,subTabs \n" +
             "RETURN \n" +
-            "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.editable as editable,accessPage.sequence as sequence, " +
+            "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.editable as editable,accessPage.sequence as sequence,accessPage as accessPage, " +
             "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
             "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
             "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization ORDER BY id(accessPage)")
-    List<AccessPageDTO> getMainTabs();
+    List<AccessPageQueryResult> getMainTabs();
 
     @Query("MATCH (org:Unit) WHERE id(org)={0} WITH org\n" +
             "MATCH(org)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(accessgroup:AccessGroup{deleted: false}) WITH accessgroup\n" +
             "MATCH(accessgroup)-[r:" + HAS_ACCESS_OF_TABS + "]->(accessPage:AccessPage{isModule:true}) WITH  r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage\n" +
-            "RETURN DISTINCT id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.sequence as sequence," +
+            "RETURN DISTINCT id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.sequence as sequence,accessPage.editable as editable,accessPage as accessPage," +
             "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub, \n" +
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion, \n" +
             "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization  ORDER BY id(accessPage)")
-    List<AccessPageDTO> getMainTabsForUnit(Long unitId);
+    List<AccessPageQueryResult> getMainTabsForUnit(Long unitId);
 
 
     @Query("MATCH (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) WHERE id(accessPage)={0} WITH subPage,accessPage \n" +
@@ -123,13 +140,13 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH(subPage)-[subTabs:"+SUB_PAGE+"]->(sub:AccessPage)\n" +
             "WITH r,subPage,id(accessPage) as parentTabId,subTabs,\n" +
             "r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization\n" +
-            "RETURN id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,subPage.sequence as sequence, parentTabId, " +
+            "RETURN id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,subPage.sequence as sequence,subPage.editable as editable, parentTabId,subPage as accessPage, " +
             "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs,\n" +
             "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
             "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization "
     )
-    List<AccessPageDTO> getChildTabs(Long tabId);
+    List<AccessPageQueryResult> getChildTabs(Long tabId);
 
     @Query("MATCH (accessPage:AccessPage) WHERE id(accessPage)={0} set accessPage.name={1} RETURN accessPage")
     AccessPage updateAccessTab(Long id, String name);
@@ -171,7 +188,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WITH r,customRel,unitPermission,childrenAccessPages,g\n" +
             "RETURN childrenAccessPages.name as name,id(childrenAccessPages) as id, CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read ,\n" +
             "CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END as write ORDER BY id DESC")
-    List<AccessPageQueryResult> getChildTabsAccessPermissionsByStaffAndOrg(long orgId, long unitId, Long staffId, Long tabId, Long accessGroupId);
+    List<AccessPageQueryResult> getChildTabsAccessPermissionsByStaffAndOrg(Long orgId, Long unitId, Long staffId, Long tabId, Long accessGroupId);
 
     @Query("MATCH(ac:AccessGroup) WHERE id(ac)={1} WITH ac " +
             "MATCH(accessGroup:AccessGroup)-[rel:" + HAS_ACCESS_OF_TABS + "]->(accessPage:AccessPage) WHERE id(accessGroup)={0} WITH ac,accessGroup as accessGroup," +
@@ -208,7 +225,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
     @Query("MATCH (position:Position)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={0} WITH position\n" +
-            "MATCH (position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization{isKairosHub:true}) RETURN org ORDER BY id(org) LIMIT 1 \n" )
+            "MATCH (position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization{isKairosHub:true})-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup) RETURN org, COLLECT(r),COLLECT(ag) ORDER BY id(org) LIMIT 1 \n" )
     Organization fetchParentHub(Long userId);
 
 
@@ -217,12 +234,19 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     @Query("MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(user)={0} WITH position \n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org{isEnable:true}) WHERE id(org)={1}  WITH unitPermission,org \n" +
-            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date()) WITH accessGroup,org,unitPermission \n" +
+            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) WHERE id(accessGroup) IN {2} AND (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date()) WITH accessGroup,org,unitPermission \n" +
             "MATCH (module:AccessPage)<-[modulePermission:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(accessGroup) WITH module,modulePermission,unitPermission,accessGroup\n" +
             "OPTIONAL MATCH (unitPermission)-[moduleCustomRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(module) WHERE moduleCustomRel.accessGroupId=id(accessGroup) \n" +
             "WITH module,modulePermission,unitPermission,moduleCustomRel,accessGroup\n" +
-            "RETURN module.name as name,id(module) as id,module.moduleId as moduleId,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.read ELSE moduleCustomRel.read END as read,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.write ELSE moduleCustomRel.write END as write,module.isModule as module,module.sequence as sequence")
-    List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId);
+            "RETURN module.name as name,id(module) as id,module.moduleId as moduleId,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.read ELSE moduleCustomRel.read END as read,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.write ELSE moduleCustomRel.write END as write,module.isModule as module,module.sequence as sequence  " +
+            " UNION " +
+            " MATCH (module:AccessPage)<-[modulePermission:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(ag:AccessGroup) WHERE id (ag) IN {3} " +
+            " RETURN module.name as name,id(module) as id,module.moduleId as moduleId,modulePermission.read  as read,modulePermission.write  as write,module.isModule as module,module.sequence as sequence  ")
+    List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId, Set<Long> accessGroupIds, Set<Long> allAccessGroupIds);
+
+    @Query(" MATCH (module:AccessPage) " +
+            " RETURN module.name as name,id(module) as id,module.moduleId as moduleId,true  as read,true  as write,module.isModule as module,module.sequence as sequence  ")
+    List<AccessPageQueryResult> fetchHubSystemAdminPermissions();
 
     @Query("MATCH (u:User) WHERE id(u)={0} \n" +
             "MATCH (org:Organization{isEnable:true})-[:"+ HAS_POSITIONS +"]-(position:Position)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
@@ -231,7 +255,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH  (o:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]-(units) \n" +
             "WITH o,position, [o]+units as units  unwind units as org  WITH DISTINCT org,o,position\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
-            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) " +
+            "MATCH (unitPermission)-[agr:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE agr.endDate IS NULL OR DATE(agr.endDate) >= DATE() " +
             "MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayType:DayType) " +
             "WITH collect(dayType) as dayType,accessGroup,org,unitPermission " +
             "WHERE ANY(dt IN dayType WHERE id(dt) IN   {1})   AND (accessGroup.endDate IS NULL OR DATE(accessGroup.endDate) >= DATE())  WITH org,accessGroup,unitPermission\n" +
@@ -251,7 +275,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH  (o:Unit{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]-(units) \n" +
             "WITH o,position, [o]+units as units  unwind units as org  WITH DISTINCT org,o,position\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
-            "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date())  WITH org,accessGroup,unitPermission\n" +
+            "MATCH (unitPermission)-[agr:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE (agr.endDate IS NULL OR date(agr.endDate) >= date())  WITH org,accessGroup,unitPermission\n" +
             "MATCH (accessPage:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) \n" +
             "MATCH (org) WHERE id(org)={1} \n"+
             "OPTIONAL MATCH (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
@@ -275,7 +299,12 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH (accessPage) -[:"+SUB_PAGE+"]->(subPages:AccessPage{active:true,kpiEnabled:true})\n" +
             "OPTIONAL MATCH (up)-[childCustomRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(subPages) WHERE childCustomRel.accessGroupId=id(accessgroup) \n" +
             "WITH accessPage,subPages,customRel,r,childCustomRel\n" +
-            "RETURN accessPage.name as name,accessPage.moduleId as moduleId,\n" +
+            "RETURN " +
+            "{english :{name: CASE WHEN accessPage.`translatedNames.english` IS NULL THEN '' ELSE accessPage.`translatedNames.english` END, description : CASE WHEN accessPage.`translatedDescriptions.english` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN accessPage.`translatedNames.hindi` IS NULL THEN '' ELSE accessPage.`translatedNames.hindi` END, description : CASE WHEN accessPage.`translatedDescriptions.hindi` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN accessPage.`translatedNames.danish` IS NULL THEN '' ELSE accessPage.`translatedNames.danish` END, description : CASE WHEN accessPage.`translatedDescriptions.danish` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN accessPage.`translatedNames.britishenglish` IS NULL THEN '' ELSE accessPage.`translatedNames.britishenglish` END, description : CASE WHEN accessPage.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE accessPage.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "accessPage.name as name,accessPage.moduleId as moduleId,\n" +
             "CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read,\n" +
             "CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END as write ,\n" +
             "collect( DISTINCT {name:subPages.name,moduleId:subPages.moduleId,read:CASE WHEN childCustomRel IS NULL THEN r.read ELSE childCustomRel.read END,write:CASE WHEN childCustomRel IS NULL THEN r.write ELSE childCustomRel.write END}) as child ORDER BY moduleId")
@@ -313,4 +342,29 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "OPTIONAL MATCH(up)-[r:"+HAS_ACCESS_GROUP+"]->(accessGroup) " +
             "RETURN id(unit) as unitId, CASE WHEN COUNT(r)>0 THEN TRUE ELSE FALSE END AS hasPermission")
     List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, Set<Long> organizationIds);
+
+    @Query("MATCH (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
+            "OPTIONAL MATCH (accessPage)-[alr:" + ACCESS_PAGE_HAS_LANGUAGE + "]-(systemLanguage:SystemLanguage) " +
+            "WHERE id(systemLanguage)={0} " +
+            "WITH accessPage,alr " +
+            "OPTIONAL MATCH(accessPage)-[subTabs:"+SUB_PAGE+"]-(sub:AccessPage) " +
+            "WITH accessPage,subTabs,alr.description as helperText \n" +
+            "RETURN \n" +
+            "id(accessPage) as id,accessPage.name as name,accessPage.url as url,accessPage.moduleId as moduleId,accessPage.active as active,accessPage.editable as editable,accessPage.sequence as sequence,accessPage as accessPage,helperText, " +
+            "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs \n" +
+            " ORDER BY id(accessPage) ")
+    List<AccessPageQueryResult> getMainTabsWithHelperText(Long languageId);
+
+    @Query("MATCH (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) WHERE id(accessPage)={0} WITH subPage,accessPage \n" +
+            "OPTIONAL MATCH(subPage)-[alr:" + ACCESS_PAGE_HAS_LANGUAGE + "]-(systemLanguage:SystemLanguage) \n" +
+            "WHERE id(systemLanguage)={1} " +
+            "WITH DISTINCT accessPage,subPage,alr " +
+            "OPTIONAL MATCH(subPage)-[subTabs:"+SUB_PAGE+"]->(sub:AccessPage)\n" +
+            "WITH DISTINCT subPage,id(accessPage) as parentTabId,subTabs,\n" +
+            " alr.description as helperText\n" +
+            "RETURN DISTINCT id(subPage) as id, subPage.name as name,subPage.url as url,subPage.moduleId as moduleId,subPage.active as active,subPage.sequence as sequence,subPage.editable as editable, parentTabId,subPage as accessPage,helperText, " +
+            "CASE WHEN count(subTabs)>0 THEN true ELSE false END as hasSubTabs \n"
+    )
+    List<AccessPageQueryResult> getChildTabsWithHelperText(Long tabId, Long languageId);
+
 }

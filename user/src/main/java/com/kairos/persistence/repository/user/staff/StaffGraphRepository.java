@@ -17,10 +17,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -40,6 +37,11 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " +
             "RETURN id(staff) AS id,staff.firstName AS firstName,staff.lastName AS lastName,staff.familyName AS familyName,user.cprNumber AS cprNumber,{1} + staff.profilePic AS profilePic order by data.firstName")
     List<StaffPersonalDetailQueryResult> getStaffByTeamId(long teamId, String imageUrl);
+
+    @Query("MATCH (team:Team)-[:" + TEAM_HAS_MEMBER + "{isEnabled:true}]->(staff:Staff) WHERE id(team)={0} " +
+            " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " +
+            "RETURN id(staff)")
+    List<Long> getStaffIdsByTeamId(long teamId);
 
     @Query("MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit) WHERE id(organization)={0} WITH unitPermission\n" +
             "MATCH (staffs:Staff)<-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission) WITH staffs " +
@@ -102,7 +104,17 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + ORGANIZATION_HAS_TAG + "]-(unit) WITH  skill,staff, orgSkillRelation,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END AS otags\n" +
             "OPTIONAL MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill{isEnabled:true}) WITH skill,r,orgSkillRelation, ctags,otags\n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH skill,skillCategory,r,orgSkillRelation,ctags,otags\n" +
-            "RETURN {children:COLLECT(DISTINCT {id:id(skill),name:case WHEN orgSkillRelation is null or orgSkillRelation.customName is null then skill.name else orgSkillRelation.customName end ,isSelected:r.isEnabled, tags:ctags+otags}),id:id(skillCategory),name:skillCategory.name} AS data")
+            "RETURN {children:COLLECT(DISTINCT {" +
+            "translations:{english :{name: CASE WHEN skill.`translatedNames.english` IS NULL THEN '' ELSE skill.`translatedNames.english` END, description : CASE WHEN skill.`translatedDescriptions.english` IS NULL THEN '' ELSE skill.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN skill.`translatedNames.hindi` IS NULL THEN '' ELSE skill.`translatedNames.hindi` END, description : CASE WHEN skill.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skill.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN skill.`translatedNames.danish` IS NULL THEN '' ELSE skill.`translatedNames.danish` END, description : CASE WHEN skill.`translatedDescriptions.danish` IS NULL THEN '' ELSE skill.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN skill.`translatedNames.britishenglish` IS NULL THEN '' ELSE skill.`translatedNames.britishenglish` END, description : CASE WHEN skill.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skill.`translatedDescriptions.britishenglish` END}},\n" +
+            "id:id(skill),name:case WHEN orgSkillRelation is null or orgSkillRelation.customName is null then skill.name else orgSkillRelation.customName end ,isSelected:r.isEnabled, tags:ctags+otags})," +
+            "translations:{english :{name: CASE WHEN skillCategory.`translatedNames.english` IS NULL THEN '' ELSE skillCategory.`translatedNames.english` END, description : CASE WHEN skillCategory.`translatedDescriptions.english` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.english` END},\n" +
+            "hindi:{name: CASE WHEN skillCategory.`translatedNames.hindi` IS NULL THEN '' ELSE skillCategory.`translatedNames.hindi` END, description : CASE WHEN skillCategory.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.hindi` END},\n" +
+            "danish:{name: CASE WHEN skillCategory.`translatedNames.danish` IS NULL THEN '' ELSE skillCategory.`translatedNames.danish` END, description : CASE WHEN skillCategory.`translatedDescriptions.danish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.danish` END},\n" +
+            "britishenglish:{name: CASE WHEN skillCategory.`translatedNames.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedNames.britishenglish` END, description : CASE WHEN skillCategory.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.britishenglish` END}},\n" +
+            "id:id(skillCategory),name:skillCategory.name} AS data")
     List<Map<String, Object>> getSkills(long staffId, long unitId);
 
     @Query("MATCH (o:Unit)-[*..5]->(s:Staff) WHERE id(o)= {0}  WITH s AS staff " +
@@ -189,7 +201,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "set r.isEnabled=false")
     void removeSkillsByExpertise(long staffId, List<Long> expertiseIds);
 
-    Staff findByKmdExternalId(Long kmdExternalId);
+    Optional<Staff> findByKmdExternalId(Long kmdExternalId);
 
 
     @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]-(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff) WHERE id(organization)={0} AND id(staff)={1}\n" +
@@ -444,9 +456,13 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff)={0} AND id(skill) IN {1} MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill) set r.isEnabled=false,r.lastModificationDate={2} RETURN r")
     void deleteSkillFromStaff(long staffId, List<Long> skillId, long lastModificationDate);
 
+    @Query("MATCH(staff:Staff)-[r:" + STAFF_HAS_SKILLS +"]-(skill:Skill) WHERE id (staff)={0} AND id(skill) IN {1} RETURN COUNT(r)>1")
+    boolean isExists(long staffId, List<Long> skillId);
+
+
     @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff)={0} and id(skill) IN {1}\n" +
             "MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory) WITH skill, staff, skillCategory, r\n" +
-            "MATCH (organization:Unit)-[orgHasSkill:" + ORGANISATION_HAS_SKILL + "]->(skill:Skill) WHERE id(organization)={2} WITH skill, staff, skillCategory,orgHasSkill, r \n" +
+            "MATCH (organization:OrganizationBaseEntity)-[orgHasSkill:" + ORGANISATION_HAS_SKILL + "]->(skill:Skill) WHERE id(organization)={2} WITH skill, staff, skillCategory,orgHasSkill, r \n" +
             "RETURN {id:id(r),skillId:id(skill),name:orgHasSkill.customName,skillCategory:skillCategory.name,startDate:r.startDate,endDate:r.endDate,visitourId:skill.visitourId,lastSyncInVisitour:r.lastModificationDate,status:r.isEnabled,skillLevel:r.skillLevel} AS data")
     List<Map<String, Object>> getStaffSkillInfo(long staffId, List<Long> skillId, long unitId);
 
@@ -484,8 +500,23 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={0} RETURN id(staff)")
     Long getStaffIdByUserId(Long userId, Long parentOrganizationId);
 
+    @Query("MATCH (employments:Employment)-[:IN_UNIT]-(unit:Unit) WHERE id(unit)={0} AND ( employments.endDate > {1} OR employments.endDate is null) " +
+            "WITH employments MATCH (user:User)<-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_STAFF]-(employments)" +
+            "WITH user,staff,employments OPTIONAL MATCH (staff)-[:BELONGS_TO_TAGS]-(tags:Tag)"+
+            "RETURN distinct id(staff) as id, id(user) as userId, staff.firstName as firstName,staff.lastName as lastName," +
+            "collect(employments) as employments," +
+            "collect(tags) as tags " +
+            "ORDER BY staff.firstName")
+    List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId, String dateToCompare);
+
     @Query("MATCH(user:User)-[rel:BELONGS_TO]-(staff:Staff)-[rela:BELONGS_TO]-(position:Position)-[relb:HAS_POSITIONS]-(o:Organization)\n" +
             "WHERE id(o)={0} AND id(user)={1} RETURN staff")
     Staff getStaffByUnitIdAndUserId(Long unitId,Long userId);
+
+    @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_SKILLS + "]->(skill:Skill) where id(staff) = {0}  AND id(skill) IN {1} detach delete rel")
+    void deleteSkill(Long staffId,List<Long> skillIds);
+
+    @Query("MATCH (staff:Staff)-[:STAFF_HAS_SKILLS{isEnabled:true}]->(skills:Skill{isEnabled:true}) where id(staff) in {0} return id(staff) as id,COLLECT(id(skills)) as skillIds")
+    List<StaffPersonalDetailQueryResult> getSkillIdsByStaffIds(Collection<Long> staffIds);
 }
 

@@ -19,9 +19,9 @@ import org.apache.commons.collections.CollectionUtils;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.wta.MinMaxSetting.MAXIMUM;
 import static com.kairos.enums.wta.MinMaxSetting.MINIMUM;
 import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
@@ -57,16 +57,15 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues) && (MINIMUM.equals(minMaxSetting) && ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType())) || (MAXIMUM.equals(minMaxSetting) && !ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType()))) {
             if (CollectionUtils.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())) {
-                TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrapperMap(), infoWrapper.getShift());
-                if (timeInterval != null) {
+                List<TimeInterval> timeIntervals = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrapperMap(), null);
+                if (isCollectionNotEmpty(timeIntervals)) {
                     List<ShiftWithActivityDTO> shiftQueryResultWithActivities = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
                     DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-                    shiftQueryResultWithActivities = getShiftsByInterval(dateTimeInterval, shiftQueryResultWithActivities, timeInterval);
+                    shiftQueryResultWithActivities = getShiftsByInterval(dateTimeInterval, shiftQueryResultWithActivities, timeIntervals);
                     if(MAXIMUM.equals(minMaxSetting)){
                         shiftQueryResultWithActivities.add(infoWrapper.getShift());
                     }
-                    Set<LocalDate> shiftDates = getSortedAndUniqueDates(shiftQueryResultWithActivities);
-                    int consecutiveDays = getConsecutiveDaysInDate(new ArrayList<>(shiftDates));
+                    int consecutiveDays = getConsecutiveDaysInDate(new ArrayList<>(getSortedAndUniqueDates(shiftQueryResultWithActivities)));
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], consecutiveDays);
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,

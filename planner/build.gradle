@@ -12,7 +12,7 @@ buildscript {
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath("net.saliman:gradle-cobertura-plugin:2.5.1")
+		classpath("net.saliman:gradle-cobertura-plugin:3.0.0")
 	}
 }
 
@@ -23,7 +23,7 @@ plugins {
 ext {
 	versionslf4j='1.7.23'
 	springCloudVersion = 'Finchley.M8'
-	versionoptaplannerbom='7.20.0.Final'
+	versionoptaplannerbom='7.39.0.Final'
 	versionlogback='1.2.3'
 }
 
@@ -32,7 +32,7 @@ version = "$projectVersion-SNAPSHOT"
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
-apply plugin: "net.saliman.cobertura"
+//apply plugin: "net.saliman.cobertura"
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'application'
 applicationDefaultJvmArgs = ["-Xms1024m", "-Xmx1048m"]
@@ -43,7 +43,7 @@ jar {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-mainClassName = 'com.planner.app.PlanningAppConfig'
+mainClassName = 'com.planner.app.PlannerApplication'
 
 repositories {
 	mavenCentral()
@@ -55,12 +55,13 @@ repositories {
 }
 
 dependencies {
-	compile project(':kcommons')
 	compile project('optaplanner-shiftplanning')
 	compile project('optaplanner-taskplanning')
 	compile project('optaplanner-vrp-taskplanning')
-	compile project (':kcommons')
-	compile project (':kpermissions')
+	//compile project (':kcommons')
+	compile(project(":kcommons")) {
+		exclude module: "org.neo4j"
+	}
 	compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
 	compile group: 'com.google.guava', name: 'guava', version: '19.0'
 	compile group: 'com.codahale.metrics', name: 'metrics-core', version: '3.0.2'
@@ -73,31 +74,34 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')//c
 	compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
 	compile("org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}")
-	compile('org.springframework.boot:spring-boot-starter-data-neo4j')
 	testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
 	testCompile group: 'junit', name: 'junit', version: '4.12'
 	compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
+	compile('org.springframework.data:spring-data-redis:2.0.3.RELEASE')
+	compile('redis.clients:jedis:2.9.0')
 }
 subprojects {
-	repositories {
-		mavenCentral()
-		maven { url 'https://repository.jboss.org/'}
-	}
-	apply plugin: 'java'
-	dependencies {
-		compile project(':kcommons')
-		compile group: 'org.optaplanner', name: 'optaplanner-persistence-xstream', version: versionoptaplannerbom
-		compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
-		compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom
-		compile group: 'org.optaplanner', name: 'optaplanner-benchmark', version: versionoptaplannerbom
-		compile group: 'ch.qos.logback', name: 'logback-core', version: versionlogback
-		compile group: 'ch.qos.logback', name: 'logback-classic', version: versionlogback
-		compile 'org.freemarker:freemarker:2.3.28'
-		compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.2'
-		compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.2'
-		compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
-		testCompile group: 'junit', name: 'junit', version: '4.12'
-		compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+	if (!getName().equals("optaplanner-shiftplanning")) {
+		repositories {
+			mavenCentral()
+			maven { url 'https://repository.jboss.org/' }
+		}
+		apply plugin: 'java'
+		dependencies {
+			compile project(':kcommons')
+			compile group: 'org.optaplanner', name: 'optaplanner-persistence-xstream', version: versionoptaplannerbom
+			compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+			compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom
+			compile group: 'org.optaplanner', name: 'optaplanner-benchmark', version: versionoptaplannerbom
+			compile group: 'ch.qos.logback', name: 'logback-core', version: versionlogback
+			compile group: 'ch.qos.logback', name: 'logback-classic', version: versionlogback
+			compile 'org.freemarker:freemarker:2.3.28'
+			compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.2'
+			compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.2'
+			compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
+			testCompile group: 'junit', name: 'junit', version: '4.12'
+			compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+		}
 	}
 }
 dependencyManagement {

@@ -1,5 +1,7 @@
 package com.kairos.controller.staff;
 
+import com.kairos.annotations.KPermissionActions;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
@@ -7,16 +9,20 @@ import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
+import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
 import com.kairos.persistence.model.staff.StaffSkillDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
 import com.kairos.persistence.model.staff.position.StaffPositionDetail;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.client.ClientService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.employment.EmploymentJobService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.*;
 import com.kairos.utils.response.ResponseHandler;
@@ -26,6 +32,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +45,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.enums.kpermissions.PermissionAction.EDIT;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 
 /**
@@ -55,6 +63,8 @@ public class StaffController {
     @Inject
     private PositionService positionService;
     @Inject
+    private ExceptionService exceptionService;
+    @Inject
     private ApiExternalStaffService apiExternalStaffService;
     @Inject
     private SkillService skillService;
@@ -65,6 +75,7 @@ public class StaffController {
     @Inject
     private EmploymentJobService employmentJobService;
     @Inject private StaffCreationService staffCreationService;
+    @Inject private ClientService clientService;
 
 
     @RequestMapping(value = "/{staffId}/position_details", method = RequestMethod.PUT)
@@ -105,9 +116,10 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.PUT)
     @ApiOperation("update staff personal information")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> savePersonalDetail(@PathVariable long unitId, @PathVariable long staffId, @RequestBody @Valid StaffPersonalDetail staffPersonalDetail) throws ParseException {
-        StaffPersonalDetail response = staffService.savePersonalDetail(staffId, staffPersonalDetail, unitId);
+    @KPermissionActions(modelName = "Staff",action = EDIT)
+    @PreAuthorize("@appPermissionEvaluator.isValid('Staff','EDIT')")
+    public ResponseEntity<Map<String, Object>> savePersonalDetail(@PathVariable long unitId, @PathVariable long staffId, @RequestBody @Valid StaffDTO staffDTO) throws ParseException {
+        StaffDTO response = staffService.savePersonalDetail(staffId, staffDTO, unitId);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, Collections.EMPTY_MAP);
         }
@@ -132,11 +144,19 @@ public class StaffController {
     @ApiOperation("update employments of staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable long staffId, @RequestBody Map<String, Object> unitPermissionDetails) {
-
         long accessGroupId = Long.parseLong((String) unitPermissionDetails.get("roleId"));
         boolean isCreated = (boolean) unitPermissionDetails.get("isCreated");
         long unitId = Long.parseLong((String) unitPermissionDetails.get("organizationId"));
-        Map<String, Object> response = positionService.createUnitPermission(unitId, staffId, accessGroupId, isCreated);
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        if(isCreated && unitPermissionDetails.get("startDate")==null){
+            exceptionService.actionNotPermittedException("message.startDateMillis.null");
+        }
+        if(isCreated){
+             startDate= LocalDate.parse((CharSequence) unitPermissionDetails.get("startDate"));
+             endDate= unitPermissionDetails.get("endDate")==null?null:LocalDate.parse((CharSequence) unitPermissionDetails.get("endDate"));
+        }
+        Map<String, Object> response = positionService.createUnitPermission(unitId, staffId, accessGroupId, isCreated,startDate,endDate);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }
@@ -206,7 +226,6 @@ public class StaffController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> saveNote(@PathVariable long staffId, @RequestBody Map<String, String> reqData) {
         Map<String, Object> response = staffService.saveNotes(staffId, reqData.get("generalNote"), reqData.get("reqFromPerson"));
-
         if (response != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
         }
@@ -257,24 +276,6 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffWithFilter(unitId, id, staffFilterDTO, moduleId));
     }
 
-    /**
-     * unit manager can assign specific expertise to staff
-     * every staff will have one expertise at time
-     *
-     * @param staffId
-     * @param expertiseIds
-     * @return
-     */
-    @RequestMapping(value = "/{staffId}/expertise/{expertiseId}", method = RequestMethod.POST)
-    @ApiOperation("assign expertise to staff")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> assignExpertiseToStaff(@PathVariable long staffId, @RequestBody List<Long> expertiseIds) {
-        Staff staff = staffService.assignExpertiseToStaff(staffId, expertiseIds);
-        if (staff == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staff);
-    }
 
     @RequestMapping(value = "/{staffId}/expertise/{expertiseId}", method = RequestMethod.GET)
     @ApiOperation("get expertise to staff")
@@ -386,8 +387,7 @@ public class StaffController {
     @ApiOperation("Get All  Staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllStaff() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffService.getAllStaff());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaff());
     }
 
     @RequestMapping(value = "/{staffId}/deleteStaff/{positionId}", method = RequestMethod.DELETE)
@@ -434,8 +434,9 @@ public class StaffController {
     }
 
     @RequestMapping(value = "/create_staff_from_web", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) throws ParseException {
+    @KPermissionActions(modelName = "Staff",action = PermissionAction.ADD)
+    @PreAuthorize("@appPermissionEvaluator.isValid('Staff','ADD')")
+    public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffCreationService.createStaff(unitId, staffCreationDTO));
     }
 
@@ -451,8 +452,7 @@ public class StaffController {
     @GetMapping(value = "/{staffId}/assigned_tasks")
     @ApiOperation("Get All Task types of a Staff")
     public ResponseEntity<Map<String, Object>> getAssignedTasksOfStaff(@PathVariable long unitId, @PathVariable long staffId, @RequestParam("date") String date) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService
-                .getAssignedTasksOfStaff(unitId, staffId, date));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getAssignedTasksOfStaff(unitId, staffId, date));
     }
 
      /**
@@ -465,7 +465,7 @@ public class StaffController {
     @ApiOperation("Get loggedin Staff Info")
     public ResponseEntity<Map<String, Object>> getStaffInfo(OAuth2Authentication user) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffInfo(user.getUserAuthentication().getPrincipal().toString()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getStaffInfo(user.getUserAuthentication().getPrincipal().toString()));
     }
 
 
@@ -477,7 +477,7 @@ public class StaffController {
     @ApiOperation("Get All staff List available in Org")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllStaffByUnitId(@PathVariable long unitId, @RequestParam("employment") boolean allStaffRequired) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffByUnitId(unitId, allStaffRequired));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getAllStaffByUnitId(unitId, allStaffRequired));
     }
 
 
@@ -485,7 +485,7 @@ public class StaffController {
     @ApiOperation("get only personal details of staff by StaffId ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffInfoById(@PathVariable long unitId, @PathVariable long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffInfoById(staffId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffInfoById(staffId, unitId));
     }
 
     @RequestMapping(value = "/{staffId}", method = RequestMethod.GET)
@@ -620,16 +620,16 @@ public class StaffController {
     @GetMapping(value = "/staff_employment/{employmentId}")
     @ApiOperation("get staff by employmentId")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentDataByEmploymentId( @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "reasonCodeIds", required = false) Set<Long> reasonCodeIds, @PathVariable long unitId,
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentDataByEmploymentId( @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,@RequestParam("activityCutOffEndDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate activityCutOffEndDate, @RequestParam(value = "reasonCodeIds", required = false) Set<Long> reasonCodeIds, @PathVariable long unitId,
                                                                                     @PathVariable Long employmentId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDataByEmploymentId(startDate, employmentId, unitId, reasonCodeIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffEmploymentDataByEmploymentId(startDate, employmentId, unitId, reasonCodeIds,activityCutOffEndDate));
     }
 
     @RequestMapping(value = "/staff_list/chat", method = RequestMethod.GET)
     @ApiOperation("Get All staff List with login user staff id for chat purpose")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<ResponseDTO<StaffEmploymentTypeWrapper>> getAllStaffListAndLoginUserStaffIdByUnitIdForChat(@PathVariable long unitId) {
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, staffService.getStaffListAndLoginUserStaffIdByUnitId(unitId));
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, staffRetrievalService.getStaffListAndLoginUserStaffIdByUnitId(unitId));
     }
 
     @RequestMapping(value = "/{staffId}/update_password", method = RequestMethod.PUT)
@@ -659,11 +659,38 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsDataForPermissionByUnitId(unitId));
     }
 
-    @GetMapping(value = "/endPositionProcess")
+    @PostMapping(value = "/get_all_planning_staff")
+    @ApiOperation("Get all staff eligible for planning")
+    public ResponseEntity<Map<String, Object>> getStaffEligibleForPlanning(@PathVariable Long unitId, @RequestBody StaffFilterDTO staffFilterDetails,@RequestParam boolean showAllStaffs) {
+        Long loggedInUserId = UserContext.getUserDetails().getId();
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getAllStaffForUnitWithEmploymentStatus(loggedInUserId, unitId, staffFilterDetails,showAllStaffs));
+    }
+
+    @GetMapping(value = "/end_position_process")
     @ApiOperation("end position process")
     public ResponseEntity<Map<String, Object>> endPositionProcess() {
         positionService.endPositionProcess();
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
+
+    @PostMapping(value = "/get_all_staff_for_planning")
+    @ApiOperation("Get all staff eligible for planning")
+    public ResponseEntity<Map<String, Object>>  getStaffsByIds(@PathVariable Long unitId, @RequestBody List<Long> staffIds){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsByIds(unitId,staffIds));
+    }
+
+    @PutMapping(value ="/organization/language_settings" )
+    @ApiOperation("update organization staff translation data")
+    public ResponseEntity<Map<String, Object>>  updateStaffOrganizationTranslations(@PathVariable Long unitId,@RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.updateStaffOrganizationTranslatedData(unitId,translations));
+    }
+
+    @PutMapping(value ="/{staffId}/staff_child/{staffChildId}/language_settings" )
+    @ApiOperation("update staff child translation data")
+    public ResponseEntity<Map<String, Object>>  updateStaffChildTranslations(@PathVariable Long unitId,@PathVariable Long staffId,@PathVariable Long staffChildId,@RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.updateStaffChildTranslatedData(staffChildId,translations,staffId,unitId));
+    }
+
+
 
 }

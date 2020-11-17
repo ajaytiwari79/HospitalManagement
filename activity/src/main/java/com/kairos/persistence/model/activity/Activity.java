@@ -3,10 +3,13 @@ package com.kairos.persistence.model.activity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
+import com.kairos.annotations.KPermissionField;
+import com.kairos.annotations.KPermissionModel;
+import com.kairos.annotations.KPermissionSubModel;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.tabs.*;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +18,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,16 +28,20 @@ import java.util.Set;
  * Created by pawanmandhan on 17/8/17.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"path"})
 @Document(collection = "activities")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Activity extends MongoBaseEntity implements Serializable {
+@KPermissionModel
+public class Activity extends MongoBaseEntity {
 
+    @KPermissionField
     private String name;
+    @KPermissionField
     private String description;
     private Long countryId;
+    @KPermissionField
     private List<Long> expertises;
     private List<Long> organizationTypes;
     private List<Long> organizationSubTypes;
@@ -50,22 +56,34 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private BigInteger parentId;
     @JsonIgnore
     private boolean isParentActivity = true;
-    private GeneralActivityTab generalActivityTab;
-    private BalanceSettingsActivityTab balanceSettingsActivityTab;
-
-    private IndividualPointsActivityTab individualPointsActivityTab;
-
+    @KPermissionSubModel
+    private ActivityGeneralSettings activityGeneralSettings;
+    @KPermissionSubModel
+    private ActivityBalanceSettings activityBalanceSettings;
+    @KPermissionSubModel
+    private ActivityIndividualPointsSettings activityIndividualPointsSettings;
+    @KPermissionField
     private Set<BigInteger> childActivityIds=new HashSet<>();
-    private NotesActivityTab notesActivityTab;
-    private CommunicationActivityTab communicationActivityTab;
-    private BonusActivityTab bonusActivityTab;
-    private RulesActivityTab rulesActivityTab;
-    private TimeCalculationActivityTab timeCalculationActivityTab;
-    private SkillActivityTab skillActivityTab;
-    private PhaseSettingsActivityTab phaseSettingsActivityTab;
-    private OptaPlannerSettingActivityTab optaPlannerSettingActivityTab;
-    private CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab;
-    private LocationActivityTab locationActivityTab;
+    @KPermissionSubModel
+    private ActivityNotesSettings activityNotesSettings;
+    @KPermissionSubModel
+    private ActivityCommunicationSettings activityCommunicationSettings;
+    @KPermissionSubModel
+    private ActivityBonusSettings activityBonusSettings;
+    @KPermissionSubModel
+    private ActivityRulesSettings activityRulesSettings;
+    @KPermissionSubModel
+    private ActivityTimeCalculationSettings activityTimeCalculationSettings;
+    @KPermissionField
+    private ActivitySkillSettings activitySkillSettings;
+    @KPermissionField
+    private ActivityPhaseSettings activityPhaseSettings;
+    @KPermissionSubModel
+    private ActivityOptaPlannerSetting activityOptaPlannerSetting;
+    @KPermissionSubModel
+    private ActivityCTAAndWTASettings activityCTAAndWTASettings;
+    @KPermissionSubModel
+    private ActivityLocationSettings activityLocationSettings;
     private BigInteger countryParentId;
     @JsonIgnore
     private boolean disabled;
@@ -73,17 +91,19 @@ public class Activity extends MongoBaseEntity implements Serializable {
 
     //time care id
     private String externalId;
+    private String path;
 
     public Activity(String name, String description, List<BigInteger> tags) {
         this.name = name;
         this.description = description;
         this.tags = tags;
-
     }
 
 
-    public Activity(BalanceSettingsActivityTab balanceSettingsActivityTab) {
-        this.balanceSettingsActivityTab = balanceSettingsActivityTab;
+
+
+    public Activity(ActivityBalanceSettings activityBalanceSettings) {
+        this.activityBalanceSettings = activityBalanceSettings;
     }
 
 

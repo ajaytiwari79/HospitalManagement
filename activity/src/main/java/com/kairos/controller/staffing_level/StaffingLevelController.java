@@ -2,10 +2,14 @@ package com.kairos.controller.staffing_level;
 
 import com.kairos.constants.ApiConstants;
 import com.kairos.dto.activity.staffing_level.StaffingLevelFromTemplateDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelGraphConfigurationDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelPublishDTO;
 import com.kairos.dto.activity.staffing_level.UpdatedStaffingLevelDTO;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
+import com.kairos.service.staffing_level.StaffingLevelGraphConfigurationService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.utils.Message;
 import com.kairos.utils.response.ResponseHandler;
@@ -13,7 +17,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -38,14 +42,14 @@ import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 @Api(value = API_UNIT_URL + "/staffing_level")
 public class StaffingLevelController {
 
-    private Logger logger= LoggerFactory.getLogger(StaffingLevelController.class);
-    @Autowired private StaffingLevelService staffingLevelService;
+    private static  final Logger LOGGER= LoggerFactory.getLogger(StaffingLevelController.class);
+    @Inject private StaffingLevelService staffingLevelService;
+    @Inject private StaffingLevelGraphConfigurationService staffingLevelGraphConfigurationService;
 
 
     @RequestMapping(value = "/presence", method = RequestMethod.POST)
     @ApiOperation("Create staffing_level for presence")
-    public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto,
-                                                                @PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 staffingLevelService.createStaffingLevel(presenceStaffingLevelDto,unitId));
     }
@@ -60,8 +64,7 @@ public class StaffingLevelController {
     @ApiOperation("getting  staffing_level between date unit wise ")
     public ResponseEntity<Map<String, Object>> getPresenceStaffingLevels(@PathVariable Long unitId
     , @RequestParam("startDate")@DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam("endDate")@DateTimeFormat(pattern="yyyy-MM-dd")Date endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.getPresenceStaffingLevel(unitId,startDate,endDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,staffingLevelService.getPresenceStaffingLevel(unitId,startDate,endDate));
     }
 
 
@@ -73,10 +76,8 @@ public class StaffingLevelController {
      */
     @RequestMapping(value = "/currentDay", method = RequestMethod.GET)
     @ApiOperation("getting  staffing_level for selected day ")
-    public ResponseEntity<Map<String, Object>> getStaffingLevel(@PathVariable Long unitId
-            ,@RequestParam("currentDate")Date currentDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.getPresenceStaffingLevel(unitId,currentDate));
+    public ResponseEntity<Map<String, Object>> getStaffingLevel(@PathVariable Long unitId,@RequestParam("currentDate")Date currentDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.getPresenceStaffingLevel(unitId,currentDate));
     }
 
     /**
@@ -146,8 +147,7 @@ public class StaffingLevelController {
     @ApiOperation("update and create staffing_level")
     public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos,
                                                                    @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.updateAbsenceStaffingLevel(unitId,absenceStaffingLevelDtos));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.updateAbsenceStaffingLevel(unitId,absenceStaffingLevelDtos));
     }
 
     /**
@@ -175,5 +175,41 @@ public class StaffingLevelController {
     public ResponseEntity<Map<String, Object>> getStaffingLevelIfUpdated(@PathVariable Long unitId, @RequestBody @Valid @NotNull(message = "message.staffingLevel.currentDate.not.exists") List<UpdatedStaffingLevelDTO> updatedStaffingLevels) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 staffingLevelService.getStaffingLevelIfUpdated(unitId, updatedStaffingLevels));
+    }
+
+    @RequestMapping(value = "/publish", method = RequestMethod.PUT)
+    @ApiOperation("publish staffing_level")
+    public ResponseEntity<Map<String, Object>> publishStaffingLevel(@PathVariable Long unitId, @RequestBody StaffingLevelPublishDTO staffingLevelPublishDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.publishStaffingLevel(unitId,staffingLevelPublishDTO));
+    }
+
+    @GetMapping(value = "/weekly")
+    @ApiOperation("weekly staffing Level")
+    public ResponseEntity<Map<String, Object>> getWeeklyStaffingLevel(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date,@RequestParam BigInteger activityId,@RequestParam(required = false) boolean unpublishedChanges) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.getWeeklyStaffingLevel(unitId,date,activityId,unpublishedChanges));
+    }
+
+    @GetMapping(value = "/get_staffing_level_activities")
+    @ApiOperation("weekly staffing Level")
+    public ResponseEntity<Map<String, Object>> getStaffingLevelActivities(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam String query) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.getStaffingLevelActivities(unitId,startDate,query));
+    }
+
+    @GetMapping(value = "/graph/configuration")
+    @ApiOperation("Get staffing level graph configuration")
+    public ResponseEntity<Map<String, Object>> getStaffingLevelGraphConfiguration(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelGraphConfigurationService.getStaffingLevelGraphConfiguration(unitId, UserContext.getUserDetails().getId()));
+    }
+
+    @PutMapping(value = "/graph/configuration")
+    @ApiOperation("update staffing level graph configuration")
+    public ResponseEntity<Map<String, Object>> updateOrCreateStaffingLevelConfiguration(@PathVariable Long unitId, @RequestBody @Valid StaffingLevelGraphConfigurationDTO staffingLevelGraphConfigurationDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelGraphConfigurationService.updateOrCreateStaffingLevelConfiguration(unitId, UserContext.getUserDetails().getId(),staffingLevelGraphConfigurationDTO));
+    }
+
+    @PutMapping(value = "/set_initial")
+    @ApiOperation("update staffing level graph configuration")
+    public ResponseEntity<Map<String, Object>> updateInitialInStaffingLevel(@PathVariable Long unitId, @RequestBody @Valid StaffingLevelGraphConfigurationDTO staffingLevelGraphConfigurationDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelService.updateInitialInStaffingLevel());
     }
 }

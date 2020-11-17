@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.constraints.activityconstraint;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 public class CountryHolidayCalender {
     private Long id;
     private boolean reOccuring;

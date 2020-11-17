@@ -2,6 +2,10 @@ package com.kairos.dto.activity.presence_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -11,33 +15,12 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PresenceTypeWithTimeTypeDTO {
     private List<PresenceTypeDTO> presenceTypes;
     private Long countryId;
-
-
-    public PresenceTypeWithTimeTypeDTO() {
-    }
-
-    public PresenceTypeWithTimeTypeDTO(List<PresenceTypeDTO> presenceTypes, Long countryId) {
-        this.presenceTypes = presenceTypes;
-        this.countryId = countryId;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public List<PresenceTypeDTO> getPresenceTypes() {
-        return presenceTypes;
-    }
-
-    public void setPresenceTypes(List<PresenceTypeDTO> presenceTypes) {
-        this.presenceTypes = presenceTypes;
-    }
 
 }

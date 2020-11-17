@@ -74,8 +74,8 @@ public class StaffActivitySettingController {
     @ApiOperation("Get Staff Personalized activity settings")
     @GetMapping(value = "/staff_activity_setting/staff/{staffId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffSpecificActivitySettings( @PathVariable Long unitId,@PathVariable Long staffId,@RequestParam(value = "includeTeamActivity") boolean includeTeamActivity) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.getStaffSpecificActivitySettings(unitId,staffId,includeTeamActivity));
+    public ResponseEntity<Map<String, Object>> getStaffSpecificActivitySettings( @PathVariable Long unitId,@PathVariable Long staffId,@RequestParam(value = "includeTeamActivity") boolean includeTeamActivity,@RequestParam(value = "isActivityType") boolean isActivityType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.getStaffSpecificActivitySettings(unitId,staffId,includeTeamActivity,isActivityType));
     }
 
     @ApiOperation("Get Staff Personalized activity settings")
@@ -97,5 +97,12 @@ public class StaffActivitySettingController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffActivitySettingsByActivityId( @PathVariable Long unitId,@PathVariable BigInteger activityId,@PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.getStaffActivitySettingsByActivityId(unitId,activityId,staffId));
+    }
+
+    @ApiOperation("get staff filter data")
+    @PostMapping(value = "/get_staff_filter_data")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffFilterData(@PathVariable Long unitId, @RequestBody Map<String,List<BigInteger>> timeTypeIdsAndActivityIdsMap) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.getStaffFilterDataDTO(unitId, timeTypeIdsAndActivityIdsMap.get("timeTypeIds"), timeTypeIdsAndActivityIdsMap.get("activityIds")));
     }
 }

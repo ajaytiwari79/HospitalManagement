@@ -23,4 +23,8 @@ public class ActivityWrapper {
         this.timeType = timeType;
         this.timeTypeInfo = timeTypeInfo;
     }
+
+    public ActivityWrapper(Activity activity) {
+        this.activity = activity;
+    }
 }

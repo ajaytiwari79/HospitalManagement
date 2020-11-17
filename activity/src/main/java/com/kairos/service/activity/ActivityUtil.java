@@ -18,7 +18,8 @@ import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.LocationEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.*;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.PQLSettings;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -35,7 +36,7 @@ import static com.kairos.constants.AppConstants.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ActivityUtil {
 
-    private static LocationActivityTab initializeLocationActivityTab(GlideTimeSettingsDTO glideTimeSettingsDTO){
+    private static ActivityLocationSettings initializeLocationActivitySettings(GlideTimeSettingsDTO glideTimeSettingsDTO){
         Set<ActivityGlideTimeDetails> activityGlideTimeDetailsForCheckIn =new HashSet<>();
         ActivityGlideTimeDetails activityGlideTimeDetailsForHome =new ActivityGlideTimeDetails(LocationEnum.HOME,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
         ActivityGlideTimeDetails activityGlideTimeDetailsForUnit =new ActivityGlideTimeDetails(LocationEnum.OFFICE,glideTimeSettingsDTO.getGlideTimeForCheckIn().getBefore(),glideTimeSettingsDTO.getGlideTimeForCheckIn().getAfter());
@@ -56,12 +57,11 @@ public class ActivityUtil {
         activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForUnit);
         activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForDepot);
         activityGlideTimeDetailsForCheckOut.add(activityCheckOutGlideTimeDetailsForOther);
-        return new LocationActivityTab(activityGlideTimeDetailsForCheckIn, activityGlideTimeDetailsForCheckOut);
+        return new ActivityLocationSettings(activityGlideTimeDetailsForCheckIn, activityGlideTimeDetailsForCheckOut);
     }
 
-    public static List<CutOffInterval> getCutoffInterval(LocalDate dateFrom, CutOffIntervalUnit cutOffIntervalUnit, Integer dayValue) {
+    public static List<CutOffInterval> getCutoffInterval(LocalDate dateFrom, CutOffIntervalUnit cutOffIntervalUnit, Integer dayValue,LocalDate endDate) {
         LocalDate startDate = dateFrom;
-        LocalDate endDate = startDate.plusYears(1);
         List<CutOffInterval> cutOffIntervals = new ArrayList<>();
         updateCutOff(cutOffIntervalUnit, dayValue, startDate, endDate, cutOffIntervals);
         return cutOffIntervals;
@@ -142,23 +142,23 @@ public class ActivityUtil {
             ,ActivityCategory activityCategory,List<Skill> skills, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId){
         Optional<Activity> result = activitiesByExternalIds.stream().filter(activityByExternalId -> timeCareActivity.getId().equals(activityByExternalId.getExternalId())).findFirst();
         Activity activity = getActivity(timeCareActivity, orgType, orgSubTypes, countryId, result);
-        //general tab
-        GeneralActivityTab generalActivityTab = getGeneralActivityTab(timeCareActivity, activityCategory, activity);
-        activity.setGeneralActivityTab(generalActivityTab);
+        //general settings
+        ActivityGeneralSettings activityGeneralSettings = getGeneralActivitySettings(timeCareActivity, activityCategory, activity);
+        activity.setActivityGeneralSettings(activityGeneralSettings);
 
-        //balance setting tab
-        BalanceSettingsActivityTab balanceSettingsActivityTab = getBalanceSettingsActivityTab(timeCareActivity, presenceTimeTypeId, absenceTimeTypeId, activity);
-        activity.setBalanceSettingsActivityTab(balanceSettingsActivityTab);
-        //rules activity tab
-        RulesActivityTab rulesActivityTab = getRulesActivityTab(timeCareActivity, phases, activity);
-        activity.setRulesActivityTab(rulesActivityTab);
+        //balance setting settings
+        ActivityBalanceSettings activityBalanceSettings = getBalanceSettingsActivitySettings(timeCareActivity, presenceTimeTypeId, absenceTimeTypeId, activity);
+        activity.setActivityBalanceSettings(activityBalanceSettings);
+        //rules activity settings
+        ActivityRulesSettings activityRulesSettings = getRulesActivitySettings(timeCareActivity, phases, activity);
+        activity.setActivityRulesSettings(activityRulesSettings);
         // location settings
-        activity.setLocationActivityTab(ActivityUtil.initializeLocationActivityTab(glideTimeSettingsDTO));
-        //Time calculation tab
-        TimeCalculationActivityTab timeCalculationActivityTab = getTimeCalculationActivityTab(timeCareActivity, activity);
-        activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
-        SkillActivityTab skillActivityTab = getSkillActivityTab(timeCareActivity, skills, activity);
-        activity.setSkillActivityTab(skillActivityTab);
+        activity.setActivityLocationSettings(ActivityUtil.initializeLocationActivitySettings(glideTimeSettingsDTO));
+        //Time calculation settings
+        ActivityTimeCalculationSettings activityTimeCalculationSettings = getTimeCalculationActivitySettings(timeCareActivity, activity);
+        activity.setActivityTimeCalculationSettings(activityTimeCalculationSettings);
+        ActivitySkillSettings activitySkillSettings = getSkillActivitySettings(timeCareActivity, skills, activity);
+        activity.setActivitySkillSettings(activitySkillSettings);
         return activity;
     }
 
@@ -174,96 +174,95 @@ public class ActivityUtil {
         return activity;
     }
 
-    private static GeneralActivityTab getGeneralActivityTab(TimeCareActivity timeCareActivity, ActivityCategory activityCategory, Activity activity) {
-        GeneralActivityTab generalActivityTab = (Optional.ofNullable(activity.getGeneralActivityTab()).isPresent()) ? activity.getGeneralActivityTab() :
-                new GeneralActivityTab();
-        generalActivityTab.setName(activity.getName());
-        generalActivityTab.setShortName(timeCareActivity.getShortName());
-        generalActivityTab.setCategoryId(activityCategory.getId());
-        return generalActivityTab;
+    private static ActivityGeneralSettings getGeneralActivitySettings(TimeCareActivity timeCareActivity, ActivityCategory activityCategory, Activity activity) {
+        ActivityGeneralSettings activityGeneralSettings = (Optional.ofNullable(activity.getActivityGeneralSettings()).isPresent()) ? activity.getActivityGeneralSettings() :
+                new ActivityGeneralSettings();
+        activityGeneralSettings.setName(activity.getName());
+        activityGeneralSettings.setShortName(timeCareActivity.getShortName());
+        activityGeneralSettings.setCategoryId(activityCategory.getId());
+        return activityGeneralSettings;
     }
 
-    private static SkillActivityTab getSkillActivityTab(TimeCareActivity timeCareActivity, List<Skill> skills, Activity activity) {
-        SkillActivityTab skillActivityTab = new SkillActivityTab();
+    private static ActivitySkillSettings getSkillActivitySettings(TimeCareActivity timeCareActivity, List<Skill> skills, Activity activity) {
+        ActivitySkillSettings activitySkillSettings = new ActivitySkillSettings();
         if (!timeCareActivity.getArrayOfSkill().isEmpty()) {
             List<ActivitySkill> activitySkills = skills.stream().filter(kairosSkill -> timeCareActivity.getArrayOfSkill().stream().map(timeCareSkill -> timeCareSkill).
                     anyMatch(timeCareSkill -> timeCareSkill.equals(kairosSkill.getName()))).map(skill -> new ActivitySkill(skill.getName(), "2", skill.getId())).collect(Collectors.toList());
-            skillActivityTab = Optional.ofNullable(activity.getSkillActivityTab()).isPresent() ? activity.getSkillActivityTab() : new SkillActivityTab();
-            skillActivityTab.setActivitySkills(activitySkills);
-            activity.setSkillActivityTab(skillActivityTab);
+            activitySkillSettings = Optional.ofNullable(activity.getActivitySkillSettings()).isPresent() ? activity.getActivitySkillSettings() : new ActivitySkillSettings();
+            activitySkillSettings.setActivitySkills(activitySkills);
+            activity.setActivitySkillSettings(activitySkillSettings);
         }
-        return skillActivityTab;
+        return activitySkillSettings;
     }
 
-    private static TimeCalculationActivityTab getTimeCalculationActivityTab(TimeCareActivity timeCareActivity, Activity activity) {
-        TimeCalculationActivityTab timeCalculationActivityTab = Optional.ofNullable(activity.getTimeCalculationActivityTab()).isPresent() ?
-                activity.getTimeCalculationActivityTab() : new TimeCalculationActivityTab();
+    private static ActivityTimeCalculationSettings getTimeCalculationActivitySettings(TimeCareActivity timeCareActivity, Activity activity) {
+        ActivityTimeCalculationSettings activityTimeCalculationSettings = Optional.ofNullable(activity.getActivityTimeCalculationSettings()).isPresent() ?
+                activity.getActivityTimeCalculationSettings() : new ActivityTimeCalculationSettings();
         List<String> balanceTypes = new ArrayList<>();
         balanceTypes.add(timeCareActivity.getBalanceType().replace(" ", "_"));
-        timeCalculationActivityTab.setMethodForCalculatingTime(durationCalculationMethod(timeCareActivity.getTimeMethod()));
-        timeCalculationActivityTab.setBalanceType(balanceTypes);
-        if (timeCalculationActivityTab.getMethodForCalculatingTime().equals(FIXED_TIME)) {
-            timeCalculationActivityTab.setFixedTimeValue(0l);
+        activityTimeCalculationSettings.setMethodForCalculatingTime(durationCalculationMethod(timeCareActivity.getTimeMethod()));
+        activityTimeCalculationSettings.setBalanceType(balanceTypes);
+        if (activityTimeCalculationSettings.getMethodForCalculatingTime().equals(FIXED_TIME)) {
+            activityTimeCalculationSettings.setFixedTimeValue(0l);
         }
-        timeCalculationActivityTab.setDefaultStartTime(LocalTime.of(7, 0));
-        timeCalculationActivityTab.setMultiplyWithValue(1d);
-        timeCalculationActivityTab.setMultiplyWith(true);
+        activityTimeCalculationSettings.setDefaultStartTime(LocalTime.of(7, 0));
+        activityTimeCalculationSettings.setMultiplyWithValue(1d);
+        activityTimeCalculationSettings.setMultiplyWith(true);
         if (!StringUtils.isBlank(timeCareActivity.getMultiplyTimeWith())) {
-            timeCalculationActivityTab.setMultiplyWithValue(Double.parseDouble(timeCareActivity.getMultiplyTimeWith()));
-            timeCalculationActivityTab.setMultiplyWith(true);
+            activityTimeCalculationSettings.setMultiplyWithValue(Double.parseDouble(timeCareActivity.getMultiplyTimeWith()));
+            activityTimeCalculationSettings.setMultiplyWith(true);
         }
-        return timeCalculationActivityTab;
+        return activityTimeCalculationSettings;
     }
 
-    private static RulesActivityTab getRulesActivityTab(TimeCareActivity timeCareActivity, List<PhaseDTO> phases, Activity activity) {
-        RulesActivityTab rulesActivityTab = Optional.ofNullable(activity.getRulesActivityTab()).isPresent() ? activity.getRulesActivityTab() :
-                new RulesActivityTab();
+    private static ActivityRulesSettings getRulesActivitySettings(TimeCareActivity timeCareActivity, List<PhaseDTO> phases, Activity activity) {
+        ActivityRulesSettings activityRulesSettings = Optional.ofNullable(activity.getActivityRulesSettings()).isPresent() ? activity.getActivityRulesSettings() :
+                new ActivityRulesSettings();
 
-        rulesActivityTab.setEligibleForStaffingLevel(timeCareActivity.getIsStaffing());
-        return rulesActivityTab;
+        activityRulesSettings.setEligibleForStaffingLevel(timeCareActivity.getIsStaffing());
+        return activityRulesSettings;
     }
 
-    private static BalanceSettingsActivityTab getBalanceSettingsActivityTab(TimeCareActivity timeCareActivity, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId, Activity activity) {
-        BalanceSettingsActivityTab balanceSettingsActivityTab = Optional.ofNullable(activity.getBalanceSettingsActivityTab()).isPresent() ? activity.getBalanceSettingsActivityTab() :
-                new BalanceSettingsActivityTab();
-        balanceSettingsActivityTab.setTimeTypeId(timeCareActivity.getIsWork() && timeCareActivity.getIsPresence() ? presenceTimeTypeId : absenceTimeTypeId);
-        balanceSettingsActivityTab.setNegativeDayBalancePresent(timeCareActivity.getNegativeDayBalance());
-        return balanceSettingsActivityTab;
+    private static ActivityBalanceSettings getBalanceSettingsActivitySettings(TimeCareActivity timeCareActivity, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId, Activity activity) {
+        ActivityBalanceSettings activityBalanceSettings = Optional.ofNullable(activity.getActivityBalanceSettings()).isPresent() ? activity.getActivityBalanceSettings() :
+                new ActivityBalanceSettings();
+        activityBalanceSettings.setTimeTypeId(timeCareActivity.getIsWork() && timeCareActivity.getIsPresence() ? presenceTimeTypeId : absenceTimeTypeId);
+        activityBalanceSettings.setNegativeDayBalancePresent(timeCareActivity.getNegativeDayBalance());
+        return activityBalanceSettings;
     }
 
-    public  static void initializeActivityTabs(Activity activity,List<PhaseTemplateValue> phaseTemplateValues,GlideTimeSettingsDTO glideTimeSettingsDTO){
+    public  static void initializeActivitySettings(Activity activity, List<PhaseTemplateValue> phaseTemplateValues, GlideTimeSettingsDTO glideTimeSettingsDTO){
 
-        RulesActivityTab rulesActivityTab = new RulesActivityTab();
-        PQLSettings pqlSettings=new PQLSettings();
-        rulesActivityTab.setPqlSettings(pqlSettings);
-        rulesActivityTab.setCutOffBalances(CutOffIntervalUnit.CutOffBalances.EXPIRE);
-        activity.setRulesActivityTab(rulesActivityTab);
+        ActivityRulesSettings activityRulesSettings = new ActivityRulesSettings();
+        activityRulesSettings.setPqlSettings(new PQLSettings());
+        activityRulesSettings.setCutOffBalances(CutOffIntervalUnit.CutOffBalances.EXPIRE);
+        activity.setActivityRulesSettings(activityRulesSettings);
 
-        TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab(ENTERED_TIMES, 0L, true, LocalTime.of(7, 0), 1d);
-        activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
+        ActivityTimeCalculationSettings activityTimeCalculationSettings = new ActivityTimeCalculationSettings(ENTERED_TIMES, 0L, true, LocalTime.of(7, 0), 1d);
+        activity.setActivityTimeCalculationSettings(activityTimeCalculationSettings);
 
-        IndividualPointsActivityTab individualPointsActivityTab = new IndividualPointsActivityTab("addHourValues", 0.0);
-        activity.setIndividualPointsActivityTab(individualPointsActivityTab);
+        ActivityIndividualPointsSettings activityIndividualPointsSettings = new ActivityIndividualPointsSettings("addHourValues", 0.0);
+        activity.setActivityIndividualPointsSettings(activityIndividualPointsSettings);
 
-        CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab(false, false, false);
-        activity.setCommunicationActivityTab(communicationActivityTab);
+        ActivityCommunicationSettings activityCommunicationSettings = new ActivityCommunicationSettings(false, false, false);
+        activity.setActivityCommunicationSettings(activityCommunicationSettings);
 
-        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(AppConstants.MAX_ONE_ACTIVITY_PER_SHIFT, 0, true);
-        activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
+        ActivityOptaPlannerSetting activityOptaPlannerSetting = new ActivityOptaPlannerSetting(AppConstants.MAX_ONE_ACTIVITY_PER_SHIFT, 0, true);
+        activity.setActivityOptaPlannerSetting(activityOptaPlannerSetting);
 
-        CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = new CTAAndWTASettingsActivityTab(false);
-        activity.setCtaAndWtaSettingsActivityTab(ctaAndWtaSettingsActivityTab);
+        ActivityCTAAndWTASettings activityCTAAndWTASettings = new ActivityCTAAndWTASettings(false);
+        activity.setActivityCTAAndWTASettings(activityCTAAndWTASettings);
 
-        PhaseSettingsActivityTab phaseSettingsActivityTab=new PhaseSettingsActivityTab(phaseTemplateValues);
-        activity.setPhaseSettingsActivityTab(phaseSettingsActivityTab);
-        activity.setNotesActivityTab(new NotesActivityTab());
+        ActivityPhaseSettings activityPhaseSettings =new ActivityPhaseSettings(phaseTemplateValues);
+        activity.setActivityPhaseSettings(activityPhaseSettings);
+        activity.setActivityNotesSettings(new ActivityNotesSettings());
 
-        SkillActivityTab skillActivityTab = new SkillActivityTab();
-        activity.setSkillActivityTab(skillActivityTab);
-        activity.setLocationActivityTab(ActivityUtil.initializeLocationActivityTab(glideTimeSettingsDTO));
-        BalanceSettingsActivityTab balanceSettingsActivityTab = new BalanceSettingsActivityTab(false, false);
+        ActivitySkillSettings activitySkillSettings = new ActivitySkillSettings();
+        activity.setActivitySkillSettings(activitySkillSettings);
+        activity.setActivityLocationSettings(ActivityUtil.initializeLocationActivitySettings(glideTimeSettingsDTO));
+        ActivityBalanceSettings activityBalanceSettings = new ActivityBalanceSettings(false, false);
 
-        activity.setBalanceSettingsActivityTab(balanceSettingsActivityTab);
+        activity.setActivityBalanceSettings(activityBalanceSettings);
     }
 
     public static Set<BigInteger> getAllActivities(ShiftWithActivityDTO shift) {

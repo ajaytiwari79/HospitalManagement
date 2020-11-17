@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.kairos.commons.utils.DateTimeInterval;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +10,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+
+import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
 
 @Getter
 @Setter
@@ -31,6 +35,9 @@ public class Duration {
             return 0;
     }
 
+    public DateTimeInterval getInterval(LocalDate localDate){
+        return new DateTimeInterval(asZonedDateTime(localDate,from),from.isAfter(to) ? asZonedDateTime(localDate.plusDays(1),to) : asZonedDateTime(localDate,to));
+    }
 
     @Override
     public boolean equals(Object o) {

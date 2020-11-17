@@ -1,5 +1,7 @@
 package com.kairos.controller.access_group;
 
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.dto.user.access_permission.AccessPageStatusDTO;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
@@ -8,6 +10,7 @@ import com.kairos.persistence.model.access_permission.Tab;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -103,5 +107,41 @@ public class AccessPageController {
     @GetMapping(value = "/module/{moduleId}/language/{languageId}")
     public ResponseEntity<Map<String, Object>> getLanguageSpecificData(@PathVariable String moduleId, @PathVariable Long languageId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getLanguageDataByModuleId(moduleId,languageId));
+    }
+
+    @ApiOperation(value = "add translated data")
+    @PostMapping(COUNTRY_URL + "/access_page/{accessPageId}/update_translation")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfaccesspage(@PathVariable String moduleId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.updateTranslation(moduleId, translations));
+    }
+
+    @ApiOperation(value = "get translated data")
+    @GetMapping(COUNTRY_URL + "/access_page/{accessPageId}/translation")
+    public ResponseEntity<Map<String, Object>> getTranslatedData(@PathVariable Long accessPageId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getTranslatedData(accessPageId));
+    }
+
+    @ApiOperation(value = "get tab hierarchy")
+    @GetMapping("/tab_hierarchy")
+    public ResponseEntity<Map<String, Object>> getTabHierarchy(@RequestParam("languageId") Long languageId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getTabHierarchy(languageId));
+    }
+
+    @ApiOperation(value = "set ulr in  tab hierarchy")
+    @PutMapping("/set_url_in_pages")
+    public ResponseEntity<Map<String, Object>> setUrlInTabHierarchy() throws IOException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.setUrlInAccessPages());
+    }
+
+    @ApiOperation(value = "add translated data")
+    @PutMapping(COUNTRY_URL + "/access_page//module/{moduleId}/language_settings")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfKpiAccessPages(@PathVariable String moduleId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.updateTranslation(moduleId, translations));
+    }
+
+    @ApiOperation(value = "add translated data")
+    @PutMapping(UNIT_URL + "/access_page//module/{moduleId}/language_settings")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfKpiAccessPagesAtUnit(@PathVariable String moduleId, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.updateTranslation(moduleId, translations));
     }
 }

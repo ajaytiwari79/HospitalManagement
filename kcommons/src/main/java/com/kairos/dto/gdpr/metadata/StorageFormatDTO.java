@@ -17,7 +17,8 @@ public class StorageFormatDTO {
     private Long id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
-    @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$")
+    @Pattern(message = "error.message.name.more.than.one.characters.Allowed", regexp = "^.{2,}$")
+    @Pattern(message = "error.message.name.special.character.or.first.char.num.notAllowed", regexp = "^[a-zA-Z][a-zA-Z0-9\\s]+$")
     private String name;
 
     public String getName() { return name.trim(); }

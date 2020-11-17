@@ -118,11 +118,11 @@ public class ProcessingActivityService {
 
     private List<RelatedDataSubject> createRelatedDataProcessingActivity(List<RelatedDataSubjectDTO> relatedDataSubjects) {
         List<RelatedDataSubject> dataSubjects = relatedDataSubjects.stream().map(dataSubjectDTO ->
-                new RelatedDataSubject(dataSubjectDTO.getId(), dataSubjectDTO.getName(),
+                new RelatedDataSubject(null, dataSubjectDTO.getName(),
                         dataSubjectDTO.getDataCategories().stream().map(dataCategoryDTO ->
-                                new RelatedDataCategory(dataCategoryDTO.getId(), dataCategoryDTO.getName(),
+                                new RelatedDataCategory(null, dataCategoryDTO.getName(),
                                         dataCategoryDTO.getDataElements().stream().map(relatedDataElementsDTO ->
-                                                new RelatedDataElements(relatedDataElementsDTO.getId(), relatedDataElementsDTO.getName(), relatedDataElementsDTO.getRelativeDeadlineDuration(), relatedDataElementsDTO.getRelativeDeadlineType())).collect(Collectors.toList()
+                                                new RelatedDataElements(null, relatedDataElementsDTO.getName(), relatedDataElementsDTO.getRelativeDeadlineDuration(), relatedDataElementsDTO.getRelativeDeadlineType())).collect(Collectors.toList()
                                         ))
                         ).collect(Collectors.toList()))
         ).collect(Collectors.toList());
@@ -190,7 +190,7 @@ public class ProcessingActivityService {
             processingActivity.setProcessingLegalBasis(processingLegalBasisRepository.findAllByIds(processingActivityDTO.getProcessingLegalBasis()));
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getRisks())) {
             processingActivityDTO.getRisks().forEach(organizationLevelRiskDTO -> organizationLevelRiskDTO.setOrganizationId(unitId));
-            processingActivity.setRisks(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingActivityDTO.getRisks(), Risk.class));
+            processingActivity.setRisks(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivityDTO.getRisks(), Risk.class));
         }
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getAssetIds())) {
             processingActivity.setAssets(assetRepository.findAllByUnitIdAndIds(unitId, processingActivityDTO.getAssetIds()));
@@ -206,7 +206,7 @@ public class ProcessingActivityService {
         processingActivity.setDescription(processingActivityDTO.getDescription());
         processingActivity.setControllerContactInfo(processingActivityDTO.getControllerContactInfo());
         processingActivity.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
-        processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
+        processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMaxDataSubjectVolume());
         processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setManagingDepartment(new ManagingOrganization(processingActivityDTO.getManagingDepartment().getManagingOrgId(), processingActivityDTO.getManagingDepartment().getManagingOrgName()));
         processingActivity.setProcessOwner(new Staff(processingActivityDTO.getProcessOwner().getStaffId(), processingActivityDTO.getProcessOwner().getFirstName(), processingActivityDTO.getProcessOwner().getLastName()));
@@ -277,12 +277,12 @@ public class ProcessingActivityService {
     private ProcessingActivityResponseDTO prepareProcessingActivityResponseData(ProcessingActivity processingActivity) {
         ProcessingActivityResponseDTO processingActivityResponseDTO = getProcessingActivityResponseDTO(processingActivity);
         if (CollectionUtils.isNotEmpty(processingActivity.getRisks())) {
-            processingActivityResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class));
+            processingActivityResponseDTO.setRisks(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class));
         }
         if (CollectionUtils.isNotEmpty(processingActivity.getAssets())) {
             processingActivityResponseDTO.setAssets(processingActivity.getAssets().stream().map(asset -> new AssetBasicResponseDTO(asset.getId(), asset.getName(), asset.getDescription(), asset.getHostingLocation(), asset.getManagingDepartment(), asset.isActive())).collect(Collectors.toList()));
         }
-        processingActivityResponseDTO.setDataSubjectList(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingActivity.getDataSubjectList(), RelatedDataSubjectDTO.class));
+        processingActivityResponseDTO.setDataSubjectList(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivity.getDataSubjectList(), RelatedDataSubjectDTO.class));
         if (CollectionUtils.isNotEmpty(processingActivity.getSubProcessingActivities())) {
             processingActivity.getSubProcessingActivities().forEach(subProcessingActivity -> processingActivityResponseDTO.getSubProcessingActivities().add(prepareProcessingActivityResponseData(subProcessingActivity)));
         }
@@ -297,16 +297,16 @@ public class ProcessingActivityService {
         processingActivityResponseDTO.setDescription(processingActivity.getDescription());
         processingActivityResponseDTO.setControllerContactInfo(processingActivity.getControllerContactInfo());
         processingActivityResponseDTO.setJointControllerContactInfo(processingActivity.getJointControllerContactInfo());
-        processingActivityResponseDTO.setMaxDataSubjectVolume(processingActivity.getMinDataSubjectVolume());
+        processingActivityResponseDTO.setMaxDataSubjectVolume(processingActivity.getMaxDataSubjectVolume());
         processingActivityResponseDTO.setMinDataSubjectVolume(processingActivity.getMinDataSubjectVolume());
         processingActivityResponseDTO.setManagingDepartment(ObjectMapperUtils.copyPropertiesByMapper(processingActivity.getManagingDepartment(), com.kairos.dto.gdpr.ManagingOrganization.class));
         processingActivityResponseDTO.setProcessOwner(ObjectMapperUtils.copyPropertiesByMapper(processingActivity.getProcessOwner(), com.kairos.dto.gdpr.Staff.class));
         processingActivityResponseDTO.setResponsibilityType(ObjectMapperUtils.copyPropertiesByMapper(processingActivity.getResponsibilityType(), ResponsibilityTypeResponseDTO.class));
-        processingActivityResponseDTO.setTransferMethods(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingActivity.getTransferMethods(), TransferMethodResponseDTO.class));
-        processingActivityResponseDTO.setProcessingPurposes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingActivity.getProcessingPurposes(), ProcessingPurposeResponseDTO.class));
-        processingActivityResponseDTO.setDataSources(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingActivity.getDataSources(), DataSourceResponseDTO.class));
-        processingActivityResponseDTO.setAccessorParties(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingActivity.getAccessorParties(), AccessorPartyResponseDTO.class));
-        processingActivityResponseDTO.setProcessingLegalBasis(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingActivity.getProcessingLegalBasis(), ProcessingLegalBasisResponseDTO.class));
+        processingActivityResponseDTO.setTransferMethods(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivity.getTransferMethods(), TransferMethodResponseDTO.class));
+        processingActivityResponseDTO.setProcessingPurposes(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivity.getProcessingPurposes(), ProcessingPurposeResponseDTO.class));
+        processingActivityResponseDTO.setDataSources(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivity.getDataSources(), DataSourceResponseDTO.class));
+        processingActivityResponseDTO.setAccessorParties(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivity.getAccessorParties(), AccessorPartyResponseDTO.class));
+        processingActivityResponseDTO.setProcessingLegalBasis(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivity.getProcessingLegalBasis(), ProcessingLegalBasisResponseDTO.class));
         processingActivityResponseDTO.setSuggested(processingActivity.isSuggested());
         processingActivityResponseDTO.setDataRetentionPeriod(processingActivity.getDataRetentionPeriod());
         processingActivityResponseDTO.setDpoContactInfo(processingActivity.getDpoContactInfo());
@@ -369,7 +369,7 @@ public class ProcessingActivityService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_PROCESSINGACTIVITY, processingActivityId);
         }
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingActivity.getDataSubjectList(), RelatedDataSubjectDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivity.getDataSubjectList(), RelatedDataSubjectDTO.class);
     }
 
     /*
@@ -390,14 +390,14 @@ public class ProcessingActivityService {
             processingActivityRiskResponseDTO.setMainParent(isParentProcessingActivity);
             processingActivityRiskResponseDTO.setName(processingActivity.getName());
             if (!isParentProcessingActivity) {
-                processingActivityRiskResponseDTO.setRisks(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class));
+                processingActivityRiskResponseDTO.setRisks(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class));
             }
             List<ProcessingActivity> subProcessingActivities = processingActivity.getSubProcessingActivities();
             if (!subProcessingActivities.isEmpty()) {
                 subProcessingActivityRiskResponseDTOS = prepareProcessingActivityRiskResponseDTOData(subProcessingActivities, false);
             }
             if (isParentProcessingActivity) {
-                subProcessingActivityRiskResponseDTOS.add(0, new ProcessingActivityRiskResponseDTO(processingActivityRiskResponseDTO.getId(), processingActivityRiskResponseDTO.getName(), processingActivityRiskResponseDTO.getMainParent(), ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class)));
+                subProcessingActivityRiskResponseDTOS.add(0, new ProcessingActivityRiskResponseDTO(processingActivityRiskResponseDTO.getId(), processingActivityRiskResponseDTO.getName(), processingActivityRiskResponseDTO.getMainParent(), ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivity.getRisks(), RiskBasicResponseDTO.class)));
                 processingActivityRiskResponseDTO.setProcessingActivities(subProcessingActivityRiskResponseDTOS);
             }
             processingActivityRiskResponseDTOS.add(processingActivityRiskResponseDTO);
@@ -439,5 +439,14 @@ public class ProcessingActivityService {
     }
 
 
+    public ProcessingActivityRiskResponseDTO updateRiskDetail(Long unitId, Long id, ProcessingActivityRiskResponseDTO processingActivityRiskResponseDTO) {
+        ProcessingActivity processingActivity = processingActivityRepository.findByIdAndOrganizationIdAndDeletedFalse(id, unitId);
+        if (!processingActivity.isActive()) {
+            exceptionService.invalidRequestException("message.processing.activity.inactive");
+        }
+        processingActivity.setRisks(ObjectMapperUtils.copyCollectionPropertiesByMapper(processingActivityRiskResponseDTO.getRisks(), Risk.class));
+        processingActivityRepository.save(processingActivity);
+        return processingActivityRiskResponseDTO;
+    }
 }
 

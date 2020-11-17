@@ -8,8 +8,10 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelTemplateDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
@@ -28,6 +30,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
@@ -42,6 +45,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
+    @Inject private StaffingLevelMongoRepository staffingLevelMongoRepository;
 
     /**
      * @param staffingLevelTemplateDTO
@@ -59,12 +63,12 @@ public class StaffingLevelTemplateService extends MongoBaseService {
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
         }
-
-        StaffingLevelTemplate staffingLevelTemplate = new StaffingLevelTemplate();
-        ObjectMapperUtils.copyProperties(staffingLevelTemplateDTO, staffingLevelTemplate);
-        this.save(staffingLevelTemplate);
+        StaffingLevel staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId,asDate(staffingLevelTemplateDTO.getSelectedDate()));
+        StaffingLevelTemplate staffingLevelTemplate = ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplateDTO, StaffingLevelTemplate.class);
+        staffingLevelTemplate.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval());
+        staffingLevelTemplateRepository.save(staffingLevelTemplate);
         BeanUtils.copyProperties(staffingLevelTemplate, staffingLevelTemplateDTO);
-        staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().stream()
+        staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
 
         return staffingLevelTemplateDTO;
@@ -124,8 +128,12 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         LocalDate localDate = DateUtils.asLocalDate(proposedDate);
 
         String day = localDate.getDayOfWeek().name();
-        Day dayEnum = holidayDayType.isPresent() ? Day.EVERYDAY : Day.valueOf(day);
-        return staffingLevelTemplateRepository.findByUnitIdDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+        Day dayEnum = Day.valueOf(day);
+        if(!holidayDayType.isPresent()) {
+            return staffingLevelTemplateRepository.findByUnitIdDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+        }else {
+            return staffingLevelTemplateRepository.findByUnitIdDayTypeAndDate(unitId,proposedDate, proposedDate, dayTypeIds,null);
+        }
         }
 
     /**
@@ -150,31 +158,31 @@ public class StaffingLevelTemplateService extends MongoBaseService {
             }
                 List<String> errors=new ArrayList<>();
                 if(!Optional.ofNullable(staffingLevelTemplateDTO.getValidity().getEndDate()).isPresent()) {
-                    if (!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
-                            activity.getGeneralActivityTab().getEndDate().isBefore(staffingLevelTemplateDTO.getValidity().getStartDate())) {
+                    if (!Optional.ofNullable(activity.getActivityGeneralSettings().getEndDate()).isPresent() &&
+                            activity.getActivityGeneralSettings().getEndDate().isBefore(staffingLevelTemplateDTO.getValidity().getStartDate())) {
                         errors.add(exceptionService.getLanguageSpecificText(ACTIVITY_OUT_OF_RANGE, activity.getName()));
                     }
                 }else {
-                    if(Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
-                            (activity.getGeneralActivityTab().getEndDate().isBefore(staffingLevelTemplateDTO.getValidity().getStartDate()) ||
-                                    activity.getGeneralActivityTab().getStartDate().isAfter(staffingLevelTemplateDTO.getValidity().getEndDate()))){
+                    if(Optional.ofNullable(activity.getActivityGeneralSettings().getEndDate()).isPresent() &&
+                            (activity.getActivityGeneralSettings().getEndDate().isBefore(staffingLevelTemplateDTO.getValidity().getStartDate()) ||
+                                    activity.getActivityGeneralSettings().getStartDate().isAfter(staffingLevelTemplateDTO.getValidity().getEndDate()))){
                         errors.add(exceptionService.getLanguageSpecificText(ACTIVITY_OUT_OF_RANGE,activity.getName()));
-                    } else if(!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
-                            activity.getGeneralActivityTab().getStartDate().isAfter(staffingLevelTemplateDTO.getValidity().getEndDate())){
+                    } else if(!Optional.ofNullable(activity.getActivityGeneralSettings().getEndDate()).isPresent() &&
+                            activity.getActivityGeneralSettings().getStartDate().isAfter(staffingLevelTemplateDTO.getValidity().getEndDate())){
                         errors.add(exceptionService.getLanguageSpecificText(ACTIVITY_OUT_OF_RANGE,activity.getName()));
                     }
                 }
 
-                if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
+                if(!activity.getActivityRulesSettings().isEligibleForStaffingLevel())  {
                     errors.add(exceptionService.getLanguageSpecificText(ACTIVITY_NOT_ELIGIBLE_FOR_STAFFING_LEVEL,activity.getName()));
                 }
-                if(!CollectionUtils.containsAny(staffingLevelTemplateDTO.getDayType(),activity.getRulesActivityTab().getDayTypes())){
+                if(!CollectionUtils.containsAny(staffingLevelTemplateDTO.getDayType(),activity.getActivityRulesSettings().getDayTypes())){
                     errors.add(exceptionService.getLanguageSpecificText(ACTIVITY_NOT_ELIGIBLE_DAYTYPE,activity.getName()));
                 }
 
                 if(!errors.isEmpty()){
-                activityValidationErrors.add(new ActivityValidationError(activity.getId(),activity.getName(),activity.getGeneralActivityTab().getStartDate(),
-                        activity.getGeneralActivityTab().getEndDate(),errors));
+                activityValidationErrors.add(new ActivityValidationError(activity.getId(),activity.getName(),activity.getActivityGeneralSettings().getStartDate(),
+                        activity.getActivityGeneralSettings().getEndDate(),errors));
             } });
         return activityValidationErrors;
 

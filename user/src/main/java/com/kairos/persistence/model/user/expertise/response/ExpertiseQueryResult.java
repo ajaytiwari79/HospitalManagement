@@ -2,6 +2,11 @@ package com.kairos.persistence.model.user.expertise.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
@@ -15,10 +20,7 @@ import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
 
@@ -53,6 +55,10 @@ public class ExpertiseQueryResult {
     private Location unionLocation;// in case of expertise at unit level only
     private Set<Long> supportedUnitIds;
     private List<ExpertiseLineQueryResult> expertiseLines=new ArrayList<>();
+    private CTACompensationSettingDTO ctaCompensationSetting;
+    private Long countryId;
+    private Long unitId;
+    private Map<String, TranslationInfo> translations;
 
     @JsonIgnore
     public ExpertiseLineQueryResult getCurrentlyActiveLine(){
@@ -70,4 +76,13 @@ public class ExpertiseQueryResult {
         expertiseLines.forEach(k->k.setBreakPaymentSetting(this.breakPaymentSetting));
         return expertiseLines;
     }
+
+    public String getName() {
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
+    }
+
+    public String getDescription() {
+        return  TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
+    }
+
 }

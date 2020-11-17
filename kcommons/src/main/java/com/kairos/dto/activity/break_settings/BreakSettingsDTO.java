@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 import java.math.BigInteger;
 
@@ -19,5 +20,10 @@ public class BreakSettingsDTO {
     private BigInteger activityId;
     private boolean primary;
     private boolean includeInPlanning;
+    
+    @AssertTrue(message = "error.breakSettings.breakDuration.must.lessThanShiftDuration")
+    public boolean isValid() {
+        return shiftDurationInMinute > breakDurationInMinute;
+    }
 
 }

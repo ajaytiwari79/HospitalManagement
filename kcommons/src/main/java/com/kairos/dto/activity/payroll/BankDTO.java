@@ -4,11 +4,18 @@ package com.kairos.dto.activity.payroll;
  *
  */
 
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
+import java.util.Map;
 
+@Getter
+@Setter
 public class BankDTO {
     private BigInteger id;
     @NotBlank(message = "name.absent")
@@ -24,81 +31,14 @@ public class BankDTO {
     private Long staffId;
     @Range(message = "accountNumber.greater_than.provided_value")
     private Long accountNumber;
-
-
-    public BankDTO() {
-        //Default Constructor
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
+    private Map<String, TranslationInfo> translations;
+    private Long countryId;
 
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name.trim();
+        return TranslationUtil.getName(translations,name);
     }
 
     public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getRegistrationNumber() {
-        return registrationNumber;
-    }
-
-    public void setRegistrationNumber(String registrationNumber) {
-        this.registrationNumber = registrationNumber.trim();
-    }
-
-    public String getInternationalAccountNumber() {
-        return internationalAccountNumber;
-    }
-
-    public void setInternationalAccountNumber(String internationalAccountNumber) {
-        this.internationalAccountNumber = internationalAccountNumber.trim();
-    }
-
-    public String getSwiftCode() {
-        return swiftCode;
-    }
-
-    public void setSwiftCode(String swiftCode) {
-        this.swiftCode = swiftCode.trim();
-    }
-
-    public Long getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(Long organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-    public Long getAccountNumber() {
-        return accountNumber;
-    }
-
-    public void setAccountNumber(Long accountNumber) {
-        this.accountNumber = accountNumber;
+        return TranslationUtil.getDescription(translations,description);
     }
 }

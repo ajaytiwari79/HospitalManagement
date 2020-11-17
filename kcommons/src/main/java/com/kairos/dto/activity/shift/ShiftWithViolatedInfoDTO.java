@@ -21,9 +21,18 @@ public class ShiftWithViolatedInfoDTO {
     @Valid
     private List<ShiftDTO> shifts;
     private ViolatedRulesDTO violatedRules = new ViolatedRulesDTO();
+    private String actionPerformed;
 
     public ShiftWithViolatedInfoDTO(ViolatedRulesDTO violatedRules) {
         this.violatedRules = violatedRules;
     }
 
+    public ShiftWithViolatedInfoDTO(@Valid List<ShiftDTO> shifts) {
+        this.shifts = shifts;
+    }
+
+    public ShiftWithViolatedInfoDTO(List<ShiftDTO> shifts, ViolatedRulesDTO violatedRules){
+        this.shifts = shifts;
+        this.violatedRules = violatedRules;
+    }
 }

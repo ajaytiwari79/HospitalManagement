@@ -1,5 +1,6 @@
 package com.kairos.controller.access_group;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
 import com.kairos.dto.user.access_permission.AccessGroupPermissionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -270,4 +271,40 @@ public class AccessGroupController {
     public ResponseEntity<Map<String, Object>> getAccessGroupDayTypesAndUserId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getAccessGroupWithDayTypesByStaffIdAndUnitId(unitId));
     }
+
+    @ApiOperation("Get unit Access Roles by accessGroupId")
+    @PostMapping(value = UNIT_URL + "/get_access_roles" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAccessRolesByAccessGroupId(@PathVariable Long unitId,@RequestBody Set<Long> accessGroupIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getAccessRoles(accessGroupIds));
+    }
+
+    @ApiOperation("update translation data")
+    @PutMapping(value = UNIT_URL + "/access_group/{id}/language_settings" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfAccessGroupOfOrganization(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.updateTranslation(id,translations));
+    }
+
+    @ApiOperation("update translation data")
+    @PutMapping(value = UNIT_URL + "/access_page/{id}/language_settings" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfAccessPageOfOrganization(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.updateTranslationOfAccessPage(id, translations));
+    }
+
+    @ApiOperation("update translation data")
+    @PutMapping(value = COUNTRY_URL + "/access_group/{id}/language_settings" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfAccessGroup(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.updateTranslation(id,translations));
+    }
+
+    @ApiOperation("update translation data")
+    @PutMapping(value = COUNTRY_URL + "/access_page/{id}/language_settings" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfAccessPage(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.updateTranslationOfAccessPage(id, translations));
+    }
+
 }

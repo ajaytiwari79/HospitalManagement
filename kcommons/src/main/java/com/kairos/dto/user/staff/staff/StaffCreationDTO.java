@@ -9,6 +9,7 @@ import com.kairos.enums.StaffStatusEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.NotBlank;
@@ -47,6 +48,7 @@ public class StaffCreationDTO {
     @NotNull(message = "error.staff.accessGroup.id.notnull")
     private Long accessGroupId;
     private StaffStatusEnum currentStatus;
+    private String email;
 
     private List<TagDTO> tags;
 
@@ -57,16 +59,11 @@ public class StaffCreationDTO {
         return inactiveFrom.getTime();
     }
 
+    public String getPrivateEmail() {
+        return privateEmail=privateEmail==null?email:privateEmail;
+    }
 
-    public StaffCreationDTO(@NotNull(message = "error.staff.firstname.notnull") String firstName, @NotNull(message = "error.staff.lastname.notnull") String lastName, @NotNull(message = "error.staff.cprNumber.notnull") String cprNumber, String familyName, @Email(message = "error.email.valid") String privateEmail, Gender gender, String userName,  Long externalId, @NotNull(message = "error.staff.accessGroup.id.notnull") Long accessGroupId) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.cprNumber = cprNumber;
-        this.familyName = familyName;
-        this.privateEmail = privateEmail;
-        this.gender = gender;
-        this.userName = userName;
-        this.externalId = externalId;
-        this.accessGroupId = accessGroupId;
+    public void setCprNumber(String cprNumber) {
+        this.cprNumber = StringUtils.isEmpty(cprNumber)?null:cprNumber;
     }
 }

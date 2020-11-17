@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -20,7 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ResourceWrapper implements Serializable {
+public class ResourceWrapper {
     private Long id;
     private String registrationNumber;
     private String number;

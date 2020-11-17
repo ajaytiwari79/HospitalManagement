@@ -1,0 +1,20 @@
+db.getCollection('shifts').find({"deleted":false}).forEach( function (shift) {
+var timeTypeId = shift.activities.forEach(function(ac){
+    if(ac.activityId){
+    var activity = db.activities.findOne({"_id":ac.activityId});
+    if(activity.activityBalanceSettings.timeType){
+        ac.secondLevelTimeType = activity.activityBalanceSettings.timeType
+        }
+}
+    });
+
+db.shifts.save(shift);
+});
+
+
+db.getCollection('breakSettings').find({}).forEach(function(breakSetting){
+    if(breakSetting.shiftDurationInMinute<breakSetting.breakDurationInMinute){
+        breakSetting.breakDurationInMinute = NumberLong(30);
+        db.breakSettings.save(breakSetting);
+        }
+    });

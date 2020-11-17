@@ -8,6 +8,7 @@ public class ActivityMessagesConstants {
 
 
     public static final String ACTIVITY = "activity";
+    public static final String ACTION = "action";
     public static final String EXCEPTION_INVALIDREQUEST = "exception.invalidRequest";
     public static final String EXCEPTION_ALREADYINUSE = "exception.alreadyInUse";
     public static final String ERROR_WTA_INVALID  = "error.wta.invalid";
@@ -38,6 +39,9 @@ public class ActivityMessagesConstants {
     public static final String ERROR_CTA_NOTFOUND  = "error.cta.notFound";
     public static final String ERROR_CTA_INVALID  = "error.cta.invalid";
     public static final String MESSAGE_CTA_NOTFOUND = "message.cta.notFound";
+    public static final String PUBLISH_DATE_SHOULD_BE_IN_FUTURE = "publish.date.should.be.in.future";
+    public static final String STARTDATE_CANNOT_CHANGE = "startDate.cannot.change";
+    public static final String ERROR_NO_GAP = "error.no.gap";
     public static final String ERROR_DAYVALUE_ZERO = "error.DayValue.zero";
     public static final String ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY = "error.OrganizationService.name.notEmpty";
     public static final String ERROR_EXPERTISE_NAME_NOTEMPTY = "error.Expertise.name.notEmpty";
@@ -62,6 +66,7 @@ public class ActivityMessagesConstants {
     public static final String ERROR_TASKTYPE_TITLE_NOTNULL = "error.Tasktype.title.notnull";
     public static final String EXCEPTION_DATANOTFOUND = "exception.dataNotFound";
     public static final String EXCEPTION_DUPLICATEDATA = "exception.duplicateData";
+    public static final String REQUEST_ABSENCE_ACTIVITY_TYPE = "request.absence.activity.type";
     public static final String ERROR_EXCEPTION_TYPE_NOTEXIST = "error.exception.type.notexist";
     public static final String ERROR_EXCEPTION_NOTFOUND = "error.exception.notfound";
     public static final String MESSAGE_CATEGORY_RENAME = "message.category.rename";
@@ -92,6 +97,8 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_OVERLAP_WITH_FULL_DAY = "message.shift.overlap.with.full_day";
     public static final String ERROR_ACTIVITY_ALREADYUSE_PRIORITY  = "error.activity.alreadyuse.priority";
     public static final String MESSAGE_ACTIVITY_PRIORITY_ID = "message.activity.priority.id";
+    public static final String MESSAGE_DUPLICATE_ACTIVITY_PRIORITY_ID = "message.duplicate.activity.priority.id";
+    public static final String MESSAGE_ACTIVITY_PRIORITY_ID_NOT_SET = "message.activity.priority.id.not.set";
     public static final String MESSAGE_ACTIVITY_PRIORITY_SAME_SEQUENCE  = "message.activity.priority.same.sequence";
     public static final String MESSAGE_ACTIVITY_PRIORITY_SEQUENCE  = "message.activity.priority.sequence";
     public static final String MESSAGE_TIMETYPE_LINKED = "message.timetype.linked";
@@ -215,6 +222,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_TEAM_ACTIVITY_NOT_ASSIGN = "message.team.activity.not.assign";
     public static final String MESSAGE_WTA_NAME_DUPLICATE = "message.wta.name.duplicate";
     public static final String MESSAGE_WTA_ID = "message.wta.id";
+    public static final String MESSAGE_WTA_VALUE = "message.wta.value";
     public static final String MESSAGE_WTA_EXPIRED_UNIT = "message.wta.expired-unit";
     public static final String MESSAGE_WTA_START_ENDDATE = "message.wta.start-end-date";
     public static final String MESSAGE_WTA_NAME_ALREADYEXISTS = "message.wta.name.alreadyExists";
@@ -252,6 +260,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS = "message.activity.active.alreadyExists";
     public static final String MESSAGE_ACTIVITY_ENDDATE_REQUIRED = "message.activity.enddate.required";
     public static final String MESSAGE_ACTIVITY_OVERLAPING = "message.activity.overlaping";
+    public static final String MESSAGE_ACTIVITY_NOTFOUND = "message.activity.notfound";
     public static final String SHORTEST_TIME_GREATER_LONGEST = "shortest.time.greater.longest";
     public static final String EARLIEST_START_TIME_LESS_LATEST = "earliest.start.time.less.latest";
     public static final String LONGEST_DURATION_EXCEED_LIMIT = "longest.duration.exceed.limit";
@@ -287,6 +296,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_STAFF_ACTIVITY_SETTINGS_ABSENT = "message.staff.activity.settings.absent";
     public static final String EMPLOYMENT_TYPE_ABSENT_ACTIVITY = "employment_type.absent.activity";
     public static final String EXPERTISE_ABSENT_ACTIVITY = "expertise.absent.activity";
+    public static final String STAFF_SKILL_DOES_NOT_MATCHED = "activity.skill.not.matched";
     public static final String DEFAULT_ADDED = "default.added";
     public static final String ERROR_EMPTY_STAFF_OR_ACTIVITY_SETTING = "error.empty.staff.or.activity.setting";
     public static final String EMPLOYMENT_ABSENT = "employment.absent";
@@ -298,6 +308,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL  = "message.ruleTemplate.counter.value.notNull";
     public static final String MESSAGE_RULETEMPLATE_COUNTER_EXHAUSTED  = "message.ruleTemplate.counter.exhausted";
     public static final String MESSAGE_RULETEMPLATE_HOURS_NOTZERO  = "message.ruleTemplate.hours.notzero";
+    public static final String MESSAGE_MIN_GREATER_THAN_MAX  = "min.greater.max";
     public static final String MESSAGE_COUNTER_KPI_NOTFOUND = "message.counter.kpi.notfound";
     public static final String MESSAGE_ACCESSGROUP_KPI_NOTFOUND = "message.accessgroup.kpi.notfound";
     public static final String MESSAGE_ORGTYPE_KPI_NOTFOUND = "message.orgtype.kpi.notfound";
@@ -357,7 +368,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SELFROSTERING_METADATA_NULL = "message.selfRostering.metaData.null";
     public static final String REQUEST_ABSENCE_APPROVED = "request.absence.approved";
     public static final String REQUEST_ABSENCE_REQUESTED = "request.absence.request";
-    public static final String REQUEST_ABSENCE_ACTIVITY_TYPE = "request.absence.activity.type";
+    public static final String REQUES4T_ABSENCE_ACTIVITY_TYPE = "request.absence.activity.type";
     public static final String REALTIME_DURATION_NOT_CONFIGURED = "realtime.duration.not.configured";
     public static final String SHIFT_NOT_EXISTS = "shift.not.exists";
     public static final String MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF = "message.organization.protected.days.off";
@@ -371,7 +382,21 @@ public class ActivityMessagesConstants {
     public static final String SHORTCUT_ALREADY_EXISTS_NAME="message.shortcut.already.exists.name";
     public static final String ERROR_BLOCK_SETTING_NOT_FOUND = "error.block.setting.not.found";
     public static final String MESSAGE_BLOCKED_FOR_SHIFT_ENTER_AT_DATE = "message.blocked.for.shift.entered.at.date";
+    public static final String MESSAGE_STAFF_MAIN_EMPLOYMENT_NOT_FOUND= "message.staff.main.employment.notfound";
+    public static final String MESSAGE_STAFF_CARE_DAYS_NOT_FOUND = "message.staff.caredays.setting.notfound";
+    public static final String MESSAGE_ACTIVITY_USEDON_FREEDAY= "message.activity.used.on.freedays";
+    public static final String MESSAGE_ACTIVITY_USEDON_PROTECTEDDAYSOFF= "message.activity.used.on.protecteddaysoff";
+    public static final String MESSAGE_PROTECTEDDAYSOFF_ACTIVITY_NOT_FOUND="message.protected.day.off.activity.not.found";
+    public static final String PLEASE_SELECT_REPLACE_SETTINGS="message.replace_setting.absent";
+    public static final String MESSAGE_ACTIVITY_USEDON_APPROVEABSENCES= "message.activity.usedon.approve.absences";
+    public static final String MESSAGE_NON_WORKING_SICKNESS_ACTIVITY_NOT_FOUND= "message.activity.nonworking.sickness.activity.not.found";
+    public static final String EMPLOYMENT_NOT_VALID_TO_MARK_SICK = "employment.not.valid.to.mark.sick";
     public static final String CUT_OFF_CONFIGUATION = "activity.cutoff.configuration";
     public static final String ACTIVITY_NOT_ASSIGN_IN_PROTECTED_DAYS_OFF_RULE_TEMPLATE = "activity.not.assign.in.protected.days.off.rule.template";
+    public static final String STAFF_ALREADY_SICK="staff.already.sick";
+    public static final String MESSAGE_CTA_VALUE ="message.cta.value";
+    public static final String ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL = "error.value.changed.publish.date.null";
+    public static final String MESSAGE_FULLWEEK_STARTDAY_NOTFOUND = "message.fullWeek.startDay.notFound";
+
 
 }

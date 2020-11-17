@@ -1,7 +1,10 @@
 package com.kairos.service.activity;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityPriorityDTO;
+import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -203,7 +206,10 @@ public class ActivityPriorityService {
         if (isNull(activityPriority)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_PRIORITY_ID, activityPriorityId);
         }
-        activity.setActivityPriorityId(activityPriorityId);
+        boolean isExist = isPriorityIdExists(activity,activityPriorityId);
+        if(!isExist) {
+            activity.setActivityPriorityId(activityPriorityId);
+        }
         activityMongoRepository.save(activity);
         return true;
     }
@@ -214,6 +220,23 @@ public class ActivityPriorityService {
 
     public ActivityPriority getActivityPriorityById(BigInteger activityPriorityId){
         return activityPriorityMongoRepository.findOne(activityPriorityId);
+    }
+    public boolean isPriorityIdExists(Activity activity, BigInteger activityPriorityId) {
+        if (PriorityFor.NONE.equals(activity.getActivityBalanceSettings().getPriorityFor())) {
+            exceptionService.dataNotFoundException(MESSAGE_ACTIVITY_PRIORITY_ID_NOT_SET, activityPriorityId);
+        }
+        boolean isExist = activityMongoRepository.isActivityPriorityIdIsExistOrNot(activity.getActivityBalanceSettings().getPriorityFor(), activityPriorityId,activity.getId());
+        if (isExist) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_DUPLICATE_ACTIVITY_PRIORITY_ID, activityPriorityId);
+        }
+        return isExist;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger activityPriorityId, Map<String,TranslationInfo> translations) {
+        ActivityPriority activityPriority =activityPriorityMongoRepository.findOne(activityPriorityId);
+        activityPriority.setTranslations(translations);
+        activityPriorityMongoRepository.save(activityPriority);
+        return activityPriority.getTranslations();
     }
 
 }

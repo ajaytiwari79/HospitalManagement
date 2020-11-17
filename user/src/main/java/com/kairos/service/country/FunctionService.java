@@ -1,11 +1,13 @@
 package com.kairos.service.country;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
@@ -78,8 +80,12 @@ public class FunctionService {
     }
 
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsByCountry(long countryId) {
-        return functionGraphRepository.findFunctionsByCountry(countryId);
-
+        List<com.kairos.persistence.model.country.functions.FunctionDTO> functionDTOS = functionGraphRepository.findFunctionsByCountry(countryId);
+        functionDTOS.forEach(functionDTO -> {
+            functionDTO.setCountryId(countryId);
+            functionDTO.setTranslations(TranslationUtil.getTranslatedData(functionDTO.getTranslatedNames(),functionDTO.getTranslatedDescriptions()));
+        });
+        return functionDTOS;
     }
 
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsIdAndNameByCountry(long countryId) {
@@ -87,10 +93,33 @@ public class FunctionService {
     }
 
     public com.kairos.persistence.model.country.functions.FunctionDTO updateFunction(Long countryId, FunctionDTO functionDTO) {
+        Function function = validateDetails(countryId, functionDTO);
+        List<Level> levels = new ArrayList<>();
+        if (!functionDTO.getOrganizationLevelIds().isEmpty()) {
+            levels = countryGraphRepository.getLevelsByIdsIn(countryId, functionDTO.getOrganizationLevelIds());
+        }
+        List<Organization> unions = new ArrayList<>();
+        if (!functionDTO.getUnionIds().isEmpty()) {
+            unions = unitGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
+        }
+        functionGraphRepository.removeOrganizationLevelRelation(functionDTO.getId(),functionDTO.getOrganizationLevelIds());
+        function.setName(functionDTO.getName());
+        function.setDescription(functionDTO.getDescription());
+        function.setStartDate(functionDTO.getStartDate());
+        function.setEndDate(functionDTO.getEndDate());
+        function.setUnions(unions);
+        function.setOrganizationLevels(levels);
+        function.setIcon(functionDTO.getIcon());
+        function.setCode(functionDTO.getCode());
+        functionGraphRepository.save(function);
+        return new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
+                function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon(),function.getCode());
+    }
+
+    private Function validateDetails(Long countryId, FunctionDTO functionDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-
         }
         Function function = functionGraphRepository.findOne(functionDTO.getId());
         if (!Optional.ofNullable(function).isPresent() || function.isDeleted()) {
@@ -102,27 +131,7 @@ public class FunctionService {
             exceptionService.duplicateDataException(MESSAGE_FUNCTION_NAME_ALREADYEXIST, functionDTO.getName());
 
         }
-        List<Level> levels = new ArrayList<>();
-        if (!functionDTO.getOrganizationLevelIds().isEmpty()) {
-            levels = countryGraphRepository.getLevelsByIdsIn(countryId, functionDTO.getOrganizationLevelIds());
-        }
-        List<Organization> unions = new ArrayList<>();
-        if (!functionDTO.getUnionIds().isEmpty()) {
-            unions = unitGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
-        }
-
-        function.setName(functionDTO.getName());
-        function.setDescription(functionDTO.getDescription());
-        function.setStartDate(functionDTO.getStartDate());
-        function.setEndDate(functionDTO.getEndDate());
-        function.setUnions(unions);
-        function.setOrganizationLevels(levels);
-        function.setIcon(functionDTO.getIcon());
-        function.setCode(functionDTO.getCode());
-        functionGraphRepository.save(function);
-
-        return new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
-                function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon(),function.getCode());
+        return function;
     }
 
     public boolean deleteFunction(long functionId) {
@@ -153,8 +162,6 @@ public class FunctionService {
                 }
             }
             return employmentWithFunctionIdAndLocalDateMap;
-        } else {
-            //TODO throw exception
         }
         return null;
     }
@@ -200,7 +207,7 @@ public class FunctionService {
     }
 
     public Map<LocalDate, List<FunctionDTO>> findAppliedFunctionsAtEmployment(Long unitId, String startDate, String endDate) {
-        List<EmploymentQueryResult> employmentQueryResults = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(functionGraphRepository.findAppliedFunctionsAtEmpployment(unitId, startDate, endDate), EmploymentQueryResult.class);
+        List<EmploymentQueryResult> employmentQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(functionGraphRepository.findAppliedFunctionsAtEmpployment(unitId, startDate, endDate), EmploymentQueryResult.class);
         Map<LocalDate, List<FunctionDTO>> dateWiseFunctionMap = new HashMap<>();
         for (EmploymentQueryResult employmentQueryResult : employmentQueryResults) {
             for (com.kairos.persistence.model.country.functions.FunctionDTO appliedFunctionDTO : employmentQueryResult.getAppliedFunctions()) {
@@ -231,6 +238,20 @@ public class FunctionService {
 
     public Map<String, TranslationInfo> getTranslatedData(Long functionId) {
         Function function = functionGraphRepository.findOne(functionId);
+        return function.getTranslatedData();
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfCountryFunctions(Long functionId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Function function =functionGraphRepository.findOne(functionId);
+        function.setTranslatedNames(translatedNames);
+        function.setTranslatedDescriptions(translatedDescriptios);
+        functionGraphRepository.save(function);
         return function.getTranslatedData();
     }
 

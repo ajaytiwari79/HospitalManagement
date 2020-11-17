@@ -43,6 +43,7 @@ import static com.kairos.constants.CommonConstants.*;
 @Service
 public class SendGridMailService implements EmailService{
     private static final Logger LOGGER = LoggerFactory.getLogger(SendGridMailService.class);
+    public static final String EXCEPTION_OCCURED = "exception occured {}";
 
     @Inject
     private JavaMailSender javaMailSender;
@@ -64,7 +65,7 @@ public class SendGridMailService implements EmailService{
             javaMailSender.send(mimeMessage);
             LOGGER.info("Email sent");
         } catch (Exception e){
-            LOGGER.info("exception occured {}",e);
+            LOGGER.info(EXCEPTION_OCCURED,e);
         }
         return false;
     }
@@ -93,7 +94,7 @@ public class SendGridMailService implements EmailService{
             Response response = sendGrid.api(request);
             LOGGER.info("Mail response {}", response.getBody());
         } catch (IOException ex) {
-            LOGGER.error("exception occured {}", ex);
+            LOGGER.error(EXCEPTION_OCCURED, ex);
         }
     }
 
@@ -126,7 +127,7 @@ public class SendGridMailService implements EmailService{
 
 
             } catch (Exception e) {
-             LOGGER.info("exception occured {}",e);
+             LOGGER.info(EXCEPTION_OCCURED,e);
              return false;
             }
 

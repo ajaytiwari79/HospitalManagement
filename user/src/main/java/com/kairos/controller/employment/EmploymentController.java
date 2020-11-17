@@ -46,10 +46,10 @@ public class EmploymentController {
     @Inject private UnionService unionService;
     @Inject private InitialTimeBankLogService initialTimeBankLogService;
 
-    @ApiOperation(value = "Create a New Position")
+    @ApiOperation(value = "Create a New Employment")
     @PostMapping(value = "/employment")
-    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable Long unitId,  @RequestBody @Valid EmploymentDTO employmentDTO, @RequestParam("saveAsDraft") boolean saveAsDraft) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createEmployment(unitId, employmentDTO, false, saveAsDraft));
+    public ResponseEntity<Map<String, Object>> createEmployment(@RequestBody @Valid EmploymentDTO employmentDTO, @RequestParam("saveAsDraft") boolean saveAsDraft) throws Exception {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createEmployment(employmentDTO, saveAsDraft));
     }
 
     /*
@@ -83,8 +83,8 @@ public class EmploymentController {
 
     @ApiOperation(value = "Update employment's WTA")
     @PutMapping(value = "/employment/{employmentId}/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> updateEmploymentWTA(@PathVariable Long employmentId, @PathVariable Long unitId, @PathVariable BigInteger wtaId, @RequestBody @Valid WTADTO wtadto) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.updateEmploymentWTA(unitId, employmentId, wtaId, wtadto));
+    public ResponseEntity<Map<String, Object>> updateEmploymentWTA(@PathVariable Long employmentId, @PathVariable Long unitId, @PathVariable BigInteger wtaId, @RequestBody @Valid WTADTO wtadto, @RequestParam("save") Boolean save) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.updateEmploymentWTA(unitId, employmentId, wtaId, wtadto,save));
     }
 
     @ApiOperation(value = "apply function to employment")

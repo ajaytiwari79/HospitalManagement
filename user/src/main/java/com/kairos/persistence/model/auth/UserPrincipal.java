@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.auth;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -72,10 +74,12 @@ public class UserPrincipal implements UserDetails, Authentication {
         details.setAge(this.user.getAge());
         details.setLastSelectedOrganizationId(this.getUser().getLastSelectedOrganizationId());
         details.setCountryId(this.getUser().getCountryId());
-        details.setUnitWiseAccessRole(this.getUser().getUnitWiseAccessRole());
-        details.setHubMember(this.user.getHubMember());
+        //details.setUnitWiseAccessRole(this.getUser().getUnitWiseAccessRole());
+        //details.setHubMember(this.user.getHubMember());
+        details.setSystemAdmin(this.user.getSystemAdmin());
         details.setLastSelectedOrganizationCategory(this.user.getLastSelectedOrganizationCategory());
         details.setProfilePic(this.user.getProfilePic());
+        details.setUserLanguage(ObjectMapperUtils.copyPropertiesByMapper(this.user.getUserLanguage(), SystemLanguageDTO.class));
         return details;
     }
 

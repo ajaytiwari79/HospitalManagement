@@ -1,16 +1,19 @@
 package com.kairos.controller.country;
 
 import com.kairos.config.BootDataService;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.organization.OrgTypeLevelWrapper;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
+import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
 import com.kairos.service.country.CountryHolidayCalenderService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.expertise.ExpertiseService;
@@ -160,7 +163,7 @@ public class CountryController {
     @GetMapping(value = COUNTRY_URL + "/organization_type/sub_type/{organizationTypeId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrgTypesSubByCountryId(@PathVariable Long countryId, @PathVariable long organizationTypeId) {
-        List<Object> response = organizationTypeService.getOrgSubTypesByTypeId(organizationTypeId);
+        List<OrgTypeLevelWrapper> response = organizationTypeService.getOrgSubTypesByTypeId(organizationTypeId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
     }
 
@@ -177,7 +180,7 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllSkillCategory(@PathVariable Long countryId) {
         if (countryId != null) {
-            List<Object> skillCategory = skillCategoryService.getAllSkillCategoryOfCountry(countryId);
+            List<SkillCategoryQueryResults> skillCategory = skillCategoryService.getAllSkillCategoryOfCountry(countryId);
             if (skillCategory != null) {
                 return ResponseHandler.generateResponse(HttpStatus.OK, true, skillCategory);
             }
@@ -197,8 +200,8 @@ public class CountryController {
     @PutMapping(value = COUNTRY_URL + "/skill_category")
     @ApiOperation("Update a skillCategory  by id")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateSkillCategoryById(@RequestBody @Validated SkillCategory skillData, @PathVariable Long countryId) {
-        Map<String, Object> updatedSkillCategory = skillCategoryService.updateSkillCategory(skillData, countryId);
+    public ResponseEntity<Map<String, Object>> updateSkillCategoryById(@RequestBody @Validated SkillCategory skillData) {
+        Map<String, Object> updatedSkillCategory = skillCategoryService.updateSkillCategory(skillData);
         if (updatedSkillCategory == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, updatedSkillCategory);
         }
@@ -338,7 +341,7 @@ public class CountryController {
     @ApiOperation("get Skill list for particular organization type")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertise(@PathVariable long countryId, @PathVariable long orgTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getSkillsByOrganizationTypeId(countryId, orgTypeId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getSkillsByOrganizationTypeId(orgTypeId));
     }
 
     @GetMapping(value = "/country/organizaton_service/{organizationServiceId}")
@@ -422,8 +425,8 @@ public class CountryController {
 
     @ApiOperation(value = "get all units of Country")
     @GetMapping(value = COUNTRY_URL + "/get_all_units")
-    public ResponseEntity<Map<String, Object>> getAllUnits(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getAllUnits(countryId));
+    public ResponseEntity<Map<String, Object>> getAllUnits() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getAllUnits());
 
     }
 
@@ -431,8 +434,36 @@ public class CountryController {
     @PostMapping(value = COUNTRY_URL + "/admin")
     public ResponseEntity<Map<String, Object>> createDefaultCountryAdmin(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, bootDataService.createDefaultCountryAdmin());
-
     }
+
+    @RequestMapping(value = COUNTRY_URL+"/skill_Category/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfSkillCategory(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillCategoryService.updateTranslation(id,translations));
+    }
+
+    @RequestMapping(value = COUNTRY_URL+"/expertise/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfExpertise(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateTranslation(id,translations));
+    }
+
+    @RequestMapping(value = COUNTRY_URL+"/organization_type/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateTranslation(id,translations));
+    }
+
+    @RequestMapping(value = COUNTRY_URL+"/organization_sub_type/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationSubType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateTranslation(id,translations));
+    }
+
 
 
 }

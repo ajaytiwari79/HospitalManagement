@@ -1,5 +1,6 @@
 package com.kairos.rule_validator.activity;
 
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.dto.activity.activity.activity_tabs.ActivitySkill;
 import com.kairos.dto.activity.activity.activity_tabs.SkillActivityDTO;
 import com.kairos.dto.activity.shift.ActivityRuleViolation;
@@ -36,8 +37,8 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
 
     @Override
     public boolean isSatisfied(ShiftWithActivityDTO shift) {
-//        if (!shift.getActivity().getSkillActivityTab().getActivitySkills().isEmpty()) {
-//            shift.getActivity().getSkillActivityTab().getActivitySkills().forEach(
+//        if (!shift.getActivity().getActivitySkillSettings().getActivitySkills().isEmpty()) {
+//            shift.getActivity().getActivitySkillSettings().getActivitySkills().forEach(
 //                    activityTypeSkill -> activitySkills.add(activityTypeSkill.getSkillId()));
 //            if( !activitySkills.containsAll(this.staffSkills)){
 //                exceptionService.actionNotPermittedException("message.activity.skills-match");
@@ -61,9 +62,9 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
 
     private void validateStaffSkills(List<String> errorMessages, ShiftActivityDTO shiftActivityDTO) {
         ActivityRuleViolation activityRuleViolation;
-        if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds()) &&
-                (CollectionUtils.isEmpty(skillLevelDTOS) || !isSkillSatisfied(shiftActivityDTO.getActivity().getSkillActivityTab()))) {
-            errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_SKILL_MATCH, shiftActivityDTO.getActivity().getName()));
+        if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getActivitySkillSettings().getActivitySkillIds()) &&
+                (CollectionUtils.isEmpty(skillLevelDTOS) || !isSkillSatisfied(shiftActivityDTO.getActivity().getActivitySkillSettings()))) {
+            errorMessages.add(CommonsExceptionUtil.convertMessage(MESSAGE_ACTIVITY_SKILL_MATCH, shiftActivityDTO.getActivity().getName(), shiftActivityDTO.getActivity().getActivitySkillSettings().getActivitySkillIds()));
             activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
             if(activityRuleViolation==null){
                 activityRuleViolation=new ActivityRuleViolation(shiftActivityDTO.getActivity().getId(),shiftActivityDTO.getActivity().getName(),0,new HashSet<>(errorMessages));

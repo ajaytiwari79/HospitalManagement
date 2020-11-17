@@ -1,8 +1,11 @@
 package com.kairos.service.access_permisson;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -21,12 +24,20 @@ import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepositor
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ResourceUtils;
 
 import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.constants.AppConstants.MODULE_11;
+import static com.kairos.constants.AppConstants.TAB_119;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 
@@ -72,28 +83,42 @@ public class AccessPageService {
     }
 
     public AccessPage updateAccessPage(Long accessPageId,AccessPageDTO accessPageDTO){
-        AccessPage accessPage = (Optional.ofNullable(accessPageId).isPresent())?accessPageRepository.
-                updateAccessTab(accessPageId,accessPageDTO.getName()): null;
-        if(!Optional.ofNullable(accessPage).isPresent()){
+        AccessPage accessPage = accessPageRepository.findOne(accessPageId);
+        if(isNull(accessPage)){
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,TAB,accessPageId);
-
         }
+        accessPage.setName(accessPageDTO.getName());
+        accessPage.setTranslatedNames(accessPageDTO.getTranslatedNames());
+        accessPageRepository.save(accessPage);
         return accessPage;
     }
 
     public List<AccessPageDTO> getMainTabs(){
-        return accessPageRepository.getMainTabs();
+        List<AccessPageQueryResult> accessPageQueryResults = accessPageRepository.getMainTabs();
+        return prepareAccessPageDTOList(accessPageQueryResults);
     }
 
     public List<AccessPageDTO> getMainTabsForUnit(Long unitId){
-        return accessPageRepository.getMainTabsForUnit(unitId);
+        List<AccessPageQueryResult> accessPageQueryResults = accessPageRepository.getMainTabsForUnit(unitId);
+        return prepareAccessPageDTOList(accessPageQueryResults);
     }
 
     public List<AccessPageDTO> getChildTabs(Long tabId){
         if( !Optional.ofNullable(tabId).isPresent() ){
             return Collections.emptyList();
         }
-        return accessPageRepository.getChildTabs(tabId);
+        List<AccessPageQueryResult> accessPageQueryResults = accessPageRepository.getChildTabs(tabId);
+        return prepareAccessPageDTOList(accessPageQueryResults);
+    }
+
+    private List<AccessPageDTO> prepareAccessPageDTOList(List<AccessPageQueryResult> accessPageQueryResults){
+        List<AccessPageDTO> accessPageDTOS = new ArrayList<>();
+        for (AccessPageQueryResult accessPageQueryResult : accessPageQueryResults) {
+            AccessPageDTO accessPageDTO = ObjectMapperUtils.copyPropertiesByMapper(accessPageQueryResult, AccessPageDTO.class);
+            accessPageDTO.setTranslatedNames(accessPageQueryResult.getAccessPage().getTranslatedNames());
+            accessPageDTOS.add(accessPageDTO);
+        }
+        return accessPageDTOS;
     }
 
     public Boolean updateStatus(boolean active,Long tabId){
@@ -104,10 +129,12 @@ public class AccessPageService {
         if( !Optional.ofNullable(tabId).isPresent() ){
             return false;
         }
-
+        AccessPage accessPage = accessPageRepository.findById(tabId).orElse(new AccessPage());
         Boolean isKairosHub = OrganizationCategory.HUB.equals(orgCategoryTabAccessDTO.getOrganizationCategory());
         Boolean isUnion = OrganizationCategory.UNION.equals(orgCategoryTabAccessDTO.getOrganizationCategory());
-
+        if(isKairosHub && !orgCategoryTabAccessDTO.isAccessStatus() && (MODULE_11.equals(accessPage.getModuleId()) || TAB_119.equals(accessPage.getModuleId()))){
+            exceptionService.actionNotPermittedException(ERROR_TAB_CAN_NOT_BE_HIDE_FOR_HUB);
+        }
         if(orgCategoryTabAccessDTO.isAccessStatus()){
             accessGroupRepository.addAccessPageRelationshipForCountryAccessGroups(tabId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
             accessGroupRepository.addAccessPageRelationshipForOrganizationAccessGroups(tabId, isKairosHub, isUnion);
@@ -189,7 +216,7 @@ public class AccessPageService {
 
     public List<KPIAccessPageDTO> getKPIAccessPageListForCountry(Long countryId){
         List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForCountry(countryId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessPages, KPIAccessPageDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(accessPages, KPIAccessPageDTO.class);
     }
 
     public List<KPIAccessPageDTO> getKPIAccessPageListForUnit(Long unitId){
@@ -199,7 +226,7 @@ public class AccessPageService {
             unitId=parentHub.getId();
         }
         List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForUnit(unitId,userId);
-        List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessPages, KPIAccessPageDTO.class);
+        List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessPages, KPIAccessPageDTO.class);
         for (KPIAccessPageDTO accessPage : kpiTabs) {
             for (KPIAccessPageDTO kpiAccessPageDTO : accessPage.getChild()) {
                 kpiAccessPageDTO.setActive(kpiAccessPageDTO.isRead()||kpiAccessPageDTO.isWrite());
@@ -211,34 +238,25 @@ public class AccessPageService {
 
     public List<KPIAccessPageDTO> getKPIAccessPageList(String moduleId){
         List<AccessPage> accessPages = accessPageRepository.getKPITabsList(moduleId);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessPages, KPIAccessPageDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(accessPages, KPIAccessPageDTO.class);
     }
 
     public AccessPageLanguageDTO assignLanguageToAccessPage(String moduleId, AccessPageLanguageDTO accessPageLanguageDTO){
-        if(Optional.ofNullable(accessPageLanguageDTO.getId()).isPresent()){
-            Optional<AccessPageLanguageRelationShip> accessPageLanguageRelationShip= accessPageLanguageRelationShipRepository.findById(accessPageLanguageDTO.getId());
-            if(!accessPageLanguageRelationShip.isPresent()){
-                exceptionService.dataNotFoundByIdException(ACCESS_PAGE_LANG_DESCRIPTION_ABSENT,accessPageLanguageDTO.getLanguageId());
+            AccessPage accessPage=accessPageRepository.findByModuleId(moduleId);
+            if(!Optional.ofNullable(accessPage).isPresent()){
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"Access Page",moduleId);
             }
-            accessPageLanguageRelationShip.get().setDescription(accessPageLanguageDTO.getDescription());
-            accessPageLanguageRelationShipRepository.save(accessPageLanguageRelationShip.get());
+            SystemLanguage systemLanguage=systemLanguageGraphRepository.findSystemLanguageById(accessPageLanguageDTO.getLanguageId());
+            if(!Optional.ofNullable(systemLanguage).isPresent()){
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"SystemLanguage", accessPageLanguageDTO.getLanguageId());
+            }
+            AccessPageLanguageRelationShip accessPageLanguageRelationShip= accessPageLanguageRelationShipRepository.findByModuleIdAndLanguageId(accessPageLanguageDTO.getModuleId(),accessPageLanguageDTO.getLanguageId()).orElse(new AccessPageLanguageRelationShip());
+            accessPageLanguageRelationShip.setDescription(accessPageLanguageDTO.getDescription());
+            accessPageLanguageRelationShip.setAccessPage(accessPage);
+            accessPageLanguageRelationShip.setSystemLanguage(systemLanguage);
+            accessPageLanguageRelationShipRepository.save(accessPageLanguageRelationShip);
+            accessPageLanguageDTO.setId(accessPageLanguageRelationShip.getId());
             return accessPageLanguageDTO;
-        }
-
-        AccessPage accessPage=accessPageRepository.findByModuleId(moduleId);
-        if(!Optional.ofNullable(accessPage).isPresent()){
-            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"Access Page",moduleId);
-        }
-        SystemLanguage systemLanguage=systemLanguageGraphRepository.findSystemLanguageById(accessPageLanguageDTO.getLanguageId());
-        if(!Optional.ofNullable(systemLanguage).isPresent()){
-            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"SystemLanguage", accessPageLanguageDTO.getLanguageId());
-        }
-
-        AccessPageLanguageRelationShip accessPageLanguageRelationShip=new AccessPageLanguageRelationShip(accessPageLanguageDTO.getId(),accessPage,systemLanguage, accessPageLanguageDTO.getDescription());
-        accessPageLanguageRelationShipRepository.save(accessPageLanguageRelationShip);
-        accessPageLanguageDTO.setId(accessPageLanguageRelationShip.getId());
-        return accessPageLanguageDTO;
-
     }
 
     public AccessPageLanguageDTO getLanguageDataByModuleId(String moduleId, Long languageId){
@@ -247,5 +265,55 @@ public class AccessPageService {
 
     public List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, Set<Long> organizationIds){
        return accessPageRepository.getAccessPermission(userId,  organizationIds);
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(String moduleId, Map<String,TranslationInfo> translationData) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translationData.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        AccessPage accessPage = accessPageRepository.findByModuleId(moduleId);
+        accessPage.setTranslatedNames(translatedNames);
+        accessPage.setTranslatedDescriptions(translatedDescriptios);
+        accessPageRepository.save(accessPage);
+        return accessPage.getTranslatedData();
+    }
+
+    public Map<String, TranslationInfo> getTranslatedData(Long accessPageId) {
+        AccessPage accessPage = accessPageRepository.findOne(accessPageId);
+        return accessPage.getTranslatedData();
+    }
+
+    public List<AccessPageDTO> getTabHierarchy(Long languageId) {
+        List<AccessPageDTO> mainTabs = prepareAccessPageDTOList(accessPageRepository.getMainTabsWithHelperText(languageId));
+        for (AccessPageDTO accessPageDTO : mainTabs) {
+            setChildrenAccessPages(accessPageDTO, languageId);
+        }
+        return mainTabs;
+    }
+
+    private void setChildrenAccessPages(AccessPageDTO accessPageDTO, Long languageId){
+        List<AccessPageDTO> childAccessPageDTOS = prepareAccessPageDTOList(accessPageRepository.getChildTabsWithHelperText(accessPageDTO.getId(), languageId));
+        for (AccessPageDTO childAccessPageDTO : childAccessPageDTOS) {
+            if(childAccessPageDTO.isHasSubTabs()){
+                setChildrenAccessPages(childAccessPageDTO, languageId);
+            }
+        }
+        accessPageDTO.setChildren(childAccessPageDTOS);
+    }
+
+    public boolean setUrlInAccessPages() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        ClassPathResource resource = new ClassPathResource("accesspage/accessPageUrl.json");
+        InputStream inputStream = resource.getInputStream();
+        //File file = ResourceUtils.getFile("classpath:accesspage/accessPageUrl.json");
+        Map<String, String> accessPageMap = mapper.readValue(inputStream, new TypeReference<Map<String, String>>() {
+        });
+        List<AccessPage> accessPages= (List<AccessPage>) accessPageRepository.findAll();
+        accessPages.forEach(accessPage-> accessPage.setUrl(accessPageMap.get(accessPage.getModuleId())));
+        accessPageRepository.saveAll(accessPages);
+        return true;
     }
 }

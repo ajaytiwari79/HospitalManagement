@@ -1,6 +1,11 @@
 package com.kairos.service.language;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.country.LanguageDTO;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.LocationType;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
@@ -12,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,21 +42,25 @@ public class LanguageService {
     public List<Language> getAllLanguage(){
         return languageGraphRepository.findAll();
     }
-// TODO FIX LATER
-    public Language save( Language language){
+    public Language save( Language language) {
         return languageGraphRepository.save(language);
     }
-    public List<Language> getLanguageByCountryId(long countryId){
-        return languageGraphRepository.getLanguageByCountryId(countryId);
+
+    public List<LanguageDTO> getLanguageByCountryId(long countryId){
+        List<Language> languages = languageGraphRepository.getLanguageByCountryId(countryId);
+        List<LanguageDTO> languageDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(languages,LanguageDTO.class);
+        languageDTOS.forEach(languageDTO -> {
+            languageDTO.setCountryId(countryId);
+            languageDTO.setTranslations(TranslationUtil.getTranslatedData(languageDTO.getTranslatedNames(),languageDTO.getTranslatedDescriptions()));
+        });
+        return languageDTOS;
     }
-
-
 
     public Map<String, Object> createLanguage(long countryId, Language language){
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
 
-            Boolean languageExistInCountryByName = languageGraphRepository.languageExistInCountryByName(countryId, "(?i)" + language.getName(), -1L);
+            boolean languageExistInCountryByName = languageGraphRepository.languageExistInCountryByName(countryId, "(?i)" + language.getName(), -1L);
             if (languageExistInCountryByName) {
                 exceptionService.duplicateDataException("error.Language.name.exist");
             }
@@ -64,7 +75,7 @@ public class LanguageService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
 
-            Boolean languageExistInCountryByName = languageGraphRepository.languageExistInCountryByName(countryId, "(?i)" + language.getName(), language.getId());
+            boolean languageExistInCountryByName = languageGraphRepository.languageExistInCountryByName(countryId, "(?i)" + language.getName(), language.getId());
             if (languageExistInCountryByName) {
                 exceptionService.duplicateDataException("error.Language.name.exist");
             }
@@ -91,17 +102,26 @@ public class LanguageService {
     public List<Map<String, Object>> getUnitAvailableLanguages(long unitId) {
 
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-
+        List<Map<String, Object>> data = null;
         if (countryId != null) {
 
-            logger.info("Finding available languages for CountryId: " + countryId);
-            List<Map<String, Object>> data = languageGraphRepository.getLanguageByCountryIdAnotherFormat(countryId);
-            return data != null ? FormatUtil.formatNeoResponse(data) : null;
-
+            logger.info("Finding available languages for CountryId: {}" , countryId);
+            data  = languageGraphRepository.getLanguageByCountryIdAnotherFormat(countryId);
+            return data != null ? FormatUtil.formatNeoResponse(data) : new ArrayList<>();
         }
-        return null;
+        return data;
     }
 
+    public Map<String, TranslationInfo> updateTranslation(Long languageId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptions = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
+        Language language =languageGraphRepository.findOne(languageId);
+        language.setTranslatedNames(translatedNames);
+        language.setTranslatedDescriptions(translatedDescriptions);
+        languageGraphRepository.save(language);
+        return language.getTranslatedData();
+    }
 
 
 

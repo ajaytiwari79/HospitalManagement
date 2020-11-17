@@ -3,12 +3,15 @@ import com.kairos.config.neo4j.converter.LocalTimeConverter;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.DayType;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.DAY_TYPE;
 
 /**
  * CountryHolidayCalender Domain extending Base Entity
@@ -18,6 +21,7 @@ import java.util.Map;
 public class CountryHolidayCalender extends UserBaseEntity {
     private String holidayTitle;
     private LocalDate holidayDate;
+    @Relationship(type = DAY_TYPE)
     private DayType dayType;
     @Convert(LocalTimeConverter.class)
     private LocalTime startTime;

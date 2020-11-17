@@ -1,6 +1,7 @@
 package com.kairos.service.unit_settings;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.unit_settings.PhaseSettingsDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
@@ -11,8 +12,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -27,7 +30,7 @@ public class PhaseSettingsService extends MongoBaseService {
         phaseSettingsDTOS.forEach(phaseSettingsDTO -> {
             phaseSettingsDTO.setUnitId(unitId);
         });
-        List<PhaseSettings> phaseSettings = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(phaseSettingsDTOS,PhaseSettings.class);
+        List<PhaseSettings> phaseSettings = ObjectMapperUtils.copyCollectionPropertiesByMapper(phaseSettingsDTOS,PhaseSettings.class);
         save(phaseSettings);
         return phaseSettingsDTOS;
     }
@@ -36,7 +39,7 @@ public class PhaseSettingsService extends MongoBaseService {
 
     public boolean createDefaultPhaseSettings(Long unitId, List<Phase> phases){
         if (!Optional.ofNullable(phases).isPresent()){
-            phases=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(phaseService.getPhasesByUnit(unitId),Phase.class);
+            phases=ObjectMapperUtils.copyCollectionPropertiesByMapper(phaseService.getPhasesByUnit(unitId),Phase.class);
         }
         List<PhaseSettings> phaseSettings=new ArrayList<>();
         phases.forEach(phase -> {
@@ -45,5 +48,12 @@ public class PhaseSettingsService extends MongoBaseService {
         });
         phaseSettingsRepository.saveEntities(phaseSettings);
         return true;
+    }
+
+    public Map<String, TranslationInfo> updatePhaseSettingTranslations(Long unitId, BigInteger phaseId,Map<String,TranslationInfo> translations){
+        PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(unitId,phaseId);
+        phaseSettings.setTranslations(translations);
+        phaseSettingsRepository.save(phaseSettings);
+        return phaseSettings.getTranslations();
     }
 }

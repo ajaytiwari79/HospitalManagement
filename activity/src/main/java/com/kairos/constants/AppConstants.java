@@ -173,6 +173,7 @@ public class AppConstants {
     public static final String OPENSHIFT_SUBJECT = "Open Shift";
     public static final String SHIFT_NOTIFICATION="Shift Reminder";
     public static final String ACTIVITY_REMINDER="Activity Reminder";
+    public static final String DESCRIPTION="description";
     public static final String SHIFT_NOTIFICATION_MESSAGE="SHIFT_NOTIFICATION_MESSAGE";
     public static final String NORMAL_TIME="Normal Time";
     public static final String EXTRA_TIME="Extra Time";
@@ -194,6 +195,7 @@ public class AppConstants {
     public static final String OVERSTAFFING="OVERSTAFFING";
     public static final String UNDERSTAFFING="UNDERSTAFFING";
     public static final String BALANCED="BALANCED";
+    public static final String LOW_ACTIVITY_RANK="LOW ACTIVITY RANK";
     public static final float VETO_BLOCKING_POINT=1;
     public static final float STOP_BRICK_BLOCKING_POINT=0.5f;
 
@@ -258,6 +260,7 @@ public class AppConstants {
 
     public static final String PLANNING_PERIOD_NAME="PP_";
     public static final int NOT_VALID_VALUE = -1;
+    public static final String PLANNING_PERIOD="Planning_Period";
 
 
 }

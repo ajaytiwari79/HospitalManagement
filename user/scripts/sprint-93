@@ -1,0 +1,7 @@
+//Add new tab
+Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Action",isModule:false,moduleId:"tab_452",active:true,`translatedNames.english`:"Action"});
+
+// To update the super admin access group
+MATCH(u:User) where u.userName starts with 'ulrik'
+MATCH(ag:AccessGroup) where ag.name="SUPER_ADMIN"
+CREATE UNIQUE(u)-[:BELONGS_TO_SUPER_ADMIN]-(ag)

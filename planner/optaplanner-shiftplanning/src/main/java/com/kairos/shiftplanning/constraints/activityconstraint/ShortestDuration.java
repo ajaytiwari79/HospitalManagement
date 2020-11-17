@@ -1,9 +1,10 @@
 package com.kairos.shiftplanning.constraints.activityconstraint;
 
-import com.kairos.shiftplanning.constraints.Constraint;
-import com.kairos.shiftplanning.constraints.ScoreLevel;
+import com.kairos.enums.constraint.ScoreLevel;
+import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +14,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ShortestDuration implements Constraint {
+@EqualsAndHashCode
+public class ShortestDuration implements ConstraintHandler {
 
     private int shortestDuration;
     private ScoreLevel level;
@@ -30,7 +32,5 @@ public class ShortestDuration implements Constraint {
     }
 
     @Override
-    public int checkConstraints(Activity activity, List<ShiftImp> shifts) {
-        return 0;
-    }
+    public int checkConstraints(List<ShiftImp> shifts){return 0;}
 }

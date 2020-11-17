@@ -60,7 +60,7 @@ public class TechnicalSecurityMeasureService {
             technicalSecurityMeasureRepository.saveAll(technicalSecurityMeasures);
         }
 
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(technicalSecurityMeasures, TechnicalSecurityMeasureDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(technicalSecurityMeasures, TechnicalSecurityMeasureDTO.class);
     }
 
 

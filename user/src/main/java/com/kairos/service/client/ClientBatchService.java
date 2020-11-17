@@ -75,64 +75,12 @@ public class ClientBatchService {
     @Inject
     private ExceptionService exceptionService;
 
-    public void updateClientFromExcel(MultipartFile multipartFile) {
-
-        int clientUpdated = 0;
-
-        try {
-
-            InputStream stream = multipartFile.getInputStream();
-            //Get the workbook instance for XLS file
-            XSSFWorkbook workbook = new XSSFWorkbook(stream);
-            //Get first sheet from the workbook
-            XSSFSheet sheet = workbook.getSheetAt(0);
-            Iterator<Row> rowIterator = sheet.iterator();
-
-            if (!rowIterator.hasNext()) {
-                exceptionService.internalServerError(ERROR_XSSFSHEET_NOMOREROW, 1);
-
-            }
-
-            User client;
-            Cell cell;
-            Row row;
-            long clientId;
-            String firstName;
-            String lastName;
-            while (rowIterator.hasNext()) {
-                row = rowIterator.next();
-                if (row.getRowNum() > 1) {
-                    cell = row.getCell(0);
-                    cell.setCellType(Cell.CELL_TYPE_STRING);
-                    clientId = Long.valueOf(cell.getStringCellValue());
-
-                    client = clientGraphRepository.getUserByClientId(clientId);
-                    if (client != null) {
-                        cell = row.getCell(4);
-                        firstName = cell.getStringCellValue();
-                        cell = row.getCell(5);
-                        lastName = cell.getStringCellValue();
-
-                        client.setFirstName(firstName);
-                        client.setLastName(lastName);
-                        userGraphRepository.save(client);
-                        clientUpdated++;
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        logger.info("total client updated  " + clientUpdated);
-    }
 
     public List<Map<String, Object>> batchAddClientsToDatabase(MultipartFile multipartFile, long unitId) {
         Unit currentUnit = unitGraphRepository.findOne(unitId);
         if (currentUnit == null) {
             return null;
         }
-        logger.info("Organization found is : " + currentUnit.getName());
         List<Map<String, Object>> clientList = new ArrayList<>();
         List<Map<String, Object>> houseUnverifiedClient = new ArrayList<>();
         InputStream stream;
@@ -395,7 +343,7 @@ public class ClientBatchService {
                 if (connectToOrganization) {
                     if (client != null) {
                         logger.info("Creating relationship : " + client.getId());
-                        relation = new ClientOrganizationRelation(client, currentUnit, DateUtils.getCurrentDate().getTime());
+                        relation = new ClientOrganizationRelation(client, currentUnit, DateUtils.getDate().getTime());
                         relationService.createRelation(relation);
 
                         Map<String, Object> clientInfo = new HashMap<>();

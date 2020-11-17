@@ -1,6 +1,7 @@
 package com.kairos.service.wta;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateAndCategoryResponseDTO;
@@ -9,6 +10,7 @@ import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryRe
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
+import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -178,9 +181,6 @@ public class RuleTemplateCategoryService extends MongoBaseService {
                 excpExceptionService.duplicateDataException(MESSAGE_RULETEMPLATECATEGORY_NAME_ALREADYEXIST, ruleTemplateCategoryDTO.getName());
             }
         }
-        if (ruleTemplateCategoryObj.getName().equals("NONE") || ruleTemplateCategoryDTO.getName().equals("NONE")) {
-            excpExceptionService.actionNotPermittedException(MESSAGE_RULETEMPLATECATEGORY_NAME_UPDATE);
-        }
         ruleTemplateCategoryObj.setName(ruleTemplateCategoryDTO.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategoryDTO.getDescription());
         ruleTemplateCategoryObj.setTags(ruleTemplateCategoryDTO.getTags());
@@ -227,6 +227,14 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         ruleTemplateCategory.setId(ruleTemplateCategoryObj.getId());
         return ruleTemplateCategory;
     }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger categoryId, Map<String,TranslationInfo> translations) {
+        RuleTemplateCategory ruleTemplateCategory= ruleTemplateCategoryMongoRepository.findOne(categoryId);
+        ruleTemplateCategory.setTranslations(translations);
+        ruleTemplateCategoryMongoRepository.save(ruleTemplateCategory);
+        return ruleTemplateCategory.getTranslations();
+    }
+
 
 
 }

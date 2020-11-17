@@ -9,6 +9,9 @@ import com.kairos.persistence.model.country.default_data.HousingType;
 import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -24,6 +27,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
 public class ContactAddress extends UserBaseEntity{
     @KPermissionField
     private String street;
@@ -60,14 +66,6 @@ public class ContactAddress extends UserBaseEntity{
 
     private boolean verifiedByVisitour;
 
-    public boolean isVerifiedByVisitour() {
-        return verifiedByVisitour;
-    }
-
-    public boolean isAddressProtected() {
-        return addressProtected;
-    }
-
     @KPermissionField
     private boolean addressProtected;
 
@@ -100,27 +98,6 @@ public class ContactAddress extends UserBaseEntity{
     private String locationName;
     private boolean primary;
 
-
-    public String getLocationName() {
-        return locationName;
-    }
-
-    public void setLocationName(String locationName) {
-        this.locationName = locationName;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
-
-    public ContactAddress() {
-    }
-
-
     public ContactAddress(String houseNumber,String province,String street,String city,String regionName) {
 
         this.houseNumber = houseNumber;
@@ -130,19 +107,6 @@ public class ContactAddress extends UserBaseEntity{
         this.regionName = regionName;
     }
 
-    public ContactAddress(String street, int floorNumber, String houseNumber, ZipCode zipCode) {
-        this.street = street;
-        this.floorNumber = floorNumber;
-        this.houseNumber = houseNumber;
-        this.zipCode = zipCode;
-    }
-    public ContactAddress(String street, int floorNumber, String houseNumber, ZipCode zipCode,Municipality municipality) {
-        this.street = street;
-        this.floorNumber = floorNumber;
-        this.houseNumber = houseNumber;
-        this.zipCode = zipCode;
-        this.municipality = municipality;
-    }
 
     public ContactAddress(Municipality municipality,@NotNull(message = ERROR_CONTACTADDRESS_LONGITUDE_NOTNULL) float longitude,@NotNull(message = ERROR_CONTACTADDRESS_LATITUDE_NOTNULL) float latitude,String province, String regionName,String city,String country,ZipCode zipCode,String houseNumber,String street, String streetUrl,int floorNumber) {
         this.municipality = municipality;
@@ -159,204 +123,6 @@ public class ContactAddress extends UserBaseEntity{
 
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public AccessToLocation getAccessToLocation() {
-        return accessToLocation;
-    }
-
-    public void setAccessToLocation(AccessToLocation accessToLocation) {
-        this.accessToLocation = accessToLocation;
-    }
-
-    public String getRegionCode() {
-        return regionCode;
-    }
-
-
-    public String getProvince() {
-        return province;
-    }
-
-    public void setProvince(String province) {
-        this.province = province;
-    }
-
-    public void setRegionCode(String regionCode) {
-        this.regionCode = regionCode;
-    }
-
-    public String getRegionName() {
-        return regionName;
-    }
-
-    public void setRegionName(String regionName) {
-        this.regionName = regionName;
-    }
-
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public void setStartDate(long startDate) {
-        this.startDate = startDate;
-    }
-
-    public void setEndDate(long endDate) {
-        this.endDate = endDate;
-    }
-
-    public long getStartDate() {
-
-        return startDate;
-    }
-
-    public long getEndDate() {
-        return endDate;
-    }
-
-    public String getHouseNumber() {
-        return houseNumber;
-    }
-
-    public void setHouseNumber(String houseNumber) {
-        this.houseNumber = houseNumber;
-    }
-
-
-
-    public Float getLongitude() {
-        return longitude;
-    }
-
-
-    public Float getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Float latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    public int getFloorNumber() {
-        return floorNumber;
-    }
-
-    public void setFloorNumber(int floorNumber) {
-        this.floorNumber = floorNumber;
-    }
-
-    public ZipCode getZipCode() {
-        return zipCode;
-    }
-
-    public void setZipCode(ZipCode zipCode) {
-        this.zipCode = zipCode;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public boolean isPrivateAddress() {
-        return privateAddress;
-    }
-
-    public void setPrivateAddress(boolean privateAddress) {
-        this.privateAddress = privateAddress;
-    }
-
-    public HousingType getTypeOfHousing() {
-        return typeOfHousing;
-    }
-
-    public void setTypeOfHousing(HousingType typeOfHousing) {
-        this.typeOfHousing = typeOfHousing;
-    }
-
-    public void setVerifiedByVisitour(boolean verifiedByVisitour) {
-        this.verifiedByVisitour = verifiedByVisitour;
-    }
-
-    public void setAddressProtected(boolean addressProtected) {
-        this.addressProtected = addressProtected;
-    }
-
-    public String getStreetUrl() {
-        return streetUrl;
-    }
-
-    public void setStreetUrl(String streetUrl) {
-        this.streetUrl = streetUrl;
-    }
-
-    public PaymentType getPaymentType() {
-        return paymentType;
-    }
-
-    public Currency getCurrency() {
-        return currency;
-    }
-
-    public void setPaymentType(PaymentType paymentType) {
-        this.paymentType = paymentType;
-    }
-
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
-    }
-
-    public void setContactPersonForBillingAddress(String contactPersonForBillingAddress) {
-        this.contactPersonForBillingAddress = contactPersonForBillingAddress;
-    }
-
-    public String getContactPersonForBillingAddress() {
-        return contactPersonForBillingAddress;
-    }
-
-    public void setLongitude(float longitude) {
-        this.longitude = longitude;
-    }
-
-    public void setMunicipality(Municipality municipality) {
-        this.municipality = municipality;
-    }
-
-    public Municipality getMunicipality() {
-
-        return municipality;
-    }
-
-    public boolean isPrimary() {
-        return primary;
-    }
-
-    public void setPrimary(boolean primary) {
-        this.primary = primary;
-    }
 
     /**
      * @autor prabjot
@@ -370,22 +136,6 @@ public class ContactAddress extends UserBaseEntity{
         return contactAddress;
     }
 
-
-    public ContactAddress(String houseNumber, Integer floorNumber, String street, String city, String regionName, String country, Float latitude, Float longitude,
-                          String province, String streetUrl, Boolean addressProtected, Boolean verifiedByVisitour) {
-        this.houseNumber = houseNumber;
-        this.floorNumber = floorNumber;
-        this.street = street;
-        this.city = city;
-        this.regionName = regionName;
-        this.country = country;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.province = province;
-        this.streetUrl = streetUrl;
-        this.addressProtected = addressProtected;
-        this.verifiedByVisitour = verifiedByVisitour;
-    }
 
 
 }

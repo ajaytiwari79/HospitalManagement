@@ -6,10 +6,14 @@ import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.data.annotation.Transient;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,10 +22,13 @@ public class StaffingLevelInterval {
     private int sequence;
     private int minNoOfStaff;
     private int maxNoOfStaff;
+    @Transient
     private int availableNoOfStaff;
     private Duration staffingLevelDuration;
     private Set<StaffingLevelActivity> staffingLevelActivities=new LinkedHashSet<>();
     private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
+    private TreeSet<StaffingLevelIntervalLog> staffingLevelIntervalLogs=new TreeSet<>();
+    private Set<BigInteger> activityIds=new HashSet<>();
 
 
 
@@ -46,12 +53,33 @@ public class StaffingLevelInterval {
         this.staffingLevelDuration = staffingLevelDuration;
     }
 
+    public StaffingLevelInterval(int sequence, Duration staffingLevelDuration) {
+        this.sequence = sequence;
+        this.staffingLevelDuration = staffingLevelDuration;
+    }
+
     public void addStaffLevelActivity(Set<StaffingLevelActivity> staffLevelActivitys) {
         if (staffLevelActivitys == null)
             throw new NullPointerException(CAN_T_ADD_NULL_STAFF_LEVEL_ACTIVITY);
 
         this.getStaffingLevelActivities().addAll(staffLevelActivitys);
 
+    }
+
+    //This Getter is used for Unity Graph don't remove it
+    public StaffingLevelIntervalLog getUnpublishChanges(){
+        if(isCollectionNotEmpty(this.staffingLevelIntervalLogs)){
+            return this.staffingLevelIntervalLogs.last();
+        }
+        return null;
+    }
+
+    public Set<BigInteger> getActivityIds(){
+        return staffingLevelActivities.stream().map(staffingLevelActivity -> staffingLevelActivity.getActivityId()).collect(Collectors.toSet());
+    }
+
+    public StaffingLevelActivity getStaffingLevelActivity(BigInteger activityId){
+        return staffingLevelActivities.stream().filter(staffingLevelActivity -> staffingLevelActivity.getActivityId().equals(activityId)).findAny().orElse(null);
     }
 
 

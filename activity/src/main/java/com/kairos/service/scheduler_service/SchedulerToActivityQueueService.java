@@ -10,6 +10,7 @@ import com.kairos.service.payroll_setting.UnitPayrollSettingService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.shift.ActivityReminderService;
 import com.kairos.service.shift.ShiftReminderService;
+import com.kairos.service.time_bank.CalculatePlannedHoursAndScheduledHours;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.getStartOfDay;
@@ -75,7 +77,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 break;
             case PROTECTED_DAYS_OFF:
                 LOGGER.info("Job to protected days off ");
-                timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().updateTimeBankAgainstProtectedDaysOffSetting();
+                new CalculatePlannedHoursAndScheduledHours(timeBankCalculationService,new HashMap<>(),null).updateTimeBankAgainstProtectedDaysOffSetting();
                 break;
             case WTA_LEAVE_COUNT:
                 LOGGER.info("Job to protected days off ");
@@ -86,7 +88,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 activityService.unassighExpertiseFromActivities(job.getEntityId());
                 break;
             case ACTIVITY_REMINDER:
-                LOGGER.info("Job to Reminders to be sent to the staff for not planning the absences within the cutoff period. ");
+                LOGGER.info("Job to Reminders to be sent to the staff for not planning the absences with in the cutoff period. ");
                 activityReminderService.sendActivityReminderViaEmail(job.getUnitId(), job.getEntityId());
                 break;
             default:

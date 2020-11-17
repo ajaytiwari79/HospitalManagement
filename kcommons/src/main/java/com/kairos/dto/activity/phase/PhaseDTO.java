@@ -1,10 +1,13 @@
 package com.kairos.dto.activity.phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 
@@ -14,6 +17,7 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -22,6 +26,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@NoArgsConstructor
 public class PhaseDTO {
     private BigInteger id;
 
@@ -46,18 +51,9 @@ public class PhaseDTO {
     private DayOfWeek untilNextDay;
     private int realtimeDuration;
     private String shortName;
-    public Long getOrganizationId() {
-        return organizationId;
-    }
     private Set<Long> accessGroupIds=new HashSet<>();
+    private Map<String, TranslationInfo> translations;
 
-    public void setOrganizationId(Long organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    public PhaseDTO() {
-        //default cons
-    }
 
     public PhaseDTO(@NotNull(message = "error.phase.name.notnull") String name, String description, PhaseDefaultName phaseEnum, @Range(min = 0) int duration, DurationType durationType, int sequence, Long countryId) {
         this.name = name;
@@ -72,6 +68,14 @@ public class PhaseDTO {
 
     public PhaseWeeklyDTO buildWeekDTO() {
         return new PhaseWeeklyDTO(id, name, description, duration, sequence, organizationId);
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+    public String getDescription() {
+        return TranslationUtil.getDescription(translations,description);
     }
 
 

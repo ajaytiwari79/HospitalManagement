@@ -4,42 +4,27 @@ package com.kairos.dto.activity.payroll;
  *
  */
 
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
+import java.util.Map;
 
+@Getter
+@Setter
 public class PensionProviderDTO {
     private BigInteger id;
     @NotBlank(message = "name.absent")
     private String name;
     @NotBlank(message = "paymentNumber.absent")
     private String paymentNumber;
-
-    public PensionProviderDTO() {
-        //Default Constructor
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
+    private Long countryId;
+    private Map<String, TranslationInfo> translations;
 
     public String getName() {
-        return name;
+        return TranslationUtil.getName(translations,name);
     }
-
-    public void setName(String name) {
-        this.name = name.trim();
-    }
-
-    public String getPaymentNumber() {
-        return paymentNumber;
-    }
-
-    public void setPaymentNumber(String paymentNumber) {
-        this.paymentNumber = paymentNumber.trim();
-    }
-
 }

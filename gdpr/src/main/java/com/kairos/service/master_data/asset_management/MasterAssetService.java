@@ -104,10 +104,10 @@ public class MasterAssetService {
      * @return
      */
     private void addMetadataOfMasterAsset(MasterAssetDTO masterAssetDto, MasterAsset masterAsset) {
-        masterAsset.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(new ArrayList<>(masterAssetDto.getOrganizationTypes()), OrganizationType.class));
-        masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubTypes()), OrganizationSubType.class));
-        masterAsset.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(new ArrayList<>(masterAssetDto.getOrganizationServices()), ServiceCategory.class));
-        masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubServices()), SubServiceCategory.class));
+        masterAsset.setOrganizationTypes(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterAssetDto.getOrganizationTypes()), OrganizationType.class));
+        masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubTypes()), OrganizationSubType.class));
+        masterAsset.setOrganizationServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterAssetDto.getOrganizationServices()), ServiceCategory.class));
+        masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(new ArrayList<>(masterAssetDto.getOrganizationSubServices()), SubServiceCategory.class));
     }
 
     /**
@@ -131,17 +131,7 @@ public class MasterAssetService {
         }
 
         if (Optional.ofNullable(masterAssetDTO.getSubAssetType()).isPresent()) {
-            if (masterAssetDTO.getSubAssetType().getId() != null) {
-                Optional<AssetType> subAssetTypeObj = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(masterAssetDTO.getSubAssetType().getId())).findAny();
-                if (subAssetTypeObj.isPresent()) {
-                    subAssetType = subAssetTypeObj.get();
-                } else {
-                    exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, "message.assetType", masterAssetDTO.getSubAssetType().getId());
-                }
-            } else {
-                subAssetType = new AssetType(masterAssetDTO.getSubAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
-                subAssetType.setSubAssetType(true);
-            }
+            subAssetType = getSubAssetType(countryId, masterAssetDTO, assetType);
             masterAsset.setSubAssetType(subAssetType);
         }
         assetTypeRepository.save(assetType);
@@ -151,6 +141,22 @@ public class MasterAssetService {
             assetTypeRepository.save(subAssetType);
             masterAsset.setSubAssetType(subAssetType);
         }
+    }
+
+    private AssetType getSubAssetType(Long countryId, MasterAssetDTO masterAssetDTO, AssetType assetType) {
+        AssetType subAssetType = null;
+        if (masterAssetDTO.getSubAssetType().getId() != null) {
+            Optional<AssetType> subAssetTypeObj = assetType.getSubAssetTypes().stream().filter(assetSubType -> assetSubType.getId().equals(masterAssetDTO.getSubAssetType().getId())).findAny();
+            if (subAssetTypeObj.isPresent()) {
+                subAssetType = subAssetTypeObj.get();
+            } else {
+                exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, "message.assetType", masterAssetDTO.getSubAssetType().getId());
+            }
+        } else {
+            subAssetType = new AssetType(masterAssetDTO.getSubAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
+            subAssetType.setSubAssetType(true);
+        }
+        return subAssetType;
     }
 
 
@@ -265,9 +271,9 @@ public class MasterAssetService {
         });
         MasterAsset masterAsset = new MasterAsset(assetDTO.getName(), assetDTO.getDescription(), countryId, LocalDate.now(), SuggestedDataStatus.PENDING);
         masterAsset.setOrganizationTypes(Arrays.asList(new OrganizationType(orgTypeSubTypeServicesAndSubServicesDTO.getId(), orgTypeSubTypeServicesAndSubServicesDTO.getName())));
-        masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypeDTOS(), OrganizationSubType.class));
-        masterAsset.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationServices(), ServiceCategory.class));
-        masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubServices(), SubServiceCategory.class));
+        masterAsset.setOrganizationSubTypes(ObjectMapperUtils.copyCollectionPropertiesByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypeDTOS(), OrganizationSubType.class));
+        masterAsset.setOrganizationServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationServices(), ServiceCategory.class));
+        masterAsset.setOrganizationSubServices(ObjectMapperUtils.copyCollectionPropertiesByMapper(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubServices(), SubServiceCategory.class));
         masterAssetRepository.save(masterAsset);
         assetDTO.setId(masterAsset.getId());
         return assetDTO;

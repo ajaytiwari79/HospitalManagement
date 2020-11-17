@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solver>
   <!--<environmentMode>FULL_ASSERT</environmentMode>-->
-  <solutionClass>com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution</solutionClass>
+  <solutionClass>com.kairos.shiftplanning.solution.ShiftPlanningSolution</solutionClass>
   <entityClass>com.kairos.shiftplanning.domain.shift.ShiftImp</entityClass>
   <entityClass>com.kairos.shiftplanning.domain.staff.IndirectActivity</entityClass>
   <scoreDirectorFactory>

@@ -2,20 +2,25 @@ package com.kairos.service.staff_settings;
 
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.common.StaffFilterDataDTO;
 import com.kairos.dto.activity.shift.StaffActivityResponse;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffAndActivitySettingWrapper;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.activity.StaffActivityDetails;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
-import com.kairos.rule_validator.activity.StaffExpertiseSpecification;
+import com.kairos.rule_validator.activity.StaffActivityAssignmentSpecification;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.StaffActivityDetailsService;
+import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
@@ -27,6 +32,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
@@ -42,13 +48,19 @@ public class StaffActivitySettingService extends MongoBaseService {
     @Inject private ActivityService activityService;
     @Inject private OrganizationActivityService organizationActivityService;
     @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private TimeTypeService timeTypeService;
+    @Inject private StaffActivityDetailsService staffActivityDetailsService;
 
     public StaffActivitySettingDTO createStaffActivitySetting(Long unitId,StaffActivitySettingDTO staffActivitySettingDTO){
         activityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=new StaffActivitySetting();
         ObjectMapperUtils.copyProperties(staffActivitySettingDTO,staffActivitySetting);
+        if(isNotNull(staffActivitySettingDTO.getActivityId())) {
+            Activity activity = activityMongoRepository.findOne(staffActivitySettingDTO.getActivityId());
+            staffActivitySetting.setSecondLevelTimtype(activity.getActivityBalanceSettings().getTimeType());
+        }
         staffActivitySetting.setUnitId(unitId);
-        save(staffActivitySetting);
+        staffActivitySettingRepository.save(staffActivitySetting);
         staffActivitySettingDTO.setId(staffActivitySetting.getId());
         return staffActivitySettingDTO;
     }
@@ -87,8 +99,6 @@ public class StaffActivitySettingService extends MongoBaseService {
         if(staffAndActivitySettingWrapper.getStaffIds().isEmpty() || staffAndActivitySettingWrapper.getStaffActivitySettings().isEmpty()){
             exceptionService.actionNotPermittedException(ERROR_EMPTY_STAFF_OR_ACTIVITY_SETTING);
         }
-
-
         Set<BigInteger> activityIds=staffAndActivitySettingWrapper.getStaffActivitySettings().stream().map(StaffActivitySettingDTO::getActivityId).collect(Collectors.toSet());
         Set<StaffActivitySetting> staffActivitySettings=staffActivitySettingRepository.findByStaffIdInAndActivityIdInAndDeletedFalse(staffAndActivitySettingWrapper.getStaffIds(),activityIds);
         if(staffActivitySettings==null){
@@ -96,8 +106,8 @@ public class StaffActivitySettingService extends MongoBaseService {
         }
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger,Activity> activityMap=activities.stream().collect(Collectors.toMap(Activity::getId,v->v));
-        List<StaffPersonalDetail> staffExpertiseWrappers= userIntegrationService.getStaffDetailByIds(unitId,staffAndActivitySettingWrapper.getStaffIds());
-        Map<Long,StaffPersonalDetail> staffExpertiseWrapperMap=staffExpertiseWrappers.stream().collect(Collectors.toMap(StaffPersonalDetail::getId,v->v));
+        List<StaffDTO> staffExpertiseWrappers= userIntegrationService.getStaffDetailByIds(unitId,staffAndActivitySettingWrapper.getStaffIds());
+        Map<Long, StaffDTO> staffExpertiseWrapperMap=staffExpertiseWrappers.stream().collect(Collectors.toMap(StaffDTO::getId, v->v));
         Map<String,List<StaffActivityResponse>> responseMap=new HashMap<>();
         for(Long currentStaffId:staffAndActivitySettingWrapper.getStaffIds()){
             responseMap=assignActivitySettingsForCurrentStaff(responseMap,activityMap,staffExpertiseWrapperMap,currentStaffId,staffAndActivitySettingWrapper.getStaffActivitySettings(),unitId,staffActivitySettings);
@@ -105,39 +115,27 @@ public class StaffActivitySettingService extends MongoBaseService {
         return responseMap;
     }
 
-    public List<ActivityWithCompositeDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId,boolean includeTeamActivity){
-        List<ActivityWithCompositeDTO> staffPersonalizedActivities= staffActivitySettingRepository.findAllByUnitIdAndStaffIdAndDeletedFalse(unitId,staffId);
-        Map<BigInteger,ActivityWithCompositeDTO> mostlyUsedActivityData = shiftMongoRepository.findMostlyUsedActivityByStaffId(staffId).stream().collect(Collectors.toMap(k->k.getId(),v->v));
+    public List<ActivityWithCompositeDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId,boolean includeTeamActivity,boolean isActivityType){
+        List<ActivityWithCompositeDTO> staffPersonalizedActivities = staffActivitySettingRepository.findAllStaffActivitySettingByStaffIdAndUnityIdWithMostUsedActivityCount(unitId,staffId);;
         if(includeTeamActivity) {
-            List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId, staffPersonalizedActivities);
+            List<StaffActivitySettingDTO> activitySettings = staffActivitySettingRepository.findAllByStaffIdAndDeletedFalse(staffId);
+            List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId,isActivityType);
             Map<BigInteger, ActivityWithCompositeDTO> activityMap = activityList.stream().collect(Collectors.toMap(ActivityWithCompositeDTO::getId, Function.identity()));
-            staffPersonalizedActivities.forEach(activity -> {
+            activitySettings.forEach(activity -> {
                 if (activityMap.containsKey(activity.getActivityId())) {
                     ActivityWithCompositeDTO teamActivity = activityMap.get(activity.getActivityId());
-                    teamActivity.getRulesActivityTab().setEarliestStartTime(activity.getEarliestStartTime());
-                    teamActivity.getRulesActivityTab().setLatestStartTime(activity.getLatestStartTime());
-                    teamActivity.getRulesActivityTab().setShortestTime(activity.getShortestTime());
-                    teamActivity.getRulesActivityTab().setLongestTime(activity.getLongestTime());
-                    updateActivityPriorityAndMostlyUsedCountAndTimeType(mostlyUsedActivityData, teamActivity);
+                    teamActivity.getActivityRulesSettings().setEarliestStartTime(activity.getEarliestStartTime());
+                    teamActivity.getActivityRulesSettings().setLatestStartTime(activity.getLatestStartTime());
+                    teamActivity.getActivityRulesSettings().setShortestTime(activity.getShortestTime());
+                    teamActivity.getActivityRulesSettings().setLongestTime(activity.getLongestTime());
+
                 }
             });
-            return activityList;
+            staffPersonalizedActivities = activityList;
+        }else {
+            staffPersonalizedActivities = staffActivitySettingRepository.findAllStaffActivitySettingByStaffIdAndUnityIdWithMostUsedActivityCount(unitId,staffId);
         }
-        else {
-            for (ActivityWithCompositeDTO staffPersonalizedActivity : staffPersonalizedActivities) {
-                updateActivityPriorityAndMostlyUsedCountAndTimeType(mostlyUsedActivityData, staffPersonalizedActivity);
-            }
-            return staffPersonalizedActivities;
-        }
-    }
-
-    private void updateActivityPriorityAndMostlyUsedCountAndTimeType(Map<BigInteger, ActivityWithCompositeDTO> mostlyUsedActivityData, ActivityWithCompositeDTO staffPersonalizedActivity) {
-        if(mostlyUsedActivityData.containsKey(staffPersonalizedActivity.getActivityId())){
-            ActivityWithCompositeDTO compositeDTO = mostlyUsedActivityData.get(staffPersonalizedActivity.getActivityId());
-            staffPersonalizedActivity.setMostlyUsedCount(compositeDTO.getMostlyUsedCount());
-            staffPersonalizedActivity.setActivityPriority(compositeDTO.getActivityPriority());
-            staffPersonalizedActivity.setSecondLevelTimtype(compositeDTO.getSecondLevelTimtype());
-        }
+        return staffPersonalizedActivities;
     }
 
 
@@ -155,29 +153,29 @@ public class StaffActivitySettingService extends MongoBaseService {
             staffActivitySetting.setUnitId(unitId);
             staffActivitySetting.setStaffId(staffId);
         });
-        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffActivitySettings,StaffActivitySetting.class);
+        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyCollectionPropertiesByMapper(staffActivitySettings,StaffActivitySetting.class);
         save(staffActivitySettingsList);
         return staffActivitySettings;
    }
 
 
-    private  String validateActivitySettingsForCurrentStaff(StaffPersonalDetail staffDTO, Activity activity){
-        Specification<StaffPersonalDetail> staffDTOSpecification=new StaffExpertiseSpecification(activity);
+    private  List<String> validateActivitySettingsForCurrentStaff(StaffDTO staffDTO, Activity activity){
+        Specification<StaffDTO> staffDTOSpecification=new StaffActivityAssignmentSpecification(activity);
         List<String> messages = staffDTOSpecification.isSatisfiedString(staffDTO);
-        return (!messages.isEmpty())?localeService.getMessage(messages.get(0)):null;
+        return !messages.isEmpty() ? messages.stream().map(message-> localeService.getMessage(message)).collect(Collectors.toList()) : null;
     }
 
-   private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap,Map<BigInteger,Activity> activityMap,Map<Long,StaffPersonalDetail> staffExpertiseWrapperMap,Long staffId,
-                                                                                         List<StaffActivitySettingDTO> staffActivitySettingDTOS,Long unitId,Set<StaffActivitySetting> staffActivitySettings){
+   private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap, Map<BigInteger,Activity> activityMap, Map<Long, StaffDTO> staffExpertiseWrapperMap, Long staffId,
+                                                                                         List<StaffActivitySettingDTO> staffActivitySettingDTOS, Long unitId, Set<StaffActivitySetting> staffActivitySettings){
        List<StaffActivityResponse> success=(responseMap.get(SUCCESS)==null)?new ArrayList<>():responseMap.get(SUCCESS);
        List<StaffActivityResponse> error=(responseMap.get(ERROR)==null)?new ArrayList<>():responseMap.get(ERROR);
        Set<StaffActivitySetting> staffActivitySettingSet=new HashSet<>();
        Map<BigInteger,StaffActivitySettingDTO> activitySettingDTOMap=new HashMap<>();
        Map<Long,Map<BigInteger,StaffActivitySettingDTO>> staffWiseActivityMap=new HashMap<>();
        staffActivitySettingDTOS.forEach(staffActivitySetting->{
-          String validationMessage= validateActivitySettingsForCurrentStaff(staffExpertiseWrapperMap.get(staffId),activityMap.get(staffActivitySetting.getActivityId()));
-           if(Optional.ofNullable(validationMessage).isPresent()){
-               StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),validationMessage);
+          List<String> validationMessage= validateActivitySettingsForCurrentStaff(staffExpertiseWrapperMap.get(staffId),activityMap.get(staffActivitySetting.getActivityId()));
+           if(isCollectionNotEmpty(validationMessage)){
+               StaffActivityResponse staffActivityResponse = new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),validationMessage);
                error.add(staffActivityResponse);
                return;
            }
@@ -204,12 +202,13 @@ public class StaffActivitySettingService extends MongoBaseService {
        });
 
        activitySettingDTOMap.forEach((activityId,activitySetting)->{
+           Activity activity = activityMap.get(activitySetting.getActivityId());
            StaffActivitySetting staffActivitySetting=new StaffActivitySetting(staffId,activitySetting.getActivityId(),activitySetting.getEmploymentId(),
                    unitId,activitySetting.getShortestTime(),activitySetting.getLongestTime(),activitySetting.getMinLength(),activitySetting.getMaxThisActivityPerShift(),
                    activitySetting.isEligibleForMove(),activitySetting.getEarliestStartTime(),activitySetting.getLatestStartTime(),activitySetting.getMaximumEndTime(),
-                   activityMap.get(activitySetting.getActivityId()).getRulesActivityTab().getDayTypes(), activitySetting.getDefaultStartTime());
+                   activity.getActivityRulesSettings().getDayTypes(), activitySetting.getDefaultStartTime(),activity.getActivityBalanceSettings().getTimeType());
            staffActivitySettingSet.add(staffActivitySetting);
-           StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),localeService.getMessage(DEFAULT_ADDED));
+           StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),newArrayList(localeService.getMessage(DEFAULT_ADDED)));
            success.add(staffActivityResponse);
 
        });
@@ -222,4 +221,25 @@ public class StaffActivitySettingService extends MongoBaseService {
        responseMap.put(ERROR,error);
        return responseMap;
    }
+
+   public List<StaffActivitySetting> getActivitySettingByUnitIdAndActivityIds(Long unitId, List<BigInteger> activityIds){
+        return staffActivitySettingRepository.findByUnitIdAndActivityIdAndDeletedFalse(unitId,activityIds);
+   }
+
+   public StaffFilterDataDTO getStaffFilterDataDTO(Long unitId, List<BigInteger> timeTypeIds, List<BigInteger> activityIds){
+        StaffFilterDataDTO staffFilterDataDTO = new StaffFilterDataDTO();
+        staffFilterDataDTO.setActivityIds(isCollectionNotEmpty(activityIds) ? activityIds : new ArrayList<>());
+        if(isCollectionNotEmpty(timeTypeIds)) {
+            List<TimeTypeDTO> leafTimeTypes = new ArrayList<>();
+            timeTypeService.getAllLeafTimeTypeByParentTimeTypeIds(timeTypeIds, leafTimeTypes);
+            List<Activity> activities = activityService.findAllByUnitIdAndTimeTypeIds(unitId, leafTimeTypes.stream().map(TimeTypeDTO::getId).collect(Collectors.toList()));
+            staffFilterDataDTO.getActivityIds().addAll(activities.stream().map(Activity::getId).collect(Collectors.toList()));
+        }
+       if(isCollectionNotEmpty(staffFilterDataDTO.getActivityIds())) {
+           List<StaffActivitySetting> staffActivitySettings = getActivitySettingByUnitIdAndActivityIds(unitId,staffFilterDataDTO.getActivityIds());
+           staffFilterDataDTO.setStaffIds(staffActivitySettings.stream().map(StaffActivitySetting::getStaffId).collect(Collectors.toList()));
+       }
+       return staffFilterDataDTO;
+   }
+
 }

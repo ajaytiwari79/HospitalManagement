@@ -1,7 +1,7 @@
 package com.kairos.controller.staff;
 
 import com.kairos.dto.user.staff.StaffFilterDTO;
-import com.kairos.dto.user.team.TeamDTO;
+import com.kairos.enums.FilterType;
 import com.kairos.service.staff.StaffFilterService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
@@ -72,5 +73,15 @@ public class StaffFilterController {
                                                                    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllStaffByUnitId(unitId, staffFilterDTO,moduleId,startDate,endDate,showAllStaffs,selectedDate));
     }
+
+    @RequestMapping(value = UNIT_URL+"/get_required_data_for_filter", method = RequestMethod.POST)
+    @ApiOperation("Get Required Data For Filter")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public <T> ResponseEntity<Map<String, Object>> getRequiredDataForFilter(@PathVariable long unitId,
+                                                                        @RequestBody Map<FilterType, Set<T>> filterTypeMap) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getRequiredDataForFilter(unitId, filterTypeMap));
+    }
+
+
 
 }

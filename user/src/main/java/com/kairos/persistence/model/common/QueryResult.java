@@ -1,14 +1,17 @@
 package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.organization.CompanyType;
 import com.kairos.enums.OrganizationLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prabjot on 14/11/16.
@@ -36,6 +39,9 @@ public class QueryResult {
     private boolean hasPermission;
     private boolean unit;
     private CompanyType type;
+    private String startDate;
+    private String endDate;
+    private Map<String, TranslationInfo> translations;
 
     public QueryResult(String name, long id, List<QueryResult> children) {
         this.name = name;

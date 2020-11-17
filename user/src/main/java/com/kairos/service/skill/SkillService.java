@@ -2,8 +2,12 @@ package com.kairos.service.skill;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.SendGridMailService;
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationSkillDTO;
 import com.kairos.enums.MasterDataTypeEnum;
@@ -16,13 +20,14 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.time_care.TimeCareSkill;
 import com.kairos.persistence.model.user.expertise.response.SkillLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.response.SkillQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
+import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
@@ -32,6 +37,7 @@ import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGr
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.expertise.ExpertiseUnitService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.staff.StaffRetrievalService;
@@ -61,6 +67,8 @@ import static com.kairos.enums.SkillLevel.BASIC;
 @Service
 @Transactional
 public class SkillService {
+    private static final String AVAILABLE_SKILLS = "availableSkills" ;
+    private static final String SELECTED_SKILLS = "selectedSkills" ;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -89,6 +97,8 @@ public class SkillService {
     private ExceptionService exceptionService;
     @Inject
     private StaffRetrievalService staffRetrievalService;
+    @Inject
+    private ExpertiseUnitService expertiseUnitService;
 
     public Map<String, Object> createSkill(SkillDTO skillDTO, long skillCategoryId) {
         SkillCategory skillCategory = skillCategoryGraphRepository.findOne(skillCategoryId);
@@ -162,9 +172,7 @@ public class SkillService {
      * this method returns all skills based on type of node{all skills of organization or team it depends on type parameter} and relationship of staff and skills
      */
     public HashMap<String, Object> getAllAvailableSkills(long id) {
-
         HashMap<String, Object> response = new HashMap<>();
-
         Organization parent = organizationService.fetchParentOrganization(id);
         List<Map<String, Object>> organizationSkills;
         if(parent.getId().equals(id)){
@@ -172,17 +180,58 @@ public class SkillService {
         }else {
             organizationSkills=unitGraphRepository.getSkillsOfChildUnit(parent.getId(), id);
         }
-        List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
-        for (Map<String, Object> map : organizationSkills) {
-            orgSkillRel.add((Map<String, Object>) map.get("data"));
+        List<Map<String, Object>> avialableSkillsCategory = null;
+        List<Map<String, Object>> selectedSkillsCategory = null;
+        List<SkillCategoryQueryResults> availableSkillCategory = new ArrayList<>();
+        List<SkillCategoryQueryResults> selectedSkillCategory = new ArrayList<>();
+        for(Map<String,Object> map : organizationSkills){
+            if(isNotNull(((Map<String, Object>) map.get("data")).get(AVAILABLE_SKILLS))){
+                avialableSkillsCategory = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(AVAILABLE_SKILLS);
+            }
+            if(isNotNull(((Map<String, Object>) map.get("data")).get(SELECTED_SKILLS))){
+                selectedSkillsCategory = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(SELECTED_SKILLS);
+            }
         }
-
+        getAllSkills(avialableSkillsCategory, selectedSkillsCategory, availableSkillCategory, selectedSkillCategory);
+        Map<String,List<SkillCategoryQueryResults>> stringSkillCategoryQueryResultsMap = new HashMap<>();
+        stringSkillCategoryQueryResultsMap.put(AVAILABLE_SKILLS,availableSkillCategory);
+        stringSkillCategoryQueryResultsMap.put(SELECTED_SKILLS,selectedSkillCategory);
+        List<Map.Entry<String, List<SkillCategoryQueryResults>>> orgSkillRel = new ArrayList<>(organizationSkills.size());
+        for (Map.Entry<String, List<SkillCategoryQueryResults>> map : stringSkillCategoryQueryResultsMap.entrySet()) {
+            orgSkillRel.add(map);
+        }
         response.put("orgData", orgSkillRel);
         response.put("skillLevels", SkillLevel.values());
         response.put("teamList", teamService.getAllTeamsInOrganization(id));
-
         return response;
+    }
 
+    private void getAllSkills(List<Map<String, Object>> avialableSkillsCategory, List<Map<String, Object>> selectedSkillsCategory,  List<SkillCategoryQueryResults> availableSkillCategory,  List<SkillCategoryQueryResults> selectedSkillCategory) {
+        avialableSkillsCategory.forEach(asc->{
+            List<SkillDTO> availableSKillDTOS=new ArrayList<>();
+            List<Map<String,Object>> availableSkills =(List<Map<String,Object>>)asc.get("children");
+            availableSkills.forEach(ass->{
+                SkillDTO organizationAvailableSubSkillDTO = new SkillDTO((Long)ass.get("id"),(String)ass.get("name"),(String)ass.get("description"),(List<Long>)ass.get("tags"),(Long)ass.get("visitourId"),(boolean)ass.get("isEdited"),(Map<String, TranslationInfo>) ass.get("translations"),(String)ass.get("customName"));
+                availableSKillDTOS.add(organizationAvailableSubSkillDTO);
+            });
+
+            SkillCategoryQueryResults skillCategoryQueryResults = new SkillCategoryQueryResults((Long)asc.get("id"),(String) asc.get("name"),(String)asc.get("description"),availableSKillDTOS,(Map<String, TranslationInfo>) asc.get("translations"));
+            availableSkillCategory.add(skillCategoryQueryResults);
+
+        });
+
+        selectedSkillsCategory.forEach(ssc->{
+            List<SkillDTO> selectedSkillDTOS=new ArrayList<>();
+            List<Map<String,Object>> selectedSkillsData =(List<Map<String,Object>>)ssc.get("children");
+            selectedSkillsData.forEach(ss->{
+            SkillDTO organizationSelectedSkillDTO = new SkillDTO((Long)ss.get("id"),(String)ss.get("name"),(String)ss.get("description"),(List<Long>)ss.get("tags"),(Long)ss.get("visitourId"),(boolean)ss.get("isEdited"),(Map<String, TranslationInfo>) ss.get("translations"),(String)ss.get("customName"));
+            selectedSkillDTOS.add(organizationSelectedSkillDTO);
+        });
+
+        SkillCategoryQueryResults skillCategoryQueryResults = new SkillCategoryQueryResults((Long)ssc.get("id"),(String) ssc.get("name"),(String)ssc.get("description"),selectedSkillDTOS,(Map<String, TranslationInfo>) ssc.get("translations"));
+        selectedSkillCategory.add(skillCategoryQueryResults);
+
+        });
     }
 
 
@@ -199,12 +248,12 @@ public class SkillService {
 
         if (isSelected) {
             if (unitGraphRepository.isSkillAlreadyExist(id, skillId) == 0) {
-                unitGraphRepository.addSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                unitGraphRepository.addSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
             } else {
-                unitGraphRepository.updateSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                unitGraphRepository.updateSkillInOrganization(id, Arrays.asList(skillId), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
             }
         } else {
-            unitGraphRepository.removeSkillFromOrganization(id, skillId, DateUtils.getCurrentDate().getTime());
+            unitGraphRepository.removeSkillFromOrganization(id, skillId, DateUtils.getDate().getTime());
         }
         return getAllAvailableSkills(id);
 
@@ -270,7 +319,8 @@ public class SkillService {
         Map<Long,Skill>  skillMap=skills.stream().collect(Collectors.toMap(UserBaseEntity::getId, Function.identity()));
         for(Long skillId:selectedSkillId){
             Set<SkillLevelQueryResult> skillLevelQueryResult=userSkillLevelRelationshipGraphRepository.getSkillLevel(staffId,skillId);
-            list.add(new SkillQueryResult(skillId,skillLevelQueryResult,skillMap.get(skillId).getName(),skillMap.get(skillId).getSkillCategory().getName()));
+            Map<String,TranslationInfo> translationInfoMap =TranslationUtil.getTranslatedData(skillMap.get(skillId).getTranslatedNames(),skillMap.get(skillId).getTranslatedDescriptions());
+            list.add(new SkillQueryResult(skillId,skillLevelQueryResult,skillMap.get(skillId).getName(),skillMap.get(skillId).getSkillCategory().getName(),translationInfoMap));
         }
         Map<String, Object> map = new HashMap<>();
         map.put("tableData", list);
@@ -281,20 +331,13 @@ public class SkillService {
 
 
     public void updateStaffSkillLevel(Long staffId, SkillDTO skillDTO) {
-        Skill skill=skillGraphRepository.findById(skillDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage("skill not found")));
-        Staff staff=staffGraphRepository.findById(staffId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage("staff not found")));
+        Skill skill=skillGraphRepository.findById(skillDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage("skill not found")));
+        Staff staff=staffGraphRepository.findById(staffId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage("staff not found")));
         userSkillLevelRelationshipGraphRepository.removeExistingByStaffIdAndSkillId(staffId,skillDTO.getId());
         List<StaffSkillLevelRelationship> staffSkillLevelRelationships=new ArrayList<>(3);
         skillDTO.getSkillLevels().forEach(skillLevelDTO -> staffSkillLevelRelationships.add(new StaffSkillLevelRelationship(staff,skill,skillLevelDTO.getSkillLevel(),skillLevelDTO.getStartDate(),skillLevelDTO.getEndDate(),true)));
         userSkillLevelRelationshipGraphRepository.saveAll(staffSkillLevelRelationships);
     }
-
-
-    public void updateStaffSkillLevel(long staffId, long skillId, SkillLevel skillLevel, long startDate, long endDate, boolean status, long unitId) {
-        Staff staff = staffGraphRepository.findOne(staffId);
-        userSkillLevelRelationshipGraphRepository.updateStaffSkill(staffId, skillId, skillLevel, startDate, endDate, status);
-    }
-
 
     public boolean assignSkillToStaff(long id, long staffId, long skillId, boolean isSelected) {
 
@@ -304,7 +347,7 @@ public class SkillService {
 
         }
 
-        long lastModificationDate = DateUtils.getCurrentDate().getTime();
+        long lastModificationDate = DateUtils.getDate().getTime();
         if (isSelected) {
             staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), getCurrentLocalDate().toString(), lastModificationDate, BASIC, true);
         } else {
@@ -331,17 +374,17 @@ public class SkillService {
 
         Map<String, Object> map = new HashMap<>();
         map.put("skills", skillsResponse);
-        map.put("staffList", ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffList, Map.class));
+        map.put("staffList", ObjectMapperUtils.copyCollectionPropertiesByMapper(staffList, Map.class));
         return map;
     }
 
-    public Map<String, List<StaffPersonalDetail>> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, LocalDate selectedFromDate,  LocalDate selectedToDate) {
-        Map<String, List<StaffPersonalDetail>> staffSkillsMap = new HashMap<>();
+    public Map<String, List<StaffDTO>> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, LocalDate selectedFromDate, LocalDate selectedToDate) {
+        Map<String, List<StaffDTO>> staffSkillsMap = new HashMap<>();
         while (!selectedFromDate.isAfter(selectedToDate)){
             List<StaffQueryResult> staffQueryResults = skillGraphRepository.getStaffSkillAndLevelByStaffIds(staffIds, selectedFromDate.toString());
-            List<StaffPersonalDetail> staffDTOS = new ArrayList<>();
+            List<StaffDTO> staffDTOS = new ArrayList<>();
             if(isCollectionNotEmpty(staffQueryResults)) {
-                staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffPersonalDetail(isNotNull(staffQueryResult.getStaff()) ? staffQueryResult.getStaff().getId() : staffQueryResult.getId(), staffQueryResult.getSkills())));
+                staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffDTO(isNotNull(staffQueryResult.getStaff()) ? staffQueryResult.getStaff().getId() : staffQueryResult.getId(), staffQueryResult.getSkills())));
             }
             staffSkillsMap.put(selectedFromDate.toString(), staffDTOS);
             selectedFromDate = selectedFromDate.plusDays(1);
@@ -408,6 +451,14 @@ public class SkillService {
         return skills;
     }
 
+    public ActivityDTO getSkillByUnit(Long unitId){
+        ActivityDTO activityDTO=new ActivityDTO();
+        activityDTO.setSkills(skillGraphRepository.findAllSkillsByUnitId(unitId));
+        activityDTO.setExpertises(expertiseUnitService.getExpertiseIdsByUnit(unitId));
+        return activityDTO;
+
+    }
+
 
     /**
      * @param
@@ -417,7 +468,7 @@ public class SkillService {
      * @param unitId
      * @return
      */
-    public List<? extends Map<String, Object>> assignSkillToStaff(long staffId, List<Long> removedSkillIds, boolean isSelected, long unitId) {
+    public List<Map<String, Object>> assignSkillToStaff(long staffId, List<Long> removedSkillIds, boolean isSelected, long unitId) {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
@@ -425,16 +476,17 @@ public class SkillService {
         }
         List<Map<String, Object>> response;
         if (isSelected) {
-            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getCurrentDate().getTime(), BASIC, true);
+            boolean isStaffAndSkillRelationshipExistMoreThenOne =staffGraphRepository.isExists(staffId,removedSkillIds);
+            if(isStaffAndSkillRelationshipExistMoreThenOne){
+                staffGraphRepository.deleteSkill(staffId,removedSkillIds);
+            }
+            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getDate().getTime(), BASIC, true);
             response = prepareSelectedSkillResponse(staffId, removedSkillIds, unitId);
         } else {
-            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime());
-            response = Collections.emptyList();
+            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getDate().getTime());
+            response =Collections.emptyList();
+
         }
-        /*if (staffGraphRepository.checkIfStaffIsTaskGiver(staffId, unitId) != 0) {
-            logger.info("Staff  is TaskGiver: Now Syncing Skills in Visitour");
-            updateSkillsOfStaffInVisitour(staff, unitId);
-        }*/
         return response;
 
     }
@@ -462,5 +514,19 @@ public class SkillService {
     public List<StaffQueryResult> getStaffAllSkillAndLevelByStaffIds(List<Long> staffIds) {
         List<StaffQueryResult> staffQueryResults = skillGraphRepository.getAllStaffSkillAndLevelByStaffIds(staffIds);
         return staffQueryResults;
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfOrganizationSkills(Long skillId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Skill skill =skillGraphRepository.findOne(skillId);
+        skill.setTranslatedNames(translatedNames);
+        skill.setTranslatedDescriptions(translatedDescriptios);
+        skillGraphRepository.save(skill);
+        return skill.getTranslatedData();
     }
 }

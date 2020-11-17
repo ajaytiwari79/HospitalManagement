@@ -1,7 +1,7 @@
 package com.kairos.dto.user.staff.staff;
 
 
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,5 +12,5 @@ import java.util.List;
 public class UnitStaffResponseDTO {
 
     private Long unitId;
-    private List<StaffPersonalDetail> staffList = new ArrayList<>();
+    private List<StaffDTO> staffList = new ArrayList<>();
 }

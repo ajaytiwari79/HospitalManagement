@@ -131,45 +131,31 @@ public class PriorityGroupRulesDataGetterService {
     }
 //flagged to be changed after accumulatedtimebank has been
     public void calculateTimeBankAndPlannedHours(Long unitId, Map<Long, List<DailyTimeBankEntry>> employmentDailyTimeBankEntryMap, Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, Map<BigInteger,OpenShift> openShiftMap) {
-
-
-
         for(Map.Entry<BigInteger,List<StaffEmploymentQueryResult>> entry: openShiftStaffMap.entrySet()) {
             Iterator<StaffEmploymentQueryResult> staffEmploymentIterator = entry.getValue().iterator();
             int timeBank;
             int deltaTimeBank;
             int plannedHoursWeekly;
             while(staffEmploymentIterator.hasNext()) {
-
                 StaffEmploymentQueryResult staffEmploymentQueryResult = staffEmploymentIterator.next();
                 LocalDate openShiftDate = DateUtils.asLocalDate(openShiftMap.get(entry.getKey()).getStartDate());
                 Long endDate = DateUtils.getLongFromLocalDate(openShiftDate);
                 Long endDateDeltaWeek = DateUtils.getISOEndOfWeekDate(openShiftDate).getTime();
                 Long startDateDeltaWeek = DateUtils.getISOStartOfWeek(openShiftDate);
                 //Todo Yatharth please check it and change for totalWeekly hour
-                EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = new EmploymentWithCtaDetailsDTO(staffEmploymentQueryResult.getEmploymentId(),
-                        Optional.ofNullable(staffEmploymentQueryResult.getContractedMinByWeek()).isPresent()? staffEmploymentQueryResult.getContractedMinByWeek():0,
-                        Optional.ofNullable(staffEmploymentQueryResult.getWorkingDaysPerWeek()).isPresent()? staffEmploymentQueryResult.getWorkingDaysPerWeek():0,
-                        DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate()), DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getEndDate()), staffEmploymentQueryResult.getTotalWeeklyHours());
+                EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = new EmploymentWithCtaDetailsDTO(staffEmploymentQueryResult.getEmploymentId(), Optional.ofNullable(staffEmploymentQueryResult.getContractedMinByWeek()).isPresent()? staffEmploymentQueryResult.getContractedMinByWeek():0, Optional.ofNullable(staffEmploymentQueryResult.getWorkingDaysPerWeek()).isPresent()? staffEmploymentQueryResult.getWorkingDaysPerWeek():0, DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate()), DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getEndDate()), staffEmploymentQueryResult.getTotalWeeklyHours());
                 LocalDate startDatePlanned = DateUtils.getDateFromEpoch(DateUtils.getISOStartOfWeek(openShiftDate));
                 LocalDate endDatePlanned = DateUtils.asLocalDate(DateUtils.getISOEndOfWeekDate(openShiftDate));
                 List<DailyTimeBankEntry> dailyTimeBankEntries = employmentDailyTimeBankEntryMap.get(staffEmploymentQueryResult.getEmploymentId());
-
                 dailyTimeBankEntries = Optional.ofNullable(dailyTimeBankEntries).orElse(new ArrayList<>());
-
-                plannedHoursWeekly = dailyTimeBankEntries.stream().filter(dailyTimeBankEntry -> dailyTimeBankEntry.getDate().isAfter(startDatePlanned)||
-                        dailyTimeBankEntry.getDate().isEqual(startDatePlanned)&&dailyTimeBankEntry.getDate().isBefore(endDatePlanned)||
-               dailyTimeBankEntry.getDate().isEqual(endDatePlanned)).mapToInt(d->d.getScheduledMinutesOfTimeBank() + d.getCtaBonusMinutesOfTimeBank()).sum();
+                plannedHoursWeekly = dailyTimeBankEntries.stream().filter(dailyTimeBankEntry -> dailyTimeBankEntry.getDate().isAfter(startDatePlanned)||dailyTimeBankEntry.getDate().isEqual(startDatePlanned)&&dailyTimeBankEntry.getDate().isBefore(endDatePlanned)|| dailyTimeBankEntry.getDate().isEqual(endDatePlanned)).mapToInt(d->d.getScheduledMinutesOfTimeBank() + d.getCtaBonusMinutesOfTimeBank()).sum();
                 DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
-                timeBank = -1* (int)timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval,new Interval(DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate())).getTime(),endDate),
-                        employmentWithCtaDetailsDTO,new HashSet<>(),dailyTimeBankEntries,false)[0];
+                timeBank = -1* (int)timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval,new Interval(DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate())).getTime(),endDate),employmentWithCtaDetailsDTO,new HashSet<>(),dailyTimeBankEntries,false)[0];
                 planningPeriodInterval =  planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
-                deltaTimeBank =  -1 * (int)timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval,new Interval(startDateDeltaWeek,endDateDeltaWeek),
-                        employmentWithCtaDetailsDTO,new HashSet<>(),dailyTimeBankEntries, false)[0];
+                deltaTimeBank =  -1 * (int)timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval,new Interval(startDateDeltaWeek,endDateDeltaWeek),employmentWithCtaDetailsDTO,new HashSet<>(),dailyTimeBankEntries, false)[0];
                 staffEmploymentQueryResult.setAccumulatedTimeBank(timeBank);
                 staffEmploymentQueryResult.setDeltaWeeklytimeBank(deltaTimeBank);
                 staffEmploymentQueryResult.setPlannedHoursWeek(plannedHoursWeekly);
-
             }
 
         }

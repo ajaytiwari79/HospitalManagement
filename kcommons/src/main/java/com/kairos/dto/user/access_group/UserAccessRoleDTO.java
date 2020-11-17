@@ -13,8 +13,8 @@ import java.util.Set;
 public class UserAccessRoleDTO {
     private Long userId;
     private Long unitId;
-    private Boolean staff;
-    private Boolean management;
+    private boolean staff;
+    private boolean management;
     private Long staffId;
     private Set<Long> accessGroupIds = new HashSet<>();
 

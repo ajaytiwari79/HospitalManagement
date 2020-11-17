@@ -1,6 +1,9 @@
 package com.kairos.dto.user.country.day_type;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.enums.Day;
 import lombok.Getter;
@@ -19,6 +22,7 @@ public class DayType {
     private String description;
     private String colorCode;
     private List<Day> validDays=new ArrayList<>();
+    @JsonAlias({"countryHolidayCalenderData","countryHolidayCalenders"})
     private List<CountryHolidayCalenderDTO> countryHolidayCalenderData;
     private boolean holidayType;
     private boolean isEnabled = true;

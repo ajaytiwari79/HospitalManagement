@@ -1,5 +1,6 @@
     package com.kairos.controller.organization;
 
+    import com.kairos.dto.TranslationInfo;
     import com.kairos.persistence.model.organization.team.TeamDTO;
     import com.kairos.persistence.model.staff.StaffTeamDTO;
     import com.kairos.service.organization.TeamService;
@@ -16,7 +17,7 @@
     import java.util.Map;
     import java.util.Set;
 
-    import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+    import static com.kairos.constants.ApiConstants.*;
 
     /**
      * Created by oodles on 18/10/16.
@@ -77,9 +78,9 @@
         @ApiOperation(value = "Update Activities in Team")
         @PutMapping(value = "/team/{teamId}/update_activities")
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> updateActivitiesOfTeam(@PathVariable Long teamId,  @RequestBody Set<BigInteger> activityIds) {
+        public ResponseEntity<Map<String, Object>> updateActivitiesOfTeam(@PathVariable Long unitId,@PathVariable Long teamId,  @RequestBody Set<BigInteger> activityIds) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.updateActivitiesOfTeam(teamId, activityIds));
+                    teamService.updateActivitiesOfTeam(unitId,teamId, activityIds));
         }
 
         @ApiOperation(value = "Get Team Selected Skills")
@@ -184,4 +185,18 @@
                     teamService.isActivityAssignedToTeam(activityId));
         }
 
+        @PutMapping("/team/activity/{activityId}/assign_child_activities")
+        @ApiOperation("verify is activity assign to any team")
+        //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> assignChildActivitiesToTeam(@PathVariable BigInteger activityId,@RequestBody Set<BigInteger> childActivityIds) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                    teamService.assignChildActivitiesToTeam(activityId,childActivityIds));
+        }
+
+        @PutMapping(value = "/team/{id}/language_settings")
+        @ApiOperation("Add translated data")
+            //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        ResponseEntity<Map<String, Object>> updateTranslationsOfRelationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.updateTranslationOfOrganizationTeams(id,translations));
+        }
     }

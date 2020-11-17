@@ -17,6 +17,7 @@ import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -195,7 +196,7 @@ public class CounterRepository{
                 project(TITLE,"fibonacciKPIConfigs").and(KPI_ID).as("_id").and(KPI_TYPE).as("type")
                         .and("kpi.calculationFormula").as("calculationFormula").and(KPI_COUNTER).as(COUNTER).
                         and(KPI_FIBONACCI_KPI).as("fibonacciKPI").and("kpi.description").as("kpi.description")
-                        .and("kpi.referenceId").as("referenceId")
+                        .and("kpi.referenceId").as("referenceId").and("kpi.translations").as("translations")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
         return results.getMappedResults();
@@ -250,7 +251,7 @@ public class CounterRepository{
         String queryField = getRefQueryField(level);
         Criteria matchCriteria = categoryIds == null ? Criteria.where(DELETED).is(false).and(queryField).is(refId) : Criteria.where(DELETED).is(false).and("_id").in(categoryIds).and(queryField).is(refId);
         Query query = new Query(matchCriteria);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query, KPICategory.class), KPICategoryDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, KPICategory.class), KPICategoryDTO.class);
     }
 
 
@@ -308,7 +309,7 @@ public class CounterRepository{
         } else {
             query = new Query(Criteria.where(DELETED).is(false).and(TAB_ID).in(tabIds).and(KPI_ID1).in(kpiIds).and(refQueryField).is(refId).and(LEVEL).is(level));
         }
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query, TabKPIConf.class), TabKPIMappingDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, TabKPIConf.class), TabKPIMappingDTO.class);
     }
 
     public List<TabKPIDTO> getTabKPIIdsByTabIds(String tabId, Long refId, Long countryId, ConfLevel level) {
@@ -472,7 +473,7 @@ public class CounterRepository{
         } else {
             query = new Query(Criteria.where(DELETED).is(false).and(ORG_TYPE_ID).in(orgTypeIds).and(KPI_ID1).in(kpiIds));
         }
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query, OrgTypeKPIEntry.class), OrgTypeMappingDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, OrgTypeKPIEntry.class), OrgTypeMappingDTO.class);
     }
 
 
@@ -500,7 +501,7 @@ public class CounterRepository{
         } else {
             query = new Query(Criteria.where(DELETED).is(false).and(ACCESS_GROUP_ID).in(accessGroupIds).and(KPI_ID1).in(kpiIds).and(queryField).is(refId));
         }
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query, AccessGroupKPIEntry.class), AccessGroupMappingDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, AccessGroupKPIEntry.class), AccessGroupMappingDTO.class);
     }
 
     public List<BigInteger> getAccessGroupKPIIdsAccessGroupIds(List<Long> accessGroupIds, List<BigInteger> kpiIds, ConfLevel level, Long refId) {
@@ -609,7 +610,7 @@ public class CounterRepository{
     public List<CounterDTO> getAllCounterBySupportedModule(ModuleType supportedModuleType) {
         Query query = new Query(Criteria.where(DELETED).is(false).and("supportedModuleTypes").in(supportedModuleType));
         query.fields().include("id").include(TITLE);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query, Counter.class), CounterDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, Counter.class), CounterDTO.class);
     }
 
     //dashboard tab
@@ -623,7 +624,7 @@ public class CounterRepository{
         String refQueryField = getRefQueryField(level);
         Criteria matchCriteria = dashBoardIds == null ? Criteria.where(DELETED).is(false).and(refQueryField).is(refId).and(LEVEL).is(level) : Criteria.where(DELETED).is(false).and(MODULE_ID).in(dashBoardIds).and(refQueryField).is(refId).and(LEVEL).is(level);
         Query query = new Query(matchCriteria);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
     public List<KPIAccessPageDTO> getKPIAcceccPage(Long refId, ConfLevel level) {
@@ -646,31 +647,24 @@ public class CounterRepository{
     public List<KPIDashboardDTO> getKPIDashboard(long unitId, ConfLevel level, Long staffId) {
         Criteria matchCriteria = Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).and(STAFF_ID).is(staffId).and(LEVEL).is(level);
         Query query = new Query(matchCriteria);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
     public List<KPIDashboardDTO> getKPIDashboardsOfStaffs(Long unitId, ConfLevel level, List<Long> staffIds) {
         Criteria matchCriteria = Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).and(STAFF_ID).in(staffIds).and(LEVEL).is(level);
         Query query = new Query(matchCriteria);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
     public List<KPIDashboard> getKPIDashboardsOfStaffAndUnits(List<Long> unitIds, ConfLevel level, List<Long> staffIds) {
         Criteria matchCriteria = Criteria.where(DELETED).is(false).and(UNIT_ID).in(unitIds).and(STAFF_ID).in(staffIds).and(LEVEL).is(level);
         Query query = new Query(matchCriteria);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboard.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboard.class);
     }
 
     public <S extends MongoBaseEntity> S save(@Valid S entity) {
         Assert.notNull(entity, "Entity must not be null!");
-        /**
-         *  Get class name for sequence class
-         * */
         String className = entity.getClass().getSimpleName();
-
-        /**
-         *  Set Id if entity don't have Id
-         * */
         if(entity.getId() == null){
             if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
                 //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
@@ -679,15 +673,12 @@ public class CounterRepository{
             if(entity.getClass().equals(FibonacciKPI.class)){
                 className = KPI.class.getSimpleName();
             }
-            entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+            entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName(),UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
             entity.setCreatedAt(DateUtils.getDate());
             entity.setId(nextSequence(className));
         }else {
-            entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+            entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName(),UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
         }
-        /**
-         *  Set updatedAt time as current time
-         * */
         entity.setUpdatedAt(DateUtils.getDate());
         mongoTemplate.save(entity);
         return entity;
@@ -700,31 +691,36 @@ public class CounterRepository{
         MongoConverter converter = mongoTemplate.getConverter();
         BasicDBObject dbObject;
         try{
-            for (T entity: entities) {
-                String className = entity.getClass().getSimpleName();
-                entity.setUpdatedAt(DateUtils.getDate());
-                if(entity.getId() == null){
-                    entity.setCreatedAt(DateUtils.getDate());
-                    entity.setId(nextSequence(className));
-                    entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
-                    dbObject = new BasicDBObject();
-                    converter.write(entity, dbObject);
-                    bulkWriteOperation.insert(dbObject);
-                }else {
-                    entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
-                    dbObject = new BasicDBObject();
-                    converter.write(entity, dbObject);
-                    BasicDBObject query = new BasicDBObject();
-                    query.put("_id", dbObject.get("_id"));
-                    bulkWriteOperation.find(query).replaceOne(dbObject);
-                }
-            }
+            updateBulkOperation(entities, bulkWriteOperation, converter);
             bulkWriteOperation.execute();
             return entities;
         } catch(Exception ex){
             LOGGER.error("BulkWriteOperation Exception ::  ", ex);
         }
         return new ArrayList<>();
+    }
+
+    private <T extends MongoBaseEntity> void updateBulkOperation(@Valid List<T> entities, BulkWriteOperation bulkWriteOperation, MongoConverter converter) {
+        BasicDBObject dbObject;
+        for (T entity: entities) {
+            String className = entity.getClass().getSimpleName();
+            entity.setUpdatedAt(DateUtils.getDate());
+            if(entity.getId() == null){
+                entity.setCreatedAt(DateUtils.getDate());
+                entity.setId(nextSequence(className));
+                entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName(),UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
+                dbObject = new BasicDBObject();
+                converter.write(entity, dbObject);
+                bulkWriteOperation.insert(dbObject);
+            }else {
+                entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName(),UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF));
+                dbObject = new BasicDBObject();
+                converter.write(entity, dbObject);
+                BasicDBObject query = new BasicDBObject();
+                query.put("_id", dbObject.get("_id"));
+                bulkWriteOperation.find(query).replaceOne(dbObject);
+            }
+        }
     }
 
     public BigInteger nextSequence(String sequenceName){

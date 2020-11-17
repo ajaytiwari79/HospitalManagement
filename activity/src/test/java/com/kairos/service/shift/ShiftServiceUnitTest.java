@@ -13,12 +13,11 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
-import com.kairos.persistence.model.shift.ShiftViolatedRules;
+import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.phase.PhaseService;
 import org.junit.Assert;
@@ -45,8 +44,9 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ShiftServiceUnitTest {
+    public static final String TIME_ATTENDANCE = "TIME & ATTENDANCE";
     @InjectMocks
-    private ShiftService shiftService;
+    private ShiftStateService shiftStateService;
     @InjectMocks
     private ShiftValidatorService shiftValidatorService;
 
@@ -60,8 +60,6 @@ public class ShiftServiceUnitTest {
     private ShiftMongoRepository shiftMongoRepository;
     @Mock
     private ActivityMongoRepository activityMongoRepository;
-    @Mock
-    private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @Mock private PhaseService phaseService;
     public ShiftDTO shiftDTO;
     public ShiftActivity activity;
@@ -92,13 +90,13 @@ public class ShiftServiceUnitTest {
         shifts.add(shift);
 
         List<ShiftState> shiftStates = new ArrayList<>();
-        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT,"TIME & ATTENDANCE",LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
+        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT, TIME_ATTENDANCE,LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
         shiftStates.add(shiftState);
         Set<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
 
         when(shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT)).thenReturn(shiftStates);
 
-        ButtonConfig buttonConfig = shiftService.findButtonConfig(shifts,true);
+        ButtonConfig buttonConfig = shiftStateService.findButtonConfig(shifts,true);
         Assert.assertEquals(buttonConfig.isSendToPayrollEnabled(),false);;
 
 
@@ -123,15 +121,15 @@ public class ShiftServiceUnitTest {
 
 
         List<ShiftState> shiftStates = new ArrayList<>();
-        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT,"TIME & ATTENDANCE",LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
+        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT, TIME_ATTENDANCE,LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
         shiftStates.add(shiftState);
-        shiftState = new ShiftState(BigInteger.valueOf(13880L),AccessGroupRole.MANAGEMENT,"TIME & ATTENDANCE",LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,21,0),35602L,14139L);
+        shiftState = new ShiftState(BigInteger.valueOf(13880L),AccessGroupRole.MANAGEMENT, TIME_ATTENDANCE,LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,21,0),35602L,14139L);
         shiftStates.add(shiftState);
         Set<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
 
         when(shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT)).thenReturn(shiftStates);
 
-        ButtonConfig buttonConfig = shiftService.findButtonConfig(shifts,true);
+        ButtonConfig buttonConfig = shiftStateService.findButtonConfig(shifts,true);
         Assert.assertEquals(buttonConfig.isSendToPayrollEnabled(),true);;
 
 
@@ -217,7 +215,6 @@ public class ShiftServiceUnitTest {
         List<Shift> overLappedShifts=ObjectMapperUtils.jsonStringToList(getOverLappedShift(),Shift.class);
         when(shiftMongoRepository.findOne(any(BigInteger.class))).thenReturn(shift);
         when(activityMongoRepository.findActivityAndTimeTypeByActivityId(any(BigInteger.class))).thenReturn(activityWrapper);
-        when(shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(anyList())).thenReturn(shiftViolatedRules);
         when(shiftMongoRepository.findShiftBetweenDurationByEmploymentId(any(Long.class), any(Date.class),any(Date.class))).thenReturn(overLappedShifts);
         shiftDTO.setStartDate(updatedStartDate);
         shiftDTO.setEndDate(updatedEndDate);
@@ -326,95 +323,6 @@ public class ShiftServiceUnitTest {
                "}" ;
     }
 
-    private String getShiftViolation(){
-        return "{\n" +
-                "   \"shifts\":[\n" +
-                "      {\n" +
-                "         \"id\":2628,\n" +
-                "         \"startDate\":1557208800000,\n" +
-                "         \"endDate\":1557223200000,\n" +
-                "         \"bid\":0,\n" +
-                "         \"pId\":0,\n" +
-                "         \"amount\":0,\n" +
-                "         \"probability\":0,\n" +
-                "         \"unitId\":1172,\n" +
-                "         \"staffId\":1002,\n" +
-                "         \"employmentId\":19902,\n" +
-                "         \"activities\":[\n" +
-                "            {\n" +
-                "               \"status\":[\n" +
-                "\n" +
-                "               ],\n" +
-                "               \"message\":null,\n" +
-                "               \"success\":false,\n" +
-                "               \"activity\":null,\n" +
-                "               \"activityId\":823,\n" +
-                "               \"startDate\":1557208800000,\n" +
-                "               \"endDate\":1557223200000,\n" +
-                "               \"scheduledMinutes\":0,\n" +
-                "               \"durationMinutes\":240,\n" +
-                "               \"activityName\":\"Er tilgængelig\",\n" +
-                "               \"bid\":0,\n" +
-                "               \"pId\":0,\n" +
-                "               \"reasonCodeId\":null,\n" +
-                "               \"absenceReasonCodeId\":null,\n" +
-                "               \"remarks\":\"\",\n" +
-                "               \"id\":5315,\n" +
-                "               \"timeType\":\"NON_WORKING_TYPE\",\n" +
-                "               \"backgroundColor\":null,\n" +
-                "               \"haltBreak\":false,\n" +
-                "               \"plannedTimeId\":2,\n" +
-                "               \"breakShift\":false,\n" +
-                "               \"breakReplaced\":true,\n" +
-                "               \"reasonCode\":null,\n" +
-                "               \"allowedBreakDurationInMinute\":null,\n" +
-                "               \"timeBankCtaBonusMinutes\":0,\n" +
-                "               \"timeBankCTADistributions\":[\n" +
-                "\n" +
-                "               ],\n" +
-                "               \"location\":null,\n" +
-                "               \"description\":null,\n" +
-                "               \"wtaRuleViolations\":null,\n" +
-                "               \"plannedMinutesOfTimebank\":0,\n" +
-                "               \"startLocation\":\"\",\n" +
-                "               \"endLocation\":\"\",\n" +
-                "               \"scheduledMinutesOfTimebank\":0,\n" +
-                "               \"scheduledMinutesOfPayout\":0\n" +
-                "            }\n" +
-                "         ],\n" +
-                "         \"scheduledMinutes\":0,\n" +
-                "         \"durationMinutes\":240,\n" +
-                "         \"editable\":false,\n" +
-                "         \"functionDeleted\":false,\n" +
-                "         \"shiftType\":\"PRESENCE\",\n" +
-                "         \"timeBankCtaBonusMinutes\":0,\n" +
-                "         \"deltaTimeBankMinutes\":0,\n" +
-                "         \"accumulatedTimeBankMinutes\":0,\n" +
-                "         \"plannedMinutesOfTimebank\":0,\n" +
-                "         \"multipleActivity\":false,\n" +
-                "         \"planningPeriodId\":214,\n" +
-                "         \"phaseId\":97,\n" +
-                "         \"restingMinutes\":0,\n" +
-                "         \"escalationReasons\":[\n" +
-                "\n" +
-                "         ],\n" +
-                "         \"escalationFreeShiftIds\":[\n" +
-                "\n" +
-                "         ],\n" +
-                "         \"escalationResolved\":false\n" +
-                "      }\n" +
-                "   ],\n" +
-                "   \"violatedRules\":{\n" +
-                "      \"workTimeAgreements\":[\n" +
-                "\n" +
-                "      ],\n" +
-                "      \"activities\":[\n" +
-                "\n" +
-                "      ]\n" +
-                "   }\n" +
-                "}";
-    }
-
     private String getActivityDetailsJson(){
         return "{\n" +
                 "   \"activity\":{\n" +
@@ -456,7 +364,7 @@ public class ShiftServiceUnitTest {
                 "      \"state\":\"DRAFT\",\n" +
                 "      \"unitId\":1172,\n" +
                 "      \"parentId\":770,\n" +
-                "      \"generalActivityTab\":{\n" +
+                "      \"activityGeneralSettings\":{\n" +
                 "         \"name\":\"Er tilgængelig\",\n" +
                 "         \"categoryId\":20,\n" +
                 "         \"colorPresent\":true,\n" +
@@ -468,14 +376,14 @@ public class ShiftServiceUnitTest {
                 "         ],\n" +
                 "         \"active\":true\n" +
                 "      },\n" +
-                "      \"balanceSettingsActivityTab\":{\n" +
+                "      \"activityBalanceSettings\":{\n" +
                 "         \"addTimeTo\":null,\n" +
                 "         \"timeTypeId\":9,\n" +
                 "         \"timeType\":null,\n" +
                 "         \"onCallTimePresent\":false,\n" +
                 "         \"negativeDayBalancePresent\":false\n" +
                 "      },\n" +
-                "      \"rulesActivityTab\":{\n" +
+                "      \"activityRulesSettings\":{\n" +
                 "         \"eligibleForFinalSchedule\":false,\n" +
                 "         \"eligibleForDraftSchedule\":false,\n" +
                 "         \"eligibleForRequest\":false,\n" +
@@ -539,11 +447,11 @@ public class ShiftServiceUnitTest {
                 "         \"reasonCodeRequired\":false,\n" +
                 "         \"reasonCodeRequiredState\":null\n" +
                 "      },\n" +
-                "      \"individualPointsActivityTab\":{\n" +
+                "      \"activityIndividualPointsSettings\":{\n" +
                 "         \"individualPointsCalculationMethod\":\"addHourValues\",\n" +
                 "         \"numberOfFixedPoints\":0.0\n" +
                 "      },\n" +
-                "      \"timeCalculationActivityTab\":{\n" +
+                "      \"activityTimeCalculationSettings\":{\n" +
                 "         \"methodForCalculatingTime\":\"ENTERED_TIMES\",\n" +
                 "         \"fixedTimeValue\":0,\n" +
                 "         \"multiplyWith\":true,\n" +
@@ -571,17 +479,17 @@ public class ShiftServiceUnitTest {
                 "      \"childActivityIds\":[\n" +
                 "\n" +
                 "      ],\n" +
-                "      \"notesActivityTab\":{\n" +
+                "      \"activityNotesSettings\":{\n" +
                 "         \"content\":null,\n" +
                 "         \"originalDocumentName\":null,\n" +
                 "         \"modifiedDocumentName\":null\n" +
                 "      },\n" +
-                "      \"communicationActivityTab\":{\n" +
+                "      \"activityCommunicationSettings\":{\n" +
                 "         \"allowCommunicationReminder\":false,\n" +
                 "         \"notifyAfterDeleteActivity\":false,\n" +
                 "         \"activityReminderSettings\":null\n" +
                 "      },\n" +
-                "      \"skillActivityTab\":{\n" +
+                "      \"activitySkillSettings\":{\n" +
                 "         \"activitySkills\":[\n" +
                 "\n" +
                 "         ],\n" +
@@ -589,15 +497,15 @@ public class ShiftServiceUnitTest {
                 "\n" +
                 "         ]\n" +
                 "      },\n" +
-                "      \"optaPlannerSettingActivityTab\":{\n" +
+                "      \"activityOptaPlannerSetting\":{\n" +
                 "         \"maxThisActivityPerShift\":10,\n" +
                 "         \"minLength\":0,\n" +
                 "         \"eligibleForMove\":true\n" +
                 "      },\n" +
-                "      \"ctaAndWtaSettingsActivityTab\":{\n" +
+                "      \"activityCTAAndWTASettings\":{\n" +
                 "         \"eligibleForCostCalculation\":false\n" +
                 "      },\n" +
-                "      \"locationActivityTab\":{\n" +
+                "      \"activityLocationSettings\":{\n" +
                 "         \"glideTimeForCheckIn\":[\n" +
                 "            {\n" +
                 "               \"location\":\"OFFICE\",\n" +
@@ -651,7 +559,7 @@ public class ShiftServiceUnitTest {
                 "            }\n" +
                 "         ]\n" +
                 "      },\n" +
-                "      \"phaseSettingsActivityTab\":{\n" +
+                "      \"activityPhaseSettings\":{\n" +
                 "         \"activityId\":823,\n" +
                 "         \"phaseTemplateValues\":[\n" +
                 "            {\n" +

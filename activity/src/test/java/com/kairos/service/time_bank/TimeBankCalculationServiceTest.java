@@ -153,24 +153,24 @@ public class TimeBankCalculationServiceTest {
                 timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 480);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 480);
-                activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(ENTERED_MANUALLY);
+                activity.getActivityTimeCalculationSettings().setMethodForCalculatingTime(ENTERED_MANUALLY);
                 shiftActivity.setDurationMinutes(180);
                 timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 180);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 180);
-                activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(FIXED_TIME);
+                activity.getActivityTimeCalculationSettings().setMethodForCalculatingTime(FIXED_TIME);
                 timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 150);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 150);
-                activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(CommonConstants.FULL_DAY_CALCULATION);
+                activity.getActivityTimeCalculationSettings().setMethodForCalculatingTime(CommonConstants.FULL_DAY_CALCULATION);
                 timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 2220);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 2220);
-                activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(WEEKLY_HOURS);
+                activity.getActivityTimeCalculationSettings().setMethodForCalculatingTime(WEEKLY_HOURS);
                 timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 1920);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 1920);
-                activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(WEEKLY_HOURS);
+                activity.getActivityTimeCalculationSettings().setMethodForCalculatingTime(WEEKLY_HOURS);
                 timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 1920);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 1920);
@@ -242,10 +242,9 @@ public class TimeBankCalculationServiceTest {
     public void updateMessageProperties() {
         File file = new File("/media/pradeep/bak/kairos/kairos-user/planner/src/main/resources/messages/messages.properties");
         File file2 = new File("/media/pradeep/bak/test.txt");
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(file2);
+        try(FileOutputStream fileOutputStream = new FileOutputStream(file2);
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));) {
             bufferedReader.lines().forEach(string->{
                 if(!string.contains("#") && !string.isEmpty()){
                     String key = string.substring(0,string.indexOf("="));

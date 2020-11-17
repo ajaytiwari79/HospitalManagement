@@ -4,6 +4,8 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -19,9 +21,11 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
+import com.kairos.service.counter.KPIBuilderCalculationService;
+import com.kairos.service.counter.KPIService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.time_bank.TimeBankService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -37,15 +41,16 @@ import static com.kairos.commons.utils.CommonsExceptionUtil.convertMessage;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.ONE_HOUR_MINUTES;
-import static com.kairos.constants.AppConstants.TIME_AND_ATTENDANCE;
+import static com.kairos.constants.AppConstants.*;
+import static com.kairos.dto.activity.counter.enums.XAxisConfig.PERCENTAGE;
+import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
 
 /**
  * @author pradeep
  * @date - 18/9/18
  */
 @Service
-public class ShiftBreakService {
+public class ShiftBreakService implements KPIService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ShiftBreakService.class);
     @Inject
     private BreakSettingMongoRepository breakSettingMongoRepository;
@@ -61,8 +66,8 @@ public class ShiftBreakService {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private PhaseService phaseService;
-    @Inject
-    private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
+    @Inject private KPIBuilderCalculationService kpiBuilderCalculationService;
+    @Inject private TimeBankService timeBankService;
 
 
     public Map<BigInteger, ActivityWrapper> getBreakActivities(BreakSettings breakSetting, Long unitId) {
@@ -77,11 +82,13 @@ public class ShiftBreakService {
     }
 
 
-    public List<ShiftActivity> updateBreakInShift(boolean shiftUpdated, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot, Shift dbShift) {
 
-        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
-        if (TIME_AND_ATTENDANCE.equals(phase.getName()) && isCollectionNotEmpty(shift.getBreakActivities())) {
-            return getBreakActivity(shift, dbShift, activityWrapperMap);
+    public List<ShiftActivity> updateBreakInShift(boolean shiftUpdated, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot, Shift dbShift,Phase phase) {
+         phase = phase!=null?phase:phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
+        if ((TIME_AND_ATTENDANCE.equals(phase.getName()) || REALTIME.equals(phase.getName())) && isCollectionNotEmpty(shift.getBreakActivities())) {
+            validateBreakDuration(shift);
+            return shift.getBreakActivities();
+            //return getBreakActivity(shift, dbShift, activityWrapperMap);
         }
         BreakSettings breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseId(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
         List<ShiftActivity> breakActivities = new ArrayList<>();
@@ -107,10 +114,10 @@ public class ShiftBreakService {
                     if (isNull(breakActivity)) {
                         Date breakStartDate = placeBreakAfterThisDate;
                         Optional<ShiftActivity> shiftActivityOptional = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getInterval().containsAndEqualsEndDate(breakStartDate)).findAny();
-                        Date breakEndDate = asDate(asZoneDateTime(placeBreakAfterThisDate).plusMinutes(breakSettings.getBreakDurationInMinute()));
+                        Date breakEndDate = asDate(asZonedDateTime(placeBreakAfterThisDate).plusMinutes(breakSettings.getBreakDurationInMinute()));
                         breakActivity = buildBreakActivity(placeBreakAfterThisDate, breakEndDate, breakSettings, staffAdditionalInfoDTO, activityWrapperMap);
                         ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivityOptional.get().getActivityId());
-                        breakActivity.setBreakNotHeld(!activityWrapper.getActivity().getRulesActivityTab().isBreakAllowed());
+                        breakActivity.setBreakNotHeld(!activityWrapper.getActivity().getActivityRulesSettings().isBreakAllowed());
                         if (shiftActivityOptional.isPresent() && breakActivity.isBreakNotHeld() && !activityWrapper.getTimeTypeInfo().isBreakNotHeldValid()) {
                             breakActivity = null;
                         }
@@ -128,6 +135,16 @@ public class ShiftBreakService {
             }
         }
         return breakActivities;
+    }
+
+    private void validateBreakDuration(Shift shift) {
+        shift.getBreakActivities().forEach(k->{
+            if(!shift.getInterval().contains(k.getInterval())){
+                LOGGER.info("Shift Interval {}",shift.getInterval().toString());
+                LOGGER.info("Activity Interval {}",k.getInterval().toString());
+                exceptionService.actionNotPermittedException(BREAK_NOT_VALID);
+            }
+        });
     }
 
     public List<ShiftActivity> getBreakActivity(Shift shift, Shift dbShift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
@@ -164,16 +181,16 @@ public class ShiftBreakService {
     private ShiftActivity getBreakActivityAfterCalculation(Map<BigInteger, ActivityWrapper> activityWrapperMap, BreakSettings breakSetting, boolean placeBreakAnyWhereInShift, Date placeBreakAfterThisDate, ShiftActivity shiftActivity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ShiftActivity breakActivity = null;
         Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
-        boolean breakAllowed = activity.getRulesActivityTab().isBreakAllowed();
+        boolean breakAllowed = activity.getActivityRulesSettings().isBreakAllowed();
         if (breakAllowed) {
             boolean breakCanbePlace = shiftActivity.getEndDate().after(placeBreakAfterThisDate);
             breakCanbePlace = breakCanbePlace ? new DateTimeInterval(shiftActivity.getStartDate().after(placeBreakAfterThisDate) ? shiftActivity.getStartDate() : placeBreakAfterThisDate, shiftActivity.getEndDate()).getMinutes() > breakSetting.getBreakDurationInMinute() : breakCanbePlace;
             if (breakCanbePlace && !placeBreakAnyWhereInShift) {
                 Date startDate = roundDateByMinutes(shiftActivity.getStartDate().after(placeBreakAfterThisDate) ? shiftActivity.getStartDate() : placeBreakAfterThisDate, 15);
-                Date endDate = asDate(asZoneDateTime(startDate).plusMinutes(breakSetting.getBreakDurationInMinute()));
+                Date endDate = asDate(asZonedDateTime(startDate).plusMinutes(breakSetting.getBreakDurationInMinute()));
                 if (endDate.after(shiftActivity.getEndDate())) {
                     endDate = shiftActivity.getEndDate();
-                    startDate = asDate(asZoneDateTime(endDate).minusMinutes(breakSetting.getBreakDurationInMinute()));
+                    startDate = asDate(asZonedDateTime(endDate).minusMinutes(breakSetting.getBreakDurationInMinute()));
                 }
                 breakActivity = buildBreakActivity(startDate, endDate, breakSetting, staffAdditionalInfoDTO, activityWrapperMap);
             }
@@ -184,15 +201,15 @@ public class ShiftBreakService {
     private ShiftActivity buildBreakActivity(Date startDate, Date endDate, BreakSettings breakSettings, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         ActivityWrapper activityWrapper = activityWrapperMap.get(breakSettings.getActivityId());
         ShiftActivity shiftActivity = new ShiftActivity(activityWrapper.getActivity().getName(), startDate, endDate, activityWrapper.getActivity().getId(), activityWrapper.getTimeType());
-        shiftService.updateActivityDetailsInShiftActivity(shiftActivity, activityWrapperMap, staffAdditionalInfoDTO);
+        timeBankService.updateScheduledHoursAndActivityDetailsInShiftActivity(shiftActivity, activityWrapperMap, staffAdditionalInfoDTO);
         return shiftActivity;
     }
 
     private DateTimeInterval getBreakInterval(Shift shift, BreakAvailabilitySettings breakAvailabilitySettings, BreakSettings breakSettings, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
-        ZonedDateTime endDate = asZoneDateTime(shift.getEndDate()).minusMinutes(breakAvailabilitySettings.getEndBeforeMinutes());
-        ZonedDateTime startDateWithShiftPercentage = asZoneDateTime(shift.getStartDate()).plusMinutes(shift.getMinutes() * breakAvailabilitySettings.getShiftPercentage() / 100);
+        ZonedDateTime endDate = asZonedDateTime(shift.getEndDate()).minusMinutes(breakAvailabilitySettings.getEndBeforeMinutes());
+        ZonedDateTime startDateWithShiftPercentage = asZonedDateTime(shift.getStartDate()).plusMinutes(shift.getMinutes() * breakAvailabilitySettings.getShiftPercentage() / 100);
         ZonedDateTime startDate = isEqualOrAfter(startDateWithShiftPercentage, endDate.minusMinutes(breakSettings.getBreakDurationInMinute())) ? endDate.minusMinutes(breakSettings.getBreakDurationInMinute()) : startDateWithShiftPercentage;
-        if (shift.getActivities().size() > 1 && shift.getActivities().stream().anyMatch(k -> !activityWrapperMap.get(k.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(k.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed() && k.getInterval().contains(startDate))) {
+        if (shift.getActivities().size() > 1 && shift.getActivities().stream().anyMatch(k -> !activityWrapperMap.get(k.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(k.getActivityId()).getActivity().getActivityRulesSettings().isBreakAllowed() && k.getInterval().contains(startDate))) {
             return getDateTimeInterval(shift, breakSettings, activityWrapperMap, endDate, startDate);
         }
         return new DateTimeInterval(startDate, endDate);
@@ -202,17 +219,17 @@ public class ShiftBreakService {
         ShiftActivity nextShiftActivity;
         ShiftActivity previousShiftActivity;
         for (int i = 0; i < shift.getActivities().size(); i++) {
-            if (!activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed() && shift.getActivities().get(i).getInterval().contains(startDate)) {
+            if (!activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivity().getActivityRulesSettings().isBreakAllowed() && shift.getActivities().get(i).getInterval().contains(startDate)) {
                 if (i > 0) {
                     previousShiftActivity = shift.getActivities().get(i - 1);
-                    if (activityWrapperMap.get(previousShiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() || activityWrapperMap.get(previousShiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
-                        endDate = asZoneDateTime(previousShiftActivity.getEndDate());
+                    if (activityWrapperMap.get(previousShiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() || activityWrapperMap.get(previousShiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isBreakAllowed()) {
+                        endDate = asZonedDateTime(previousShiftActivity.getEndDate());
                         startDate = endDate.minusMinutes(breakSettings.getBreakDurationInMinute());
                     }
                 } else if (i < shift.getActivities().size() - 1) {
                     nextShiftActivity = shift.getActivities().get(i + 1);
-                    if (activityWrapperMap.get(nextShiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() || activityWrapperMap.get(nextShiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
-                        endDate = asZoneDateTime(nextShiftActivity.getEndDate());
+                    if (activityWrapperMap.get(nextShiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() || activityWrapperMap.get(nextShiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isBreakAllowed()) {
+                        endDate = asZonedDateTime(nextShiftActivity.getEndDate());
                         startDate = endDate.minusMinutes(breakSettings.getBreakDurationInMinute());
                     }
                 }
@@ -223,7 +240,7 @@ public class ShiftBreakService {
 
     private BreakAvailabilitySettings findCurrentBreakAvailability(Date startDate, List<TimeSlotWrapper> timeSlots, BreakWTATemplate breakWTATemplate) {
         BreakAvailabilitySettings breakAvailabilitySettings = null;
-        TimeSlotWrapper currentTimeSlot = timeSlots.stream().filter(current -> new TimeInterval((current.getStartHour() * ONE_HOUR_MINUTES) + current.getStartMinute(), (current.getEndHour() * ONE_HOUR_MINUTES) + current.getEndMinute() - 1).contains(asZoneDateTime(startDate).get(ChronoField.MINUTE_OF_DAY))).findFirst().orElse(null);
+        TimeSlotWrapper currentTimeSlot = timeSlots.stream().filter(current -> new TimeInterval((current.getStartHour() * ONE_HOUR_MINUTES) + current.getStartMinute(), (current.getEndHour() * ONE_HOUR_MINUTES) + current.getEndMinute() - 1).contains(asZonedDateTime(startDate).get(ChronoField.MINUTE_OF_DAY))).findFirst().orElse(null);
         if (currentTimeSlot != null && breakWTATemplate != null && !breakWTATemplate.isDisabled()) {
             breakAvailabilitySettings = breakWTATemplate.getBreakAvailability().stream().filter(currentAvailability -> (currentAvailability.getTimeSlot().toString().equalsIgnoreCase(currentTimeSlot.getName()))).findFirst().get();
         }
@@ -233,7 +250,7 @@ public class ShiftBreakService {
     public boolean interruptBreak(BigInteger shiftId, BreakAction breakAction) {
         Shift shift = shiftMongoRepository.findById(shiftId).orElseThrow(() -> new DataNotFoundByIdException(convertMessage(MESSAGE_SHIFT_ID, shiftId)));
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
-        if (TIME_AND_ATTENDANCE.equals(phase.getName())) {
+        if (TIME_AND_ATTENDANCE.equals(phase.getName()) || REALTIME.equals(phase.getName())) {
             switch (breakAction) {
                 case INTERRUPT:
                     shift.getBreakActivities().forEach(shiftActivity -> shiftActivity.setBreakInterrupt(true));
@@ -247,21 +264,45 @@ public class ShiftBreakService {
                 default:
                     break;
             }
-
         }
         shiftMongoRepository.save(shift);
         return true;
     }
 
     private void updateBreakHeldInShift(ShiftActivity breakActivity, Shift shift, Shift dbShift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
-        if (isCollectionNotEmpty(dbShift.getBreakActivities())||breakActivity.isBreakNotHeld()) {
+        if (isCollectionNotEmpty(dbShift.getBreakActivities()) || breakActivity.isBreakNotHeld()) {
             ShiftActivity shiftActivity = shift.getActivities().stream().filter(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()).contains(breakActivity.getStartDate())).findFirst().orElseThrow(()->new InvalidRequestException(convertMessage(BREAK_NOT_VALID)));
-            if (!activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
+            if (!activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isBreakAllowed()) {
                 exceptionService.actionNotPermittedException(BREAK_NOT_VALID);
             }
-            breakActivity.setBreakNotHeld(!activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed());
+            breakActivity.setBreakNotHeld(!activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().isBreakAllowed());
+        }
+    }
+
+    public double getNumberOfBreakInterrupt(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval,true);
+        KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
+        KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS, shiftActivityCriteria, false).invoke();
+        long interruptShift = filterShiftActivity.getShifts().stream().filter(k -> k.getBreakActivities().stream().anyMatch(ShiftActivityDTO::isBreakInterrupt)).count();
+        if (PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
+            return isCollectionNotEmpty(filterShiftActivity.getShifts()) ? getValueWithDecimalFormat((interruptShift * 100.0d) / filterShiftActivity.getShifts().size()) : 0;
+        } else
+            return interruptShift;
+    }
+
+
+
+    public void updateBreak(Shift shift, Shift shift1, ShiftActivity shiftActivity) {
+        ShiftActivity breakActivity = shift.getBreakActivities().stream().filter(k -> k.getStartDate().before(shiftActivity.getEndDate())).findFirst().orElse(null);
+        shift.getBreakActivities().remove(breakActivity);
+        if (breakActivity != null) {
+            shift1.setBreakActivities(Arrays.asList(breakActivity));
         }
     }
 
 
+    @Override
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+        return getNumberOfBreakInterrupt(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+    }
 }

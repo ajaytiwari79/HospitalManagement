@@ -1,0 +1,12 @@
+db.activities.updateMany( {}, { $rename: { 'activityGeneralSettings': 'activityGeneralSettings'} } );
+db.activities.updateMany({},{$rename:{'activityBalanceSettings':'activityBalanceSettings'}});
+db.activities.updateMany({},{$rename:{'activityIndividualPointsSettings':'activityIndividualPointsSettings'}});
+db.activities.updateMany({},{$rename:{'activityNotesSettings':'activityNotesSettings'}});
+db.activities.updateMany({},{$rename:{'activityCommunicationSettings':'activityCommunicationSettings'}});
+db.activities.updateMany({},{$rename:{'activityRulesSettings':'activityRulesSettings'}});
+db.activities.updateMany({},{$rename:{'activityTimeCalculationSettings':'activityTimeCalculationSettings'}});
+db.activities.updateMany({},{$rename:{'activitySkillSettings':'activitySkillSettings'}});
+db.activities.updateMany({},{$rename:{'activityPhaseSettings':'activityPhaseSettings'}});
+db.activities.updateMany({},{$rename:{'activityOptaPlannerSetting':'activityOptaPlannerSettings'}});
+db.activities.updateMany({},{$rename:{'activityCTAAndWTASettings':'activityCTAAndWTASettings'}});
+db.activities.updateMany({},{$rename:{'activityLocationSettings':'activityLocationSettings'}});

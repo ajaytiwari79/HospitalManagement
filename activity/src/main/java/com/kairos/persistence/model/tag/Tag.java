@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.tag;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 
 /**
  * Created by prerna on 20/11/17.
@@ -30,6 +32,11 @@ public class Tag extends MongoBaseEntity {
     private long countryId;
 
     private long organizationId;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private String shortName;
+    private String ultraShortName;
+    private String color;
 
     public Tag(String name, MasterDataTypeEnum masterDataType, boolean countryTag, Long countryOrOrgId){
         this.name = name;
@@ -53,5 +60,6 @@ public class Tag extends MongoBaseEntity {
             this.organizationId = countryOrOrgId;
         }
     }
+
 
 }

@@ -8,6 +8,9 @@ public class UserMessagesConstants {
 
     public static final String MESSAGE_DATANOTFOUND = "message.dataNotFound";
     public static final String TAB = "tab";
+    public static final String STAFF_ID = "staffId";
+    public static final String LEADER_TYPE = "leaderType";
+    public static final String DATA = "data";
     public static final String PARENTACCESSPAGE = "parentAccessPage";
     public static final String COUNTRY = "country";
     public static final String MESSAGE_DUPLICATE = "message.duplicate";
@@ -51,6 +54,7 @@ public class UserMessagesConstants {
     public static final String ERROR_ORGANIZATION_KAIROSID_NOTNULL = "error.Organization.kairosId.notnull";
     public static final String ERROR_ORGANIZATION_UNITMANAGER_ACCESSGROUPID_NOTNULL = "error.Organization.unitmanager.accessgroupid.notnull";
     public static final String ERROR_ORGANIZATION_UNITMANAGER_ACCESSGROUP_NOTNULL = "error.Organization.unitmanager.accessgroup.notnull";
+    public static final String MESSAGE_UNIT_IS_PUBLISHED="published.unit.can.not.be.deleted";
     public static final String MESSAGE_DAY_TYPE_ABSENT = "message.day_type.absent";
     public static final String ERROR_ORGANIZATION_DESIREDURL_NOTNULL = "error.Organization.desiredUrl.notNull";
     public static final String ERROR_ORGANIZATION_ACCOUNTTYPE_NOTNULL = "error.Organization.accountType.notNull";
@@ -67,10 +71,12 @@ public class UserMessagesConstants {
     public static final String ERROR_CONTACTADDRESS_HOUSENUMBER_NOTNULL = "error.ContactAddress.HouseNumber.notnull";
     public static final String ERROR_TASKDEMAND_PRIORITY_RANGE = "error.TaskDemand.priority.range";
     public static final String ERROR_TASKDEMAND_STAFFCOUNT_MINIMUMONE = "error.TaskDemand.staffCount.minimumOne";
+    public static final String MESSAGE_TEAM_DETAIL_NOT_VALID = "message.staff.team.detail.not.valid";
     public static final String ERROR_STAFF_EMPLOYEDSINCE_NOTNULL = "error.Staff.employedsince.notnull";
     public static final String ERROR_STAFF_EXISTS_SAME_CPRNUMBER = "error.staff.exists.same.cprNumber";
     public static final String ERROR_CITIZENSTATUS_NAME_NOTEMPTY = "error.CitizenStatus.name.notEmpty";
     public static final String ERROR_CITIZENSTATUS_NOTFOUND  = "error.CitizenStatus.notfound ";
+    public static final String ERROR_WEATHER_NOTFOUND  = "error.weather.notfound";
     public static final String ERROR_CITIZENSTATUS_NAME_EXIST  = "error.CitizenStatus.name.exist ";
     public static final String ERROR_LANGUAGELEVEL_NAME_NOTEMPTY  = "error.LanguageLevel.name.notEmpty ";
     public static final String ERROR_LANGUAGELEVEL_NAME_EXIST  = "error.LanguageLevel.name.exist ";
@@ -157,13 +163,14 @@ public class UserMessagesConstants {
     public static final String MESSAGE_CATEGORY_NOTEXIST = "message.category.notExist";
     public static final String MESSAGE_COUNTRY_ID_NOTEXIST = "message.country.id.notExist";
     public static final String MESSAGE_USER_USERNAME_NOTFOUND = "message.user.userName.notFound";
+    public static final String ERROR_USERNAME_BLANK = "error.userName.notnull";
     public static final String MESSAGE_USER_MOBILENUMBER_NOTFOUND = "message.user.mobileNumber.notFound";
     public static final String MESSAGE_ORGANISATION_NOTFOUND = "message.organisation.notFound";
     public static final String MESSAGE_USER_EMAIL_NOTFOUND = "message.user.email.notFound";
     public static final String MESSAGE_USER_TOKEN_NOTFOUND = "message.user.token.notFound";
     public static final String MESSAGE_USER_TOKEN_EXPIRED = "message.user.token.expired";
     public static final String MESSAGE_USER_MAIL_INVALID = "message.user.mail.invalid";
-    public static final String MESSAGE_USER_USERNAME_ALREADY_USE  = "message.user.userName.already.use ";
+    public static final String MESSAGE_USER_USERNAME_ALREADY_USE  = "message.user.userName.already.use";
     public static final String MESSAGE_USER_USERNAME_OR_EMAIL_NOTFOUND  = "message.user.userName.or.email.notFound ";
     public static final String ERROR_ACCESSTOLOCATION_NULL = "error.accessToLocation.null";
     public static final String ERROR_XSSFSHEET_NOMOREROW = "error.xssfsheet.noMoreRow";
@@ -273,6 +280,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_TEAMSERVICE_SOMETHINGWRONG = "message.teamservice.somethingwrong";
     public static final String MESSAGE_TEAMSERVICE_TEAM_NOTFOUND = "message.teamservice.team.notFound";
     public static final String STAFF_CAN_NOT_BE_TEAM_LEADER="message.staff.team.leader";
+    public static final String RANKING_SHOULD_BE_UNIQUE="message.ranking.should.be.unique";
     public static final String STAFF_ASSIGN_DATE_CONTAIN_BY_TEAM_DATES="message.staff.assign.date.contain.by.team.dates";
     public static final String MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT = "message.teamservice.team.alreadyexists.in.unit";
     public static final String MESSAGE_TIMESLOT_ID_NOTFOUND = "message.timeslot.id.notfound";
@@ -304,6 +312,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_PAYGROUP_DATERANGE_OVERLAPOLD = "message.paygroup.daterange.overlapold";
     public static final String MESSAGE_PAYGROUP_LEVEL_NOTFOUND = "message.paygroup.level.notfound";
     public static final String MESSAGE_PAYGROUPAREA_EXISTS = "message.payGroupArea.exists";
+    public static final String MESSAGE_PAYGROUPAREA_GAP_NOT_CREATE = "message.payGroupArea.gap.not.create";
     public static final String MESSAGE_PAYTABLE_LEVEL_NOTFOUND = "message.paytable.level.notfound";
     public static final String MESSAGE_PAYTABLE_NAME_ALREADYEXIST = "message.payTable.name.alreadyExist";
     public static final String MESSAGE_STARTDATE_ALLOWED = "message.startdate.allowed";
@@ -358,10 +367,12 @@ public class UserMessagesConstants {
     public static final String MESSAGE_TASKGIVER_ACCESGROUP_NOTPRESENT = "message.taskgiver.accesgroup.notPresent";
     public static final String MESSAGE_STAFF_ALREADYEXIST = "message.staff.alreadyexist";
     public static final String MESSAGE_STAFF_USERNAME_ALREADYEXIST  = "message.staff.userName.alreadyexist ";
+    public static final String MESSAGE_STAFF_USERNAME_NOTEXIST  = "error.Staff.userName.notnull";
     public static final String MESSAGE_EXCEPTION_TASKMICROSERVICE = "message.exception.taskmicroservice";
     public static final String MESSAGE_DATE_SOMETHINGWRONG = "message.date.somethingwrong";
     public static final String MESSAGE_CITIZEN_STAFF_ALREADYEXIST = "message.citizen.staff.alreadyexist";
     public static final String MESSAGE_STAFF_DATA_EMPLOYMENTDATE_LESSTHAN = "message.staff.data.employmentdate.lessthan";
+    public static final String MESSAGE_STAFF_DATA_EMPLOYMENTDATE_GREATERTHAN = "message.staff.data.employmentdate.greaterthan";
     public static final String MESSAGE_POSITION_EMPLOYMENTTYPE_NOTEXIST = "message.position.employmenttype.notexist";
     public static final String MESSAGE_WTA_ID = "message.wta.id";
     public static final String MESSAGE_CTA_ID = "message.cta.id";
@@ -398,6 +409,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_EMAIL_ALREADYEXIST = "message.email.alreadyExist";
     public static final String MESSAGE_FUNCTIONALPAYMENT_ALREADYPUBLISHED = "message.functionalPayment.alreadyPublished";
     public static final String MESSAGE_PUBLISHDATE_NOTLESSTHAN_STARTDATE = "message.publishDate.notlessthan.startDate";
+    public static final String MESSAGE_PUBLISHDATE_NOTLESSTHAN_CURRENTDATE = "message.publishDate.notlessthan.currentDate";
     public static final String MESSAGE_PUBLISHDATE_NOTLESSTHAN_OR_EQUALS_PARENT_STARTDATE = "message.publishDate.notlessthan_or_equals.parent_startDate";
     public static final String MESSAGE_MAIN_EMPLOYMENT_EXISTS_WITH_END_DATE = "message.main_employment.exists_with_end_date";
     public static final String MESSAGE_MAIN_EMPLOYMENT_EXISTS = "message.main_employment.exists";
@@ -419,6 +431,8 @@ public class UserMessagesConstants {
     public static final String MESSAGE_EMPLOYMENT_WTAMISSING  = "message.employment.wtamissing ";
     public static final String MESSAGE_EMPLOYMENT_CONTAIN_SHIFT = "message.employment.contain.shift";
     public static final String MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX = "message_functional_Payment_empty_matrix";
+    public static final String MESSAGE_CHILD_CARE_EMPTY = "message.child.care.empty";
+    public static final String MESSAGE_SENIOR_DAY_EMPTY = "message.senior.day.empty";
     public static final String MESSAGE_HOUSENUMBER_NULL = "message.houseNumber.null";
     public static final String MESSAGE_PROVINCE_NULL  = "message.province.null ";
     public static final String MESSAGE_STREET_NULL  = "message.street.null ";
@@ -427,6 +441,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_ZIPCODEID_NULL  = "message.zipCodeId.null ";
     public static final String MESSAGE_MUNICIPALITY_NULL  = "message.municipality.null ";
     public static final String END_DATE_FROM_END_DATE = "end_date.from.end_date";
+    public static final String EMPLOYMENT_START_DATE_CANNOT_BE_BEFORE_EXPERTISE_START_DATE = "employment.startdate.cannot.before.expertise.startdate";
     public static final String START_DATE_FROM_END_DATE = "start_date.from.end_date";
     public static final String MESSAGE_PUBLISH_EXPERTISE_UNION = "message.publish.expertise.union";
     public static final String MESSAGE_LOCATION_NAME_BLANK = "message.location.name.blank";
@@ -460,4 +475,8 @@ public class UserMessagesConstants {
     public static final String  ERROR_EMAIL_VALID="error.email.valid";
     public static  final String ERROR_STAFF_USERNAME_NOTNULL="error.Staff.userName.notnull";
     public static  final String ERROR_STAFF_ACCESSGROUP_NOTNULL="error.staff.accessGroup.id.notnull";
+    public static  final String ERROR_TAB_CAN_NOT_BE_HIDE_FOR_HUB="Tab can not be hide for HUB";
+    public static final String STAFF_SKILL_DOES_NOT_MATCHED = "team.skill.not.matched";
+    public static final String UNIT_IS_MANDATORY = "error.unit.mandatory";
+    public static final String SHIFT_PERCENTAGE_CAN_NOT_BE_LESS_THEN_ZERO_OR_GREATER_THEN_HUNDRED ="shift.percentage.can.not.be.less.then.zero";
 }

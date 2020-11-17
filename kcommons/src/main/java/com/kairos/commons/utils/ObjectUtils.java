@@ -1,13 +1,16 @@
 package com.kairos.commons.utils;
 
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import org.springframework.lang.Nullable;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 
 /**
@@ -59,6 +62,12 @@ public class ObjectUtils {
         return Optional.ofNullable(object).isPresent();
     }
 
+    public static <T> void isNullOrEmptyThrowException(Collection<T> collection){
+        if(isCollectionEmpty(collection)){
+            throw new InvalidRequestException("Invalid Request");
+        }
+    }
+
     public static <E> HashSet<E> newHashSet(E... elements) {
         HashSet<E> set = new HashSet<>(elements.length);
         Collections.addAll(set, elements);
@@ -86,6 +95,19 @@ public class ObjectUtils {
         return o1 == null && o2 == null;
     }
 
+    public static <T> Set<BigInteger> getBigIntegerSet(Collection<T> objects) {
+        return objects.stream().map(o -> new BigInteger((o).toString())).collect(Collectors.toSet());
+    }
+
+    public static <T> Set<Long> getLongSet(Collection<T> objects) {
+        return objects.stream().map(o -> Long.valueOf(o.toString())).collect(Collectors.toSet());
+    }
+
+    public static <T> Set<LocalDate> getLocalDate(Collection<T> objects) {
+        return !(ObjectUtils.isCollectionEmpty(objects)) ? objects.stream().map(o -> (o instanceof LocalDate) ? (LocalDate) o : DateUtils.asLocalDate((String) o)).collect(Collectors.toSet()) : newHashSet();
+    }
+
+
     public static List<ShiftActivityDTO> mergeShiftActivity(List<ShiftActivityDTO> activities){
         if(isCollectionNotEmpty(activities)) {
             Collections.sort(activities);
@@ -111,4 +133,39 @@ public class ObjectUtils {
         return new ArrayList<>();
     }
 
+    public static <T>  String getToString(T str) {
+        return str == null ? null : str.toString();
+    }
+    public static Object [] removeNull(Collection<Object> objects){
+        objects=objects.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        return objects.toArray();
+    }
+
+    public static <T> List<BigInteger> getBigInteger(Collection<T> objects) {
+        List<BigInteger> ids = new ArrayList<>();
+        for (T object : objects) {
+            String id = (object instanceof String) ? (String) object : ""+object;
+            ids.add(new BigInteger(id));
+        }
+        return ids;
+    }
+
+    public static String getBigIntegerString(Iterator<BigInteger> iterator) {
+        if (!iterator.hasNext()) {
+            return "[]";
+        } else {
+            StringBuilder var2 = new StringBuilder();
+            var2.append("['");
+
+            while(true) {
+                BigInteger var3 = iterator.next();
+                var2.append(var3);
+                if (!iterator.hasNext()) {
+                    return var2.append("']").toString();
+                }
+
+                var2.append("','");
+            }
+        }
+    }
 }

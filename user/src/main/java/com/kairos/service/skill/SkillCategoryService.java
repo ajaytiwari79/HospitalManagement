@@ -1,18 +1,28 @@
 package com.kairos.service.skill;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
+import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
+import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_SKILLCATEGORY_NAME_DUPLICATE;
 
 /**
@@ -27,6 +37,8 @@ public class SkillCategoryService {
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private SkillGraphRepository skillGraphRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -74,7 +86,7 @@ public class SkillCategoryService {
         return  skillCategoryGraphRepository.findAll();
     }
 
-    public Map<String, Object> updateSkillCategory(SkillCategory skillCategory, Long countryId) {
+    public Map<String, Object> updateSkillCategory(SkillCategory skillCategory) {
 
         if (skillCategory!=null){
             SkillCategory currentCategory= skillCategoryGraphRepository.findOne(skillCategory.getId());
@@ -93,14 +105,24 @@ public class SkillCategoryService {
     }
 
 
-    public List<Object> getAllSkillCategoryOfCountry(Long countryId) {
-        List<Object> objectList = new ArrayList<>();
-         List<Map<String,Object>> mapList = skillCategoryGraphRepository.findSkillCategoryByCountryId(countryId);
-        for(Map<String,Object> map :  mapList){
-            Object o = map.get("result");
-            objectList.add(o);
-        }
-        return objectList;
+    public List<SkillCategoryQueryResults> getAllSkillCategoryOfCountry(Long countryId) {
+//        List<Object> objectList = new ArrayList<>();
+         List<SkillCategoryQueryResults> skillCategoryQueryResultsList= skillCategoryGraphRepository.findSkillCategoryByCountryId(countryId);
+        skillCategoryQueryResultsList.forEach(skillCategoryQueryResults -> {
+            List<SkillDTO> skillDTOS =new ArrayList<>();
+            if(isCollectionNotEmpty(skillCategoryQueryResults.getSkillList())){
+              skillDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(skillCategoryQueryResults.getSkillList(),SkillDTO.class);
+            }
+            for(SkillDTO skillDTO :skillDTOS){
+                skillDTO.setCountryId(countryId);
+                skillDTO.setTranslations(TranslationUtil.getTranslatedData(skillDTO.getTranslatedNames(),skillDTO.getTranslatedDescriptions()));
+            }
+            skillCategoryQueryResults.setSkillList(skillDTOS);
+            skillCategoryQueryResults.setCountryId(countryId);
+            skillCategoryQueryResults.setTranslations(TranslationUtil.getTranslatedData(skillCategoryQueryResults.getTranslatedNames(),skillCategoryQueryResults.getTranslatedDescriptions()));
+        });
+
+        return skillCategoryQueryResultsList;
     }
 
 
@@ -112,5 +134,27 @@ public class SkillCategoryService {
             objectList.add(o);
         }
         return objectList;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long id, Map<String,TranslationInfo> translationInfoMap) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translationInfoMap.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        SkillCategory skillCategory = skillCategoryGraphRepository.findOne(id);
+        if(isNotNull(skillCategory)) {
+            skillCategory.setTranslatedNames(translatedNames);
+            skillCategory.setTranslatedDescriptions(translatedDescriptios);
+            skillCategoryGraphRepository.save(skillCategory);
+            return skillCategory.getTranslatedData();
+        }else {
+            Skill skill =skillGraphRepository.findOne(id);
+            skill.setTranslatedNames(translatedNames);
+            skill.setTranslatedDescriptions(translatedDescriptios);
+            skillGraphRepository.save(skill);
+            return skill.getTranslatedData();
+        }
     }
 }

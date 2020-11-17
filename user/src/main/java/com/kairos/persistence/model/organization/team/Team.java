@@ -13,7 +13,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +38,7 @@ public class Team extends UserBaseEntity {
     private String description;
 
     @Relationship(type = TEAM_HAS_SKILLS)
-    private List<Skill> skillList;
+    private List<Skill> skillList=new ArrayList<>();
 
     @Relationship(type = TEAM_HAS_LOCATION)
     private ContactAddress contactAddress;

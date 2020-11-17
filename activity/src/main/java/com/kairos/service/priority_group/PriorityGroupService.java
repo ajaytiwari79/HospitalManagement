@@ -3,6 +3,7 @@ package com.kairos.service.priority_group;
 import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
@@ -10,6 +11,7 @@ import com.kairos.dto.activity.open_shift.PriorityGroupWrapper;
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
+import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplate;
 import com.kairos.persistence.model.priority_group.PriorityGroup;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
@@ -26,10 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
@@ -59,13 +58,18 @@ public class PriorityGroupService extends MongoBaseService {
         if(isPriorityGroupsAlreadyExists){
             exceptionService.actionNotPermittedException(PRIORITYGROUP_ALREADY_EXISTS,countryId);
         }
-        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(priorityGroupDTO, PriorityGroup.class);
+        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyCollectionPropertiesByMapper(priorityGroupDTO, PriorityGroup.class);
         save(priorityGroups);
         return true;
     }
 
     public PriorityGroupWrapper findAllPriorityGroups(long countryId) {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByCountryIdAndDeletedFalseAndRuleTemplateIdIsNull(countryId);
+        priorityGroupDTOS.forEach(priorityGroupDTO -> {
+            if(priorityGroupDTO.getTranslations()==null){
+                priorityGroupDTO.setTranslations(new HashMap<>());
+            }
+        });
         PriorityGroupDefaultData priorityGroupDefaultData= userIntegrationService.getExpertiseAndEmployment(countryId);
         List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new PriorityGroupWrapper(new PriorityGroupDefaultData(priorityGroupDefaultData.getEmploymentTypes(),priorityGroupDefaultData.getExpertises(),counters)
@@ -120,6 +124,11 @@ public class PriorityGroupService extends MongoBaseService {
 
     public PriorityGroupWrapper getPriorityGroupsOfUnit(long unitId) {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByUnitIdAndDeletedFalseAndRuleTemplateIdIsNullAndOrderIdIsNull(unitId);
+        priorityGroupDTOS.forEach(priorityGroupDTO -> {
+            if(priorityGroupDTO.getTranslations()==null){
+                priorityGroupDTO.setTranslations(new HashMap<>());
+            }
+        });
         PriorityGroupDefaultData priorityGroupDefaultData= userIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
         List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new PriorityGroupWrapper(new PriorityGroupDefaultData(priorityGroupDefaultData.getEmploymentTypes(),priorityGroupDefaultData.getExpertises(),counters),priorityGroupDTOS);
@@ -181,14 +190,14 @@ public class PriorityGroupService extends MongoBaseService {
             priorityGroupDTO.setId(null);
 
         });
-        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(priorityGroupDTOs, PriorityGroup.class);
+        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyCollectionPropertiesByMapper(priorityGroupDTOs, PriorityGroup.class);
         save(priorityGroups);
 
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(priorityGroups,PriorityGroupDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(priorityGroups,PriorityGroupDTO.class);
         //return  priorityGroupDTOs;
     }
     public List<PriorityGroupDTO> updatePriorityGroupsForOrder(List<PriorityGroupDTO> priorityGroupDTOs) {
-        List<PriorityGroup> priorityGroups= ObjectMapperUtils.copyPropertiesOfCollectionByMapper(priorityGroupDTOs,PriorityGroup.class);
+        List<PriorityGroup> priorityGroups= ObjectMapperUtils.copyCollectionPropertiesByMapper(priorityGroupDTOs,PriorityGroup.class);
         save(priorityGroups);
         return priorityGroupDTOs;
     }
@@ -247,6 +256,13 @@ public class PriorityGroupService extends MongoBaseService {
         PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises(),counters);
         return new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
 
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger priorityGroupId, Map<String,TranslationInfo> translations) {
+        PriorityGroup priorityGroup= priorityGroupRepository.findOne(priorityGroupId);
+        priorityGroup.setTranslations(translations);
+        priorityGroupRepository.save(priorityGroup);
+        return priorityGroup.getTranslations();
     }
 }
 

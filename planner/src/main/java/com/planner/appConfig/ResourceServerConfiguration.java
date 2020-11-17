@@ -1,5 +1,7 @@
 package com.planner.appConfig;
 
+import com.planner.component.exception.ExceptionService;
+import com.planner.service.redis.RedisService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,11 +14,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 @Configuration
@@ -24,13 +29,17 @@ import java.io.IOException;
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 	
     Logger log = LoggerFactory.getLogger(ResourceServerConfiguration.class);
+    @Inject
+    private ExceptionService exceptionService;
+    @Inject
+    private RedisService redisService;
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll();
+                .antMatchers("/**").permitAll().and().addFilterBefore(getAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
     }
 
     @Override
@@ -58,6 +67,10 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
         //anilm2 use commented code if certificate not install
         converter.setSigningKey("123456");
           	    return converter;
+    }
+
+    public OAuth2AuthenticationProcessingFilter getAuthenticationFilter() {
+        return new CustomBasicAuthenticationProcessingFilter(tokenStore(), redisService, exceptionService);
     }
  
     @Bean

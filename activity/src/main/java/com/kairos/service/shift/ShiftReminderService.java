@@ -12,7 +12,7 @@ import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.SchedulerServiceRestClient;
@@ -88,7 +88,7 @@ public class ShiftReminderService{
         }
         Activity activity = activityMongoRepository.findOne(shiftActivity.get().getActivityId());
 
-        StaffPersonalDetail staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
+        StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
         LocalDateTime lastTriggerDateTime = DateUtils.getLocalDateTimeFromMillis(jobDetails.getOneTimeTriggerDateMillis());
         LocalDateTime nextTriggerDateTime = calculateTriggerTime(activity, shiftActivity.get().getStartDate(), lastTriggerDateTime);
 
@@ -113,7 +113,7 @@ public class ShiftReminderService{
 
     private LocalDateTime calculateNextTrigger(Activity activity, LocalDateTime lastTriggerDateTime, DurationType durationType, LocalDateTime shiftDateTime, long remainingUnit) {
         LocalDateTime nextTriggerDateTime = null;
-        for (ActivityReminderSettings current : activity.getCommunicationActivityTab().getActivityReminderSettings()) {
+        for (ActivityReminderSettings current : activity.getActivityCommunicationSettings().getActivityReminderSettings()) {
 
             if (current.getSendReminder().getDurationType().equals(durationType)) {
                 /**

@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_WTA_NOTFOUND;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
@@ -76,15 +77,15 @@ public class AbsenceShiftService {
     @Inject
     private StaffActivitySettingService staffActivitySettingService;
 
-    public ShiftWithViolatedInfoDTO createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean shiftOverlappedWithNonWorkingType, ShiftActionType shiftActionType) {
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
+    public List<ShiftWithViolatedInfoDTO> createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Object[] shiftOverlapInfo, ShiftActionType shiftActionType) {
+        List<ShiftWithViolatedInfoDTO>  shiftWithViolatedInfoDTOS = new ArrayList<>();
         Long absenceReasonCodeId = shiftDTO.getActivities().get(0).getAbsenceReasonCodeId();
-        if (activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
+        if (activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
             Date endDate = DateUtils.toJodaDateTime(shiftDTO.getShiftDate()).plusDays(1).withTimeAtStartOfDay().toDate();
-            Date startDate = DateUtils.toJodaDateTime(shiftDTO.getShiftDate()).minusWeeks(activityWrapper.getActivity().getTimeCalculationActivityTab().getHistoryDuration()).withTimeAtStartOfDay().toDate();
+            Date startDate = DateUtils.toJodaDateTime(shiftDTO.getShiftDate()).minusWeeks(activityWrapper.getActivity().getActivityTimeCalculationSettings().getHistoryDuration()).withTimeAtStartOfDay().toDate();
             List<ShiftDTO> shifts = shiftMongoRepository.findAllShiftBetweenDuration(staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate);
             ShiftDTO newShiftDTO;
-            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getFullDayCalculationType())) {
+            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals(activityWrapper.getActivity().getActivityTimeCalculationSettings().getFullDayCalculationType())) {
                 shiftDTO.setStartDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MIN)));
                 shiftDTO.getActivities().get(0).setStartDate(asDate(shiftDTO.getShiftDate().atTime(LocalTime.MIN)));
                 shiftDTO.getActivities().get(0).setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1).atTime(LocalTime.MIN)));
@@ -96,27 +97,29 @@ public class AbsenceShiftService {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(staffAdditionalInfoDTO.getUnitId(), newShiftDTO.getActivities().get(0).getStartDate(), newShiftDTO.getActivities().get(newShiftDTO.getActivities().size() - 1).getEndDate());
             newShiftDTO.setId(shiftDTO.getId());
             newShiftDTO.setShiftType(ShiftType.ABSENCE);
-            shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
+            ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase, shiftOverlapInfo, shiftActionType);
+            shiftService.addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
+            shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
         } else {
-            shiftWithViolatedInfoDTO = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activityWrapper.getActivity(), shiftDTO, absenceReasonCodeId, shiftActionType);
+            shiftWithViolatedInfoDTOS = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activityWrapper.getActivity(), shiftDTO, absenceReasonCodeId, shiftActionType);
         }
-        return shiftWithViolatedInfoDTO;
+        return shiftWithViolatedInfoDTOS;
     }
 
-    private ShiftWithViolatedInfoDTO getAverageOfShiftByActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity, ShiftDTO shiftDTO, Long absenceReasonCodeId, ShiftActionType shiftActionType) {
+    private List<ShiftWithViolatedInfoDTO> getAverageOfShiftByActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity, ShiftDTO shiftDTO, Long absenceReasonCodeId, ShiftActionType shiftActionType) {
         Date fromDate = asDate(shiftDTO.getShiftDate());
         Date endDate = new DateTime(fromDate).withTimeAtStartOfDay().plusDays(8).toDate();
-        Date startDate = new DateTime(fromDate).minusWeeks(activity.getTimeCalculationActivityTab().getHistoryDuration()).toDate();
+        Date startDate = new DateTime(fromDate).minusWeeks(activity.getActivityTimeCalculationSettings().getHistoryDuration()).toDate();
         List<ShiftDTO> shiftQueryResultsInInterval = shiftMongoRepository.findAllShiftBetweenDuration(staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate);
         List<ShiftDTO> shiftDTOS = new ArrayList<>(7);
         //As we support create Fullweek Shift from Monday to sunday
-        if (!shiftDTO.getShiftDate().getDayOfWeek().equals(activity.getTimeCalculationActivityTab().getFullWeekStart())) {
-            exceptionService.actionNotPermittedException("error.activity.fullweek.start", StringUtils.capitalize(activity.getTimeCalculationActivityTab().getFullWeekStart().toString().toLowerCase()));
+        if (!shiftDTO.getShiftDate().getDayOfWeek().equals(activity.getActivityTimeCalculationSettings().getFullWeekStart())) {
+            exceptionService.actionNotPermittedException("error.activity.fullweek.start", StringUtils.capitalize(activity.getActivityTimeCalculationSettings().getFullWeekStart().toString().toLowerCase()));
         }
         for (int day = 0; day < 7; day++) {
             ShiftDTO newShiftDTO;
             LocalDate shiftDate = shiftDTO.getShiftDate().plusDays(day);
-            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals(activity.getTimeCalculationActivityTab().getFullWeekCalculationType())) {
+            if (TimeCalaculationType.MIDNIGHT_TO_MIDNIGHT_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullWeekCalculationType())) {
                 startDate = asDate(shiftDate.atTime(LocalTime.MIN));
                 endDate = asDate(shiftDate.plusDays(1).atTime(LocalTime.MIN));
                 shiftDTO.setStartDate(startDate);
@@ -136,12 +139,11 @@ public class AbsenceShiftService {
             shiftDTOS.add(newShiftDTO);
         }
         shiftValidatorService.validateShifts(shiftDTOS);
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO();
+        List<ShiftWithViolatedInfoDTO>  shiftWithViolatedInfoDTOS = new ArrayList<>();
         if (!shiftDTOS.isEmpty()) {
-            shiftWithViolatedInfoDTO = saveShifts(activity, staffAdditionalInfoDTO, shiftDTOS, shiftActionType);
-
+            shiftWithViolatedInfoDTOS = saveShifts(activity, staffAdditionalInfoDTO, shiftDTOS, shiftActionType);
         }
-        return shiftWithViolatedInfoDTO;
+        return shiftWithViolatedInfoDTOS;
     }
 
     private ShiftDTO calculateAverageShiftByActivity(List<ShiftDTO> shifts, Activity activity,
@@ -151,12 +153,12 @@ public class AbsenceShiftService {
         shiftActivity.setRemarks(shiftActivityDTO.getRemarks());
         Integer startAverageMin = null;
         Date fromDate = asDate(shiftDate);
-        if (shifts != null && !shifts.isEmpty() && activity.getTimeCalculationActivityTab().getHistoryDuration() != 0) {
+        if (shifts != null && !shifts.isEmpty() && activity.getActivityTimeCalculationSettings().getHistoryDuration() != 0) {
             startAverageMin = getStartAverage(new DateTime(fromDate).getDayOfWeek(), shifts);
 
         }
         StaffActivitySettingDTO staffActivitySetting = staffActivitySettingService.getStaffActivitySettingsByActivityId(activity.getUnitId(), activity.getId(),staffAdditionalInfoDTO.getId());
-        LocalTime defaultStartTime = isNotNull(staffActivitySetting) && isNotNull(staffActivitySetting.getDefaultStartTime()) ? staffActivitySetting.getDefaultStartTime() : activity.getTimeCalculationActivityTab().getDefaultStartTime();
+        LocalTime defaultStartTime = isNotNull(staffActivitySetting) && isNotNull(staffActivitySetting.getDefaultStartTime()) ? staffActivitySetting.getDefaultStartTime() : activity.getActivityTimeCalculationSettings().getDefaultStartTime();
         DateTime startDateTime = (startAverageMin != null) ?
                 new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes(startAverageMin) :
                 new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes((defaultStartTime.getHour() * 60) + defaultStartTime.getMinute());
@@ -191,7 +193,7 @@ public class AbsenceShiftService {
         return shiftQueryResults;
     }
 
-    private ShiftWithViolatedInfoDTO saveShifts(Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ShiftDTO> shiftDTOS, ShiftActionType shiftActionType) {
+    public List<ShiftWithViolatedInfoDTO> saveShifts(Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ShiftDTO> shiftDTOS, ShiftActionType shiftActionType) {
         List<Shift> shifts = new ArrayList<>(shiftDTOS.size());
         Set<LocalDateTime> dates = shiftDTOS.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
         Map<Date, Phase> phaseMapByDate = phaseService.getPhasesByDates(shiftDTOS.get(0).getUnitId(), dates);
@@ -199,18 +201,18 @@ public class AbsenceShiftService {
         if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
             exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
         }
-        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getActivityBalanceSettings().getTimeTypeId());
         Map<BigInteger, ActivityWrapper> activityWrapperMap = new HashMap<>();
         activityWrapperMap.put(activity.getId(), new ActivityWrapper(activity, timeType.getTimeTypes().toValue(),timeType));
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO();
+        List<ShiftWithViolatedInfoDTO>  shiftWithViolatedInfoDTOS = new ArrayList<>();
         shiftDTOS.sort(Comparator.comparing(ShiftDTO::getStartDate));
         Date startDate = shiftDTOS.get(0).getStartDate();
         Date endDate = shiftDTOS.get(shiftDTOS.size() - 1).getEndDate();
         List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllByUnitIdAndBetweenDates(staffAdditionalInfoDTO.getUnitId(), startDate, endDate);
         for (ShiftDTO shiftDTO : shiftDTOS) {
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
-            ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityWrapperMap,null);
-            ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false);
+            ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(shiftDTO, activityWrapperMap,null);
+            ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false, true);
             Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
             Optional<PlanningPeriod> planningPeriodByShift = planningPeriods.stream().filter(planningPeriod -> new DateTimeInterval(asDate(planningPeriod.getStartDate()), asDate(planningPeriod.getEndDate())).contains(shift.getStartDate()) || planningPeriod.getEndDate().equals(asLocalDate(shift.getStartDate()))).findAny();
             if (!planningPeriodByShift.isPresent()) {
@@ -221,17 +223,29 @@ public class AbsenceShiftService {
             shiftStatusService.updateStatusOfShiftIfPhaseValid(planningPeriodByShift.get(),phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), shift, activityWrapperMap, staffAdditionalInfoDTO);
             shifts.add(shift);
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-            shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getActivities());
-            shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
+            shiftWithViolatedInfoDTOS.add(updatedShiftWithViolatedInfoDTO);
+            /*shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getActivities());
+            shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());*/
         }
         Phase phase = phaseMapByDate.get(shiftDTOS.get(0).getActivities().get(0).getStartDate());
-        if ((PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
+        if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || !isRuleViolated(shiftWithViolatedInfoDTOS)) {
             shiftService.saveShiftWithActivity(phaseMapByDate, shifts, staffAdditionalInfoDTO);
-            shiftDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shifts, ShiftDTO.class);
+            shiftDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(shifts, ShiftDTO.class);
             shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
+            shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS);
+            shiftDTOS.forEach(shiftDTO -> shiftWithViolatedInfoDTOS.add(new ShiftWithViolatedInfoDTO(newArrayList(shiftDTO))));
         }
-        shiftWithViolatedInfoDTO.setShifts(shiftDTOS);
-        return shiftWithViolatedInfoDTO;
+        //shiftWithViolatedInfoDTO.setShifts(shiftDTOS);
+        return shiftWithViolatedInfoDTOS;
+    }
+
+    public boolean isRuleViolated(List<ShiftWithViolatedInfoDTO>  shiftWithViolatedInfoDTOS){
+        for (ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO : shiftWithViolatedInfoDTOS) {
+            if(!(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty())){
+                return true;
+            }
+        }
+        return false;
     }
 
 }

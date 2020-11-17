@@ -6,6 +6,7 @@ import com.kairos.persistence.model.cta.CostTimeAgreement;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -40,11 +41,11 @@ public interface CustomCostTimeAgreementRepository {
 
     CTAResponseDTO getCTAByEmploymentIdAndDate(Long employmentId, Date date);
 
-    List<CTAResponseDTO> getCTAByEmploymentIds(List<Long> employmentIds, Date date);
+    List<CTAResponseDTO> getCTAByEmploymentIds(Collection<Long> employmentIds, Date date);
 
     List<CTAResponseDTO> getCTAByEmploymentIdsAndDate(List<Long> employmentIds, Date startDate, Date endDate);
 
-    CostTimeAgreement getCTABasicByEmploymentAndDate(Long employmentId, Date date);
+    List<CostTimeAgreement> getCTAByEmployment(Long employmentId);
 
     void disableOldCta(BigInteger oldctaId, LocalDate endDate);
     void setEndDateToCTAOfEmployment(Long employmentId, LocalDate endDate);
@@ -53,4 +54,10 @@ public interface CustomCostTimeAgreementRepository {
 
     boolean ctaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger ctaId, Long employmentId, Date startDate, Date endDate);
     List<CTARuleTemplateDTO> getCTARultemplateByEmploymentId(Long employmentId);
+
+    boolean isEmploymentCTAExistsOnDate(Long employmentId,LocalDate localDate,BigInteger ctaId);
+    boolean isGapExistsInEmploymentCTA(Long employmentId,LocalDate localDate,BigInteger ctaId);
+    CTAResponseDTO findCTAById(BigInteger ctaId);
+    boolean existsOngoingCTAByEmployment(Long employmentId,Date endDate);
+    List<CTAResponseDTO> getEmploymentIdsByAccountTypes(Set<Long> employmentIds,Set<String> accountTypes);
 }

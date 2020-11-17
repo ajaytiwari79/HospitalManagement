@@ -130,18 +130,18 @@ public class AgreementSectionService {
                 clause = new OrganizationClause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), Arrays.asList(defaultTag), Arrays.asList(policyAgreementTemplate.getTemplateType()), referenceId, clauseBasicDTO.getTempClauseId());
             else
                 clause = new MasterClause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), Arrays.asList(defaultTag), Arrays.asList(policyAgreementTemplate.getTemplateType()), referenceId, clauseBasicDTO.getTempClauseId(),
-                        ObjectMapperUtils.copyPropertiesOfCollectionByMapper(policyAgreementTemplate.getAccountTypes(), AccountType.class),
-                        ObjectMapperUtils.copyPropertiesOfCollectionByMapper(policyAgreementTemplate.getOrganizationTypes(), OrganizationType.class),
-                        ObjectMapperUtils.copyPropertiesOfCollectionByMapper(policyAgreementTemplate.getOrganizationSubTypes(), OrganizationSubType.class),
-                        ObjectMapperUtils.copyPropertiesOfCollectionByMapper(policyAgreementTemplate.getOrganizationServices(), ServiceCategory.class),
-                        ObjectMapperUtils.copyPropertiesOfCollectionByMapper(policyAgreementTemplate.getOrganizationSubServices(), SubServiceCategory.class));
+                        ObjectMapperUtils.copyCollectionPropertiesByMapper(policyAgreementTemplate.getAccountTypes(), AccountType.class),
+                        ObjectMapperUtils.copyCollectionPropertiesByMapper(policyAgreementTemplate.getOrganizationTypes(), OrganizationType.class),
+                        ObjectMapperUtils.copyCollectionPropertiesByMapper(policyAgreementTemplate.getOrganizationSubTypes(), OrganizationSubType.class),
+                        ObjectMapperUtils.copyCollectionPropertiesByMapper(policyAgreementTemplate.getOrganizationServices(), ServiceCategory.class),
+                        ObjectMapperUtils.copyCollectionPropertiesByMapper(policyAgreementTemplate.getOrganizationSubServices(), SubServiceCategory.class));
             clauses.add(clause);
         }
         clauses = clauseRepository.saveAll(clauses);
         Map<UUID, Long> clauseData = new HashMap<>();
         clauses.forEach(clause -> clauseData.put(clause.getTempClauseId(), clause.getId()));
         mapClauseIdToEmbeddedClausesOfSectionDTO(sectionDTOList, clauseData);
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(sectionDTOList, AgreementSection.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(sectionDTOList, AgreementSection.class);
     }
 
     /**

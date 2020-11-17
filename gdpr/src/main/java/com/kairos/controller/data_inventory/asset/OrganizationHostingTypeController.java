@@ -57,7 +57,7 @@ class OrganizationHostingTypeController {
     @ApiOperation("delete HostingType  by id")
     @DeleteMapping("/hosting_type/{hostingTypeId}")
     public ResponseEntity<Object> deleteHostingType(@PathVariable Long unitId, @PathVariable BigInteger hostingTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.deleteHostingType(unitId, hostingTypeId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
 
     }
 

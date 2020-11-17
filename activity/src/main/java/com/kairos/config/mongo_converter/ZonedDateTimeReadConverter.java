@@ -1,11 +1,10 @@
 package com.kairos.config.mongo_converter;
 
+import com.kairos.commons.utils.DateUtils;
 import org.springframework.core.convert.converter.Converter;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
-
-import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
 
 /**
  * Created by pradeep
@@ -15,6 +14,6 @@ import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
 public class ZonedDateTimeReadConverter implements Converter<Date, ZonedDateTime> {
     @Override
     public ZonedDateTime convert(Date source) {
-        return asZoneDateTime(source);
+        return DateUtils.asZonedDateTime(source);
     }
 }

@@ -1,11 +1,13 @@
 package com.kairos.persistence.model.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -18,10 +20,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Document(collection = "staffing_level")
+@Getter
+@Setter
+@NoArgsConstructor
 public class StaffingLevel extends MongoBaseEntity {
     @Indexed
     private Date currentDate;
@@ -32,20 +35,6 @@ public class StaffingLevel extends MongoBaseEntity {
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private List<StaffingLevelInterval> absenceStaffingLevelInterval =new ArrayList<>();
-
-    public List<StaffingLevelInterval> getAbsenceStaffingLevelInterval() {
-        return absenceStaffingLevelInterval;
-    }
-
-    public void setAbsenceStaffingLevelInterval(List<StaffingLevelInterval> absenceStaffingLevelInterval) {
-        this.absenceStaffingLevelInterval = absenceStaffingLevelInterval;
-    }
-
-
-    public StaffingLevel() {
-        //default constructor
-    }
-
 
     public StaffingLevel(Date currentDate, Integer weekCount,
                          Long organizationId, BigInteger phaseId, StaffingLevelSetting staffingLevelSetting) {
@@ -62,62 +51,13 @@ public class StaffingLevel extends MongoBaseEntity {
         this.unitId = organizationId;
         this.phaseId = phaseId;
     }
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
     public Date getCurrentDate() {
         return currentDate;
     }
 
-    public void setCurrentDate(Date currentDate) {
-        this.currentDate = currentDate;
-    }
 
-    public Integer getWeekCount() {
-        return weekCount;
-    }
-
-    public void setWeekCount(Integer weekCount) {
-        this.weekCount = weekCount;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public BigInteger getPhaseId() {
-        return phaseId;
-    }
-
-    public void setPhaseId(BigInteger phaseId) {
-        this.phaseId = phaseId;
-    }
-
-    public StaffingLevelSetting getStaffingLevelSetting() {
-        return staffingLevelSetting;
-    }
-
-    public void setStaffingLevelSetting(StaffingLevelSetting staffingLevelSetting) {
-        this.staffingLevelSetting = staffingLevelSetting;
-    }
-
-    public List<StaffingLevelInterval> getPresenceStaffingLevelInterval() {
-        return presenceStaffingLevelInterval;
-    }
-
-    public void setPresenceStaffingLevelInterval(List<StaffingLevelInterval> presenceStaffingLevelInterval) {
-        this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
-    }
-
-    public void addStaffingLevelTimeSlot(StaffingLevelInterval staffingLevelTimeSlot) {
-        if (staffingLevelTimeSlot == null)
-            throw new NullPointerException("Can't add null staffLevelActivity");
-
-        this.getPresenceStaffingLevelInterval().add(staffingLevelTimeSlot);
-
-    }
 
     public void addStaffingLevelTimeSlot(Set<StaffingLevelInterval> staffingLevelTimeSlots) {
         if (staffingLevelTimeSlots == null)
@@ -127,10 +67,7 @@ public class StaffingLevel extends MongoBaseEntity {
 
     }
 
-    @JsonIgnore
-    public StaffingLevelInterval getAbsenceStaffingLevel() {
-        return isCollectionNotEmpty(absenceStaffingLevelInterval) ? absenceStaffingLevelInterval.get(0) : null;
-    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -168,5 +105,9 @@ public class StaffingLevel extends MongoBaseEntity {
                 .append("staffingLevelSetting", staffingLevelSetting)
                 .append("presenceStaffingLevelInterval", presenceStaffingLevelInterval)
                 .toString();
+    }
+
+    public enum Type{
+        PRESENCE,ABSENCE
     }
 }

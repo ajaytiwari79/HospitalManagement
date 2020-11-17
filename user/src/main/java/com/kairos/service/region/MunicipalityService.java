@@ -1,17 +1,16 @@
 package com.kairos.service.region;
 
-import com.kairos.persistence.model.user.region.Municipality;
-import com.kairos.persistence.model.user.region.Province;
-import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.persistence.model.user.region.*;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.FormatUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -113,8 +112,8 @@ public class MunicipalityService {
         return false;
     }
 
-    public List<Map<String,Object>> getAllZipCodeToMunicipality(Long municipalityId) {
-        return FormatUtil.formatNeoResponse( municipalityGraphRepository.getAllZipCodes(municipalityId));
+    public List<ZipCodeQueryResult> getAllZipCodeToMunicipality(Long municipalityId) {
+        return municipalityGraphRepository.getAllZipCodes(municipalityId);
     }
 
 
@@ -129,12 +128,40 @@ public class MunicipalityService {
         return null;
     }
 
-    public List<Map<String,Object>> getMunicipalityToProvince(Long provinceId) {
-        return FormatUtil.formatNeoResponse(municipalityGraphRepository.getAllMunicipalitiesOfProvince(provinceId));
-
+    public List<MunicipalityQueryResults> getMunicipalityToProvince(Long provinceId) {
+        return municipalityGraphRepository.getAllMunicipalitiesOfProvince(provinceId);
     }
 
     public List<Municipality> getMunicipalitiesByZipCode(int zipcode){
         return municipalityGraphRepository.getMuncipalityByZipcode(zipcode);
     }
+
+    public Map<String, TranslationInfo> updateTranslationOfMunicipality(Long municipalityId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Municipality municipality =municipalityGraphRepository.findOne(municipalityId);
+        municipality.setTranslatedNames(translatedNames);
+        municipality.setTranslatedDescriptions(translatedDescriptios);
+        municipalityGraphRepository.save(municipality);
+        return municipality.getTranslatedData();
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfZipCode(Long zipCodeId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        ZipCode zipCode =zipCodeGraphRepository.findOne(zipCodeId);
+        zipCode.setTranslatedNames(translatedNames);
+        zipCode.setTranslatedDescriptions(translatedDescriptios);
+        zipCodeGraphRepository.save(zipCode);
+        return zipCode.getTranslatedData();
+    }
+
 }

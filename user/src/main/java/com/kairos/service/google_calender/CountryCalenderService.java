@@ -12,7 +12,6 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import com.kairos.constants.AppConstants;
-import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,7 @@ public class CountryCalenderService {
     @Inject
     private CountryGraphRepository countryGraphRepository;
 
-    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(CountryCalenderService.class);
+    private  static final org.slf4j.Logger logger = LoggerFactory.getLogger(CountryCalenderService.class);
 
 
 
@@ -47,8 +46,8 @@ public class CountryCalenderService {
         try {
             AppConstants.HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             AppConstants.DATA_STORE_FACTORY = new FileDataStoreFactory(AppConstants.DATA_STORE_DIR);
-        } catch (Throwable t) {
-            t.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             System.exit(1);
         }
     }
@@ -60,37 +59,7 @@ public class CountryCalenderService {
      * @return an authorized Credential object.
      * @throws IOException
      */
-    public static Credential authorize() throws IOException, ClassNotFoundException {
-
-
-        // Load client secrets.
-//        InputStream targetStream =CountryCalenderService.class.getResourceAsStream("/client_secret.json");
-//        if (targetStream==null){
-//            System.out.print("No Stream found");
-//        }
-//        else {
-//            System.out.print(targetStream.toString());
-//        }
-//        GoogleClientSecrets clientSecrets =   GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(targetStream));
-//
-//        // Build flow and trigger user authorization request.
-//        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-//                .setDataStoreFactory(DATA_STORE_FACTORY)
-//                .setAccessType("offline")
-//                .build();
-//        logger.info("New Auth URL: "+flow.newAuthorizationUrl());
-//        String authURI = clientSecrets.getDetails().getAuthUri();
-//        logger.info("Auth URI: "+authURI);
-//        List<String> rediectURI  = clientSecrets.getDetails().getRedirectUris();
-//        logger.info("Redirct URI: "+rediectURI);
-//        Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
-//        System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
-//        return credential;
-
-
-
-
-
+    public static Credential authorize() throws IOException {
         // load client secrets
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(AppConstants.JSON_FACTORY,
                 new InputStreamReader(CountryCalenderService.class.getResourceAsStream("/client_secret.json")));
@@ -99,7 +68,6 @@ public class CountryCalenderService {
                 AppConstants.HTTP_TRANSPORT, AppConstants.JSON_FACTORY, clientSecrets,
                 Collections.singleton(CalendarScopes.CALENDAR)).setDataStoreFactory(AppConstants.DATA_STORE_FACTORY)
                 .build();
-        // authorize
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
 
 
@@ -121,23 +89,19 @@ public class CountryCalenderService {
             // Initialize Calendar service with valid OAuth credentials
             service = new Calendar.Builder(AppConstants.HTTP_TRANSPORT, AppConstants.JSON_FACTORY, credential).setApplicationName(AppConstants.APPLICATION_NAME).build();
             String pageToken = null;
-            CountryHolidayCalender holidayCalender = null;
-            List<CountryHolidayCalender> calenderList= new ArrayList<>();
             do {
                 Events events = service.events().list("en.danish#holiday@group.v.calendar.google.com").setPageToken(pageToken).execute();
                 List<Event> items = events.getItems();
-                logger.info("No of Events:"+items.size());
+                logger.info("No of Events:{}",items.size());
                 itemsList.addAll(items);
 
                 pageToken = events.getNextPageToken();
             } while (pageToken != null);
 
-            logger.info("Number of holidays found: "+itemsList.size());
+            logger.info("Number of holidays found: {}",itemsList.size());
 
         } catch (IOException e) {
-            logger.info("Exception occured: "+e.getCause());
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+            logger.info("Exception occured: {}",e.getCause());
             e.printStackTrace();
         }
         return itemsList;

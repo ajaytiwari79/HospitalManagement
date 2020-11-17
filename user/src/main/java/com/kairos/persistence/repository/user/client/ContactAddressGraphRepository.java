@@ -14,7 +14,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface ContactAddressGraphRepository extends Neo4jBaseRepository<ContactAddress,Long>{
 
     @Query("MATCH (organization:OrganizationBaseEntity) WHERE id(organization)={0} WITH organization " +
-            "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[rel:" + MUNICIPALITY + "]->(municipality:Municipality) \n" +
+            "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) " +
+            "OPTIONAL MATCH(contactAddress)-[rel:" + MUNICIPALITY + "]->(municipality:Municipality) \n" +
             " OPTIONAL MATCH (contactAddress)-[zipRel:" + ZIP_CODE + "]->(zipCode:ZipCode)" +
             "RETURN contactAddress,rel,municipality,zipRel,zipCode ")
     ContactAddress getContactAddressOfOrganization(Long unitId);

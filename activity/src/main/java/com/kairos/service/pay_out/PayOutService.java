@@ -122,7 +122,7 @@ public class PayOutService extends MongoBaseService {
      */
     public void updatePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         updateActivityWrapper(shift,activityWrapperMap);
-        ZonedDateTime startDate = DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime startDate = DateUtils.asZonedDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = startDate.plusDays(1);
         DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
         ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shift,activityWrapperMap);
@@ -153,7 +153,7 @@ public class PayOutService extends MongoBaseService {
             shiftActivity.setPayoutCtaBonusMinutes(shiftActivity.getPayoutCtaBonusMinutes() + shiftActivityDTO.getPayoutCtaBonusMinutes());
             shiftActivity.setPlannedMinutesOfPayout(shiftActivity.getPlannedMinutesOfPayout() + shiftActivityDTO.getScheduledMinutesOfPayout() + shiftActivityDTO.getPayoutCtaBonusMinutes());
             shiftActivity.setScheduledMinutesOfPayout(shiftActivity.getScheduledMinutesOfPayout() + shiftActivityDTO.getScheduledMinutesOfPayout());
-            shiftActivity.setPayoutPerShiftCTADistributions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftActivityDTO.getPayoutPerShiftCTADistributions(), PayOutPerShiftCTADistribution.class));
+            shiftActivity.setPayoutPerShiftCTADistributions(ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftActivityDTO.getPayoutPerShiftCTADistributions(), PayOutPerShiftCTADistribution.class));
             totalPlannerMinutesOfPayout = shiftActivity.getPlannedMinutesOfPayout();
         }
         return totalPlannerMinutesOfPayout;
@@ -168,8 +168,10 @@ public class PayOutService extends MongoBaseService {
             shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
             shiftActivityDTO.setTimeType(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getTimeType());
             shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> {
-                childActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
-                childActivityDTO.setTimeType(activityWrapperMap.get(childActivityDTO.getActivityId()).getTimeType());
+                if(activityWrapperMap.containsKey(childActivityDTO.getActivityId())) {
+                    childActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(childActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
+                    childActivityDTO.setTimeType(activityWrapperMap.get(childActivityDTO.getActivityId()).getTimeType());
+                }
             });
         });
         shiftWithActivityDTO.setStartDate(shift.getActivities().get(0).getStartDate());
@@ -180,7 +182,7 @@ public class PayOutService extends MongoBaseService {
     private void updatePayoutByShift(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftWithActivityDTO shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, DateTimeInterval interval) {
         PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shift.getId());
         payOutPerShift = isNullOrElse(payOutPerShift, new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(), shift.getUnitId()));
-        payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getEmployment(), shift, activityWrapperMap, payOutPerShift, staffAdditionalInfoDTO.getDayTypes());
+        payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO, shift, activityWrapperMap, payOutPerShift, staffAdditionalInfoDTO.getDayTypes());
         payOutRepository.save(payOutPerShift);
     }
 

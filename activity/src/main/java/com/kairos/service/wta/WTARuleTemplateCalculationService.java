@@ -13,14 +13,13 @@ import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.shift.ShiftViolatedRules;
+import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -29,7 +28,6 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;
 import com.kairos.persistence.repository.night_worker.NightWorkerMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -68,8 +66,6 @@ public class WTARuleTemplateCalculationService {
     private WorkTimeAgreementService workTimeAgreementService;
     @Inject
     private PhaseService phaseService;
-    @Inject
-    private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @Inject private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
@@ -83,8 +79,8 @@ public class WTARuleTemplateCalculationService {
     @Inject private StaffWTACounterRepository staffWTACounterRepository;
     @Inject
     private ExpertiseNightWorkerSettingRepository expertiseNightWorkerSettingRepository;
-    @Inject private
-    TimeBankService timeBankService;
+    @Inject
+    private TimeBankService timeBankService;
     @Inject
     private NightWorkerMongoRepository nightWorkerMongoRepository;
     @Inject private ActivityService activityService;
@@ -94,36 +90,34 @@ public class WTARuleTemplateCalculationService {
             if (!(shifts instanceof ArrayList)) {
                 shifts = new ArrayList<>(shifts);
             }
-            Set<BigInteger> activityIds = shifts.stream().flatMap(shiftDTO -> shiftDTO.getActivities().stream()).map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toSet());
-            List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
-            Map<BigInteger,BigInteger> activityIdAndTimetypeIdMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->v.getBalanceSettingsActivityTab().getTimeTypeId()));
             shifts.sort(comparing(ShiftDTO::getStartDate));
             Date startDate = getStartOfDay(shifts.get(0).getStartDate());
             Date endDate = getStartOfDay(plusDays(shifts.get(shifts.size() - 1).getEndDate(), 1));
-            List<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toList());
-            Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds,false).stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
             List<WTAQueryResultDTO> workingTimeAgreements = workTimeAgreementService.getWTAByEmploymentIdAndDatesWithRuleTemplateType(shifts.get(0).getEmploymentId(), startDate, endDate, WTATemplateType.DURATION_BETWEEN_SHIFTS);
             Map<DateTimeInterval, List<DurationBetweenShiftsWTATemplate>> intervalWTARuletemplateMap = getIntervalWTARuletemplateMap(workingTimeAgreements, asLocalDate(endDate).plusDays(1));
             Set<LocalDateTime> dateTimes = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
             Map<Date, Phase> phaseMapByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dateTimes);
-            Set<BigInteger> escalationFreeShiftIds= shiftValidatorService.getEscalationFreeShifts(shifts.stream().map(ShiftDTO::getId).collect(Collectors.toList()));
             for (ShiftDTO shift : shifts) {
-                int restingMinutes = getRestingMinutes(activityIdAndTimetypeIdMap, intervalWTARuletemplateMap, phaseMapByDate, shift);
+                int restingMinutes = getRestingMinutes(intervalWTARuletemplateMap, phaseMapByDate, shift);
                 shift.setRestingMinutes(restingMinutes);
-                shift.setEscalationReasons(shiftViolatedRulesMap.containsKey(shift.getId()) ? shiftViolatedRulesMap.get(shift.getId()).getEscalationReasons():newHashSet());
-                shift.setEscalationResolved(escalationFreeShiftIds.contains(shift.getId()));
+                if(isNotNull(shift.getShiftViolatedRules())){
+                    shift.setEscalationReasons(shift.getShiftViolatedRules().getEscalationReasons());
+                    shift.setEscalationResolved(shift.getShiftViolatedRules().isEscalationResolved());
+                }
+                boolean editable=shiftValidatorService.validateGracePeriod(shift.getStartDate(), true, shift.getUnitId(), phaseMapByDate.get(shift.getActivities().get(0).getStartDate()));
+                shift.setEditable(editable);
             }
         }
         return shifts;
     }
 
-    private int getRestingMinutes( Map<BigInteger, BigInteger> activityIdAndTimetypeIdMap, Map<DateTimeInterval, List<DurationBetweenShiftsWTATemplate>> intervalWTARuletemplateMap, Map<Date, Phase> phaseMapByDate, ShiftDTO shift) {
+    private int getRestingMinutes(Map<DateTimeInterval, List<DurationBetweenShiftsWTATemplate>> intervalWTARuletemplateMap, Map<Date, Phase> phaseMapByDate, ShiftDTO shift) {
         int restingMinutes = 0;
         Map.Entry<DateTimeInterval, List<DurationBetweenShiftsWTATemplate>> dateTimeIntervalListEntry = intervalWTARuletemplateMap.entrySet().stream().filter(dateTimeIntervalList -> dateTimeIntervalList.getKey().contains(shift.getStartDate()) || dateTimeIntervalList.getKey().getEndLocalDate().equals(asLocalDate(shift.getStartDate()))).findAny().orElse(null);
         if (isNotNull(dateTimeIntervalListEntry)) {
             List<DurationBetweenShiftsWTATemplate> durationBetweenShiftsWTATemplates = dateTimeIntervalListEntry.getValue();
             for (DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate : durationBetweenShiftsWTATemplates) {
-                boolean anyActivityValid = shift.getActivities().stream().filter(shiftActivityDTO -> durationBetweenShiftsWTATemplate.getTimeTypeIds().contains(activityIdAndTimetypeIdMap.get(shiftActivityDTO.getActivityId()))).findAny().isPresent();
+                boolean anyActivityValid = shift.getActivities().stream().filter(shiftActivityDTO -> durationBetweenShiftsWTATemplate.getTimeTypeIds().contains(shiftActivityDTO.getTimeTypeId())).findAny().isPresent();
                 if(anyActivityValid && phaseMapByDate.containsKey(shift.getStartDate())) {
                     Integer currentRuletemplateRestingMinutes = getValueByPhase( durationBetweenShiftsWTATemplate.getPhaseTemplateValues(), phaseMapByDate.get(shift.getStartDate()).getId());
                     if(isNotNull(currentRuletemplateRestingMinutes) && restingMinutes < currentRuletemplateRestingMinutes) {
@@ -147,9 +141,10 @@ public class WTARuleTemplateCalculationService {
     public void updateWTACounter(Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         WTAQueryResultDTO wtaQueryResultDTO = workTimeAgreementService.getWtaQueryResultDTOByDateAndEmploymentId(shift.getEmploymentId(),shift.getStartDate());
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(isNotNull(shift) ? newArrayList(shift) : newArrayList(), null);
-        DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(shift.getUnitId());
-        ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftDTO.class), activityWrapperMap,null);
-        DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shiftWithActivityDTO, wtaQueryResultDTO.getRuleTemplates(), activityWrapperMap, planningPeriodInterval.getEndLocalDate());
+        PlanningPeriod planningPeriodContainsDate = planningPeriodService.getPlanningPeriodContainsDate(shift.getUnitId(), asLocalDate(shift.getStartDate()));
+        DateTimeInterval planningPeriodInterval = new DateTimeInterval(planningPeriodContainsDate.getStartDate(),planningPeriodContainsDate.getEndDate());
+        ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftDTO.class), activityWrapperMap,null);
+        DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shiftWithActivityDTO, wtaQueryResultDTO.getRuleTemplates(), activityWrapperMap, planningPeriodInterval.getEndLocalDate()).addInterval(planningPeriodInterval);
         List<PlanningPeriodDTO> planningPeriodDTOS = planningPeriodService.findAllPlanningPeriodBetweenDatesAndUnitId(shift.getUnitId(),intervalByRuleTemplates.getStartDate(),intervalByRuleTemplates.getEndDate());
         List<WTAQueryResultDTO> wtaQueryResultDTOS = workTimeAgreementService.getWTAByEmploymentIdAndDates(shift.getEmploymentId(),intervalByRuleTemplates.getStartDate(),intervalByRuleTemplates.getEndDate());
         List<ShiftWithActivityDTO> shifts = new ArrayList<>(shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentIdNotEqualShiftIds(shift.getEmploymentId(), DateUtils.asDate(intervalByRuleTemplates.getStart()), DateUtils.asDate(intervalByRuleTemplates.getEnd()),newArrayList(shiftWithActivityDTO.getId())));
@@ -160,16 +155,14 @@ public class WTARuleTemplateCalculationService {
         List<ShiftWithActivityDTO> existingShifts = new ArrayList<>(shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentIdNotEqualShiftIds(shift.getEmploymentId(), DateUtils.asDate(intervalByRuleTemplates.getStart()), DateUtils.asDate(intervalByRuleTemplates.getEnd()),shiftIds));
         PlanningPeriod lastPlanningPeriod = planningPeriodService.getLastPlanningPeriod(staffAdditionalInfoDTO.getUnitId());
         existingShifts.addAll(shifts);
-        shiftValidatorService.updateFullDayAndFullWeekActivityShift(existingShifts);
+        shiftValidatorService.updateFullDayAndFullWeekActivityShifts(existingShifts);
         Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         Map<String, TimeSlotWrapper> timeSlotWrapperMap = staffAdditionalInfoDTO.getTimeSlotSets().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = getExpertiseNightWorkerSetting(shift, staffAdditionalInfoDTO);
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(shift.getStaffId());
-        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = getShiftIdShiftViolatedRulesMap(shiftIds);
         Map<Date, Phase> phaseMapByDate = getDateWisePhaseMap(shift, shifts);
-        updateWTACounter(shiftWithActivityDTO, staffAdditionalInfoDTO, activityWrapperMap, planningPeriodDTOS, wtaQueryResultDTOS, shifts, staffWTACounters, existingShifts, lastPlanningPeriod, dayTypeDTOMap, timeSlotWrapperMap, expertiseNightWorkerSetting, nightWorker, shiftViolatedRulesMap, phaseMapByDate);
+        updateWTACounter( staffAdditionalInfoDTO, activityWrapperMap, planningPeriodDTOS, wtaQueryResultDTOS, shifts, staffWTACounters, existingShifts, lastPlanningPeriod, dayTypeDTOMap, timeSlotWrapperMap, expertiseNightWorkerSetting, nightWorker,  phaseMapByDate);
         staffWTACounterRepository.saveEntities(staffWTACounters);
-        shiftViolatedRulesMongoRepository.saveEntities(shiftViolatedRulesMap.values());
     }
 
     private Map<Date, Phase> getDateWisePhaseMap(Shift shift, List<ShiftWithActivityDTO> shifts) {
@@ -177,17 +170,12 @@ public class WTARuleTemplateCalculationService {
         return phaseService.getPhasesByDates(shift.getUnitId(), dates);
     }
 
-    private Map<BigInteger, ShiftViolatedRules> getShiftIdShiftViolatedRulesMap(List<BigInteger> shiftIds) {
-        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIdsAndWorkTimeAgreement(shiftIds,false);
-        return shiftViolatedRules.stream().collect(Collectors.toMap(ShiftViolatedRules::getShiftId, v -> v));
-    }
-
-    private void updateWTACounter(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, List<PlanningPeriodDTO> planningPeriodDTOS, List<WTAQueryResultDTO> wtaQueryResultDTOS, List<ShiftWithActivityDTO> shifts, List<StaffWTACounter> staffWTACounters, List<ShiftWithActivityDTO> existingShifts, PlanningPeriod lastPlanningPeriod, Map<Long, DayTypeDTO> dayTypeDTOMap, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ExpertiseNightWorkerSetting expertiseNightWorkerSetting, NightWorker nightWorker, Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap, Map<Date, Phase> phaseMapByDate) {
+    private void updateWTACounter(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, List<PlanningPeriodDTO> planningPeriodDTOS, List<WTAQueryResultDTO> wtaQueryResultDTOS, List<ShiftWithActivityDTO> shifts, List<StaffWTACounter> staffWTACounters, List<ShiftWithActivityDTO> existingShifts, PlanningPeriod lastPlanningPeriod, Map<Long, DayTypeDTO> dayTypeDTOMap, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ExpertiseNightWorkerSetting expertiseNightWorkerSetting, NightWorker nightWorker, Map<Date, Phase> phaseMapByDate) {
         for (ShiftWithActivityDTO updateShiftWithActivityDTO : shifts) {
             Phase phase = phaseMapByDate.get(updateShiftWithActivityDTO.getStartDate());
             LocalDate shiftStartDate = asLocalDate(updateShiftWithActivityDTO.getStartDate());
-            if(!shiftStartDate.isBefore(LocalDate.now()) && shiftViolatedRulesMap.containsKey(updateShiftWithActivityDTO.getId())) {
-                ShiftViolatedRules currentShiftViolatedRules = shiftViolatedRulesMap.get(updateShiftWithActivityDTO.getId());
+            if(!shiftStartDate.isBefore(getCurrentLocalDate()) && isNotNull(updateShiftWithActivityDTO.getShiftViolatedRules())) {
+                ShiftViolatedRules currentShiftViolatedRules = updateShiftWithActivityDTO.getShiftViolatedRules();
                 List<ShiftWithActivityDTO> shiftForValidation = new ArrayList<>(existingShifts);
                 shiftForValidation.removeIf(currentShiftWithActivityDTO -> currentShiftWithActivityDTO.isDeleted());
                 WTAQueryResultDTO updateWtaQueryResultDTO = wtaQueryResultDTOS.stream().filter(wtaQueryResultDTO1 -> wtaQueryResultDTO1.isValidWorkTimeAgreement(shiftStartDate)).findFirst().orElseThrow(() -> new DataNotFoundException(MESSAGE_WTA_NOTFOUND));
@@ -197,7 +185,7 @@ public class WTARuleTemplateCalculationService {
                 Map<BigInteger, StaffWTACounter> staffWTACounterMap = staffWTACounters.stream().filter(staffWTACounter -> staffWTACounter.getStartDate().equals(planningPeriod.getStartDate()) && staffWTACounter.getEndDate().equals(planningPeriod.getEndDate())).collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, Function.identity()));
                 RuleTemplateSpecificInfo ruleTemplateSpecificInfo = new RuleTemplateSpecificInfo(new ArrayList<>(shiftForValidation), updateShiftWithActivityDTO, timeSlotWrapperMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), new HashMap<>(), dayTypeDTOMap,  expectedTimebank, activityWrapperMap, staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate(), expertiseNightWorkerSetting, isNotNull(nightWorker) ? nightWorker.isNightWorker() : false, phase.getPhaseEnum());
                 for (WTABaseRuleTemplate ruleTemplate : updateWtaQueryResultDTO.getRuleTemplates()) {
-                    if(shiftViolatedRulesMap.get(updateShiftWithActivityDTO.getId()).getBreakedRuleTemplateIds().contains(ruleTemplate.getId())) {
+                    if(updateShiftWithActivityDTO.getShiftViolatedRules().getBreakedRuleTemplateIds().contains(ruleTemplate.getId())) {
                         updateStaffWTACounter(ObjectMapperUtils.copyPropertiesByMapper(updateShiftWithActivityDTO, Shift.class), currentShiftViolatedRules, ruleTemplate, staffWTACounterMap, ruleTemplateSpecificInfo);
                     }
                 }
@@ -219,23 +207,6 @@ public class WTARuleTemplateCalculationService {
         }
         return intervalByRuleTemplates;
     }
-
-    /*private void updateShiftLengthWTARuletemplate(Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shiftWithActivityDTO, List<PlanningPeriodDTO> planningPeriodDTOS, List<StaffWTACounter> staffWTACounters, PlanningPeriod lastPlanningPeriod, Map<Long, DayTypeDTO> dayTypeDTOMap, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ExpertiseNightWorkerSetting expertiseNightWorkerSetting, NightWorker nightWorker, Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap, Map<Date, Phase> phaseMapByDate) {
-        if(shiftViolatedRulesMap.containsKey(shiftWithActivityDTO.getId()) && shift.isDeleted()){
-            Iterable<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllById(shiftViolatedRulesMap.get(shiftWithActivityDTO.getId()).getBreakedRuleTemplateIds());
-            ShiftViolatedRules shiftViolatedRules = shiftViolatedRulesMap.get(shiftWithActivityDTO.getId());
-            for (WTABaseRuleTemplate wtaBaseRuleTemplate : wtaBaseRuleTemplates) {
-                LocalDate shiftStartDate = asLocalDate(shiftWithActivityDTO.getStartDate());
-                PlanningPeriodDTO planningPeriod = planningPeriodDTOS.stream().filter(planningPeriodDTO -> shiftStartDate.equals(planningPeriodDTO.getStartDate()) || shiftStartDate.equals(planningPeriodDTO.getEndDate()) || (planningPeriodDTO.getStartDate().isBefore(shiftStartDate) && planningPeriodDTO.getEndDate().isAfter(shiftStartDate))).findFirst().get();
-                Map<BigInteger, StaffWTACounter> staffWTACounterMap = staffWTACounters.stream().filter(staffWTACounter -> staffWTACounter.getStartDate().equals(planningPeriod.getStartDate()) && staffWTACounter.getEndDate().equals(planningPeriod.getEndDate())).collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, Function.identity()));
-                Phase phase = phaseMapByDate.get(shiftWithActivityDTO.getStartDate());
-                RuleTemplateSpecificInfo ruleTemplateSpecificInfo = new RuleTemplateSpecificInfo(newArrayList(), shiftWithActivityDTO, timeSlotWrapperMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), new HashMap<>(), dayTypeDTOMap, 0l, activityWrapperMap, staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate(), expertiseNightWorkerSetting, isNotNull(nightWorker) ? nightWorker.isNightWorker() : false, phase.getPhaseEnum());
-                if(wtaBaseRuleTemplate instanceof ShiftLengthWTATemplate && shiftViolatedRulesMap.get(shiftWithActivityDTO.getId()).getBreakedRuleTemplateIds().contains(wtaBaseRuleTemplate.getId())){
-                    updateStaffWTACounter(shift, shiftViolatedRules, wtaBaseRuleTemplate, staffWTACounterMap, ruleTemplateSpecificInfo);
-                }
-            }
-        }
-    }*/
 
     private void updateStaffWTACounter(Shift shift, ShiftViolatedRules shiftViolatedRules, WTABaseRuleTemplate wtaBaseRuleTemplate, Map<BigInteger, StaffWTACounter> staffWTACounterMap, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
         if(staffWTACounterMap.containsKey(wtaBaseRuleTemplate.getId())) {

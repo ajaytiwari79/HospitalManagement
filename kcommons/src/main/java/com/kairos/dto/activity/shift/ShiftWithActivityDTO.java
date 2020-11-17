@@ -2,18 +2,19 @@ package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.shift.ShiftStatus;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
@@ -26,18 +27,23 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
  *
  * */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
+@Data
+@EqualsAndHashCode(callSuper=true)
 public class ShiftWithActivityDTO extends ShiftDTO{
     private PhaseDTO phase;
     private String timeType;
     @JsonIgnore
-    private List<BigInteger> activitiesTimeTypeIds = new ArrayList<>();
+    private Set<BigInteger> activitiesTimeTypeIds = new HashSet<>();
     @JsonIgnore
-    private List<BigInteger> activityIds = new ArrayList<>();
+    private Set<BigInteger> activityIds = new HashSet<>();
     @JsonIgnore
-    private List<BigInteger> activitiesPlannedTimeIds = new ArrayList<>();
+    private Set<BigInteger> activitiesPlannedTimeIds = new HashSet<>();
     private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
+    private transient String oldShiftTimeSlot;//it is only for conditional CTA calculation
+
 
     public ShiftWithActivityDTO() {
     }
@@ -48,24 +54,28 @@ public class ShiftWithActivityDTO extends ShiftDTO{
         this.activities = activities;
     }
 
-    public List<BigInteger> getActivitiesTimeTypeIds(){
+    public Set<BigInteger> getActivitiesTimeTypeIds(){
         if(activitiesTimeTypeIds.isEmpty()) {
-            activitiesTimeTypeIds = activities.stream().filter(shiftActivityDTO -> shiftActivityDTO.getActivity()!=null).map(shiftActivityDTO -> shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).collect(Collectors.toList());
+            activitiesTimeTypeIds = activities.stream().filter(shiftActivityDTO -> shiftActivityDTO.getActivity()!=null).map(shiftActivityDTO -> shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeTypeId()).collect(Collectors.toSet());
         }
         return activitiesTimeTypeIds;
     }
 
-    public List<BigInteger> getActivitiesPlannedTimeIds(){
+    public Set<BigInteger> getActivitiesPlannedTimeIds(){
         if(activitiesPlannedTimeIds.isEmpty()) {
-            activitiesPlannedTimeIds = activities.stream().flatMap(k -> k.getPlannedTimes().stream().map(plannedTime->plannedTime.getPlannedTimeId())).collect(Collectors.toList());
+            activitiesPlannedTimeIds = activities.stream().flatMap(k -> k.getPlannedTimes().stream().map(plannedTime->plannedTime.getPlannedTimeId())).collect(Collectors.toSet());
         }
         return activitiesPlannedTimeIds;
     }
 
+    public List<PlannedTime> getActivitiesPlannedTimes(){
+        return activities.stream().flatMap(k -> k.getPlannedTimes().stream()).collect(Collectors.toList());
+    }
+
     @JsonIgnore
-    public List<BigInteger> getActivityIds(){
+    public Set<BigInteger> getActivityIds(){
         if(activityIds.isEmpty()) {
-            activityIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toList());
+            activityIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toSet());
         }
         return activityIds;
     }
@@ -86,15 +96,16 @@ public class ShiftWithActivityDTO extends ShiftDTO{
     }
 
     public int getMinutes() {
+//        return 0;
         return ((int) (this.activities.get(activities.size() - 1).getEndDate().getTime() - this.activities.get(0).getStartDate().getTime()) / 60000);
     }
 
     public boolean isPresence(){
-        return this.getActivities().stream().anyMatch(shiftActivityDTO -> isNotNull(shiftActivityDTO.getActivity()) && TimeTypeEnum.PRESENCE.equals(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType()));
+        return this.getActivities().stream().anyMatch(shiftActivityDTO -> isNotNull(shiftActivityDTO.getActivity()) && TimeTypeEnum.PRESENCE.equals(shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeType()));
     }
 
     public boolean isAbsence(){
-        return this.getActivities().stream().allMatch(shiftActivityDTO -> isNotNull(shiftActivityDTO.getActivity()) && TimeTypeEnum.ABSENCE.equals(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType()));
+        return this.getActivities().stream().allMatch(shiftActivityDTO -> isNotNull(shiftActivityDTO.getActivity()) && TimeTypeEnum.ABSENCE.equals(shiftActivityDTO.getActivity().getActivityBalanceSettings().getTimeType()));
     }
 
     @JsonIgnore
@@ -110,6 +121,11 @@ public class ShiftWithActivityDTO extends ShiftDTO{
     @JsonIgnore
     public DateTimeInterval getDateTimeInterval() {
         return new DateTimeInterval(startDate.getTime(), endDate.getTime());
+    }
+
+    @JsonIgnore
+    public Set<ShiftStatus> getStatuses() {
+        return activities.stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getStatus().stream()).collect(Collectors.toSet());
     }
 
     @JsonIgnore

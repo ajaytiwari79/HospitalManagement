@@ -8,6 +8,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
 
@@ -30,8 +31,11 @@ public class AccessPageDTO {
     private boolean accessibleForUnion;
     private boolean accessibleForOrganization;
     private List<OrganizationCategory> accessibleFor = new ArrayList<>();
-    //this value is true only in case of "moduleId" : "module_1"
     private Boolean editable;
     private boolean hasSubTabs;
     private int sequence;
+    private Map<String,String> translatedNames;
+    private String helperText;
+    private String url;
+    private List<AccessPageDTO> children = new ArrayList<>();
 }

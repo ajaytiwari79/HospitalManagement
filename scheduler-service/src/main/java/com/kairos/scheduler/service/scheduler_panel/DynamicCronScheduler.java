@@ -59,7 +59,6 @@ public class DynamicCronScheduler{
 
         ScheduledFuture<?> future;
         threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);
-        threadPoolTaskScheduler.initialize();
         Runnable runnable = getTask(schedulerPanel, trigger, TimeZone.getTimeZone(timezone));
 
         if (!schedulerPanel.isOneTimeTrigger()) {
@@ -67,11 +66,13 @@ public class DynamicCronScheduler{
         } else {
             future = threadPoolTaskScheduler.schedule(runnable, DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate().atZone(ZoneId.of(timezone))));
         }
-
-        logger.info("Name of cron job is --> {} scheduler {}",schedulerPanel.getId(),TimeZone.getDefault());
-        BeanFactoryUtil.registerSingleton(SCHEDULER + schedulerPanel.getId(), future);
-        logger.info("Name of cron job is --> " + SCHEDULER + schedulerPanel.getId());
-
+        try {
+            logger.info("Name of cron job is --> {} scheduler {}", schedulerPanel.getId(), TimeZone.getDefault());
+            BeanFactoryUtil.registerSingleton(SCHEDULER + schedulerPanel.getId(), future);
+            logger.info("Name of cron job is --> " + SCHEDULER + schedulerPanel.getId());
+        }catch (Exception ex){
+            logger.info("Exception --> {}", ex.getMessage());
+        }
         return SCHEDULER + schedulerPanel.getId();
 
 
@@ -142,7 +143,7 @@ public class DynamicCronScheduler{
     private Runnable getTask(SchedulerPanel schedulerPanel, CronTrigger trigger, TimeZone timeZone) {
         return () -> {
             logger.info("control pannel exist--> " + schedulerPanel.getId());
-            schedulerPanel.setLastRunTime(DateUtils.getCurrentDate());
+            schedulerPanel.setLastRunTime(DateUtils.getDate());
             if (!schedulerPanel.isOneTimeTrigger()) {
                 schedulerPanel.setNextRunTime(getNextExecutionTime(trigger, schedulerPanel.getLastRunTime(), timeZone));
             } else {

@@ -2,14 +2,15 @@ package com.kairos.persistence.repository.user.auth;
 
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
-import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
+import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -28,11 +29,6 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     User findUserByCprNumber(String cprNumber);
 
     List<User> findAll();
-
-    @Query("MATCH(u:User { accessToken: {0} })SET u.accessToken = NULL RETURN u")
-    User findAndRemoveAccessToken(String accessToken);
-
-    User findByAccessToken(String accessToken);
 
     @Query("MATCH(u:User) WHERE u.forgotPasswordToken={0} RETURN u")
     User findByForgotPasswordToken(String forgotPasswordToken);
@@ -55,7 +51,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "MATCH (user)<-[:"+BELONGS_TO+"]-(:Staff)<-[:"+BELONGS_TO+"]-(:Position)<-[:"+ HAS_POSITIONS +"]-(organization:Organization{isEnable:true,boardingCompleted: true,deleted:false}) RETURN user")
     User findUserByEmailInAnyOrganization(String email);
 
-    User findByKmdExternalId(Long kmdExternalId);
+    Optional<User> findByKmdExternalId(Long kmdExternalId);
 
     @Query("MATCH (staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(staff)={0} RETURN user")
     User getUserByStaffId(Long staffId);
@@ -67,27 +63,35 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("MATCH(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) WHERE id(user)={0} RETURN id(userLanguage) LIMIT 1")
     Long getUserSelectedLanguageId(Long userId);
 
+    @Query("MATCH(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) WHERE id(user)={0} RETURN userLanguage LIMIT 1")
+    SystemLanguage getUserSystemLanguage(Long userId);
+
+    @Query("Match (language:SystemLanguage{deleted:false}) where id(language)={1}\n" +
+            "MATCH (user:User)-[r: SELECTED_LANGUAGE ]->(userLanguage:SystemLanguage{deleted:false}) WHERE id(user)={0}\n" +
+            "detach delete r \n" +
+            "CREATE UNIQUE (user)-[:SELECTED_LANGUAGE]->(language)")
+    void updateUserSystemLanguage(Long userId, Long languageId);
     // This is used to get the very first user of the organization
     @Query("MATCH (org) WHERE id(org)={0}" +
             "OPTIONAL MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission,position\n" +
-            "OPTIONAL MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'})-[:"+HAS_PARENT_ACCESS_GROUP+"]-(parentAG:AccessGroup) WITH org,unitPermission,position,r1,ag,parentAG\n" +
+            "OPTIONAL MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false})-[:"+HAS_PARENT_ACCESS_GROUP+"]-(parentAG:AccessGroup) WITH org,unitPermission,position,r1,ag,parentAG\n" +
             "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "RETURN  id(org) AS organizationId ,id(user) AS id, user.email AS email,user.firstName AS firstName," +
             "user.userName AS userName,ag.name AS accessGroupName,id(parentAG) AS parentAccessGroupId,id(ag) AS " +
-            "accessGroupId,user.lastName AS lastName ,user.cprNumber AS cprNumber,user.creationDate AS creationDate ORDER BY user.creationDate DESC LIMIT 1" )
+            "accessGroupId,user.lastName AS lastName ,user.cprNumber AS cprNumber,user.creationDate AS creationDate ORDER BY user.creationDate ASC LIMIT 1" )
     StaffPersonalDetailQueryResult getUnitManagerOfOrganization(Long unitId);
 
     @Query("MATCH (org:Organization) WHERE id(org)  = {1}" +
             " MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission,position\n" +
             " MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) WITH org,unitPermission,position,r1,ag\n" +
-            "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
+            "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff{currentStatus:'ACTIVE'})-[:"+BELONGS_TO+"]-(user:User) \n" +
             "RETURN  id(org) AS organizationId ,user.email AS email,id(user) AS id,ag.name AS accessGroupName,id(ag) AS accessGroupId, user.firstName AS firstName,user.lastName AS lastName , user.userName AS userName, user.cprNumber AS cprNumber,staff AS staff,user.creationDate AS creationDate " +
             "UNION " +
             "MATCH (org:Organization),(child) WHERE id(org) = {1} and id(child) IN {0}\n " +
             " MATCH (org)-[:"+HAS_POSITIONS+"]->(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission) WITH child,position,unitPermission\n" +
             " MATCH (unitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(child) WITH  unitPermission,position,child\n" +
             " MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) WITH child,position,ag\n" +
-            "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
+            "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff{currentStatus:'ACTIVE'})-[:"+BELONGS_TO+"]-(user:User) \n" +
             "RETURN  id(child) AS organizationId ,user.email AS email,id(user) AS id,ag.name AS accessGroupName,id(ag) AS accessGroupId, user.firstName AS firstName,user.lastName AS lastName, user.userName AS userName, user.cprNumber AS cprNumber,staff AS staff,user.creationDate AS creationDate " )
 
     List<StaffPersonalDetailQueryResult> getUnitManagerOfOrganization(List<Long> unitId, Long parentOrganizationId);
@@ -97,6 +101,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             " MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "RETURN user LIMIT 1 " )
     User getUserOfOrganization(Long unitId);
+
 
     @Query("MATCH (user:User) WHERE ( user.cprNumber={1} OR user.email=~{0} ) AND id(user)<>{2} RETURN count(user) ")
     byte validateUserEmailAndCPRExceptCurrentUser(String email, String cprNumber, Long userId);
@@ -118,4 +123,10 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "\n" +
             "RETURN CASE WHEN e IS NULL THEN id(organization) ELSE id(u) END LIMIT 1")
     Long getLastSelectedOrganizationId(Long id);
+
+    @Query("MATCH (user:User) WHERE user.userName=~{0} AND NOT user.email=~{1} RETURN COUNT(user)>0")
+    boolean existByUserName(String userName, String email);
+
+    @Query("MATCH (user:User)-[:BELONGS_TO_SUPER_ADMIN]-(ag:AccessGroup) WHERE id(user)={0} AND ag.name='SUPER_ADMIN' RETURN COUNT(user)>0")
+    boolean isSystemAdmin(Long id);
 }

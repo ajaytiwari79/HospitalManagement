@@ -1,5 +1,8 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.IndustryType;
 import com.kairos.persistence.model.country.default_data.IndustryTypeDTO;
@@ -12,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
 
@@ -50,7 +55,13 @@ public class IndustryTypeService {
     }
 
     public List<IndustryTypeDTO> getIndustryTypeByCountryId(long countryId){
-        return industryTypeGraphRepository.findIndustryTypeByCountry(countryId);
+        List<IndustryType> industryTypes = industryTypeGraphRepository.findIndustryTypeByCountry(countryId);
+        List<IndustryTypeDTO> industryTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(industryTypes,IndustryTypeDTO.class);
+        for(IndustryTypeDTO industryTypeDTO :industryTypeDTOS){
+            industryTypeDTO.setCountryId(countryId);
+            industryTypeDTO.setTranslations(TranslationUtil.getTranslatedData(industryTypeDTO.getTranslatedNames(),industryTypeDTO.getTranslatedDescriptions()));
+        }
+        return industryTypeDTOS;
     }
 
     public IndustryTypeDTO updateIndustryType(long countryId, IndustryTypeDTO industryTypeDTO){
@@ -76,5 +87,16 @@ public class IndustryTypeService {
             exceptionService.dataNotFoundByIdException("error.IndustryType.notfound");
         }
         return true;
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long industryTypeId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
+        IndustryType industryType =industryTypeGraphRepository.findOne(industryTypeId);
+        industryType.setTranslatedNames(translatedNames);
+        industryType.setTranslatedDescriptions(translatedDescriptios);
+        industryTypeGraphRepository.save(industryType);
+        return industryType.getTranslatedData();
     }
 }

@@ -12,6 +12,8 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
+import com.kairos.persistence.model.kpermissions.KPermissionAction;
+import com.kairos.persistence.model.kpermissions.KPermissionModel;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
@@ -26,12 +28,16 @@ import com.kairos.persistence.model.user.region.Region;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.kpermissions.KPermissionActionGraphRepository;
+import com.kairos.persistence.repository.kpermissions.PermissionModelRepository;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.UserBaseRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CurrencyGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentCategoryGraphRepository;
@@ -44,9 +50,7 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffTeamRelationshipGraphRepository;
-import com.kairos.persistence.repository.user.staff.UnitPermissionAndAccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
-import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OpenningHourService;
 import com.kairos.utils.CPRUtil;
@@ -60,6 +64,9 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
@@ -71,9 +78,12 @@ import static com.kairos.enums.user.UserType.USER_ACCOUNT;
  */
 @Service
 public class BootDataService {
+    public static final String SMITH_EMAIL = "smith@kairos.com";
+    public static final String ADMIN_KAIROS_COM = "admin@kairos.com";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
+    private
     com.kairos.service.organization.OrganizationService organizationService;
     @Inject
     StaffGraphRepository staffGraphRepository;
@@ -86,8 +96,6 @@ public class BootDataService {
     @Inject
     CountryGraphRepository countryGraphRepository;
     @Inject
-    UnitGraphRepository unitGraphRepository;
-    @Inject
     SkillGraphRepository skillGraphRepository;
     @Inject
     UserGraphRepository userGraphRepository;
@@ -97,8 +105,6 @@ public class BootDataService {
     UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
     LanguageGraphRepository languageGraphRepository;
-    @Inject
-    CitizenStatusGraphRepository citizenStatusGraphRepository;
     @Inject
     ZipCodeGraphRepository zipCodeGraphRepository;
     @Inject
@@ -116,10 +122,6 @@ public class BootDataService {
       @Inject
     private OpenningHourService openningHourService;
     @Inject
-    private AccessPageService accessPageService;
-    @Inject
-    private UnitPermissionAndAccessPermissionGraphRepository unitPermissionAndAccessPermissionGraphRepository;
-    @Inject
     private EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;
     @Inject
     private UserBaseRepository userBaseRepository;
@@ -128,6 +130,10 @@ public class BootDataService {
     @Inject private StaffTeamRelationshipGraphRepository StaffTeamRelationshipGraphRepository;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private KPermissionActionGraphRepository kPermissionActionGraphRepository;
+    @Inject
+    private PermissionModelRepository permissionModelRepository;
 
     private List<Long> skillList;
     private OrganizationService homeCareService;
@@ -228,7 +234,7 @@ public class BootDataService {
         adminAsStaff.setSignature("will");
         adminAsStaff.setCardNumber("LPSPSW11323");
         adminAsStaff.setCopyKariosMailToLogin(true);
-        adminAsStaff.setContactDetail(new ContactDetail("smith@kairos.com", "admin@kairos.com", "5365433", "facebook.com/will_cool"));
+        adminAsStaff.setContactDetail(new ContactDetail(SMITH_EMAIL, ADMIN_KAIROS_COM, "5365433", "facebook.com/will_cool"));
         adminAsStaff.setFamilyName(COUNTRY_ADMIN_NAME);
         adminAsStaff.setFirstName(COUNTRY_ADMIN_NAME);
         adminAsStaff.setLastName("Smith");
@@ -236,7 +242,7 @@ public class BootDataService {
         adminAsStaff.setEmail(COUNTRY_ADMIN_EMAIL);
         adminAsStaff.setNationalInsuranceNumber("NIN44500331");
         adminAsStaff.setLanguage(danish);
-        adminAsStaff.setPassword(new BCryptPasswordEncoder().encode("smith@kairos.com"));
+        adminAsStaff.setPassword(new BCryptPasswordEncoder().encode(SMITH_EMAIL));
         return adminAsStaff;
     }
 
@@ -246,7 +252,7 @@ public class BootDataService {
         admin.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(admin.getCprNumber()));
         admin.setUserName(COUNTRY_ADMIN_EMAIL);
         admin.setEmail(COUNTRY_ADMIN_EMAIL);
-        admin.setPassword(new BCryptPasswordEncoder().encode("smith@kairos.com"));
+        admin.setPassword(new BCryptPasswordEncoder().encode(SMITH_EMAIL));
         admin.setFirstName(COUNTRY_ADMIN_NAME);
         admin.setNickName(COUNTRY_ADMIN_NAME);
         admin.setLastName("Smith");
@@ -343,7 +349,7 @@ public class BootDataService {
     }
 
     private void createMasterSkills() {
-        String personalSkills[] = new String[]{"Bathing Partial", "Full Bathing", "Assist with feeding"};
+        String[] personalSkills = new String[]{"Bathing Partial", "Full Bathing", "Assist with feeding"};
         SkillCategory personalSkillCategory = new SkillCategory("Personal Skills");
         personalSkillCategory.setCountry(denmark);
         skillList = new ArrayList<>();
@@ -355,21 +361,19 @@ public class BootDataService {
         }
         SkillCategory medicalSkillCategory = new SkillCategory("Medical Skills");
         medicalSkillCategory.setCountry(denmark);
-        String medicalSkills[] = new String[]{"Pharma knowledge", "Basic Medical Checkup", "Basic Nursing"};
+        String[] medicalSkills = new String[]{"Pharma knowledge", "Basic Medical Checkup", "Basic Nursing"};
         for (String medicalSkill : medicalSkills) {
             skill = new Skill(medicalSkill, medicalSkillCategory);
             skillGraphRepository.save(skill);
             skillList.add(skill.getId());
         }
-        SkillCategory homeSkillCategory = new SkillCategory("Home Skills");
-        homeSkillCategory.setCountry(denmark);
-        String homeSkills[] = new String[]{"Home Cleaning", "Dish Washing", "Cooking food"};
+        SkillCategory homeSkillCategory = new SkillCategory(denmark,"Home Skills");
+        String[] homeSkills = new String[]{"Home Cleaning", "Dish Washing", "Cooking food"};
         for (String homeSkill : homeSkills) {
             skill = new Skill(homeSkill, homeSkillCategory);
             skillGraphRepository.save(skill);
             skillList.add(skill.getId());
         }
-
         danish = new Language("Danish", false);
         danish.setCountry(denmark);
         danish = languageGraphRepository.save(danish);
@@ -494,7 +498,7 @@ public class BootDataService {
         adminAsStaff.setSignature("ulrik");
         adminAsStaff.setCardNumber("LPSPSW1134");
         adminAsStaff.setCopyKariosMailToLogin(true);
-        adminAsStaff.setContactDetail(new ContactDetail("admin@kairos.com", "admin@kairos.com", "536533", "facebook.com/ulrik"));
+        adminAsStaff.setContactDetail(new ContactDetail(ADMIN_KAIROS_COM, ADMIN_KAIROS_COM, "536533", "facebook.com/ulrik"));
         adminAsStaff.setFamilyName(ULRIK);
         adminAsStaff.setFirstName(ULRIK);
         adminAsStaff.setLastName("Rasmussen");

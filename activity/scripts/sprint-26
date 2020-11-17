@@ -7,5 +7,5 @@ db.staffActivitySetting.createIndex( { staffId:1,activityId:1 }, { unique: true 
 // To set default values in existing activities
 
 db.activities.updateMany({},{$set:{
-"rulesActivityTab.plannedTimeInAdvance": {"type":"HOURS","value":0}
+"activityRulesSettings.plannedTimeInAdvance": {"type":"HOURS","value":0}
       }})

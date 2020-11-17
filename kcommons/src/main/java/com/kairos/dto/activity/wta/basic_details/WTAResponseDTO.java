@@ -2,9 +2,12 @@ package com.kairos.dto.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
+import com.kairos.dto.user_context.UserContext;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +18,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
  * Created by vipul on 21/8/17.
@@ -44,6 +50,9 @@ public class WTAResponseDTO {
     private List<WTAResponseDTO> versions = new ArrayList<>();
     private List<TagDTO> tags;
     private Map<String, Object> unitInfo;
+    private Long countryId;
+    private Long unitId;
+    private Map<String, TranslationInfo> translations;
 
     public WTAResponseDTO(String name, BigInteger id,BigInteger parentId) {
         this.name = name;
@@ -71,6 +80,18 @@ public class WTAResponseDTO {
         this.organizationType = organizationType;
         this.organizationSubType = organizationSubType;
         this.tags = tags;
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+    public String getDescription() {
+        return  TranslationUtil.getDescription(translations,description);
+    }
+
+    public boolean isValidWorkTimeAgreement(LocalDate localDate){
+        return (isNull(this.getEndDate()) && !this.getStartDate().isAfter(localDate)) || (isNotNull(this.getEndDate()) && !this.getStartDate().isAfter(localDate) && !this.getEndDate().isBefore(localDate));
     }
 
 }

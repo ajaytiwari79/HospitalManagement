@@ -1,8 +1,12 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.BusinessTypeDTO;
+import com.kairos.persistence.model.country.default_data.ContractType;
 import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -10,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
 
@@ -47,7 +53,13 @@ public class BusinessTypeService {
     }
 
     public List<BusinessTypeDTO> getBusinessTypeByCountryId(long countryId) {
-        return businessTypeGraphRepository.findBusinessTypeByCountry(countryId);
+        List<BusinessType> businessTypes = businessTypeGraphRepository.findBusinessTypeByCountry(countryId);
+        List<BusinessTypeDTO> businessTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(businessTypes,BusinessTypeDTO.class);
+        for(BusinessTypeDTO businessTypeDTO :businessTypeDTOS){
+            businessTypeDTO.setCountryId(countryId);
+            businessTypeDTO.setTranslations(TranslationUtil.getTranslatedData(businessTypeDTO.getTranslatedNames(),businessTypeDTO.getTranslatedDescriptions()));
+        }
+        return businessTypeDTOS;
     }
 
     public BusinessTypeDTO updateBusinessType(long countryId, BusinessTypeDTO businessTypeDTO) {
@@ -74,4 +86,16 @@ public class BusinessTypeService {
         }
         return true;
     }
+
+    public Map<String, TranslationInfo> updateTranslation(Long businessTypeId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptions = new HashMap<>();
+        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
+        BusinessType buisnessType =businessTypeGraphRepository.findOne(businessTypeId);
+        buisnessType.setTranslatedNames(translatedNames);
+        buisnessType.setTranslatedDescriptions(translatedDescriptions);
+        businessTypeGraphRepository.save(buisnessType);
+        return buisnessType.getTranslatedData();
+    }
+
 }

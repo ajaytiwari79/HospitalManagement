@@ -3,6 +3,9 @@ package com.kairos.service.country;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.EmploymentTypeKpiDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
@@ -13,10 +16,10 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.TimeSlotType;
@@ -31,10 +34,9 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
-import com.kairos.persistence.model.user.expertise.response.ExpertiseDTO;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseBasicDetails;
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -45,6 +47,7 @@ import com.kairos.persistence.repository.user.country.EmploymentTypeGraphReposit
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
@@ -54,6 +57,7 @@ import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.FormatUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -69,6 +73,7 @@ import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.enums.kpi.CalculationType.*;
 
 
 /**
@@ -118,6 +123,8 @@ public class EmploymentTypeService {
     @Inject
     private SkillService skillService;
     @Inject CountryHolidayCalenderService countryHolidayCalenderService;
+    @Inject
+    private SkillGraphRepository skillGraphRepository;
 
 
     public EmploymentType addEmploymentType(Long countryId, EmploymentTypeDTO employmentTypeDTO) {
@@ -181,17 +188,28 @@ public class EmploymentTypeService {
         return true;
     }
 
-    public List<EmploymentType> getEmploymentTypeList(long countryId, boolean isDeleted) {
+    public List<EmploymentTypeDTO> getEmploymentTypeList(long countryId, boolean isDeleted) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
         }
-        return countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
+        List<EmploymentType> employmentTypes =countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
+        List<EmploymentTypeDTO> employmentTypeDTOS =ObjectMapperUtils.copyCollectionPropertiesByMapper(employmentTypes,EmploymentTypeDTO.class);
+        employmentTypeDTOS.forEach(employmentTypeDTO -> {
+            employmentTypeDTO.setCountryId(countryId);
+            employmentTypeDTO.setTranslations(TranslationUtil.getTranslatedData(employmentTypeDTO.getTranslatedNames(),employmentTypeDTO.getTranslatedDescriptions()));
+        });
+        return employmentTypeDTOS;
     }
 
     public List<Map<String, Object>> getEmploymentTypeOfOrganization(Long unitId, boolean isDeleted) {
         Organization organization=organizationService.fetchParentOrganization(unitId);
         return unitGraphRepository.getEmploymentTypeByOrganization(organization.getId(), isDeleted);
+    }
+
+    public List<EmploymentType> getEmploymentTypes(Long unitId){
+        Organization organization=organizationService.fetchParentOrganization(unitId);
+        return employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false);
     }
 
     public OrganizationEmploymentTypeDTO setEmploymentTypeSettingsOfOrganization(Long unitId, Long employmentTypeId, OrganizationEmploymentTypeDTO organizationEmploymentTypeDTO) {
@@ -211,7 +229,7 @@ public class EmploymentTypeService {
         Boolean settingUpdated = employmentTypeGraphRepository.setEmploymentTypeSettingsForOrganization(unitId, employmentTypeId,
                 organizationEmploymentTypeDTO.isAllowedForContactPerson(),
                 organizationEmploymentTypeDTO.isAllowedForShiftPlan(),
-                organizationEmploymentTypeDTO.isAllowedForFlexPool(), organizationEmploymentTypeDTO.getPaymentFrequency(), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                organizationEmploymentTypeDTO.isAllowedForFlexPool(), organizationEmploymentTypeDTO.getPaymentFrequency(), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
         if (settingUpdated) {
             return organizationEmploymentTypeDTO;
         } else {
@@ -241,7 +259,7 @@ public class EmploymentTypeService {
     public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId,String selectedDate) {
         OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         // Set employment type
-        organizationMappingDTO.setEmploymentTypes(getEmploymentTypeList(countryId, false));
+        organizationMappingDTO.setEmploymentTypes(countryGraphRepository.getEmploymentTypeByCountry(countryId,false));
         // set Expertise
         organizationMappingDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByCountry(countryId));
         //set levels
@@ -254,27 +272,27 @@ public class EmploymentTypeService {
     }
     public PriorityGroupDefaultData getExpertiseAndEmployment(long countryId, boolean isDeleted) {
         List<EmploymentTypeDTO> employmentTypes=countryGraphRepository.getEmploymentTypes(countryId,isDeleted);
-        List<ExpertiseDTO> expertise=expertiseGraphRepository.getAllExpertiseByCountryAndDate(countryId);
-        List<com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO> employmentTypeDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employmentTypes, com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO.class);
-        List<ExpertiseResponseDTO> expertiseResponseDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise,ExpertiseResponseDTO.class);
+        List<ExpertiseBasicDetails> expertise=expertiseGraphRepository.getAllExpertiseByCountryAndDate(countryId);
+        List<com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO> employmentTypeDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(employmentTypes, com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO.class);
+        List<ExpertiseResponseDTO> expertiseResponseDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise,ExpertiseResponseDTO.class);
         return new PriorityGroupDefaultData(employmentTypeDTOS,expertiseResponseDTOS);
     }
 
     public PriorityGroupDefaultData getExpertiseAndEmploymentForUnit(long unitId, boolean isDeleted) {
         Long countryId=countryGraphRepository.getCountryIdByUnitId(unitId);
         List<EmploymentTypeDTO> employmentTypes=countryGraphRepository.getEmploymentTypes(countryId,isDeleted);
-        List<ExpertiseDTO> expertises=expertiseGraphRepository.getAllExpertiseByCountryAndDate(countryId);
-        List<com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO> employmentTypeDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employmentTypes, com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO.class);
-        List<ExpertiseResponseDTO> expertiseResponseDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertises,ExpertiseResponseDTO.class);
+        List<ExpertiseBasicDetails> expertises=expertiseGraphRepository.getAllExpertiseByCountryAndDate(countryId);
+        List<com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO> employmentTypeDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(employmentTypes, com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO.class);
+        List<ExpertiseResponseDTO> expertiseResponseDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(expertises,ExpertiseResponseDTO.class);
         return new PriorityGroupDefaultData(employmentTypeDTOS,expertiseResponseDTOS);
     }
 
     public DayTypeEmploymentTypeWrapper getDayTypesAndEmploymentTypes(Long countryId, boolean isDeleted) {
         List<EmploymentTypeDTO> employmentTypes=countryGraphRepository.getEmploymentTypes(countryId,isDeleted);
-        List<com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO> employmentTypeDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employmentTypes, com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO.class);
+        List<com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO> employmentTypeDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(employmentTypes, com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO.class);
         List<DayType>  dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
 
-        List<com.kairos.dto.user.country.day_type.DayType> dayTypesDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypes, com.kairos.dto.user.country.day_type.DayType.class);
+        List<com.kairos.dto.user.country.day_type.DayType> dayTypesDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes, com.kairos.dto.user.country.day_type.DayType.class);
         return new DayTypeEmploymentTypeWrapper(dayTypesDTOS,employmentTypeDTOS);
 
     }
@@ -298,53 +316,81 @@ public class EmploymentTypeService {
     }
 
     public List<StaffKpiFilterDTO> getStaffByKpiFilter(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
-        Long countryId=countryGraphRepository.getCountryIdByUnitId(staffEmploymentTypeDTO.getOrganizationId());
-        List<DayTypeDTO> dayTypeDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeGraphRepository.findByCountryId(countryId),DayTypeDTO.class);
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
         List<StaffKpiFilterQueryResult> staffKpiFilterQueryResult=staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), organizationBaseEntity instanceof Organization,staffEmploymentTypeDTO.getTagIds());
-        List<EmploymentLinesQueryResult> hourlyCostPerLine=employmentGraphRepository.findFunctionalHourlyCost(staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(EmploymentQueryResult::getId)).collect(Collectors.toList()));
-       // List<EmploymentLinesQueryResult> payTableAmount=employmentGraphRepository.findSum(staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(EmploymentQueryResult::getId)).collect(Collectors.toList()),staffEmploymentTypeDTO.getStartDate());
-//        Map<Long,Long> longIntegerMap=payTableAmount.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getPayTableAmount));
-        List<Long> staffIds = staffKpiFilterQueryResult.stream().map(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getId()).collect(Collectors.toList());
-        List<StaffKpiFilterQueryResult> staffsWithTag = tagGraphRepository.getStaffsTagsByStaffIds(staffIds);
-        Map<Long,List<TagQueryResult>> staffTagsMap = staffsWithTag.stream().collect(Collectors.toMap(k->k.getId(),v->v.getTags()));
-        Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
-        List<Long> expertiseIds=staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(employmentQueryResult -> employmentQueryResult.getExpertise().getId())).collect(Collectors.toList());
-        Map<Long, SeniorAndChildCareDaysDTO> expertiseIdsAndSeniorAndChildCareDaysMap=expertiseService.getSeniorAndChildCareDaysMapByExpertiseIds(expertiseIds);
-        for (StaffKpiFilterQueryResult kpiFilterQueryResult : staffKpiFilterQueryResult) {
-            kpiFilterQueryResult.setDayTypeDTOS(dayTypeDTOS);
-//            if(ObjectUtils.isNotNull(longIntegerMap.get(kpiFilterQueryResult.getId()))) {
-//                kpiFilterQueryResult.setPayTableAmount(longIntegerMap.get(kpiFilterQueryResult.getId()));
-//            }
-            kpiFilterQueryResult.setTags(staffTagsMap.getOrDefault(kpiFilterQueryResult.getId(),new ArrayList<>()));
-            for (EmploymentQueryResult employmentQueryResult : kpiFilterQueryResult.getEmployment()) {
-                employmentQueryResult.setUnitId(staffEmploymentTypeDTO.getOrganizationId());
-                employmentQueryResult.setSeniorAndChildCareDays(expertiseIdsAndSeniorAndChildCareDaysMap.get(employmentQueryResult.getExpertise().getId()));
-                for (EmploymentLinesQueryResult employmentLine : employmentQueryResult.getEmploymentLines()) {
-                    if(hourlyCostMap.containsKey(employmentLine.getId())) {
-                        BigDecimal hourlyCost = employmentLine.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
-                        employmentLine.setHourlyCost(hourlyCost);
+        if(staffEmploymentTypeDTO.isIncludeDataForKPIs()){
+            Set<String> filterValues = (Set<String>)staffEmploymentTypeDTO.getFilterBasedCriteria().values().stream().flatMap(list -> list.stream()).map(value->value.toString()).collect(Collectors.toSet());
+            updateTagsDetails(filterValues,staffKpiFilterQueryResult);
+            updateHourlyCostDetails(staffKpiFilterQueryResult,filterValues,staffEmploymentTypeDTO.getOrganizationId());
+            updateSkillsDetails(filterValues,staffKpiFilterQueryResult);
+            updateDayTypeDetails(filterValues,staffEmploymentTypeDTO.getOrganizationId(),staffKpiFilterQueryResult);
+        }
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(staffKpiFilterQueryResult, StaffKpiFilterDTO.class);
+    }
+
+    private Map<Long, BigDecimal> updateHourlyCostDetails(List<StaffKpiFilterQueryResult> staffKpiFilterQueryResult, Set<String> filterValues,Long organizationId) {
+        Map<Long, BigDecimal> hourlyCostMap = new HashMap<>();
+        if(filterValues.contains(XAxisConfig.VARIABLE_COST.toString())){
+            List<EmploymentLinesQueryResult> hourlyCostPerLine=employmentGraphRepository.findFunctionalHourlyCost(staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(EmploymentQueryResult::getId)).collect(Collectors.toList()));
+            hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
+            for (StaffKpiFilterQueryResult kpiFilterQueryResult : staffKpiFilterQueryResult) {
+                for (EmploymentQueryResult employmentQueryResult : kpiFilterQueryResult.getEmployment()) {
+                    employmentQueryResult.setUnitId(organizationId);
+                    for (EmploymentLinesQueryResult employmentLine : employmentQueryResult.getEmploymentLines()) {
+                        if(hourlyCostMap.containsKey(employmentLine.getId())) {
+                            BigDecimal hourlyCost = employmentLine.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
+                            employmentLine.setHourlyCost(hourlyCost);
+                        }
                     }
                 }
             }
         }
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffKpiFilterQueryResult, StaffKpiFilterDTO.class);
+        return hourlyCostMap;
+    }
+
+    private void updateTagsDetails(Set<String> filterValues, List<StaffKpiFilterQueryResult> staffKpiFilterQueryResult) {
+        if(filterValues.contains(CARE_BUBBLE.toString())){
+            List<Long> staffIds = staffKpiFilterQueryResult.stream().map(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getId()).collect(Collectors.toList());
+            List<StaffKpiFilterQueryResult> staffsWithTag = tagGraphRepository.getStaffsTagsByStaffIds(staffIds);
+            Map<Long, List<TagQueryResult>> tagMap = staffsWithTag.stream().collect(Collectors.toMap(k->k.getId(), v->v.getTags()));
+            for (StaffKpiFilterQueryResult kpiFilterQueryResult : staffKpiFilterQueryResult) {
+                kpiFilterQueryResult.setTags(tagMap.getOrDefault(kpiFilterQueryResult.getId(),new ArrayList<>()));
+            }
+        }
+    }
+
+    private void updateSkillsDetails(Set<String> filterValues, List<StaffKpiFilterQueryResult> staffKpiFilterQueryResult) {
+        if(CollectionUtils.containsAny(filterValues,newHashSet(STAFF_SKILLS_COUNT.toString(),PRESENCE_OVER_STAFFING.toString(),PRESENCE_UNDER_STAFFING.toString(),ABSENCE_OVER_STAFFING.toString(),ABSENCE_UNDER_STAFFING.toString()))) {
+            List<Long> staffIds = staffKpiFilterQueryResult.stream().map(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getId()).collect(Collectors.toList());
+            Map<Long, List<SkillLevelDTO>> skillMap = skillGraphRepository.getAllStaffSkillAndLevelByStaffIds(staffIds).stream().collect(Collectors.toMap(staffQueryResult -> staffQueryResult.getId(), staffQueryResult -> staffQueryResult.getSkills()));
+            for (StaffKpiFilterQueryResult kpiFilterQueryResult : staffKpiFilterQueryResult) {
+                kpiFilterQueryResult.setSkills(skillMap.getOrDefault(kpiFilterQueryResult.getId(),new ArrayList<>()));
+            }
+        }
+    }
+
+    private void updateDayTypeDetails(Set<String> filterValues, Long organizationId, List<StaffKpiFilterQueryResult> staffKpiFilterQueryResult) {
+        if(filterValues.contains(XAxisConfig.VARIABLE_COST.toString())) {
+            List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypeGraphRepository.getDayTypeByOrganizationById(organizationId), DayTypeDTO.class);
+            for (StaffKpiFilterQueryResult kpiFilterQueryResult : staffKpiFilterQueryResult) {
+                kpiFilterQueryResult.setDayTypeDTOS(dayTypeDTOS);
+            }
+        }
     }
 
 
     public DefaultKpiDataDTO getKpiDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
         Long countryId = countryGraphRepository.getCountryIdByUnitId(staffEmploymentTypeDTO.getOrganizationId());
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), organizationBaseEntity instanceof Organization,staffEmploymentTypeDTO.getTagIds()), StaffKpiFilterDTO.class);
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), organizationBaseEntity instanceof Organization,staffEmploymentTypeDTO.getTagIds()), StaffKpiFilterDTO.class);
         List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
         Map<Long, List<Map>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.get("dayTypeId") != null).collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.toList()));
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<DayTypeDTO> dayTypeDTOS = dayTypes.stream().map(dayType ->
-                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), ObjectMapperUtils.copyPropertiesOfCollectionByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings(),dayType.getColorCode())
+                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), ObjectMapperUtils.copyCollectionPropertiesByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings(),dayType.getColorCode())
         ).collect(Collectors.toList());
-//        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeGraphRepository.findByCountryId(countryId), DayTypeDTO.class);
         List<Long> unitIds = ObjectUtils.isCollectionNotEmpty(staffEmploymentTypeDTO.getUnitIds()) ? staffEmploymentTypeDTO.getUnitIds() : Arrays.asList(staffEmploymentTypeDTO.getOrganizationId());
-        List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(unitIds, TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
+        List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(unitIds, TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
         return new DefaultKpiDataDTO(staffKpiFilterDTOS, dayTypeDTOS, timeSlotSetDTOS);
     }
 
@@ -356,25 +402,37 @@ public class EmploymentTypeService {
             Long organizationId = organizationBaseRepository.findParentOrgId(unitId);
             tags = tagGraphRepository.getListOfOrganizationTagsByMasterDataType(organizationId, false, "", MasterDataTypeEnum.STAFF.toString());
         }
-        List<com.kairos.dto.user.country.tag.TagDTO> tagDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(tags,com.kairos.dto.user.country.tag.TagDTO.class);
-        List<OrganizationCommonDTO>  organizationCommonDTO=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(unitGraphRepository.getAllOrganizaionByStaffid(staffId),OrganizationCommonDTO.class);
+        List<com.kairos.dto.user.country.tag.TagDTO> tagDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(tags,com.kairos.dto.user.country.tag.TagDTO.class);
+        List<OrganizationCommonDTO>  organizationCommonDTO=ObjectMapperUtils.copyCollectionPropertiesByMapper(unitGraphRepository.getAllOrganizaionByStaffid(staffId),OrganizationCommonDTO.class);
         List<Long> unitIds=organizationCommonDTO.stream().map(organizationCommonDto -> organizationCommonDto.getId()).collect(Collectors.toList());
-        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeGraphRepository.findByCountryId(countryId), DayTypeDTO.class);
-        List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(isCollectionNotEmpty(unitIds)?unitIds:Arrays.asList(unitId), TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
-        List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(countryGraphRepository.getEmploymentTypes(countryId,false),EmploymentTypeKpiDTO.class);
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffGraphRepository.getAllStaffIdAndNameByUnitId(isNull(staffId)?Arrays.asList(unitId):unitIds), StaffKpiFilterDTO.class);
-        List<ReasonCodeDTO> reasonCodeDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(reasonCodeService.getReasonCodesByUnitIds(isCollectionNotEmpty(unitIds)?unitIds:Arrays.asList(unitId), ReasonCodeType.FORCEPLAN),ReasonCodeDTO.class);
+        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypeGraphRepository.findByCountryId(countryId), DayTypeDTO.class);
+        List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(isCollectionNotEmpty(unitIds)?unitIds:Arrays.asList(unitId), TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
+        List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(countryGraphRepository.getEmploymentTypes(countryId,false),EmploymentTypeKpiDTO.class);
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(staffGraphRepository.getAllStaffIdAndNameByUnitId(isNull(staffId)?Arrays.asList(unitId):unitIds), StaffKpiFilterDTO.class);
+        List<ReasonCodeDTO> reasonCodeDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeService.getReasonCodesByUnitIds(isCollectionNotEmpty(unitIds)?unitIds:Arrays.asList(unitId), ReasonCodeType.FORCEPLAN),ReasonCodeDTO.class);
         return new DefaultKpiDataDTO(countryId,staffKpiFilterDTOS, dayTypeDTOS, timeSlotSetDTOS,organizationCommonDTO,employmentTypeKpiDTOS,reasonCodeDTOS,tagDTOS);
     }
 
     public DefaultKpiDataDTO getKpiAllDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = getStaffByKpiFilter(staffEmploymentTypeDTO);
         List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getUnitTimeSlot(staffEmploymentTypeDTO.getOrganizationId());
-        List<Long> staffIds = staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
         LocalDate startDate = asLocalDate(staffEmploymentTypeDTO.getStartDate());
         LocalDate endDate = asLocalDate(staffEmploymentTypeDTO.getEndDate());
-        Map<String, List<StaffPersonalDetail>> skills = skillService.getStaffSkillAndLevelByStaffIds(staffIds, startDate, endDate);
-        List<CountryHolidayCalenderDTO> holidayCalenders = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(countryHolidayCalenderService.getCountryHolidayCalenders(UserContext.getUserDetails().getCountryId(), startDate, endDate), CountryHolidayCalenderDTO.class);
-        return new DefaultKpiDataDTO(staffKpiFilterDTOS, timeSlotDTOS, skills, holidayCalenders);
+        List<CountryHolidayCalenderDTO> holidayCalenders = ObjectMapperUtils.copyCollectionPropertiesByMapper(countryHolidayCalenderService.getCountryHolidayCalenders(UserContext.getUserDetails().getCountryId(), startDate, endDate), CountryHolidayCalenderDTO.class);
+        return DefaultKpiDataDTO.builder().staffKpiFilterDTOs(staffKpiFilterDTOS).timeSlotDTOS(timeSlotDTOS).holidayCalenders(holidayCalenders).build();
+    }
+
+    public Map<String, TranslationInfo> updateTranslationOfEmploymentType(Long employmentTypeId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        EmploymentType employmentType =employmentTypeGraphRepository.findOne(employmentTypeId);
+        employmentType.setTranslatedNames(translatedNames);
+        employmentType.setTranslatedDescriptions(translatedDescriptios);
+        employmentTypeGraphRepository.save(employmentType);
+        return employmentType.getTranslatedData();
     }
 }

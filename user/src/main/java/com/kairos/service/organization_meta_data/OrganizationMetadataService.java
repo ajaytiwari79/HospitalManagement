@@ -98,24 +98,25 @@ public class OrganizationMetadataService {
         existingLocalAreaTag.setPaths(localAreaTag.getPaths());
         existingLocalAreaTag.setName(localAreaTag.getName());
         existingLocalAreaTag.setColor(localAreaTag.getColor());
-
         List<ClientHomeAddressQueryResult> clientHomeAddressQueryResults = clientGraphRepository.getClientsAndHomeAddressByUnitId(unitId);
         Set<Long> clientIds = clientHomeAddressQueryResults.stream().map(clientHomeAddressQueryResult -> clientHomeAddressQueryResult.getCitizen().getId()).collect(Collectors.toSet());
-
         Iterable<Client> clientList = clientGraphRepository.findAllById(clientIds, 1);
         Map<Long, Client> citizenMap = new HashMap<>();
         for (Client citizen : clientList) {
             citizenMap.put(citizen.getId(), citizen);
         }
         List<Client> citizenList = new ArrayList<>(clientHomeAddressQueryResults.size());
+        setCitizenInfo(existingLocalAreaTag, clientHomeAddressQueryResults, citizenMap, citizenList);
+        clientGraphRepository.saveAll(citizenList);
+        return organizationMetadataRepository.save(existingLocalAreaTag);
+    }
+
+    private void setCitizenInfo(LocalAreaTag existingLocalAreaTag, List<ClientHomeAddressQueryResult> clientHomeAddressQueryResults, Map<Long, Client> citizenMap, List<Client> citizenList) {
         for (ClientHomeAddressQueryResult clientHomeAddressQueryResult : clientHomeAddressQueryResults) {
             if (clientHomeAddressQueryResult != null) {
-                boolean isVerified = isCoordinateInsidePolygon(existingLocalAreaTag.getPaths(), clientHomeAddressQueryResult.getHomeAddress().getLatitude(),
-                        clientHomeAddressQueryResult.getHomeAddress().getLongitude());
-                //Client citizen = clientGraphRepository.findOne(clientHomeAddressQueryResult.getCitizen().getId());
+                boolean isVerified = isCoordinateInsidePolygon(existingLocalAreaTag.getPaths(), clientHomeAddressQueryResult.getHomeAddress().getLatitude(), clientHomeAddressQueryResult.getHomeAddress().getLongitude());
                 Client citizen = citizenMap.get(clientHomeAddressQueryResult.getCitizen().getId());
                 if (isVerified) {
-                    //Client citizen = clientHomeAddressQueryResult.getCitizen();
                     citizen.setLocalAreaTag(existingLocalAreaTag);
                     citizenList.add(citizen);
                 } else if (Optional.ofNullable(clientHomeAddressQueryResult.getLocalAreaTagId()).isPresent()) {
@@ -126,9 +127,6 @@ public class OrganizationMetadataService {
                 }
             }
         }
-        clientGraphRepository.saveAll(citizenList);
-
-        return organizationMetadataRepository.save(existingLocalAreaTag);
     }
 
     public boolean deleteTagData(Long localAreaTagId) {

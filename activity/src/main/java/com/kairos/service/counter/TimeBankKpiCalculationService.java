@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.*;
 
@@ -57,9 +58,9 @@ public class TimeBankKpiCalculationService implements CounterService {
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
-    private TimeBankRepository timeBankRepository;
+    public TimeBankRepository timeBankRepository;
     @Inject
-    private CounterHelperService counterHelperService;
+    public CounterHelperService counterHelperService;
     @Inject private PlanningPeriodService planningPeriodService;
 
     private List<DailyTimeBankEntry> getDailyTimeBankEntryByDate(List<Long> employmentIds, LocalDate startDate, LocalDate endDate, Set<DayOfWeek> daysOfWeeks) {
@@ -215,16 +216,12 @@ public class TimeBankKpiCalculationService implements CounterService {
 
     public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
-        Map<Long, Double> kpiAndStaffIdMap = new HashMap<>();
         Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
         List<Long> staffIds = new ArrayList<>();
         List<LocalDate> filterDates = (List<LocalDate>) filterCriteria[1];
-        List<Long> unitIds = (List<Long>) filterCriteria[2];
+        List<Long> unitIds = CollectionUtils.isEmpty((List<Long>) filterCriteria[2]) ? newArrayList(organizationId) : (List<Long>) filterCriteria[2];
         List<Long> employmentTypeIds = (List<Long>) filterCriteria[3];
         Set<DayOfWeek> daysOfWeeks = (Set<DayOfWeek>) filterCriteria[4];
-        if (CollectionUtils.isEmpty(unitIds)) {
-            unitIds.add(organizationId);
-        }
         Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
@@ -233,7 +230,16 @@ public class TimeBankKpiCalculationService implements CounterService {
         Map<Long, List<DailyTimeBankEntry>> staffAndDailyTimeBankMap;
         Map<Long, StaffKpiFilterDTO> staffAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, v -> v));
         Map<Long, List<DailyTimeBankEntry>> staffIdAndDailyTimeBankMap = getDailyTimeBankEntryByStaffId(staffIds, employmentAndDailyTimeBank);
+        Map<Long, Double> kpiAndStaffIdMap = getTimebankDetailsByStaffs(staffIds, dateTimeIntervals, staffAndStaffKpiFilterMap, staffIdAndDailyTimeBankMap);
+        kpiSetResponseDTO.setKpiName(kpi.getTitle());
+        kpiSetResponseDTO.setKpiId(kpi.getId());
+        kpiSetResponseDTO.setStaffKPIValue(kpiAndStaffIdMap);
+        return kpiSetResponseDTO;
+    }
 
+    private Map<Long, Double> getTimebankDetailsByStaffs(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, Map<Long, StaffKpiFilterDTO> staffAndStaffKpiFilterMap, Map<Long, List<DailyTimeBankEntry>> staffIdAndDailyTimeBankMap) {
+        Map<Long, List<DailyTimeBankEntry>> staffAndDailyTimeBankMap;
+        Map<Long, Double> kpiAndStaffIdMap = new HashMap<>();
         for (Long staffId : staffIds) {
             staffAndDailyTimeBankMap = staffIdAndDailyTimeBankMap.getOrDefault(staffId, new ArrayList<>()).stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toList()));
             Long totalTimeBankOfUnit = 0l;
@@ -242,10 +248,7 @@ public class TimeBankKpiCalculationService implements CounterService {
             totalTimeBankOfUnit = getTotalTimeBank(staffAndDailyTimeBankMap, dateTimeInterval, totalTimeBankOfUnit, staffKpiFilterDTO);
             kpiAndStaffIdMap.put(staffId,getHoursByMinutes(totalTimeBankOfUnit.doubleValue()));
         }
-        kpiSetResponseDTO.setKpiName(kpi.getTitle());
-        kpiSetResponseDTO.setKpiId(kpi.getId());
-        kpiSetResponseDTO.setStaffKPIValue(kpiAndStaffIdMap);
-        return kpiSetResponseDTO;
+        return kpiAndStaffIdMap;
     }
 
     @Override

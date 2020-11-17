@@ -1,6 +1,7 @@
 package com.kairos.controller.period;
 
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
+import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.enums.planning_period.PlanningPeriodAction;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -77,14 +78,7 @@ public class PlanningPeriodController {
     public ResponseEntity<Map<String, Object>> updatePlanningPeriodPhaseToNext(@PathVariable BigInteger periodId, @PathVariable Long unitId , @RequestBody(required=false) Set<Long> employmentTypeIds, @RequestParam PlanningPeriodAction planningPeriodAction) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setPlanningPeriodPhaseToPublishOrFlip(unitId, periodId ,employmentTypeIds,planningPeriodAction));
     }
-//test api
-//    @ApiOperation(value = "update period's flipping Date")
-//    @PutMapping(value = "/period/{periodId}/flip_phase/{schedulerPanelId}")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> updateFlippingDates(@PathVariable BigInteger periodId, @PathVariable Long unitId, @PathVariable BigInteger schedulerPanelId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updateFlippingDate(periodId, unitId, schedulerPanelId));
-//
-//    }
+
     @ApiOperation(value = "restore shift base planning period and phase id")
     @PutMapping(value = "/period/{periodId}/reset_phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -92,14 +86,7 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.restoreShiftToPreviousPhase(periodId,unitId));
     }
 
-    //TODO currently not use
-//    @ApiOperation(value = "restore shift data based on shiftIds and phase")
-//    @PutMapping(value = "/phase/{phaseId}/restore_shifts")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> restoreShiftsDataByShiftIds(@RequestBody List<BigInteger> shiftIds, @PathVariable Long unitId,@PathVariable BigInteger phaseId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialDataOfShiftIds(shiftIds,phaseId,unitId));
-//
-//    }
+
 
     @ApiOperation(value = "Migrate Planning Period")
     @PostMapping(value="/migrate_planning_period")
@@ -110,5 +97,24 @@ public class PlanningPeriodController {
     }
 
 
+    @ApiOperation(value = "Register Job For Existing Planning Period")
+    @PostMapping(value="/register_job_for_existing_planning_period")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> registerJobForExistingPlanningPeriod() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.registerJobForExistingPlanningPeriod());
+    }
+
+    @ApiOperation(value = "/get details for auto planning")
+    @PostMapping(value="/get_details_for_auto_planning")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> registerJobForExistingPlanningPeriod(@RequestBody ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.findDataForAutoPlanning(shiftPlanningProblemSubmitDTO));
+    }
+
+    @ApiOperation(value = "Get default data for solver config")
+    @GetMapping(value="/get_default_data_for_solver_cofig")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForPlanning(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getDefaultDataForPlanning(unitId));
+    }
 
 }

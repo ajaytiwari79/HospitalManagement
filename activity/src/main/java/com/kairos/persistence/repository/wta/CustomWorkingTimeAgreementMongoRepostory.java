@@ -56,7 +56,7 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getProtectedWTAByEmploymentIdsAndDates(List<Long> employmentIds, Date startDate, Date endDate,WTATemplateType templateType);
 
-    WorkingTimeAgreement getWTABasicByEmploymentAndDate(Long employmentId, Date date);
+    List<WorkingTimeAgreement> getWTAByEmployment(Long employmentId);
 
     void disableOldWta(BigInteger oldwtaId, LocalDate endDate);
 
@@ -70,7 +70,13 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getAllWTAByEmploymentIds(Collection<Long> employmentIds);
 
+    List<WTAQueryResultDTO> getAllWTAByEmploymentIdsAndShowRuleToView(Collection<Long> employmentIds,boolean showRuleToView);
+
     List<WTAQueryResultDTO> getAllWTAByDate(Date date);
+
+    boolean isEmploymentWTAExistsOnDate(Long employmentId, LocalDate localDate, BigInteger wtaId);
+    boolean isGapExistsInEmploymentWTA(Long employmentId, LocalDate localDate, BigInteger wtaId);
+    boolean existsOngoingWTAByEmployment(Long employmentId, Date endDate);
 
 }
 

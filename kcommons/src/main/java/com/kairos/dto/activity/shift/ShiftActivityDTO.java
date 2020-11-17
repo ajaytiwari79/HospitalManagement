@@ -86,6 +86,10 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private BigInteger phaseId;
     private ShiftType shiftType;
     private boolean breakInterrupt;
+    private TimeTypeEnum secondLevelTimeType;
+    private BigInteger shiftId;
+    private BigInteger timeTypeId;
+    private String methodForCalculatingTime;
 
     public ShiftActivityDTO(Date startDate, Date endDate) {
         this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
@@ -107,6 +111,7 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
         this.message=message;
         this.success=success;
     }
+
 
     public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success) {
         this.message = message;

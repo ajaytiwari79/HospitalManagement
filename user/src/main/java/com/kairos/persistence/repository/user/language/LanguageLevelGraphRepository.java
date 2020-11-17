@@ -26,7 +26,7 @@ public interface LanguageLevelGraphRepository extends Neo4jBaseRepository<Langua
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(languageLevel:LanguageLevel {isEnabled:true}) WHERE id(country)={0} AND id(languageLevel)<>{2} AND languageLevel.name =~{1}  " +
             " WITH count(languageLevel) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
-    Boolean languageLevelExistInCountryByName(Long countryId, String name, Long currentLanguageLevelId);
+    boolean languageLevelExistInCountryByName(Long countryId, String name, Long currentLanguageLevelId);
 
 
 

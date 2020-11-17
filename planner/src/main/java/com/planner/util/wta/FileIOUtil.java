@@ -3,10 +3,10 @@ package com.planner.util.wta;
 import com.kairos.planner.vrp.taskplanning.model.LocationPair;
 import com.kairos.planner.vrp.taskplanning.model.LocationPairDifference;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
-import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
-import com.kairos.shiftplanning.utils.JodaLocalDateConverter;
-import com.kairos.shiftplanning.utils.JodaLocalTimeConverter;
-import com.kairos.shiftplanning.utils.JodaTimeConverter;
+import com.kairos.shiftplanning.solution.ShiftPlanningSolution;
+import com.kairos.shiftplanning.utils.LocalDateConverter;
+import com.kairos.shiftplanning.utils.LocalTimeConverter;
+import com.kairos.shiftplanning.utils.ZonedDateTimeConverter;
 import com.planner.service.taskPlanningService.PlannerService;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
@@ -23,14 +23,14 @@ import java.io.*;
 
 public class FileIOUtil {
     private static Logger log= LoggerFactory.getLogger(PlannerService.class);
-    public static void writeShiftPlanningXMLToFile(ShiftRequestPhasePlanningSolution solution, String fileName) {
+    public static void writeShiftPlanningXMLToFile(ShiftPlanningSolution solution, String fileName) {
         try {
             XStream xstream = new XStream(new PureJavaReflectionProvider());
             //xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
             xstream.setMode(XStream.ID_REFERENCES);
-            xstream.registerConverter(new JodaTimeConverter());
-            xstream.registerConverter(new JodaLocalTimeConverter());
-            xstream.registerConverter(new JodaLocalDateConverter());
+            xstream.registerConverter(new ZonedDateTimeConverter());
+            xstream.registerConverter(new LocalTimeConverter());
+            xstream.registerConverter(new LocalDateConverter());
             // xstream.registerConverter(new JodaTimeConverterNoTZ());
             xstream.registerConverter(new HardMediumSoftLongScoreXStreamConverter());
             String xmlString = xstream.toXML(solution);

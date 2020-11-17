@@ -6,14 +6,14 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
+import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.country.experties.AgeRangeDTO;
+import com.kairos.dto.user.country.experties.*;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
-import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
-import com.kairos.dto.user.country.experties.SeniorityLevelDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
@@ -26,6 +26,7 @@ import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryResult;
 import com.kairos.persistence.model.country.experties.UnionServiceWrapper;
@@ -33,25 +34,30 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.pay_table.PayGrade;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
+import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
+import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
+import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.response.*;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseBasicDetails;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
-import com.kairos.persistence.repository.user.expertise.ExpertiseEmploymentTypeRelationshipGraphRepository;
-import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
-import com.kairos.persistence.repository.user.expertise.FunctionalPaymentGraphRepository;
-import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
+import com.kairos.persistence.repository.user.expertise.*;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationServiceService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,6 +126,14 @@ public class ExpertiseService {
     private SchedulerServiceRestClient schedulerRestClient;
     @Inject
     private SectorGraphRepository sectorGraphRepository;
+    @Inject
+    private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
+    @Inject
+    private SeniorDaysGraphRepository seniorDaysGraphRepository;
+    @Inject
+    private ChildCareDaysGraphRepository childCareDaysGraphRepository;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
 
 
     public ExpertiseQueryResult saveExpertise(Long countryId, ExpertiseDTO expertiseDTO) {
@@ -136,8 +150,9 @@ public class ExpertiseService {
                 exceptionService.invalidRequestException(MESSAGE_PUBLISH_EXPERTISE_UNION);
             }
         });
-        validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
+        validateSeniorityLevels(ObjectMapperUtils.copyCollectionPropertiesByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
         ExpertiseLine expertiseLine = createExpertiseLine(expertiseDTO);
+        addSeniorityLevelsInExpertise(expertiseLine, expertiseDTO);
         Expertise expertise = new Expertise(expertiseDTO.getName(), expertiseDTO.getDescription(), expertiseDTO.getStartDate(), expertiseDTO.getEndDate(), country, expertiseDTO.isPublished(), Collections.singletonList(expertiseLine),expertiseDTO.getBreakPaymentSetting());
         expertiseGraphRepository.save(expertise);
         setBasicDetails(expertiseDTO, expertise);
@@ -162,12 +177,7 @@ public class ExpertiseService {
     }
 
     public ExpertiseQueryResult updateExpertise(Long countryId, ExpertiseDTO expertiseDTO, Long expertiseId) {
-        if (StringUtils.isBlank(expertiseDTO.getName())) {
-            exceptionService.actionNotPermittedException("error.Expertise.name.notEmpty");
-        }
-        if (expertiseDTO.getEndDate() != null && expertiseDTO.getStartDate().isAfter(expertiseDTO.getEndDate())) {
-            exceptionService.actionNotPermittedException("message.start_date.less_than.end_date");
-        }
+        validateDetails(expertiseDTO);
         expertiseDTO.setId(expertiseId);
         Expertise currentExpertise = expertiseGraphRepository.findOne(expertiseId);
         Country country = countryGraphRepository.findOne(countryId);
@@ -195,6 +205,15 @@ public class ExpertiseService {
         return updatedExpertiseData(currentExpertise);
     }
 
+    private void validateDetails(ExpertiseDTO expertiseDTO) {
+        if (StringUtils.isBlank(expertiseDTO.getName())) {
+            exceptionService.actionNotPermittedException("error.Expertise.name.notEmpty");
+        }
+        if (expertiseDTO.getEndDate() != null && expertiseDTO.getStartDate().isAfter(expertiseDTO.getEndDate())) {
+            exceptionService.actionNotPermittedException("message.start_date.less_than.end_date");
+        }
+    }
+
     private void validateExpertiseDetails(Long countryId, ExpertiseDTO expertiseDTO, Long expertiseId, Expertise currentExpertise, Country country) {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, COUNTRY, countryId);
@@ -213,16 +232,11 @@ public class ExpertiseService {
     public ExpertiseQueryResult updateExpertiseLine(ExpertiseDTO expertiseDTO, Long expertiseId, Long expertiseLineId) {
         expertiseDTO.setExpertiseLineId(expertiseLineId);
         Expertise expertise = expertiseGraphRepository.findById(expertiseId, 2).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseDTO.getId())));
-        validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
+        validateSeniorityLevels(ObjectMapperUtils.copyCollectionPropertiesByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
         ExpertiseLine currentExpertiseLine = expertise.getExpertiseLines().stream().filter(k -> k.getId().equals(expertiseLineId)).findFirst().orElseThrow(() -> new ActionNotPermittedException(exceptionService.convertMessage(PLEASE_PROVIDE_THE_VALID_LINE_ID)));
         expertise.getExpertiseLines().sort(Comparator.comparing(ExpertiseLine::getStartDate));
         if (expertise.isPublished() && isExpertiseLineChanged(currentExpertiseLine, expertiseDTO.getOrganizationServiceIds(), expertiseDTO) && currentExpertiseLine.getStartDate().isBefore(expertiseDTO.getStartDate())) {
-            if (expertiseDTO.getStartDate().isBefore(currentExpertiseLine.getStartDate()) && (currentExpertiseLine.getEndDate() == null || currentExpertiseLine.getEndDate().isAfter(getLocalDate()))) {
-                exceptionService.actionNotPermittedException(PLEASE_SELECT_PUBLISHED_DATE_LESS_AFTER_CURRENT_LINE_START_DATE);
-            }
-            if (isNotNull(expertise.getEndDate()) && !expertiseDTO.getStartDate().isBefore(expertise.getEndDate())) {
-                exceptionService.actionNotPermittedException(PLEASE_SELECT_PUBLISHED_DATE_BEFORE_EXPERTISE_END_DATE);
-            }
+            validateDetails(expertiseDTO, expertise, currentExpertiseLine);
             ExpertiseLine expertiseLine = createExpertiseLine(expertiseDTO);
             currentExpertiseLine.setEndDate(expertiseDTO.getStartDate().minusDays(1L));
             if (expertise.getExpertiseLines().size() - 1 > expertise.getExpertiseLines().indexOf(currentExpertiseLine)) {
@@ -242,6 +256,15 @@ public class ExpertiseService {
         return updatedExpertiseData(expertise);
     }
 
+    private void validateDetails(ExpertiseDTO expertiseDTO, Expertise expertise, ExpertiseLine currentExpertiseLine) {
+        if (expertiseDTO.getStartDate().isBefore(currentExpertiseLine.getStartDate()) && (currentExpertiseLine.getEndDate() == null || currentExpertiseLine.getEndDate().isAfter(getLocalDate()))) {
+            exceptionService.actionNotPermittedException(PLEASE_SELECT_PUBLISHED_DATE_LESS_AFTER_CURRENT_LINE_START_DATE);
+        }
+        if (isNotNull(expertise.getEndDate()) && !expertiseDTO.getStartDate().isBefore(expertise.getEndDate())) {
+            exceptionService.actionNotPermittedException(PLEASE_SELECT_PUBLISHED_DATE_BEFORE_EXPERTISE_END_DATE);
+        }
+    }
+
     public void updateExistingLine(ExpertiseDTO expertiseDTO, Expertise expertise, ExpertiseLine currentExpertiseLine) {
         setBasicDetails(expertiseDTO, expertise);
         initializeExpertiseLine(currentExpertiseLine, expertiseDTO);
@@ -252,12 +275,18 @@ public class ExpertiseService {
         List<ExpertiseQueryResult> expertiseQueryResults = expertiseGraphRepository.getAllExpertise(countryId, new boolean[]{true});
         List<Long> allExpertiseIds = expertiseQueryResults.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
         List<ExpertiseLineQueryResult> expertiseLineQueryResults = expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
+        List<CTACompensationSettingDTO> ctaCompensationSettingDTOS = activityIntegrationService.getCTACompensationSettingByCountryId(countryId);
+        Map<Long,CTACompensationSettingDTO> ctaCompensationSettingDTOMap = ctaCompensationSettingDTOS.stream().collect(Collectors.toMap(ctaCompensationSettingDTO -> ctaCompensationSettingDTO.getExpertiseId(),v->v));
         Map<Long, List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap = expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
-        expertiseQueryResults.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
+        expertiseQueryResults.forEach(expertiseQueryResult -> {
+            expertiseQueryResult.setCountryId(countryId);
+            expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId()));
+            expertiseQueryResult.setCtaCompensationSetting(ctaCompensationSettingDTOMap.get(expertiseQueryResult.getId()));
+        });
         return expertiseQueryResults;
     }
 
-    private boolean validateSeniorityLevels(List<SeniorityLevel> seniorityLevels) {
+    private void validateSeniorityLevels(List<SeniorityLevel> seniorityLevels) {
         Collections.sort(seniorityLevels);
         if (isCollectionNotEmpty(seniorityLevels) && seniorityLevels.get(0).getTo() != null && seniorityLevels.get(0).getTo() <= seniorityLevels.get(0).getFrom()) {
             exceptionService.actionNotPermittedException(PLEASE_ENTER_VALID_SENIORITY_LEVELS);
@@ -269,8 +298,6 @@ public class ExpertiseService {
                 }
             }
         }
-        return true;
-
     }
 
 
@@ -303,7 +330,7 @@ public class ExpertiseService {
         unionServiceWrapper.setServices(organizationServiceService.getAllOrganizationService(countryId));
         unionServiceWrapper.setUnions(unitGraphRepository.findAllUnionsByCountryId(countryId));
         unionServiceWrapper.setOrganizationLevels(countryGraphRepository.getLevelsByCountry(countryId));
-        unionServiceWrapper.setSectors(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(sectorGraphRepository.findAllSectorsByCountryAndDeletedFalse(countryId), SectorDTO.class));
+        unionServiceWrapper.setSectors(ObjectMapperUtils.copyCollectionPropertiesByMapper(sectorGraphRepository.findAllSectorsByCountryAndDeletedFalse(countryId), SectorDTO.class));
         return unionServiceWrapper;
     }
 
@@ -345,12 +372,15 @@ public class ExpertiseService {
         List<Long> allExpertiseIds = expertiseQueryResults.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
         List<ExpertiseLineQueryResult> expertiseLineQueryResults = expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
         Map<Long, List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap = expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
-        expertiseQueryResults.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
+        expertiseQueryResults.forEach(expertiseQueryResult ->{
+                expertiseQueryResult.setCountryId(countryId);
+                expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId()));
+    });
         return expertiseQueryResults;
     }
 
 
-    public List<com.kairos.persistence.model.user.expertise.response.ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
+    public List<ExpertiseBasicDetails> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
         return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId);
     }
 
@@ -394,7 +424,7 @@ public class ExpertiseService {
         List<EmploymentTypeQueryResult> employmentTypes = employmentTypeGraphRepository.getEmploymentTypeByCountry(countryId, false);
         Map<String, Object> countryDetail = new HashMap<>();
         countryDetail.put("countryId", countryId);
-        List<PresenceTypeDTO> presenceTypes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper
+        List<PresenceTypeDTO> presenceTypes = ObjectMapperUtils.copyCollectionPropertiesByMapper
                 (genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/plannedTimeType", countryDetail), PresenceTypeDTO.class);
 
         countryDetail.put("employmentTypes", employmentTypes);
@@ -426,7 +456,7 @@ public class ExpertiseService {
 
     public List<ProtectedDaysOffSettingDTO> getProtectedDaysOffSetting(Long expertiseId){
         Expertise expertise = expertiseGraphRepository.findById(expertiseId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseId)));
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getProtectedDaysOffSettings(),ProtectedDaysOffSettingDTO.class);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(expertise.getProtectedDaysOffSettings(),ProtectedDaysOffSettingDTO.class);
     }
 
 
@@ -441,53 +471,18 @@ public class ExpertiseService {
             });
             expertiseEmploymentTypeRelationshipGraphRepository.saveAll(expertiseEmploymentList);
         }
-        functionalPaymentGraphRepository.linkFunctionalPaymentInExpertise(sourceExpertiseId, targetExpertiseId);
+        //functionalPaymentGraphRepository.linkFunctionalPaymentInExpertise(sourceExpertiseId, targetExpertiseId);
 
 
     }
 
-    public SeniorAndChildCareDaysDTO getSeniorAndChildCareDays(Long expertiseId) {
-        Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
-        List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
-        List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
+    public SeniorAndChildCareDaysDTO getSeniorAndChildCareDays(Long expertiseId,LocalDate selectedDate) {
+        String date=selectedDate==null?getLocalDate().toString():selectedDate.toString();
+        SeniorDays seniorDay=seniorDaysGraphRepository.findSeniorDaysBySelectedDate(expertiseId,date);
+        ChildCareDays childCareDay=childCareDaysGraphRepository.findChildCareDaysBySelectedDate(expertiseId,date);
+        List<CareDaysDTO> childCareDays =isNull(seniorDay) ? new ArrayList<>(): ObjectMapperUtils.copyCollectionPropertiesByMapper(seniorDay.getCareDays(), CareDaysDTO.class);
+        List<CareDaysDTO> seniorDays = isNull(childCareDay) ? new ArrayList<>():ObjectMapperUtils.copyCollectionPropertiesByMapper(childCareDay.getCareDays(), CareDaysDTO.class);
         return new SeniorAndChildCareDaysDTO(seniorDays, childCareDays);
-    }
-
-    public List<AgeRangeDTO> updateAgeRangeInExpertise(Long expertiseId, List<AgeRangeDTO> ageRangeDTO, String wtaType) {
-        if(SENIOR_DAYS.equalsIgnoreCase(wtaType)){
-            expertiseGraphRepository.removeSeniorDays(expertiseId);
-        }else if(CHILD_CARE.equalsIgnoreCase(wtaType)){
-            expertiseGraphRepository.removeChildCareDays(expertiseId);
-        }
-        Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
-        if (isNull(expertise) || expertise.isDeleted()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
-
-        }
-        validateAgeRange(ageRangeDTO);
-
-        List<CareDays> careDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(ageRangeDTO, CareDays.class);
-        if (SENIOR_DAYS.equalsIgnoreCase(wtaType)) {
-            expertise.setSeniorDays(careDays);
-        } else if (CHILD_CARE.equalsIgnoreCase(wtaType)) {
-            expertise.setChildCareDays(careDays);
-        }
-        expertiseGraphRepository.save(expertise);
-        ageRangeDTO = ObjectMapperUtils.copyPropertiesOfCollectionByMapper((wtaType.equals(CHILD_CARE) ? expertise.getChildCareDays() : expertise.getSeniorDays()), AgeRangeDTO.class);
-        return ageRangeDTO;
-    }
-
-    //Validating age range
-    private void validateAgeRange(List<AgeRangeDTO> ageRangeDTO) {
-        Collections.sort(ageRangeDTO);
-        for (int i = 0; i < ageRangeDTO.size(); i++) {
-            if (ageRangeDTO.get(i).getTo() != null && (ageRangeDTO.get(i).getFrom() > ageRangeDTO.get(i).getTo()))
-                exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_AGE_RANGEINVALID, ageRangeDTO.get(i).getFrom(), ageRangeDTO.get(i).getTo());
-            if (ageRangeDTO.size() > 1 && i < ageRangeDTO.size() - 1 && ageRangeDTO.get(i).getTo() > ageRangeDTO.get(i + 1).getFrom())
-                exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_AGE_OVERLAP);
-
-        }
-
     }
 
 
@@ -500,16 +495,14 @@ public class ExpertiseService {
         return getPlannedTimeAndEmploymentType(countryId);
     }
 
-    //register a job for unassign expertise from activity and this method call when set enddate of publish expertise
-    public boolean registerJobForUnassingExpertiesFromActivity(List<SchedulerPanelDTO> schedulerPanelDTOS) {
+    //register a job for unassign expertise from activity and this method call when set enddate of published expertise
+    public void registerJobForUnassingExpertiesFromActivity(List<SchedulerPanelDTO> schedulerPanelDTOS) {
         if (isCollectionNotEmpty(schedulerPanelDTOS)) {
             LOGGER.info("create job for add planning period");
             // using -1 for unitId becounse this is not unit base job
-            schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, -1L, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
-            });
+             schedulerRestClient.publishRequest(schedulerPanelDTOS, -1L, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
             LOGGER.info("successfully job registered of add planning period");
         }
-        return isCollectionNotEmpty(schedulerPanelDTOS);
     }
 
     private boolean isExpertiseLineChanged(ExpertiseLine expertiseLine, List<Long> organizationServiceIds, ExpertiseDTO expertiseDTO) {
@@ -595,17 +588,23 @@ public class ExpertiseService {
     public ExpertiseQueryResult copyExpertise(Long expertiseId, ExpertiseDTO expertiseDTO) {
         Expertise expertise = expertiseGraphRepository.findById(expertiseId, 2).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage("Data not found")));
         ExpertiseLine expertiseLine = (expertise.getExpertiseLines().get(expertise.getExpertiseLines().size() - 1));
-        expertiseDTO.setUnion(ObjectMapperUtils.copyPropertiesByMapper(expertise.getUnion(), UnionIDNameDTO.class));
+        if(expertiseDTO.getUnion()==null){
+            expertiseDTO.setUnion(ObjectMapperUtils.copyPropertiesByMapper(expertise.getUnion(), UnionIDNameDTO.class));
+        }
         List<SeniorityLevel> seniorityLevels = seniorityLevelGraphRepository.findAllById(expertiseLine.getSeniorityLevel().stream().map(SeniorityLevel::getId).collect(Collectors.toList()));
         Map<Long, Long> seniorityLevelAndPayGradeIdMap = seniorityLevels.stream().collect(Collectors.toMap(SeniorityLevel::getId, v -> v.getPayGrade().getId()));
-        expertiseDTO.setSeniorityLevels(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertiseLine.getSeniorityLevel(), SeniorityLevelDTO.class));
+        expertiseDTO.setSeniorityLevels(ObjectMapperUtils.copyCollectionPropertiesByMapper(expertiseLine.getSeniorityLevel(), SeniorityLevelDTO.class));
         expertiseDTO.getSeniorityLevels().forEach(s -> {
             s.setPayGradeId(seniorityLevelAndPayGradeIdMap.get(s.getId()));
             s.setId(null);
         });
-        expertiseDTO.setOrganizationLevelId(isNull(expertise.getOrganizationLevel()) ? null : expertise.getOrganizationLevel().getId());
+        if(expertiseDTO.getOrganizationLevelId()==null){
+            expertiseDTO.setOrganizationLevelId(isNull(expertise.getOrganizationLevel()) ? null : expertise.getOrganizationLevel().getId());
+        }
+        if(expertiseDTO.getSector()==null){
+            expertiseDTO.setSector(ObjectMapperUtils.copyPropertiesByMapper(expertise.getSector(), SectorDTO.class));
+        }
         expertiseDTO.setOrganizationServiceIds(isCollectionEmpty(expertiseLine.getOrganizationServices()) ? null : expertiseLine.getOrganizationServices().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
-        expertiseDTO.setSector(ObjectMapperUtils.copyPropertiesByMapper(expertise.getSector(), SectorDTO.class));
         expertiseDTO.setBreakPaymentSetting(expertise.getBreakPaymentSetting());
         expertiseDTO.setNumberOfWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
         expertiseDTO.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
@@ -642,15 +641,61 @@ public class ExpertiseService {
        return expertiseGraphRepository.findById(id,depth).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, id)));
     }
 
-    public Map<Long,SeniorAndChildCareDaysDTO> getSeniorAndChildCareDaysMapByExpertiseIds(List<Long> expertiseIds) {
-        Map<Long,SeniorAndChildCareDaysDTO> seniorAndChildCareDaysDTOMap=new HashMap<>();
-        List<Expertise> expertises = expertiseGraphRepository.findAllById(expertiseIds);
-        for (Expertise expertise : expertises) {
-            List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
-            List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
-            seniorAndChildCareDaysDTOMap.put(expertise.getId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
+
+    public Expertise getExpertise(Long expertiseId, Long countryId) {
+        Expertise expertise;
+        if (expertiseId == null) {
+            expertise = expertiseGraphRepository.getOneDefaultExpertiseByCountry(countryId);
+        } else {
+            expertise = expertiseGraphRepository.getExpertiesOfCountry(countryId, expertiseId);
         }
-        return seniorAndChildCareDaysDTOMap;
+        if (expertise == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_EXPERTISE_NOTFOUND, expertiseId);
+        }
+        return expertise;
     }
+
+    public void assignExpertiseToStaff(StaffDTO staffDTO, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
+        List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
+        for (int i = 0; i < staffDTO.getExpertiseWithExperience().size(); i++) {
+            Expertise expertise = expertiseMap.get(staffDTO.getExpertiseWithExperience().get(i).getExpertiseId());
+            expertise =findById(expertise.getId(), 2);
+            StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExperienceInExpertiseDTOMap.get(staffDTO.getExpertiseWithExperience().get(i).getExpertiseId());
+            Long id = null;
+            ExpertiseLine expertiseLine = expertise.getCurrentlyActiveLine(null);
+            if (Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent())
+                id = staffExperienceInExpertiseDTO.getId();
+            Date expertiseStartDate = staffDTO.getExpertiseWithExperience().get(i).getExpertiseStartDate();
+            staffExpertiseRelationShips.add(new StaffExpertiseRelationShip(id, staffToUpdate, expertise, staffDTO.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate));
+            boolean isSeniorityLevelMatched = false;
+            for (SeniorityLevel seniorityLevel : expertiseLine.getSeniorityLevel()) {
+                if (staffDTO.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() >= seniorityLevel.getFrom() * 12 && (seniorityLevel.getTo() == null || staffDTO.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() < seniorityLevel.getTo() * 12)) {
+                    isSeniorityLevelMatched = true;
+                    break;
+                }
+            }
+            if (!isSeniorityLevelMatched) {
+                exceptionService.actionNotPermittedException(ERROR_NOSENIORITYLEVELFOUND, "seniorityLevel " + staffDTO.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
+            }
+        }
+        if (CollectionUtils.isNotEmpty(staffExpertiseRelationShips)) {
+            staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
+        }
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(Long expertiseId, Map<String,TranslationInfo> translations) {
+        Map<String,String> translatedNames = new HashMap<>();
+        Map<String,String> translatedDescriptios = new HashMap<>();
+        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
+            translatedNames.put(entry.getKey(),entry.getValue().getName());
+            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
+        }
+        Expertise expertise =expertiseGraphRepository.findOne(expertiseId);
+        expertise.setTranslatedNames(translatedNames);
+        expertise.setTranslatedDescriptions(translatedDescriptios);
+        expertiseGraphRepository.save(expertise);
+        return expertise.getTranslatedData();
+    }
+
 
 }

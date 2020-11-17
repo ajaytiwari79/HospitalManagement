@@ -5,6 +5,7 @@ package com.kairos.service.payroll;
  */
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.payroll.PayRollDTO;
 import com.kairos.persistence.model.payroll.PayRoll;
 import com.kairos.persistence.repository.payroll.PayRollRepository;
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -95,6 +98,13 @@ public class PayRollService extends MongoBaseService {
             }
         }
 
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger payrollId, Map<String,TranslationInfo> translations) {
+        PayRoll payRoll =payRollRepository.getByIdAndDeletedFalse(payrollId);
+        payRoll.setTranslations(translations);
+        payRollRepository.save(payRoll);
+        return payRoll.getTranslations();
     }
 
 

@@ -1,13 +1,13 @@
 package com.kairos.persistence.model.activity;
 
-import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
-import com.kairos.persistence.model.activity.tabs.SkillActivityTab;
-import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.activity.tabs.ActivitySkillSettings;
+import com.kairos.persistence.model.activity.tabs.ActivityTimeCalculationSettings;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.enums.PriorityFor.PRESENCE;
@@ -40,10 +41,10 @@ public class TimeType extends MongoBaseEntity{
     private boolean partOfTeam;
     private boolean allowChildActivities;
     private boolean allowedConflicts;
-    private RulesActivityTab rulesActivityTab;
-    private TimeCalculationActivityTab timeCalculationActivityTab;
-    private SkillActivityTab skillActivityTab;
-    private PhaseSettingsActivityTab phaseSettingsActivityTab;
+    private ActivityRulesSettings activityRulesSettings;
+    private ActivityTimeCalculationSettings activityTimeCalculationSettings;
+    private ActivitySkillSettings activitySkillSettings;
+    private ActivityPhaseSettings activityPhaseSettings;
     private List<Long> expertises;
     private List<Long> organizationTypes;
     private List<Long> organizationSubTypes;
@@ -54,6 +55,7 @@ public class TimeType extends MongoBaseEntity{
     private BigInteger activityPriorityId;
     private PriorityFor priorityFor = PRESENCE;
     private boolean sicknessSettingValid;
+    private Map<String,BigInteger> upperLevelTimeTypeDetails;
 
     public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.timeTypes = timeTypes;

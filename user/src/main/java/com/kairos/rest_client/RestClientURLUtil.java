@@ -10,7 +10,7 @@ import java.util.Optional;
 public class RestClientURLUtil {
 
     public static final String UNIT = "unit/";
-    private static String userServiceUrl;
+    private static String activityServiceUrl;
     private static String plannerServiceUrl;
     private static String schedulerServiceUrl;
     private static String gdprServiceUrl;
@@ -27,7 +27,7 @@ public class RestClientURLUtil {
 
     @Value("${gateway.activityservice.url}")
     public void setUserServiceUrl(String userServiceUrl) {
-        RestClientURLUtil.userServiceUrl = userServiceUrl;
+        RestClientURLUtil.activityServiceUrl = userServiceUrl;
     }
 
     @Value("${gateway.gdprservice.url}")
@@ -37,27 +37,27 @@ public class RestClientURLUtil {
 
     public final static String getBaseUrl(boolean hasUnitInUrl) {
         if (hasUnitInUrl) {
-            return new StringBuilder(userServiceUrl).append("/unit/").append(UserContext.getUnitId()).toString();
+            return new StringBuilder(activityServiceUrl).append("/unit/").append(UserContext.getUnitId()).toString();
         } else {
-            return new StringBuilder(userServiceUrl).toString();        }
+            return new StringBuilder(activityServiceUrl).toString();        }
     }
 
     public final static String getBaseUrl(boolean hasUnitInUrl, Long id) {
         if (!Optional.ofNullable(id).isPresent()) {
-            return userServiceUrl;
+            return activityServiceUrl;
         } else {
             if (hasUnitInUrl) {
-                return new StringBuilder(userServiceUrl)
+                return new StringBuilder(activityServiceUrl)
                         .append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
             } else {
-                return new StringBuilder(userServiceUrl).append("/country/").append(id).toString();
+                return new StringBuilder(activityServiceUrl).append("/country/").append(id).toString();
             }
         }
 
     }
 
     public final static String getBaseUrl() {
-        return userServiceUrl;
+        return activityServiceUrl;
     }
 
     public static final String getPlannerBaseUrl() {

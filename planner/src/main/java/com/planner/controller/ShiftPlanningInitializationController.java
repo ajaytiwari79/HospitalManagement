@@ -2,8 +2,6 @@ package com.planner.controller;
 
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.planner.commonUtil.ResponseHandler;
-import com.planner.repository.shift_planning.ActivityMongoRepository;
-import com.planner.service.shift_planning.CTAService;
 import com.planner.service.shift_planning.ShiftPlanningInitializationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,32 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.inject.Inject;
 import java.util.Map;
 
-/**
- * For testing
- *
- * @author mohit
- */
 @RestController
 @RequestMapping("/opta")
 public class ShiftPlanningInitializationController {
     @Inject
     private ShiftPlanningInitializationService shiftPlanningInitializationService;
-    @Inject
-    private ActivityMongoRepository activityMongoRepository;
-    @Inject
-    private CTAService ctaService;
-
-    /**
-     * @return
-     */
-
-    ResponseEntity<Map<String, Object>> getActivities() {
-        return null;//ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.OK, shiftPlanningInitializationService.getActivities(2567L, new Date(1530383400000l), new Date(1532975400000l)));
-    }
-
-    /**
-     * @return
-     */
 
 
     @PostMapping(value = "/shiftPlanningInitialization")

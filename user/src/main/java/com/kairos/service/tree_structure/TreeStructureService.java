@@ -26,13 +26,7 @@ public class TreeStructureService {
         int index = 0;
         for (QueryResult queryResult : queryResults) {
             if (prev != null) {
-                for (QueryResult children : prev.getChildren()) {
-                    for(QueryResult queryResult1 : queryResults){
-                        if (queryResult1.getId() == children.getId()) {
-                            children.setChildren(queryResult1.getChildren());
-                        }
-                    }
-                }
+                setChildren(queryResults, prev);
             }
 
             if (index == 0) {
@@ -46,14 +40,16 @@ public class TreeStructureService {
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
-        QueryResult queryResult = objectMapper.convertValue(firstRecord,QueryResult.class);
-        return queryResult;
+        return objectMapper.convertValue(firstRecord,QueryResult.class);
+    }
 
-      /*  QueryResult queryResult = new QueryResult(firstRecord.getName(), firstRecord.getId(), firstRecord.getChildUnits());
-        queryResult.setAccessable(firstRecord.isAccessable());
-        queryResult.setType(firstRecord.getType());
-        queryResult.setKairosHub(firstRecord.isKairosHub());
-        queryResult.setEnabled(firstRecord.isEnabled());
-        return queryResult;*/
+    private void setChildren(List<QueryResult> queryResults, QueryResult prev) {
+        for (QueryResult children : prev.getChildren()) {
+            for(QueryResult queryResult1 : queryResults){
+                if (queryResult1.getId() == children.getId()) {
+                    children.setChildren(queryResult1.getChildren());
+                }
+            }
+        }
     }
 }

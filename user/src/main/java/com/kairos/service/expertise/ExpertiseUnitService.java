@@ -2,6 +2,7 @@ package com.kairos.service.expertise;
 
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.union.Location;
@@ -18,6 +19,7 @@ import com.kairos.persistence.repository.user.expertise.OrganizationPersonalizeL
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -61,6 +63,8 @@ public class ExpertiseUnitService {
     private OrganizationBaseRepository organizationBaseRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
 
 
 
@@ -71,6 +75,9 @@ public class ExpertiseUnitService {
         List<ExpertiseQueryResult> expertises=new ArrayList<>();
         if(ObjectUtils.isNotNull(servicesAndLevel)){
             expertises  = expertiseGraphRepository.findExpertiseByOrganizationServicesForUnit(countryId, servicesAndLevel.getServicesId());
+            expertises.forEach(expertiseQueryResult -> {
+                expertiseQueryResult.setUnitId(unitId);
+            });
             List<Long> allExpertiseIds=expertises.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
             List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
             Map<Long,List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap=expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
@@ -80,8 +87,8 @@ public class ExpertiseUnitService {
             List<Long> expertiseIds = expertises.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
             List<ExpertiseLocationStaffQueryResult> locations = organizationLocationRelationShipGraphRepository.getExpertisesLocationInOrganization(expertiseIds, unitId);
             List<ExpertiseLocationStaffQueryResult> staffs = staffGraphRepository.findAllUnionRepresentativeOfExpertiseInUnit(expertiseIds, organizationService.fetchParentOrganization(unitId).getId());
-            Map<Long, Map<String, Object>> staffMap = staffs.stream().collect(Collectors.toMap(current -> current.getExpertiseId(), v -> v.getStaff()));
-            Map<Long, Location> locationMap = locations.stream().collect(Collectors.toMap(current -> current.getExpertiseId(), v -> v.getLocation()));
+            Map<Long, Map<String, Object>> staffMap = staffs.stream().collect(Collectors.toMap(ExpertiseLocationStaffQueryResult::getExpertiseId, ExpertiseLocationStaffQueryResult::getStaff));
+            Map<Long, Location> locationMap = locations.stream().collect(Collectors.toMap(ExpertiseLocationStaffQueryResult::getExpertiseId, ExpertiseLocationStaffQueryResult::getLocation));
             expertises.forEach(current -> {
                 current.setUnionRepresentative(staffMap.get(current.getId()));
                 current.setUnionLocation(locationMap.get(current.getId()));
@@ -111,8 +118,20 @@ public class ExpertiseUnitService {
         return true;
     }
 
-    public List<ExpertiseQueryResult> findAllExpertiseWithUnits() {
-        return expertiseGraphRepository.findAllExpertiseWithUnitIds();
+    public List<ExpertiseQueryResult> findAllExpertiseWithUnits(Long unitId) {
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
+        List<CTACompensationSettingDTO> ctaCompensationSettingDTOS = activityIntegrationService.getCTACompensationSettingByCountryId(countryId);
+        Map<Long,CTACompensationSettingDTO> ctaCompensationSettingDTOMap = ctaCompensationSettingDTOS.stream().collect(Collectors.toMap(ctaCompensationSettingDTO -> ctaCompensationSettingDTO.getExpertiseId(),v->v));
+        List<ExpertiseQueryResult> expertiseQueryResults = expertiseGraphRepository.findAllExpertiseWithUnitIds();
+        expertiseQueryResults.forEach(expertiseQueryResult -> expertiseQueryResult.setCtaCompensationSetting(ctaCompensationSettingDTOMap.get(expertiseQueryResult.getId())));
+        return expertiseQueryResults;
+    }
+
+    public List<Long> getExpertiseIdsByUnit(Long unitId){
+        List<Long> allUnitIds = organizationBaseRepository.fetchAllUnitIds(unitId);
+        OrganizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(allUnitIds);
+        return expertiseGraphRepository.getExpertiseIdsByServices(servicesAndLevel.getServicesId());
+
     }
 
 
