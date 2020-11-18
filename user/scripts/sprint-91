@@ -1,7 +1,7 @@
 //Update tab details
 MATCH (accessPage:AccessPage) WHERE accessPage.moduleId="module_1"
 SET accessPage.editable = true
-RETURN accessPage
+RETURN accessPage;
 
 MATCH (accessPage:AccessPage) WHERE accessPage.moduleId="tab_413"
 SET accessPage.active=true,accessPage.deleted=false,accessPage.name="Unity Graph"

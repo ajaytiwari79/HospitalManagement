@@ -68,7 +68,7 @@ public class ShiftController {
     @PostMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createShift(@PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO, @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType) {
-        if (UserContext.getUserDetails().getUnitWiseAccessRole().containsKey(unitId.toString()) && AccessGroupRole.STAFF.toString().equals(UserContext.getUserDetails().getUnitWiseAccessRole().get(unitId.toString()))) {
+        if (UserContext.getUserDetails().isStaff()) {
             shiftActionType = ShiftActionType.SAVE;
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO, shiftActionType));
