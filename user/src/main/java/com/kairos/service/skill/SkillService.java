@@ -451,6 +451,22 @@ public class SkillService {
         return skills;
     }
 
+    public List<Skill> getSkillsByIds(List<Long> skillIds) {
+        int sizeOfSkillIds = skillIds.size();
+        int skip = 0;
+        List<Skill> skills = new ArrayList<>();
+        if (sizeOfSkillIds > DB_RECORD_LIMIT) {
+            do {
+                List<Long> skillsToFind = skillIds.stream().skip(skip).limit(DB_RECORD_LIMIT).collect(Collectors.toList());
+                skills.addAll(skillGraphRepository.findSkillByIds(skillsToFind));
+                skip += DB_RECORD_LIMIT;
+            } while (skip <= sizeOfSkillIds);
+        } else {
+            skills.addAll(skillGraphRepository.findSkillByIds(skillIds));
+        }
+        return skills;
+    }
+
     public ActivityDTO getSkillByUnit(Long unitId){
         ActivityDTO activityDTO=new ActivityDTO();
         activityDTO.setSkills(skillGraphRepository.findAllSkillsByUnitId(unitId));
