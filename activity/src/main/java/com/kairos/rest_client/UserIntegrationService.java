@@ -929,6 +929,10 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(skillsOfAllTimeCareActivity, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/skills_by_name", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Skill>>>() {});
     }
 
+    public List<Skill> getSkillsByIds(List<Long> skillIds, Long countryId) {
+        return genericRestClient.publishRequest(skillIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/skills_by_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Skill>>>() {});
+    }
+
     public ActivityDTO getAllSkillsByUnit(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/skills_and_expertise_by_unit", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ActivityDTO>>() {});
     }
