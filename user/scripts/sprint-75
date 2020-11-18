@@ -17,4 +17,4 @@ return fg;
 
 match (n:OrganizationBaseEntity)<-[r:ORGANIZATION_HAS_ACCESS_GROUPS]-(ag:AccessGroup)
 Detach delete r
-CREATE UNIQUE(n)-[r1:ORGANIZATION_HAS_ACCESS_GROUPS]->(ag)
+CREATE UNIQUE(n)-[r1:ORGANIZATION_HAS_ACCESS_GROUPS]->(ag);

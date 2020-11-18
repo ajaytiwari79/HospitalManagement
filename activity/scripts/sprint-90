@@ -38,7 +38,7 @@ var shiftId = shiftViolatedRule.shiftId
 print(shiftId);
 if(shiftId){
 var shift = db.shifts.findOne({"deleted":false,"_id":shiftId})
-print(shift._id);
+
 if(shift){
 shift.shiftViolatedRules =shiftViolatedRule;
 db.shifts.save(shift);
@@ -46,3 +46,80 @@ db.shifts.save(shift);
 }
 }
 );
+
+
+
+db.activities.aggregate([
+    {
+    $graphLookup: {
+    from: "time_Type",
+    startWith: '$balanceSettingsActivityTab.timeTypeId',
+    connectFromField: "upperLevelTimeTypeId",
+    connectToField: "_id",
+    as: "patharray" ,
+    maxDepth: 3,
+    depthField: "numofchild"
+    }
+    },
+    {
+    $unwind : "$patharray"
+    },
+    	{
+       	$sort : {  "patharray._id":1}
+        	},
+    {
+$project : { "_id":1,"name":1,"depthField":1,"patharray._id":1,"patharray.label":1,"patharray.upperLevelTimeTypeId":1,"patharray.timeTypes":1 }
+
+},
+    {
+    	$group: { _id : {"_id":"$_id","name":"$name"}, timeTypeHierarchy: { $push: "$patharray" } }
+      },
+      {
+    	$project: {"_id":"$_id._id","name":"$_id.name","timeTypeHierarchy":1}
+      }
+    ],{ allowDiskUse: true }).forEach(function(activity) {
+                      		 var path = ",";
+                            	print("updating activitiy");
+                            	print(activity["_id"]);
+                      		 var pathElementsRawArray = activity["timeTypeHierarchy"];
+                            	var arrayElementsSize = pathElementsRawArray.length ;
+                      		 for( var i=0;i<pathElementsRawArray.length;i++){
+                                	path = path + pathElementsRawArray[i]["_id"]+",";
+                      		 }
+
+                            	if(arrayElementsSize>0){
+                                	path = ","+pathElementsRawArray[0]["timeTypes"] + path;
+                                	}
+                      	print(path);
+                      	db.activities.update({ "_id": activity["_id"]}, {$set : { "path" : path  }}) ;
+
+   			 });
+
+
+db.shifts.aggregate([{$project : {_id:1,startDate:1,endDate:1,activities:1 }}]).forEach(function(s) {
+
+            	print("shift start date for Shift id",s["_id"]);
+            	var shiftStartDate = new Date(s["startDate"]);
+            	var shiftEndDate = new Date(s["endDate"]);
+            	print("shift start time  ",shiftStartDate.getUTCHours(),":",shiftStartDate.getUTCMinutes());
+            	print("shift end time  ",shiftEndDate.getUTCHours(),":",shiftEndDate.getUTCMinutes());
+                	var shiftStartTime = parseInt((shiftStartDate.getUTCHours()*60*60)+(shiftStartDate.getUTCMinutes()*60)+shiftStartDate.getUTCSeconds());
+                	var shiftEndTime = parseInt((shiftEndDate.getUTCHours()*60*60)+(shiftEndDate.getUTCMinutes()*60)+shiftEndDate.getUTCSeconds());
+                	var activities = s["activities"];
+                   	if(activities!=undefined){
+                 	for(var i=0;i<activities.length;i++){
+                     	var activityStartDate = activities[i]["startDate"];
+                     	var activityEndDate = activities[i]["endDate"];
+                     	var activityStartTime = parseInt((activityStartDate.getUTCHours()*60*60)+(activityStartDate.getUTCMinutes()*60)+activityStartDate.getUTCSeconds());
+                     	var activityEndTime = parseInt((activityEndDate.getUTCHours()*60*60)+(activityEndDate.getUTCMinutes()*60)+activityEndDate.getUTCSeconds());
+                     	print("for activity id ",activities[i]["_id"]);
+                     	print("activity start time ",activityStartDate.getUTCHours(),"and end time",activityEndDate.getUTCHours());
+                     	db.shifts.update({"_id":s["_id"],"activities._id":activities[i]["_id"]},{$set : {"activities.$.startTime":NumberInt(activityStartTime),"activities.$.endTime":NumberInt(activityEndTime)}});
+                     	}
+                 	}
+                 	print("setting up start time as ",shiftStartTime);
+                 	print("setting up end time as ",shiftEndTime);
+                 	print("===========================================================================");
+                 	db.shifts.update({"_id":s["_id"]},{$set : {"shiftStartTime":NumberInt(shiftStartTime),"shiftEndTime":NumberInt(shiftEndTime)} });
+
+            	});
