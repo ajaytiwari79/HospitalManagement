@@ -1,0 +1,7 @@
+MATCH(ag:AccessGroup)-[:DAY_TYPES]-(dt:DayType)
+WITH ag,collect(toString(id(dt))) as t
+set ag.dayTypeIds=t
+
+
+
+

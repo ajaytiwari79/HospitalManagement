@@ -21,7 +21,7 @@ public class ShiftCalculationService {
         staffAdditionalInfoDTO.getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
             Set<DayOfWeek> dayOfWeeks = new HashSet<>();
             List<LocalDate> publicHolidaysDates= new ArrayList<>();
-            for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
+            for (BigInteger dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
                 List<Day> currentDay = daytypesMap.get(dayTypeId);
                 currentDay.forEach(day -> {
                     if (!day.name().equals(EVERYDAY)) {

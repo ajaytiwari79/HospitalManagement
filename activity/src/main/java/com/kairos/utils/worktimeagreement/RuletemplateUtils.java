@@ -639,7 +639,7 @@ public class RuletemplateUtils {
 
     public static void updateDayTypeDetailInCTARuletemplate(Map<BigInteger, List<Day>> daytypesMap, CTARuleTemplateDTO ctaRuleTemplateDTO) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
+        for (BigInteger dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
             List<Day> applicableDaysOfWeek = daytypesMap.get(dayTypeId);
             if (applicableDaysOfWeek == null) {
                 throwException(ERROR_DAYTYPE_NOTFOUND, dayTypeId);

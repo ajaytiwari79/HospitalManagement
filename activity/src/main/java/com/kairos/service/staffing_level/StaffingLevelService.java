@@ -48,6 +48,7 @@ import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftValidatorService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.utils.service_util.StaffingLevelUtil;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -142,6 +143,8 @@ public class StaffingLevelService {
     private PhaseSettingsRepository phaseSettingsRepository;
     @Inject
     private DayTypeService dayTypeService;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
 
     /**
@@ -1105,7 +1108,7 @@ public class StaffingLevelService {
     public Map<LocalDate, DailyStaffingLevelDetailsDTO> getWeeklyStaffingLevel(Long unitId, LocalDate date, BigInteger activityId, boolean unpublishedChanges) {
         LocalDate startLocalDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
         LocalDate endLocalDate = startLocalDate.plusWeeks(3).plusDays(1);
-        List<TimeSlotDTO> timeSlots = userIntegrationService.getUnitTimeSlot(unitId);
+        List<TimeSlotDTO> timeSlots = timeSlotSetService.getShiftPlanningTimeSlotByUnit(unitId);
         List<PresenceStaffingLevelDto> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDatesAndActivityId(unitId, asDate(startLocalDate), asDate(endLocalDate), activityId);
         Object[] staffingLevelMapAndActivityIds = getStaffingLevelMapAndActivityIds(staffingLevels);
         Set<BigInteger> activityIds = (Set<BigInteger>) staffingLevelMapAndActivityIds[0];

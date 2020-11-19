@@ -69,7 +69,7 @@ public class CTARuleTemplateDTO {
     private Set<BigInteger> timeTypeIds;
     private Set<BigInteger> plannedTimeIds;
 
-    private List<Long> dayTypeIds;
+    private List<BigInteger> dayTypeIds;
     private List<DayOfWeek> days;
     private List<LocalDate> publicHolidays;
     @NotNull
@@ -86,12 +86,12 @@ public class CTARuleTemplateDTO {
         this.phaseInfo = Optional.ofNullable(phaseInfo).orElse(new ArrayList<>());
     }
 
-    public List<Long> getDayTypeIds() {
+    public List<BigInteger> getDayTypeIds() {
         this.dayTypeIds = isNull(dayTypeIds) ? new ArrayList<>() : this.dayTypeIds;
         return dayTypeIds;
     }
 
-    public void setDayTypeIds(List<Long> dayTypeIds) {
+    public void setDayTypeIds(List<BigInteger> dayTypeIds) {
         this.dayTypeIds = isNull(dayTypeIds) ? new ArrayList<>() : dayTypeIds;
     }
 

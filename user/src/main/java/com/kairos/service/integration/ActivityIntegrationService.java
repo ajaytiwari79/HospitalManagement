@@ -44,8 +44,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApiConstants.GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS;
 import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
 
@@ -257,11 +256,11 @@ public class ActivityIntegrationService {
         return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/holiday/all", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<CountryHolidayCalenderDTO>>>(){});
     }
 
-    public void linkProtectedDaysOff(HashSet<Long> expertiseId,Long countryId) {
+    public void linkProtectedDaysOff(Long expertiseId,Long countryId) {
         BasicNameValuePair expertiseParam = new BasicNameValuePair("expertiseId", expertiseId + "");
         List<NameValuePair> param = new ArrayList<>();
         param.add(expertiseParam);
-        genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.UPDATE, "/link_protected_days_off", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
+        genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.CREATE, "/link_protected_days_off", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
     }
 
     public List<ReasonCodeDTO> getReasonCodeByType(Long unitId, ReasonCodeType reasonCodeType) {
@@ -273,6 +272,10 @@ public class ActivityIntegrationService {
 
     public void updateTimeZoneInUnitSettings(Long unitId, ZoneId zoneIdString) {
         genericRestClient.publishRequest(zoneIdString, unitId, true, IntegrationOperation.UPDATE, "/update_time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
+    }
+
+    public List<DayTypeDTO> getDayTypeByIds(Collection<BigInteger> dayTypeIds) {
+        return isCollectionEmpty(dayTypeIds)?new ArrayList<>():genericRestClient.publishRequest(dayTypeIds, null, false, IntegrationOperation.GET, "/dayType", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayTypeDTO>>>(){});
     }
 }
 

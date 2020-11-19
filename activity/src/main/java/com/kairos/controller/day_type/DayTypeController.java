@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -41,7 +42,7 @@ public class DayTypeController {
     }
 
     @ApiOperation(value = "Get DayType for unit")
-    @GetMapping(value = UNIT_URL + "/day_type")
+    @GetMapping(value = UNIT_URL + "/dayType")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDayTypeForUnit() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeByCountryId(UserContext.getUserDetails().getCountryId()));
@@ -76,6 +77,32 @@ public class DayTypeController {
     ResponseEntity<Map<String, Object>> updateTranslationsOfDayType(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.updateTranslation(id,translations));
     }
+
+    @ApiOperation(value = "Get DayType by countryId")
+    @GetMapping(value =  "/dayType")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDayType(@RequestBody Set<BigInteger> dayTypeIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypeWithCountryHolidayCalender(dayTypeIds));
+    }
+
+    @ApiOperation(value = "Get DayType and Presence Type")
+    @GetMapping(UNIT_URL + "/getWtaTemplateDefaultDataInfoByUnitId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getWtaTemplateDefaultDataInfo(unitId,false));
+
+    }
+
+    @ApiOperation(value = "Get DayType and Presence Type")
+    @GetMapping(value = COUNTRY_URL + "/getWtaTemplateDefaultDataInfo")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfoByCountryId(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getWtaTemplateDefaultDataInfo(countryId,true));
+
+    }
+
+
+
 
 
 

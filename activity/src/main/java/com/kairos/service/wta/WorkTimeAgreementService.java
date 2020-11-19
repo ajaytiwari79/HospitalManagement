@@ -463,7 +463,7 @@ public class WorkTimeAgreementService{
     }
 
     public WTADefaultDataInfoDTO getDefaultWtaInfoForUnit(Long unitId) {
-        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = userIntegrationService.getWtaTemplateDefaultDataInfoByUnitId();
+        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = new WTADefaultDataInfoDTO();
         List<ActivityDTO> activities = activityMongoRepository.findByDeletedFalseAndUnitId(unitId);
         List<PresenceTypeDTO> presenceTypeDTOS=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, wtaDefaultDataInfoDTO.getCountryID());

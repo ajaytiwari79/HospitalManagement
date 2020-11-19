@@ -16,6 +16,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -75,5 +76,10 @@ public class AccessGroup extends UserBaseEntity {
         this.dayTypeIds=dayTypeIds;
         this.startDate=startDate;
         this.endDate=endDate;
+    }
+
+    public Set<BigInteger> getDayTypeIds() {
+        this.dayTypeIds=dayTypeIds==null?new HashSet<>():dayTypeIds;
+        return dayTypeIds;
     }
 }

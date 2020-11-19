@@ -565,7 +565,7 @@ public class ExpertiseService {
     }
 
     public void linkProtectedDaysOffSetting(Long expertiseId,Long countryId) {
-        activityIntegrationService.linkProtectedDaysOff(newHashSet(expertiseId),countryId);
+        activityIntegrationService.linkProtectedDaysOff(expertiseId,countryId);
     }
 
     public ExpertiseQueryResult copyExpertise(Long expertiseId, ExpertiseDTO expertiseDTO) {

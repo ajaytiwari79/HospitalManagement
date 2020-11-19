@@ -30,11 +30,11 @@ public class WTADefaultDataInfoDTO {
 
 
 
-    public WTADefaultDataInfoDTO(List<PresenceTypeDTO> presenceTypes, List<TimeSlotDTO> timeSlots, Long countryID) {
+    public WTADefaultDataInfoDTO(List<DayTypeDTO> dayTypeDTOS,List<PresenceTypeDTO> presenceTypes, List<TimeSlotDTO> timeSlots, Long countryID) {
         this.presenceTypes = presenceTypes;
         this.timeSlots = timeSlots;
         this.countryID = countryID;
+        this.dayTypes=dayTypeDTOS;
     }
-
 
 }

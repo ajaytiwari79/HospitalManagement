@@ -13,6 +13,8 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.AccessPermissionDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user_context.UserContext;
@@ -48,6 +50,7 @@ import com.kairos.persistence.repository.user.country.default_data.AccountTypeGr
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.tree_structure.TreeStructureService;
@@ -61,6 +64,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
@@ -108,6 +112,7 @@ public class AccessGroupService {
     @Inject
     private StaffRetrievalService staffRetrievalService;
     @Inject private UserGraphRepository userGraphRepository;
+    @Inject private ActivityIntegrationService activityIntegrationService;
 
     public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
@@ -875,14 +880,18 @@ public class AccessGroupService {
     }
 
     public List<AccessGroup> validAccessGroupByDate(Long unitId,Date date){
-
-        AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
         List<AccessGroup> accessGroups = new ArrayList<>();
         if(!UserContext.getUserDetails().isSystemAdmin()){
+            AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
             List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
+            Map<Long,Set<BigInteger>> accessGroupAndDayTypeMap= getMapOfAccessGroupAndDayType(accessGroupDayTypesQueryResults);
+            Set<BigInteger> dayTypesIds=new HashSet<>();
+            accessGroupAndDayTypeMap.forEach((k,v)->dayTypesIds.addAll(v));
+            List<DayTypeDTO> dayTypeDTOS=activityIntegrationService.getDayTypeByIds(dayTypesIds);
             for (AccessGroupDayTypesQueryResult accessGroupDayTypesQueryResult : accessGroupDayTypesQueryResults) {
                 if(isNotNull(accessGroupDayTypesQueryResult.getAccessGroup())){
-                    if(!accessGroupDayTypesQueryResult.getAccessGroup().isAllowedDayTypes() && isDayTypeValid(date,accessGroupDayTypesQueryResult.getDayTypes()));{
+                    List<DayTypeDTO> dayTypeDTOList=dayTypeDTOS.stream().filter(k->accessGroupAndDayTypeMap.get(accessGroupDayTypesQueryResult.getAccessGroup().getId()).contains(k.getId())).collect(Collectors.toList());
+                    if(!accessGroupDayTypesQueryResult.getAccessGroup().isAllowedDayTypes() || isDayTypeValid(date,dayTypeDTOList)){
                         accessGroups.add(accessGroupDayTypesQueryResult.getAccessGroup());
                     }
                 }
@@ -892,19 +901,25 @@ public class AccessGroupService {
         return accessGroups;
     }
 
-    public boolean isDayTypeValid(Date date, List<DayTypeCountryHolidayCalenderQueryResult> dayTypeCountryHolidayCalenderQueryResults) {
+    public Map<Long, Set<BigInteger>> getMapOfAccessGroupAndDayType(List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults) {
+        Map<Long,Set<BigInteger>> accessGroupAndDayTypeMap=new HashMap<>();
+        accessGroupDayTypesQueryResults.forEach(k->accessGroupAndDayTypeMap.put(k.getAccessGroup().getId(),k.getAccessGroup().getDayTypeIds()));
+        return accessGroupAndDayTypeMap;
+    }
+
+    public boolean isDayTypeValid(Date date, List<DayTypeDTO> dayTypeDTOs) {
         boolean valid = false;
-        for (DayTypeCountryHolidayCalenderQueryResult dayTypeCountryHolidayCalenderQueryResult : dayTypeCountryHolidayCalenderQueryResults) {
-            if (dayTypeCountryHolidayCalenderQueryResult.isHolidayType()) {
-                for (CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult : dayTypeCountryHolidayCalenderQueryResult.getCountryHolidayCalenders()) {
-                    DateTimeInterval dateTimeInterval = getDateTimeInterval(dayTypeCountryHolidayCalenderQueryResult, countryHolidayCalendarQueryResult);
+        for (DayTypeDTO dayTypeDTO : dayTypeDTOs) {
+            if (dayTypeDTO.isHolidayType()) {
+                for (CountryHolidayCalenderDTO countryHolidayCalendarQueryResult : dayTypeDTO.getCountryHolidayCalenderData()) {
+                    DateTimeInterval dateTimeInterval = getDateTimeInterval(dayTypeDTO, countryHolidayCalendarQueryResult);
                     valid = dateTimeInterval.contains(date);
                     if (valid) {
                         break;
                     }
                 }
             } else {
-                valid = isCollectionNotEmpty(dayTypeCountryHolidayCalenderQueryResult.getValidDays()) && dayTypeCountryHolidayCalenderQueryResult.getValidDays().contains(Day.fromValue(asLocalDate(date).getDayOfWeek().toString()));
+                valid = isCollectionNotEmpty(dayTypeDTO.getValidDays()) && dayTypeDTO.getValidDays().contains(Day.fromValue(asLocalDate(date).getDayOfWeek().toString()));
             }
             if (valid) {
                 break;
@@ -913,7 +928,7 @@ public class AccessGroupService {
         return valid;
     }
 
-    private DateTimeInterval getDateTimeInterval(DayTypeCountryHolidayCalenderQueryResult dayTypeCountryHolidayCalenderQueryResult, CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult) {
+    private DateTimeInterval getDateTimeInterval(DayTypeDTO dayTypeCountryHolidayCalenderQueryResult, CountryHolidayCalenderDTO countryHolidayCalendarQueryResult) {
         DateTimeInterval dateTimeInterval;
         if (dayTypeCountryHolidayCalenderQueryResult.isAllowTimeSettings()) {
             LocalTime holidayEndTime = countryHolidayCalendarQueryResult.getEndTime().get(ChronoField.MINUTE_OF_DAY) == 0 ? LocalTime.MAX : countryHolidayCalendarQueryResult.getEndTime();

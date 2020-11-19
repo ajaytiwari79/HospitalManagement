@@ -4,13 +4,19 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.day_type.DayType;
 import com.kairos.persistence.repository.day_type.CountryHolidayCalenderRepository;
 import com.kairos.persistence.repository.day_type.DayTypeRepository;
+import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +43,10 @@ public class DayTypeService {
     private ExceptionService exceptionService;
     @Inject
     private CountryHolidayCalenderRepository countryHolidayCalenderRepository;
+    @Inject
+    private PlannedTimeTypeService plannedTimeTypeService;
+    @Inject
+    private TimeSlotSetService timeSlotService;
 
     public DayTypeDTO createDayType(DayTypeDTO dayTypeDTO, long countryId) {
         boolean dayTypeExistInCountryByNameOrCode = dayTypeRepository.existsByCountryIdAndNameOrColorCodeIgnoreCaseAndIdNotIn(countryId, dayTypeDTO.getName(), dayTypeDTO.getCode(), new BigInteger("-1"));
@@ -137,7 +147,24 @@ public class DayTypeService {
         Map<BigInteger, List<CountryHolidayCalenderDTO>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.getDayTypeId() != null).collect(Collectors.groupingBy(CountryHolidayCalenderDTO::getDayTypeId, Collectors.toList()));
         List<DayTypeDTO> dayTypes = dayTypeRepository.findAllByCountryIdAndDeletedFalse(countryId);
         return dayTypes.stream().map(dayType ->
-                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), copyCollectionPropertiesByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings())
+                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), copyCollectionPropertiesByMapper(publicHolidayMap.getOrDefault(dayType.getId(),new ArrayList<>()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings())
         ).collect(Collectors.toList());
+    }
+
+    public List<DayTypeDTO> getDayTypeWithCountryHolidayCalender(Set<BigInteger> dayTypeIds) {
+        List<CountryHolidayCalenderDTO> publicHolidaysResult = countryHolidayCalenderRepository.getCountryAllHolidays(UserContext.getUserDetails().getCountryId());
+        Map<BigInteger, List<CountryHolidayCalenderDTO>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.getDayTypeId() != null).collect(Collectors.groupingBy(CountryHolidayCalenderDTO::getDayTypeId, Collectors.toList()));
+        List<DayTypeDTO> dayTypes = dayTypeRepository.findAllByIdInAndDeletedFalse(dayTypeIds);
+        return dayTypes.stream().map(dayType ->
+                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), copyCollectionPropertiesByMapper(publicHolidayMap.getOrDefault(dayType.getId(),new ArrayList<>()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings())
+        ).collect(Collectors.toList());
+    }
+
+    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long unitId, boolean country) {
+        Long countryId = UserContext.getUserDetails().getCountryId();
+        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
+        List<DayTypeDTO> dayTypes = dayTypeRepository.findAllByCountryIdAndDeletedFalse(countryId);
+        List<TimeSlotDTO> timeSlotDTOS =country?timeSlotService.getDefaultTimeSlot(): timeSlotService.getShiftPlanningTimeSlotByUnit(unitId);
+        return new WTADefaultDataInfoDTO(dayTypes, presenceTypeDTOS, timeSlotDTOS, countryId);
     }
 }

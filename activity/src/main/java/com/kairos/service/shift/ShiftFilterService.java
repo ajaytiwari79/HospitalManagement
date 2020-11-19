@@ -23,6 +23,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,8 @@ public class ShiftFilterService {
     private TimeBankService timeBankService;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO,List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
@@ -64,7 +67,7 @@ public class ShiftFilterService {
             staffFilterDTO = new StaffFilterDTO();
             staffFilterDTO.setFiltersData(new ArrayList<>());
         }
-        List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(unitId);
+        List<TimeSlotDTO> timeSlotDTOS = timeSlotSetService.getShiftPlanningTimeSlotByUnit(unitId);
         Map<FilterType, Set<T>> filterTypeMap = staffFilterDTO.getFiltersData().stream().filter(distinctByKey(filterSelectionDTO -> filterSelectionDTO.getName())).collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
         ShiftFilter timeTypeFilter = getTimeTypeFilter(filterTypeMap);
         ShiftFilter activityTimecalculationTypeFilter = new ActivityTimeCalculationTypeFilter(filterTypeMap);

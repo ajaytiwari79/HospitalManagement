@@ -8,8 +8,10 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.CommonConstants.DELETED;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -27,7 +29,7 @@ public class CountryHolidayCalenderRepositoryImpl implements CustomCountryHolida
                 .and("dayTypes.colorCode").as("colorCode")
         );
         AggregationResults<CountryHolidayCalenderDTO> result = mongoTemplate.aggregate(aggregation, CountryHolidayCalender.class, CountryHolidayCalenderDTO.class);
-        return result.getMappedResults();
+        return isCollectionEmpty(result.getMappedResults())?new ArrayList<>():result.getMappedResults();
     }
 
 }
