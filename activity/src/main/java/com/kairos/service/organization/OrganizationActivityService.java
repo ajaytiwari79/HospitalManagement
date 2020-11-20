@@ -495,6 +495,11 @@ public class OrganizationActivityService extends MongoBaseService {
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Activity activity = activityMongoRepository.findOne(activityId);
         ActivityPhaseSettings activityPhaseSettings = activity.getActivityPhaseSettings();
+        List<Phase> phases = phaseService.getPhaseByUnitId(unitId);
+        Map<BigInteger,Map<String, TranslationInfo>> phaseTranslationMap =phases.stream().collect(Collectors.toMap(Phase::getId,Phase::getTranslations));
+        activityPhaseSettings.getPhaseTemplateValues().forEach(phaseTemplateValue -> {
+            phaseTemplateValue.setTranslations(phaseTranslationMap.getOrDefault(phaseTemplateValue.getPhaseId(),new HashMap<>()));
+        });
         return new ActivitySettingsWrapper(roles, activityPhaseSettings, dayTypes, employmentTypeDTOS);
     }
 

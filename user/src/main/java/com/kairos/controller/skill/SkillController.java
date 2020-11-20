@@ -66,7 +66,11 @@ public class SkillController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,skillService.getSkillsByName(skillsName));
     }
 
-
+    @ApiOperation(value = "Get all skills by ids")
+    @PostMapping(value = "/country/{countryId}/skills_by_id")
+    public ResponseEntity<Map<String,Object>> getSkillsByIds(@RequestBody List<Long> skillIds){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,skillService.getSkillsByIds(skillIds));
+    }
 
     @PostMapping("/country/{countryId}/get_Skill_and_level_by_staff_ids")
     @ApiOperation("Get Staff's SkillId And Level")

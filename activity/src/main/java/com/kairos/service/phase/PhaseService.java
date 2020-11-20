@@ -348,6 +348,10 @@ public class PhaseService extends MongoBaseService {
         return phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId,name);
     }
 
+    public List<Phase> getPhaseByUnitId(Long unitId) {
+        return phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
+    }
+
     public Map<String, TranslationInfo>  updateTranslations(BigInteger phaseId,Map<String, TranslationInfo> translations){
         Phase phase = phaseMongoRepository.findOne(phaseId);
         phase.setTranslations(translations);
