@@ -197,13 +197,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "OPTIONAL MATCH (org)-[:SUB_TYPE_OF]->(subType:OrganizationType) WITH COLLECT(id(subType)) as organizationSubTypeIds,org,ot\n" +
             "OPTIONAL MATCH (org)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) WITH organizationSubTypeIds,org,ot,zipCode\n" +
             "OPTIONAL MATCH (org)-[:HAS_ACCOUNT_TYPE]-(accountType:AccountType)\n" +
-            "RETURN\n" +
-            "{english: CASE WHEN org.`translatedNames.english` IS NULL THEN '' ELSE org.`translatedNames.english`\n" +
-            "END,\n" +
-            "danish: CASE WHEN org.`translatedNames.danish` IS NULL THEN '' ELSE org.`translatedNames.danish` END,\n" +
-            "hindi: CASE WHEN org.`translatedNames.hindi` IS NULL THEN '' ELSE org.`translatedNames.hindi` END,\n" +
-            "britishenglish: CASE WHEN org.`translatedNames.britishenglish` IS NULL THEN '' ELSE org.`translatedNames.britishenglish` END} as translatedNames,\n" +
-            "{english: CASE WHEN org.`translatedDescriptions.english` IS NULL THEN '' ELSE org.`translatedDescriptions.english` END,danish: CASE WHEN org.`translatedDescriptions.danish` IS NULL THEN '' ELSE org.`translatedDescriptions.danish` END,hindi: CASE WHEN  org.`translatedDescriptions.hindi` IS NULL THEN '' ELSE org.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN org.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE org.`translatedDescriptions.britishenglish` END} as translatedDescriptions,\n" +
+            "RETURN org.translations as translations,\n" +
             "id(org) as id,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId,id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY org.name")
     List<OrganizationBasicResponse> getAllParentOrganizationOfCountry(Long countryId);
 

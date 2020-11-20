@@ -3,10 +3,12 @@ package com.kairos.persistence.model.pay_table;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
+import com.kairos.persistence.model.common.UserTranslationInfoConverter;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -27,6 +29,7 @@ public class OrganizationLevelPayGroupAreaDTO {
     private String description;
     private Integer payTablesCount;
     private List<PayGroupArea> payGroupAreas;
+    @Convert(UserTranslationInfoConverter.class)
     private Map<String, TranslationInfo> translations;
 
     public String getName() {

@@ -3,9 +3,11 @@ package com.kairos.persistence.model.access_permission;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.persistence.model.common.UserTranslationInfoConverter;
 import com.kairos.persistence.model.country.default_data.DayType;
 import lombok.Getter;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
@@ -33,6 +35,7 @@ public class AccessGroupQueryResult {
     private List<DayType> dayTypes;
     private boolean allowedDayTypes;
     private AccessGroup parentAccessGroup;
+    @Convert(UserTranslationInfoConverter.class)
     private Map<String, TranslationInfo> translations;
 
     public String getName() {

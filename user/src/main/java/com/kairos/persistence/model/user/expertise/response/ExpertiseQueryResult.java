@@ -8,6 +8,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.BreakPaymentSetting;
+import com.kairos.persistence.model.common.UserTranslationInfoConverter;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
@@ -17,6 +18,7 @@ import com.kairos.persistence.model.pay_table.PayTable;
 import com.kairos.persistence.model.user.expertise.CareDays;
 import lombok.Getter;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
@@ -58,6 +60,7 @@ public class ExpertiseQueryResult {
     private CTACompensationSettingDTO ctaCompensationSetting;
     private Long countryId;
     private Long unitId;
+    @Convert(UserTranslationInfoConverter.class)
     private Map<String, TranslationInfo> translations;
 
     @JsonIgnore

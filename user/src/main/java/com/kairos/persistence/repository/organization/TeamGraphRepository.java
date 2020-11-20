@@ -31,9 +31,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "CASE when rel.leaderType='MAIN_LEAD' THEN COLLECT(id(teamMembers)) ELSE NULL END AS mainTeamLeaderIds,\n" +
             "CASE when rel.leaderType='ACTING_LEAD' THEN COLLECT(id(teamMembers)) ELSE NULL END AS actingTeamLeaderIds\n" +
             "WITH DISTINCT team,COLLECT(DISTINCT mainTeamLeaderIds) as mainTeamLeaderIds,COLLECT(DISTINCT actingTeamLeaderIds) as actingTeamLeaderIds\n" +
-            "RETURN\n" +
-            "{english: CASE WHEN team.`translatedNames.english` IS NULL THEN '' ELSE team.`translatedNames.english` END,danish: CASE WHEN team.`translatedNames.danish` IS NULL THEN '' ELSE team.`translatedNames.danish` END,hindi: CASE WHEN team.`translatedNames.hindi` IS NULL THEN '' ELSE team.`translatedNames.hindi` END,britishenglish: CASE WHEN team.`translatedNames.britishenglish` IS NULL THEN '' ELSE team.`translatedNames.britishenglish` END} as translatedNames,\n" +
-            "{english: CASE WHEN team.`translatedDescriptions.english` IS NULL THEN '' ELSE team.`translatedDescriptions.english` END,danish: CASE WHEN team.`translatedDescriptions.danish` IS NULL THEN '' ELSE team.`translatedDescriptions.danish` END,hindi: CASE WHEN team.`translatedDescriptions.hindi` IS NULL THEN '' ELSE team.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN team.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE team.`translatedDescriptions.britishenglish` END}as translatedDescriptions,\n" +
+            "RETURN team.translations as translations,\n" +
             "id(team) as id,team.name as name,team.description as descriptions,\n" +
             "CASE WHEN mainTeamLeaderIds[0] IS NULL THEN [] ELSE  mainTeamLeaderIds[0] END as mainTeamLeaderIds, \n" +
             "CASE WHEN actingTeamLeaderIds[0] IS NULL THEN [] ELSE  actingTeamLeaderIds[0] END AS actingTeamLeaderIds")
@@ -43,9 +41,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "OPTIONAL MATCH (team)-[staffRel:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) where staffRel.teamMembership = true\n" +
             "WITH team,COLLECT(DISTINCT{staffId:id(teamMembers),teamType:staffRel.teamType,startDate:staffRel.startDate,endDate:staffRel.endDate,sequence:staffRel.sequence,teamMembership:staffRel.teamMembership}) as staffDetails\n" +
             "OPTIONAL MATCH (team)-[:"+TEAM_HAS_SKILLS+"]->(skills:Skill) with team, COLLECT (id(skills)) as skillIds ,staffDetails\n" +
-            "RETURN " +
-            "{english: CASE WHEN team.`translatedNames.english` IS NULL THEN '' ELSE team.`translatedNames.english` END,danish: CASE WHEN team.`translatedNames.danish` IS NULL THEN '' ELSE team.`translatedNames.danish` END,hindi: CASE WHEN team.`translatedNames.hindi` IS NULL THEN '' ELSE team.`translatedNames.hindi` END,britishenglish: CASE WHEN team.`translatedNames.britishenglish` IS NULL THEN '' ELSE team.`translatedNames.britishenglish` END} as translatedNames,\n" +
-            "{english: CASE WHEN team.`translatedDescriptions.english` IS NULL THEN '' ELSE team.`translatedDescriptions.english` END,danish: CASE WHEN team.`translatedDescriptions.danish` IS NULL THEN '' ELSE team.`translatedDescriptions.danish` END,hindi: CASE WHEN team.`translatedDescriptions.hindi` IS NULL THEN '' ELSE team.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN team.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE team.`translatedDescriptions.britishenglish` END}as translatedDescriptions,\n" +
+            "RETURN team.translations as translations,\n" +
             "id(team) as id, team.name as name, team.description as description, team.activityIds as activityIds, skillIds as skillIds,staffDetails as staffDetails")
     TeamDTO getTeamDetailsById(long teamId);
 

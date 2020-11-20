@@ -54,11 +54,7 @@ public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<Syste
 
 
     @Query("MATCH (c:Country)-[rel:"+ HAS_SYSTEM_LANGUAGE +"]->(language:SystemLanguage{active:true}) WHERE id(c)={0} AND language.active=true " +
-            "RETURN " +
-            "{english :{name: CASE WHEN language.`translatedNames.english` IS NULL THEN '' ELSE language.`translatedNames.english` END, description : CASE WHEN language.`translatedDescriptions.english` IS NULL THEN '' ELSE language.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN language.`translatedNames.hindi` IS NULL THEN '' ELSE language.`translatedNames.hindi` END, description : CASE WHEN language.`translatedDescriptions.hindi` IS NULL THEN '' ELSE language.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN language.`translatedNames.danish` IS NULL THEN '' ELSE language.`translatedNames.danish` END, description : CASE WHEN language.`translatedDescriptions.danish` IS NULL THEN '' ELSE language.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN language.`translatedNames.britishenglish` IS NULL THEN '' ELSE language.`translatedNames.britishenglish` END, description : CASE WHEN language.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE language.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "RETURN language.translations as translations,\n" +
             "id(language) as id,language.name as name,language.code as code ,language.active as active,rel.defaultLanguage as defaultLanguage")
     List<SystemLanguageQueryResult> findSystemLanguagesByCountryId(Long countryId);
 

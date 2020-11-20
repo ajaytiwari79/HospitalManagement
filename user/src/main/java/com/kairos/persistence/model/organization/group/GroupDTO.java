@@ -5,10 +5,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
+import com.kairos.persistence.model.common.UserTranslationInfoConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -36,6 +38,7 @@ public class GroupDTO {
     private Long unitId;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
+    @Convert(UserTranslationInfoConverter.class)
     private Map<String, TranslationInfo> translations;
 
     public GroupDTO(Long id, String name, String description, List<Long> excludedStaffs, String roomId){

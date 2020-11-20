@@ -6,8 +6,10 @@ import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.LevelDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.persistence.model.common.UserTranslationInfoConverter;
 import lombok.Getter;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -31,6 +33,7 @@ public class OrgTypeLevelWrapper {
     private Long countryId;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
+    @Convert(UserTranslationInfoConverter.class)
     private Map<String, TranslationInfo> translations ;
     private List<LevelDTO> levels;
 

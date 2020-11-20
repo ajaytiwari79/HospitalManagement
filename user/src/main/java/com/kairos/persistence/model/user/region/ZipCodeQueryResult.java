@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.persistence.model.common.UserTranslationInfoConverter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.Map;
@@ -25,6 +27,7 @@ public class ZipCodeQueryResult {
     private String code;
     private Double latitude;
     private Double Longitude;
+    @Convert(UserTranslationInfoConverter.class)
     private Map<String, TranslationInfo> translations;
 
     public String getName() {

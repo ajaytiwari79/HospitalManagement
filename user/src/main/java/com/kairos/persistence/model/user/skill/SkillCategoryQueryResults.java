@@ -6,10 +6,12 @@ import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.persistence.model.common.UserTranslationInfoConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -30,6 +32,7 @@ public class SkillCategoryQueryResults {
     private Long countryId;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
+    @Convert(UserTranslationInfoConverter.class)
     private Map<String, TranslationInfo> translations;
     private List<SkillDTO> children;
 
