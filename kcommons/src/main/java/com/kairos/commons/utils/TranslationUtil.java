@@ -11,9 +11,7 @@ import java.util.Map;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
-
 public class TranslationUtil {
-
     public static void convertTranslationFromStringToMap(Map<String, Object> map) {
         Map<String, TranslationInfo> translations;
         try{

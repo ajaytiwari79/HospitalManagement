@@ -464,7 +464,12 @@ public class OrganizationService {
         List<Map<String, Object>> organizationSkills = unitGraphRepository.getSkillsOfParentOrganization(unitId);
         List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
         for (Map<String, Object> map : organizationSkills) {
-            orgSkillRel.add((Map<String, Object>) map.get("data"));
+            Map<String, Object> organizationSkill = (Map<String, Object>) map.get("data");
+            TranslationUtil.convertTranslationFromStringToMap(organizationSkill);
+            ((List<Map<String, Object>>)organizationSkill.get("children")).forEach(childMap->{
+                TranslationUtil.convertTranslationFromStringToMap(childMap);
+            });
+            orgSkillRel.add(organizationSkill);
         }
         data.put("skillsOfOrganization", orgSkillRel);
         data.put("teamsOfOrganization", teamService.getTeamsInUnit(unitId));

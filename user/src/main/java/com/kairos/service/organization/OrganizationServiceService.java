@@ -274,12 +274,14 @@ public class OrganizationServiceService {
         List<OrganizationServiceDTO> selectedServiceDTOS = new ArrayList<>();
         List<OrganizationServiceDTO> selectedSubServiceDTOS = new ArrayList<>();
         for(Map<String,Object> map : services){
-            if(isNotNull(((Map<String, Object>) map.get("data")).get(AVAILABLE_SERVICES))){
-                avialableService = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(AVAILABLE_SERVICES);
+            Map<String, Object> service =(Map<String, Object>) map.get("data");
+            if(isNotNull(service.get(AVAILABLE_SERVICES))){
+                avialableService = (List<Map<String,Object>>)service.get(AVAILABLE_SERVICES);
             }
-            if(isNotNull(((Map<String, Object>) map.get("data")).get(SELECTED_SERVICES))){
-                selectedService = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(SELECTED_SERVICES);
+            if(isNotNull(service.get(SELECTED_SERVICES))){
+                selectedService = (List<Map<String,Object>>)service.get(SELECTED_SERVICES);
             }
+            TranslationUtil.convertTranslationFromStringToMap(service);
         }
 
         getAllOrganizationServices(avialableService, selectedService, availableServiceDTOS, availableSubServiceDTOS, selectedServiceDTOS, selectedSubServiceDTOS);
@@ -297,24 +299,24 @@ public class OrganizationServiceService {
         avialableService.forEach(as->{
             List<Map<String,Object>> availableSubServices =(List<Map<String,Object>>)as.get("children");
             availableSubServices.forEach(ass->{
+                TranslationUtil.convertTranslationFromStringToMap(ass);
                 OrganizationServiceDTO organizationAvailableSubServiceDTO = new OrganizationServiceDTO((String)ass.get("customName"),(Long)ass.get("id"),(String) ass.get("name"),(String)ass.get("description"),(Map<String, TranslationInfo>) ass.get("translations"),(Long)ass.get("unitId"),null);
                 availableSubServiceDTOS.add(organizationAvailableSubServiceDTO);
             });
-
+            TranslationUtil.convertTranslationFromStringToMap(as);
             OrganizationServiceDTO organizationAvailableServiceDTO = new OrganizationServiceDTO((String)as.get("customName"),(Long)as.get("id"),(String) as.get("name"),(String)as.get("description"),(Map<String, TranslationInfo>) as.get("translations"),(Long)as.get("unitId"),availableSubServiceDTOS);
             availableServiceDTOS.add(organizationAvailableServiceDTO);
-
         });
-
         selectedService.forEach(ss->{
             List<Map<String,Object>> selectedSubService =(List<Map<String,Object>>)ss.get("children");
             selectedSubService.forEach(sss->{
+                TranslationUtil.convertTranslationFromStringToMap(sss);
                 OrganizationServiceDTO organizationSelectedSubServiceDTO = new OrganizationServiceDTO((String)sss.get("customName"),(Long)sss.get("id"),(String) sss.get("name"),(String)sss.get("description"),(Map<String, TranslationInfo>) sss.get("translations"),(Long)sss.get("unitId"),null);
                 selectedSubServiceDTOS.add(organizationSelectedSubServiceDTO);
             });
+            TranslationUtil.convertTranslationFromStringToMap(ss);
             OrganizationServiceDTO organizationSelectedServiceDTO = new OrganizationServiceDTO((String)ss.get("customName"),(Long)ss.get("id"),(String) ss.get("name"),(String)ss.get("description"),(Map<String, TranslationInfo>) ss.get("translations"),(Long)ss.get("unitId"),selectedSubServiceDTOS);
             selectedServiceDTOS.add(organizationSelectedServiceDTO);
-
         });
     }
 

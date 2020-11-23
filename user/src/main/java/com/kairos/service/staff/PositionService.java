@@ -359,6 +359,7 @@ public class PositionService {
             for (Map<String, Object> unitData : units) {
                 Map<String, Object> parentUnit = (Map<String, Object>) ((Map<String, Object>) unitData.get("data")).get("parent");
                 long id = (long) parentUnit.get("id");
+                TranslationUtil.convertTranslationFromStringToMap(parentUnit);
                 Map<String, Object> position;
                 if (ids.contains(id)) {
                     for (QueryResult queryResult : list) {
@@ -382,7 +383,9 @@ public class PositionService {
                     }
                 } else {
                     List<QueryResult> queryResults = new ArrayList<>();
-                    QueryResult child = objectMapper.convertValue(((Map<String, Object>) unitData.get("data")).get(CHILD), QueryResult.class);
+                    Map<String, Object> childMap = (Map<String, Object>)((Map<String, Object>) unitData.get("data")).get(CHILD);
+                    TranslationUtil.convertTranslationFromStringToMap(childMap);
+                    QueryResult child = objectMapper.convertValue(childMap, QueryResult.class);
                     child.setTranslations(unit.getTranslations());
                     position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
                     if (position != null && !position.isEmpty()) {

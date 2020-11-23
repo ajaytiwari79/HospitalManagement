@@ -185,12 +185,14 @@ public class SkillService {
         List<SkillCategoryQueryResults> availableSkillCategory = new ArrayList<>();
         List<SkillCategoryQueryResults> selectedSkillCategory = new ArrayList<>();
         for(Map<String,Object> map : organizationSkills){
-            if(isNotNull(((Map<String, Object>) map.get("data")).get(AVAILABLE_SKILLS))){
-                avialableSkillsCategory = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(AVAILABLE_SKILLS);
+            Map<String, Object> organizationSkill = (Map<String, Object>) map.get("data");
+            if(isNotNull(organizationSkill.get(AVAILABLE_SKILLS))){
+                avialableSkillsCategory = (List<Map<String,Object>>)organizationSkill.get(AVAILABLE_SKILLS);
             }
-            if(isNotNull(((Map<String, Object>) map.get("data")).get(SELECTED_SKILLS))){
-                selectedSkillsCategory = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(SELECTED_SKILLS);
+            if(isNotNull(organizationSkill.get(SELECTED_SKILLS))){
+                selectedSkillsCategory = (List<Map<String,Object>>)organizationSkill.get(SELECTED_SKILLS);
             }
+            TranslationUtil.convertTranslationFromStringToMap(organizationSkill);
         }
         getAllSkills(avialableSkillsCategory, selectedSkillsCategory, availableSkillCategory, selectedSkillCategory);
         Map<String,List<SkillCategoryQueryResults>> stringSkillCategoryQueryResultsMap = new HashMap<>();
@@ -211,26 +213,25 @@ public class SkillService {
             List<SkillDTO> availableSKillDTOS=new ArrayList<>();
             List<Map<String,Object>> availableSkills =(List<Map<String,Object>>)asc.get("children");
             availableSkills.forEach(ass->{
+                TranslationUtil.convertTranslationFromStringToMap(ass);
                 SkillDTO organizationAvailableSubSkillDTO = new SkillDTO((Long)ass.get("id"),(String)ass.get("name"),(String)ass.get("description"),(List<Long>)ass.get("tags"),(Long)ass.get("visitourId"),(boolean)ass.get("isEdited"),(Map<String, TranslationInfo>) ass.get("translations"),(String)ass.get("customName"));
                 availableSKillDTOS.add(organizationAvailableSubSkillDTO);
             });
-
+            TranslationUtil.convertTranslationFromStringToMap(asc);
             SkillCategoryQueryResults skillCategoryQueryResults = new SkillCategoryQueryResults((Long)asc.get("id"),(String) asc.get("name"),(String)asc.get("description"),availableSKillDTOS,(Map<String, TranslationInfo>) asc.get("translations"));
             availableSkillCategory.add(skillCategoryQueryResults);
-
         });
-
         selectedSkillsCategory.forEach(ssc->{
             List<SkillDTO> selectedSkillDTOS=new ArrayList<>();
             List<Map<String,Object>> selectedSkillsData =(List<Map<String,Object>>)ssc.get("children");
             selectedSkillsData.forEach(ss->{
-            SkillDTO organizationSelectedSkillDTO = new SkillDTO((Long)ss.get("id"),(String)ss.get("name"),(String)ss.get("description"),(List<Long>)ss.get("tags"),(Long)ss.get("visitourId"),(boolean)ss.get("isEdited"),(Map<String, TranslationInfo>) ss.get("translations"),(String)ss.get("customName"));
-            selectedSkillDTOS.add(organizationSelectedSkillDTO);
-        });
-
-        SkillCategoryQueryResults skillCategoryQueryResults = new SkillCategoryQueryResults((Long)ssc.get("id"),(String) ssc.get("name"),(String)ssc.get("description"),selectedSkillDTOS,(Map<String, TranslationInfo>) ssc.get("translations"));
-        selectedSkillCategory.add(skillCategoryQueryResults);
-
+                TranslationUtil.convertTranslationFromStringToMap(ss);
+                SkillDTO organizationSelectedSkillDTO = new SkillDTO((Long)ss.get("id"),(String)ss.get("name"),(String)ss.get("description"),(List<Long>)ss.get("tags"),(Long)ss.get("visitourId"),(boolean)ss.get("isEdited"),(Map<String, TranslationInfo>) ss.get("translations"),(String)ss.get("customName"));
+                selectedSkillDTOS.add(organizationSelectedSkillDTO);
+            });
+            TranslationUtil.convertTranslationFromStringToMap(ssc);
+            SkillCategoryQueryResults skillCategoryQueryResults = new SkillCategoryQueryResults((Long)ssc.get("id"),(String) ssc.get("name"),(String)ssc.get("description"),selectedSkillDTOS,(Map<String, TranslationInfo>) ssc.get("translations"));
+            selectedSkillCategory.add(skillCategoryQueryResults);
         });
     }
 
