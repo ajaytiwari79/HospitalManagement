@@ -1,5 +1,6 @@
 package com.kairos.service.reason_code;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -146,4 +147,11 @@ public class ReasonCodeService {
     public List<ReasonCodeDTO> findAllByIds(Set<BigInteger> absenceReasonCodeIds) {
         return reasonCodeRepository.findAllByIdAndDeletedFalse(absenceReasonCodeIds);
     }
+
+    public void transferReasonCode(List<ReasonCodeDTO> reasonCodeDTOS) {
+        List<ReasonCode> reasonCodes= ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodeDTOS,ReasonCode.class);
+        reasonCodeRepository.saveEntities(reasonCodes);
+    }
+
+
 }

@@ -985,6 +985,13 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateTranslation(id,translations));
     }
 
+    @RequestMapping(value = "transfer_reason_code")
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> transferReasonCode() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.transferReasonCode());
+    }
+
 
 
 }

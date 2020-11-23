@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -111,4 +112,11 @@ public class ReasonCodeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.updateTranslation(id,translations));
     }
 
+    @PostMapping(value = "transfer_reason_code")
+    @ApiOperation("Add reason code data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> transferReasonCode(@RequestBody List<ReasonCodeDTO> reasonCodeDTOS) {
+        reasonCodeService.transferReasonCode(reasonCodeDTOS);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
 }

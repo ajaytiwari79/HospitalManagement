@@ -1,6 +1,14 @@
+
+Step 1: http://server.kairosplanning.com/kairos/activity/api/v1/time_slots_in_existing
+
+
+
+
 MATCH(ag:AccessGroup)-[:DAY_TYPES]-(dt:DayType)
 WITH ag,collect(toString(id(dt))) as t
 set ag.dayTypeIds=t
+
+
 
 
 

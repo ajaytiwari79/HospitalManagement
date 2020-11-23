@@ -277,5 +277,9 @@ public class ActivityIntegrationService {
     public List<DayTypeDTO> getDayTypeByIds(Collection<BigInteger> dayTypeIds) {
         return isCollectionEmpty(dayTypeIds)?new ArrayList<>():genericRestClient.publishRequest(dayTypeIds, null, false, IntegrationOperation.GET, "/dayType", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayTypeDTO>>>(){});
     }
+
+    public void transferReasonCode(List<ReasonCodeDTO> reasonCodeDTOS) {
+        genericRestClient.publishRequest(reasonCodeDTOS, null, false, IntegrationOperation.CREATE, "/transfer_reason_code", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
+    }
 }
 

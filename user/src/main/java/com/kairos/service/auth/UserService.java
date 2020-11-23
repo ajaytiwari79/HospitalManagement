@@ -13,6 +13,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.auth.GoogleCalenderTokenDTO;
 import com.kairos.dto.user.auth.UserDetailsDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
@@ -24,6 +25,7 @@ import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
+import com.kairos.persistence.model.auth.ReasonCode;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.common.UserBaseEntity;
@@ -35,6 +37,7 @@ import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.persistence.repository.user.staff.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.service.SmsService;
@@ -70,6 +73,7 @@ import java.nio.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.*;
@@ -133,6 +137,8 @@ public class UserService {
     private KMailService kMailService;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
 
 
     /**
@@ -512,7 +518,8 @@ public class UserService {
             }
         }
         if (checkDayType) {
-            unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds, organizationId);
+            unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds.stream().map(BigInteger::toString).collect(Collectors.toSet()), organizationId);
+
         } else {
             unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, organizationId);
         }
@@ -560,7 +567,7 @@ public class UserService {
     public boolean updateSelectedLanguageOfUser(Long userLanguageId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         userGraphRepository.updateUserSystemLanguage(currentUser.getId(),userLanguageId);
-        UserContext.getUserDetails().setUserLanguage(ObjectMapperUtils.copyPropertiesByMapper(currentUser.getUserLanguage(),SystemLanguageDTO.class));
+        UserContext.getUserDetails().setUserLanguage(copyPropertiesByMapper(currentUser.getUserLanguage(),SystemLanguageDTO.class));
         return true;
     }
 
@@ -684,4 +691,6 @@ public class UserService {
         }
         return user;
     }
+
+
 }
