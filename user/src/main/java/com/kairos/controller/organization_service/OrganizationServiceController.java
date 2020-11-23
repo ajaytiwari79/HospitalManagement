@@ -5,6 +5,7 @@ import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +35,7 @@ public class OrganizationServiceController {
     @Inject
     OrganizationServiceService organizationServiceService;
 
+    @Inject private TranslationService translationService;
 
     // GET by id
     @RequestMapping(value = COUNTRY_URL+"/organization_service/{id}", method = RequestMethod.GET)
@@ -136,7 +138,7 @@ public class OrganizationServiceController {
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfActivity(@PathVariable Long id, @RequestBody Map<String,TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 
 //  Todo please do not remove this commited code I am working On it later
