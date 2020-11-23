@@ -14,6 +14,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.translation.TranslationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,8 @@ public class ReasonCodeService {
     private ExceptionService exceptionService;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private TranslationService translationService;
 
     public ReasonCodeDTO createReasonCodeForCountry(long countryId, ReasonCodeDTO reasonCodeDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -186,17 +189,6 @@ public class ReasonCodeService {
 
     public boolean anyReasonCodeLinkedWithTimeType(BigInteger timeTypeId){
         return reasonCodeGraphRepository.existsByTimeTypeIdAndDeletedFalse(timeTypeId);
-    }
-
-    public Map<String, TranslationInfo> updateTranslation(Long reasonCodeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
-        ReasonCode reasonCode =reasonCodeGraphRepository.findOne(reasonCodeId);
-        reasonCode.setTranslatedNames(translatedNames);
-        reasonCode.setTranslatedDescriptions(translatedDescriptios);
-        reasonCodeGraphRepository.save(reasonCode);
-        return reasonCode.getTranslatedData();
     }
 
 }

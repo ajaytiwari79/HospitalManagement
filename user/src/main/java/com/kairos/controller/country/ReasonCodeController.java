@@ -5,6 +5,7 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.region.RegionService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +31,8 @@ public class ReasonCodeController {
     private ReasonCodeService reasonCodeService;
     @Inject
     private RegionService regionService;
+    @Inject
+    private TranslationService translationService;
 
     @ApiOperation(value = "Add ReasonCode by countryId")
     @RequestMapping(value = COUNTRY_URL + "/reason_code", method = RequestMethod.POST)
@@ -109,14 +112,14 @@ public class ReasonCodeController {
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfReasonCodesOfUnit(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 
     @PutMapping(value = COUNTRY_URL + "/reason_code/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfReasonCodesOfCountry(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 
 }

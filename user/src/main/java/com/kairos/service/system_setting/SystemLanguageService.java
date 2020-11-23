@@ -225,18 +225,4 @@ public class SystemLanguageService {
         return systemLanguageGraphRepository.findSystemLanguageByName(name);
     }
 
-    public Map<String, TranslationInfo> updateTranslation(Long systemLanguageId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        SystemLanguage systemLanguage =systemLanguageGraphRepository.findOne(systemLanguageId);
-        systemLanguage.setTranslatedNames(translatedNames);
-        systemLanguage.setTranslatedDescriptions(translatedDescriptios);
-        systemLanguageGraphRepository.save(systemLanguage);
-        return systemLanguage.getTranslatedData();
-    }
-
 }

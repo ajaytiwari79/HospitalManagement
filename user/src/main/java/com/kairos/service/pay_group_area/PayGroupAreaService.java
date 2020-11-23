@@ -259,18 +259,4 @@ public class PayGroupAreaService {
     public List<PayGroupAreaQueryResult> getPayGroupAreaByLevel(Long levelId) {
         return payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(levelId);
     }
-
-    public Map<String, TranslationInfo> updateTranslationOfPayGroupArea(Long payGroupAreaId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        PayGroupArea payGroupArea =payGroupAreaGraphRepository.findOne(payGroupAreaId);
-        payGroupArea.setTranslatedNames(translatedNames);
-        payGroupArea.setTranslatedDescriptions(translatedDescriptios);
-        payGroupAreaGraphRepository.save(payGroupArea);
-        return payGroupArea.getTranslatedData();
-    }
 }

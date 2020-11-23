@@ -88,15 +88,4 @@ public class ContractTypeService {
         return true;
     }
 
-    public Map<String, TranslationInfo> updateTranslation(Long contractTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        ContractType contractType =contractTypeGraphRepository.findOne(contractTypeId);
-        contractType.setTranslatedNames(translatedNames);
-        contractType.setTranslatedDescriptions(translatedDescriptions);
-        contractTypeGraphRepository.save(contractType);
-        return contractType.getTranslatedData();
-    }
-
 }

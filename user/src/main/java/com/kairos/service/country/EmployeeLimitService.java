@@ -88,15 +88,4 @@ public class EmployeeLimitService {
         }
         return true;
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long employeeLimitId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        EmployeeLimit employeeLimit =employeeLimitGraphRepository.findOne(employeeLimitId);
-        employeeLimit.setTranslatedNames(translatedNames);
-        employeeLimit.setTranslatedDescriptions(translatedDescriptions);
-        employeeLimitGraphRepository.save(employeeLimit);
-        return employeeLimit.getTranslatedData();
-    }
 }

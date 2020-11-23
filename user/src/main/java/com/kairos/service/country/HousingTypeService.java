@@ -86,15 +86,4 @@ public class HousingTypeService {
         }
         return true;
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long housingTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        HousingType housingType =housingTypeGraphRepository.findOne(housingTypeId);
-        housingType.setTranslatedNames(translatedNames);
-        housingType.setTranslatedDescriptions(translatedDescriptions);
-        housingTypeGraphRepository.save(housingType);
-        return housingType.getTranslatedData();
-    }
 }

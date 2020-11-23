@@ -1030,41 +1030,9 @@ public class StaffRetrievalService {
     }
 
     public Map<String, TranslationInfo> updateStaffOrganizationTranslatedData(Long unitId,Map<String,TranslationInfo> translations){
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
-        organizationBaseEntity.setTranslatedNames(translatedNames);
-        organizationBaseEntity.setTranslatedDescriptions(translatedDescriptios);
+        organizationBaseEntity.setTranslations(translations);
         organizationBaseRepository.save(organizationBaseEntity);
         return organizationBaseEntity.getTranslatedData();
-    }
-
-    public Map<String, TranslationInfo> updateStaffChildTranslatedData(Long staffChildId,Map<String,TranslationInfo> translations,Long staffId,Long unitId){
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptions.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Staff staff = staffGraphRepository.findById(staffId,2).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_STAFF_IDANDUNITID_NOTFOUND, staffId, unitId)));
-        staff.getStaffChildDetails().forEach(staffChildDetail -> {
-            if(staffChildDetail.getId().equals(staffChildId)){
-                staffChildDetail.setTranslatedNames(translatedNames);
-                staffChildDetail.setTranslatedDescriptions(translatedDescriptions);
-            }
-        });
-        staffGraphRepository.save(staff);
-        List<StaffChildDetailDTO> staffChildDetailDTOS = copyCollectionPropertiesByMapper(staff.getStaffChildDetails(),StaffChildDetailDTO.class);
-        staffChildDetailDTOS.forEach(staffChildDetailDTO -> {
-            if(staffChildDetailDTO.getId().equals(staffChildId)) {
-                staffChildDetailDTO.setTranslations(translations);
-            }
-        });
-        Map<Long,Map<String,TranslationInfo>> staffChildTranslationMap = staffChildDetailDTOS.stream().collect(Collectors.toMap(StaffChildDetailDTO::getId,StaffChildDetailDTO::getTranslations));
-        return staffChildTranslationMap.get(staffChildId);
     }
 }

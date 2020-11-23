@@ -1,6 +1,5 @@
 package com.kairos.service.skill;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.CommonsExceptionUtil;
@@ -312,9 +311,9 @@ public class SkillService {
                 if (skill.get("isSelected") != null && (boolean) skill.get("isSelected")) {
                     selectedSkillId.add((long) skill.get("id"));
                 }
-                TranslationUtil.convertTranslationInfoStringToMap(skill);
+                TranslationUtil.convertTranslationFromStringToMap(skill);
             }
-            TranslationUtil.convertTranslationInfoStringToMap(map);
+            TranslationUtil.convertTranslationFromStringToMap(map);
             treeData.add(map);
         }
         List<SkillQueryResult> list = new ArrayList<>();
@@ -532,19 +531,5 @@ public class SkillService {
     public List<StaffQueryResult> getStaffAllSkillAndLevelByStaffIds(List<Long> staffIds) {
         List<StaffQueryResult> staffQueryResults = skillGraphRepository.getAllStaffSkillAndLevelByStaffIds(staffIds);
         return staffQueryResults;
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfOrganizationSkills(Long skillId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Skill skill =skillGraphRepository.findOne(skillId);
-        skill.setTranslatedNames(translatedNames);
-        skill.setTranslatedDescriptions(translatedDescriptios);
-        skillGraphRepository.save(skill);
-        return skill.getTranslatedData();
     }
 }

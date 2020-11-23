@@ -98,16 +98,5 @@ public class CitizenStatusService{
         return FormatUtil.formatNeoResponse(data);
     }
 
-    public Map<String, TranslationInfo> updateTranslation(Long citizenStatusId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        CitizenStatus citizenStatus =citizenStatusGraphRepository.findOne(citizenStatusId);
-        citizenStatus.setTranslatedNames(translatedNames);
-        citizenStatus.setTranslatedDescriptions(translatedDescriptions);
-        citizenStatusGraphRepository.save(citizenStatus);
-        return citizenStatus.getTranslatedData();
-    }
-
 
 }

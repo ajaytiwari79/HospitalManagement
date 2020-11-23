@@ -180,16 +180,6 @@ public class DayTypeService {
         return dayTypes;
 
     }
-    public Map<String, TranslationInfo> updateTranslation(Long dayTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
-        DayType dayType =dayTypeGraphRepository.findOne(dayTypeId);
-        dayType.setTranslatedNames(translatedNames);
-        dayType.setTranslatedDescriptions(translatedDescriptios);
-        dayTypeGraphRepository.save(dayType);
-        return dayType.getTranslatedData();
-    }
 
 
 }

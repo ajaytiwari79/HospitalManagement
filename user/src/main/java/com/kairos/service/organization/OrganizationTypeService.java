@@ -225,19 +225,4 @@ public class OrganizationTypeService{
         return organizationTypeGraphRepository.getOrganizationIdsByOrgSubTypeIdsAndOrgSubServiceIds(organizationSubTypeIds, organizationSubServicesIds);
     }
 
-    public Map<String, TranslationInfo> updateTranslation(Long orgTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        OrganizationType organizationType =organizationTypeGraphRepository.findOne(orgTypeId);
-        organizationType.setTranslatedNames(translatedNames);
-        organizationType.setTranslatedDescriptions(translatedDescriptios);
-        organizationTypeGraphRepository.save(organizationType);
-        return organizationType.getTranslatedData();
-    }
-
-
 }

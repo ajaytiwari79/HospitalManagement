@@ -4,6 +4,7 @@
     import com.kairos.persistence.model.organization.team.TeamDTO;
     import com.kairos.persistence.model.staff.StaffTeamDTO;
     import com.kairos.service.organization.TeamService;
+    import com.kairos.service.translation.TranslationService;
     import com.kairos.utils.response.ResponseHandler;
     import io.swagger.annotations.ApiOperation;
     import org.springframework.http.HttpStatus;
@@ -28,6 +29,8 @@
 
         @Inject
         private TeamService teamService;
+
+        @Inject private TranslationService translationService;
 
         @ApiOperation(value = "Add Team in Unit")
         @PostMapping(value = "/team")
@@ -197,6 +200,6 @@
         @ApiOperation("Add translated data")
             //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
         ResponseEntity<Map<String, Object>> updateTranslationsOfRelationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.updateTranslationOfOrganizationTeams(id,translations));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
         }
     }

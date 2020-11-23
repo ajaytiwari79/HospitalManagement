@@ -240,14 +240,4 @@ public class FunctionService {
         return function.getTranslatedData();
     }
 
-    public Map<String, TranslationInfo> updateTranslationOfCountryFunctions(Long functionId, Map<String,TranslationInfo> translations) {
-        Function function =functionGraphRepository.findOne(functionId);
-        function.setTranslations(translations);
-        functionGraphRepository.save(function);
-        return function.getTranslatedData();
-    }
-
-
-
-
 }

@@ -437,18 +437,4 @@ public class TeamService {
     public List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds){
         return teamGraphRepository.getAllStaffToAssignActivitiesByTeam(unitId, activityIds);
     }
-
-    public Map<String, TranslationInfo> updateTranslationOfOrganizationTeams(Long teamId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Team team =teamGraphRepository.findOne(teamId);
-        team.setTranslatedNames(translatedNames);
-        team.setTranslatedDescriptions(translatedDescriptios);
-        teamGraphRepository.save(team);
-        return team.getTranslatedData();
-    }
 }

@@ -83,15 +83,4 @@ public class PaymentTypeService {
         }
         return true;
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long paymentTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        PaymentType paymentType =paymentTypeGraphRepository.findOne(paymentTypeId);
-        paymentType.setTranslatedNames(translatedNames);
-        paymentType.setTranslatedDescriptions(translatedDescriptions);
-        paymentTypeGraphRepository.save(paymentType);
-        return paymentType.getTranslatedData();
-    }
 }

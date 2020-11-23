@@ -85,15 +85,4 @@ public class ClinicTypeService {
         }
         return true;
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long clinicTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
-        ClinicType clinicType =clinicTypeGraphRepository.findOne(clinicTypeId);
-        clinicType.setTranslatedNames(translatedNames);
-        clinicType.setTranslatedDescriptions(translatedDescriptios);
-        clinicTypeGraphRepository.save(clinicType);
-        return clinicType.getTranslatedData();
-    }
 }

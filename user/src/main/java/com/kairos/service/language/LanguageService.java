@@ -112,17 +112,6 @@ public class LanguageService {
         return data;
     }
 
-    public Map<String, TranslationInfo> updateTranslation(Long languageId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        Language language =languageGraphRepository.findOne(languageId);
-        language.setTranslatedNames(translatedNames);
-        language.setTranslatedDescriptions(translatedDescriptions);
-        languageGraphRepository.save(language);
-        return language.getTranslatedData();
-    }
-
 
 
 }

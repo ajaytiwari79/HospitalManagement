@@ -85,15 +85,4 @@ public class OwnershipTypeService {
         }
         return true;
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long ownershipTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
-        OwnershipType ownershipType =ownershipTypeGraphRepository.findOne(ownershipTypeId);
-        ownershipType.setTranslatedNames(translatedNames);
-        ownershipType.setTranslatedDescriptions(translatedDescriptios);
-        ownershipTypeGraphRepository.save(ownershipType);
-        return ownershipType.getTranslatedData();
-    }
 }

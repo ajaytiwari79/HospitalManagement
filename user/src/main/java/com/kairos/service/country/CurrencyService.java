@@ -90,15 +90,4 @@ public class CurrencyService {
     public Currency getCurrencyByCountryId(Long countryId){
        return  currencyGraphRepository.findFirstByCountryIdAndDeletedFalse(countryId);
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long currencyId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        Currency currency =currencyGraphRepository.findOne(currencyId);
-        currency.setTranslatedNames(translatedNames);
-        currency.setTranslatedDescriptions(translatedDescriptions);
-        currencyGraphRepository.save(currency);
-        return currency.getTranslatedData();
-    }
 }

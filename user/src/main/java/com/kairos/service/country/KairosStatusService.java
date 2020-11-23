@@ -86,15 +86,4 @@ public class KairosStatusService {
         }
         return true;
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long kairosStatusId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        KairosStatus kairosStatus =kairosStatusGraphRepository.findOne(kairosStatusId);
-        kairosStatus.setTranslatedNames(translatedNames);
-        kairosStatus.setTranslatedDescriptions(translatedDescriptions);
-        kairosStatusGraphRepository.save(kairosStatus);
-        return kairosStatus.getTranslatedData();
-    }
 }

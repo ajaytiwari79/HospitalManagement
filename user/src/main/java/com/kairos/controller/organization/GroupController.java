@@ -4,6 +4,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistence.model.organization.group.GroupDTO;
 import com.kairos.service.organization.GroupService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,8 @@ import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 public class GroupController {
     @Inject
     private GroupService groupService;
+
+    @Inject private TranslationService translationService;
 
     @ApiOperation(value = "Add Group in Unit")
     @PostMapping(value = "/group")
@@ -80,6 +83,6 @@ public class GroupController {
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfRelationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.updateTranslationOfGroup(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 }

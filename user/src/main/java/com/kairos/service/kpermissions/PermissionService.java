@@ -1,6 +1,5 @@
 package com.kairos.service.kpermissions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.annotations.KPermissionRelatedModel;
 import com.kairos.annotations.KPermissionRelationshipFrom;
 import com.kairos.annotations.KPermissionRelationshipTo;
@@ -24,7 +23,6 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.kpermissions.*;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.repository.custom_repository.CommonRepositoryImpl;
 import com.kairos.persistence.repository.kpermissions.KPermissionActionGraphRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionFieldRepository;
@@ -203,7 +201,7 @@ public class PermissionService {
             }
             modelPermissionQueryResults.forEach(modelPermissionQueryResult -> {
                 modelPermissionQueryResult.getActions().forEach(mapObjects->{
-                    TranslationUtil.convertTranslationInfoStringToMap(mapObjects);
+                    TranslationUtil.convertTranslationFromStringToMap(mapObjects);
                 });
             });
             return modelPermissionQueryResults;
@@ -665,33 +663,5 @@ public class PermissionService {
         permissionModelRepository.disableActionPermission(customPermissionDTO.getId(),customPermissionDTO.getAccessGroupId());
         permissionModelRepository.setActionPermissions(customPermissionDTO.getAccessGroupId(),customPermissionDTO.getActions(),customPermissionDTO.getId());
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long kpermisionModelId, Map<String,TranslationInfo> translations) {
-        Map<String,Map<String,String>> translatedMap =accessGroupService.getMapOfTranslationData(translations);
-        KPermissionModel kPermissionModel =permissionModelRepository.findOne(kpermisionModelId);
-        kPermissionModel.setTranslatedNames(translatedMap.get(TRANSLATED_NAMES));
-        kPermissionModel.setTranslatedDescriptions(translatedMap.get(TRANSLATED_DESCRIPTIONS));
-        permissionModelRepository.save(kPermissionModel);
-        return kPermissionModel.getTranslatedData();
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfActionPermissions(Long actionId, Map<String,TranslationInfo> translations) {
-        Map<String,Map<String,String>> translatedMap =accessGroupService.getMapOfTranslationData(translations);
-        KPermissionAction kPermissionAction =kPermissionActionGraphRepository.findOne(actionId);
-        kPermissionAction.setTranslatedNames(translatedMap.get(TRANSLATED_NAMES));
-        kPermissionAction.setTranslatedDescriptions(translatedMap.get(TRANSLATED_DESCRIPTIONS));
-        kPermissionActionGraphRepository.save(kPermissionAction);
-        return kPermissionAction.getTranslatedData();
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfFieldPermissions(Long fieldId, Map<String,TranslationInfo> translations) {
-        Map<String,Map<String,String>> translatedMap =accessGroupService.getMapOfTranslationData(translations);
-        KPermissionField kPermissionField =permissionFieldRepository.findOne(fieldId);
-        kPermissionField.setTranslatedNames(translatedMap.get(TRANSLATED_NAMES));
-        kPermissionField.setTranslatedDescriptions(translatedMap.get(TRANSLATED_DESCRIPTIONS));
-        permissionFieldRepository.save(kPermissionField);
-        return kPermissionField.getTranslatedData();
-    }
-
 
 }

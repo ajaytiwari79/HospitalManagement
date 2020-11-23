@@ -421,18 +421,4 @@ public class EmploymentTypeService {
         List<CountryHolidayCalenderDTO> holidayCalenders = ObjectMapperUtils.copyCollectionPropertiesByMapper(countryHolidayCalenderService.getCountryHolidayCalenders(UserContext.getUserDetails().getCountryId(), startDate, endDate), CountryHolidayCalenderDTO.class);
         return DefaultKpiDataDTO.builder().staffKpiFilterDTOs(staffKpiFilterDTOS).timeSlotDTOS(timeSlotDTOS).holidayCalenders(holidayCalenders).build();
     }
-
-    public Map<String, TranslationInfo> updateTranslationOfEmploymentType(Long employmentTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        EmploymentType employmentType =employmentTypeGraphRepository.findOne(employmentTypeId);
-        employmentType.setTranslatedNames(translatedNames);
-        employmentType.setTranslatedDescriptions(translatedDescriptios);
-        employmentTypeGraphRepository.save(employmentType);
-        return employmentType.getTranslatedData();
-    }
 }

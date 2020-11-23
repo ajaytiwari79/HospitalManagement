@@ -88,15 +88,4 @@ public class IndustryTypeService {
         }
         return true;
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long industryTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
-        IndustryType industryType =industryTypeGraphRepository.findOne(industryTypeId);
-        industryType.setTranslatedNames(translatedNames);
-        industryType.setTranslatedDescriptions(translatedDescriptios);
-        industryTypeGraphRepository.save(industryType);
-        return industryType.getTranslatedData();
-    }
 }

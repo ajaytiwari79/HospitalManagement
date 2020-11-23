@@ -14,7 +14,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 public class TranslationUtil {
 
-    public static void convertTranslationInfoStringToMap(Map<String, Object> map) {
+    public static void convertTranslationFromStringToMap(Map<String, Object> map) {
         Map<String, TranslationInfo> translations;
         try{
             ObjectMapper objectMapper = new ObjectMapper();
@@ -23,13 +23,6 @@ public class TranslationUtil {
             translations = new HashMap();
         }
         map.put("translations", translations);
-    }
-
-    public static void updateTranslationData(Map<String, TranslationInfo> translations, Map<String, String> translatedNames, Map<String, String> translatedDescriptios) {
-        for (Map.Entry<String, TranslationInfo> entry : translations.entrySet()) {
-            translatedNames.put(entry.getKey(), entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(), entry.getValue().getDescription());
-        }
     }
 
     public static Map<String, TranslationInfo> getTranslatedData(Map<String, String> translatedNames, Map<String, String> translatedDescriptions) {

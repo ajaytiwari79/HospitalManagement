@@ -117,20 +117,4 @@ public class AccountTypeService {
         accountTypeRepository.save(accountType.get());
         return true;
     }
-
-    public Map<String, TranslationInfo> updateTranslationOfAccountType(Long accountTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        AccountType accountType =accountTypeRepository.findOne(accountTypeId);
-        accountType.setTranslatedNames(translatedNames);
-        accountType.setTranslatedDescriptions(translatedDescriptios);
-        accountTypeRepository.save(accountType);
-        return accountType.getTranslatedData();
-    }
-
-
 }

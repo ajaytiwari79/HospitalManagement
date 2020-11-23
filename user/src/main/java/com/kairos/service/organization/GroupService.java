@@ -181,18 +181,4 @@ public class GroupService {
         staffIds.removeAll(excludedStaffs);
         return staffIds;
     }
-
-    public Map<String, TranslationInfo> updateTranslationOfGroup(Long groupId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Group group =groupGraphRepository.findOne(groupId);
-        group.setTranslatedNames(translatedNames);
-        group.setTranslatedDescriptions(translatedDescriptios);
-        groupGraphRepository.save(group);
-        return group.getTranslatedData();
-    }
 }

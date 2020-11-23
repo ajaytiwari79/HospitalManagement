@@ -4,6 +4,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.TranslationDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +34,7 @@ public class SkillController {
 
     @Inject
     private SkillService skillService;
+    @Inject private TranslationService translationService;
 
     @ApiOperation(value = "Get a skill by id ")
     @RequestMapping(value = "/skill/{id}", method = RequestMethod.GET)
@@ -94,7 +96,7 @@ public class SkillController {
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationSkill(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.updateTranslationOfOrganizationSkills(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 
 

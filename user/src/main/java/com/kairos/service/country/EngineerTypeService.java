@@ -87,15 +87,4 @@ public class EngineerTypeService{
         }
         return false;
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long engineerTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        EngineerType engineerType =engineerTypeGraphRepository.findOne(engineerTypeId);
-        engineerType.setTranslatedNames(translatedNames);
-        engineerType.setTranslatedDescriptions(translatedDescriptions);
-        engineerTypeGraphRepository.save(engineerType);
-        return engineerType.getTranslatedData();
-    }
 }

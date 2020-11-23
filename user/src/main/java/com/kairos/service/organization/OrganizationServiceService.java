@@ -6,10 +6,8 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
@@ -17,7 +15,6 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -269,9 +266,9 @@ public class OrganizationServiceService {
                 Map<String, Object> map = (Map<String, Object>)objectMap;
                 ((List)map.get("children")).forEach(child->{
                     Map<String, Object> childMap = (Map<String, Object>)child;
-                    TranslationUtil.convertTranslationInfoStringToMap(childMap);
+                    TranslationUtil.convertTranslationFromStringToMap(childMap);
                 });
-                TranslationUtil.convertTranslationInfoStringToMap(map);
+                TranslationUtil.convertTranslationFromStringToMap(map);
             });
         }
         return objectList;

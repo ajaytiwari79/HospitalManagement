@@ -87,15 +87,4 @@ public class LocationTypeService {
         }
         return false;
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long locationTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        LocationType locationType =locationTypeGraphRepository.findOne(locationTypeId);
-        locationType.setTranslatedNames(translatedNames);
-        locationType.setTranslatedDescriptions(translatedDescriptions);
-        locationTypeGraphRepository.save(locationType);
-        return locationType.getTranslatedData();
-    }
 }

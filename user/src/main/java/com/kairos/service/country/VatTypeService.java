@@ -88,15 +88,4 @@ public class VatTypeService {
         }
         return true;
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long vatTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
-        VatType vatType =vatTypeGraphRepository.findOne(vatTypeId);
-        vatType.setTranslatedNames(translatedNames);
-        vatType.setTranslatedDescriptions(translatedDescriptios);
-        vatTypeGraphRepository.save(vatType);
-        return vatType.getTranslatedData();
-    }
 }

@@ -614,18 +614,4 @@ public class PayTableService {
         }
         return payGradePublishedAmountMap;
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long paytableId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        PayTable payTable =payTableGraphRepository.findOne(paytableId);
-        payTable.setTranslatedNames(translatedNames);
-        payTable.setTranslatedDescriptions(translatedDescriptios);
-        payTableGraphRepository.save(payTable);
-        return payTable.getTranslatedData();
-    }
 }

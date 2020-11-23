@@ -973,37 +973,4 @@ public class AccessGroupService {
     public Set<Long> getAccessGroupIdsOfUnit(final Long unitId){
         return organizationService.fetchParentOrganization(unitId).getAccessGroups().stream().map(k->k.getId()).collect(Collectors.toSet());
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long accessGroupId, Map<String,TranslationInfo> translations) {
-        Map<String,Map<String,String>> translatedMap = getMapOfTranslationData(translations);
-        AccessGroup accessGroup =accessGroupRepository.findOne(accessGroupId);
-        accessGroup.setTranslatedNames(translatedMap.get(TRANSLATED_NAMES));
-        accessGroup.setTranslatedDescriptions(translatedMap.get(TRANSLATED_DESCRIPTIONS));
-        accessGroupRepository.save(accessGroup);
-        return accessGroup.getTranslatedData();
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfAccessPage(Long accessPageId, Map<String,TranslationInfo> translations) {
-        Map<String,Map<String,String>> translatedMap = getMapOfTranslationData(translations);
-        AccessPage accessPage =accessPageRepository.findOne(accessPageId);
-        accessPage.setTranslatedNames(translatedMap.get(TRANSLATED_NAMES));
-        accessPage.setTranslatedDescriptions(translatedMap.get(TRANSLATED_DESCRIPTIONS));
-        accessPageRepository.save(accessPage);
-        return accessPage.getTranslatedData();
-    }
-
-    public Map<String,Map<String,String>> getMapOfTranslationData(Map<String,TranslationInfo> translations){
-        Map<String,Map<String,String>> tanslationMap = new HashMap<>();
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        tanslationMap.put(TRANSLATED_NAMES,translatedNames);
-        tanslationMap.put(TRANSLATED_DESCRIPTIONS,translatedDescriptios);
-        return tanslationMap;
-    }
-
-
 }

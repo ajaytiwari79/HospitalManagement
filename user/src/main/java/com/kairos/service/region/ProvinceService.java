@@ -75,19 +75,5 @@ public class ProvinceService {
 
     }
 
-    public Map<String, TranslationInfo> updateTranslationOfProvince(Long provinceId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Province province =provinceGraphRepository.findOne(provinceId);
-        province.setTranslatedNames(translatedNames);
-        province.setTranslatedDescriptions(translatedDescriptios);
-        provinceGraphRepository.save(province);
-        return province.getTranslatedData();
-    }
-
 
 }

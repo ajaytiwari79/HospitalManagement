@@ -370,19 +370,5 @@ public class TagService {
         List<TagQueryResult> tagQueryResults = tagGraphRepository.getListOfStaffOrganizationTags(orgId,false,"", masterDataType.toString());
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(tagQueryResults,TagDTO.class);
     }
-
-    public Map<String, TranslationInfo> updateTranslationOfTag(Long tagId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Tag tag =tagGraphRepository.findOne(tagId);
-        tag.setTranslatedNames(translatedNames);
-        tag.setTranslatedDescriptions(translatedDescriptios);
-        tagGraphRepository.save(tag);
-        return tag.getTranslatedData();
-    }
 }
 
