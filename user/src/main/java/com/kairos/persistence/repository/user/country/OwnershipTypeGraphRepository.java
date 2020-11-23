@@ -18,7 +18,7 @@ public interface OwnershipTypeGraphRepository extends Neo4jBaseRepository<Owners
 
     @Query("MATCH (c:Country)-[:"+ BELONGS_TO +"]-(ot:OwnershipType {isEnabled:true}) where id(c)={0} " +
             "RETURN ot")
-    List<OwnershipType> findOwnershipTypeByCountry(long countryId);
+    List<OwnershipTypeDTO> findOwnershipTypeByCountry(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(ownershipType:OwnershipType {isEnabled:true}) WHERE id(country)={0} AND id(ownershipType)<>{2} AND ownershipType.name =~{1}  " +
             " WITH count(ownershipType) as totalCount " +

@@ -28,6 +28,7 @@ public class Skill {
     private SkillCategory skillCategory;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
+    protected Map<String, TranslationInfo> translations;
 
     public Skill(String name, SkillCategory skillCategory) {
         this.name = name;

@@ -53,13 +53,7 @@ public class LocationTypeService {
     }
 
     public List<LocationTypeDTO> getLocationTypeByCountryId(long countryId) {
-        List<LocationType> locationTypes = locationTypeGraphRepository.findLocationTypeByCountry(countryId);
-        List<LocationTypeDTO> locationTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(locationTypes,LocationTypeDTO.class);
-        locationTypeDTOS.forEach(locationTypeDTO -> {
-            locationTypeDTO.setCountryId(countryId);
-            locationTypeDTO.setTranslations(TranslationUtil.getTranslatedData(locationTypeDTO.getTranslatedNames(),locationTypeDTO.getTranslatedDescriptions()));
-        });
-        return locationTypeDTOS;
+        return locationTypeGraphRepository.findLocationTypeByCountry(countryId);
     }
 
     public LocationTypeDTO updateLocationType(long countryId, LocationTypeDTO locationTypeDTO) {

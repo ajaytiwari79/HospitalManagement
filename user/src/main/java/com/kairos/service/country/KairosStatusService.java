@@ -53,13 +53,7 @@ public class KairosStatusService {
     }
 
     public List<KairosStatusDTO> getKairosStatusByCountryId(long countryId){
-        List<KairosStatus> kairosStatusList = kairosStatusGraphRepository.findKairosStatusByCountry(countryId);
-        List<KairosStatusDTO> kairosStatusDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(kairosStatusList,KairosStatusDTO.class);
-        for(KairosStatusDTO kairosStatusDTO:kairosStatusDTOS){
-            kairosStatusDTO.setCountryId(countryId);
-            kairosStatusDTO.setTranslations(TranslationUtil.getTranslatedData(kairosStatusDTO.getTranslatedNames(),kairosStatusDTO.getTranslatedDescriptions()));
-        }
-        return kairosStatusDTOS;
+        return kairosStatusGraphRepository.findKairosStatusByCountry(countryId);
     }
 
     public KairosStatusDTO updateKairosStatus(long countryId, KairosStatusDTO kairosStatusDTO){

@@ -18,7 +18,7 @@ public interface HousingTypeGraphRepository extends Neo4jBaseRepository<HousingT
 
     @Query("MATCH (country:Country)<-[:"+ BELONGS_TO +"]-(housingType:HousingType {isEnabled:true}) where id(country)={0} " +
             "RETURN housingType")
-    List<HousingType> findHousingTypeByCountry(long countryId);
+    List<HousingTypeDTO> findHousingTypeByCountry(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(housingType:HousingType {isEnabled:true}) WHERE id(country)={0} AND id(housingType)<>{2} AND housingType.name =~{1}  " +
             " WITH count(housingType) as totalCount " +

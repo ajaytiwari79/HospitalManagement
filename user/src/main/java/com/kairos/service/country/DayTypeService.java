@@ -71,14 +71,8 @@ public class DayTypeService {
         return dayTypeDTO;
     }
 
-    public List<DayTypeDTO> getAllDayTypeByCountryId(long countryId) {
-        List<DayType> dayTypes =dayTypeGraphRepository.findByCountryId(countryId);
-        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
-        for(DayTypeDTO dayTypeDTO :dayTypeDTOS){
-            dayTypeDTO.setTranslations(TranslationUtil.getTranslatedData(dayTypeDTO.getTranslatedNames(),dayTypeDTO.getTranslatedDescriptions()));
-            dayTypeDTO.setCountryId(countryId);
-        }
-        return dayTypeDTOS;
+    public List<DayType> getAllDayTypeByCountryId(long countryId) {
+        return dayTypeGraphRepository.findByCountryId(countryId);
     }
 
     public List<DayType> getAllDayTypeForUnit(long unitId) {

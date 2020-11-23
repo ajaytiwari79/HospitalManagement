@@ -25,12 +25,6 @@ public class TranslationUtil {
         map.put("translations", translations);
     }
 
-    public static Map<String, TranslationInfo> getTranslatedData(Map<String, String> translatedNames, Map<String, String> translatedDescriptions) {
-        Map<String, TranslationInfo> infoMap = new HashMap<>();
-        translatedNames.forEach((k, v) -> infoMap.put(k, new TranslationInfo(v, translatedDescriptions.get(k))));
-        return infoMap;
-    }
-
     public static String getName(Map<String, TranslationInfo> translations, String name) {
         boolean isNullOrEmptyString = isNotNull(translations) && isNotNull(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translations.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).getName().trim());
         if(isNullOrEmptyString) {

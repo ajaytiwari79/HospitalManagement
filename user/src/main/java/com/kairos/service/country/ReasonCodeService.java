@@ -82,24 +82,12 @@ public class ReasonCodeService {
 
 
     public List<ReasonCodeResponseDTO> getReasonCodesForCountry(long countryId, ReasonCodeType reasonCodeType) {
-        List<ReasonCode> reasonCodes =reasonCodeGraphRepository.findReasonCodesByCountry(countryId, reasonCodeType);
-        List<ReasonCodeResponseDTO> reasonCodeResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodes,ReasonCodeResponseDTO.class);
-        reasonCodeResponseDTOS.forEach(reasonCodeResponseDTO -> {
-            reasonCodeResponseDTO.setCountryId(countryId);
-            reasonCodeResponseDTO.setTranslations(TranslationUtil.getTranslatedData(reasonCodeResponseDTO.getTranslatedNames(),reasonCodeResponseDTO.getTranslatedDescriptions()));
-        });
-        return reasonCodeResponseDTOS;
+        return reasonCodeGraphRepository.findReasonCodesByCountry(countryId, reasonCodeType);
     }
 
 
     public List<ReasonCodeResponseDTO> getReasonCodesByUnitId(long unitId, ReasonCodeType reasonCodeType) {
-        List<ReasonCode> reasonCodes = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, reasonCodeType);
-        List<ReasonCodeResponseDTO> reasonCodeResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodes, ReasonCodeResponseDTO.class);
-        for(ReasonCodeResponseDTO reasonCodeResponseDTO :reasonCodeResponseDTOS){
-            reasonCodeResponseDTO.setUnitId(unitId);
-            reasonCodeResponseDTO.setTranslations(TranslationUtil.getTranslatedData(reasonCodeResponseDTO.getTranslatedNames(),reasonCodeResponseDTO.getTranslatedDescriptions()));
-        }
-        return reasonCodeResponseDTOS;
+        return reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, reasonCodeType);
     }
 
     public List<ReasonCodeResponseDTO> getReasonCodesByUnitIds(List<Long> unitIds, ReasonCodeType reasonCodeType) {

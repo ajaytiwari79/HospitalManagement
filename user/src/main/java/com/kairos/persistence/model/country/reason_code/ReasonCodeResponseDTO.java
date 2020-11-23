@@ -37,10 +37,6 @@ public class ReasonCodeResponseDTO {
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
 
-    public ReasonCodeResponseDTO() {
-        //Default Constructor
-    }
-
     public ReasonCodeResponseDTO(Long id, String name, String code, String description, ReasonCodeType reasonCodeType) {
         this.id = id;
         this.name = name;

@@ -57,14 +57,8 @@ public class CompanyCategoryService{
     }
 
     public List<CompanyCategoryResponseDTO> getCompanyCategories(Long countryId) {
-        List<CompanyCategory> companyCategories =companyCategoryGraphRepository.findCompanyCategoriesByCountry(countryId);
-        List<CompanyCategoryResponseDTO> companyCategoryResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(companyCategories,CompanyCategoryResponseDTO.class);
-        companyCategoryResponseDTOS.forEach(companyCategoryResponseDTO -> {
-            companyCategoryResponseDTO.setCountryId(countryId);
-            companyCategoryResponseDTO.setTranslations(TranslationUtil.getTranslatedData(companyCategoryResponseDTO.getTranslatedNames(),companyCategoryResponseDTO.getTranslatedDescriptions()));
-        });
-        return companyCategoryResponseDTOS;
-    }
+        return companyCategoryGraphRepository.findCompanyCategoriesByCountry(countryId);
+     }
 
     public CompanyCategoryResponseDTO updateCompanyCategory(Long countryId, CompanyCategoryDTO companyCategoryDTO) {
 

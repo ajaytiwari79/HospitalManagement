@@ -18,7 +18,7 @@ public interface CurrencyGraphRepository extends Neo4jBaseRepository<Currency,Lo
 
     @Query("MATCH (country:Country)<-[:"+ BELONGS_TO +"]-(currency:Currency {deleted:false}) where id(country)={0} " +
             "RETURN currency")
-    List<Currency> findCurrencyByCountry(long countryId);
+    List<CurrencyDTO> findCurrencyByCountry(long countryId);
 
 
     @Query("Match (n:Currency{deleted:false})-[:"+ BELONGS_TO +"]->(country:Country) where id(country)={0} return n limit 1")

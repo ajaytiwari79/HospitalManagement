@@ -48,12 +48,7 @@ public class LanguageService {
 
     public List<LanguageDTO> getLanguageByCountryId(long countryId){
         List<Language> languages = languageGraphRepository.getLanguageByCountryId(countryId);
-        List<LanguageDTO> languageDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(languages,LanguageDTO.class);
-        languageDTOS.forEach(languageDTO -> {
-            languageDTO.setCountryId(countryId);
-            languageDTO.setTranslations(TranslationUtil.getTranslatedData(languageDTO.getTranslatedNames(),languageDTO.getTranslatedDescriptions()));
-        });
-        return languageDTOS;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(languages,LanguageDTO.class);
     }
 
     public Map<String, Object> createLanguage(long countryId, Language language){

@@ -14,6 +14,7 @@ import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.ExpertiseUnitService;
 import com.kairos.service.expertise.FunctionalPaymentService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -51,7 +52,7 @@ public class ExpertiseController {
     @Inject
     private ExpertiseUnitService expertiseUnitService;
     @Inject private EmploymentCTAWTAService employmentCTAWTAService;
-
+    @Inject private TranslationService translationService;
 
     @ApiOperation(value = "find an expertise by id")
     @GetMapping(value = "country/{countryId}/expertise/{expertiseId}")
@@ -253,7 +254,7 @@ public class ExpertiseController {
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfExpertise(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 
 }

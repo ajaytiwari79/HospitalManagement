@@ -37,16 +37,6 @@ public class OrganizationServiceDTO {
     private Long unitId;
     private List<OrganizationServiceDTO> children;
 
-    public Map<String, TranslationInfo> getTranslatedData() {
-        if(isNotNull(translatedNames) && isNotNull(translatedDescriptions)) {
-            Map<String, TranslationInfo> infoMap = new HashMap<>();
-            translatedNames.forEach((k, v) -> infoMap.put(k, new TranslationInfo(v, translatedDescriptions.get(k))));
-            return infoMap;
-        }else {
-            return new HashMap<>();
-        }
-    }
-
     public List<OrganizationServiceDTO> getOrganizationSubService() {
         if(this.organizationSubService==null){
             this.organizationSubService=new ArrayList<>();

@@ -50,13 +50,7 @@ public class PaymentTypeService {
     }
 
     public List<PaymentTypeDTO> getPaymentTypes(long countryId) {
-        List<PaymentType> paymentTypes = paymentTypeGraphRepository.findPaymentTypeByCountry(countryId);
-        List<PaymentTypeDTO> paymentTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(paymentTypes,PaymentTypeDTO.class);
-        for(PaymentTypeDTO paymentTypeDTO:paymentTypeDTOS){
-            paymentTypeDTO.setCountryId(countryId);
-            paymentTypeDTO.setTranslations(TranslationUtil.getTranslatedData(paymentTypeDTO.getTranslatedNames(),paymentTypeDTO.getTranslatedDescriptions()));
-        }
-        return  paymentTypeDTOS;
+        return paymentTypeGraphRepository.findPaymentTypeByCountry(countryId);
     }
 
     public PaymentTypeDTO updatePaymentType(long countryId, PaymentTypeDTO paymentTypeDTO) {

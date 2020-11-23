@@ -53,13 +53,7 @@ public class BusinessTypeService {
     }
 
     public List<BusinessTypeDTO> getBusinessTypeByCountryId(long countryId) {
-        List<BusinessType> businessTypes = businessTypeGraphRepository.findBusinessTypeByCountry(countryId);
-        List<BusinessTypeDTO> businessTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(businessTypes,BusinessTypeDTO.class);
-        for(BusinessTypeDTO businessTypeDTO :businessTypeDTOS){
-            businessTypeDTO.setCountryId(countryId);
-            businessTypeDTO.setTranslations(TranslationUtil.getTranslatedData(businessTypeDTO.getTranslatedNames(),businessTypeDTO.getTranslatedDescriptions()));
-        }
-        return businessTypeDTOS;
+        return businessTypeGraphRepository.findBusinessTypeByCountry(countryId);
     }
 
     public BusinessTypeDTO updateBusinessType(long countryId, BusinessTypeDTO businessTypeDTO) {

@@ -52,13 +52,7 @@ public class CurrencyService {
     }
 
     public List<CurrencyDTO> getCurrencies(long countryId) {
-        List<Currency> currencies = currencyGraphRepository.findCurrencyByCountry(countryId);
-        List<CurrencyDTO> currencyDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(currencies,CurrencyDTO.class);
-        currencyDTOS.forEach(currencyDTO -> {
-            currencyDTO.setCountryId(countryId);
-            currencyDTO.setTranslations(TranslationUtil.getTranslatedData(currencyDTO.getTranslatedNames(),currencyDTO.getTranslatedDescriptions()));
-        });
-        return currencyDTOS;
+        return currencyGraphRepository.findCurrencyByCountry(countryId);
     }
 
     public CurrencyDTO updateCurrency(long countryId, CurrencyDTO currencyDTO) {

@@ -55,13 +55,7 @@ public class IndustryTypeService {
     }
 
     public List<IndustryTypeDTO> getIndustryTypeByCountryId(long countryId){
-        List<IndustryType> industryTypes = industryTypeGraphRepository.findIndustryTypeByCountry(countryId);
-        List<IndustryTypeDTO> industryTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(industryTypes,IndustryTypeDTO.class);
-        for(IndustryTypeDTO industryTypeDTO :industryTypeDTOS){
-            industryTypeDTO.setCountryId(countryId);
-            industryTypeDTO.setTranslations(TranslationUtil.getTranslatedData(industryTypeDTO.getTranslatedNames(),industryTypeDTO.getTranslatedDescriptions()));
-        }
-        return industryTypeDTOS;
+        return industryTypeGraphRepository.findIndustryTypeByCountry(countryId);
     }
 
     public IndustryTypeDTO updateIndustryType(long countryId, IndustryTypeDTO industryTypeDTO){

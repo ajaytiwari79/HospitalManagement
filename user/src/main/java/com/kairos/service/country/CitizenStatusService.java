@@ -80,13 +80,7 @@ public class CitizenStatusService{
     }
 
     public List<CitizenStatusDTO> getCitizenStatusByCountryId(long countryId){
-        List<CitizenStatus> citizenStatusList = citizenStatusGraphRepository.findCitizenStatusByCountryId(countryId);
-        List<CitizenStatusDTO> citizenStatusDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(citizenStatusList,CitizenStatusDTO.class);
-        citizenStatusDTOS.forEach(citizenStatusDTO -> {
-            citizenStatusDTO.setCountryId(countryId);
-            citizenStatusDTO.setTranslations(TranslationUtil.getTranslatedData(citizenStatusDTO.getTranslatedNames(),citizenStatusDTO.getTranslatedDescriptions()));
-        });
-        return citizenStatusDTOS;
+        return citizenStatusGraphRepository.findCitizenStatusByCountryId(countryId);
     }
 
 

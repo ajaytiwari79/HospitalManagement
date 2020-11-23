@@ -18,7 +18,7 @@ public interface VatTypeGraphRepository extends Neo4jBaseRepository<VatType,Long
 
     @Query("MATCH (c:Country)-[:"+ BELONGS_TO +"]-(vt:VatType {isEnabled:true}) where id(c)={0} " +
             " RETURN vt")
-    List<VatType> findVatTypesByCountry(long countryId);
+    List<VatTypeDTO> findVatTypesByCountry(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(vatType:VatType {isEnabled:true}) WHERE id(country)={0} AND id(vatType)<>{3} AND (vatType.name =~{1} OR vatType.code={2}) " +
             " WITH count(vatType) as totalCount " +

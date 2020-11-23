@@ -53,13 +53,7 @@ public class EmployeeLimitService {
     }
 
     public List<EmployeeLimitDTO> getEmployeeLimitByCountryId(long countryId){
-        List<EmployeeLimit> employeeLimits =employeeLimitGraphRepository.findEmployeeLimitByCountry(countryId);
-        List<EmployeeLimitDTO> employeeLimitDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(employeeLimits,EmployeeLimitDTO.class);
-        for(EmployeeLimitDTO employeeLimitDTO :employeeLimitDTOS){
-            employeeLimitDTO.setCountryId(countryId);
-            employeeLimitDTO.setTranslations(TranslationUtil.getTranslatedData(employeeLimitDTO.getTranslatedNames(),employeeLimitDTO.getTranslatedDescriptions()));
-        }
-        return employeeLimitDTOS;
+        return employeeLimitGraphRepository.findEmployeeLimitByCountry(countryId);
     }
 
     public EmployeeLimitDTO updateEmployeeLimit(long countryId, EmployeeLimitDTO employeeLimitDTO){

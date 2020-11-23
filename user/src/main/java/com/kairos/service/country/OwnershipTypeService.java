@@ -52,13 +52,7 @@ public class OwnershipTypeService {
     }
 
     public List<OwnershipTypeDTO> getOwnershipTypeByCountryId(long countryId){
-        List<OwnershipType> ownershipTypes = ownershipTypeGraphRepository.findOwnershipTypeByCountry(countryId);
-        List<OwnershipTypeDTO> ownershipTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(ownershipTypes,OwnershipTypeDTO.class);
-        for(OwnershipTypeDTO ownershipTypeDTO :ownershipTypeDTOS){
-            ownershipTypeDTO.setCountryId(countryId);
-            ownershipTypeDTO.setTranslations(TranslationUtil.getTranslatedData(ownershipTypeDTO.getTranslatedNames(),ownershipTypeDTO.getTranslatedDescriptions()));
-        }
-        return ownershipTypeDTOS;
+        return ownershipTypeGraphRepository.findOwnershipTypeByCountry(countryId);
     }
 
     public OwnershipTypeDTO updateOwnershipType(long countryId, OwnershipTypeDTO ownershipTypeDTO){

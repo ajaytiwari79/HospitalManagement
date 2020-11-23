@@ -53,13 +53,7 @@ public class HousingTypeService {
     }
 
     public List<HousingTypeDTO> getHousingTypeByCountryId(long countryId) {
-        List<HousingType> housingTypes =housingTypeGraphRepository.findHousingTypeByCountry(countryId);
-        List<HousingTypeDTO> housingTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(housingTypes,HousingTypeDTO.class);
-        housingTypeDTOS.forEach(housingTypeDTO -> {
-            housingTypeDTO.setCountryId(countryId);
-            housingTypeDTO.setTranslations(TranslationUtil.getTranslatedData(housingTypeDTO.getTranslatedNames(),housingTypeDTO.getTranslatedDescriptions()));
-        });
-        return housingTypeDTOS;
+        return housingTypeGraphRepository.findHousingTypeByCountry(countryId);
     }
 
     public HousingTypeDTO updateHousingType(long countryId, HousingTypeDTO housingTypeDTO) {

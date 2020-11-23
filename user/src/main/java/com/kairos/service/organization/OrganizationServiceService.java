@@ -95,28 +95,11 @@ public class OrganizationServiceService {
     }
 
 
-    public List<Map<String,Object>> getAllOrganizationService(long countryId) {
+    public List<OrganizationServiceDTO> getAllOrganizationService(long countryId) {
         Set<Long> serviceIds=organizationServiceRepository.getOrganizationServicesIdsByCountryId(countryId);
         List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(serviceIds));
-        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
-        List<Map<String,Object>> mapList =new ArrayList<>();
-        Map<String,Object> data = new HashMap<>();
-        for (OrganizationServiceDTO result : organizationServiceDTOS) {
-            result.getOrganizationSubService().forEach(organizationServiceDTO -> {
-                organizationServiceDTO.setTranslations(TranslationUtil.getTranslatedData(organizationServiceDTO.getTranslatedNames(),organizationServiceDTO.getTranslatedDescriptions()));
-            });
-            result.setTranslations(result.getTranslatedData());
-
-            data.put("id", result.getId());
-            data.put("name", result.getName());
-            data.put("description",result.getDescription());
-            data.put("children", result.getOrganizationSubService());
-            data.put("translations", result.getTranslations());
-            mapList.add(data);
-            data = new HashMap<>();
-        }
-        return mapList;
-    }
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
+     }
 
     public boolean deleteOrganizationServiceById(Long id) {
         OrganizationService organizationService = organizationServiceRepository.findOne(id);
@@ -217,27 +200,10 @@ public class OrganizationServiceService {
     }
 
 
-    public List<Map<String,Object>> getOrgServicesByOrgType(long orgType) {
+    public List<OrganizationServiceDTO> getOrgServicesByOrgType(long orgType) {
         List<Long> organizationServiceIds = organizationServiceRepository.getAllOrganizationServiceId(orgType);
         List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(organizationServiceIds));
-        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
-        List<Map<String,Object>> mapList =new ArrayList<>();
-        Map<String,Object> data = new HashMap<>();
-        for (OrganizationServiceDTO result : organizationServiceDTOS) {
-            result.getOrganizationSubService().forEach(organizationServiceDTO -> {
-                organizationServiceDTO.setTranslations(TranslationUtil.getTranslatedData(organizationServiceDTO.getTranslatedNames(),organizationServiceDTO.getTranslatedDescriptions()));
-            });
-            result.setTranslations(result.getTranslatedData());
-
-            data.put("id", result.getId());
-            data.put("name", result.getName());
-            data.put("description",result.getDescription());
-            data.put("children", result.getOrganizationSubService());
-            data.put("translations", result.getTranslations());
-            mapList.add(data);
-            data = new HashMap<>();
-        }
-        return mapList;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
     }
 
     public List<Object> linkOrgServiceWithOrgType(long orgTypeId, long serviceId) {
@@ -424,26 +390,5 @@ public class OrganizationServiceService {
     public List<OrganizationServiceQueryResult> getAllOrganizationServicesByUnitId(Long unitId){
         return organizationServiceRepository.getAllOrganizationServicesByUnitId(unitId);
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long serviceId, Map<String,TranslationInfo> translationInfoMap) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translationInfoMap.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        OrganizationService service = organizationServiceRepository.findOne(serviceId);
-        service.setTranslatedNames(translatedNames);
-        service.setTranslatedDescriptions(translatedDescriptios);
-        organizationServiceRepository.save(service);
-        return service.getTranslatedData();
-    }
-
-    public Map<String, TranslationInfo> getTranslatedData(Long serviceId) {
-        OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
-        return organizationService.getTranslatedData();
-    }
-
-
 
 }

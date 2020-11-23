@@ -47,7 +47,6 @@ public abstract class UserBaseEntity  {
     protected Map<String,String> translatedNames;
     @Properties
     protected Map<String,String> translatedDescriptions;
-
     @Convert(UserTranslationInfoConverter.class)
     protected Map<String, TranslationInfo> translations;
 

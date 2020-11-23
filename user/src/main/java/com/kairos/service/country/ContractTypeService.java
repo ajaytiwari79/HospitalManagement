@@ -53,13 +53,7 @@ public class ContractTypeService {
     }
 
     public List<ContractTypeDTO> getContractTypeByCountryId(long countryId){
-        List<ContractType> contractTypes = contractTypeGraphRepository.findContractTypeByCountry(countryId);
-        List<ContractTypeDTO> contractTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(contractTypes,ContractTypeDTO.class);
-        for(ContractTypeDTO contractTypeDTO :contractTypeDTOS){
-            contractTypeDTO.setCountryId(countryId);
-            contractTypeDTO.setTranslations(TranslationUtil.getTranslatedData(contractTypeDTO.getTranslatedNames(),contractTypeDTO.getTranslatedDescriptions()));
-        }
-        return contractTypeDTOS;
+        return contractTypeGraphRepository.findContractTypeByCountry(countryId);
     }
 
     public ContractTypeDTO updateContractType(long countryId, ContractTypeDTO contractTypeDTO){

@@ -53,13 +53,7 @@ public class VatTypeService {
    }
 
     public List<VatTypeDTO> getVatTypeByCountryId(long countryId){
-        List<VatType> vatTypes =vatTypeGraphRepository.findVatTypesByCountry(countryId);
-        List<VatTypeDTO> vatTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(vatTypes,VatTypeDTO.class);
-        for(VatTypeDTO vatTypeDTO:vatTypeDTOS){
-            vatTypeDTO.setCountryId(countryId);
-            vatTypeDTO.setTranslations(TranslationUtil.getTranslatedData(vatTypeDTO.getTranslatedNames(),vatTypeDTO.getTranslatedDescriptions()));
-        }
-        return vatTypeDTOS;
+        return vatTypeGraphRepository.findVatTypesByCountry(countryId);
     }
 
     public VatTypeDTO updateVatType(long countryId, VatTypeDTO vatTypeDTO){

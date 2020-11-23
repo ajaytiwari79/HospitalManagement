@@ -188,18 +188,12 @@ public class EmploymentTypeService {
         return true;
     }
 
-    public List<EmploymentTypeDTO> getEmploymentTypeList(long countryId, boolean isDeleted) {
+    public List<EmploymentType> getEmploymentTypeList(long countryId, boolean isDeleted) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
         }
-        List<EmploymentType> employmentTypes =countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
-        List<EmploymentTypeDTO> employmentTypeDTOS =ObjectMapperUtils.copyCollectionPropertiesByMapper(employmentTypes,EmploymentTypeDTO.class);
-        employmentTypeDTOS.forEach(employmentTypeDTO -> {
-            employmentTypeDTO.setCountryId(countryId);
-            employmentTypeDTO.setTranslations(TranslationUtil.getTranslatedData(employmentTypeDTO.getTranslatedNames(),employmentTypeDTO.getTranslatedDescriptions()));
-        });
-        return employmentTypeDTOS;
+        return countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
     }
 
     public List<Map<String, Object>> getEmploymentTypeOfOrganization(Long unitId, boolean isDeleted) {

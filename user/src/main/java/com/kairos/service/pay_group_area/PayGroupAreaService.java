@@ -210,12 +210,7 @@ public class PayGroupAreaService {
             exceptionService.dataNotFoundByIdException(MESSAGE_PAYGROUP_LEVEL_NOTFOUND);
 
         }
-        List<PayGroupAreaQueryResult> payGroupAreaQueryResults = payGroupAreaGraphRepository.getPayGroupAreaWithMunicipalityByOrganizationLevelId(levelId);
-        payGroupAreaQueryResults.forEach(payGroupAreaQueryResult -> {
-            payGroupAreaQueryResult.setCountryId(countryId);
-            payGroupAreaQueryResult.setTranslations(TranslationUtil.getTranslatedData(payGroupAreaQueryResult.getTranslatedNames(),payGroupAreaQueryResult.getTranslatedDescriptions()));
-        });
-        return payGroupAreaQueryResults;
+        return payGroupAreaGraphRepository.getPayGroupAreaWithMunicipalityByOrganizationLevelId(levelId);
     }
 
     public PayGroupAreaResponse getMunicipalityAndOrganizationLevel(Long countryId) {
@@ -225,16 +220,8 @@ public class PayGroupAreaService {
 
         }
         List<Level> organizationLevels = countryGraphRepository.getLevelsByCountry(countryId);
-        List<LevelDTO> levelDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationLevels,LevelDTO.class);
-        levelDTOS.forEach(levelDTO -> {
-            levelDTO.setTranslations(TranslationUtil.getTranslatedData(levelDTO.getTranslatedNames(),levelDTO.getTranslatedDescriptions()));
-        });
         List<Municipality> municipalities = municipalityGraphRepository.getMunicipalityByCountryId(countryId);
-        List<MunicipalityQueryResults> municipalityQueryResults =ObjectMapperUtils.copyCollectionPropertiesByMapper(municipalities,MunicipalityQueryResults.class);
-        municipalityQueryResults.forEach(municipality->{
-            municipality.setTranslations(TranslationUtil.getTranslatedData(municipality.getTranslatedNames(),municipality.getTranslatedDescriptions()));
-        });
-        return new PayGroupAreaResponse(levelDTOS, municipalityQueryResults);
+        return new PayGroupAreaResponse(organizationLevels, municipalities);
     }
 
 

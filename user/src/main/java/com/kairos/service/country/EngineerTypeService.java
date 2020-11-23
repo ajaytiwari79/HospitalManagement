@@ -53,13 +53,7 @@ public class EngineerTypeService{
     }
 
     public List<EngineerTypeDTO> getEngineerTypeByCountryId(long countryId){
-        List<EngineerType> engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
-        List<EngineerTypeDTO> engineerTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(engineerTypes,EngineerTypeDTO.class);
-        engineerTypeDTOS.forEach(engineerTypeDTO -> {
-            engineerTypeDTO.setCountryId(countryId);
-            engineerTypeDTO.setTranslations(TranslationUtil.getTranslatedData(engineerTypeDTO.getTranslatedNames(),engineerTypeDTO.getTranslatedDescriptions()));
-        });
-        return engineerTypeDTOS;
+        return engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
     }
 
     public EngineerTypeDTO updateEngineerType(long countryId, EngineerTypeDTO engineerTypeDTO){

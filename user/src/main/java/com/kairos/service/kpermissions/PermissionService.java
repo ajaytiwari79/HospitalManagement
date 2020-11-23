@@ -336,7 +336,6 @@ public class PermissionService {
             modelPermissionQueryResult.setPermissions(hubMember ? newHashSet(FieldLevelPermission.READ, FieldLevelPermission.WRITE) : modelPermissionQueryResult.getPermissions());
             modelPermissionQueryResult.setForOtherFieldLevelPermissions(hubMember ? newHashSet(FieldLevelPermission.READ, FieldLevelPermission.WRITE) : modelPermissionQueryResult.getForOtherFieldLevelPermissions());
             modelPermissionQueryResult.setModelName(kPermissionModel.getModelName());
-            modelPermissionQueryResult.setTranslations(TranslationUtil.getTranslatedData(kPermissionModel.getTranslatedNames(),kPermissionModel.getTranslatedDescriptions()));
             modelPermissionQueryResults.add(modelPermissionQueryResult);
         }
         return modelPermissionQueryResults;
@@ -349,7 +348,6 @@ public class PermissionService {
             fieldLevelPermissions.setFieldName(field.getFieldName());
             fieldLevelPermissions.setPermissions(hubMember ? newHashSet(FieldLevelPermission.READ, FieldLevelPermission.WRITE) : fieldLevelPermissions.getPermissions());
             fieldLevelPermissions.setForOtherFieldLevelPermissions(hubMember ? newHashSet(FieldLevelPermission.READ, FieldLevelPermission.WRITE) : fieldLevelPermissions.getForOtherFieldLevelPermissions());
-            fieldLevelPermissions.setTranslations(TranslationUtil.getTranslatedData(field.getTranslatedNames(),field.getTranslatedDescriptions()));
             fieldPermissionQueryResults.add(fieldLevelPermissions);
         }
         return fieldPermissionQueryResults;

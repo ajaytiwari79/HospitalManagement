@@ -508,8 +508,6 @@ public class UnionService {
             UnionDataDTO unionDataDTO = new UnionDataDTO();
             unionDataDTO.setId(unionDataQueryResult.getUnion().getId());
             unionDataDTO.setName(unionDataQueryResult.getUnion().getName());
-            unionDataDTO.setCountryId(countryId);
-            unionDataDTO.setTranslations(TranslationUtil.getTranslatedData(unionDataQueryResult.getUnion().getTranslatedNames(),unionDataQueryResult.getUnion().getTranslatedDescriptions()));
             unionDataDTO.setSectors(ObjectMapperUtils.copyCollectionPropertiesByMapper(unionDataQueryResult.getSectors(), SectorDTO.class));
             List<LocationDTO> locationDTOS = new ArrayList<>();
             List<MunicipalityDTO> municipalitiesUnion;

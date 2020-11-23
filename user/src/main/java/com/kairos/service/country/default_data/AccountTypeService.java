@@ -73,11 +73,6 @@ public class AccountTypeService {
         List<AccountType> accountTypes = accountTypeRepository.getAllAccountTypeByCountryId(countryId);
         // converted due to USE in both Microservice.
         List<AccountTypeDTO> accountTypeDTOS =ObjectMapperUtils.copyCollectionPropertiesByMapper(accountTypes, AccountTypeDTO.class);
-        accountTypeDTOS.forEach(accountTypeDTO -> {
-            accountTypeDTO.setCountryId(countryId);
-            accountTypeDTO.setTranslations(TranslationUtil.getTranslatedData(accountTypeDTO.getTranslatedNames(),accountTypeDTO.getTranslatedDescriptions()));
-        });
-
         return accountTypeDTOS;
     }
 

@@ -105,10 +105,6 @@ public class GroupService {
         for(Group group : groups){
             groupDTOS.add(getGroupDTOFromGroup(group));
         }
-        groupDTOS.forEach(groupDTO -> {
-            groupDTO.setUnitId(unitId);
-            groupDTO.setTranslations(TranslationUtil.getTranslatedData(groupDTO.getTranslatedNames(),groupDTO.getTranslatedDescriptions()));
-        });
         return groupDTOS;
     }
 

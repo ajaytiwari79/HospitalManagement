@@ -52,13 +52,7 @@ public class ClinicTypeService {
     }
 
     public List<ClinicTypeDTO> getClinicTypeByCountryId(long countryId){
-        List<ClinicType> clinicTypes = clinicTypeGraphRepository.findClinicByCountryId(countryId);
-        List<ClinicTypeDTO> clinicTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(clinicTypes,ClinicTypeDTO.class);
-        for(ClinicTypeDTO clinicTypeDTO :clinicTypeDTOS){
-            clinicTypeDTO.setCountryId(countryId);
-            clinicTypeDTO.setTranslations(TranslationUtil.getTranslatedData(clinicTypeDTO.getTranslatedNames(),clinicTypeDTO.getTranslatedDescriptions()));
-        }
-        return clinicTypeDTOS;
+        return clinicTypeGraphRepository.findClinicByCountryId(countryId);
     }
 
     public ClinicTypeDTO updateClinicType(long countryId, ClinicTypeDTO clinicTypeDTO){

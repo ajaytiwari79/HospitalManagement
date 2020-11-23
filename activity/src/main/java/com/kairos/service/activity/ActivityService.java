@@ -596,7 +596,7 @@ public class ActivityService {
             Map<Long, Skill> skillTranslationMap = skills.stream().collect(Collectors.toMap(Skill::getId, v -> v));
             activitySkillSettings.getActivitySkills().forEach(activitySkill -> {
                 Skill skill = skillTranslationMap.get(activitySkill.getSkillId());
-                activitySkill.setTranslations(TranslationUtil.getTranslatedData(skill.getTranslatedNames(), skill.getTranslatedDescriptions()));
+                activitySkill.setTranslations(skill.getTranslations());
             });
         }
         return new ActivitySettingsWrapper(activitySkillSettings);

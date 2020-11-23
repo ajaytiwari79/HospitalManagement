@@ -126,11 +126,7 @@ public class SystemLanguageService {
     }
 
     public List<SystemLanguageDTO> getListOfSystemLanguage() {
-        List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(systemLanguageGraphRepository.getListOfSystemLanguage(), SystemLanguageDTO.class);
-        systemLanguageDTOS.forEach(systemLanguageDTO -> {
-            systemLanguageDTO.setTranslations(TranslationUtil.getTranslatedData(systemLanguageDTO.getTranslatedNames(),systemLanguageDTO.getTranslatedDescriptions()));
-        });
-        return systemLanguageDTOS;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(systemLanguageGraphRepository.getListOfSystemLanguage(), SystemLanguageDTO.class);
     }
 
     public Boolean updateSystemLanguageOfCountry(Long countryId, Long systemLanguageId, Boolean defaultLanguage, Boolean selected) {

@@ -19,7 +19,7 @@ public interface CitizenStatusGraphRepository extends Neo4jBaseRepository<Citize
 
     @Query("MATCH (country:Country)<-[:"+ CIVILIAN_STATUS +"]-(citizenStatus:CitizenStatus {isEnabled:true}) where id(country)={0} " +
             "RETURN citizenStatus")
-    List<CitizenStatus> findCitizenStatusByCountryId(long countryId);
+    List<CitizenStatusDTO> findCitizenStatusByCountryId(long countryId);
 
     @Query("MATCH (cs:CitizenStatus{isEnabled:true})-[:"+ CIVILIAN_STATUS +"]-(c:Country) where id(c)={0} return {value:id(cs), label:cs.name,description:cs.description} as result")
     List<Map<String,Object>> findCitizenStatusByCountryIdAnotherFormat(long countryId);

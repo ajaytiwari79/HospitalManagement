@@ -18,7 +18,7 @@ public interface IndustryTypeGraphRepository extends Neo4jBaseRepository<Industr
 
     @Query("MATCH (country:Country)<-[:"+BELONGS_TO+"]-(it:IndustryType {isEnabled:true}) WHERE id(country)={0} " +
             "RETURN it")
-    List<IndustryType> findIndustryTypeByCountry(long countryId);
+    List<IndustryTypeDTO> findIndustryTypeByCountry(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(industryType:IndustryType {isEnabled:true}) WHERE id(country)={0} AND id(industryType)<>{2} AND industryType.name =~{1}  " +
             " WITH count(industryType) as totalCount " +

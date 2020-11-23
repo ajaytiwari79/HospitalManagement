@@ -361,13 +361,7 @@ public class CountryService {
     }
 
     public List<RelationTypeDTO> getRelationTypes(Long countryId) {
-        List<RelationType> relationTypes = countryGraphRepository.getRelationTypesByCountry(countryId);
-        List<RelationTypeDTO> relationTypeDTOS =ObjectMapperUtils.copyCollectionPropertiesByMapper(relationTypes,RelationTypeDTO.class);
-        relationTypeDTOS.forEach(relationTypeDTO -> {
-            relationTypeDTO.setCountryId(countryId);
-            relationTypeDTO.setTranslations(TranslationUtil.getTranslatedData(relationTypeDTO.getTranslatedNames(),relationTypeDTO.getTranslatedDescriptions()));
-        });
-        return relationTypeDTOS;
+        return countryGraphRepository.getRelationTypesByCountry(countryId);
     }
 
     public boolean deleteRelationType(Long countryId, Long relationTypeId) {

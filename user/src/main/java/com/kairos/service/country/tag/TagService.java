@@ -160,20 +160,11 @@ public class TagService {
         Map<String, Object> tagsData = new HashMap<>();
         if (masterDataType == null) {
             List<TagQueryResult> tagQueryResults =tagGraphRepository.getListOfCountryTags(countryId, false, filterText);
-            tagQueryResults.forEach(tagQueryResult -> {
-                tagQueryResult.setCountryId(countryId);
-                tagQueryResult.setTranslations(TranslationUtil.getTranslatedData(tagQueryResult.getTranslatedNames(),tagQueryResult.getTranslatedDescriptions()));
-            });
             tagsData.put("tags",tagQueryResults );
         } else {
             List<TagQueryResult> tagQueryResultList =tagGraphRepository.getListOfCountryTagsByMasterDataType(countryId, false, filterText, masterDataType.toString());
-            tagQueryResultList.forEach(tagQueryResult -> {
-                tagQueryResult.setCountryId(countryId);
-                tagQueryResult.setTranslations(TranslationUtil.getTranslatedData(tagQueryResult.getTranslatedNames(),tagQueryResult.getTranslatedDescriptions()));
-            });
             tagsData.put("tags",tagQueryResultList );
         }
-
         return tagsData;
     }
 
@@ -264,17 +255,9 @@ public class TagService {
         Map<String, Object> tagsData = new HashMap<>();
         if (masterDataType == null) {
             List<TagQueryResult> tagQueryResults =tagGraphRepository.getListOfOrganizationTags(organizationId, false, filterText);
-            tagQueryResults.forEach(tagQueryResult -> {
-                tagQueryResult.setUnutId(unit.getId());
-                tagQueryResult.setTranslations(TranslationUtil.getTranslatedData(tagQueryResult.getTranslatedNames(),tagQueryResult.getTranslatedDescriptions()));
-            });
             tagsData.put("tags", tagQueryResults);
         }else {
             List<TagQueryResult> tagQueryResults = tagGraphRepository.getListOfOrganizationTagsByMasterDataType(organizationId, false, filterText, masterDataType.toString());
-            tagQueryResults.forEach(tagQueryResult -> {
-                tagQueryResult.setCountryId(UserContext.getUserDetails().getCountryId());
-                tagQueryResult.setTranslations(TranslationUtil.getTranslatedData(tagQueryResult.getTranslatedNames(),tagQueryResult.getTranslatedDescriptions()));
-            });
             tagsData.put("tags", tagQueryResults);
         }
         return tagsData;

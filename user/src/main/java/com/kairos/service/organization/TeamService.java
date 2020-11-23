@@ -187,17 +187,11 @@ public class TeamService {
 
 
     public TeamDTO getTeamDetails(Long teamId) {
-        TeamDTO teamDTO = teamGraphRepository.getTeamDetailsById(teamId);
-        teamDTO.setTranslations(TranslationUtil.getTranslatedData(teamDTO.getTranslatedNames(),teamDTO.getTranslatedDescriptions()));
-        return teamDTO;
+        return teamGraphRepository.getTeamDetailsById(teamId);
     }
 
     public Map<String, Object> getTeamsAndPrerequisite(long unitId) {
         List<TeamDTO> teams = teamGraphRepository.getTeams(unitId);
-        teams.forEach(teamDTO -> {
-            teamDTO.setUnitId(unitId);
-            teamDTO.setTranslations(TranslationUtil.getTranslatedData(teamDTO.getTranslatedNames(),teamDTO.getTranslatedDescriptions()));
-        });
         Map<String, Object> map = new HashMap<>();
         map.put("teams", (isCollectionNotEmpty(teams)) ? teams : Collections.emptyList());
         List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());

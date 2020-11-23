@@ -15,7 +15,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 public interface ClinicTypeGraphRepository extends Neo4jBaseRepository<ClinicType,Long>{
     @Query("MATCH (c:Country)-[:"+BELONGS_TO+"]-(ct:ClinicType {isEnabled:true}) where id(c)={0} " +
             "RETURN ct")
-    List<ClinicType> findClinicByCountryId(long countryId);
+    List<ClinicTypeDTO> findClinicByCountryId(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(clinicType:ClinicType {isEnabled:true}) WHERE id(country)={0} AND id(clinicType)<>{2} AND clinicType.name =~{1}  " +
             " WITH count(clinicType) as totalCount " +

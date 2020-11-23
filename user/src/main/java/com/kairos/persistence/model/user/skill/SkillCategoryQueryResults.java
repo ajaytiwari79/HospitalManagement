@@ -28,7 +28,7 @@ public class SkillCategoryQueryResults {
     private Long id;
     private String name;
     private String description;
-    private List<SkillDTO> skillList;
+    private List<Skill> skillList;
     private Long countryId;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;

@@ -360,10 +360,6 @@ public class OrganizationService {
         Long countryId=viaCountry?countryIdOrOrgId:countryGraphRepository.getCountryIdByUnitId(countryIdOrOrgId);
         List<OrganizationBasicResponse> organizationQueryResult =viaCountry? unitGraphRepository.getAllParentOrganizationOfCountry(countryId):
                 unitGraphRepository.getAllOrganizationOfOrganization(countryIdOrOrgId);
-        organizationQueryResult.forEach(organizationBasicResponse -> {
-            organizationBasicResponse.setCountryId(countryId);
-            organizationBasicResponse.setTranslations(TranslationUtil.getTranslatedData(organizationBasicResponse.getTranslatedNames(),organizationBasicResponse.getTranslatedDescriptions()));
-        });
         OrganizationCreationData organizationCreationData = unitGraphRepository.getOrganizationCreationData(countryId);
         List<Map<String, Object>> zipCodes = FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId));
         if (Optional.ofNullable(organizationCreationData).isPresent()) {
