@@ -1,5 +1,6 @@
 package com.kairos.commons.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.collections.map.HashedMap;
@@ -12,6 +13,17 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 
 public class TranslationUtil {
+
+    public static void convertTranslationInfoStringToMap(Map<String, Object> map) {
+        Map<String, TranslationInfo> translations;
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            translations = objectMapper.readValue(map.get("translations").toString(), Map.class);
+        }catch (Exception ex) {
+            translations = new HashMap();
+        }
+        map.put("translations", translations);
+    }
 
     public static void updateTranslationData(Map<String, TranslationInfo> translations, Map<String, String> translatedNames, Map<String, String> translatedDescriptios) {
         for (Map.Entry<String, TranslationInfo> entry : translations.entrySet()) {

@@ -265,6 +265,14 @@ public class OrganizationServiceService {
                     objectList.add(o);
                 }
             }
+            objectList.forEach(objectMap->{
+                Map<String, Object> map = (Map<String, Object>)objectMap;
+                ((List)map.get("children")).forEach(child->{
+                    Map<String, Object> childMap = (Map<String, Object>)child;
+                    TranslationUtil.convertTranslationInfoStringToMap(childMap);
+                });
+                TranslationUtil.convertTranslationInfoStringToMap(map);
+            });
         }
         return objectList;
     }

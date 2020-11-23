@@ -330,13 +330,14 @@ public class AccessGroupService {
             }
         }
 
-        List<Map<String, Object>> accessPages = accessPageRepository.getSelectedAccessPageHierarchy(accessGroupId);
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<AccessPageQueryResult> queryResults = new ArrayList<>();
-        for (Map<String, Object> accessPage : accessPages) {
-            AccessPageQueryResult accessPageQueryResult = objectMapper.convertValue((Map<String, Object>) accessPage.get("data"), AccessPageQueryResult.class);
-            queryResults.add(accessPageQueryResult);
-        }
+//        List<Map<String, Object>> accessPages = accessPageRepository.getSelectedAccessPageHierarchy(accessGroupId);
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        List<AccessPageQueryResult> queryResults = new ArrayList<>();
+//        for (Map<String, Object> accessPage : accessPages) {
+//            AccessPageQueryResult accessPageQueryResult = objectMapper.convertValue((Map<String, Object>) accessPage.get("data"), AccessPageQueryResult.class);
+//            queryResults.add(accessPageQueryResult);
+//        }
+        List<AccessPageQueryResult> queryResults = accessPageRepository.getSelectedAccessPageHierarchy(accessGroupId);
         List<AccessPageQueryResult> treeData = getAccessPageHierarchy(queryResults, queryResults);
 
         List<AccessPageQueryResult> modules = new ArrayList<>();

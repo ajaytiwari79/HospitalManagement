@@ -1,5 +1,6 @@
 package com.kairos.service.kpermissions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.annotations.KPermissionRelatedModel;
 import com.kairos.annotations.KPermissionRelationshipFrom;
 import com.kairos.annotations.KPermissionRelationshipTo;
@@ -200,6 +201,11 @@ public class PermissionService {
             }else {
                 modelPermissionQueryResults = permissionModelRepository.getActionPermissions(accessGroupId);
             }
+            modelPermissionQueryResults.forEach(modelPermissionQueryResult -> {
+                modelPermissionQueryResult.getActions().forEach(mapObjects->{
+                    TranslationUtil.convertTranslationInfoStringToMap(mapObjects);
+                });
+            });
             return modelPermissionQueryResults;
     }
 
