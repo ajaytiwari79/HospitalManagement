@@ -20,10 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -87,7 +84,8 @@ public class ReasonCodeService {
 
 
     public List<ReasonCodeResponseDTO> getReasonCodesByUnitId(long unitId, ReasonCodeType reasonCodeType) {
-        return reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, reasonCodeType);
+        List<ReasonCode> reasonCodes = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, reasonCodeType);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodes,ReasonCodeResponseDTO.class);
     }
 
     public List<ReasonCodeResponseDTO> getReasonCodesByUnitIds(List<Long> unitIds, ReasonCodeType reasonCodeType) {

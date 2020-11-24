@@ -7,6 +7,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.common.UserTranslationInfoConverter;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -23,6 +24,7 @@ import java.util.Map;
 @QueryResult
 @Getter
 @Setter
+@NoArgsConstructor
 public class ReasonCodeResponseDTO {
     private Long id;
     private String name;

@@ -20,7 +20,7 @@ public class TranslationUtil {
         }catch (Exception ex) {
             translations = new HashMap();
         }
-        map.put("translations", translations);
+        map.put("translations", translations); 
     }
 
     public static String getName(Map<String, TranslationInfo> translations, String name) {

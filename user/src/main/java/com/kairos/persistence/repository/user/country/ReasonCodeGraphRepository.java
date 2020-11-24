@@ -32,10 +32,10 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
     ReasonCode findByCountryAndReasonCode(long countryId, long reasonCodeId);
 
     @Query("MATCH (organization:Unit)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} AND reasonCode.reasonCodeType={1} return reasonCode")
-    List<ReasonCodeResponseDTO> findReasonCodesByUnitIdAndReasonCodeType(long unitId, ReasonCodeType reasonCodeType);
+    List<ReasonCode> findReasonCodesByUnitIdAndReasonCodeType(long unitId, ReasonCodeType reasonCodeType);
 
     @Query("MATCH (unit:Unit)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) WHERE id(unit) IN {0} AND reasonCode.reasonCodeType={1} " +
-            "RETURN id(reasonCode) as id, reasonCode.name as name," +
+            "RETURN id(reasonCode) as id, reasonCode.name as name, reasonCode.translations as translations," +
             "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType,reasonCode.timeTypeId as timeTypeId ORDER BY reasonCode.creationDate  DESC")
     List<ReasonCodeResponseDTO> findReasonCodesByUnitIdsAndReasonCodeType(List<Long> unitId, ReasonCodeType reasonCodeType);
 
