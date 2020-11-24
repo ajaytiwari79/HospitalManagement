@@ -120,7 +120,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
 
     @Query("MATCH (country:Country)-[:"+ HAS_RELATION_TYPES +"]->(relationType:RelationType {enabled:true}) where id(country)={0} " +
             "RETURN relationType ")
-    List<RelationTypeDTO> getRelationTypesByCountry(Long countryId);
+    List<RelationType> getRelationTypesByCountry(Long countryId);
 
     @Query("MATCH (country:Country)-[:"+HAS_RELATION_TYPES+"]->(relationType:RelationType{enabled:true}) where id(country)={0} AND id(relationType)={1} RETURN relationType")
     RelationType getRelationType(Long countryId, Long relationTypeId);

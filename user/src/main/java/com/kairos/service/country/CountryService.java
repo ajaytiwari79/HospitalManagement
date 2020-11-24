@@ -25,6 +25,7 @@ import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.user.resources.Vehicle;
@@ -361,7 +362,8 @@ public class CountryService {
     }
 
     public List<RelationTypeDTO> getRelationTypes(Long countryId) {
-        return countryGraphRepository.getRelationTypesByCountry(countryId);
+        List<RelationType> relationTypes = countryGraphRepository.getRelationTypesByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(relationTypes, RelationTypeDTO.class);
     }
 
     public boolean deleteRelationType(Long countryId, Long relationTypeId) {

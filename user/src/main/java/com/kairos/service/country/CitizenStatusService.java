@@ -7,6 +7,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.country.default_data.CitizenStatusDTO;
 import com.kairos.persistence.model.country.default_data.Currency;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -80,7 +81,8 @@ public class CitizenStatusService{
     }
 
     public List<CitizenStatusDTO> getCitizenStatusByCountryId(long countryId){
-        return citizenStatusGraphRepository.findCitizenStatusByCountryId(countryId);
+        List<CitizenStatus> citizenStatuses = citizenStatusGraphRepository.findCitizenStatusByCountryId(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(citizenStatuses, CitizenStatusDTO.class);
     }
 
 

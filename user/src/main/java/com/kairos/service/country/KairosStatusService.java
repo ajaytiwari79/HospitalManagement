@@ -7,6 +7,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.KairosStatus;
 import com.kairos.persistence.model.country.default_data.KairosStatusDTO;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.KairosStatusGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -53,7 +54,8 @@ public class KairosStatusService {
     }
 
     public List<KairosStatusDTO> getKairosStatusByCountryId(long countryId){
-        return kairosStatusGraphRepository.findKairosStatusByCountry(countryId);
+        List<KairosStatus> kairosStatuses = kairosStatusGraphRepository.findKairosStatusByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(kairosStatuses, KairosStatusDTO.class);
     }
 
     public KairosStatusDTO updateKairosStatus(long countryId, KairosStatusDTO kairosStatusDTO){

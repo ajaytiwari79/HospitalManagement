@@ -7,6 +7,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.country.default_data.LocationType;
 import com.kairos.persistence.model.country.default_data.LocationTypeDTO;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.LocationTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -53,7 +54,8 @@ public class LocationTypeService {
     }
 
     public List<LocationTypeDTO> getLocationTypeByCountryId(long countryId) {
-        return locationTypeGraphRepository.findLocationTypeByCountry(countryId);
+        List<LocationType> locationTypes = locationTypeGraphRepository.findLocationTypeByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(locationTypes, LocationTypeDTO.class);
     }
 
     public LocationTypeDTO updateLocationType(long countryId, LocationTypeDTO locationTypeDTO) {

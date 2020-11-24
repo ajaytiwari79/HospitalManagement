@@ -20,7 +20,7 @@ public interface EmployeeLimitGraphRepository extends Neo4jBaseRepository<Employ
 
     @Query("MATCH (country:Country)<-[:"+ BELONGS_TO +"]-(employeeLimit:EmployeeLimit {isEnabled:true}) where id(country)={0} " +
             "RETURN employeeLimit ")
-    List<EmployeeLimitDTO> findEmployeeLimitByCountry(long countryId);
+    List<EmployeeLimit> findEmployeeLimitByCountry(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(employeeLimit:EmployeeLimit {isEnabled:true}) WHERE id(country)={0} AND id(employeeLimit)<>{2} AND employeeLimit.name =~{1}  " +
             " WITH count(employeeLimit) as totalCount " +

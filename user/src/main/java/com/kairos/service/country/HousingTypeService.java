@@ -6,6 +6,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.HousingType;
 import com.kairos.persistence.model.country.default_data.HousingTypeDTO;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.HousingTypeGraphRepository;
@@ -53,7 +54,8 @@ public class HousingTypeService {
     }
 
     public List<HousingTypeDTO> getHousingTypeByCountryId(long countryId) {
-        return housingTypeGraphRepository.findHousingTypeByCountry(countryId);
+        List<HousingType> housingTypes = housingTypeGraphRepository.findHousingTypeByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(housingTypes, HousingTypeDTO.class);
     }
 
     public HousingTypeDTO updateHousingType(long countryId, HousingTypeDTO housingTypeDTO) {

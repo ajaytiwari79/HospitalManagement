@@ -7,6 +7,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.BusinessTypeDTO;
 import com.kairos.persistence.model.country.default_data.ContractType;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -53,7 +54,8 @@ public class BusinessTypeService {
     }
 
     public List<BusinessTypeDTO> getBusinessTypeByCountryId(long countryId) {
-        return businessTypeGraphRepository.findBusinessTypeByCountry(countryId);
+        List<BusinessType> businessTypes = businessTypeGraphRepository.findBusinessTypeByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(businessTypes, BusinessTypeDTO.class);
     }
 
     public BusinessTypeDTO updateBusinessType(long countryId, BusinessTypeDTO businessTypeDTO) {

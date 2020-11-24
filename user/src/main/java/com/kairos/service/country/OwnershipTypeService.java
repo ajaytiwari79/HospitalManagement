@@ -6,6 +6,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.ClinicType;
 import com.kairos.persistence.model.country.default_data.OwnershipType;
 import com.kairos.persistence.model.country.default_data.OwnershipTypeDTO;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.OwnershipTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -52,7 +53,8 @@ public class OwnershipTypeService {
     }
 
     public List<OwnershipTypeDTO> getOwnershipTypeByCountryId(long countryId){
-        return ownershipTypeGraphRepository.findOwnershipTypeByCountry(countryId);
+        List<OwnershipType> ownershipTypes = ownershipTypeGraphRepository.findOwnershipTypeByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(ownershipTypes, OwnershipTypeDTO.class);
     }
 
     public OwnershipTypeDTO updateOwnershipType(long countryId, OwnershipTypeDTO ownershipTypeDTO){

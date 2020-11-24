@@ -20,7 +20,7 @@ public interface KairosStatusGraphRepository extends Neo4jBaseRepository<KairosS
 
     @Query("MATCH (country:Country)<-[:"+ BELONGS_TO +"]-(kairosStatus:KairosStatus {isEnabled:true}) where id(country)={0} " +
             "RETURN kairosStatus")
-    List<KairosStatusDTO> findKairosStatusByCountry(long countryId);
+    List<KairosStatus> findKairosStatusByCountry(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(kairosStatus:KairosStatus {isEnabled:true}) WHERE id(country)={0} AND id(kairosStatus)<>{2} AND kairosStatus.name =~{1}  " +
             " WITH count(kairosStatus) as totalCount " +

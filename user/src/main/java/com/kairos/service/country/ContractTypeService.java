@@ -7,6 +7,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.ContractType;
 import com.kairos.persistence.model.country.default_data.ContractTypeDTO;
 import com.kairos.persistence.model.country.default_data.VatType;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.ContractTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -53,7 +54,8 @@ public class ContractTypeService {
     }
 
     public List<ContractTypeDTO> getContractTypeByCountryId(long countryId){
-        return contractTypeGraphRepository.findContractTypeByCountry(countryId);
+        List<ContractType> contractTypes = contractTypeGraphRepository.findContractTypeByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(contractTypes, ContractTypeDTO.class);
     }
 
     public ContractTypeDTO updateContractType(long countryId, ContractTypeDTO contractTypeDTO){

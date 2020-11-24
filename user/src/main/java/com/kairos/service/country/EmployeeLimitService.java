@@ -7,6 +7,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.EmployeeLimit;
 import com.kairos.persistence.model.country.default_data.EmployeeLimitDTO;
 import com.kairos.persistence.model.country.default_data.KairosStatus;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmployeeLimitGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -53,7 +54,8 @@ public class EmployeeLimitService {
     }
 
     public List<EmployeeLimitDTO> getEmployeeLimitByCountryId(long countryId){
-        return employeeLimitGraphRepository.findEmployeeLimitByCountry(countryId);
+        List<EmployeeLimit> employeeLimits = employeeLimitGraphRepository.findEmployeeLimitByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(employeeLimits, EmployeeLimitDTO.class);
     }
 
     public EmployeeLimitDTO updateEmployeeLimit(long countryId, EmployeeLimitDTO employeeLimitDTO){

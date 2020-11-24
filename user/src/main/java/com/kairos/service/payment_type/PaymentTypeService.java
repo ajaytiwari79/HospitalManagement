@@ -7,6 +7,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.EmployeeLimit;
 import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.country.default_data.PaymentTypeDTO;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepository;
 import com.kairos.service.country.CountryService;
@@ -50,7 +51,8 @@ public class PaymentTypeService {
     }
 
     public List<PaymentTypeDTO> getPaymentTypes(long countryId) {
-        return paymentTypeGraphRepository.findPaymentTypeByCountry(countryId);
+        List<PaymentType> paymentTypes = paymentTypeGraphRepository.findPaymentTypeByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(paymentTypes, PaymentTypeDTO.class);
     }
 
     public PaymentTypeDTO updatePaymentType(long countryId, PaymentTypeDTO paymentTypeDTO) {

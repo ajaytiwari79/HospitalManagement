@@ -20,7 +20,7 @@ public interface BusinessTypeGraphRepository extends Neo4jBaseRepository<Busines
 
     @Query("MATCH (country:Country)<-[:"+ BELONGS_TO +"]-(businessType:BusinessType {isEnabled:true}) where id(country)={0} " +
             "RETURN businessType")
-    List<BusinessTypeDTO> findBusinessTypeByCountry(long countryId);
+    List<BusinessType> findBusinessTypeByCountry(long countryId);
 
     @Query("MATCH (businessType:BusinessType) where id(businessType) in {0} return businessType")
     List<BusinessType> findByIdIn(List<Long> ids);

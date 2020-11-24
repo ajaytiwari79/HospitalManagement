@@ -6,6 +6,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.IndustryType;
 import com.kairos.persistence.model.country.default_data.IndustryTypeDTO;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.IndustryTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -55,7 +56,8 @@ public class IndustryTypeService {
     }
 
     public List<IndustryTypeDTO> getIndustryTypeByCountryId(long countryId){
-        return industryTypeGraphRepository.findIndustryTypeByCountry(countryId);
+        List<IndustryType> industryTypes = industryTypeGraphRepository.findIndustryTypeByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(industryTypes, IndustryTypeDTO.class);
     }
 
     public IndustryTypeDTO updateIndustryType(long countryId, IndustryTypeDTO industryTypeDTO){

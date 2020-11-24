@@ -20,7 +20,7 @@ public interface LocationTypeGraphRepository extends Neo4jBaseRepository<Locatio
 
     @Query("MATCH (country:Country)<-[:"+ BELONGS_TO +"]-(locationType:LocationType {isEnabled:true}) where id(country)={0} " +
             "RETURN locationType")
-    List<LocationTypeDTO> findLocationTypeByCountry(long countryId);
+    List<LocationType> findLocationTypeByCountry(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(locationType:LocationType {isEnabled:true}) WHERE id(country)={0} AND id(locationType)<>{2} AND locationType.name =~{1}  " +
             " WITH count(locationType) as totalCount " +

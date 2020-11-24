@@ -7,6 +7,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.country.default_data.EngineerTypeDTO;
 import com.kairos.persistence.model.country.default_data.PaymentType;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -53,7 +54,8 @@ public class EngineerTypeService{
     }
 
     public List<EngineerTypeDTO> getEngineerTypeByCountryId(long countryId){
-        return engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
+        List<EngineerType> engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(engineerTypes, EngineerTypeDTO.class);
     }
 
     public EngineerTypeDTO updateEngineerType(long countryId, EngineerTypeDTO engineerTypeDTO){

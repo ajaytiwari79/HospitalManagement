@@ -7,6 +7,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.OwnershipType;
 import com.kairos.persistence.model.country.default_data.VatType;
 import com.kairos.persistence.model.country.default_data.VatTypeDTO;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.VatTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -53,7 +54,8 @@ public class VatTypeService {
    }
 
     public List<VatTypeDTO> getVatTypeByCountryId(long countryId){
-        return vatTypeGraphRepository.findVatTypesByCountry(countryId);
+        List<VatType> vatTypes = vatTypeGraphRepository.findVatTypesByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(vatTypes, VatTypeDTO.class);
     }
 
     public VatTypeDTO updateVatType(long countryId, VatTypeDTO vatTypeDTO){

@@ -18,7 +18,7 @@ public interface PaymentTypeGraphRepository extends Neo4jBaseRepository<PaymentT
 
     @Query("MATCH (country:Country)<-[:"+ BELONGS_TO +"]-(paymentType:PaymentType {isEnabled:true}) where id(country)={0} " +
             "RETURN paymentType")
-    List<PaymentTypeDTO> findPaymentTypeByCountry(long countryId);
+    List<PaymentType> findPaymentTypeByCountry(long countryId);
 
     @Query("MATCH(country:Country)<-[:" + BELONGS_TO + "]-(paymentType:PaymentType {isEnabled:true}) WHERE id(country)={0} AND id(paymentType)<>{2} AND paymentType.name =~{1}  " +
             " WITH count(paymentType) as totalCount " +

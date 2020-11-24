@@ -79,7 +79,8 @@ public class ReasonCodeService {
 
 
     public List<ReasonCodeResponseDTO> getReasonCodesForCountry(long countryId, ReasonCodeType reasonCodeType) {
-        return reasonCodeGraphRepository.findReasonCodesByCountry(countryId, reasonCodeType);
+        List<ReasonCode> reasonCodes = reasonCodeGraphRepository.findReasonCodesByCountry(countryId, reasonCodeType);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(reasonCodes,ReasonCodeResponseDTO.class);
     }
 
 
