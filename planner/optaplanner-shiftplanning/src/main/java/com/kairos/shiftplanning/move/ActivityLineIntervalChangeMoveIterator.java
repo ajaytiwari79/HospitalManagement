@@ -35,7 +35,9 @@ public class  ActivityLineIntervalChangeMoveIterator<T>
         if(activityLineIntervalWrapper.getActivityLineInterval().getActivity().isTypeAbsence()){
             log.debug("providing absence move");
         }
-        List<ActivityLineInterval> exIntervals = ShiftPlanningUtility.getOverlappingActivityLineIntervals(activityLineIntervalWrapper.getShiftImp()==null?null:activityLineIntervalWrapper.getShiftImp().getActivityLineIntervals(),activityLineIntervalWrapper.getActivityLineInterval());
+        List<ActivityLineInterval> activityLineIntervals = activityLineIntervalWrapper.getShiftImp() == null ? null : activityLineIntervalWrapper.getShiftImp().getActivityLineIntervals();
+        ActivityLineInterval activityLineInterval = activityLineIntervalWrapper.getActivityLineInterval();
+        List<ActivityLineInterval> exIntervals = ShiftPlanningUtility.getOverlappingActivityLineIntervals(activityLineIntervals, activityLineInterval);
         ActivityLineIntervalChangeMove changeMove = new ActivityLineIntervalChangeMove(activityLineIntervalWrapper.getActivityLineInterval(),activityLineIntervalWrapper.getShiftImp(),exIntervals,null);
         return changeMove;
     }

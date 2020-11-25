@@ -6,6 +6,8 @@ import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.TimeSlot;
+import com.kairos.shiftplanning.domain.unit.Unit;
+import com.kairos.shiftplanningNewVersion.entity.Shift;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -44,4 +46,7 @@ public class DislikeNightShiftsForNonNightWorkers implements ConstraintHandler {
     public int checkConstraints(List<ShiftImp> shifts) {
         return 0;
     }
+
+    @Override
+    public int verifyConstraints(Unit unit, Shift shiftImp, List<Shift> shiftImps){return 0;};
 }

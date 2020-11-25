@@ -4,6 +4,9 @@ import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.unit.Unit;
+import com.kairos.shiftplanningNewVersion.entity.Shift;
+import com.kairos.shiftplanningNewVersion.utils.StaffingLevelPlanningUtility;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,8 +44,13 @@ public class ActivityDayType implements ConstraintHandler {
         return isValidForDayType(shift,dayTypes) ? 0 : 1;
     }
 
-    public int checkConstraints(List<ShiftImp> shifts) {
-        return 0;
+    @Override
+    public int verifyConstraints(Activity activity, Shift shift) {
+        List<DayType> dayTypes = activity.getValidDayTypeIds().stream().map(id -> shift.getStaff().getUnit().getDayTypeMap().get(id)).collect(Collectors.toList());
+        return StaffingLevelPlanningUtility.isValidForDayType(shift,dayTypes) ? 0 : 1;
     }
+
+    @Override
+    public int verifyConstraints(Unit unit, Shift shiftImp, List<Shift> shiftImps){return 0;};
 
 }

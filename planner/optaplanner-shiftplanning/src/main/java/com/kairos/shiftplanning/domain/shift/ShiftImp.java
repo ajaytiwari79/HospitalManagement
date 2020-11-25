@@ -119,7 +119,7 @@ public class ShiftImp implements Shift{
     }
 
     public boolean isShiftTypeChanged() {
-        return isCollectionNotEmpty(actualShiftActivities) && isCollectionNotEmpty(shiftActivities) && !actualShiftActivities.get(0).getActivity().getTimeType().equals(shiftActivities.get(0).getActivity().getTimeType().getTimeTypeEnum());
+        return true;//isCollectionNotEmpty(actualShiftActivities) && isCollectionNotEmpty(shiftActivities) && !actualShiftActivities.get(0).getActivity().getTimeType().equals(shiftActivities.get(0).getActivity().getTimeType().getTimeTypeEnum());
     }
 
     @Override
@@ -295,4 +295,5 @@ public class ShiftImp implements Shift{
     public boolean hasAnyEmployee(List<Employee> emps){
         return emps.contains(this.employee);
     }
+
 }

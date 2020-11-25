@@ -4,6 +4,8 @@ import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.unit.Unit;
+import com.kairos.shiftplanningNewVersion.entity.Shift;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,4 +39,7 @@ public class ShiftOnWeekend implements ConstraintHandler {
     public int checkConstraints(List<ShiftImp> shifts) {
         return (int)shifts.stream().filter(shiftImp -> weekEndSet.contains(shiftImp.getStartDate().getDayOfWeek())).count();
     }
+
+    @Override
+    public int verifyConstraints(Unit unit, Shift shiftImp, List<Shift> shiftImps){return 0;};
 }
