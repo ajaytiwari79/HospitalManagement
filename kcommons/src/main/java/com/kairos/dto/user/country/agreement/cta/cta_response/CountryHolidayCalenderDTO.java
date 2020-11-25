@@ -30,4 +30,5 @@ public class CountryHolidayCalenderDTO {
     private String colorCode;
     private boolean allowTimeSettings;
     private DayTypeDTO dayTypeDTO;
+    private Long countryId;
 }

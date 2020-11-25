@@ -15,7 +15,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.CommonConstants.DELETED;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
-public class CountryHolidayCalenderRepositoryImpl implements CustomCountryHolidayCalenderRepository{
+public class CountryCalenderRepoImpl implements CustomCountryCalenderRepo {
 
     @Inject
     private MongoTemplate mongoTemplate;

@@ -11,7 +11,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.repository.day_type.CountryHolidayCalenderRepository;
+import com.kairos.persistence.repository.day_type.CountryCalenderRepo;
 import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.day_type.CountryHolidayCalenderService;
@@ -41,7 +41,7 @@ public class CounterHelperService {
     @Inject
     private CountryHolidayCalenderService countryHolidayCalenderService;
     @Inject
-    private CountryHolidayCalenderRepository countryHolidayCalenderRepository;
+    private CountryCalenderRepo countryCalenderRepo;
     @Inject
     private DayTypeRepository dayTypeRepository;
     @Inject
@@ -71,7 +71,7 @@ public class CounterHelperService {
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString(),tagIds,filterBasedCriteria,true);
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiAllDefaultData(UserContext.getUserDetails().getCountryId(), staffEmploymentTypeDTO);
         defaultKpiDataDTO.setDateTimeIntervals(dateTimeIntervals);
-        defaultKpiDataDTO.setHolidayCalenders(countryHolidayCalenderRepository.getAllByCountryIdAndHolidayDateBetween(UserContext.getUserDetails().getCountryId(),LocalDate.parse(staffEmploymentTypeDTO.getStartDate()), LocalDate.parse(staffEmploymentTypeDTO.getEndDate())));
+        defaultKpiDataDTO.setHolidayCalenders(countryCalenderRepo.getAllByCountryIdAndHolidayDateBetween(UserContext.getUserDetails().getCountryId(),LocalDate.parse(staffEmploymentTypeDTO.getStartDate()), LocalDate.parse(staffEmploymentTypeDTO.getEndDate())));
         defaultKpiDataDTO.setTimeSlotDTOS(timeSlotSetService.getUnitTimeSlot(staffEmploymentTypeDTO.getOrganizationId()));
         return defaultKpiDataDTO;
     }

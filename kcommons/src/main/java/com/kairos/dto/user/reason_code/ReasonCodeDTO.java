@@ -2,6 +2,8 @@ package com.kairos.dto.user.reason_code;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +13,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * Created by pavan on 23/3/18.
@@ -31,6 +34,12 @@ public class ReasonCodeDTO {
     private BigInteger timeTypeId;
     private Long unitId;
     private Long countryId;
+
+    //TODO will get Remove after prod build
+    private List<ProtectedDaysOffSettingDTO> protectedDaysOffSettingDTO;
+    private List<CountryHolidayCalenderDTO> countryHolidayCalenderDTOS;
+
+
 
 
     public ReasonCodeDTO(BigInteger id, @NotBlank(message = "message.reasonCode.name.notEmpty") String name) {

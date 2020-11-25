@@ -13,7 +13,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.auth.GoogleCalenderTokenDTO;
 import com.kairos.dto.user.auth.UserDetailsDTO;
-import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
@@ -25,7 +25,6 @@ import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
-import com.kairos.persistence.model.auth.ReasonCode;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.common.UserBaseEntity;
@@ -37,7 +36,6 @@ import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.staff.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.service.SmsService;
@@ -79,7 +77,6 @@ import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
-import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 
 /**
  * Calls UserGraphRepository to perform CRUD operation on  User
@@ -137,8 +134,6 @@ public class UserService {
     private KMailService kMailService;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
-    @Inject
-    private ReasonCodeGraphRepository reasonCodeGraphRepository;
 
 
     /**

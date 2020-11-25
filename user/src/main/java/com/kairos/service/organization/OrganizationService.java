@@ -13,16 +13,21 @@ import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
+import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.OrganizationCategory;
+import com.kairos.persistence.model.access_permission.query_result.DayTypeCountryHolidayCalenderQueryResult;
+import com.kairos.persistence.model.auth.ReasonCode;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
@@ -30,6 +35,7 @@ import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -51,6 +57,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
+import com.kairos.persistence.repository.user.staff.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.PlannedTimeTypeRestClient;
 import com.kairos.rest_client.SchedulerServiceRestClient;
@@ -168,6 +175,8 @@ public class OrganizationService {
     @Inject private UnitService unitService;
     @Inject
     private TagService tagService;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationService.class);
 
@@ -907,5 +916,31 @@ public class OrganizationService {
         organizationGraphRepository.save(organization);
         return organization.getTranslatedData();
     }
+
+    public boolean transferReasonCode(){
+        Iterable<ReasonCode> reasonCodes=reasonCodeGraphRepository.findAll();
+        List<DayTypeCountryHolidayCalenderQueryResult> protectedDaysOff=reasonCodeGraphRepository.getDataOfProtectedDaysOffToTransferInActivity();
+        List<ProtectedDaysOffSettingDTO> protectedDaysOffSettingDTO=ObjectMapperUtils.copyCollectionPropertiesByMapper(protectedDaysOff,ProtectedDaysOffSettingDTO.class);
+        List<CountryHolidayCalendarQueryResult> countryHolidayCalendarQueryResults=reasonCodeGraphRepository.getDataOfCHCToTransferInActivity();
+        List<CountryHolidayCalenderDTO> countryHolidayCalenderDTOS=ObjectMapperUtils.copyCollectionPropertiesByMapper(countryHolidayCalendarQueryResults,CountryHolidayCalenderDTO.class);
+        List<ReasonCodeDTO> reasonCodeDTOS=new ArrayList<>();
+        reasonCodes.forEach(reasonCode -> {
+            if(!reasonCode.isDeleted()){
+                ReasonCodeDTO reasonCodeDTO=ObjectMapperUtils.copyPropertiesByMapper(reasonCode,ReasonCodeDTO.class);
+                if(reasonCode.getCountry()!=null)
+                    reasonCodeDTO.setCountryId(reasonCode.getCountry().getId());
+                else if(reasonCode.getUnit()!=null)
+                    reasonCodeDTO.setUnitId(reasonCode.getUnit().getId());
+
+                reasonCodeDTOS.add(reasonCodeDTO);
+            }
+        });
+        reasonCodeDTOS.get(0).setProtectedDaysOffSettingDTO(protectedDaysOffSettingDTO);
+        reasonCodeDTOS.get(0).setCountryHolidayCalenderDTOS(countryHolidayCalenderDTOS);
+        activityIntegrationService.transferReasonCode(reasonCodeDTOS);
+        return true;
+    }
+
+
 
 }

@@ -11,8 +11,9 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
+import com.kairos.persistence.model.day_type.CountryHolidayCalender;
 import com.kairos.persistence.model.day_type.DayType;
-import com.kairos.persistence.repository.day_type.CountryHolidayCalenderRepository;
+import com.kairos.persistence.repository.day_type.CountryCalenderRepo;
 import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.exception.ExceptionService;
@@ -42,7 +43,7 @@ public class DayTypeService {
     @Inject
     private ExceptionService exceptionService;
     @Inject
-    private CountryHolidayCalenderRepository countryHolidayCalenderRepository;
+    private CountryCalenderRepo countryCalenderRepo;
     @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
     @Inject
@@ -94,7 +95,7 @@ public class DayTypeService {
     public List<DayTypeDTO> getDayTypeByDate(Long countryId, Date date) {
         Date startDate = DateUtils.getStartOfDay(date);
         Date endDate = DateUtils.getEndOfDay(date);
-        CountryHolidayCalenderDTO countryHolidayCalenderDTO = countryHolidayCalenderRepository.getByCountryIdAndHolidayDateBetween(countryId, DateUtils.asLocalDate(startDate), DateUtils.asLocalDate(endDate));
+        CountryHolidayCalenderDTO countryHolidayCalenderDTO = countryCalenderRepo.getByCountryIdAndHolidayDateBetween(countryId, DateUtils.asLocalDate(startDate), DateUtils.asLocalDate(endDate));
 
         if (Optional.ofNullable(countryHolidayCalenderDTO).isPresent()) {
             List<DayTypeDTO> dayTypes = new ArrayList<>();
@@ -121,7 +122,7 @@ public class DayTypeService {
     }
 
     public List<BigInteger> getCurrentApplicableDayType(Long countryId) {
-        CountryHolidayCalenderDTO countryHolidayCalenderDTO = countryHolidayCalenderRepository.getCurrentlyActiveByCountryId(countryId,getCurrentLocalDate(),getCurrentLocalTime());
+        CountryHolidayCalender countryHolidayCalenderDTO = countryCalenderRepo.findActiveByCountryId(countryId,getCurrentLocalDate(),getCurrentLocalTime());
         List<BigInteger> dayTypes=new ArrayList<>();
         Day dayEnum = Day.valueOf(LocalDate.now().getDayOfWeek().name());
         List<DayTypeDTO> dayTypeList = dayTypeRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
@@ -132,7 +133,6 @@ public class DayTypeService {
             dayTypes.addAll(dayTypeList.stream().map(DayTypeDTO::getId).collect(Collectors.toSet()));
         }
         return dayTypes;
-
     }
 
     public Map<String, TranslationInfo> updateTranslation(BigInteger dayTypeId, Map<String,TranslationInfo> translations) {
@@ -143,7 +143,7 @@ public class DayTypeService {
     }
 
     public List<DayTypeDTO> getDayTypeWithCountryHolidayCalender(Long countryId) {
-        List<CountryHolidayCalenderDTO> publicHolidaysResult = countryHolidayCalenderRepository.getCountryAllHolidays(countryId);
+        List<CountryHolidayCalenderDTO> publicHolidaysResult = countryCalenderRepo.getCountryAllHolidays(countryId);
         Map<BigInteger, List<CountryHolidayCalenderDTO>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.getDayTypeId() != null).collect(Collectors.groupingBy(CountryHolidayCalenderDTO::getDayTypeId, Collectors.toList()));
         List<DayTypeDTO> dayTypes = dayTypeRepository.findAllByCountryIdAndDeletedFalse(countryId);
         return dayTypes.stream().map(dayType ->
@@ -152,7 +152,7 @@ public class DayTypeService {
     }
 
     public List<DayTypeDTO> getDayTypeWithCountryHolidayCalender(Set<BigInteger> dayTypeIds) {
-        List<CountryHolidayCalenderDTO> publicHolidaysResult = countryHolidayCalenderRepository.getCountryAllHolidays(UserContext.getUserDetails().getCountryId());
+        List<CountryHolidayCalenderDTO> publicHolidaysResult = countryCalenderRepo.getCountryAllHolidays(UserContext.getUserDetails().getCountryId());
         Map<BigInteger, List<CountryHolidayCalenderDTO>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.getDayTypeId() != null).collect(Collectors.groupingBy(CountryHolidayCalenderDTO::getDayTypeId, Collectors.toList()));
         List<DayTypeDTO> dayTypes = dayTypeRepository.findAllByIdInAndDeletedFalse(dayTypeIds);
         return dayTypes.stream().map(dayType ->

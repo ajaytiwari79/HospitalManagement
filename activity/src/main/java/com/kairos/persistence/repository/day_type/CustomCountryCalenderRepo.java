@@ -4,7 +4,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCale
 
 import java.util.List;
 
-public interface CustomCountryHolidayCalenderRepository {
+public interface CustomCountryCalenderRepo {
 
     List<CountryHolidayCalenderDTO> getCountryAllHolidays(Long countryId);
 

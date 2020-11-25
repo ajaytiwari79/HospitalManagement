@@ -112,6 +112,13 @@ public class ProtectedDaysOffService extends MongoBaseService {
         protectedDaysOffRepository.saveEntities(protectedDaysOffs);
     }
 
+    //TODO will get remove after production build
+    public boolean transferData(List<ProtectedDaysOffSettingDTO> protectedDaysOffs) {
+        List<ProtectedDaysOff> protectedDaysOffList=ObjectMapperUtils.copyCollectionPropertiesByMapper(protectedDaysOffs,ProtectedDaysOff.class);
+        protectedDaysOffRepository.saveEntities(protectedDaysOffList);
+        return true;
+    }
+
 
 
 }

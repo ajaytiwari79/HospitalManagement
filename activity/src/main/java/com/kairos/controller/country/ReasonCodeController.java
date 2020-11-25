@@ -3,7 +3,9 @@ package com.kairos.controller.country;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.reason_code.ReasonCodeType;
+import com.kairos.service.day_type.CountryHolidayCalenderService;
 import com.kairos.service.reason_code.ReasonCodeService;
+import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +30,10 @@ import static com.kairos.constants.ApiConstants.*;
 public class ReasonCodeController {
     @Inject
     private ReasonCodeService reasonCodeService;
+    @Inject
+    private ProtectedDaysOffService protectedDaysOffService;
+    @Inject
+    private CountryHolidayCalenderService countryHolidayCalenderService;
 
     @ApiOperation(value = "Add ReasonCode by countryId")
     @RequestMapping(value = COUNTRY_URL + "/reason_code", method = RequestMethod.POST)
@@ -117,6 +123,9 @@ public class ReasonCodeController {
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> transferReasonCode(@RequestBody List<ReasonCodeDTO> reasonCodeDTOS) {
         reasonCodeService.transferReasonCode(reasonCodeDTOS);
+        protectedDaysOffService.transferData(reasonCodeDTOS.get(0).getProtectedDaysOffSettingDTO());
+        countryHolidayCalenderService.transferDataOfCHCInActivity(reasonCodeDTOS.get(0).getCountryHolidayCalenderDTOS());
+
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 }

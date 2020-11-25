@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.day_type;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.persistence.model.day_type.CountryHolidayCalender;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.springframework.data.neo4j.annotation.Query;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
@@ -16,7 +16,10 @@ import java.util.List;
  */
 
 @Repository
-public interface CountryHolidayCalenderRepository extends MongoBaseRepository<CountryHolidayCalender, BigInteger>,CustomCountryHolidayCalenderRepository {
+public interface CountryCalenderRepo extends MongoBaseRepository<CountryHolidayCalender, BigInteger>, CustomCountryCalenderRepo {
+
+    @Query("{'deleted':false,'countryId':?0,'holidayDate':?1,'$or':[{'endTime':{$exists:false}},{'startTime':{$lte:?2},'endTime':{$gte:2}}]}")
+    CountryHolidayCalender findActiveByCountryId(Long countryId, LocalDate holidayDate,LocalTime time);
 
     CountryHolidayCalender findByCountryId(Long countryId);
 
@@ -24,8 +27,7 @@ public interface CountryHolidayCalenderRepository extends MongoBaseRepository<Co
 
     CountryHolidayCalenderDTO getByCountryIdAndHolidayDateBetween(Long countryId, LocalDate startDate, LocalDate endDate);
 
-    @Query("{deleted:false,countryId:?0,holidayDate:?1,'$or':[{endTime:{$exists:false}},{startTime:{$lte:?2},endTime:{$gte:2}}]}")
-    CountryHolidayCalenderDTO getCurrentlyActiveByCountryId(Long countryId, LocalDate holidayDate, LocalTime currentTime);
+
 
 
 }

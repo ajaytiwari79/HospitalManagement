@@ -19,6 +19,7 @@ import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
@@ -274,8 +275,8 @@ public class ActivityIntegrationService {
         genericRestClient.publishRequest(zoneIdString, unitId, true, IntegrationOperation.UPDATE, "/update_time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){});
     }
 
-    public List<DayTypeDTO> getDayTypeByIds(Collection<BigInteger> dayTypeIds) {
-        return isCollectionEmpty(dayTypeIds)?new ArrayList<>():genericRestClient.publishRequest(dayTypeIds, null, false, IntegrationOperation.GET, "/dayType", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayTypeDTO>>>(){});
+    public List<DayTypeDTO> getDayTypeByIds(Set<BigInteger> dayTypeIds) {
+        return isCollectionEmpty(dayTypeIds)?new ArrayList<>():genericRestClient.publishRequest(dayTypeIds, null, false, IntegrationOperation.UPDATE, "/dayType_byIds", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<DayTypeDTO>>>(){});
     }
 
     public void transferReasonCode(List<ReasonCodeDTO> reasonCodeDTOS) {

@@ -5,7 +5,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCale
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.day_type.CountryHolidayCalender;
 import com.kairos.persistence.model.day_type.DayType;
-import com.kairos.persistence.repository.day_type.CountryHolidayCalenderRepository;
+import com.kairos.persistence.repository.day_type.CountryCalenderRepo;
 import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
@@ -25,7 +25,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
 public class CountryHolidayCalenderService {
 
     @Inject
-    private CountryHolidayCalenderRepository countryHolidayCalenderRepository;
+    private CountryCalenderRepo countryCalenderRepo;
     @Inject
     private DayTypeRepository dayTypeRepository;
     @Inject
@@ -37,17 +37,17 @@ public class CountryHolidayCalenderService {
     public List<CountryHolidayCalenderDTO> getAllCountryHolidaysByCountryIdAndYear(int year, Long countryId) {
         LocalDate startDate = LocalDate.of(1, 1, year);
         LocalDate endDate = LocalDate.of(31, 12, year);
-        return countryHolidayCalenderRepository.getAllByCountryIdAndHolidayDateBetween(countryId, startDate, endDate);
+        return countryCalenderRepo.getAllByCountryIdAndHolidayDateBetween(countryId, startDate, endDate);
     }
 
     public List<CountryHolidayCalenderDTO> getAllCountryAllHolidaysByCountryId(Long countyId) {
-        return countryHolidayCalenderRepository.getCountryAllHolidays(isNull(countyId) ? UserContext.getUserDetails().getCountryId() : countyId);
+        return countryCalenderRepo.getCountryAllHolidays(isNull(countyId) ? UserContext.getUserDetails().getCountryId() : countyId);
     }
 
     public CountryHolidayCalenderDTO createHolidayCalenderByCountryId(Long countryId, CountryHolidayCalenderDTO countryHolidayCalenderDTO) {
         CountryHolidayCalender countryHolidayCalender = ObjectMapperUtils.copyPropertiesByMapper(countryHolidayCalenderDTO, CountryHolidayCalender.class);
         countryHolidayCalender.setCountryId(countryId);
-        countryHolidayCalenderRepository.save(countryHolidayCalender);
+        countryCalenderRepo.save(countryHolidayCalender);
         DayType dayType=dayTypeRepository.findOne(countryHolidayCalenderDTO.getDayTypeId());
         countryHolidayCalenderDTO.setHolidayType(dayType.isHolidayType());
         countryHolidayCalenderDTO.setId(countryHolidayCalender.getId());
@@ -57,24 +57,31 @@ public class CountryHolidayCalenderService {
 
     public CountryHolidayCalenderDTO updateCountryCalender(CountryHolidayCalenderDTO countryHolidayCalenderDTO) {
         LOGGER.info("Data Received: " + countryHolidayCalenderDTO);
-        CountryHolidayCalender calender = countryHolidayCalenderRepository.findOne(countryHolidayCalenderDTO.getId());
+        CountryHolidayCalender calender = countryCalenderRepo.findOne(countryHolidayCalenderDTO.getId());
         calender.setHolidayDate(countryHolidayCalenderDTO.getHolidayDate());
         calender.setHolidayTitle(countryHolidayCalenderDTO.getHolidayTitle());
         calender.setDescription(countryHolidayCalenderDTO.getDescription());
         calender.setDayTypeId(countryHolidayCalenderDTO.getDayTypeId());
         calender.setStartTime(countryHolidayCalenderDTO.getStartTime());
         calender.setEndTime(countryHolidayCalenderDTO.getEndTime());
-        countryHolidayCalenderRepository.save(calender);
+        countryCalenderRepo.save(calender);
         return countryHolidayCalenderDTO;
     }
 
     public boolean safeDeleteCountryCalender(BigInteger id) {
-        CountryHolidayCalender calender = countryHolidayCalenderRepository.findOne(id);
+        CountryHolidayCalender calender = countryCalenderRepo.findOne(id);
         if (calender != null) {
             calender.setEnabled(false);
-            countryHolidayCalenderRepository.save(calender);
+            countryCalenderRepo.save(calender);
             return true;
         }
         return false;
+    }
+
+    public boolean transferDataOfCHCInActivity(List<CountryHolidayCalenderDTO> countryHolidayCalenderDTOS){
+        List<CountryHolidayCalender> countryHolidayCalenders=ObjectMapperUtils.copyCollectionPropertiesByMapper(countryHolidayCalenderDTOS,CountryHolidayCalender.class);
+        countryCalenderRepo.saveEntities(countryHolidayCalenders);
+        return true;
+
     }
 }

@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.query_wrapper;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -24,13 +25,15 @@ public class CountryHolidayCalendarQueryResult {
     private DayTypeDTO dayType;
     private Long id;
     private String holidayTitle;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private String startTime;
+    private String endTime;
     private boolean reOccuring;
     private String description;
-    private String holidayType;
+    private boolean holidayType;
     private boolean isEnabled = true;
     private String googleCalId;
+    private Long dayTypeId;
+    private Long countryId;
 
 
 }

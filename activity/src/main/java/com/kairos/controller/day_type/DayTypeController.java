@@ -1,6 +1,7 @@
 package com.kairos.controller.day_type;
 
 import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.service.day_type.DayTypeService;
@@ -79,7 +80,7 @@ public class DayTypeController {
     }
 
     @ApiOperation(value = "Get DayType by countryId")
-    @GetMapping(value =  "/dayType")
+    @PutMapping(value =  "/dayType_byIds")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDayType(@RequestBody Set<BigInteger> dayTypeIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypeWithCountryHolidayCalender(dayTypeIds));

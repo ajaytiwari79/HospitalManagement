@@ -22,6 +22,7 @@ public class ProtectedDaysOffSettingDTO {
     private LocalDate publicHolidayDate;
     private boolean protectedDaysOff;
     private BigInteger dayTypeId;
+    private Long expertiseId;
 
     public ProtectedDaysOffSettingDTO(BigInteger id, Long unitId, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
         this.id=id;
