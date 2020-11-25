@@ -8,7 +8,6 @@ import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.cta.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,5 @@
 package com.kairos.dto.user.organization.skill;
 
-import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -3,7 +3,6 @@ package com.kairos.utils;
 import com.kairos.commons.utils.ArrayUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.TranslationDTO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

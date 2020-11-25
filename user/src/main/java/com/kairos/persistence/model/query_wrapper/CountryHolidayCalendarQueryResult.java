@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.query_wrapper;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -9,7 +8,6 @@ import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 /**
  * Created by oodles on 16/11/17.

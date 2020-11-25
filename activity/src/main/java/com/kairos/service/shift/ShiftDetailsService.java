@@ -16,7 +16,6 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.reason_code.ReasonCodeService;
-import com.kairos.service.shift.ShiftService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

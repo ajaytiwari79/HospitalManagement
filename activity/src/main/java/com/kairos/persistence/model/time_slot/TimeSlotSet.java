@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.time_slot;
 
 import com.kairos.dto.user.country.time_slot.TimeSlot;
-import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.common.MongoBaseEntity;

@@ -5,7 +5,6 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.unit_settings.PhaseSettingsDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
-import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.phase.PhaseService;

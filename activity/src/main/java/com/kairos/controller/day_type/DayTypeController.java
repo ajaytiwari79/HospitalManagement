@@ -1,7 +1,6 @@
 package com.kairos.controller.day_type;
 
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.service.day_type.DayTypeService;

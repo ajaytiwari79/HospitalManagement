@@ -31,7 +31,6 @@ import static com.kairos.enums.TimeSlotType.SHIFT_PLANNING;
 import static com.kairos.enums.TimeSlotType.TASK_PLANNING;
 import static com.kairos.enums.time_slot.TimeSlotMode.ADVANCE;
 import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
-import static java.util.Collections.*;
 
 @Service
 public class TimeSlotSetService {

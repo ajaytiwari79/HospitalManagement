@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.access_permission;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.OrganizationCategory;
 import lombok.Getter;

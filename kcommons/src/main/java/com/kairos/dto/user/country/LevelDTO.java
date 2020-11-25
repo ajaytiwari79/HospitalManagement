@@ -2,14 +2,11 @@ package com.kairos.dto.user.country;
 
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user_context.UserContext;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Getter
 @Setter
