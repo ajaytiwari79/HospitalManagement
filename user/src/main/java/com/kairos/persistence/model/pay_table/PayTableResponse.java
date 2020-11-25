@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.organization.Level;
 import lombok.Getter;
@@ -49,6 +50,13 @@ public class PayTableResponse {
         this.paymentUnit = paymentUnit;
 
 
+    }
+    public String getName() {
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
+    }
+
+    public String getDescription() {
+        return TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
     }
 
     @Override
