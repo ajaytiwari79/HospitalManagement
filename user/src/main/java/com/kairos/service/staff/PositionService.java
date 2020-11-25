@@ -49,6 +49,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.redis.RedisService;
 import com.kairos.service.scheduler.UserSchedulerJobService;
 import com.kairos.service.tree_structure.TreeStructureService;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -318,7 +319,7 @@ public class PositionService {
         Organization organization = organizationGraphRepository.findOrganizationOfStaff(staffId);
         OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
         List<AccessGroup> accessGroups = accessGroupRepository.getAccessGroups(organization.getId());
-        List<Map<String, Object>> units= unitGraphRepository.getSubOrgHierarchy(organization.getId());
+        List<Map<String, Object>> units= ObjectMapperUtils.copyCollectionPropertiesByMapper(unitGraphRepository.getSubOrgHierarchy(organization.getId()), HashedMap.class);
         List<Map<String, Object>> positions;
         List<Map<String, Object>> workPlaces = new ArrayList<>();
         // This is for parent organization i.e if unit is itself parent organization

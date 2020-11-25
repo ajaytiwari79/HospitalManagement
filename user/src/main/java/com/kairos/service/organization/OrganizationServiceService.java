@@ -21,6 +21,7 @@ import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.GdprIntegrationService;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.util.IterableUtils;
@@ -213,7 +214,7 @@ public class OrganizationServiceService {
             if (checkIfServiceExistsWithOrganizationType(orgTypeId, serviceId) != 0) {
                 LOGGER.info("Already Selected now Deselecting ");
                 organizationTypeGraphRepository.deleteService(orgTypeId, serviceId);
-                List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
+                List<Map<String, Object>> mapList = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceRepository.getOrgServicesByOrgType(orgTypeId), HashedMap.class);
                 for (Map<String, Object> map : mapList) {
                     Object o = map.get(RESULT);
                     objectList.add(o);
@@ -222,7 +223,7 @@ public class OrganizationServiceService {
             } else {
                 LOGGER.info("Not  Selected now Selecting ");
                 organizationTypeGraphRepository.selectService(orgTypeId, serviceId);
-                List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
+                List<Map<String, Object>> mapList = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceRepository.getOrgServicesByOrgType(orgTypeId), HashedMap.class);
                 for (Map<String, Object> map : mapList) {
                     Object o = map.get(RESULT);
                     objectList.add(o);
@@ -267,6 +268,7 @@ public class OrganizationServiceService {
     public Map<String, List<OrganizationServiceDTO>> organizationServiceData(long id) {
         List<Long> allUnitIds=organizationBaseRepository.fetchAllUnitIds(id);
         List<Map<String, Object>> services=(allUnitIds.size()==1 && allUnitIds.get(0).equals(id))?unitGraphRepository.getServicesForUnit(id):unitGraphRepository.getServicesForUnits(allUnitIds);
+        services = ObjectMapperUtils.copyCollectionPropertiesByMapper(services, HashedMap.class);
         List<Map<String, Object>> avialableService = null;
         List<Map<String, Object>> selectedService = null;
         List<OrganizationServiceDTO> availableServiceDTOS = new ArrayList<>();

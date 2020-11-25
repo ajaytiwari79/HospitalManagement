@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.activity.task.StaffTaskDTO;
@@ -65,6 +66,7 @@ import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.ClientPersonalCalenderPrerequisiteDTO;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -596,10 +598,15 @@ public class ClientService {
         List<TaskTypeAggregateResult> results = taskDemandRestClient.getTaskTypesOfCitizens(citizenIds);
         clientStaffQueryResults.forEach(client -> setCitizenDetails(citizenStaffList, results, client));
         HashMap<String, Object> orgData = new HashMap<>();
-        List<Map<String, Object>> skills = unitGraphRepository.getSkillsOfOrganization(unitId);
+        List<Map<String, Object>> skills = ObjectMapperUtils.copyCollectionPropertiesByMapper(unitGraphRepository.getSkillsOfOrganization(unitId), HashedMap.class);
         List<Map<String, Object>> filterSkillData = new ArrayList<>();
         for (Map<String, Object> map : skills) {
-            filterSkillData.add((Map<String, Object>) map.get("data"));
+            Map<String, Object> skillCategory = (Map<String, Object>) map.get("data");
+            TranslationUtil.convertTranslationFromStringToMap(skillCategory);
+            ((List<Map<String, Object>>)skillCategory.get("skills")).forEach(skill->{
+                TranslationUtil.convertTranslationFromStringToMap(skill);
+            });
+            filterSkillData.add(skillCategory);
         }
         orgData.put("taskTypes", taskTypeRestClient.getTaskTypesOfUnit(unitId));
         orgData.put("skills", filterSkillData);

@@ -80,6 +80,7 @@ import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -461,7 +462,7 @@ public class OrganizationService {
 
     public Map<String, Object> getCommonDataOfOrganization(Long unitId) {
         Map<String, Object> data = new HashMap<>();
-        List<Map<String, Object>> organizationSkills = unitGraphRepository.getSkillsOfParentOrganization(unitId);
+        List<Map<String, Object>> organizationSkills = ObjectMapperUtils.copyCollectionPropertiesByMapper(unitGraphRepository.getSkillsOfParentOrganization(unitId), HashedMap.class);
         List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
         for (Map<String, Object> map : organizationSkills) {
             Map<String, Object> organizationSkill = (Map<String, Object>) map.get("data");

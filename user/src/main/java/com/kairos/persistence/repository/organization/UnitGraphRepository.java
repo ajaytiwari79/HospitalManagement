@@ -382,7 +382,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH  org,skill,skillCategory,r\n" +
             "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=org.showCountryTags WITH  org,skill,skillCategory,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
             "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[ORGANIZATION_HAS_TAG]-(org) WITH skill,skillCategory,r,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
-            "RETURN {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,skills:COLLECT(distinct {id:id(skill),name:skill.name,visitourId:skill.visitourId,description:skill.description,customName:r.customName,isEdited:true, tags:ctags+otags})} as data")
+            "RETURN {id:id(skillCategory),translations:skillCategory.translations,name:skillCategory.name,description:skillCategory.description,skills:COLLECT(distinct {id:id(skill),translations:skill.translations,name:skill.name,visitourId:skill.visitourId,description:skill.description,customName:r.customName,isEdited:true, tags:ctags+otags})} as data")
     List<Map<String, Object>> getSkillsOfOrganization(long unitId);
 
     @Query("MATCH (org:Unit)-[r:" + HAS_SUB_ORGANIZATION + "]->(unit:Unit) WHERE id(org)={0} AND id(unit)={1} RETURN count(r)")
