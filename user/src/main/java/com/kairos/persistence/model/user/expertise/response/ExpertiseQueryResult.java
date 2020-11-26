@@ -2,13 +2,11 @@ package com.kairos.persistence.model.user.expertise.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.BreakPaymentSetting;
-import com.kairos.persistence.model.common.UserTranslationInfoConverter;
+import com.kairos.persistence.model.common.TranslationConverter;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
@@ -60,7 +58,7 @@ public class ExpertiseQueryResult {
     private CTACompensationSettingDTO ctaCompensationSetting;
     private Long countryId;
     private Long unitId;
-    @Convert(UserTranslationInfoConverter.class)
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
     @JsonIgnore

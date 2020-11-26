@@ -2,7 +2,7 @@ package com.kairos.persistence.model.access_permission;
 
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
-import com.kairos.persistence.model.common.UserTranslationInfoConverter;
+import com.kairos.persistence.model.common.TranslationConverter;
 import lombok.Getter;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
@@ -21,7 +21,7 @@ public class KPIAccessPageQueryResult {
     private boolean write;
     private boolean active;
     private List<KPIAccessPageDTO> child;
-    @Convert(UserTranslationInfoConverter.class)
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
     public String getName() {

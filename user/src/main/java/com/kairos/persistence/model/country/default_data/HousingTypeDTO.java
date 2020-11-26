@@ -2,7 +2,7 @@ package com.kairos.persistence.model.country.default_data;
 
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.persistence.model.common.UserTranslationInfoConverter;
+import com.kairos.persistence.model.common.TranslationConverter;
 import lombok.Getter;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
@@ -23,7 +23,7 @@ public class HousingTypeDTO {
     private Long countryId;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
-    @Convert(UserTranslationInfoConverter.class)
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations ;
 
     public HousingTypeDTO() {

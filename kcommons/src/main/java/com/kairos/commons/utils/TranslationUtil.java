@@ -12,11 +12,11 @@ import java.util.Map;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 public class TranslationUtil {
+    //TODO remove uses of this function
     public static void convertTranslationFromStringToMap(Map<String, Object> map) {
         Map<String, TranslationInfo> translations;
         try{
-            ObjectMapper objectMapper = new ObjectMapper();
-            translations = objectMapper.readValue(map.get("translations").toString(), Map.class);
+            translations = ObjectMapperUtils.mapper.readValue(map.get("translations").toString(), Map.class);
         }catch (Exception ex) {
             translations = new HashMap();
         }

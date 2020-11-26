@@ -1,8 +1,7 @@
 package com.kairos.persistence.model.user.open_shift;
 
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.persistence.model.common.UserTranslationInfoConverter;
+import com.kairos.persistence.model.common.TranslationConverter;
 import com.kairos.persistence.model.organization.OrganizationType;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +19,7 @@ public class OrganizationTypeAndSubType {
     private String name;
     private List<OrganizationType> children;
     private Long levelId;
-    @Convert(UserTranslationInfoConverter.class)
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
 

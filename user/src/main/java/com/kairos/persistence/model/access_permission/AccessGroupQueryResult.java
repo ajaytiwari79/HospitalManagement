@@ -3,7 +3,7 @@ package com.kairos.persistence.model.access_permission;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.persistence.model.common.UserTranslationInfoConverter;
+import com.kairos.persistence.model.common.TranslationConverter;
 import com.kairos.persistence.model.country.default_data.DayType;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +35,7 @@ public class AccessGroupQueryResult {
     private List<DayType> dayTypes;
     private boolean allowedDayTypes;
     private AccessGroup parentAccessGroup;
-    @Convert(UserTranslationInfoConverter.class)
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
     public String getName() {

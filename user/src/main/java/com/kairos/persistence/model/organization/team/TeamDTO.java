@@ -5,7 +5,7 @@ import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.team.LeaderType;
 import com.kairos.enums.team.TeamType;
-import com.kairos.persistence.model.common.UserTranslationInfoConverter;
+import com.kairos.persistence.model.common.TranslationConverter;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,7 +52,7 @@ public class TeamDTO {
     private Long unitId;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
-    @Convert(UserTranslationInfoConverter.class)
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
     @AssertTrue(message = "message.same_staff.belongs_to.both_lead")
     public boolean isValid() {

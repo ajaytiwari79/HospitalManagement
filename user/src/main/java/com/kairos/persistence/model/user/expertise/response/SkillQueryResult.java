@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.expertise.response;
 
 import com.kairos.dto.TranslationInfo;
-import com.kairos.persistence.model.common.UserTranslationInfoConverter;
+import com.kairos.persistence.model.common.TranslationConverter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,7 +30,7 @@ public class SkillQueryResult {
     private List<Long> tags;
     private Set<SkillLevelQueryResult> skillLevels;
     private String skillCategory;
-    @Convert(UserTranslationInfoConverter.class)
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
 

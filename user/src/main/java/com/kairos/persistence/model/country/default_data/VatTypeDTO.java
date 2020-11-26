@@ -2,7 +2,7 @@ package com.kairos.persistence.model.country.default_data;
 
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.persistence.model.common.UserTranslationInfoConverter;
+import com.kairos.persistence.model.common.TranslationConverter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,7 +28,7 @@ public class VatTypeDTO {
     private Long countryId;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
-    @Convert(UserTranslationInfoConverter.class)
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations ;
 
     public VatTypeDTO(@NotBlank(message = "error.VatType.name.notEmpty") String name, int code, String description, @NotBlank(message = "error.VatType.percentage.notEmpty") String percentage) {

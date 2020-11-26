@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.system_setting;
 
 import com.kairos.dto.TranslationInfo;
-import com.kairos.persistence.model.common.UserTranslationInfoConverter;
+import com.kairos.persistence.model.common.TranslationConverter;
 import lombok.Getter;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
@@ -18,7 +18,7 @@ public class SystemLanguageQueryResult {
     private String code;
     private boolean active;
     private boolean defaultLanguage;
-    @Convert(UserTranslationInfoConverter.class)
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
     public SystemLanguageQueryResult() {

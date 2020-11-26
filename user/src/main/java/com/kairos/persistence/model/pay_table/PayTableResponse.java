@@ -3,7 +3,7 @@ package com.kairos.persistence.model.pay_table;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.persistence.model.common.UserTranslationInfoConverter;
+import com.kairos.persistence.model.common.TranslationConverter;
 import com.kairos.persistence.model.organization.Level;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +35,7 @@ public class PayTableResponse {
     private Boolean published;
     private Boolean editable;
     private BigDecimal percentageValue;
-    @Convert(UserTranslationInfoConverter.class)
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
 
