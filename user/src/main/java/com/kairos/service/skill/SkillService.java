@@ -313,7 +313,7 @@ public class SkillService {
             Map<String, Object> map = (Map<String, Object>) data.get("data");
             for (Map<String, Object> skill : (List<Map<String, Object>>) map.get("children")) {
                 if (skill.get("isSelected") != null && (boolean) skill.get("isSelected")) {
-                    selectedSkillId.add((long) skill.get("id"));
+                    selectedSkillId.add(Long.valueOf(skill.get("id").toString()));
                 }
                 TranslationUtil.convertTranslationFromStringToMap(skill);
             }
