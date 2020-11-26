@@ -72,6 +72,10 @@ public class CTAResponseDTO {
         this.description=description;
     }
 
+    public CTAResponseDTO(List<CTARuleTemplateDTO> ruleTemplates) {
+        this.ruleTemplates = ruleTemplates;
+    }
+
     public String getName() {
         return TranslationUtil.getName(translations,name);
     }
