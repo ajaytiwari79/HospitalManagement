@@ -8,12 +8,6 @@ MATCH(ag:AccessGroup)-[:DAY_TYPES]-(dt:DayType)
 WITH ag,collect(toString(id(dt))) as t
 set ag.dayTypeIds=t
 
-
-
-
-
-
-
 try {
    // Replace the Ids by executing below query in neo4j
    // Match(dt:DayType{deleted:false}) return dt;
