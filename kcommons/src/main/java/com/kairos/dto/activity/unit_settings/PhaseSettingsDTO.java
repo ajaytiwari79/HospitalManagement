@@ -1,6 +1,5 @@
 package com.kairos.dto.activity.unit_settings;
 
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,12 +23,4 @@ public class PhaseSettingsDTO {
     private Long unitId;
     private int sequence;
     private Map<String, TranslationInfo> translations;
-
-    public String getName(){
-        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
-    }
-
-    public String getDescription(){
-        return TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
-    }
 }

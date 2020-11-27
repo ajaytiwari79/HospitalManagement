@@ -81,9 +81,6 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
 
     List<Skill> findSkillByNameIn(List<String> skillNames);
 
-    @Query("Match (skill:Skill) where id(skill) IN {0} RETURN distinct skill")
-    List<Skill> findSkillByIds(List<Long> skillIds);
-
     List<Skill> findByExternalIdInAndIsEnabledTrue(List<String> timecareIds);
 
     @Query("MATCH (skill:Skill{isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory)-[:"+BELONGS_TO+"]->(country:Country) where id(country)={0} return skill")
