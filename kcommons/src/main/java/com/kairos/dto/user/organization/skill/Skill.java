@@ -1,5 +1,6 @@
 package com.kairos.dto.user.organization.skill;
 
+import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,14 +26,13 @@ public class Skill {
     private String shortName;
     private SkillStatus skillStatus;
     private SkillCategory skillCategory;
-
+    private Map<String,String> translatedNames;
+    private Map<String,String> translatedDescriptions;
 
     public Skill(String name, SkillCategory skillCategory) {
         this.name = name;
         this.skillCategory = skillCategory;
     }
-
-
 
     public Map<String, Object> retrieveDetails() {
         Map<String,Object> data = new HashMap<>();

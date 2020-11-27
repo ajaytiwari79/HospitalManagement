@@ -85,7 +85,7 @@ public class SkillCategoryController {
     @ApiOperation("Get a skillCategory by id")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllSkillCategory(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillCategoryService.findSkillCategoryByUnitId(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillCategoryService.getAllSkillCategoryOfCountryOrUnit(unitId, false));
     }
 
 
