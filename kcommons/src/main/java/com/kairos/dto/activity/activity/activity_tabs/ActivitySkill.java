@@ -1,24 +1,32 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.Map;
-
 /**
  * Created by pawanmandhan on 28/8/17.
  */
-@Getter
-@Setter
-@NoArgsConstructor
 public class ActivitySkill  {
     private  String name;
     private String level;
     private Long skillId;
-    private Map<String, TranslationInfo> translations;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+    public ActivitySkill(){
+
+    }
+
 
     public ActivitySkill(String name, String level, Long skillId) {
         this.name = name;
@@ -26,7 +34,11 @@ public class ActivitySkill  {
         this.skillId = skillId;
     }
 
-    public String getName(){
-        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
+    public Long getSkillId() {
+        return skillId;
+    }
+
+    public void setSkillId(Long skillId) {
+        this.skillId = skillId;
     }
 }
