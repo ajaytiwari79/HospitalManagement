@@ -186,6 +186,7 @@ public class SystemLanguageService {
         List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId), SystemLanguageDTO.class);
         systemLanguageDTOS.forEach(systemLanguageDTO -> {
             systemLanguageDTO.setCountryId(countryId);
+            systemLanguageDTO.setTranslations(TranslationUtil.getTranslatedData(systemLanguageDTO.getTranslatedNames(),systemLanguageDTO.getTranslatedDescriptions()));
         });
         return systemLanguageDTOS;
     }

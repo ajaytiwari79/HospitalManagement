@@ -1,0 +1,23 @@
+package com.kairos.shiftplanning.rules;
+    dialect "java"
+import com.kairos.shiftplanning.domain.activity.*;
+import com.kairos.shiftplanningNewVersion.entity.*;
+import com.kairos.shiftplanning.domain.staffing_level.*;
+import com.kairos.shiftplanning.domain.skill.*;
+import com.kairos.enums.constraint.ConstraintSubType;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import java.util.ArrayList;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+global HardMediumSoftLongScoreHolder scoreHolder;
+
+
+/********Activity Rules*******/
+rule "Max Allocation Per Shift"
+salience 20
+    when
+        $ac:Activity()
+        $shift:Shift(!activityLineIntervals.isEmpty() && hasIntervalsForActivity($ac))
+        $constraintsPenality: Integer(intValue>0) from ($ac.verifyConstraints($shift,ConstraintSubType.MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF))
+    then
+        $ac.breakContraints(scoreHolder,kcontext,$constraintsPenality,  ConstraintSubType.MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF);
+end

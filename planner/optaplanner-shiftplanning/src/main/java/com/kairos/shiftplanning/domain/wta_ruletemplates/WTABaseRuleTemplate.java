@@ -7,6 +7,8 @@ import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.constraints.ConstraintHandler;
+import com.kairos.shiftplanning.domain.unit.Unit;
+import com.kairos.shiftplanningNewVersion.entity.Shift;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -88,4 +90,7 @@ public class WTABaseRuleTemplate implements ConstraintHandler {
     public int getWeight() {
         return this.constraintSetting.getConstraintWeight();
     }
+
+    @Override
+    public int verifyConstraints(Unit unit, Shift shiftImp, List<Shift> shiftImps){return 0;};
 }

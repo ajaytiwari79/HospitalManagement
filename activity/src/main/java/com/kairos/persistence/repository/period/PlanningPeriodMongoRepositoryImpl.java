@@ -373,6 +373,12 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 "                         { $gte: [ \"$currentDate\",  \"$$startDate\" ] },\n" +
                 "                         { $lte: [ \"$currentDate\", \"$$endDate\" ] },\n" +
                 "                         {$eq:[\"$unitId\",\"$$unitId\"]}\n" +
+                "{\n" +
+                        "                  \"$eq\": [\n" +
+                        "                    \"$deleted\",\n" +
+                        "                    false\n" +
+                        "                  ]\n" +
+                        "                }"+
                 "                       ]\n" +
                 "                    }\n" +
                 "                 }\n" +

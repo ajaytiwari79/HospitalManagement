@@ -71,11 +71,11 @@ public class PhaseDTO {
     }
 
     public String getName() {
-        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
+        return TranslationUtil.getName(translations,name);
     }
 
     public String getDescription() {
-        return TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
+        return TranslationUtil.getDescription(translations,description);
     }
 
 
