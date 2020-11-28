@@ -17,7 +17,7 @@ public interface ProvinceGraphRepository extends Neo4jBaseRepository<Province,Lo
     List<Province> findAll();
 
 
-    @Query("MATCH (r:Region{isEnable:true})-[:REGION]-(p:Province {isEnable:true}) where id(r)={0} return {p.translations as translations,\n" +
+    @Query("MATCH (r:Region{isEnable:true})-[:REGION]-(p:Province {isEnable:true}) where id(r)={0} return p.translations as translations,\n" +
             "p.name as name, p.code as code, p.geoFence as geoFence, p.latitude as latitude, p.longitude as longitude,id(p) as id")
     List<ProvinceQueryResult> findAllProvinceByRegionId(Long regionId);
 

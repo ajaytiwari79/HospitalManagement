@@ -35,18 +35,20 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WHERE id(parent)=id(ps.p) WITH r2,ps,ag\n" +
             "OPTIONAL MATCH (child:AccessPage)<-[r:"+HAS_ACCESS_OF_TABS+"]-(ag)\n" +
             "WHERE id(child)=id(ps.c) WITH r,r2,ps,ag\n" +
-            "RETURN ps.p.translations AS translations,\n" +
-            "ps.p.name AS name,id(ps.p) AS id,ps.p.sequence AS sequence,case when r2.isEnabled then true else false end AS selected, r2.read AS read, r2.write AS write,ps.p.isModule AS module,\n" +
-            "collect(ps.c.translations AS translations,\n" +
-            "ps.c.name AS name,id(ps.c) AS id,ps.c.sequence AS sequence,r.read AS read, r.write AS write,case when r.isEnabled then true else false end AS selected) AS children\n" +
+            "RETURN {" +
+            "translations:ps.p.translations,\n" +
+            "name:ps.p.name,id:id(ps.p),sequence:ps.p.sequence,selected:case when r2.isEnabled then true else false end, read:r2.read, write:r2.write,module:ps.p.isModule,children:collect({" +
+            "translations:ps.c.translations,\n" +
+            "name:ps.c.name,id:id(ps.c),sequence:ps.c.sequence,read:r.read, write:r.write,selected:case when r.isEnabled then true else false end})} as data\n" +
             "UNION\n" +
             // Fetch modules which does not have child
             "MATCH (ag:AccessGroup) WHERE id(ag)={0} WITH ag \n" +
             "MATCH (accessPage:AccessPage{isModule:true,active:true}) WHERE not (accessPage)-[:"+SUB_PAGE+"]->() WITH accessPage, ag\n" +
             "MATCH (accessPage)<-[r:"+HAS_ACCESS_OF_TABS+"]-(ag) WITH accessPage, ag,r\n" +
-            "RETURN accessPage.translations AS translations,\n" +
-            "accessPage.name AS name,id(accessPage) AS id,accessPage.sequence AS sequence,r.read AS read, r.write AS write,case when r.isEnabled then true else false end AS selected,accessPage.isModule AS module, [] AS children")
-    List<AccessPageQueryResult> getSelectedAccessPageHierarchy(Long accessGroupId);
+            "RETURN {" +
+            "translations:accessPage.translations,\n" +
+            "name:accessPage.name,id:id(accessPage),sequence:accessPage.sequence,read:r.read, write:r.write,selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
+    List<Map<String,Object>> getSelectedAccessPageHierarchy(Long accessGroupId);
 
 
     @Query("MATCH (accessGroup:AccessGroup),(accessPermission:AccessPermission) WHERE id(accessPermission)={0} AND id(accessGroup)={1}\n" +

@@ -198,7 +198,9 @@ public class EmploymentTypeService {
 
     public List<Map<String, Object>> getEmploymentTypeOfOrganization(Long unitId, boolean isDeleted) {
         Organization organization=organizationService.fetchParentOrganization(unitId);
-        return unitGraphRepository.getEmploymentTypeByOrganization(organization.getId(), isDeleted);
+        List<Map<String, Object>> employmentTypes = unitGraphRepository.getEmploymentTypeByOrganization(organization.getId(), isDeleted);
+        employmentTypes.forEach(employmentType->TranslationUtil.convertTranslationFromStringToMap(employmentType));
+        return employmentTypes;
     }
 
     public List<EmploymentType> getEmploymentTypes(Long unitId){

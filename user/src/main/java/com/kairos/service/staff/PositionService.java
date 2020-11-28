@@ -359,7 +359,7 @@ public class PositionService {
             positions = new ArrayList<>();
             for (Map<String, Object> unitData : units) {
                 Map<String, Object> parentUnit = (Map<String, Object>) ((Map<String, Object>) unitData.get("data")).get("parent");
-                long id = (long) parentUnit.get("id");
+                long id = Long.valueOf(parentUnit.get("id").toString());
                 TranslationUtil.convertTranslationFromStringToMap(parentUnit);
                 Map<String, Object> position;
                 if (ids.contains(id)) {

@@ -1,26 +1,44 @@
 package com.kairos.commons.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user_context.UserContext;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.isMapEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TranslationUtil {
+
+    public static final String NAME = "name";
+    public static final String TRANSLATIONS = "translations";
+    public static final String DESCRIPTION = "description";
+
     //TODO remove uses of this function
     public static void convertTranslationFromStringToMap(Map<String, Object> map) {
         Map<String, TranslationInfo> translations;
         try{
-            translations = ObjectMapperUtils.mapper.readValue(map.get("translations").toString(), Map.class);
+            Map<String,Object> translatedMap = ObjectMapperUtils.mapper.readValue(map.get(TRANSLATIONS).toString(), Map.class);
+            Map<String, TranslationInfo> finalTranslations = new HashMap<>();
+            translatedMap.forEach((k, v) -> finalTranslations.put(k, new TranslationInfo(((Map) v).get(NAME).toString(), ((Map) v).get(DESCRIPTION).toString())));
+            translations = finalTranslations;
         }catch (Exception ex) {
-            translations = new HashMap();
+            translations = new HashMap<>();
         }
-        map.put("translations", translations); 
+        map.put(TRANSLATIONS, translations);
+        if(isMapEmpty(translations))return;
+        if(map.containsKey(NAME)){
+            map.put(NAME,getName(translations,map.get(NAME).toString()));
+        }
+        if(map.containsKey(DESCRIPTION)){
+            map.put(DESCRIPTION,getName(translations,map.get(DESCRIPTION).toString()));
+         }
     }
 
     public static String getName(Map<String, TranslationInfo> translations, String name) {
@@ -46,7 +64,7 @@ public class TranslationUtil {
             Map<String, Map> translationInfoMap = ObjectMapperUtils.copyPropertiesByMapper(translations, HashedMap.class);
             Map<String, TranslationInfo> translationMap = new HashMap<>();
             for (Map.Entry<String, Map> translationInfoEntry : translationInfoMap.entrySet()) {
-                TranslationInfo translationInfo = new TranslationInfo((String) translationInfoEntry.getValue().get("name"), (String) translationInfoEntry.getValue().get("description"));
+                TranslationInfo translationInfo = new TranslationInfo((String) translationInfoEntry.getValue().get(NAME), (String) translationInfoEntry.getValue().get(DESCRIPTION));
                 translationMap.put(translationInfoEntry.getKey(), translationInfo);
             }
             return translationMap;
