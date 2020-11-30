@@ -885,9 +885,10 @@ public class StaffingLevelService {
 
     private void filterIncorrectDataByDates(List<DateWiseActivityDTO> dateWiseActivityDTOS, LocalDate startDate, LocalDate endDate, List<ActivityValidationError> activityValidationErrors) {
         Iterator<DateWiseActivityDTO> iterator = dateWiseActivityDTOS.iterator();
+        DateTimeInterval timeInterval=new DateTimeInterval(startDate,endDate);
         while (iterator.hasNext()) {
             DateWiseActivityDTO dateWiseActivityDTO = iterator.next();
-            if (dateWiseActivityDTO.getDate().isBefore(startDate) || dateWiseActivityDTO.getDate().isAfter(endDate) || dateWiseActivityDTO.getDate().isBefore(DateUtils.getCurrentLocalDate())) {
+            if (!timeInterval.contains(dateWiseActivityDTO.getDate()) || dateWiseActivityDTO.getDate().isBefore(DateUtils.getCurrentLocalDate())) {
                 iterator.remove();
                 activityValidationErrors.add(new ActivityValidationError(Arrays.asList(exceptionService.getLanguageSpecificText(DATE_OUT_OF_RANGE, dateWiseActivityDTO.getDate()))));
             }
