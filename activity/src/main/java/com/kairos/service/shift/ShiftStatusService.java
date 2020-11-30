@@ -174,6 +174,7 @@ public class ShiftStatusService {
             shiftActivityDTO.setId(currentShift.getId());
             shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
         }
+        shiftMongoRepository.save(currentShift);
         return new ShiftAndActivtyStatusDTO(newArrayList(ObjectMapperUtils.copyPropertiesByMapper(currentShift,ShiftDTO.class)), newArrayList(shiftActivityResponseDTO));
     }
 
