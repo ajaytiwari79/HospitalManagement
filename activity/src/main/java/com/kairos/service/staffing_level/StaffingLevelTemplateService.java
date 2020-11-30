@@ -158,7 +158,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
             }
                 List<String> errors=new ArrayList<>();
                 if(!Optional.ofNullable(staffingLevelTemplateDTO.getValidity().getEndDate()).isPresent()) {
-                    if (!Optional.ofNullable(activity.getActivityGeneralSettings().getEndDate()).isPresent() &&
+                    if (Optional.ofNullable(activity.getActivityGeneralSettings().getEndDate()).isPresent() &&
                             activity.getActivityGeneralSettings().getEndDate().isBefore(staffingLevelTemplateDTO.getValidity().getStartDate())) {
                         errors.add(exceptionService.getLanguageSpecificText(ACTIVITY_OUT_OF_RANGE, activity.getName()));
                     }
