@@ -93,7 +93,7 @@ public class ShiftStatusService {
         List<ShiftActivityResponseDTO> shiftActivityResponseDTOS = new ArrayList<>();
         ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO=null;
         if(isNotNull(currentShift.getRequestAbsence())){
-            shiftAndActivtyStatusDTO = updateStatusOfRequestAbsence(unitId, shiftPublishDTO, currentShift);
+            return updateStatusOfRequestAbsence(unitId, shiftPublishDTO, currentShift);
         }
             Activity activity = activityMongoRepository.findOne(currentShift.getActivities().get(0).getActivityId());
             if (CommonConstants.FULL_WEEK.equals(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
@@ -145,6 +145,7 @@ public class ShiftStatusService {
                 shiftActivityResponseDTOS.add(shiftAndActivtyStatusDTO.getShiftActivityStatusResponse().get(0));
             }
         }
+
         return new ShiftAndActivtyStatusDTO(shiftDTOS, shiftActivityResponseDTOS);
     }
 
