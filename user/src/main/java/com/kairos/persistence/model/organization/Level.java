@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.organization;
 
 
-
-import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,8 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import javax.validation.constraints.NotBlank;
-
-import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_LEVEL_NAME_NOTEMPTY;
 

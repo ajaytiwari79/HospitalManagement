@@ -18,7 +18,6 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.EngineerType;
-import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
@@ -28,7 +27,10 @@ import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.position.*;
+import com.kairos.persistence.model.staff.position.ExpiredPositionsQueryResult;
+import com.kairos.persistence.model.staff.position.Position;
+import com.kairos.persistence.model.staff.position.StaffPositionDTO;
+import com.kairos.persistence.model.staff.position.StaffPositionDetail;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -36,7 +38,6 @@ import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.rest_client.priority_group.GenericRestClient;
@@ -58,6 +59,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -111,8 +113,6 @@ public class PositionService {
     private UnitPermissionAndAccessPermissionGraphRepository unitPermissionAndAccessPermissionGraphRepository;
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
-    @Inject
-    private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -530,7 +530,7 @@ public class PositionService {
         return saveEmploymentEndDate(organization, employmentEndDate, staffId, null, null, null);
     }
 
-    public Position updatePositionEndDate(Organization organization, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId,boolean saveAsDraft) throws Exception {
+    public Position updatePositionEndDate(Organization organization, Long staffId, Long endDateMillis, BigInteger reasonCodeId, Long accessGroupId, boolean saveAsDraft) throws Exception {
         Long employmentEndDate = null;
         if (Optional.ofNullable(endDateMillis).isPresent() && !saveAsDraft) {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
@@ -559,33 +559,26 @@ public class PositionService {
 
     }
 
-    private Position saveEmploymentEndDate(Organization organization, Long employmentEndDate, Long staffId, Long reasonCodeId, Long endDateMillis, Long accessGroupId) throws Exception {
+    private Position saveEmploymentEndDate(Organization organization, Long employmentEndDate, Long staffId, BigInteger reasonCodeId, Long endDateMillis, Long accessGroupId) throws Exception {
 
         Organization parentUnit = organizationService.fetchParentOrganization(organization.getId());
-        ReasonCode reasonCode = null;
         Position position = positionGraphRepository.findPosition(parentUnit.getId(), staffId);
         //TODO Commented temporary due to kafka down on QA server
 //         userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate, position.getEndDateMillis(), parentOrganization.getId(), position.getId(),
 //             parentOrganization.getTimeZone());
         position.setEndDateMillis(employmentEndDate);
         if (!Optional.ofNullable(employmentEndDate).isPresent()) {
-            positionGraphRepository.deletePositionReasonCodeRelation(staffId);
-            position.setReasonCode(reasonCode);
+            position.setReasonCodeId(reasonCodeId);
         } else if (Optional.ofNullable(employmentEndDate).isPresent() && Objects.equals(employmentEndDate, endDateMillis)) {
-            positionGraphRepository.deletePositionReasonCodeRelation(staffId);
             if(isNotNull(reasonCodeId)) {
-                reasonCode = reasonCodeGraphRepository.findById(reasonCodeId).get();
+                position.setReasonCodeId(reasonCodeId);
             }
-            position.setReasonCode(reasonCode);
+
         }
         if (Optional.ofNullable(accessGroupId).isPresent()) {
             position.setAccessGroupIdOnPositionEnd(accessGroupId);
         }
         positionGraphRepository.save(position);
-
-        PositionReasonCodeQueryResult employmentReasonCode = positionGraphRepository.findEmploymentreasonCodeByStaff(staffId);
-        position.setReasonCode(employmentReasonCode.getReasonCode());
-
         return position;
 
     }

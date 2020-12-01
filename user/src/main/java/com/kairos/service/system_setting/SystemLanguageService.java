@@ -5,7 +5,6 @@ import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.system_setting.CountryLanguageSettingRelationship;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.system_setting.SystemLanguageQueryResult;

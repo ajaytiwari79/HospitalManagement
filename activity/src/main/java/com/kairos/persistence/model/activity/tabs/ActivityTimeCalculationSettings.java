@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class ActivityTimeCalculationSettings {
     @KPermissionField
     private LocalTime defaultStartTime;
     @KPermissionField
-    private List<Long> dayTypes = new ArrayList<>();
+    private List<BigInteger> dayTypes = new ArrayList<>();
     private boolean replaceWithPublishedShiftTime;
     private boolean replaceWithUnapprovedAbsenceRequest;
 

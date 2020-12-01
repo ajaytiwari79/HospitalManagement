@@ -3,7 +3,6 @@ package com.kairos.service.payroll;/*
  *
  */
 
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.payroll.PensionProviderDTO;
 import com.kairos.persistence.model.payroll.PensionProvider;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

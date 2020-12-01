@@ -12,7 +12,6 @@ import com.kairos.persistence.model.country.pay_table.PayGroupAreaDTO;
 import com.kairos.persistence.model.country.pay_table.PayTableResponseWrapper;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.pay_table.*;
-import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.access_permission;
 
-import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -256,15 +255,14 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WITH o,position, [o]+units as units  unwind units as org  WITH DISTINCT org,o,position\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
             "MATCH (unitPermission)-[agr:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE agr.endDate IS NULL OR DATE(agr.endDate) >= DATE() " +
-            "MATCH(accessGroup)-[:"+DAY_TYPES+"]->(dayType:DayType) " +
-            "WITH collect(dayType) as dayType,accessGroup,org,unitPermission " +
-            "WHERE ANY(dt IN dayType WHERE id(dt) IN   {1})   AND (accessGroup.endDate IS NULL OR DATE(accessGroup.endDate) >= DATE())  WITH org,accessGroup,unitPermission\n" +
+            "WITH accessGroup,org,unitPermission " +
+            "WHERE ANY(dt IN accessGroup.dayTypeIds WHERE dt IN   {1})   AND (accessGroup.endDate IS NULL OR DATE(accessGroup.endDate) >= DATE())  WITH org,accessGroup,unitPermission\n" +
             "MATCH (accessPage:AccessPage)<-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(accessGroup) \n" +
             "MATCH (org) WHERE id(org)={2} \n"+
             "OPTIONAL MATCH (unitPermission)-[customRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
             "WITH org,collect( DISTINCT {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,module:accessPage.isModule,sequence:accessPage.sequence}) as permissions\n" +
             "RETURN id(org) as unitId,'Organization' IN labels(org) as parentOrganization, permissions as permission")
-    List<UserPermissionQueryResult> fetchStaffPermissionsWithDayTypes(Long userId, Set<Long> dayTypeIds,Long organizationId);
+    List<UserPermissionQueryResult> fetchStaffPermissionsWithDayTypes(Long userId, Set<String> dayTypeIds, Long organizationId);
 
 
 

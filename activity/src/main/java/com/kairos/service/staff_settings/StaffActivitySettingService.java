@@ -8,7 +8,6 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffAndActivitySettingWrapper;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.StaffActivityDetails;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;

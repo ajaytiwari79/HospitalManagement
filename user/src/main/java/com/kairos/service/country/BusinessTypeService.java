@@ -1,12 +1,12 @@
 package com.kairos.service.country;
 
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.BusinessTypeDTO;
-import com.kairos.persistence.model.country.default_data.ContractType;
 import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -42,7 +42,8 @@ public class BusinessTypeService {
         } else {
             Boolean businessTypeExistInCountryByName = businessTypeGraphRepository.businessTypeExistInCountryByName(countryId, "(?i)" + businessTypeDTO.getName(), -1L);
             if (businessTypeExistInCountryByName) {
-                exceptionService.duplicateDataException("error.BusinessType.name.exist");
+                throw new InvalidRequestException("Min should be less than max");
+                //exceptionService.duplicateDataException("error.BusinessType.name.exist");
             }
             businessType = new BusinessType(businessTypeDTO.getName(), businessTypeDTO.getDescription());
             businessType.setCountry(country);

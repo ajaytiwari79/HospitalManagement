@@ -282,4 +282,5 @@ public class RegionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, municipalityService.updateTranslationOfZipCode(zipcodeId,translations));
     }
 
+
 }
