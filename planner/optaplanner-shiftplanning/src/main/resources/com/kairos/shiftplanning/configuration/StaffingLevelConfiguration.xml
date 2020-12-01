@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver>
+<!--  <environmentMode>FULL_ASSERT</environmentMode>-->
+  <solutionClass>com.kairos.shiftplanningNewVersion.solution.StaffingLevelSolution</solutionClass>
+  <entityClass>com.kairos.shiftplanningNewVersion.entity.ALI</entityClass>
+  <entityClass>com.kairos.shiftplanningNewVersion.entity.Shift</entityClass>
+  <scoreDirectorFactory>
+      <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
+  </scoreDirectorFactory>
+    <localSearch>
+<!--        <localSearchType>LATE_ACCEPTANCE</localSearchType>-->
+            <changeMoveSelector>
+                <filterClass>com.kairos.shiftplanningNewVersion.filter.ChangeMoveALIFilter</filterClass>
+            </changeMoveSelector>
+            <swapMoveSelector>
+                <filterClass>com.kairos.shiftplanningNewVersion.filter.ALISwapMoveFilter</filterClass>
+            </swapMoveSelector>
+
+    <acceptor>
+        <lateAcceptanceSize>800</lateAcceptanceSize>
+    </acceptor>
+    <forager>
+        <acceptedCountLimit>20</acceptedCountLimit>
+    </forager>
+    <termination>
+        <unimprovedSecondsSpentLimit>30</unimprovedSecondsSpentLimit>
+    </termination>
+    </localSearch>
+</solver>

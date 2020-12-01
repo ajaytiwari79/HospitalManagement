@@ -187,7 +187,7 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllSkillCategory(@PathVariable Long countryId) {
         if (countryId != null) {
-            List<SkillCategoryQueryResults> skillCategory = skillCategoryService.getAllSkillCategoryOfCountryOrUnit(countryId, true);
+            List<SkillCategoryQueryResults> skillCategory = skillCategoryService.getAllSkillCategoryOfCountry(countryId);
             if (skillCategory != null) {
                 return ResponseHandler.generateResponse(HttpStatus.OK, true, skillCategory);
             }

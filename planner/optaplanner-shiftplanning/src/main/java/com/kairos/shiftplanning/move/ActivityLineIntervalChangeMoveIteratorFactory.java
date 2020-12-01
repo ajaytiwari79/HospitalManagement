@@ -23,35 +23,6 @@ public class ActivityLineIntervalChangeMoveIteratorFactory implements MoveIterat
 
     @Override
     public Iterator<? extends Move<ShiftPlanningSolution>> createOriginalMoveIterator(ScoreDirector<ShiftPlanningSolution> scoreDirector) {
-        /*ShiftRequestPhasePlanningSolution solution = scoreDirector.getWorkingSolution();
-        List<ActivityLineInterval> activityLineIntervals= solution.getActivityLineIntervals();
-        List<ActivityLineIntervalWrapper> possibleActivityLineIntervals= new ArrayList<>(),nullActivityLineIntervals= new ArrayList<>();
-        List<ShiftImp> workingShifts= solution.getShifts();
-        List<ShiftImp> shifts=new ArrayList<>(workingShifts);
-        ShiftImp shift=shifts.get(new Random().nextInt(shifts.size()));
-        Activity activity=solution.getActivities().get(new Random().nextInt(solution.getActivities().size()));
-        //for (ShiftImp shift:shifts){
-
-            for (ActivityLineInterval activityLineInterval:activityLineIntervals) {
-                if(!activity.getId().equals(activityLineInterval.getActivity().getId())){// ||  !activityLineInterval.isRequired()
-                    continue;
-                }
-                if(shift==null){
-                    nullActivityLineIntervals.add(new ActivityLineIntervalWrapper(activityLineInterval,null));
-                }else if(activityLineInterval.getStart().toLocalDate().equals(shift.getDate())){
-                    possibleActivityLineIntervals.add(new ActivityLineIntervalWrapper(activityLineInterval,shift));
-                    nullActivityLineIntervals.add(new ActivityLineIntervalWrapper(activityLineInterval,null));
-                }
-            }
-        //}
-        *//*if(new Random().nextBoolean()){
-            Collections.reverse(possibleActivityLineIntervals);
-        }*//*
-
-        possibleActivityLineIntervals.addAll(nullActivityLineIntervals);
-        Collections.shuffle(possibleActivityLineIntervals);
-        ActivityLineIntervalChangeMoveIterator activityLineIntervalChangeMoveIterator = new ActivityLineIntervalChangeMoveIterator(possibleActivityLineIntervals);
-        return activityLineIntervalChangeMoveIterator;*/
         throw new UnsupportedOperationException();
     }
 
@@ -59,7 +30,7 @@ public class ActivityLineIntervalChangeMoveIteratorFactory implements MoveIterat
     public ActivityLineIntervalChangeMoveIterator<? extends Move<ShiftPlanningSolution>> createRandomMoveIterator(ScoreDirector<ShiftPlanningSolution> scoreDirector, Random workingRandom) {
         ShiftPlanningSolution solution = scoreDirector.getWorkingSolution();
         List<ActivityLineInterval> activityLineIntervals= solution.getActivityLineIntervals();
-        List<ActivityLineIntervalWrapper> possibleActivityLineIntervals= new ArrayList<>(),nullActivityLineIntervals= new ArrayList<>();
+        List<ActivityLineIntervalWrapper> possibleActivityLineIntervals= new ArrayList<>();
         List<ShiftImp> workingShifts= solution.getShifts();
         List<ShiftImp> shifts=new ArrayList<>(workingShifts);
         //Pick a random date's shift and ALIs

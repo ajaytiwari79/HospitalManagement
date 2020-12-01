@@ -11,6 +11,7 @@ import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.executioner.ShiftPlanningGenerator;
+import com.kairos.shiftplanningNewVersion.entity.Shift;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.*;
 import org.apache.commons.collections4.CollectionUtils;
@@ -93,6 +94,16 @@ public class Activity {
     public int checkConstraints(List<ShiftImp> shifts, ConstraintSubType constraintSubType) {
         if(!constraints.containsKey(constraintSubType)) return 0;
         return constraints.get(constraintSubType).checkConstraints(shifts);
+    }
+
+    public int verifyConstraints(Shift shift, ConstraintSubType constraintSubType) {
+        if(shift.isLocked() || !constraints.containsKey(constraintSubType)) return 0;
+        return constraints.get(constraintSubType).verifyConstraints(this,shift);
+    }
+
+    public int verifyConstraints(List<Shift> shifts, ConstraintSubType constraintSubType) {
+        if(!constraints.containsKey(constraintSubType)) return 0;
+        return constraints.get(constraintSubType).verifyConstraints(shifts);
     }
 
 

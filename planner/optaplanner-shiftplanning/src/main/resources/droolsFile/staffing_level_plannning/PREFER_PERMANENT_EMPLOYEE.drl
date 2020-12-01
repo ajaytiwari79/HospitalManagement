@@ -1,0 +1,25 @@
+package com.kairos.shiftplanning.rules;
+ dialect "java"
+
+import com.kairos.shiftplanning.domain.activity.*;
+import com.kairos.shiftplanningNewVersion.entity.*;
+import com.kairos.shiftplanning.domain.staffing_level.*;
+import com.kairos.shiftplanning.domain.skill.*;
+import com.kairos.shiftplanning.domain.unit.*;
+import com.kairos.enums.constraint.ConstraintSubType;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import java.util.List;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+global HardMediumSoftLongScoreHolder scoreHolder;
+
+
+//We need to change it to Unit
+rule "Prefer Permannent Employee"
+salience 20
+  when
+    $ac:Activity()
+    $shifts:List(size>0) from collect(Shift(staff!=null))
+    $constraintsPenality: Integer(intValue>0) from ($ac.verifyConstraints($shifts,ConstraintSubType.PREFER_PERMANENT_EMPLOYEE))
+  then
+    $ac.breakContraints(scoreHolder,kcontext, $constraintsPenality,ConstraintSubType.PREFER_PERMANENT_EMPLOYEE);
+end

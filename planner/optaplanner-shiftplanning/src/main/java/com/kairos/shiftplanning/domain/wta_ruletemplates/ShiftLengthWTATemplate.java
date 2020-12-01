@@ -9,6 +9,8 @@ import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.unit.Unit;
+import com.kairos.shiftplanningNewVersion.entity.Shift;
+import com.kairos.shiftplanningNewVersion.utils.StaffingLevelPlanningUtility;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -64,6 +66,22 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
                 if (isValidShift && isValidForDay(dayTypeIds, unit,shiftImp.getStart())) {
                     int limit = getValueByPhaseAndCounter(unit, phaseTemplateValues);
                     penality = isValid(minMaxSetting, limit, getValueAccordingShiftLengthAndAverageSetting(shiftLengthAndAverageSetting, shiftImp));
+                }
+            }
+        }
+        return penality;
+    }
+
+    @Override
+    public int verifyConstraints(Unit unit, Shift shift, List<Shift> shifts){
+        int penality = 0;
+        if (!isDisabled() && isValidForPhase(unit.getPlanningPeriod().getPhase().getId(), this.phaseTemplateValues)) {
+            TimeInterval timeInterval = StaffingLevelPlanningUtility.getTimeSlotByPartOfDay(partOfDays, unit.getTimeSlotMap(), shift);
+            if (isNull(timeInterval)) {
+                boolean isValidShift = isCollectionEmpty(timeTypeIds) || CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds());
+                if (isValidShift && isValidForDay(dayTypeIds, unit,shift.getStart())) {
+                    int limit = getValueByPhaseAndCounter(unit, phaseTemplateValues);
+                    penality = isValid(minMaxSetting, limit, StaffingLevelPlanningUtility.getValueAccordingShiftLengthAndAverageSetting(shiftLengthAndAverageSetting, shift));
                 }
             }
         }

@@ -30,13 +30,13 @@ public class ActivityLineIntervalSwapMoveIterator<T>
     @Override
     public ActivityLineIntervalSwapMove next() {
         n++;
-        ActivityLineInterval leftActivityLineInterval= activityLineInterval.get(workingRandom.nextInt(activityLineInterval.size()));
-        ActivityLineInterval rightActivityLineInterval= activityLineInterval.get(workingRandom.nextInt(activityLineInterval.size()));
-        boolean sameInterval=leftActivityLineInterval.getStart().isEqual(rightActivityLineInterval.getStart());
+        ActivityLineInterval leftActivityLineInterval = activityLineInterval.get(workingRandom.nextInt(activityLineInterval.size()));
+        ActivityLineInterval rightActivityLineInterval = activityLineInterval.get(workingRandom.nextInt(activityLineInterval.size()));
+        boolean sameInterval = leftActivityLineInterval.getStart().isEqual(rightActivityLineInterval.getStart());
 
-        List<ActivityLineInterval> leftExIntervals =sameInterval || rightActivityLineInterval.getShift()==null?null: ShiftPlanningUtility.getOverlappingActivityLineIntervals(rightActivityLineInterval.getShift().getActivityLineIntervals(),leftActivityLineInterval);
-        List<ActivityLineInterval> rightExIntervals =sameInterval||leftActivityLineInterval.getShift()==null?null: ShiftPlanningUtility.getOverlappingActivityLineIntervals(leftActivityLineInterval.getShift().getActivityLineIntervals(),rightActivityLineInterval);
-        ActivityLineIntervalSwapMove swapMove=new ActivityLineIntervalSwapMove(leftActivityLineInterval, rightActivityLineInterval.getShift(), leftExIntervals,null,
+        List<ActivityLineInterval> leftExIntervals = sameInterval || rightActivityLineInterval.getShift()==null ? null : ShiftPlanningUtility.getOverlappingActivityLineIntervals(rightActivityLineInterval.getShift().getActivityLineIntervals(),leftActivityLineInterval);
+        List<ActivityLineInterval> rightExIntervals = sameInterval || leftActivityLineInterval.getShift()==null ? null : ShiftPlanningUtility.getOverlappingActivityLineIntervals(leftActivityLineInterval.getShift().getActivityLineIntervals(),rightActivityLineInterval);
+        ActivityLineIntervalSwapMove swapMove = new ActivityLineIntervalSwapMove(leftActivityLineInterval, rightActivityLineInterval.getShift(), leftExIntervals,null,
                 rightActivityLineInterval, leftActivityLineInterval.getShift(), rightExIntervals,null);
         return swapMove;
     }

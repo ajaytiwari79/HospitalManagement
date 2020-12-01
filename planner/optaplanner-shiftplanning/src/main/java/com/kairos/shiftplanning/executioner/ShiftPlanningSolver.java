@@ -36,12 +36,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.LOGGER;
-import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.enums.constraint.ConstraintSubType.*;
 import static org.optaplanner.core.config.solver.SolverConfig.createFromXmlFile;
 
@@ -107,7 +108,7 @@ public class ShiftPlanningSolver implements QuarkusApplication {
 
     private SolverFactory getSolverFactory(List<File> droolsFiles, File solverConfigFile) {
         SolverConfig solverConfig = createFromXmlFile(solverConfigFile);
-        solverConfig.setMoveThreadCount(String.valueOf(8));
+        //solverConfig.setMoveThreadCount(String.valueOf(8));
         solverConfig.getScoreDirectorFactoryConfig().setScoreDrlFileList(droolsFiles);
         SolverFactory<Object> solverFactory = SolverFactory.create(solverConfig);
         director = solverFactory.getScoreDirectorFactory().buildScoreDirector();
@@ -181,7 +182,6 @@ public class ShiftPlanningSolver implements QuarkusApplication {
         Object[] solvedSolution = getSolution(unSolvedsolution);
         printSolvedSolution((ShiftPlanningSolution) solvedSolution[0]);
         printIndictment((Map<Object, Indictment>) solvedSolution[1]);
-        //sendSolutionToKairos((ShiftRequestPhasePlanningSolution) solvedSolution[0]);
         return (ShiftPlanningSolution) solvedSolution[0];
     }
 
@@ -399,6 +399,9 @@ public class ShiftPlanningSolver implements QuarkusApplication {
             ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO = ObjectMapperUtils.jsonStringToObject(stringBuilder.toString(), ShiftPlanningProblemSubmitDTO.class);
             SolverConfigDTO solverConfigDTO = getSolverConfigDTO();
             List<File> droolFiles = getDroolFiles(solverConfigDTO);
+            LocalDate localDate = LocalDate.of(2020, 11, 9);
+            shiftPlanningProblemSubmitDTO.getStaffingLevels().removeIf(presenceStaffingLevelDto -> !asLocalDate(presenceStaffingLevelDto.getCurrentDate()).equals(localDate));
+            shiftPlanningProblemSubmitDTO.getShifts().removeIf(shiftDTO -> !localDate.equals(asLocalDate(shiftDTO.getStartDate())));
             File configurationFile = getFile("/com/kairos/shiftplanning/configuration/", "ShiftPlanning_Request_ActivityLine.solver.xml");
             ShiftPlanningSolver shiftPlanningSolver = new ShiftPlanningSolver(droolFiles, configurationFile);
             ShiftPlanningSolution unSolvedsolution = new ShiftPlanningInitializer().initializeShiftPlanning(shiftPlanningProblemSubmitDTO);

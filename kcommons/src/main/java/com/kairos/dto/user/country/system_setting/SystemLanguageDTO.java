@@ -1,5 +1,6 @@
 package com.kairos.dto.user.country.system_setting;
 
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class SystemLanguageDTO {
     private Map<String,String> translatedDescriptions;
     private Map<String, TranslationInfo> translations;
 
-
-
+    public String getName(){
+        return TranslationUtil.getName(translations,name);
+    }
 }

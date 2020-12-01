@@ -105,26 +105,35 @@ public class SkillCategoryService {
     }
 
 
-    public List<SkillCategoryQueryResults> getAllSkillCategoryOfCountryOrUnit(Long countryOrUnitId, boolean isCountry) {
-         List<SkillCategoryQueryResults> skillCategoryQueryResultsList= isCountry ? skillCategoryGraphRepository.findSkillCategoryByCountryId(countryOrUnitId) : skillCategoryGraphRepository.findSkillCategoryByUnitId(countryOrUnitId);;
+    public List<SkillCategoryQueryResults> getAllSkillCategoryOfCountry(Long countryId) {
+//        List<Object> objectList = new ArrayList<>();
+         List<SkillCategoryQueryResults> skillCategoryQueryResultsList= skillCategoryGraphRepository.findSkillCategoryByCountryId(countryId);
         skillCategoryQueryResultsList.forEach(skillCategoryQueryResults -> {
             List<SkillDTO> skillDTOS =new ArrayList<>();
             if(isCollectionNotEmpty(skillCategoryQueryResults.getSkillList())){
               skillDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(skillCategoryQueryResults.getSkillList(),SkillDTO.class);
             }
             for(SkillDTO skillDTO :skillDTOS){
-                if(isCountry) {
-                    skillDTO.setCountryId(countryOrUnitId);
-                }
+                skillDTO.setCountryId(countryId);
                 skillDTO.setTranslations(TranslationUtil.getTranslatedData(skillDTO.getTranslatedNames(),skillDTO.getTranslatedDescriptions()));
             }
             skillCategoryQueryResults.setSkillList(skillDTOS);
-            if(isCountry) {
-                skillCategoryQueryResults.setCountryId(countryOrUnitId);
-            }
+            skillCategoryQueryResults.setCountryId(countryId);
             skillCategoryQueryResults.setTranslations(TranslationUtil.getTranslatedData(skillCategoryQueryResults.getTranslatedNames(),skillCategoryQueryResults.getTranslatedDescriptions()));
         });
+
         return skillCategoryQueryResultsList;
+    }
+
+
+    public List<Object> findSkillCategoryByUnitId(Long unitId) {
+        List<Object> objectList = new ArrayList<>();
+        List<Map<String,Object>> mapList = skillCategoryGraphRepository.findSkillCategoryByUnitId(unitId);
+        for(Map<String,Object> map :  mapList){
+            Object o = map.get("result");
+            objectList.add(o);
+        }
+        return objectList;
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long id, Map<String,TranslationInfo> translationInfoMap) {

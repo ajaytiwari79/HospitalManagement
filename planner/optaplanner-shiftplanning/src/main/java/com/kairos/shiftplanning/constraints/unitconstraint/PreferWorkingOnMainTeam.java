@@ -7,6 +7,8 @@ import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staff.Team;
+import com.kairos.shiftplanning.domain.unit.Unit;
+import com.kairos.shiftplanningNewVersion.entity.Shift;
 import lombok.*;
 
 import java.util.List;
@@ -40,4 +42,7 @@ public class PreferWorkingOnMainTeam implements ConstraintHandler {
     public int checkConstraints(List<ShiftImp> shifts) {
         return 0;
     }
+
+    @Override
+    public int verifyConstraints(Unit unit, Shift shiftImp, List<Shift> shiftImps){return 0;};
 }

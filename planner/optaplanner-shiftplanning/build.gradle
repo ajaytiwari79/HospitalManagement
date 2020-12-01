@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     ext {
-        versionoptaplannerbom='7.34.0.Final'
+        versionoptaplannerbom='7.39.0.Final'
         versionlogback='1.2.3'
     }
 }

@@ -1,0 +1,20 @@
+package com.kairos.shiftplanning.rules;
+    dialect "java"
+import com.kairos.shiftplanning.domain.activity.*;
+import com.kairos.shiftplanningNewVersion.entity.*;
+import com.kairos.shiftplanning.domain.staffing_level.*;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import java.util.ArrayList;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+global HardMediumSoftLongScoreHolder scoreHolder;
+/********Employee WTA Rules*******/
+rule "Shift Length"
+salience 20
+    when
+        $unit:Unit()
+        $shift:Shift(!activityLineIntervals.isEmpty() && $staff:staff)
+        $shifts:List(size>0) from collect(Shift($staff.equals(staff)))
+        $constraintsPenality: Integer(intValue>0) from ($staff.verifyConstraints($unit,$shift,$shifts,ConstraintSubType.SHIFT_LENGTH))
+    then
+        $staff.breakContraints($shift,scoreHolder,kcontext,$constraintsPenality,ConstraintSubType.SHIFT_LENGTH);
+end

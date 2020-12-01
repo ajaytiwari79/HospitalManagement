@@ -8,6 +8,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANISATION_HAS_SKILL;
 
@@ -35,11 +36,10 @@ public interface SkillCategoryGraphRepository extends Neo4jBaseRepository<SkillC
 
     @Query("MATCH (s:Skill)<-[r:"+ORGANISATION_HAS_SKILL+"]-(organization:OrganizationBaseEntity) where id(organization)={0} AND r.isEnabled=true AND s.isEnabled=true" +
             " OPTIONAL MATCH (s)-[:HAS_CATEGORY]->(sc:SkillCategory) WHERE sc.isEnabled=true with sc,s \n" +
-            "return case when s is NULL then [] else collect(s) END as skillList ,\n" +
-            "sc.name AS name, id(sc) AS id, sc.description AS description , \n" +
-            "{english: CASE WHEN sc.`translatedNames.english` IS NULL THEN '' ELSE sc.`translatedNames.english` END,danish: CASE WHEN sc.`translatedNames.danish` IS NULL THEN '' ELSE sc.`translatedNames.danish` END,hindi: CASE WHEN sc.`translatedNames.hindi` IS NULL THEN '' ELSE sc.`translatedNames.hindi` END,britishenglish: CASE WHEN sc.`translatedNames.britishenglish` IS NULL THEN '' ELSE sc.`translatedNames.britishenglish` END} as translatedNames,\n" +
-            "{english: CASE WHEN sc.`translatedDescriptions.english` IS NULL THEN '' ELSE sc.`translatedDescriptions.english` END,danish: CASE WHEN sc.`translatedDescriptions.danish` IS NULL THEN '' ELSE sc.`translatedDescriptions.danish` END,hindi: CASE WHEN sc.`translatedDescriptions.hindi` IS NULL THEN '' ELSE sc.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN sc.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE sc.`translatedDescriptions.britishenglish` END} as translatedDescriptions")
-    List<SkillCategoryQueryResults> findSkillCategoryByUnitId(Long id);
+            "return  { skillList: case when s is NULL then [] else collect({   \n" +
+            "id:id(s), name:s.name, shortName:s.shortName, description:s.description}) END ,\n" +
+            "name:sc.name, id:id(sc), description:sc.description} AS result")
+    List<Map<String,Object>> findSkillCategoryByUnitId(Long id);
 
     @Query("MATCH (s:Skill)-[:HAS_CATEGORY]->(sc:SkillCategory) where id(sc)={0} AND s.isEnabled=true  return s")
     List<Skill> getThisCategorySkills(long id);

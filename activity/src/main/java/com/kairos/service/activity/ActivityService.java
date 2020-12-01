@@ -2,7 +2,6 @@ package com.kairos.service.activity;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -527,11 +526,6 @@ public class ActivityService {
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
         ActivityPhaseSettings activityPhaseSettings = activity.getActivityPhaseSettings();
-        List<PhaseDTO> phases = phaseService.getPhasesByCountryId(countryId);
-        Map<BigInteger,Map<String, TranslationInfo>> phaseTranslationMap =phases.stream().collect(Collectors.toMap(PhaseDTO::getId,PhaseDTO::getTranslations));
-        activityPhaseSettings.getPhaseTemplateValues().forEach(phaseTemplateValue -> {
-            phaseTemplateValue.setTranslations(phaseTranslationMap.getOrDefault(phaseTemplateValue.getPhaseId(),new HashMap<>()));
-        });
         return new ActivitySettingsWrapper(roles, activityPhaseSettings, dayTypes, employmentTypeDTOS);
     }
     public ActivityPhaseSettings updatePhaseSettingTab(ActivityPhaseSettings activityPhaseSettings) {
@@ -591,17 +585,7 @@ public class ActivityService {
     }
     public ActivitySettingsWrapper getSkillTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        ActivitySkillSettings activitySkillSettings = activity.getActivitySkillSettings();
-        List<Long> skillIds = activitySkillSettings.getActivitySkillIds();
-        if(isCollectionNotEmpty(skillIds)) {
-            List<Skill> skills = userIntegrationService.getSkillsByIds(skillIds, activity.getCountryId());
-            Map<Long, Skill> skillTranslationMap = skills.stream().collect(Collectors.toMap(Skill::getId, v -> v));
-            activitySkillSettings.getActivitySkills().forEach(activitySkill -> {
-                Skill skill = skillTranslationMap.get(activitySkill.getSkillId());
-                activitySkill.setTranslations(TranslationUtil.getTranslatedData(skill.getTranslatedNames(), skill.getTranslatedDescriptions()));
-            });
-        }
-        return new ActivitySettingsWrapper(activitySkillSettings);
+        return new ActivitySettingsWrapper(activity.getActivitySkillSettings());
     }
     public void updateOrgMappingDetailOfActivity(OrganizationMappingDTO organizationMappingDTO, BigInteger activityId) {
         Activity activity = findActivityById(activityId);

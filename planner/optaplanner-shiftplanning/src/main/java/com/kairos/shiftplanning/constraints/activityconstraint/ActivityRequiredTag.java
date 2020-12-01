@@ -5,6 +5,8 @@ import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.tag.Tag;
+import com.kairos.shiftplanning.domain.unit.Unit;
+import com.kairos.shiftplanningNewVersion.entity.Shift;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,8 +40,15 @@ public class ActivityRequiredTag implements ConstraintHandler {
     }
 
     @Override
-    public int checkConstraints(List<ShiftImp> shifts) {
-        return 0;
+    public int verifyConstraints(Activity activity, Shift shift){
+        Set<Tag> tags = activity.getTags();
+        if(CollectionUtils.containsAny(tags,shift.getStaff().getTags())){
+            return 0;
+        }
+        return 1;
     }
+
+    @Override
+    public int verifyConstraints(Unit unit, Shift shiftImp, List<Shift> shiftImps){return 0;};
 
 }

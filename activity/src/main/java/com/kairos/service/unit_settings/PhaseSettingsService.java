@@ -13,21 +13,17 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class PhaseSettingsService extends MongoBaseService {
     @Inject private PhaseSettingsRepository phaseSettingsRepository;
     @Inject private PhaseService phaseService;
     public List<PhaseSettingsDTO> getPhaseSettings(Long unitId){
-        List<Phase> phases = phaseService.getPhaseByUnitId(unitId);
-        Map<BigInteger,Map<String, TranslationInfo>> phaseTranslationMap =phases.stream().collect(Collectors.toMap(Phase::getId,Phase::getTranslations));
-        List<PhaseSettingsDTO> phaseSettingsDTOS = phaseSettingsRepository.findAllByUnitIdAndDeletedFalse(unitId, Sort.by(Sort.Direction.ASC, "sequence"));
-        phaseSettingsDTOS.forEach(phaseSettingsDTO -> {
-            phaseSettingsDTO.setTranslations(phaseTranslationMap.getOrDefault(phaseSettingsDTO.getPhaseId(),new HashMap<>()));
-        });
-        return phaseSettingsDTOS;
+        return phaseSettingsRepository.findAllByUnitIdAndDeletedFalse(unitId, Sort.by(Sort.Direction.ASC, "sequence"));
     }
 
     public List<PhaseSettingsDTO> updatePhaseSettings(Long unitId, List<PhaseSettingsDTO> phaseSettingsDTOS) {
