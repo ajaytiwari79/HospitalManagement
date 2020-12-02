@@ -107,16 +107,16 @@ public class ReasonCodeController {
     @PutMapping(value = UNIT_URL + "/reason_code/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-ResponseEntity<Map<String, Object>> updateTranslationsOfReasonCodesOfUnit(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+    ResponseEntity<Map<String, Object>> updateTranslationsOfReasonCodesOfUnit(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.updateTranslation(id,translations));
-}
+    }
 
     @PutMapping(value = COUNTRY_URL + "/reason_code/{id}/language_settings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-ResponseEntity<Map<String, Object>> updateTranslationsOfReasonCodesOfCountry(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+    ResponseEntity<Map<String, Object>> updateTranslationsOfReasonCodesOfCountry(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.updateTranslation(id,translations));
-}
+    }
 
     @PostMapping(value = "transfer_reason_code")
     @ApiOperation("Add reason code data")

@@ -693,8 +693,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         aggregationOperations.add(lookup("activity_category", GENERAL_ACTIVITY_TAB_CATEGORY_ID, UNDERSCORE_ID,
                 CATEGORY));
-        aggregationOperations.add(project(CHILD_ACTIVITY_IDS, TIME_CALCULATION_ACTIVITY_TAB,"translations", BALANCE_SETTINGS_ACTIVITY_TAB, NAME, ACTIVITY_PRIORITY_ID).and(CATEGORY).arrayElementAt(0).as(CATEGORY).and(TIME_TYPE_INFO).arrayElementAt(0).as(TIME_TYPE_INFO).and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY));
-        aggregationOperations.add(project(CHILD_ACTIVITY_IDS, TIME_CALCULATION_ACTIVITY_TAB,"translations", BALANCE_SETTINGS_ACTIVITY_TAB, NAME, ACTIVITY_PRIORITY_ID, TIME_TYPE_INFO,ACTIVITY_PRIORITY).and("category._id").as(CATEGORY_ID).and("category.name").as(CATEGORY_NAME));
+        aggregationOperations.add(project(CHILD_ACTIVITY_IDS, TIME_CALCULATION_ACTIVITY_TAB,TRANSLATIONS, BALANCE_SETTINGS_ACTIVITY_TAB, NAME, ACTIVITY_PRIORITY_ID).and(CATEGORY).arrayElementAt(0).as(CATEGORY).and(TIME_TYPE_INFO).arrayElementAt(0).as(TIME_TYPE_INFO).and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY));
+        aggregationOperations.add(project(CHILD_ACTIVITY_IDS, TIME_CALCULATION_ACTIVITY_TAB,TRANSLATIONS, BALANCE_SETTINGS_ACTIVITY_TAB, NAME, ACTIVITY_PRIORITY_ID, TIME_TYPE_INFO,ACTIVITY_PRIORITY).and("category._id").as(CATEGORY_ID).and("category.name").as(CATEGORY_NAME));
         aggregationOperations.add(unwind(CHILD_ACTIVITY_IDS, true));
         aggregationOperations.add(lookup(ACTIVITIES, CHILD_ACTIVITY_IDS, UNDERSCORE_ID,
                 CHILD_ACTIVITIES));
@@ -702,9 +702,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 COMPOSITE_TIME_TYPE_INFO));
         aggregationOperations.add(lookup(ACTIVITY_PRIORITY, "childActivities.activityPriorityId", UNDERSCORE_ID, CHILD_ACTIVITY_PRIORITY));
 
-        aggregationOperations.add(project(CHILD_ACTIVITIES, TIME_CALCULATION_ACTIVITY_TAB,"translations", TIME_TYPE_INFO, ACTIVITY_PRIORITY, BALANCE_SETTINGS_ACTIVITY_TAB, NAME, ACTIVITY_PRIORITY_ID, CATEGORY_ID, CATEGORY_NAME).and(CHILD_ACTIVITIES).arrayElementAt(0).as(CHILD_ACTIVITIES).and(COMPOSITE_TIME_TYPE_INFO).arrayElementAt(0).as(COMPOSITE_TIME_TYPE_INFO).and(CHILD_ACTIVITY_PRIORITY).arrayElementAt(0).as(CHILD_ACTIVITY_PRIORITY));
-        aggregationOperations.add(project(TIME_CALCULATION_ACTIVITY_TAB,"translations", COMPOSITE_TIME_TYPE_INFO, TIME_TYPE_INFO, ACTIVITY_PRIORITY, CHILD_ACTIVITY_PRIORITY, BALANCE_SETTINGS_ACTIVITY_TAB, NAME, ACTIVITY_PRIORITY_ID, CATEGORY_ID, CATEGORY_NAME, CHILD_ACTIVITIES));
-        aggregationOperations.add(project(TIME_CALCULATION_ACTIVITY_TAB,"translations", TIME_TYPE_INFO, ACTIVITY_PRIORITY, BALANCE_SETTINGS_ACTIVITY_TAB, NAME, ACTIVITY_PRIORITY_ID, CATEGORY_ID, CATEGORY_NAME).and("compositeTimeTypeInfo.allowChildActivities").as("compositeActivities.allowChildActivities")
+        aggregationOperations.add(project(CHILD_ACTIVITIES, TIME_CALCULATION_ACTIVITY_TAB,TRANSLATIONS, TIME_TYPE_INFO, ACTIVITY_PRIORITY, BALANCE_SETTINGS_ACTIVITY_TAB, NAME, ACTIVITY_PRIORITY_ID, CATEGORY_ID, CATEGORY_NAME).and(CHILD_ACTIVITIES).arrayElementAt(0).as(CHILD_ACTIVITIES).and(COMPOSITE_TIME_TYPE_INFO).arrayElementAt(0).as(COMPOSITE_TIME_TYPE_INFO).and(CHILD_ACTIVITY_PRIORITY).arrayElementAt(0).as(CHILD_ACTIVITY_PRIORITY));
+        aggregationOperations.add(project(TIME_CALCULATION_ACTIVITY_TAB,TRANSLATIONS, COMPOSITE_TIME_TYPE_INFO, TIME_TYPE_INFO, ACTIVITY_PRIORITY, CHILD_ACTIVITY_PRIORITY, BALANCE_SETTINGS_ACTIVITY_TAB, NAME, ACTIVITY_PRIORITY_ID, CATEGORY_ID, CATEGORY_NAME, CHILD_ACTIVITIES));
+        aggregationOperations.add(project(TIME_CALCULATION_ACTIVITY_TAB,TRANSLATIONS, TIME_TYPE_INFO, ACTIVITY_PRIORITY, BALANCE_SETTINGS_ACTIVITY_TAB, NAME, ACTIVITY_PRIORITY_ID, CATEGORY_ID, CATEGORY_NAME).and("compositeTimeTypeInfo.allowChildActivities").as("compositeActivities.allowChildActivities")
                 .and("childActivities.activityTimeCalculationSettings").as("childActivities.activityTimeCalculationSettings")
                 .and("childActivities.activityBalanceSettings").as("childActivities.activityBalanceSettings")
                 .and("childActivities.activityRulesSettings").as("childActivities.activityRulesSettings")
