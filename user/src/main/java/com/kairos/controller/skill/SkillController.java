@@ -1,7 +1,6 @@
 package com.kairos.controller.skill;
 
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.TranslationDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.translation.TranslationService;
@@ -20,7 +19,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 
 /**

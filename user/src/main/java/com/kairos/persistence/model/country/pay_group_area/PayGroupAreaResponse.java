@@ -3,7 +3,6 @@ package com.kairos.persistence.model.country.pay_group_area;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.LevelDTO;
-import com.kairos.persistence.model.address.MunicipalityQueryResult;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.MunicipalityQueryResults;

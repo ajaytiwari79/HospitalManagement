@@ -5,7 +5,6 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.country.tag.Tag;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,7 +36,6 @@ public class StaffAdditionalInfoQueryResult {
     private Date organizationNightEndTimeTo;
     private List<DayTypeDTO> dayTypes;
     private ZoneId unitTimeZone;
-    private List<TimeSlotWrapper> timeSlotSets;
     private UserAccessRoleDTO user;
     private UserAccessRoleDTO userAccessRoleDTO;
     private Long staffUserId;

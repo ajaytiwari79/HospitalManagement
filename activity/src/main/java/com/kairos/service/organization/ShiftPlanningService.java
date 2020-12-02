@@ -3,7 +3,6 @@ package com.kairos.service.organization;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.filter_utils.FilterUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.shift.ShiftSearchDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.enums.FilterType.CTA_ACCOUNT_TYPE;
 

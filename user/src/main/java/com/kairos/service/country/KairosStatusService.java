@@ -4,7 +4,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.KairosStatus;
 import com.kairos.persistence.model.country.default_data.KairosStatusDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;

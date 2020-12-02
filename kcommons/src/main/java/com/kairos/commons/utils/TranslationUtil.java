@@ -73,4 +73,7 @@ public class TranslationUtil {
         }
     }
 
+    public static Map<String, TranslationInfo> getData(String translatedData) {
+        return ObjectMapperUtils.jsonStringToObject(translatedData,Map.class);
+    }
 }

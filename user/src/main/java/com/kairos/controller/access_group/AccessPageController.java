@@ -1,7 +1,6 @@
 package com.kairos.controller.access_group;
 
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.dto.user.access_permission.AccessPageStatusDTO;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;

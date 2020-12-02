@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftType;
@@ -12,6 +11,7 @@ import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.constants.AppConstants.DELETED;
-import static com.kairos.enums.FilterType.*;
+import static com.kairos.enums.FilterType.ABSENCE_ACTIVITY;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -59,6 +59,8 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
     @Inject private TimeTypeService timeTypeService;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
     @Override
     public <T> List<StaffShiftDetailsDTO> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate, boolean includeDateComparison) {
@@ -191,7 +193,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     }
 
     private void prepareTimeSlotCriteria(final Criteria criteria, final Set<String> values, final List<Criteria> criteriaArrayList, final Long unitId) {
-        List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlotByNames(unitId, values);
+        List<TimeSlotDTO> timeSlotDTOS = timeSlotSetService.getUnitTimeSlotByNames(unitId, values);
         Criteria timeslotCriteria;
         for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
             timeslotCriteria = new Criteria();

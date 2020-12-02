@@ -36,7 +36,7 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     private long timeLimit;
-    private List<Long> dayTypeIds = new ArrayList<>();
+    private List<BigInteger> dayTypeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.NIGHT);
     private float recommendedValue;

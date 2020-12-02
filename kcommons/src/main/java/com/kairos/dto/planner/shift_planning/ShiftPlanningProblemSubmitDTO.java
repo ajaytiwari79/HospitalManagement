@@ -12,7 +12,7 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
-import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import lombok.*;
@@ -47,7 +47,7 @@ public class ShiftPlanningProblemSubmitDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private List<StaffDTO> staffs;
-    private Map<Long, DayType> dayTypeMap;
+    private Map<Long, DayTypeDTO> dayTypeMap;
     private Map<String, TimeSlotDTO> timeSlotMap;
     private List<ShiftDTO> shifts;
     private List<ActivityDTO> activities;

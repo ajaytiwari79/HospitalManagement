@@ -19,7 +19,6 @@ import javax.validation.Valid;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ACCOUNT_TYPE_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 /*
  *
  *  created by bobby 20/4/2018

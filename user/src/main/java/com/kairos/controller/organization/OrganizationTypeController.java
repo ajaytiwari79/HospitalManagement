@@ -1,6 +1,5 @@
 package com.kairos.controller.organization;
 
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.service.organization.OrganizationServiceService;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

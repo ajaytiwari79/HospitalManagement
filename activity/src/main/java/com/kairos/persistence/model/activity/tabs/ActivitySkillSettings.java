@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.activity.tabs;
 
-import com.kairos.annotations.KPermissionField;
 import com.kairos.dto.activity.activity.activity_tabs.ActivitySkill;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

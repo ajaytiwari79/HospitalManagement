@@ -6,8 +6,6 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.organization.company_category.CompanyCategoryDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
-import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.company.CompanyCategoryResponseDTO;
 import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

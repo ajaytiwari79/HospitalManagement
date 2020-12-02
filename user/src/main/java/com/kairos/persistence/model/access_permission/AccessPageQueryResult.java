@@ -10,7 +10,10 @@ import lombok.Setter;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static com.kairos.commons.utils.ObjectUtils.isEmpty;
 

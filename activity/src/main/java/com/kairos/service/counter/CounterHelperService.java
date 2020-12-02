@@ -2,6 +2,7 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
@@ -10,7 +11,11 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.ApplicableKPI;
+import com.kairos.persistence.repository.day_type.CountryCalenderRepo;
+import com.kairos.persistence.repository.day_type.DayTypeRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.day_type.CountryHolidayCalenderService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.utils.counter.KPIUtils;
 import org.springframework.stereotype.Service;
 
@@ -33,12 +38,29 @@ public class CounterHelperService {
 
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private CountryHolidayCalenderService countryHolidayCalenderService;
+    @Inject
+    private CountryCalenderRepo countryCalenderRepo;
+    @Inject
+    private DayTypeRepository dayTypeRepository;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
     public Object[] getKPIdata(Map<FilterType, List> filterBasedCriteria,ApplicableKPI applicableKPI, List<LocalDate> filterDates, List<Long> staffIds, List<Long> employmentTypeIds, List<Long> unitIds, Long organizationId){
         List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), isNull(applicableKPI) ? 0 : applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates,applicableKPI.getDateForKPISetCalculation());
         List<Long> tagIds = getLongValue(filterBasedCriteria.getOrDefault(FilterType.TAGS,new ArrayList<>()));
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString(),tagIds,filterBasedCriteria,true);
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
+        Set<String> filterValues = (Set<String>)staffEmploymentTypeDTO.getFilterBasedCriteria().values().stream().flatMap(list -> list.stream()).map(value->value.toString()).collect(Collectors.toSet());
+        if(filterValues.contains(XAxisConfig.VARIABLE_COST.toString())) {
+            if(filterValues.contains(XAxisConfig.VARIABLE_COST.toString())) {
+                List<DayTypeDTO> dayTypeDTOS = dayTypeRepository.findAllByCountryIdAndDeletedFalse(organizationId);
+                for (StaffKpiFilterDTO kpiFilterQueryResult : staffKpiFilterDTOS) {
+                    kpiFilterQueryResult.setDayTypeDTOS(dayTypeDTOS);
+                }
+            }
+        }
         staffIds = staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
         return new Object[]{staffKpiFilterDTOS, dateTimeIntervals, staffIds};
     }
@@ -49,6 +71,8 @@ public class CounterHelperService {
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString(),tagIds,filterBasedCriteria,true);
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiAllDefaultData(UserContext.getUserDetails().getCountryId(), staffEmploymentTypeDTO);
         defaultKpiDataDTO.setDateTimeIntervals(dateTimeIntervals);
+        defaultKpiDataDTO.setHolidayCalenders(countryCalenderRepo.getAllByCountryIdAndHolidayDateBetween(UserContext.getUserDetails().getCountryId(),LocalDate.parse(staffEmploymentTypeDTO.getStartDate()), LocalDate.parse(staffEmploymentTypeDTO.getEndDate())));
+        defaultKpiDataDTO.setTimeSlotDTOS(timeSlotSetService.getUnitTimeSlot(staffEmploymentTypeDTO.getOrganizationId()));
         return defaultKpiDataDTO;
     }
 
@@ -66,7 +90,7 @@ public class CounterHelperService {
         return new Object[]{staffIds,filterDates,unitIds,employmentTypeIds,daysOfWeeks,shiftActivityStatus,plannedTimeIds};
     }
 
-    public Set<DayOfWeek> getDayOfWeek(List<Long> dayTypeIds,Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap)
+    public Set<DayOfWeek> getDayOfWeek(List<BigInteger> dayTypeIds,Map<BigInteger, DayTypeDTO> daysTypeIdAndDayTypeMap)
     {
         Set<DayOfWeek> daysOfWeek = new HashSet<>();
 

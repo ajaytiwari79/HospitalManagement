@@ -7,7 +7,6 @@ import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;

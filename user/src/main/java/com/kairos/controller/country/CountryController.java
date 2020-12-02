@@ -14,12 +14,12 @@ import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
-import com.kairos.service.country.CountryHolidayCalenderService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.CompanyCreationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationTypeService;
+import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.translation.TranslationService;
@@ -40,8 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 @RequestMapping(API_V1)
 @Api(API_V1)
@@ -51,8 +50,6 @@ public class CountryController {
     private CountryService countryService;
     @Inject
     private SkillCategoryService skillCategoryService;
-    @Inject
-    private CountryHolidayCalenderService countryHolidayCalenderService;
     @Inject
     private OrganizationTypeService organizationTypeService;
     @Inject
@@ -65,6 +62,8 @@ public class CountryController {
     private CompanyCreationService companyCreationService;
     @Inject private BootDataService bootDataService;
     @Inject private TranslationService translationService;
+    @Inject
+    private RegionService regionService;
 
     @PostMapping(value = "/country")
     @ApiOperation("Create a new Country")
@@ -88,6 +87,14 @@ public class CountryController {
                 return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
+    }
+
+
+    @GetMapping(UNIT_URL + "/zipcode/{zipCodeId}/address")
+    @ApiOperation("get location of organization")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAddressByZipCode(@PathVariable long zipCodeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.getAllZipCodesData(zipCodeId));
     }
 
     @GetMapping(value = "/country")
@@ -403,13 +410,14 @@ public class CountryController {
 
     }
 
-    @ApiOperation(value = "Get DayType and Presence Type")
-    @GetMapping(value = COUNTRY_URL + "/getWtaTemplateDefaultDataInfo")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getWtaTemplateDefaultDataInfo(countryId));
-
-    }
+    //TODO Integrated
+//    @ApiOperation(value = "Get DayType and Presence Type")
+//    @GetMapping(value = COUNTRY_URL + "/getWtaTemplateDefaultDataInfo")
+//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long countryId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getWtaTemplateDefaultDataInfo(countryId));
+//
+//    }
 
     @ApiOperation(value = "Map Selected Payroll Types to country ")
     @PutMapping(value = COUNTRY_URL + "/map_pay_rolls_country")

@@ -6,8 +6,6 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.HousingType;
 import com.kairos.persistence.model.country.default_data.HousingTypeDTO;
-import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
-import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.HousingTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;

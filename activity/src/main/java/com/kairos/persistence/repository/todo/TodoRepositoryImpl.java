@@ -4,14 +4,11 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoType;
-import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.todo.Todo;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
 import java.util.Collection;

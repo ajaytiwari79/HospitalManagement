@@ -6,8 +6,6 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.country.default_data.EngineerTypeDTO;
-import com.kairos.persistence.model.country.default_data.PaymentType;
-import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;

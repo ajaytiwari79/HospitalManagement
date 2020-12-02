@@ -73,8 +73,6 @@ public final class ApiConstants {
     public static final String CONTRACT_TYPE = "/contractType";
     public static final String COUNTRY_ORGANIZATION_SERVICE_URL = "/country/organizaton_service/{organizationServiceId}";
     public static final String ORGANIZATION_TYPES_HIERARCHY = "/organization_types/hierarchy";
-    public static final String TASK_TYPES_SKILLS = "/task_type/skills";
-    public static final String TIME_SLOTS = "/time_slots";
     public static final String DAY_TYPES = "/day_types";
     public static final String INTEGRATION_UNIT_CITIZEN_UNIT_ID_FLSCRED = "/integration/unit/{citizenUnitId}/flsCred";
     public static final String COUNTRY_COUNTRY_ID = COUNTRY_ID + "/{countryId}";
@@ -98,8 +96,7 @@ public final class ApiConstants {
     public static final String CURRENT_TIME_SLOTS = "/current/time_slots";
     public static final String GET_CTA_BY_EMPLOYMENT_ID = "/cta_by_employment/{employmentId}";
     public static final String WTA_RULE_INFO = "/WTARelatedInfo";
-    public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO = "/getWtaTemplateDefaultDataInfo";
-    public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO_BY_UNIT_ID = GET_WTA_TEMPLATE_DEFAULT_DATA_INFO + "ByUnitId";
+    public static final String GET_WTA_TEMPLATE_DEFAULT_DATA_INFO_BY_UNIT_ID = "/getWtaTemplateDefaultDataInfoByUnitId";
     public static final String CLIENT_ID_URL = "/client/{clientId}";
     public static final String UPDATE_CLIENT_TEMP_ADDRESS_BY_CLIENT_ID = CLIENT_ID_URL + "/updateClientTempAddress";
     public static final String CLIENT_CITIZEN_ID = "/client/{citizenId}";
@@ -108,7 +105,6 @@ public final class ApiConstants {
     public static final String GET_CLIENT_INFO = "/client/getClientInfo";
     public static final String CLIENT_CITIZEN_ID_UNIT_ID_TASK_PREREQUISITES = CLIENT_CITIZEN_ID + "/{unitId}/task_prerequisites";
     public static final String CLIENT_ORGANIZATION_CLIENTS = "/client/organization_clients";
-    public static final String ORGANIZATION_CLIENTS_IDS = "/client/organization_clients/ids";
     public static final String CLIENT_CLIENT_IDS = "/client/client_ids";
     public static final String GET_CLIENT_STAFF_INFO_BY_CLIENT_ID = CLIENT_ID_URL + "/getClientStaffInfo";
     public static final String GET_STAFF_CITIZEN_HOUSEHOLDS_BY_CITIZEN_ID_AND_STAFF_ID = CLIENT_CITIZEN_ID + STAFF_WITH_STAFF_ID + "/getStaffCitizenHouseholds";
@@ -129,7 +125,6 @@ public final class ApiConstants {
     public static final String GET_PARENT_OF_ORGANIZATION = "/getParentOfOrganization";
     public static final String EXTERNAL_ID_URL = "/external/{externalId}";
     public static final String GET_TASK_DEMAND_SUPPLIER_INFO = "/getTaskDemandSupplierInfo";
-    public static final String UNIT_VISITATION = "/unit_visitation";
     public static final String VERIFY_ORGANIZATION_EXPERTISE = "/verifyOrganizationExpertise";
     public static final String ORGANIZATION_TYPE_URL_ORGANIZATIONS = "/organization_type/{organizationTypeId}/organizations";
     public static final String ORGANIZATION_TYPE_AND_SUB_TYPES = "/organizationTypeAndSubTypes";
@@ -154,7 +149,7 @@ public final class ApiConstants {
 
     public static final String STAFF_EMPLOYMENT_BY_EMPLOYMENT_ID = STAFF_URL + "/staff_employment/{employmentId}";
 
-    public static final String UNIT_LOCATION_AND_REASON_CODE = "/unit_location_and_reason_codes";
+    public static final String UNIT_LOCATION = "/unit_location";
     public static final String GET_UNIT_BY_EMPLOYMENT = GET_EMPLOYMENT + "/get_unit";
 
     // /staff_by_employment_type

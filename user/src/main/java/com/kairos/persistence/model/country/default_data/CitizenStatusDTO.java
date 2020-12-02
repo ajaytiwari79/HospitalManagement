@@ -10,7 +10,6 @@ import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotBlank;
-
 import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_CITIZENSTATUS_NAME_NOTEMPTY;

@@ -16,7 +16,7 @@ import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDetailsByTimeSlotDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
-import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.organization.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
@@ -41,12 +41,14 @@ import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRep
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.counter.KPIBuilderCalculationService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftValidatorService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.utils.service_util.StaffingLevelUtil;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -139,6 +141,10 @@ public class StaffingLevelService {
     private PlanningPeriodService planningPeriodService;
     @Inject
     private PhaseSettingsRepository phaseSettingsRepository;
+    @Inject
+    private DayTypeService dayTypeService;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
 
     /**
@@ -248,7 +254,6 @@ public class StaffingLevelService {
     public StaffingLevel updateStaffingLevelAvailableStaffCount(LocalDate localDate, Long unitId) {
         Date startDate = asDate(localDate);
         Date endDate = getEndOfDay(startDate);
-
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate, endDate, newArrayList(unitId));
         List<ShiftDTO> shiftDTOS = shiftService.updateDraftShiftToShift(ObjectMapperUtils.copyCollectionPropertiesByMapper(shifts, ShiftDTO.class));
         StaffingLevel staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(UserContext.getUnitId(), startDate);
@@ -316,8 +321,8 @@ public class StaffingLevelService {
     }
 
     public Map<String, Object> getPhaseAndDayTypesForStaffingLevel(Long unitId, Date proposedDate) {
-        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, proposedDate, null);
-        List<DayType> dayTypes = userIntegrationService.getDayType(proposedDate);
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, proposedDate,null);
+        List<DayTypeDTO> dayTypes = dayTypeService.getDayTypeByDate(UserContext.getUserDetails().getCountryId(),proposedDate);
         Map<String, Object> mapOfPhaseAndDayType = new HashMap<>();
         mapOfPhaseAndDayType.put("phase", phase);
         mapOfPhaseAndDayType.put("dayType", dayTypes.isEmpty() ? dayTypes.get(0) : Collections.EMPTY_LIST);
@@ -885,9 +890,10 @@ public class StaffingLevelService {
 
     private void filterIncorrectDataByDates(List<DateWiseActivityDTO> dateWiseActivityDTOS, LocalDate startDate, LocalDate endDate, List<ActivityValidationError> activityValidationErrors) {
         Iterator<DateWiseActivityDTO> iterator = dateWiseActivityDTOS.iterator();
+        DateTimeInterval timeInterval=new DateTimeInterval(startDate,endDate);
         while (iterator.hasNext()) {
             DateWiseActivityDTO dateWiseActivityDTO = iterator.next();
-            if (dateWiseActivityDTO.getDate().isBefore(startDate) || dateWiseActivityDTO.getDate().isAfter(endDate) || dateWiseActivityDTO.getDate().isBefore(DateUtils.getCurrentLocalDate())) {
+            if (!timeInterval.contains(dateWiseActivityDTO.getDate()) || dateWiseActivityDTO.getDate().isBefore(DateUtils.getCurrentLocalDate())) {
                 iterator.remove();
                 activityValidationErrors.add(new ActivityValidationError(Arrays.asList(exceptionService.getLanguageSpecificText(DATE_OUT_OF_RANGE, dateWiseActivityDTO.getDate()))));
             }
@@ -1103,7 +1109,7 @@ public class StaffingLevelService {
     public Map<LocalDate, DailyStaffingLevelDetailsDTO> getWeeklyStaffingLevel(Long unitId, LocalDate date, BigInteger activityId, boolean unpublishedChanges) {
         LocalDate startLocalDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
         LocalDate endLocalDate = startLocalDate.plusWeeks(3).plusDays(1);
-        List<TimeSlotDTO> timeSlots = userIntegrationService.getUnitTimeSlot(unitId);
+        List<TimeSlotDTO> timeSlots = timeSlotSetService.getShiftPlanningTimeSlotByUnit(unitId);
         List<PresenceStaffingLevelDto> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDatesAndActivityId(unitId, asDate(startLocalDate), asDate(endLocalDate), activityId);
         Object[] staffingLevelMapAndActivityIds = getStaffingLevelMapAndActivityIds(staffingLevels);
         Set<BigInteger> activityIds = (Set<BigInteger>) staffingLevelMapAndActivityIds[0];

@@ -32,7 +32,8 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -291,8 +292,6 @@ public class OrganizationServiceService {
         Map<String,List<OrganizationServiceDTO>> organizationServiceMap = new HashMap<>();
         organizationServiceMap.put(AVAILABLE_SERVICES,availableServiceDTOS);
         organizationServiceMap.put(SELECTED_SERVICES,selectedServiceDTOS);
-
-
         return organizationServiceMap;
 
     }

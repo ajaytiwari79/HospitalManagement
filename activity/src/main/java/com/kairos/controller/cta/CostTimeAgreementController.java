@@ -5,7 +5,6 @@ import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationConfiguration;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
-import com.kairos.persistence.cta_compensation_setting.CTACompensationSetting;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.cta.CountryCTAService;
 import com.kairos.service.cta_compensation_settings.CTACompensationSettingService;

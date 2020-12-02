@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 /**
  * Created by pavan on 6/4/18.

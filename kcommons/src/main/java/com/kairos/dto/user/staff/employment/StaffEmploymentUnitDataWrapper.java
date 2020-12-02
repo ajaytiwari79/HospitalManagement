@@ -3,7 +3,7 @@ package com.kairos.dto.user.staff.employment;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import lombok.Getter;
@@ -25,7 +25,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class StaffEmploymentUnitDataWrapper {
     private List<StaffEmploymentDetails> staffEmploymentDetails;
-    private List<TimeSlotWrapper> timeSlotWrappers; // these Timeslot is shiftPlanning unit TimeSlot which tells us Day,Evening,Night from to
+    private List<TimeSlotDTO> timeSlotWrappers; // these Timeslot is shiftPlanning unit TimeSlot which tells us Day,Evening,Night from to
     private List<Long> skills;
     private String profilePic;
     private Long unitId;

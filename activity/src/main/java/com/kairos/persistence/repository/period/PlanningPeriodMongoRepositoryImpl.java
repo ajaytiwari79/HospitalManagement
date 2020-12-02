@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.period;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.CommonConstants;
-import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
@@ -20,9 +19,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.getBigIntegerString;

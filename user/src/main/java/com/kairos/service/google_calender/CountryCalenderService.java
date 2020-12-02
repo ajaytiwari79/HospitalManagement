@@ -13,7 +13,6 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +28,6 @@ import java.util.List;
  */
 @Service
 public class CountryCalenderService {
-
-    @Inject
-    private CountryHolidayCalenderGraphRepository countryHolidayGraphRepository;
 
     @Inject
     private CountryGraphRepository countryGraphRepository;

@@ -20,7 +20,10 @@ import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
 

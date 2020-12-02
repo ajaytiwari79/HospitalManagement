@@ -50,6 +50,7 @@ public class ActivityMessagesConstants {
     public static final String ERROR_REGION_CODE_NOTEMPTY = "error.Region.code.notEmpty";
     public static final String ERROR_REGION_GEOFENCE_NOTEMPTY = "error.Region.geoFence.notEmpty";
     public static final String ERROR_PROVINCE_NAME_NOTEMPTY = "error.Province.name.notEmpty";
+    public static final String ERROR_DAYTYPE_NAME_NOTEMPTY  = "error.DayType.name.notEmpty ";
     public static final String ERROR_PROVINCE_CODE_NOTEMPTY = "error.Province.code.notEmpty";
     public static final String ERROR_PROVINCE_GEOFENCE_NOTEMPTY = "error.Province.geoFence.notEmpty";
     public static final String ERROR_MUNICIPALITY_NAME_NOTEMPTY = "error.Municipality.name.notEmpty";
