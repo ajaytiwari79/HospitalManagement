@@ -2,7 +2,6 @@ package com.kairos.service.activity;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -525,11 +524,6 @@ public class ActivityService {
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
         ActivityPhaseSettings activityPhaseSettings = activity.getActivityPhaseSettings();
-        List<PhaseDTO> phases = phaseService.getPhasesByCountryId(countryId);
-        Map<BigInteger,Map<String, TranslationInfo>> phaseTranslationMap =phases.stream().collect(Collectors.toMap(PhaseDTO::getId,PhaseDTO::getTranslations));
-        activityPhaseSettings.getPhaseTemplateValues().forEach(phaseTemplateValue -> {
-            phaseTemplateValue.setTranslations(phaseTranslationMap.getOrDefault(phaseTemplateValue.getPhaseId(),new HashMap<>()));
-        });
         return new ActivitySettingsWrapper(roles, activityPhaseSettings, dayTypes, employmentTypeDTOS);
     }
     public ActivityPhaseSettings updatePhaseSettingTab(ActivityPhaseSettings activityPhaseSettings) {

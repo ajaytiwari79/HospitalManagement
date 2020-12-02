@@ -5,6 +5,9 @@ import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.domain.unit.Unit;
+import com.kairos.shiftplanningNewVersion.entity.ALI;
+import com.kairos.shiftplanningNewVersion.entity.Shift;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,7 +43,19 @@ public class MaxDiffrentActivity implements ConstraintHandler {
     }
 
     @Override
+    public int verifyConstraints(Activity activity, Shift shift) {
+        Set<Activity> activities = new HashSet<>();
+        for (ALI ali:shift.getActivityLineIntervals()) {
+            activities.add(ali.getActivity());
+        }
+        return activities.size()>maxDiffrentActivity?activities.size()-maxDiffrentActivity:0;
+    }
+
+    @Override
     public int checkConstraints(List<ShiftImp> shifts) {
         return 0;
     }
+
+    @Override
+    public int verifyConstraints(Unit unit, Shift shiftImp, List<Shift> shiftImps){return 0;};
 }

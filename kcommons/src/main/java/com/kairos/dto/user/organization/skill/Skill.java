@@ -28,12 +28,14 @@ public class Skill {
     private SkillCategory skillCategory;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
-    protected Map<String, TranslationInfo> translations;
+    private Map<String, TranslationInfo> translations;
 
     public Skill(String name, SkillCategory skillCategory) {
         this.name = name;
         this.skillCategory = skillCategory;
     }
+
+
 
     public Map<String, Object> retrieveDetails() {
         Map<String,Object> data = new HashMap<>();

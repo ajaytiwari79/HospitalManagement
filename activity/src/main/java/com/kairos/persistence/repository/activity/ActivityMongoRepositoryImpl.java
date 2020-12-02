@@ -976,7 +976,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         }
         aggregations[i++] = match(Criteria.where("staffId").in(staffId).and(DELETED).is(false));
         aggregations[i++] = group("staffId").addToSet("activityId").as("activityIds");
-        aggregations[i++] = getCustomLookUpForActivityAggregationOperation(activityIdString,isActivityType);
+        aggregations[i++] = getCustomLookUpForActivityAggregationOperation(activityIdString,isActivityType,unitId);
         aggregations[i++] = getCustomAggregationOperationForChildActivitiyIds();
         aggregations[i++] = getCustomAggregationOperationForConcatArray();
         aggregations[i++] = getCustomAggregationOperationForActivities();
@@ -1106,7 +1106,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 "    }");
     }
 
-    private CustomAggregationOperation getCustomLookUpForActivityAggregationOperation(String activityString,boolean isActivityType) {
+    private CustomAggregationOperation getCustomLookUpForActivityAggregationOperation(String activityString,boolean isActivityType,Long unitId) {
         String condition = isActivityType ?  "                { \"$ne\": [ \"$childActivityIds\", [] ] },\n" : "";
         return new CustomAggregationOperation("{\n" +
                 "    \"$lookup\": {\n" +
@@ -1125,7 +1125,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 "                    \"$_id\",\n" +
                 "                    "+activityString+"\n" +
                 "                  ]\n" +
-                "                }\n" +
+                "                },\n" +
+                "{ $eq: [ \"$unitId\",  "+unitId+" ] }"+
                 "              ]\n" +
                 "            }\n" +
                 "          }\n" +

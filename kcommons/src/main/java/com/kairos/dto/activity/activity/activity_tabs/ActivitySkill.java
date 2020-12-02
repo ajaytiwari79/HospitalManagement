@@ -1,6 +1,5 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,13 +19,10 @@ public class ActivitySkill  {
     private Long skillId;
     private Map<String, TranslationInfo> translations;
 
+
     public ActivitySkill(String name, String level, Long skillId) {
         this.name = name;
         this.level = level;
         this.skillId = skillId;
-    }
-
-    public String getName(){
-        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
     }
 }

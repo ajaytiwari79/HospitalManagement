@@ -180,9 +180,6 @@ public class SystemLanguageService {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
         List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId), SystemLanguageDTO.class);
-        systemLanguageDTOS.forEach(systemLanguageDTO -> {
-            systemLanguageDTO.setCountryId(countryId);
-        });
         return systemLanguageDTOS;
     }
 

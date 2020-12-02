@@ -105,7 +105,6 @@ public class SkillCategoryService {
         return null;
     }
 
-
     public List<SkillCategoryQueryResults> getAllSkillCategoryOfCountryOrUnit(Long countryOrUnitId, boolean isCountry) {
         return isCountry ? skillCategoryGraphRepository.findSkillCategoryByCountryId(countryOrUnitId) : skillCategoryGraphRepository.findSkillCategoryByUnitId(countryOrUnitId);
     }

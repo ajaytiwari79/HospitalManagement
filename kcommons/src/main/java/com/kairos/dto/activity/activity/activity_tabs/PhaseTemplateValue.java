@@ -1,15 +1,8 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -17,9 +10,6 @@ import java.util.Optional;
  */
 
 //This for Activity
-@NoArgsConstructor
-@Getter
-@Setter
 public class PhaseTemplateValue implements Comparable<PhaseTemplateValue>{
     private BigInteger phaseId;
     private String name;
@@ -33,7 +23,10 @@ public class PhaseTemplateValue implements Comparable<PhaseTemplateValue>{
     private int sequence;
     private AllowedSettings allowedSettings;
     private List<ActivityShiftStatusSettings> activityShiftStatusSettings;
-    private Map<String, TranslationInfo> translations;
+
+    public PhaseTemplateValue() {
+        //Default Constructor
+    }
 
     public PhaseTemplateValue(BigInteger phaseId, String name, String description, List<Long> eligibleEmploymentTypes, boolean eligibleForManagement,
                               boolean staffCanDelete, boolean managementCanDelete, boolean staffCanSell, boolean managementCanSell,AllowedSettings allowedSettings) {
@@ -48,16 +41,101 @@ public class PhaseTemplateValue implements Comparable<PhaseTemplateValue>{
         this.managementCanSell = managementCanSell;
         this.allowedSettings=allowedSettings;
     }
+
+    public BigInteger getPhaseId() {
+        return phaseId;
+    }
+
+    public void setPhaseId(BigInteger phaseId) {
+        this.phaseId = phaseId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<Long> getEligibleEmploymentTypes() {
+        return eligibleEmploymentTypes =Optional.ofNullable(eligibleEmploymentTypes).orElse(new ArrayList<>());
+    }
+
+    public void setEligibleEmploymentTypes(List<Long> eligibleEmploymentTypes) {
+        this.eligibleEmploymentTypes = eligibleEmploymentTypes;
+    }
+
+    public boolean isEligibleForManagement() {
+        return eligibleForManagement;
+    }
+
+    public void setEligibleForManagement(boolean eligibleForManagement) {
+        this.eligibleForManagement = eligibleForManagement;
+    }
+
+    public boolean isStaffCanDelete() {
+        return staffCanDelete;
+    }
+
+    public void setStaffCanDelete(boolean staffCanDelete) {
+        this.staffCanDelete = staffCanDelete;
+    }
+
+    public boolean isManagementCanDelete() {
+        return managementCanDelete;
+    }
+
+    public void setManagementCanDelete(boolean managementCanDelete) {
+        this.managementCanDelete = managementCanDelete;
+    }
+
+    public boolean isStaffCanSell() {
+        return staffCanSell;
+    }
+
+    public void setStaffCanSell(boolean staffCanSell) {
+        this.staffCanSell = staffCanSell;
+    }
+
+    public boolean isManagementCanSell() {
+        return managementCanSell;
+    }
+
+    public void setManagementCanSell(boolean managementCanSell) {
+        this.managementCanSell = managementCanSell;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
+    }
+
+    public AllowedSettings getAllowedSettings() {
+        return allowedSettings;
+    }
+
+    public void setAllowedSettings(AllowedSettings allowedSettings) {
+        this.allowedSettings = allowedSettings;
+    }
+
     public List<ActivityShiftStatusSettings> getActivityShiftStatusSettings() {
         return Optional.ofNullable(activityShiftStatusSettings).orElse(new ArrayList<>());
     }
 
-    public String getName(){
-        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
-    }
-
-    public String getDescription(){
-        return TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
+    public void setActivityShiftStatusSettings(List<ActivityShiftStatusSettings> activityShiftStatusSettings) {
+        this.activityShiftStatusSettings = activityShiftStatusSettings;
     }
 
     @Override

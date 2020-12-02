@@ -82,6 +82,10 @@ public class WTAResponseDTO {
         this.tags = tags;
     }
 
+    public WTAResponseDTO(List<WTABaseRuleTemplateDTO> ruleTemplates) {
+        this.ruleTemplates = ruleTemplates;
+    }
+
     public String getName() {
         return TranslationUtil.getName(translations,name);
     }
