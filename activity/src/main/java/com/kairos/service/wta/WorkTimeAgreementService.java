@@ -31,6 +31,7 @@ import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.StaffWorkingType;
+import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
@@ -51,6 +52,7 @@ import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
@@ -152,6 +154,7 @@ public class WorkTimeAgreementService{
 
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
+    @Inject private ActivityService activityService;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
@@ -448,6 +451,14 @@ public class WorkTimeAgreementService{
     public WTADefaultDataInfoDTO getDefaultWtaInfoForUnit(Long unitId) {
         WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = userIntegrationService.getWtaTemplateDefaultDataInfoByUnitId();
         List<ActivityDTO> activities = activityMongoRepository.findByDeletedFalseAndUnitId(unitId);
+        Map<String, Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
+        activityService.prepareFLPMap(wtaDefaultDataInfoDTO.getFieldPermissionUserData().getModelDTOS(),fieldPermissionMap);
+        activities.forEach(activity->{
+            if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
+                activity.setName("XXXXX");
+            }
+        });
+
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, wtaDefaultDataInfoDTO.getCountryID());
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);
         wtaDefaultDataInfoDTO.setActivityList(activities);

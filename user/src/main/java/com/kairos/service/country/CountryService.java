@@ -11,12 +11,14 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.country.LevelDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
@@ -44,6 +46,7 @@ import com.kairos.rest_client.activity_types.ActivityTypesRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.google_calender.CountryCalenderService;
+import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
@@ -60,6 +63,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.ApiConstants.API_ALL_PHASES_URL;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -111,6 +115,8 @@ public class CountryService {
     private VehicalGraphRepository vehicalGraphRepository;
     @Inject
     private GenericRestClient genericRestClient;
+    @Inject
+    private PermissionService permissionService;
 
     /**
      * @param country
@@ -518,7 +524,8 @@ public class CountryService {
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
-        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS, getDefaultTimeSlot(), countryId);
+        FieldPermissionUserData fieldPermissionUserData=permissionService.fetchPermissions(newHashSet("Activity"), UserContext.getUserDetails().getLastSelectedOrganizationId());
+        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS, getDefaultTimeSlot(), countryId,fieldPermissionUserData);
     }
 
     public List<TimeSlotDTO> getDefaultTimeSlot() {
