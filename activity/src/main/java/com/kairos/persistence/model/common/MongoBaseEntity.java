@@ -31,7 +31,7 @@ public abstract class MongoBaseEntity {
     protected boolean deleted;
     protected UserInfo createdBy;
     protected UserInfo lastModifiedBy;
-    private Map<String, TranslationInfo> translations = new HashMap<>();
+    protected Map<String, TranslationInfo> translations = new HashMap<>();
 
     public UserInfo getCreatedBy() {
         return createdBy;
