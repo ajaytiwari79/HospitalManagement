@@ -10,6 +10,8 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
+import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -80,6 +82,8 @@ public class Shift extends MongoBaseEntity {
     private ShiftViolatedRules shiftViolatedRules;
     private transient String oldShiftTimeSlot;//it is only for conditional CTA calculation
     private boolean planningPeriodPublished;
+    private List<TimeBankCTADistribution> timeBankCTADistributions;
+    private List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions;
 
     public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;

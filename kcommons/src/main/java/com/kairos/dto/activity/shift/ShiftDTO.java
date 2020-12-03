@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.common.UserInfo;
+import com.kairos.dto.activity.pay_out.PayOutPerShiftCTADistributionDTO;
+import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftType;
@@ -93,6 +95,8 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     private boolean disabled;
     private ShiftViolatedRules shiftViolatedRules;
     private Map<String,Object> changes;
+    protected List<TimeBankDistributionDTO> timeBankCTADistributions = new ArrayList<>();
+    protected List<PayOutPerShiftCTADistributionDTO> payoutPerShiftCTADistributions = new ArrayList<>();
 
     public ShiftDTO(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivityDTO> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
         this.startDate = startDate;
@@ -142,6 +146,15 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
         this.employmentId = employmentId;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+    public List<TimeBankDistributionDTO> getTimeBankCTADistributions() {
+        this.timeBankCTADistributions = Optional.ofNullable(this.timeBankCTADistributions).orElse(new ArrayList<>());
+        return this.timeBankCTADistributions;
+    }
+
+    public List<PayOutPerShiftCTADistributionDTO> getPayoutPerShiftCTADistributions() {
+        this.payoutPerShiftCTADistributions = Optional.ofNullable(this.payoutPerShiftCTADistributions).orElse(new ArrayList<>());
+        return this.payoutPerShiftCTADistributions;
     }
 
     @JsonIgnore
