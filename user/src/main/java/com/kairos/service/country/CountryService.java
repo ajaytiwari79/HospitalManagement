@@ -350,12 +350,7 @@ public class CountryService {
 
     public List<RelationTypeDTO> getRelationTypes(Long countryId) {
         List<RelationType> relationTypes = countryGraphRepository.getRelationTypesByCountry(countryId);
-        List<RelationTypeDTO> relationTypeDTOS =ObjectMapperUtils.copyCollectionPropertiesByMapper(relationTypes,RelationTypeDTO.class);
-        relationTypeDTOS.forEach(relationTypeDTO -> {
-            relationTypeDTO.setCountryId(countryId);
-            relationTypeDTO.setTranslations(TranslationUtil.getTranslatedData(relationTypeDTO.getTranslatedNames(),relationTypeDTO.getTranslatedDescriptions()));
-        });
-        return relationTypeDTOS;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(relationTypes, RelationTypeDTO.class);
     }
 
     public boolean deleteRelationType(Long countryId, Long relationTypeId) {
@@ -534,35 +529,5 @@ public class CountryService {
     public Country findById(Long countryId){
         return countryGraphRepository.findById(countryId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_COUNTRY_ID_NOTFOUND, countryId)));
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long levelId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Level level =levelGraphRepository.findOne(levelId);
-        level.setTranslatedNames(translatedNames);
-        level.setTranslatedDescriptions(translatedDescriptios);
-        levelGraphRepository.save(level);
-        return level.getTranslatedData();
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfRelationType(Long relationTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        RelationType relationType =relationTypeGraphRepository.findOne(relationTypeId);
-        relationType.setTranslatedNames(translatedNames);
-        relationType.setTranslatedDescriptions(translatedDescriptios);
-        relationTypeGraphRepository.save(relationType);
-        return relationType.getTranslatedData();
-    }
-
-
 
 }

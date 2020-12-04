@@ -3,9 +3,11 @@ package com.kairos.persistence.model.access_permission;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.enums.OrganizationCategory;
+import com.kairos.persistence.model.common.TranslationConverter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.ArrayList;
@@ -44,6 +46,7 @@ public class AccessPageQueryResult {
     private boolean hasSubTabs;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
     private String helperText;
     private String url;

@@ -3,8 +3,10 @@ package com.kairos.persistence.model.access_permission;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.persistence.model.common.TranslationConverter;
 import lombok.Getter;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
@@ -32,6 +34,7 @@ public class AccessGroupQueryResult {
     private Set<BigInteger> dayTypeIds;
     private boolean allowedDayTypes;
     private AccessGroup parentAccessGroup;
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
     public String getName() {

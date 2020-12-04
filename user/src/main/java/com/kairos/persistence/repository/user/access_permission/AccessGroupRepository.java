@@ -52,11 +52,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "MATCH (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false}) " +
             "OPTIONAL MATCH(accessGroup)-["+HAS_PARENT_ACCESS_GROUP+"]->(pag:AccessGroup) " +
             " WHERE NOT (accessGroup.name='" + SUPER_ADMIN + "') " +
-            "RETURN " +
-            "{english :{name: CASE WHEN accessGroup.`translatedNames.english` IS NULL THEN '' ELSE accessGroup.`translatedNames.english` END, description : CASE WHEN accessGroup.`translatedDescriptions.english` IS NULL THEN '' ELSE accessGroup.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN accessGroup.`translatedNames.hindi` IS NULL THEN '' ELSE accessGroup.`translatedNames.hindi` END, description : CASE WHEN accessGroup.`translatedDescriptions.hindi` IS NULL THEN '' ELSE accessGroup.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN accessGroup.`translatedNames.danish` IS NULL THEN '' ELSE accessGroup.`translatedNames.danish` END, description : CASE WHEN accessGroup.`translatedDescriptions.danish` IS NULL THEN '' ELSE accessGroup.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN accessGroup.`translatedNames.britishenglish` IS NULL THEN '' ELSE accessGroup.`translatedNames.britishenglish` END, accessGroup : CASE WHEN accessGroup.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE accessGroup.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "RETURN accessGroup.translations as translations," +
             "id(accessGroup) AS id, accessGroup.name AS name, accessGroup.description AS description, accessGroup.typeOfTaskGiver AS typeOfTaskGiver, accessGroup.deleted AS deleted, accessGroup.role AS role, accessGroup.enabled AS enabled,accessGroup.startDate AS startDate, accessGroup.endDate AS endDate, accessGroup.dayTypeIds AS dayTypeIds,accessGroup.allowedDayTypes AS allowedDayTypes,pag as parentAccessGroup ORDER BY accessGroup.name")
     List<AccessGroupQueryResult> getAccessGroupsForUnit(Long refId);
 
@@ -212,11 +208,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     AccessGroupCountQueryResult getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId);
 
     @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)={0} AND r.organizationCategory={1} " +
-            "RETURN " +
-            "{english :{name: CASE WHEN ag.`translatedNames.english` IS NULL THEN '' ELSE ag.`translatedNames.english` END, description : CASE WHEN ag.`translatedDescriptions.english` IS NULL THEN '' ELSE ag.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN ag.`translatedNames.hindi` IS NULL THEN '' ELSE ag.`translatedNames.hindi` END, description : CASE WHEN ag.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ag.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN ag.`translatedNames.danish` IS NULL THEN '' ELSE ag.`translatedNames.danish` END, description : CASE WHEN ag.`translatedDescriptions.danish` IS NULL THEN '' ELSE ag.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN ag.`translatedNames.britishenglish` IS NULL THEN '' ELSE ag.`translatedNames.britishenglish` END, description : CASE WHEN ag.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ag.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "RETURN ag.translations as translations," +
             "id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.deleted AS deleted, ag.role AS role, ag.enabled AS enabled,ag.startDate AS startDate, ag.endDate AS endDate, ag.dayTypeIds AS dayTypeIds,ag.allowedDayTypes AS allowedDayTypes")
     List<AccessGroupQueryResult> getCountryAccessGroupByOrgCategory(Long countryId, String orgCategory);
 

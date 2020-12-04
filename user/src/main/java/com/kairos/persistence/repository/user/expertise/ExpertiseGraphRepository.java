@@ -58,11 +58,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "with expertise,level,union,sector, " +
             "CASE when seniorDays IS NULL THEN [] ELSE collect(DISTINCT {id:id(seniorDays),from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) END as seniorDays, " +
             "CASE when childCareDays IS NULL THEN [] ELSE collect(DISTINCT {id:id(childCareDays),from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) END as childCareDays " +
-            "RETURN " +
-            "{english :{name: CASE WHEN expertise.`translatedNames.english` IS NULL THEN '' ELSE expertise.`translatedNames.english` END, description : CASE WHEN expertise.`translatedDescriptions.english` IS NULL THEN '' ELSE expertise.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN expertise.`translatedNames.hindi` IS NULL THEN '' ELSE expertise.`translatedNames.hindi` END, description : CASE WHEN expertise.`translatedDescriptions.hindi` IS NULL THEN '' ELSE expertise.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN expertise.`translatedNames.danish` IS NULL THEN '' ELSE expertise.`translatedNames.danish` END, description : CASE WHEN expertise.`translatedDescriptions.danish` IS NULL THEN '' ELSE expertise.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN expertise.`translatedNames.britishenglish` IS NULL THEN '' ELSE expertise.`translatedNames.britishenglish` END, description : CASE WHEN expertise.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE expertise.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "RETURN expertise.translations as translations,\n" +
             "expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate , " +
             "expertise.endDate as endDate ,expertise.description as description ,expertise.breakPaymentSetting as breakPaymentSetting,expertise.published as published,level as organizationLevel,union,sector, " +
             "seniorDays,childCareDays ORDER BY expertise.name")
@@ -129,11 +125,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "with expertise,exl,seniorityLevel,sector,organizationLevel,union , " +
             "CASE WHEN seniorDays IS NULL THEN [] ELSE COLLECT(DISTINCT {id:id(seniorDays),from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) END as seniorDays, " +
             "CASE WHEN childCareDays IS NULL THEN [] ELSE COLLECT(DISTINCT {id:id(childCareDays),from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) END as childCareDays ORDER BY  seniorityLevel.from \n" +
-            "RETURN DISTINCT " +
-            "{english :{name: CASE WHEN expertise.`translatedNames.english` IS NULL THEN '' ELSE expertise.`translatedNames.english` END, description : CASE WHEN expertise.`translatedDescriptions.english` IS NULL THEN '' ELSE expertise.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN expertise.`translatedNames.hindi` IS NULL THEN '' ELSE expertise.`translatedNames.hindi` END, description : CASE WHEN expertise.`translatedDescriptions.hindi` IS NULL THEN '' ELSE expertise.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN expertise.`translatedNames.danish` IS NULL THEN '' ELSE expertise.`translatedNames.danish` END, description : CASE WHEN expertise.`translatedDescriptions.danish` IS NULL THEN '' ELSE expertise.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN expertise.`translatedNames.britishenglish` IS NULL THEN '' ELSE expertise.`translatedNames.britishenglish` END, description : CASE WHEN expertise.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE expertise.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+            "RETURN DISTINCT expertise.translations as translations,\n" +
             "expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate ," +
             "expertise.endDate as endDate ,exl.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,exl.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek," +
              " seniorDays,childCareDays,sector,organizationLevel,union  order by expertise.name")

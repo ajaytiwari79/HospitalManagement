@@ -74,6 +74,7 @@ import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -333,10 +334,6 @@ public class OrganizationService {
         Long countryId=viaCountry?countryIdOrOrgId:countryGraphRepository.getCountryIdByUnitId(countryIdOrOrgId);
         List<OrganizationBasicResponse> organizationQueryResult =viaCountry? unitGraphRepository.getAllParentOrganizationOfCountry(countryId):
                 unitGraphRepository.getAllOrganizationOfOrganization(countryIdOrOrgId);
-        organizationQueryResult.forEach(organizationBasicResponse -> {
-            organizationBasicResponse.setCountryId(countryId);
-            organizationBasicResponse.setTranslations(TranslationUtil.getTranslatedData(organizationBasicResponse.getTranslatedNames(),organizationBasicResponse.getTranslatedDescriptions()));
-        });
         OrganizationCreationData organizationCreationData = unitGraphRepository.getOrganizationCreationData(countryId);
         List<Map<String, Object>> zipCodes = FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId));
         if (Optional.ofNullable(organizationCreationData).isPresent()) {
@@ -438,10 +435,15 @@ public class OrganizationService {
 
     public Map<String, Object> getCommonDataOfOrganization(Long unitId) {
         Map<String, Object> data = new HashMap<>();
-        List<Map<String, Object>> organizationSkills = unitGraphRepository.getSkillsOfParentOrganization(unitId);
+        List<Map<String, Object>> organizationSkills = ObjectMapperUtils.copyCollectionPropertiesByMapper(unitGraphRepository.getSkillsOfParentOrganization(unitId), HashedMap.class);
         List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
         for (Map<String, Object> map : organizationSkills) {
-            orgSkillRel.add((Map<String, Object>) map.get("data"));
+            Map<String, Object> organizationSkill = (Map<String, Object>) map.get("data");
+            TranslationUtil.convertTranslationFromStringToMap(organizationSkill);
+            ((List<Map<String, Object>>)organizationSkill.get("children")).forEach(childMap->{
+                TranslationUtil.convertTranslationFromStringToMap(childMap);
+            });
+            orgSkillRel.add(organizationSkill);
         }
         data.put("skillsOfOrganization", orgSkillRel);
         data.put("teamsOfOrganization", teamService.getTeamsInUnit(unitId));
@@ -940,7 +942,6 @@ public class OrganizationService {
         activityIntegrationService.transferReasonCode(reasonCodeDTOS);
         return true;
     }
-
 
 
 }

@@ -56,14 +56,9 @@ public class CompanyCategoryService{
     }
 
     public List<CompanyCategoryResponseDTO> getCompanyCategories(Long countryId) {
-        List<CompanyCategory> companyCategories =companyCategoryGraphRepository.findCompanyCategoriesByCountry(countryId);
-        List<CompanyCategoryResponseDTO> companyCategoryResponseDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(companyCategories,CompanyCategoryResponseDTO.class);
-        companyCategoryResponseDTOS.forEach(companyCategoryResponseDTO -> {
-            companyCategoryResponseDTO.setCountryId(countryId);
-            companyCategoryResponseDTO.setTranslations(TranslationUtil.getTranslatedData(companyCategoryResponseDTO.getTranslatedNames(),companyCategoryResponseDTO.getTranslatedDescriptions()));
-        });
-        return companyCategoryResponseDTOS;
-    }
+        List<CompanyCategory> companyCategories = companyCategoryGraphRepository.findCompanyCategoriesByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(companyCategories, CompanyCategoryResponseDTO.class);
+     }
 
     public CompanyCategoryResponseDTO updateCompanyCategory(Long countryId, CompanyCategoryDTO companyCategoryDTO) {
 
@@ -98,20 +93,6 @@ public class CompanyCategoryService{
         companyCategory.setDeleted(true);
         companyCategoryGraphRepository.save(companyCategory);
         return true;
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfCompanyCategory(Long companyCategoryId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        CompanyCategory companyCategory =companyCategoryGraphRepository.findOne(companyCategoryId);
-        companyCategory.setTranslatedNames(translatedNames);
-        companyCategory.setTranslatedDescriptions(translatedDescriptios);
-        companyCategoryGraphRepository.save(companyCategory);
-        return companyCategory.getTranslatedData();
     }
 
 }

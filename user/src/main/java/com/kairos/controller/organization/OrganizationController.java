@@ -28,6 +28,7 @@ import com.kairos.service.staff.StaffFilterService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -86,6 +87,7 @@ public class OrganizationController {
     private StaffCreationService staffCreationService;
     @Inject
     private StaffRetrievalService staffRetrievalService;
+    @Inject private TranslationService translationService;
 
 
     @ApiOperation(value = "Get Organization by Id")
@@ -975,14 +977,14 @@ public class OrganizationController {
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfActivity(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 
     @RequestMapping(value = UNIT_URL+"/organization/{id}/languageSettings", method = RequestMethod.PUT)
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfActivityOfOrganization(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 
     @RequestMapping(value = "transfer_reason_code")

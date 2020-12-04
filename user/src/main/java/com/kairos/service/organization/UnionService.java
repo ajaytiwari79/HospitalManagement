@@ -504,8 +504,6 @@ public class UnionService {
             UnionDataDTO unionDataDTO = new UnionDataDTO();
             unionDataDTO.setId(unionDataQueryResult.getUnion().getId());
             unionDataDTO.setName(unionDataQueryResult.getUnion().getName());
-            unionDataDTO.setCountryId(countryId);
-            unionDataDTO.setTranslations(TranslationUtil.getTranslatedData(unionDataQueryResult.getUnion().getTranslatedNames(),unionDataQueryResult.getUnion().getTranslatedDescriptions()));
             unionDataDTO.setSectors(ObjectMapperUtils.copyCollectionPropertiesByMapper(unionDataQueryResult.getSectors(), SectorDTO.class));
             List<LocationDTO> locationDTOS = new ArrayList<>();
             List<MunicipalityDTO> municipalitiesUnion;
@@ -588,19 +586,5 @@ public class UnionService {
 
         List<ReasonCodeDTO> reasonCodeType = activityIntegrationService.getReasonCodeByType(unitId,ORDER);
         return new StaffUnionWrapper(unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
-    }
-
-    public Map<String, TranslationInfo> updateTranslation(Long unionId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
-        union.setTranslatedNames(translatedNames);
-        union.setTranslatedDescriptions(translatedDescriptios);
-        organizationGraphRepository.save(union);
-        return union.getTranslatedData();
     }
 }

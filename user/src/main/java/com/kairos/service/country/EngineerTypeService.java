@@ -53,12 +53,7 @@ public class EngineerTypeService{
 
     public List<EngineerTypeDTO> getEngineerTypeByCountryId(long countryId){
         List<EngineerType> engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
-        List<EngineerTypeDTO> engineerTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(engineerTypes,EngineerTypeDTO.class);
-        engineerTypeDTOS.forEach(engineerTypeDTO -> {
-            engineerTypeDTO.setCountryId(countryId);
-            engineerTypeDTO.setTranslations(TranslationUtil.getTranslatedData(engineerTypeDTO.getTranslatedNames(),engineerTypeDTO.getTranslatedDescriptions()));
-        });
-        return engineerTypeDTOS;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(engineerTypes, EngineerTypeDTO.class);
     }
 
     public EngineerTypeDTO updateEngineerType(long countryId, EngineerTypeDTO engineerTypeDTO){
@@ -85,16 +80,5 @@ public class EngineerTypeService{
             exceptionService.dataNotFoundByIdException("error.EngineerType.notfound");
         }
         return false;
-    }
-
-    public Map<String, TranslationInfo> updateTranslation(Long engineerTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        EngineerType engineerType =engineerTypeGraphRepository.findOne(engineerTypeId);
-        engineerType.setTranslatedNames(translatedNames);
-        engineerType.setTranslatedDescriptions(translatedDescriptions);
-        engineerTypeGraphRepository.save(engineerType);
-        return engineerType.getTranslatedData();
     }
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.Properties;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -46,6 +47,8 @@ public abstract class UserBaseEntity  {
     protected Map<String,String> translatedNames;
     @Properties
     protected Map<String,String> translatedDescriptions;
+    @Convert(TranslationConverter.class)
+    protected Map<String, TranslationInfo> translations;
 
 
 

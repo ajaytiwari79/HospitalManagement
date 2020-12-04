@@ -134,9 +134,6 @@ public class ReasonCodeService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(BigInteger reasonCodeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
         ReasonCode reasonCode =reasonCodeRepository.findOne(reasonCodeId);
         reasonCode.setTranslations(translations);
         reasonCodeRepository.save(reasonCode);

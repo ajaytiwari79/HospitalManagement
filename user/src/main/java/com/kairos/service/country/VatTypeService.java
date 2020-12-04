@@ -6,6 +6,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.VatType;
 import com.kairos.persistence.model.country.default_data.VatTypeDTO;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.VatTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -52,13 +53,8 @@ public class VatTypeService {
    }
 
     public List<VatTypeDTO> getVatTypeByCountryId(long countryId){
-        List<VatType> vatTypes =vatTypeGraphRepository.findVatTypesByCountry(countryId);
-        List<VatTypeDTO> vatTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(vatTypes,VatTypeDTO.class);
-        for(VatTypeDTO vatTypeDTO:vatTypeDTOS){
-            vatTypeDTO.setCountryId(countryId);
-            vatTypeDTO.setTranslations(TranslationUtil.getTranslatedData(vatTypeDTO.getTranslatedNames(),vatTypeDTO.getTranslatedDescriptions()));
-        }
-        return vatTypeDTOS;
+        List<VatType> vatTypes = vatTypeGraphRepository.findVatTypesByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(vatTypes, VatTypeDTO.class);
     }
 
     public VatTypeDTO updateVatType(long countryId, VatTypeDTO vatTypeDTO){
@@ -86,16 +82,5 @@ public class VatTypeService {
             exceptionService.duplicateDataException("error.VatType.notfound");
         }
         return true;
-    }
-
-    public Map<String, TranslationInfo> updateTranslation(Long vatTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
-        VatType vatType =vatTypeGraphRepository.findOne(vatTypeId);
-        vatType.setTranslatedNames(translatedNames);
-        vatType.setTranslatedDescriptions(translatedDescriptios);
-        vatTypeGraphRepository.save(vatType);
-        return vatType.getTranslatedData();
     }
 }

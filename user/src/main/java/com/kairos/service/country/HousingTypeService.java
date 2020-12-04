@@ -52,13 +52,8 @@ public class HousingTypeService {
     }
 
     public List<HousingTypeDTO> getHousingTypeByCountryId(long countryId) {
-        List<HousingType> housingTypes =housingTypeGraphRepository.findHousingTypeByCountry(countryId);
-        List<HousingTypeDTO> housingTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(housingTypes,HousingTypeDTO.class);
-        housingTypeDTOS.forEach(housingTypeDTO -> {
-            housingTypeDTO.setCountryId(countryId);
-            housingTypeDTO.setTranslations(TranslationUtil.getTranslatedData(housingTypeDTO.getTranslatedNames(),housingTypeDTO.getTranslatedDescriptions()));
-        });
-        return housingTypeDTOS;
+        List<HousingType> housingTypes = housingTypeGraphRepository.findHousingTypeByCountry(countryId);
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(housingTypes, HousingTypeDTO.class);
     }
 
     public HousingTypeDTO updateHousingType(long countryId, HousingTypeDTO housingTypeDTO) {
@@ -84,16 +79,5 @@ public class HousingTypeService {
             exceptionService.dataNotFoundByIdException("error.HousingType.notfound");
         }
         return true;
-    }
-
-    public Map<String, TranslationInfo> updateTranslation(Long housingTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptions = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptions);
-        HousingType housingType =housingTypeGraphRepository.findOne(housingTypeId);
-        housingType.setTranslatedNames(translatedNames);
-        housingType.setTranslatedDescriptions(translatedDescriptions);
-        housingTypeGraphRepository.save(housingType);
-        return housingType.getTranslatedData();
     }
 }

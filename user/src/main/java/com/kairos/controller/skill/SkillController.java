@@ -3,6 +3,7 @@ package com.kairos.controller.skill;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +34,7 @@ public class SkillController {
 
     @Inject
     private SkillService skillService;
+    @Inject private TranslationService translationService;
 
     @ApiOperation(value = "Get a skill by id ")
     @RequestMapping(value = "/skill/{id}", method = RequestMethod.GET)
@@ -66,7 +68,11 @@ public class SkillController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,skillService.getSkillsByName(skillsName));
     }
 
-
+    @ApiOperation(value = "Get all skills by ids")
+    @PostMapping(value = "/country/{countryId}/skills_by_id")
+    public ResponseEntity<Map<String,Object>> getSkillsByIds(@RequestBody List<Long> skillIds){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,skillService.getSkillsByIds(skillIds));
+    }
 
     @PostMapping("/country/{countryId}/get_Skill_and_level_by_staff_ids")
     @ApiOperation("Get Staff's SkillId And Level")
@@ -90,7 +96,7 @@ public class SkillController {
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationSkill(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.updateTranslationOfOrganizationSkills(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 
 

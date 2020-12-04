@@ -187,17 +187,11 @@ public class TeamService {
 
 
     public TeamDTO getTeamDetails(Long teamId) {
-        TeamDTO teamDTO = teamGraphRepository.getTeamDetailsById(teamId);
-        teamDTO.setTranslations(TranslationUtil.getTranslatedData(teamDTO.getTranslatedNames(),teamDTO.getTranslatedDescriptions()));
-        return teamDTO;
+        return teamGraphRepository.getTeamDetailsById(teamId);
     }
 
     public Map<String, Object> getTeamsAndPrerequisite(long unitId) {
         List<TeamDTO> teams = teamGraphRepository.getTeams(unitId);
-        teams.forEach(teamDTO -> {
-            teamDTO.setUnitId(unitId);
-            teamDTO.setTranslations(TranslationUtil.getTranslatedData(teamDTO.getTranslatedNames(),teamDTO.getTranslatedDescriptions()));
-        });
         Map<String, Object> map = new HashMap<>();
         map.put("teams", (isCollectionNotEmpty(teams)) ? teams : Collections.emptyList());
         List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
@@ -436,19 +430,5 @@ public class TeamService {
 
     public List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds){
         return teamGraphRepository.getAllStaffToAssignActivitiesByTeam(unitId, activityIds);
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfOrganizationTeams(Long teamId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Team team =teamGraphRepository.findOne(teamId);
-        team.setTranslatedNames(translatedNames);
-        team.setTranslatedDescriptions(translatedDescriptios);
-        teamGraphRepository.save(team);
-        return team.getTranslatedData();
     }
 }

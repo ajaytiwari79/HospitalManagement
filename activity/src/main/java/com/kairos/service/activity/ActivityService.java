@@ -585,7 +585,17 @@ public class ActivityService {
     }
     public ActivitySettingsWrapper getSkillTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        return new ActivitySettingsWrapper(activity.getActivitySkillSettings());
+        ActivitySkillSettings activitySkillSettings = activity.getActivitySkillSettings();
+        List<Long> skillIds = activitySkillSettings.getActivitySkillIds();
+        if(isCollectionNotEmpty(skillIds)) {
+            List<Skill> skills = userIntegrationService.getSkillsByIds(skillIds, activity.getCountryId());
+            Map<Long, Skill> skillTranslationMap = skills.stream().collect(Collectors.toMap(Skill::getId, v -> v));
+            activitySkillSettings.getActivitySkills().forEach(activitySkill -> {
+                Skill skill = skillTranslationMap.get(activitySkill.getSkillId());
+                activitySkill.setTranslations(skill.getTranslations());
+            });
+        }
+        return new ActivitySettingsWrapper(activitySkillSettings);
     }
     public void updateOrgMappingDetailOfActivity(OrganizationMappingDTO organizationMappingDTO, BigInteger activityId) {
         Activity activity = findActivityById(activityId);

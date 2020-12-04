@@ -104,15 +104,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "OPTIONAL MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill{isEnabled:true}) WITH skill,r,orgSkillRelation, ctags,otags\n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH skill,skillCategory,r,orgSkillRelation,ctags,otags\n" +
             "RETURN {children:COLLECT(DISTINCT {" +
-            "translations:{english :{name: CASE WHEN skill.`translatedNames.english` IS NULL THEN '' ELSE skill.`translatedNames.english` END, description : CASE WHEN skill.`translatedDescriptions.english` IS NULL THEN '' ELSE skill.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN skill.`translatedNames.hindi` IS NULL THEN '' ELSE skill.`translatedNames.hindi` END, description : CASE WHEN skill.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skill.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN skill.`translatedNames.danish` IS NULL THEN '' ELSE skill.`translatedNames.danish` END, description : CASE WHEN skill.`translatedDescriptions.danish` IS NULL THEN '' ELSE skill.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN skill.`translatedNames.britishenglish` IS NULL THEN '' ELSE skill.`translatedNames.britishenglish` END, description : CASE WHEN skill.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skill.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations:skill.translations,\n" +
             "id:id(skill),name:case WHEN orgSkillRelation is null or orgSkillRelation.customName is null then skill.name else orgSkillRelation.customName end ,isSelected:r.isEnabled, tags:ctags+otags})," +
-            "translations:{english :{name: CASE WHEN skillCategory.`translatedNames.english` IS NULL THEN '' ELSE skillCategory.`translatedNames.english` END, description : CASE WHEN skillCategory.`translatedDescriptions.english` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN skillCategory.`translatedNames.hindi` IS NULL THEN '' ELSE skillCategory.`translatedNames.hindi` END, description : CASE WHEN skillCategory.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN skillCategory.`translatedNames.danish` IS NULL THEN '' ELSE skillCategory.`translatedNames.danish` END, description : CASE WHEN skillCategory.`translatedDescriptions.danish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN skillCategory.`translatedNames.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedNames.britishenglish` END, description : CASE WHEN skillCategory.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations:skillCategory.translations,\n" +
             "id:id(skillCategory),name:skillCategory.name} AS data")
     List<Map<String, Object>> getSkills(long staffId, long unitId);
 

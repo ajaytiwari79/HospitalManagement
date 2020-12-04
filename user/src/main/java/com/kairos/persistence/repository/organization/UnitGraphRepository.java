@@ -43,7 +43,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=true WITH  skill,r,organization,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[ORGANIZATION_HAS_TAG]-(organization) WITH  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
             "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH\n" +
-            " {id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
+            " {id:id(skillCategory),translations :skillCategory.translations,name:skillCategory.name,children:COLLECT({id:id(skill),translations :skill.translations,name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
             " RETURN {availableSkills:COLLECT(availableSkills)} as data\n" +
             " UNION\n" +
             " MATCH (unit)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) WHERE id(unit)={1} WITH subType,unit\n" +
@@ -51,7 +51,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             " MATCH (unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WITH skill,unit,r\n" +
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=unit.showCountryTags WITH  skill,unit,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[ORGANIZATION_HAS_TAG]-(unit) WITH  skill,r,unit,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
-            " MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:COLLECT({id:id(skill),name:skill.name,visitourId:r.visitourId, customName:r.customName, description:skill.description,isEdited:true, tags:ctags+otags})} as selectedSkills\n" +
+            " MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH {id:id(skillCategory),translations :skillCategory.translations,name:skillCategory.name,description:skillCategory.description,children:COLLECT({id:id(skill),translations :skill.translations,name:skill.name,visitourId:r.visitourId, customName:r.customName, description:skill.description,isEdited:true, tags:ctags+otags})} as selectedSkills\n" +
             " RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
     List<Map<String, Object>> getSkillsForParentOrganization(long organizationId, long unitId);
 
@@ -62,15 +62,9 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[ORGANIZATION_HAS_TAG]-(organization) WITH  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
             "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH\n" +
             " {" +
-            "translations :{english :{name: CASE WHEN skillCategory.`translatedNames.english` IS NULL THEN '' ELSE skillCategory.`translatedNames.english` END, description : CASE WHEN skillCategory.`translatedDescriptions.english` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN skillCategory.`translatedNames.hindi` IS NULL THEN '' ELSE skillCategory.`translatedNames.hindi` END, description : CASE WHEN skillCategory.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN skillCategory.`translatedNames.danish` IS NULL THEN '' ELSE skillCategory.`translatedNames.danish` END, description : CASE WHEN skillCategory.`translatedDescriptions.danish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN skillCategory.`translatedNames.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedNames.britishenglish` END, description : CASE WHEN skillCategory.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations :skillCategory.translations,\n" +
             "id:id(skillCategory),name:skillCategory.name,children:COLLECT({" +
-            "translations :{english :{name: CASE WHEN skill.`translatedNames.english` IS NULL THEN '' ELSE skill.`translatedNames.english` END, description : CASE WHEN skill.`translatedDescriptions.english` IS NULL THEN '' ELSE skill.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN skill.`translatedNames.hindi` IS NULL THEN '' ELSE skill.`translatedNames.hindi` END, description : CASE WHEN skill.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skill.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN skill.`translatedNames.danish` IS NULL THEN '' ELSE skill.`translatedNames.danish` END, description : CASE WHEN skill.`translatedDescriptions.danish` IS NULL THEN '' ELSE skill.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN skill.`translatedNames.britishenglish` IS NULL THEN '' ELSE skill.`translatedNames.britishenglish` END, description : CASE WHEN skill.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skill.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations :skill.translations,\n" +
             "id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
             " RETURN {availableSkills:COLLECT(availableSkills)} as data\n" +
             " UNION\n" +
@@ -80,15 +74,9 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=unit.showCountryTags WITH  skill,unit,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[ORGANIZATION_HAS_TAG]-(unit) WITH  skill,r,unit,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
             " MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH {" +
-            "translations :{english :{name: CASE WHEN skillCategory.`translatedNames.english` IS NULL THEN '' ELSE skillCategory.`translatedNames.english` END, description : CASE WHEN skillCategory.`translatedDescriptions.english` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN skillCategory.`translatedNames.hindi` IS NULL THEN '' ELSE skillCategory.`translatedNames.hindi` END, description : CASE WHEN skillCategory.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN skillCategory.`translatedNames.danish` IS NULL THEN '' ELSE skillCategory.`translatedNames.danish` END, description : CASE WHEN skillCategory.`translatedDescriptions.danish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN skillCategory.`translatedNames.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedNames.britishenglish` END, description : CASE WHEN skillCategory.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations :skillCategory.translations,\n" +
             "id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:COLLECT({" +
-            "translations :{english :{name: CASE WHEN skill.`translatedNames.english` IS NULL THEN '' ELSE skill.`translatedNames.english` END, description : CASE WHEN skill.`translatedDescriptions.english` IS NULL THEN '' ELSE skill.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN skill.`translatedNames.hindi` IS NULL THEN '' ELSE skill.`translatedNames.hindi` END, description : CASE WHEN skill.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skill.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN skill.`translatedNames.danish` IS NULL THEN '' ELSE skill.`translatedNames.danish` END, description : CASE WHEN skill.`translatedDescriptions.danish` IS NULL THEN '' ELSE skill.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN skill.`translatedNames.britishenglish` IS NULL THEN '' ELSE skill.`translatedNames.britishenglish` END, description : CASE WHEN skill.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skill.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations :skill.translations,\n" +
             "id:id(skill),name:skill.name,visitourId:r.visitourId, customName:r.customName, description:skill.description,isEdited:true, tags:ctags+otags})} as selectedSkills\n" +
             " RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
     List<Map<String, Object>> getSkillsOfChildUnit(long organizationId, long unitId);
@@ -99,15 +87,9 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH distinct skill,skillCategory,organization\n" +
             "OPTIONAL MATCH (organization)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) WITH\n" +
             "{" +
-            "translations :{english :{name: CASE WHEN skillCategory.`translatedNames.english` IS NULL THEN '' ELSE skillCategory.`translatedNames.english` END, description : CASE WHEN skillCategory.`translatedDescriptions.english` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN skillCategory.`translatedNames.hindi` IS NULL THEN '' ELSE skillCategory.`translatedNames.hindi` END, description : CASE WHEN skillCategory.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN skillCategory.`translatedNames.danish` IS NULL THEN '' ELSE skillCategory.`translatedNames.danish` END, description : CASE WHEN skillCategory.`translatedDescriptions.danish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN skillCategory.`translatedNames.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedNames.britishenglish` END, description : CASE WHEN skillCategory.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations :skillCategory.translations,\n" +
             "id:id(skillCategory),name:skillCategory.name,children:COLLECT({" +
-            "translations :{english :{name: CASE WHEN skill.`translatedNames.english` IS NULL THEN '' ELSE skill.`translatedNames.english` END, description : CASE WHEN skill.`translatedDescriptions.english` IS NULL THEN '' ELSE skill.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN skill.`translatedNames.hindi` IS NULL THEN '' ELSE skill.`translatedNames.hindi` END, description : CASE WHEN skill.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skill.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN skill.`translatedNames.danish` IS NULL THEN '' ELSE skill.`translatedNames.danish` END, description : CASE WHEN skill.`translatedDescriptions.danish` IS NULL THEN '' ELSE skill.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN skill.`translatedNames.britishenglish` IS NULL THEN '' ELSE skill.`translatedNames.britishenglish` END, description : CASE WHEN skill.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skill.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations :skill.translations,\n" +
             "id:id(skill),name:r.customName,description:skill.description,visitourId:r.visitourId,isEdited:true})} as availableSkills\n" +
             "RETURN {availableSkills:COLLECT(availableSkills)} as data\n" +
             "UNION\n" +
@@ -116,15 +98,9 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "OPTIONAL MATCH (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WITH skill,r\n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH\n" +
             "{" +
-            "translations :{english :{name: CASE WHEN skillCategory.`translatedNames.english` IS NULL THEN '' ELSE skillCategory.`translatedNames.english` END, description : CASE WHEN skillCategory.`translatedDescriptions.english` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN skillCategory.`translatedNames.hindi` IS NULL THEN '' ELSE skillCategory.`translatedNames.hindi` END, description : CASE WHEN skillCategory.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN skillCategory.`translatedNames.danish` IS NULL THEN '' ELSE skillCategory.`translatedNames.danish` END, description : CASE WHEN skillCategory.`translatedDescriptions.danish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN skillCategory.`translatedNames.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedNames.britishenglish` END, description : CASE WHEN skillCategory.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skillCategory.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations :skillCategory.translations,\n" +
             "id:id(skillCategory),name:skillCategory.name,children:COLLECT({" +
-            "translations :{english :{name: CASE WHEN skill.`translatedNames.english` IS NULL THEN '' ELSE skill.`translatedNames.english` END, description : CASE WHEN skill.`translatedDescriptions.english` IS NULL THEN '' ELSE skill.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN skill.`translatedNames.hindi` IS NULL THEN '' ELSE skill.`translatedNames.hindi` END, description : CASE WHEN skill.`translatedDescriptions.hindi` IS NULL THEN '' ELSE skill.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN skill.`translatedNames.danish` IS NULL THEN '' ELSE skill.`translatedNames.danish` END, description : CASE WHEN skill.`translatedDescriptions.danish` IS NULL THEN '' ELSE skill.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN skill.`translatedNames.britishenglish` IS NULL THEN '' ELSE skill.`translatedNames.britishenglish` END, description : CASE WHEN skill.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE skill.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations :skill.translations,\n" +
             "id:id(skill),name:r.customName,description:skill.description,visitourId:r.visitourId, customName:r.customName, isEdited:true})} as selectedSkills\n" +
             "RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
     List<Map<String, Object>> getSkillsOfParentOrganization(long unitId);
@@ -181,13 +157,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "OPTIONAL MATCH (org)-[:SUB_TYPE_OF]->(subType:OrganizationType) WITH COLLECT(id(subType)) as organizationSubTypeIds,org,ot\n" +
             "OPTIONAL MATCH (org)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) WITH organizationSubTypeIds,org,ot,zipCode\n" +
             "OPTIONAL MATCH (org)-[:HAS_ACCOUNT_TYPE]-(accountType:AccountType)\n" +
-            "RETURN\n" +
-            "{english: CASE WHEN org.`translatedNames.english` IS NULL THEN '' ELSE org.`translatedNames.english`\n" +
-            "END,\n" +
-            "danish: CASE WHEN org.`translatedNames.danish` IS NULL THEN '' ELSE org.`translatedNames.danish` END,\n" +
-            "hindi: CASE WHEN org.`translatedNames.hindi` IS NULL THEN '' ELSE org.`translatedNames.hindi` END,\n" +
-            "britishenglish: CASE WHEN org.`translatedNames.britishenglish` IS NULL THEN '' ELSE org.`translatedNames.britishenglish` END} as translatedNames,\n" +
-            "{english: CASE WHEN org.`translatedDescriptions.english` IS NULL THEN '' ELSE org.`translatedDescriptions.english` END,danish: CASE WHEN org.`translatedDescriptions.danish` IS NULL THEN '' ELSE org.`translatedDescriptions.danish` END,hindi: CASE WHEN  org.`translatedDescriptions.hindi` IS NULL THEN '' ELSE org.`translatedDescriptions.hindi` END,britishenglish: CASE WHEN org.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE org.`translatedDescriptions.britishenglish` END} as translatedDescriptions,\n" +
+            "RETURN org.translations as translations,\n" +
             "id(org) as id,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId,id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY org.name")
     List<OrganizationBasicResponse> getAllParentOrganizationOfCountry(Long countryId);
 
@@ -225,15 +195,9 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org " +
             "MATCH path=(org)-[:"+HAS_UNIT+"]->(child:Unit{isEnable:true,boardingCompleted:true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {" +
             "parent:{" +
-            "translations:{english :{name: CASE WHEN ps.p.`translatedNames.english` IS NULL THEN '' ELSE ps.p.`translatedNames.english` END, description : CASE WHEN ps.p.`translatedDescriptions.english` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN ps.p.`translatedNames.hindi` IS NULL THEN '' ELSE ps.p.`translatedNames.hindi` END, description : CASE WHEN ps.p.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN ps.p.`translatedNames.danish` IS NULL THEN '' ELSE ps.p.`translatedNames.danish` END, description : CASE WHEN ps.p.`translatedDescriptions.danish` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN ps.p.`translatedNames.britishenglish` IS NULL THEN '' ELSE ps.p.`translatedNames.britishenglish` END, description : CASE WHEN ps.p.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ps.p.`translatedDescriptions.britishenglish` END}}, \n" +
+            "translations:ps.p.translations, \n" +
             "name:ps.p.name,id:id(ps.p)},child:{" +
-            "translations:{english :{name: CASE WHEN ps.c.`translatedNames.english` IS NULL THEN '' ELSE ps.c.`translatedNames.english` END, description : CASE WHEN ps.c.`translatedDescriptions.english` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN ps.c.`translatedNames.hindi` IS NULL THEN '' ELSE ps.c.`translatedNames.hindi` END, description : CASE WHEN ps.c.`translatedDescriptions.hindi` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN ps.c.`translatedNames.danish` IS NULL THEN '' ELSE ps.c.`translatedNames.danish` END, description : CASE WHEN ps.c.`translatedDescriptions.danish` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN ps.c.`translatedNames.britishenglish` IS NULL THEN '' ELSE ps.c.`translatedNames.britishenglish` END, description : CASE WHEN ps.c.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE ps.c.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations:ps.c.translations,\n" +
             "name:ps.c.name,id:id(ps.c)}} as data")
     List<Map<String, Object>> getSubOrgHierarchy(long organizationId);
 
@@ -297,16 +261,10 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
 
     @Query("MATCH (unit:Unit) WHERE id(unit) IN {0}  MATCH (unit)-[:SUB_TYPE_OF]->(organizationType:OrganizationType{isEnable:true}) MATCH (organizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(os:OrganizationService{isEnabled:true}) MATCH (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) \n" +
             "WITH {children: case when os is NULL then [] else COLLECT(distinct {\n" +
-            "translations:{english :{name: CASE WHEN os.`translatedNames.english` IS NULL THEN '' ELSE os.`translatedNames.english` END, description : CASE WHEN os.`translatedDescriptions.english` IS NULL THEN '' ELSE os.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN os.`translatedNames.hindi` IS NULL THEN '' ELSE os.`translatedNames.hindi` END, description : CASE WHEN os.`translatedDescriptions.hindi` IS NULL THEN '' ELSE os.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN os.`translatedNames.danish` IS NULL THEN '' ELSE os.`translatedNames.danish` END, description : CASE WHEN os.`translatedDescriptions.danish` IS NULL THEN '' ELSE os.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN os.`translatedNames.britishenglish` IS NULL THEN '' ELSE os.`translatedNames.britishenglish` END, description : CASE WHEN os.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE os.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations:os.translations,\n" +
             "id:id(os), unitId:{0}, name:os.name,description:os.description}) END,\n" +
             "\n" +
-            "translations:{english :{name: CASE WHEN organizationService.`translatedNames.english` IS NULL THEN '' ELSE organizationService.`translatedNames.english` END, description : CASE WHEN os.`translatedDescriptions.english` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN organizationService.`translatedNames.hindi` IS NULL THEN '' ELSE os.`translatedNames.hindi` END, description : CASE WHEN organizationService.`translatedDescriptions.hindi` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN organizationService.`translatedNames.danish` IS NULL THEN '' ELSE os.`translatedNames.danish` END, description : CASE WHEN os.`translatedDescriptions.danish` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN organizationService.`translatedNames.britishenglish` IS NULL THEN '' ELSE organizationService.`translatedNames.britishenglish` END, description : CASE WHEN organizationService.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations:organizationService.translations,\n" +
             "\n" +
             "id:id(organizationService),name:organizationService.name, unitId:{0}, description:organizationService.description} as availableServices RETURN {availableServices:COLLECT(availableServices)} as data\n" +
             "UNION\n" +
@@ -316,32 +274,20 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "MATCH (unit)-[r:PROVIDE_SERVICE{isEnabled:true}]->(os)  MATCH (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) \n" +
             "OPTIONAL MATCH (unit)-[orgServiceCustomNameRelation:HAS_CUSTOM_SERVICE_NAME_FOR]-(organizationService:OrganizationService) \n" +
             "WITH {children: case when os is NULL then [] else COLLECT({\n" +
-            "translations:{english :{name: CASE WHEN os.`translatedNames.english` IS NULL THEN '' ELSE os.`translatedNames.english` END, description : CASE WHEN os.`translatedDescriptions.english` IS NULL THEN '' ELSE os.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN os.`translatedNames.hindi` IS NULL THEN '' ELSE os.`translatedNames.hindi` END, description : CASE WHEN os.`translatedDescriptions.hindi` IS NULL THEN '' ELSE os.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN os.`translatedNames.danish` IS NULL THEN '' ELSE os.`translatedNames.danish` END, description : CASE WHEN os.`translatedDescriptions.danish` IS NULL THEN '' ELSE os.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN os.`translatedNames.britishenglish` IS NULL THEN '' ELSE os.`translatedNames.britishenglish` END, description : CASE WHEN os.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE os.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations:os.translations,\n" +
             "id:id(os), unitId:{0}name:os.name,\n" +
             "customName:CASE WHEN r.customName IS null THEN os.name ELSE r.customName END,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,\n" +
-            "translations:{english :{name: CASE WHEN organizationService.`translatedNames.english` IS NULL THEN '' ELSE organizationService.`translatedNames.english` END, description : CASE WHEN os.`translatedDescriptions.english` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN organizationService.`translatedNames.hindi` IS NULL THEN '' ELSE os.`translatedNames.hindi` END, description : CASE WHEN organizationService.`translatedDescriptions.hindi` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN organizationService.`translatedNames.danish` IS NULL THEN '' ELSE os.`translatedNames.danish` END, description : CASE WHEN os.`translatedDescriptions.danish` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN organizationService.`translatedNames.britishenglish` IS NULL THEN '' ELSE organizationService.`translatedNames.britishenglish` END, description : CASE WHEN organizationService.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations:organizationService.translations,\n" +
             "id:id(organizationService), unitId:{0}, name:organizationService.name,description:organizationService.description,\n" +
             "customName:CASE WHEN orgServiceCustomNameRelation IS null THEN organizationService.name ELSE orgServiceCustomNameRelation.customName END} as selectedServices RETURN {selectedServices:COLLECT(selectedServices)} as data")
     List<Map<String, Object>> getServicesForUnits(List<Long> unitIds);
 
     @Query("MATCH (unit:Unit) WHERE id(unit) = {0}  MATCH (unit)-[:SUB_TYPE_OF]->(organizationType:OrganizationType{isEnable:true}) MATCH (organizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(os:OrganizationService{isEnabled:true}) MATCH (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) \n" +
             "WITH {children: case when os is NULL then [] else COLLECT(distinct {\n" +
-            "translations:{english :{name: CASE WHEN os.`translatedNames.english` IS NULL THEN '' ELSE os.`translatedNames.english` END, description : CASE WHEN os.`translatedDescriptions.english` IS NULL THEN '' ELSE os.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN os.`translatedNames.hindi` IS NULL THEN '' ELSE os.`translatedNames.hindi` END, description : CASE WHEN os.`translatedDescriptions.hindi` IS NULL THEN '' ELSE os.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN os.`translatedNames.danish` IS NULL THEN '' ELSE os.`translatedNames.danish` END, description : CASE WHEN os.`translatedDescriptions.danish` IS NULL THEN '' ELSE os.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN os.`translatedNames.britishenglish` IS NULL THEN '' ELSE os.`translatedNames.britishenglish` END, description : CASE WHEN os.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE os.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations:os.translations,\n" +
             "id:id(os),name:os.name,description:os.description,unitId:{0}}) END,\n" +
             "\n" +
-            "translations:{english :{name: CASE WHEN organizationService.`translatedNames.english` IS NULL THEN '' ELSE organizationService.`translatedNames.english` END, description : CASE WHEN organizationService.`translatedDescriptions.english` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN organizationService.`translatedNames.hindi` IS NULL THEN '' ELSE organizationService.`translatedNames.hindi` END, description : CASE WHEN organizationService.`translatedDescriptions.hindi` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN organizationService.`translatedNames.danish` IS NULL THEN '' ELSE organizationService.`translatedNames.danish` END, description : CASE WHEN organizationService.`translatedDescriptions.danish` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN organizationService.`translatedNames.britishenglish` IS NULL THEN '' ELSE organizationService.`translatedNames.britishenglish` END, description : CASE WHEN organizationService.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations:organizationService.translations,\n" +
             "\n" +
             "id:id(organizationService),name:organizationService.name,description:organizationService.description,unitId:{0}} as availableServices RETURN {availableServices:COLLECT(availableServices)} as data\n" +
             "UNION\n" +
@@ -351,16 +297,10 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "MATCH (unit)-[r:PROVIDE_SERVICE{isEnabled:true}]->(os)  MATCH (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) \n" +
             "OPTIONAL MATCH (unit)-[orgServiceCustomNameRelation:HAS_CUSTOM_SERVICE_NAME_FOR]-(organizationService:OrganizationService) \n" +
             "WITH {children: case when os is NULL then [] else COLLECT({\n" +
-            "translations:{english :{name: CASE WHEN os.`translatedNames.english` IS NULL THEN '' ELSE os.`translatedNames.english` END, description : CASE WHEN os.`translatedDescriptions.english` IS NULL THEN '' ELSE os.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN os.`translatedNames.hindi` IS NULL THEN '' ELSE os.`translatedNames.hindi` END, description : CASE WHEN os.`translatedDescriptions.hindi` IS NULL THEN '' ELSE os.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN os.`translatedNames.danish` IS NULL THEN '' ELSE os.`translatedNames.danish` END, description : CASE WHEN os.`translatedDescriptions.danish` IS NULL THEN '' ELSE os.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN os.`translatedNames.britishenglish` IS NULL THEN '' ELSE os.`translatedNames.britishenglish` END, description : CASE WHEN os.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE os.`translatedDescriptions.britishenglish` END}},\n" +
+            "translations:os.translations,\n" +
             "id:id(os),name:os.name,unitId:{0},\n" +
             "customName:CASE WHEN r.customName IS null THEN os.name ELSE r.customName END,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,\n" +
-            "translations:{english :{name: CASE WHEN organizationService.`translatedNames.english` IS NULL THEN '' ELSE organizationService.`translatedNames.english` END, description : CASE WHEN organizationService.`translatedDescriptions.english` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN organizationService.`translatedNames.hindi` IS NULL THEN '' ELSE organizationService.`translatedNames.hindi` END, description : CASE WHEN organizationService.`translatedDescriptions.hindi` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN organizationService.`translatedNames.danish` IS NULL THEN '' ELSE organizationService.`translatedNames.danish` END, description : CASE WHEN organizationService.`translatedDescriptions.danish` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN organizationService.`translatedNames.britishenglish` IS NULL THEN '' ELSE organizationService.`translatedNames.britishenglish` END, description : CASE WHEN organizationService.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE organizationService.`translatedDescriptions.britishenglish` END}},unitId:{0},\n" +
+            "translations:organizationService.translations,unitId:{0},\n" +
             "id:id(organizationService),name:organizationService.name,description:organizationService.description,\n" +
             "customName:CASE WHEN orgServiceCustomNameRelation IS null THEN organizationService.name ELSE orgServiceCustomNameRelation.customName END} as selectedServices RETURN {selectedServices:COLLECT(selectedServices)} as data")
     List<Map<String, Object>> getServicesForUnit(Long unitId);
@@ -426,7 +366,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH  org,skill,skillCategory,r\n" +
             "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=org.showCountryTags WITH  org,skill,skillCategory,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
             "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[ORGANIZATION_HAS_TAG]-(org) WITH skill,skillCategory,r,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
-            "RETURN {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,skills:COLLECT(distinct {id:id(skill),name:skill.name,visitourId:skill.visitourId,description:skill.description,customName:r.customName,isEdited:true, tags:ctags+otags})} as data")
+            "RETURN {id:id(skillCategory),translations:skillCategory.translations,name:skillCategory.name,description:skillCategory.description,skills:COLLECT(distinct {id:id(skill),translations:skill.translations,name:skill.name,visitourId:skill.visitourId,description:skill.description,customName:r.customName,isEdited:true, tags:ctags+otags})} as data")
     List<Map<String, Object>> getSkillsOfOrganization(long unitId);
 
     @Query("MATCH (org:Unit)-[r:" + HAS_SUB_ORGANIZATION + "]->(unit:Unit) WHERE id(org)={0} AND id(unit)={1} RETURN count(r)")
@@ -455,7 +395,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
 
     @Query("MATCH (organization:Organization) - [:" + BELONGS_TO + "] -> (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(organization)={0} AND et.deleted={1}\n" +
-            "RETURN id(et) as id, et.name as name, et.description as description, \n" +
+            "RETURN id(et) as id, et.name as name, et.description as description, et.translations as translations, \n" +
             "et.allowedForContactPerson as allowedForContactPerson,et.markMainEmployment as markMainEmployment, et.allowedForShiftPlan as allowedForShiftPlan, et.allowedForFlexPool as allowedForFlexPool,et.paymentFrequency as paymentFrequency, " +
             "CASE when et.employmentCategories IS NULL THEN [] ELSE et.employmentCategories END as employmentCategories,et.weeklyMinutes as weeklyMinutes,et.editableAtEmployment as editableAtEmployment,et.mainEmployment as mainEmployment ORDER BY et.name ASC")
     List<Map<String, Object>> getEmploymentTypeByOrganization(Long organizationId, Boolean isDeleted);

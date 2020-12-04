@@ -170,23 +170,19 @@ public class EmploymentTypeService {
         return true;
     }
 
-    public List<EmploymentTypeDTO> getEmploymentTypeList(long countryId, boolean isDeleted) {
+    public List<EmploymentType> getEmploymentTypeList(long countryId, boolean isDeleted) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
         }
-        List<EmploymentType> employmentTypes =countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
-        List<EmploymentTypeDTO> employmentTypeDTOS =ObjectMapperUtils.copyCollectionPropertiesByMapper(employmentTypes,EmploymentTypeDTO.class);
-        employmentTypeDTOS.forEach(employmentTypeDTO -> {
-            employmentTypeDTO.setCountryId(countryId);
-            employmentTypeDTO.setTranslations(TranslationUtil.getTranslatedData(employmentTypeDTO.getTranslatedNames(),employmentTypeDTO.getTranslatedDescriptions()));
-        });
-        return employmentTypeDTOS;
+        return countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
     }
 
     public List<Map<String, Object>> getEmploymentTypeOfOrganization(Long unitId, boolean isDeleted) {
         Organization organization=organizationService.fetchParentOrganization(unitId);
-        return unitGraphRepository.getEmploymentTypeByOrganization(organization.getId(), isDeleted);
+        List<Map<String, Object>> employmentTypes = unitGraphRepository.getEmploymentTypeByOrganization(organization.getId(), isDeleted);
+        employmentTypes.forEach(employmentType->TranslationUtil.convertTranslationFromStringToMap(employmentType));
+        return employmentTypes;
     }
 
     public List<EmploymentType> getEmploymentTypes(Long unitId){
@@ -386,19 +382,5 @@ public class EmploymentTypeService {
     public DefaultKpiDataDTO getKpiAllDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = getStaffByKpiFilter(staffEmploymentTypeDTO);
         return DefaultKpiDataDTO.builder().staffKpiFilterDTOs(staffKpiFilterDTOS).build();
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfEmploymentType(Long employmentTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        EmploymentType employmentType =employmentTypeGraphRepository.findOne(employmentTypeId);
-        employmentType.setTranslatedNames(translatedNames);
-        employmentType.setTranslatedDescriptions(translatedDescriptios);
-        employmentTypeGraphRepository.save(employmentType);
-        return employmentType.getTranslatedData();
     }
 }
