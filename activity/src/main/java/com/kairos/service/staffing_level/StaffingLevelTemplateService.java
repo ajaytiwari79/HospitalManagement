@@ -70,6 +70,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         StaffingLevel staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId,asDate(staffingLevelTemplateDTO.getSelectedDate()));
         StaffingLevelTemplate staffingLevelTemplate = ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplateDTO, StaffingLevelTemplate.class);
         staffingLevelTemplate.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval());
+        staffingLevelTemplate.setStaffingLevelSetting(staffingLevel.getStaffingLevelSetting());
         staffingLevelTemplateRepository.save(staffingLevelTemplate);
         BeanUtils.copyProperties(staffingLevelTemplate, staffingLevelTemplateDTO);
         staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevel.getPresenceStaffingLevelInterval().stream()

@@ -4,10 +4,9 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.dto.user.country.LevelDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
@@ -21,6 +20,7 @@ import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.country.default_data.RelationTypeDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
+import com.kairos.persistence.model.organization.DayType;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.user.resources.Vehicle;
@@ -37,6 +37,7 @@ import com.kairos.rest_client.activity_types.ActivityTypesRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
@@ -52,6 +53,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.ApiConstants.API_ALL_PHASES_URL;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -98,6 +100,8 @@ public class CountryService {
     private GenericRestClient genericRestClient;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private PermissionService permissionService;
 
     /**
      * @param country
@@ -490,13 +494,6 @@ public class CountryService {
         return new OrganizationLevelAndUnionWrapper(unions, organizationLevels);
     }
 
-    //TODO Integrated
-//    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId) {
-//        List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
-//        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-//        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(dayTypes,DayTypeDTO.class);
-//        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS, getDefaultTimeSlot(), countryId);
-//    }
 
     public List<TimeSlotDTO> getDefaultTimeSlot() {
         List<TimeSlotDTO> timeSlotDTOS = new ArrayList<>(3);
