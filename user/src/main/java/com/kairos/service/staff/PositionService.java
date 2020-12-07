@@ -341,7 +341,7 @@ public class PositionService {
                 }
                 Map<String, Object> workPlace = new HashMap<>();
                 workPlace.put("id", accessGroup.getId());
-                workPlace.put("name", accessGroup.getName());
+                workPlace.put("name", TranslationUtil.getName(accessGroup.getTranslations(),accessGroup.getName()));
                 workPlace.put("tree", queryResult);
                 workPlace.put("positions", positions);
                 workPlace.put("translations",accessGroup.getTranslations());
@@ -416,7 +416,7 @@ public class PositionService {
             }
             Map<String, Object> workPlace = new HashMap<>();
             workPlace.put("id", accessGroup.getId());
-            workPlace.put("name", accessGroup.getName());
+            workPlace.put("name", TranslationUtil.getName(accessGroup.getTranslations(),accessGroup.getName()));
             workPlace.put("tree", treeStructureService.getTreeStructure(list));
             workPlace.put("positions", positions);
             workPlace.put("translations",accessGroup.getTranslations());
