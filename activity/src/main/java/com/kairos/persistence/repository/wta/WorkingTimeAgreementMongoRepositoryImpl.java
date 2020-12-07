@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.wta;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
@@ -24,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.constants.CommonConstants.DELETED;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**

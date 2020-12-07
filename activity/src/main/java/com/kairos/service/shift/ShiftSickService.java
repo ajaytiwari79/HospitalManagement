@@ -2,11 +2,9 @@ package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftActionType;
@@ -228,7 +226,7 @@ public class ShiftSickService extends MongoBaseService {
         });
         shiftService.createShifts(activity.getUnitId(),ObjectMapperUtils.copyCollectionPropertiesByMapper(allShiftsToUpdate,ShiftDTO.class),ShiftActionType.SAVE);
         if(isCollectionNotEmpty(allShiftsToDelete)) {
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(allShiftsToDelete.get(0).getStartDate()), allShiftsToDelete.get(0).getStaffId(), allShiftsToDelete.get(0).getEmploymentId(), Collections.emptySet());
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(allShiftsToDelete.get(0).getStartDate()), allShiftsToDelete.get(0).getStaffId(), allShiftsToDelete.get(0).getEmploymentId());
             shiftService.deleteShifts(new ArrayList<>(), allShiftsToDelete, staffAdditionalInfoDTO);
             shiftMongoRepository.saveEntities(allShiftsToDelete);
         }

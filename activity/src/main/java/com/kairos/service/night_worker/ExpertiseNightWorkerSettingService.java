@@ -14,6 +14,7 @@ import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettin
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,8 @@ public class ExpertiseNightWorkerSettingService{
 
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
     public ExpertiseNightWorkerSettingDTO createExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = ObjectMapperUtils.copyPropertiesByMapper(nightWorkerSettingDTO, ExpertiseNightWorkerSetting.class);
@@ -74,7 +77,7 @@ public class ExpertiseNightWorkerSettingService{
 
     public ExpertiseNightWorkerSettingDTO updateExpertiseNightWorkerSettingsInUnit(Long unitId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findOne(nightWorkerSettingDTO.getId());
-        TimeSlotDTO timeSlot = userIntegrationService.getUnitTimeSlot(unitId).stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();;
+        TimeSlotDTO timeSlot = timeSlotSetService.getShiftPlanningTimeSlotByUnit(unitId).stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();;
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_NIGHTWORKER_SETTING_NOTFOUND, nightWorkerSettingDTO.getId());
         }
@@ -141,7 +144,7 @@ public class ExpertiseNightWorkerSettingService{
 
     public ExpertiseNightWorkerSettingDTO getExpertiseNightWorkerSettingsForUnit(Long unitId, Long expertiseId) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndUnitId( expertiseId,unitId);
-        TimeSlotDTO timeSlot = userIntegrationService.getUnitTimeSlot(unitId).stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();;
+        TimeSlotDTO timeSlot = timeSlotSetService.getShiftPlanningTimeSlotByUnit(unitId).stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();;
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
             // find country level settings
             expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndDeletedFalseAndCountryIdExistsTrue(expertiseId);

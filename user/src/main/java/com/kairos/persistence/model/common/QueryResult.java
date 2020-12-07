@@ -7,8 +7,8 @@ import com.kairos.enums.OrganizationLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +41,7 @@ public class QueryResult {
     private CompanyType type;
     private String startDate;
     private String endDate;
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
     public QueryResult(String name, long id, List<QueryResult> children) {

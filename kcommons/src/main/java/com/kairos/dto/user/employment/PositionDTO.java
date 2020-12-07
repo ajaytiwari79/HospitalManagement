@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 
 /**
  * Created by yatharth on 19/4/18.
@@ -13,6 +14,6 @@ import javax.validation.constraints.NotNull;
 public class PositionDTO {
     @NotNull
     private String endDate;
-    private Long reasonCodeId;
+    private BigInteger reasonCodeId;
     private Long accessGroupIdOnPositionEnd;
 }

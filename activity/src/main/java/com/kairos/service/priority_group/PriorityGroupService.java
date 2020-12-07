@@ -11,7 +11,6 @@ import com.kairos.dto.activity.open_shift.PriorityGroupWrapper;
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
-import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplate;
 import com.kairos.persistence.model.priority_group.PriorityGroup;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;

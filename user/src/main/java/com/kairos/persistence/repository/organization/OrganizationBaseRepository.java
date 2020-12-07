@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_UNIT;
 
 @Repository

@@ -39,7 +39,6 @@ import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -261,15 +260,6 @@ public class StaffService {
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffDTO.getExpertiseIds());
         // Setting Staff Details)
         setStaffDetails(staffToUpdate, staffDTO);
-        staffDTO.getStaffChildDetails().forEach(staffChildDetailDTO -> {
-            if(isNull(staffChildDetailDTO.getTranslatedNames())){
-                staffChildDetailDTO.setTranslatedNames(new HashMap<>());
-            }
-            if(isNull(staffChildDetailDTO.getTranslatedDescriptions())){
-                staffChildDetailDTO.setTranslatedDescriptions(new HashMap<>());
-            }
-            TranslationUtil.updateTranslationData(staffChildDetailDTO.getTranslations(),staffChildDetailDTO.getTranslatedNames(),staffChildDetailDTO.getTranslatedDescriptions());
-        });
         staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyCollectionPropertiesByMapper(staffDTO.getStaffChildDetails(), StaffChildDetail.class));
         updateUserDetails(staffDTO, userAccessRoleDTO, staffToUpdate);
         // Set if user is female and pregnant
@@ -872,8 +862,6 @@ public class StaffService {
         if (isCollectionNotEmpty(employmentQueryResults)) {
             EmploymentQueryResult employment = employmentQueryResults.stream().filter(employmentQueryResult -> EmploymentSubType.MAIN.equals(employmentQueryResult.getEmploymentSubType())).findAny().orElse(null);
             if (isNotNull(employment)) {
-                List<ProtectedDaysOffSetting> protectedDaysOffSettings = expertiseGraphRepository.findProtectedDaysOffSettingByExpertiseId(employment.getExpertise().getId());
-                employment.getExpertise().setProtectedDaysOffSettings(copyCollectionPropertiesByMapper(protectedDaysOffSettings, ProtectedDaysOffSetting.class));
                 employmentDetails = new StaffEmploymentDetails(employment.getId(), ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class), employment.getEndDate(), employment.getStartDate(), employment.getUnitId(), employment.getEmploymentSubType());
             }
         }

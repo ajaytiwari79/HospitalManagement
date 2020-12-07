@@ -6,7 +6,6 @@ import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.system_setting.AccountTypeDTO;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
@@ -73,11 +72,6 @@ public class AccountTypeService {
         List<AccountType> accountTypes = accountTypeRepository.getAllAccountTypeByCountryId(countryId);
         // converted due to USE in both Microservice.
         List<AccountTypeDTO> accountTypeDTOS =ObjectMapperUtils.copyCollectionPropertiesByMapper(accountTypes, AccountTypeDTO.class);
-        accountTypeDTOS.forEach(accountTypeDTO -> {
-            accountTypeDTO.setCountryId(countryId);
-            accountTypeDTO.setTranslations(TranslationUtil.getTranslatedData(accountTypeDTO.getTranslatedNames(),accountTypeDTO.getTranslatedDescriptions()));
-        });
-
         return accountTypeDTOS;
     }
 
@@ -117,20 +111,4 @@ public class AccountTypeService {
         accountTypeRepository.save(accountType.get());
         return true;
     }
-
-    public Map<String, TranslationInfo> updateTranslationOfAccountType(Long accountTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        AccountType accountType =accountTypeRepository.findOne(accountTypeId);
-        accountType.setTranslatedNames(translatedNames);
-        accountType.setTranslatedDescriptions(translatedDescriptios);
-        accountTypeRepository.save(accountType);
-        return accountType.getTranslatedData();
-    }
-
-
 }

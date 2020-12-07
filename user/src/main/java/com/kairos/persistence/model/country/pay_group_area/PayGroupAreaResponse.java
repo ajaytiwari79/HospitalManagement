@@ -3,12 +3,12 @@ package com.kairos.persistence.model.country.pay_group_area;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.LevelDTO;
-import com.kairos.persistence.model.address.MunicipalityQueryResult;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.MunicipalityQueryResults;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -22,12 +22,9 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class PayGroupAreaResponse {
-    private List<LevelDTO> organizationLevels = new ArrayList<>();
-    private List<MunicipalityQueryResults> municipalities = new ArrayList<>();
-
-    public PayGroupAreaResponse() {
-        // default constructor
-    }
+    private List<Level> organizationLevels = new ArrayList<>();
+    private List<Municipality> municipalities = new ArrayList<>();
 
 }

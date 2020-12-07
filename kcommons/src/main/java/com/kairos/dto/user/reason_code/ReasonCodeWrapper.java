@@ -16,8 +16,7 @@ public class ReasonCodeWrapper {
     private UserAccessRoleDTO userAccessRoleDTO;
     private Map<String, Object> contactAddressData;
 
-    public ReasonCodeWrapper(List<ReasonCodeDTO> reasonCodes,UserAccessRoleDTO userAccessRoleDTO) {
-        this.reasonCodes = reasonCodes;
+    public ReasonCodeWrapper(UserAccessRoleDTO userAccessRoleDTO) {
         this.userAccessRoleDTO = userAccessRoleDTO;
     }
 

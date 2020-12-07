@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 
 @Service

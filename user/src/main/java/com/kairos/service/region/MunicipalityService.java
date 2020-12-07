@@ -136,32 +136,4 @@ public class MunicipalityService {
         return municipalityGraphRepository.getMuncipalityByZipcode(zipcode);
     }
 
-    public Map<String, TranslationInfo> updateTranslationOfMunicipality(Long municipalityId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Municipality municipality =municipalityGraphRepository.findOne(municipalityId);
-        municipality.setTranslatedNames(translatedNames);
-        municipality.setTranslatedDescriptions(translatedDescriptios);
-        municipalityGraphRepository.save(municipality);
-        return municipality.getTranslatedData();
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfZipCode(Long zipCodeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        ZipCode zipCode =zipCodeGraphRepository.findOne(zipCodeId);
-        zipCode.setTranslatedNames(translatedNames);
-        zipCode.setTranslatedDescriptions(translatedDescriptios);
-        zipCodeGraphRepository.save(zipCode);
-        return zipCode.getTranslatedData();
-    }
-
 }

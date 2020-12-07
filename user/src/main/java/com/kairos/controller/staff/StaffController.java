@@ -25,6 +25,7 @@ import com.kairos.service.employment.EmploymentJobService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.*;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import io.swagger.annotations.Api;
@@ -76,7 +77,7 @@ public class StaffController {
     private EmploymentJobService employmentJobService;
     @Inject private StaffCreationService staffCreationService;
     @Inject private ClientService clientService;
-
+    @Inject private TranslationService translationService;
 
     @RequestMapping(value = "/{staffId}/position_details", method = RequestMethod.PUT)
     @ApiOperation("update staff employment details")
@@ -682,13 +683,13 @@ public class StaffController {
     @PutMapping(value ="/organization/language_settings" )
     @ApiOperation("update organization staff translation data")
     public ResponseEntity<Map<String, Object>>  updateStaffOrganizationTranslations(@PathVariable Long unitId,@RequestBody Map<String, TranslationInfo> translations){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.updateStaffOrganizationTranslatedData(unitId,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(unitId,translations));
     }
 
     @PutMapping(value ="/{staffId}/staff_child/{staffChildId}/language_settings" )
     @ApiOperation("update staff child translation data")
-    public ResponseEntity<Map<String, Object>>  updateStaffChildTranslations(@PathVariable Long unitId,@PathVariable Long staffId,@PathVariable Long staffChildId,@RequestBody Map<String, TranslationInfo> translations){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.updateStaffChildTranslatedData(staffChildId,translations,staffId,unitId));
+    public ResponseEntity<Map<String, Object>>  updateStaffChildTranslations(@PathVariable Long staffChildId,@RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(staffChildId,translations));
     }
 
 

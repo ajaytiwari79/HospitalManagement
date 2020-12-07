@@ -11,7 +11,6 @@ import com.kairos.dto.activity.pay_out.PayOutIntervalDTO;
 import com.kairos.dto.activity.pay_out.PayOutPerShiftCTADistributionDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.time_bank.CTARuletemplateBonus;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
@@ -20,7 +19,6 @@ import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.cta.AccountType;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -68,7 +66,7 @@ public class PayOutCalculationService {
     public PayOutPerShift calculateAndUpdatePayOut(DateTimeInterval interval, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftWithActivityDTO shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, PayOutPerShift payOutPerShift, List<DayTypeDTO> dayTypeDTOS) {
         int scheduledMinutesOfPayout = 0;
         Map<BigInteger, Integer> ctaPayoutMinMap = new HashMap<>();
-        Map<Long,DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(DayTypeDTO::getId, v->v));
+        Map<BigInteger,DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(DayTypeDTO::getId, v->v));
         boolean ruleTemplateValid = false;
         int ctaBonusMinutes = 0;
         for (CTARuleTemplateDTO ruleTemplate : staffAdditionalInfoDTO.getEmployment().getCtaRuleTemplates()) {

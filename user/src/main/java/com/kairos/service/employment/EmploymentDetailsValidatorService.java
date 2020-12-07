@@ -5,7 +5,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
-import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.pay_table.PayTable;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -14,7 +13,6 @@ import com.kairos.persistence.model.user.employment.EmploymentLine;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseLine;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
@@ -49,8 +47,6 @@ public class EmploymentDetailsValidatorService {
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private AsynchronousService asynchronousService;
-    @Inject
-    private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -121,11 +117,7 @@ public class EmploymentDetailsValidatorService {
             if (!Optional.ofNullable(employmentDTO.getReasonCodeId()).isPresent()) {
                 exceptionService.actionNotPermittedException(MESSAGE_REGION_ENDDATE);
             }
-            Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(employmentDTO.getReasonCodeId(), 0);
-            if (!Optional.ofNullable(reasonCode).isPresent()) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, employmentDTO.getReasonCodeId());
-            }
-            employment.setReasonCode(reasonCode.get());
+            employment.setReasonCodeId(employmentDTO.getReasonCodeId());
             employment.setEndDate(employmentDTO.getEndDate());
         }
 

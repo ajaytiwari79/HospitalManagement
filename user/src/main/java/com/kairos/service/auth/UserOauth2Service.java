@@ -1,7 +1,6 @@
 package com.kairos.service.auth;
 
 import com.kairos.config.env.EnvConfig;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.auth.UserPrincipal;

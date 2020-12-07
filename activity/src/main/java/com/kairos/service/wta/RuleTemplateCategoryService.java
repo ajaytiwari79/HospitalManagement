@@ -10,7 +10,6 @@ import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryRe
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
-import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;

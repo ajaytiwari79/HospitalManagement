@@ -3,6 +3,7 @@ package com.kairos.dto.activity.shift;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
+import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.staff.staff.Staff;
@@ -63,7 +64,7 @@ public class StaffEmploymentDetails {
     private LocalDate accumulatedTimebankDate;
     private CTAResponseDTO costTimeAgreement;
     private EmploymentSubType employmentSubType;
-    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
+    private List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings;
 
 
     public StaffEmploymentDetails(Long id, Long staffId, List<EmploymentLinesDTO> employmentLines, CTAResponseDTO costTimeAgreement) {
@@ -107,7 +108,7 @@ public class StaffEmploymentDetails {
         return isNullOrElse(expertise,new Expertise());
     }
 
-    public List<ProtectedDaysOffSetting> getProtectedDaysOffSettings() {
+    public List<ProtectedDaysOffSettingDTO> getProtectedDaysOffSettings() {
         return isNullOrElse(protectedDaysOffSettings,new ArrayList<>());
     }
 }

@@ -22,7 +22,4 @@ public class SystemLanguageDTO {
     private Map<String,String> translatedDescriptions;
     private Map<String, TranslationInfo> translations;
 
-    public String getName(){
-        return TranslationUtil.getName(translations,name);
-    }
 }

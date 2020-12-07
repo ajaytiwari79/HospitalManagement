@@ -6,6 +6,7 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.IndustryType;
 import com.kairos.persistence.model.country.default_data.IndustryTypeDTO;
+import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.IndustryTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -56,12 +57,7 @@ public class IndustryTypeService {
 
     public List<IndustryTypeDTO> getIndustryTypeByCountryId(long countryId){
         List<IndustryType> industryTypes = industryTypeGraphRepository.findIndustryTypeByCountry(countryId);
-        List<IndustryTypeDTO> industryTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(industryTypes,IndustryTypeDTO.class);
-        for(IndustryTypeDTO industryTypeDTO :industryTypeDTOS){
-            industryTypeDTO.setCountryId(countryId);
-            industryTypeDTO.setTranslations(TranslationUtil.getTranslatedData(industryTypeDTO.getTranslatedNames(),industryTypeDTO.getTranslatedDescriptions()));
-        }
-        return industryTypeDTOS;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(industryTypes, IndustryTypeDTO.class);
     }
 
     public IndustryTypeDTO updateIndustryType(long countryId, IndustryTypeDTO industryTypeDTO){
@@ -87,16 +83,5 @@ public class IndustryTypeService {
             exceptionService.dataNotFoundByIdException("error.IndustryType.notfound");
         }
         return true;
-    }
-
-    public Map<String, TranslationInfo> updateTranslation(Long industryTypeId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        TranslationUtil.updateTranslationData(translations,translatedNames,translatedDescriptios);
-        IndustryType industryType =industryTypeGraphRepository.findOne(industryTypeId);
-        industryType.setTranslatedNames(translatedNames);
-        industryType.setTranslatedDescriptions(translatedDescriptios);
-        industryTypeGraphRepository.save(industryType);
-        return industryType.getTranslatedData();
     }
 }

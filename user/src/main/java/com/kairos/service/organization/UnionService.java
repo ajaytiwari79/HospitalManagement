@@ -10,16 +10,14 @@ import com.kairos.dto.user.organization.ProvinceDTO;
 import com.kairos.dto.user.organization.RegionDTO;
 import com.kairos.dto.user.organization.ZipCodeDTO;
 import com.kairos.dto.user.organization.union.*;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.UnionState;
-import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.address.MunicipalityQueryResult;
 import com.kairos.persistence.model.address.ZipCodeSectorQueryResult;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.RelationType;
-import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
@@ -35,15 +33,14 @@ import com.kairos.persistence.repository.organization.union.LocationGraphReposit
 import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.CountryService;
-import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.wrapper.StaffUnionWrapper;
 import io.jsonwebtoken.lang.Assert;
@@ -56,8 +53,9 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.enums.reason_code.ReasonCodeType.ORDER;
 
 /**
  * Created by vipul on 13/2/18.
@@ -97,11 +95,9 @@ public class UnionService {
     @Inject
     private OrganizationService organizationService;
     @Inject
-    private ReasonCodeGraphRepository reasonCodeGraphRepository;
-    @Inject
     private ContactAddressGraphRepository contactAddressGraphRepository;
     @Inject
-    private ReasonCodeService reasonCodeService;
+    private ActivityIntegrationService activityIntegrationService;
 
 
     public List<Sector> findAllSectorsByCountry(Long countryId) {
@@ -508,8 +504,6 @@ public class UnionService {
             UnionDataDTO unionDataDTO = new UnionDataDTO();
             unionDataDTO.setId(unionDataQueryResult.getUnion().getId());
             unionDataDTO.setName(unionDataQueryResult.getUnion().getName());
-            unionDataDTO.setCountryId(countryId);
-            unionDataDTO.setTranslations(TranslationUtil.getTranslatedData(unionDataQueryResult.getUnion().getTranslatedNames(),unionDataQueryResult.getUnion().getTranslatedDescriptions()));
             unionDataDTO.setSectors(ObjectMapperUtils.copyCollectionPropertiesByMapper(unionDataQueryResult.getSectors(), SectorDTO.class));
             List<LocationDTO> locationDTOS = new ArrayList<>();
             List<MunicipalityDTO> municipalitiesUnion;
@@ -590,21 +584,7 @@ public class UnionService {
         List<UnionResponseDTO> unions = unitGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
         List<OrganizationBasicResponse> organizationHierarchy = unitGraphRepository.getOrganizationHierarchy(organization.getId());
 
-        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeService.getReasonCodesByUnitId(organizationBaseEntity.getId(), ReasonCodeType.EMPLOYMENT);
+        List<ReasonCodeDTO> reasonCodeType = activityIntegrationService.getReasonCodeByType(unitId,ORDER);
         return new StaffUnionWrapper(unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
-    }
-
-    public Map<String, TranslationInfo> updateTranslation(Long unionId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
-        union.setTranslatedNames(translatedNames);
-        union.setTranslatedDescriptions(translatedDescriptios);
-        organizationGraphRepository.save(union);
-        return union.getTranslatedData();
     }
 }

@@ -6,10 +6,8 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
@@ -17,13 +15,13 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.GdprIntegrationService;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.util.IterableUtils;
@@ -34,7 +32,8 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -98,28 +97,11 @@ public class OrganizationServiceService {
     }
 
 
-    public List<Map<String,Object>> getAllOrganizationService(long countryId) {
+    public List<OrganizationServiceDTO> getAllOrganizationService(long countryId) {
         Set<Long> serviceIds=organizationServiceRepository.getOrganizationServicesIdsByCountryId(countryId);
         List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(serviceIds));
-        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
-        List<Map<String,Object>> mapList =new ArrayList<>();
-        Map<String,Object> data = new HashMap<>();
-        for (OrganizationServiceDTO result : organizationServiceDTOS) {
-            result.getOrganizationSubService().forEach(organizationServiceDTO -> {
-                organizationServiceDTO.setTranslations(TranslationUtil.getTranslatedData(organizationServiceDTO.getTranslatedNames(),organizationServiceDTO.getTranslatedDescriptions()));
-            });
-            result.setTranslations(result.getTranslatedData());
-
-            data.put("id", result.getId());
-            data.put("name", result.getName());
-            data.put("description",result.getDescription());
-            data.put("children", result.getOrganizationSubService());
-            data.put("translations", result.getTranslations());
-            mapList.add(data);
-            data = new HashMap<>();
-        }
-        return mapList;
-    }
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
+     }
 
     public boolean deleteOrganizationServiceById(Long id) {
         OrganizationService organizationService = organizationServiceRepository.findOne(id);
@@ -220,27 +202,10 @@ public class OrganizationServiceService {
     }
 
 
-    public List<Map<String,Object>> getOrgServicesByOrgType(long orgType) {
+    public List<OrganizationServiceDTO> getOrgServicesByOrgType(long orgType) {
         List<Long> organizationServiceIds = organizationServiceRepository.getAllOrganizationServiceId(orgType);
         List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(organizationServiceIds));
-        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
-        List<Map<String,Object>> mapList =new ArrayList<>();
-        Map<String,Object> data = new HashMap<>();
-        for (OrganizationServiceDTO result : organizationServiceDTOS) {
-            result.getOrganizationSubService().forEach(organizationServiceDTO -> {
-                organizationServiceDTO.setTranslations(TranslationUtil.getTranslatedData(organizationServiceDTO.getTranslatedNames(),organizationServiceDTO.getTranslatedDescriptions()));
-            });
-            result.setTranslations(result.getTranslatedData());
-
-            data.put("id", result.getId());
-            data.put("name", result.getName());
-            data.put("description",result.getDescription());
-            data.put("children", result.getOrganizationSubService());
-            data.put("translations", result.getTranslations());
-            mapList.add(data);
-            data = new HashMap<>();
-        }
-        return mapList;
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
     }
 
     public List<Object> linkOrgServiceWithOrgType(long orgTypeId, long serviceId) {
@@ -250,7 +215,7 @@ public class OrganizationServiceService {
             if (checkIfServiceExistsWithOrganizationType(orgTypeId, serviceId) != 0) {
                 LOGGER.info("Already Selected now Deselecting ");
                 organizationTypeGraphRepository.deleteService(orgTypeId, serviceId);
-                List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
+                List<Map<String, Object>> mapList = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceRepository.getOrgServicesByOrgType(orgTypeId), HashedMap.class);
                 for (Map<String, Object> map : mapList) {
                     Object o = map.get(RESULT);
                     objectList.add(o);
@@ -259,12 +224,20 @@ public class OrganizationServiceService {
             } else {
                 LOGGER.info("Not  Selected now Selecting ");
                 organizationTypeGraphRepository.selectService(orgTypeId, serviceId);
-                List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
+                List<Map<String, Object>> mapList = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceRepository.getOrgServicesByOrgType(orgTypeId), HashedMap.class);
                 for (Map<String, Object> map : mapList) {
                     Object o = map.get(RESULT);
                     objectList.add(o);
                 }
             }
+            objectList.forEach(objectMap->{
+                Map<String, Object> map = (Map<String, Object>)objectMap;
+                ((List)map.get("children")).forEach(child->{
+                    Map<String, Object> childMap = (Map<String, Object>)child;
+                    TranslationUtil.convertTranslationFromStringToMap(childMap);
+                });
+                TranslationUtil.convertTranslationFromStringToMap(map);
+            });
         }
         return objectList;
     }
@@ -296,6 +269,7 @@ public class OrganizationServiceService {
     public Map<String, List<OrganizationServiceDTO>> organizationServiceData(long id) {
         List<Long> allUnitIds=organizationBaseRepository.fetchAllUnitIds(id);
         List<Map<String, Object>> services=(allUnitIds.size()==1 && allUnitIds.get(0).equals(id))?unitGraphRepository.getServicesForUnit(id):unitGraphRepository.getServicesForUnits(allUnitIds);
+        services = ObjectMapperUtils.copyCollectionPropertiesByMapper(services, HashedMap.class);
         List<Map<String, Object>> avialableService = null;
         List<Map<String, Object>> selectedService = null;
         List<OrganizationServiceDTO> availableServiceDTOS = new ArrayList<>();
@@ -303,12 +277,14 @@ public class OrganizationServiceService {
         List<OrganizationServiceDTO> selectedServiceDTOS = new ArrayList<>();
         List<OrganizationServiceDTO> selectedSubServiceDTOS = new ArrayList<>();
         for(Map<String,Object> map : services){
-            if(isNotNull(((Map<String, Object>) map.get("data")).get(AVAILABLE_SERVICES))){
-                avialableService = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(AVAILABLE_SERVICES);
+            Map<String, Object> service =(Map<String, Object>) map.get("data");
+            if(isNotNull(service.get(AVAILABLE_SERVICES))){
+                avialableService = (List<Map<String,Object>>)service.get(AVAILABLE_SERVICES);
             }
-            if(isNotNull(((Map<String, Object>) map.get("data")).get(SELECTED_SERVICES))){
-                selectedService = (List<Map<String,Object>>)((Map<String, Object>) map.get("data")).get(SELECTED_SERVICES);
+            if(isNotNull(service.get(SELECTED_SERVICES))){
+                selectedService = (List<Map<String,Object>>)service.get(SELECTED_SERVICES);
             }
+            TranslationUtil.convertTranslationFromStringToMap(service);
         }
 
         getAllOrganizationServices(avialableService, selectedService, availableServiceDTOS, availableSubServiceDTOS, selectedServiceDTOS, selectedSubServiceDTOS);
@@ -316,8 +292,6 @@ public class OrganizationServiceService {
         Map<String,List<OrganizationServiceDTO>> organizationServiceMap = new HashMap<>();
         organizationServiceMap.put(AVAILABLE_SERVICES,availableServiceDTOS);
         organizationServiceMap.put(SELECTED_SERVICES,selectedServiceDTOS);
-
-
         return organizationServiceMap;
 
     }
@@ -326,24 +300,24 @@ public class OrganizationServiceService {
         avialableService.forEach(as->{
             List<Map<String,Object>> availableSubServices =(List<Map<String,Object>>)as.get("children");
             availableSubServices.forEach(ass->{
-                OrganizationServiceDTO organizationAvailableSubServiceDTO = new OrganizationServiceDTO((String)ass.get("customName"),(Long)ass.get("id"),(String) ass.get("name"),(String)ass.get("description"),(Map<String, TranslationInfo>) ass.get("translations"),(Long)ass.get("unitId"),null);
+                TranslationUtil.convertTranslationFromStringToMap(ass);
+                OrganizationServiceDTO organizationAvailableSubServiceDTO = new OrganizationServiceDTO((String)ass.get("customName"),Long.valueOf(ass.get("id").toString()),(String) ass.get("name"),(String)ass.get("description"),(Map<String, TranslationInfo>) ass.get("translations"),Long.valueOf(ass.get("unitId").toString()),null);
                 availableSubServiceDTOS.add(organizationAvailableSubServiceDTO);
             });
-
-            OrganizationServiceDTO organizationAvailableServiceDTO = new OrganizationServiceDTO((String)as.get("customName"),(Long)as.get("id"),(String) as.get("name"),(String)as.get("description"),(Map<String, TranslationInfo>) as.get("translations"),(Long)as.get("unitId"),availableSubServiceDTOS);
+            TranslationUtil.convertTranslationFromStringToMap(as);
+            OrganizationServiceDTO organizationAvailableServiceDTO = new OrganizationServiceDTO((String)as.get("customName"),Long.valueOf(as.get("id").toString()),(String) as.get("name"),(String)as.get("description"),(Map<String, TranslationInfo>) as.get("translations"),Long.valueOf(as.get("unitId").toString()),availableSubServiceDTOS);
             availableServiceDTOS.add(organizationAvailableServiceDTO);
-
         });
-
         selectedService.forEach(ss->{
             List<Map<String,Object>> selectedSubService =(List<Map<String,Object>>)ss.get("children");
             selectedSubService.forEach(sss->{
-                OrganizationServiceDTO organizationSelectedSubServiceDTO = new OrganizationServiceDTO((String)sss.get("customName"),(Long)sss.get("id"),(String) sss.get("name"),(String)sss.get("description"),(Map<String, TranslationInfo>) sss.get("translations"),(Long)sss.get("unitId"),null);
+                TranslationUtil.convertTranslationFromStringToMap(sss);
+                OrganizationServiceDTO organizationSelectedSubServiceDTO = new OrganizationServiceDTO((String)sss.get("customName"),Long.valueOf(sss.get("id").toString()),(String) sss.get("name"),(String)sss.get("description"),(Map<String, TranslationInfo>) sss.get("translations"),Long.valueOf(sss.get("unitId").toString()),null);
                 selectedSubServiceDTOS.add(organizationSelectedSubServiceDTO);
             });
-            OrganizationServiceDTO organizationSelectedServiceDTO = new OrganizationServiceDTO((String)ss.get("customName"),(Long)ss.get("id"),(String) ss.get("name"),(String)ss.get("description"),(Map<String, TranslationInfo>) ss.get("translations"),(Long)ss.get("unitId"),selectedSubServiceDTOS);
+            TranslationUtil.convertTranslationFromStringToMap(ss);
+            OrganizationServiceDTO organizationSelectedServiceDTO = new OrganizationServiceDTO((String)ss.get("customName"),Long.valueOf(ss.get("id").toString()),(String) ss.get("name"),(String)ss.get("description"),(Map<String, TranslationInfo>) ss.get("translations"),Long.valueOf(ss.get("unitId").toString()),selectedSubServiceDTOS);
             selectedServiceDTOS.add(organizationSelectedServiceDTO);
-
         });
     }
 
@@ -419,26 +393,5 @@ public class OrganizationServiceService {
     public List<OrganizationServiceQueryResult> getAllOrganizationServicesByUnitId(Long unitId){
         return organizationServiceRepository.getAllOrganizationServicesByUnitId(unitId);
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long serviceId, Map<String,TranslationInfo> translationInfoMap) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translationInfoMap.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        OrganizationService service = organizationServiceRepository.findOne(serviceId);
-        service.setTranslatedNames(translatedNames);
-        service.setTranslatedDescriptions(translatedDescriptios);
-        organizationServiceRepository.save(service);
-        return service.getTranslatedData();
-    }
-
-    public Map<String, TranslationInfo> getTranslatedData(Long serviceId) {
-        OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
-        return organizationService.getTranslatedData();
-    }
-
-
 
 }

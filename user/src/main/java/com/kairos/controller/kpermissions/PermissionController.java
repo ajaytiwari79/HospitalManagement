@@ -9,6 +9,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.kpermissions.KPermissionAction;
 import com.kairos.service.kpermissions.PermissionService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +34,8 @@ public class PermissionController {
 
     @Inject
     private PermissionService permissionService;
+
+    @Inject private TranslationService translationService;
 
     @PostMapping(value = "/create_permission_schema")
     public ResponseEntity<Map<String, Object>> createFLPSchema(@Valid @RequestBody List<ModelDTO> modelDTO)  {
@@ -128,21 +131,21 @@ public class PermissionController {
     @PutMapping(value ="/model_permission/{id}/language_settings" )
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTranslationOfModelPermission(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.updateTranslation(id, translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id, translations));
     }
 
     @ApiOperation("update translation data")
     @PutMapping(value ="/action_permission/{id}/language_settings" )
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTranslationOfActionPermission(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.updateTranslationOfActionPermissions(id, translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id, translations));
     }
 
     @ApiOperation("update translation data")
     @PutMapping(value ="/field_permission/{id}/language_settings" )
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTranslationOfFieldPermission(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.updateTranslationOfFieldPermissions(id, translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id, translations));
     }
 
 }

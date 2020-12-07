@@ -45,9 +45,9 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private int durationMinutes;
     private String activityName;
     //used in T&A view
-    private Long reasonCodeId;
+    private BigInteger reasonCodeId;
     //used for adding absence type of activities.
-    private Long absenceReasonCodeId;
+    private BigInteger absenceReasonCodeId;
     private String remarks;
     //please don't use this id for any functionality this only for frontend
     private BigInteger id;
@@ -96,7 +96,7 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
         this.endDate = isNull(endDate) ? null : roundDateByMinutes(endDate,15);
     }
 
-    public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId, Long absenceReasonCodeId) {
+    public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId, BigInteger absenceReasonCodeId) {
         this.activityId = activityId;
         this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
         this.endDate = isNull(endDate) ? null : roundDateByMinutes(endDate,15);

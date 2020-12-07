@@ -1,12 +1,9 @@
 package com.kairos.config;
 
-import com.kairos.annotations.KPermissionActions;
 import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.configuration.PermissionSchemaScanner;
 import com.kairos.dto.kpermissions.ActionDTO;
-import com.kairos.dto.kpermissions.ModelDTO;
-import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.kpermissions.KPermissionAction;
@@ -19,10 +16,6 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.service.kpermissions.PermissionService;
-import org.reflections.Reflections;
-import org.reflections.scanners.MethodAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -31,8 +24,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 

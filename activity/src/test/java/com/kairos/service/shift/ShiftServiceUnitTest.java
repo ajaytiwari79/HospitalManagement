@@ -5,6 +5,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
@@ -13,7 +14,6 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
-import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 /**

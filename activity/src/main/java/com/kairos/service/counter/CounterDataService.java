@@ -34,6 +34,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.kpi.YAxisConfig;
@@ -46,11 +47,14 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.persistence.repository.time_slot.TimeSlotRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.reason_code.ReasonCodeService;
 import com.kairos.service.shift.ShiftService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +75,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.dto.activity.counter.enums.CounterType.ABSENCES_PER_INTERVAL;
 import static com.kairos.enums.FilterType.*;
+import static com.kairos.enums.reason_code.ReasonCodeType.FORCEPLAN;
 import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
 import static java.util.stream.Collectors.toList;
 
@@ -86,6 +91,12 @@ public class CounterDataService {
     private ExceptionService exceptionService;
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private DayTypeService dayTypeService;
+    @Inject
+    private ReasonCodeService reasonCodeService;
+    @Inject
+    private TimeSlotRepository timeSlotRepository;
     @Inject
     private CounterRepository counterRepository;
     @Inject
@@ -208,6 +219,9 @@ public class CounterDataService {
         List<FilterCriteria> criteriaList = new ArrayList<>();
         KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
+        defaultKpiDataDTO.setDayTypeDTOS(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
+        defaultKpiDataDTO.setReasonCodeDTOS(reasonCodeService.getReasonCodesByUnitId(refId, FORCEPLAN));
+        defaultKpiDataDTO.setTimeSlotDTOS(timeSlotRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(refId, TimeSlotType.SHIFT_PLANNING).getTimeSlots());
         getSelectedFilterDefaultData(level, criteriaList, kpi, defaultKpiDataDTO);
         setKpiProperty(applicableKPIS.get(0), criteriaList, kpi);
         return kpi;

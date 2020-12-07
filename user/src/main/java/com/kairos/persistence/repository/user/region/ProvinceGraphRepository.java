@@ -7,7 +7,6 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by oodles on 7/1/17.
@@ -17,11 +16,7 @@ public interface ProvinceGraphRepository extends Neo4jBaseRepository<Province,Lo
     List<Province> findAll();
 
 
-    @Query("MATCH (r:Region{isEnable:true})-[:REGION]-(p:Province {isEnable:true}) where id(r)={0} return {" +
-            "english :{name: CASE WHEN p.`translatedNames.english` IS NULL THEN '' ELSE p.`translatedNames.english` END, description : CASE WHEN p.`translatedDescriptions.english` IS NULL THEN '' ELSE p.`translatedDescriptions.english` END},\n" +
-            "hindi:{name: CASE WHEN p.`translatedNames.hindi` IS NULL THEN '' ELSE p.`translatedNames.hindi` END, description : CASE WHEN p.`translatedDescriptions.hindi` IS NULL THEN '' ELSE p.`translatedDescriptions.hindi` END},\n" +
-            "danish:{name: CASE WHEN p.`translatedNames.danish` IS NULL THEN '' ELSE p.`translatedNames.danish` END, description : CASE WHEN p.`translatedDescriptions.danish` IS NULL THEN '' ELSE p.`translatedDescriptions.danish` END},\n" +
-            "britishenglish:{name: CASE WHEN p.`translatedNames.britishenglish` IS NULL THEN '' ELSE p.`translatedNames.britishenglish` END, description : CASE WHEN p.`translatedDescriptions.britishenglish` IS NULL THEN '' ELSE p.`translatedDescriptions.britishenglish` END}} as translations,\n" +
+    @Query("MATCH (r:Region{isEnable:true})-[:REGION]-(p:Province {isEnable:true}) where id(r)={0} return p.translations as translations,\n" +
             "p.name as name, p.code as code, p.geoFence as geoFence, p.latitude as latitude, p.longitude as longitude,id(p) as id")
     List<ProvinceQueryResult> findAllProvinceByRegionId(Long regionId);
 

@@ -28,21 +28,17 @@ public class DefaultKpiDataDTO {
     private List<DateTimeInterval> dateTimeIntervals;
     private List<CountryHolidayCalenderDTO> holidayCalenders;
 
-    public DefaultKpiDataDTO(List<StaffKpiFilterDTO> staffKpiFilterDTOs, List<DayTypeDTO> dayTypeDTOS, List<TimeSlotDTO> timeSlotDTOS) {
-        this.staffKpiFilterDTOs = staffKpiFilterDTOs;
-        this.dayTypeDTOS = dayTypeDTOS;
-        this.timeSlotDTOS = timeSlotDTOS;
-    }
 
-    public DefaultKpiDataDTO(Long countryId, List<StaffKpiFilterDTO> staffKpiFilterDTOs, List<DayTypeDTO> dayTypeDTOS, List<TimeSlotDTO> timeSlotDTOS, List<OrganizationCommonDTO> organizationCommonDTOS, List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS, List<ReasonCodeDTO> reasonCodeDTOS, List<TagDTO> tags) {
+    public DefaultKpiDataDTO(Long countryId, List<StaffKpiFilterDTO> staffKpiFilterDTOs, List<TimeSlotDTO> timeSlotDTOS, List<OrganizationCommonDTO> organizationCommonDTOS, List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS, List<TagDTO> tags) {
         this.countryId = countryId;
         this.staffKpiFilterDTOs = staffKpiFilterDTOs;
-        this.dayTypeDTOS = dayTypeDTOS;
         this.timeSlotDTOS = timeSlotDTOS;
         this.organizationCommonDTOS = organizationCommonDTOS;
         this.employmentTypeKpiDTOS = employmentTypeKpiDTOS;
-        this.reasonCodeDTOS = reasonCodeDTOS;
         this.tags = tags;
     }
 
+    public DefaultKpiDataDTO(List<StaffKpiFilterDTO> staffKpiFilterDTOs) {
+        this.staffKpiFilterDTOs = staffKpiFilterDTOs;
+    }
 }

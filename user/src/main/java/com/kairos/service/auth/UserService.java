@@ -13,6 +13,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.auth.GoogleCalenderTokenDTO;
 import com.kairos.dto.user.auth.UserDetailsDTO;
+import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
@@ -20,11 +21,13 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.user.ChatStatus;
 import com.kairos.enums.user.UserType;
-import com.kairos.persistence.model.access_permission.*;
+import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.access_permission.AccessPage;
+import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
@@ -39,8 +42,8 @@ import com.kairos.service.SmsService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.country.CountryService;
-import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.UnitService;
@@ -63,16 +66,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigInteger;
 import java.nio.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
-import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 
 /**
  * Calls UserGraphRepository to perform CRUD operation on  User
@@ -102,8 +106,6 @@ public class UserService {
     @Inject
     private SystemLanguageGraphRepository systemLanguageGraphRepository;
     @Inject
-    private DayTypeService dayTypeService;
-    @Inject
     private SendGridMailService sendGridMailService;
     @Inject
     private ForgetPasswordTokenService forgetPasswordTokenService;
@@ -130,6 +132,8 @@ public class UserService {
 
     @Inject
     private KMailService kMailService;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
 
 
     /**
@@ -499,8 +503,7 @@ public class UserService {
     private void loadUnitPermissions(Long organizationId, long currentUserId, UnitWiseStaffPermissionsDTO permissionData) {
         List<UserPermissionQueryResult> unitWisePermissions;
         Long countryId = UserContext.getUserDetails().getCountryId();
-        List<DayType> dayTypes = dayTypeService.getCurrentApplicableDayType(countryId);
-        Set<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
+        Set<BigInteger> dayTypeIds = activityIntegrationService.getApplicableDayTypes(countryId);
         boolean checkDayType = true;
         List<AccessGroup> accessGroups = accessPageRepository.fetchAccessGroupsOfStaffPermission(currentUserId);
         for (AccessGroup currentAccessGroup : accessGroups) {
@@ -510,7 +513,8 @@ public class UserService {
             }
         }
         if (checkDayType) {
-            unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds, organizationId);
+            unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds.stream().map(BigInteger::toString).collect(Collectors.toSet()), organizationId);
+
         } else {
             unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, organizationId);
         }
@@ -558,7 +562,7 @@ public class UserService {
     public boolean updateSelectedLanguageOfUser(Long userLanguageId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         userGraphRepository.updateUserSystemLanguage(currentUser.getId(),userLanguageId);
-        UserContext.getUserDetails().setUserLanguage(ObjectMapperUtils.copyPropertiesByMapper(currentUser.getUserLanguage(),SystemLanguageDTO.class));
+        UserContext.getUserDetails().setUserLanguage(copyPropertiesByMapper(currentUser.getUserLanguage(),SystemLanguageDTO.class));
         return true;
     }
 
@@ -682,4 +686,6 @@ public class UserService {
         }
         return user;
     }
+
+
 }

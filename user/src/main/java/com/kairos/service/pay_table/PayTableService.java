@@ -12,7 +12,6 @@ import com.kairos.persistence.model.country.pay_table.PayGroupAreaDTO;
 import com.kairos.persistence.model.country.pay_table.PayTableResponseWrapper;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.pay_table.*;
-import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -613,19 +612,5 @@ public class PayTableService {
             payGradePublishedAmountMap.put(payGroupAreaDTO.getPayGroupAreaId(),payGroupAreaDTO.getPublishedAmount());
         }
         return payGradePublishedAmountMap;
-    }
-
-    public Map<String, TranslationInfo> updateTranslation(Long paytableId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        PayTable payTable =payTableGraphRepository.findOne(paytableId);
-        payTable.setTranslatedNames(translatedNames);
-        payTable.setTranslatedDescriptions(translatedDescriptios);
-        payTableGraphRepository.save(payTable);
-        return payTable.getTranslatedData();
     }
 }

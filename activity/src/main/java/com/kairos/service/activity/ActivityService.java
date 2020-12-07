@@ -21,8 +21,8 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
-import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
@@ -53,6 +53,7 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.glide_time.GlideTimeSettingsService;
 import com.kairos.service.integration.PlannerSyncService;
@@ -110,6 +111,7 @@ public class ActivityService {
     @Inject private ActivitySettingsService activitySettingsService;
     @Inject private StaffActivityDetailsService staffActivityDetailsService;
     @Inject private PlanningPeriodService planningPeriodService;
+    @Inject private DayTypeService dayTypeService;
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
 
@@ -427,10 +429,10 @@ public class ActivityService {
         userIntegrationService.assignChildActivitiesInTeam(activityId,childActivityIds);
     }
     public ActivitySettingsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
-        List<DayType> dayTypes = userIntegrationService.getDayTypesByCountryId(countryId);
+        List<DayTypeDTO> dayTypes = dayTypeService.getDayTypeWithCountryHolidayCalender(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
         ActivityTimeCalculationSettings activityTimeCalculationSettings = activity.getActivityTimeCalculationSettings();
-        List<Long> rulesTabDayTypes = activity.getActivityRulesSettings().getDayTypes();
+        List<BigInteger> rulesTabDayTypes = activity.getActivityRulesSettings().getDayTypes();
         return new ActivitySettingsWrapper(activityTimeCalculationSettings, dayTypes, rulesTabDayTypes);
     }
     public ActivityWithCompositeDTO getCompositeAndChildActivityOfCountryActivity(BigInteger activityId, Long countryId) {
@@ -520,7 +522,7 @@ public class ActivityService {
     public ActivitySettingsWrapper getPhaseSettingTabOfActivity(BigInteger activityId, Long countryId) {
         Activity activity = findActivityById(activityId);
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
-        List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<DayTypeDTO> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
         ActivityPhaseSettings activityPhaseSettings = activity.getActivityPhaseSettings();
@@ -534,7 +536,7 @@ public class ActivityService {
     }
     public ActivitySettingsWrapper getRulesTabOfActivity(BigInteger activityId, Long countryId) {
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
-        List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<DayTypeDTO> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Activity activity = activityMongoRepository.findOne(activityId);
         ActivityRulesSettings activityRulesSettings = activity.getActivityRulesSettings();
@@ -583,7 +585,17 @@ public class ActivityService {
     }
     public ActivitySettingsWrapper getSkillTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
-        return new ActivitySettingsWrapper(activity.getActivitySkillSettings());
+        ActivitySkillSettings activitySkillSettings = activity.getActivitySkillSettings();
+        List<Long> skillIds = activitySkillSettings.getActivitySkillIds();
+        if(isCollectionNotEmpty(skillIds)) {
+            List<Skill> skills = userIntegrationService.getSkillsByIds(skillIds, activity.getCountryId());
+            Map<Long, Skill> skillTranslationMap = skills.stream().collect(Collectors.toMap(Skill::getId, v -> v));
+            activitySkillSettings.getActivitySkills().forEach(activitySkill -> {
+                Skill skill = skillTranslationMap.get(activitySkill.getSkillId());
+                activitySkill.setTranslations(skill.getTranslations());
+            });
+        }
+        return new ActivitySettingsWrapper(activitySkillSettings);
     }
     public void updateOrgMappingDetailOfActivity(OrganizationMappingDTO organizationMappingDTO, BigInteger activityId) {
         Activity activity = findActivityById(activityId);

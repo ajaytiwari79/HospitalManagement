@@ -3,10 +3,8 @@ package com.kairos.rest_client;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
