@@ -147,6 +147,10 @@ public class PayOutService extends MongoBaseService {
         shift.setPlannedMinutesOfPayout(shift.getPlannedMinutesOfPayout()+totalPlannerMinutesOfPayout);
         shift.setPayoutCtaBonusMinutes(shift.getActivities().stream().mapToInt(shiftActivity -> shiftActivity.getPayoutCtaBonusMinutes()).sum());
         shift.setPayoutCtaBonusMinutes(shift.getPayoutCtaBonusMinutes() + shift.getBreakActivities().stream().mapToInt(shiftActivity -> shiftActivity.getPayoutCtaBonusMinutes()).sum());
+        shift.setPayoutPerShiftCTADistributions(ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftWithActivityDTO.getPayoutPerShiftCTADistributions(), PayOutPerShiftCTADistribution.class));
+        int ctaBonusOfShift = shift.getPayoutPerShiftCTADistributions().stream().mapToInt(payOutPerShiftCTADistribution -> payOutPerShiftCTADistribution.getMinutes()).sum();
+        shift.setPayoutCtaBonusMinutes(shift.getPayoutCtaBonusMinutes() + ctaBonusOfShift);
+        shift.setPlannedMinutesOfPayout(shift.getPlannedMinutesOfPayout()+ctaBonusOfShift);
     }
 
     private int updatePayDetailsInShiftActivity(List<ShiftActivityDTO> shiftActivityDTOS, List<ShiftActivity> shiftActivities) {

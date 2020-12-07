@@ -439,11 +439,12 @@ public class TimeBankService implements KPIService {
 
                 }
             }
-            updateTimebankDetailsInShifts(shifts, shiftActivityDTOMap);
+            updateTimebankDetailsInShifts(shifts, shiftActivityDTOMap,shiftWithActivityDTOS);
         }
     }
 
-    private void updateTimebankDetailsInShifts(List<Shift> shifts, Map<String, ShiftActivityDTO> shiftActivityDTOMap) {
+    private void updateTimebankDetailsInShifts(List<Shift> shifts, Map<String, ShiftActivityDTO> shiftActivityDTOMap,List<ShiftWithActivityDTO> shiftWithActivityDTOS) {
+        Map<BigInteger,ShiftWithActivityDTO> shiftWithActivityDTOMap = shiftWithActivityDTOS.stream().collect(Collectors.toMap(shiftWithActivityDTO -> shiftWithActivityDTO.getId(),v->v));
         for (Shift shift : shifts) {
             if (!shift.isDeleted()) {
                 if (isNotNull(shift.getDraftShift())) {
@@ -470,6 +471,13 @@ public class TimeBankService implements KPIService {
                         plannedMinutesOfTimebank += breakActivity.getPlannedMinutesOfTimebank();
                         timeBankScheduledMinutes += breakActivity.getScheduledMinutesOfTimebank();
                     }
+                }
+                if(shiftWithActivityDTOMap.containsKey(shift.getId())){
+                    ShiftWithActivityDTO shiftWithActivityDTO = shiftWithActivityDTOMap.get(shift.getId());
+                    shift.setTimeBankCTADistributions(ObjectMapperUtils.copyCollectionPropertiesByMapper(shiftWithActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
+                    int ctaBonusOfShift = shift.getTimeBankCTADistributions().stream().mapToInt(timeBankCTADistribution -> timeBankCTADistribution.getMinutes()).sum();
+                    timeBankCtaBonusMinutes+=ctaBonusOfShift;
+                    plannedMinutesOfTimebank+=ctaBonusOfShift;
                 }
                 shift.setScheduledMinutesOfTimebank(timeBankScheduledMinutes);
                 shift.setTimeBankCtaBonusMinutes(timeBankCtaBonusMinutes);

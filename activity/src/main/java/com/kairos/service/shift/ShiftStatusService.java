@@ -155,55 +155,74 @@ public class ShiftStatusService {
             return new ShiftAndActivtyStatusDTO(shiftDTOS, shiftActivityResponseDTOS);
     }
 
-        private ShiftAndActivtyStatusDTO updateStatusOfRequestAbsence (Long unitId, ShiftPublishDTO
-        shiftPublishDTO, Shift currentShift){
-            Activity activity = activityMongoRepository.findOne(currentShift.getRequestAbsence().getActivityId());
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, currentShift.getStartDate(), currentShift.getEndDate());
-            PhaseTemplateValue phaseTemplateValue = activity.getActivityPhaseSettings().getPhaseTemplateValues().stream().filter(p -> p.getPhaseId().equals(phase.getId())).findFirst().get();
-            StaffAccessGroupDTO staffAccessGroupDTO = userIntegrationService.getStaffAccessGroupDTO(unitId);
-            ActivityShiftStatusSettings activityShiftStatusSettings = getActivityShiftStatusSettingByStatus(phaseTemplateValue, shiftPublishDTO.getStatus());
-            String staffAccessRole = UserContext.getUserDetails().getUnitWiseAccessRole().get(unitId.toString());
-            boolean validAccessGroup = shiftValidatorService.validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
-            Set<String> accessRoles = activityShiftStatusSettings == null ? new HashSet<>() : userIntegrationService.getAccessRolesByAccessGroupIds(unitId, activityShiftStatusSettings.getAccessGroupIds());
-            ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(currentShift.getId());
-            List<TodoStatus> todoStatuses = newArrayList(TodoStatus.REQUESTED, TodoStatus.PENDING);
-            if (todoStatuses.contains(currentShift.getRequestAbsence().getTodoStatus()) && validAccessGroup && accessRoles.contains(staffAccessRole)) {
-                todoService.updateTodoStatus(null, currentShift.getRequestAbsence().getTodoStatus(), shiftPublishDTO.getShifts().get(0).getShiftId(), null);
-                ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, newHashSet(shiftPublishDTO.getStatus()));
-                shiftActivityDTO.setId(currentShift.getId());
-                shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
-            } else if (!accessRoles.contains(staffAccessRole) || !validAccessGroup) {
-                ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), currentShift.getStartDate(), currentShift.getEndDate(), currentShift.getId(), localeService.getMessage(ACCESS_GROUP_NOT_MATCHED) + " to " + shiftPublishDTO.getStatus() + " Request Absence", false);
-                shiftActivityDTO.setId(currentShift.getId());
-                shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
-            } else {
-                ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), currentShift.getStartDate(), currentShift.getEndDate(), currentShift.getId(), localeService.getMessage(ACTIVITY_STATUS_INVALID) + " to " + shiftPublishDTO.getStatus() + " Request Absence", false);
-                shiftActivityDTO.setId(currentShift.getId());
-                shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
+    private ShiftAndActivtyStatusDTO updateStatusOfRequestAbsence(Long unitId, ShiftPublishDTO shiftPublishDTO, Shift currentShift) {
+        Activity activity = activityMongoRepository.findOne(currentShift.getRequestAbsence().getActivityId());
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, currentShift.getStartDate(),currentShift.getEndDate());
+        PhaseTemplateValue phaseTemplateValue = activity.getActivityPhaseSettings().getPhaseTemplateValues().stream().filter(p -> p.getPhaseId().equals(phase.getId())).findFirst().get();
+        StaffAccessGroupDTO staffAccessGroupDTO = userIntegrationService.getStaffAccessGroupDTO(unitId);
+        ActivityShiftStatusSettings activityShiftStatusSettings = getActivityShiftStatusSettingByStatus(phaseTemplateValue, shiftPublishDTO.getStatus());
+        String staffAccessRole = UserContext.getUserDetails().getUnitWiseAccessRole().get(unitId.toString());
+        boolean validAccessGroup = shiftValidatorService.validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
+        Set<String> accessRoles =activityShiftStatusSettings==null?new HashSet<>(): userIntegrationService.getAccessRolesByAccessGroupIds(unitId,activityShiftStatusSettings.getAccessGroupIds());
+        ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(currentShift.getId());
+        List<TodoStatus> todoStatuses = newArrayList(TodoStatus.REQUESTED,TodoStatus.PENDING);
+        if(todoStatuses.contains(currentShift.getRequestAbsence().getTodoStatus()) && validAccessGroup && accessRoles.contains(staffAccessRole)){
+            todoService.updateTodoStatus(null, getTodoStatus(shiftPublishDTO.getStatus()),shiftPublishDTO.getShifts().get(0).getShiftId(),null);
+            ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, newHashSet(shiftPublishDTO.getStatus()));
+            shiftActivityDTO.setId(currentShift.getId());
+            shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
+            if(DISAPPROVE.equals(shiftPublishDTO.getStatus())){
+                currentShift.setRequestAbsence(null);
             }
-            shiftMongoRepository.save(currentShift);
-            return new ShiftAndActivtyStatusDTO(newArrayList(ObjectMapperUtils.copyPropertiesByMapper(currentShift, ShiftDTO.class)), newArrayList(shiftActivityResponseDTO));
+        }else if(!accessRoles.contains(staffAccessRole) || !validAccessGroup){
+            ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), currentShift.getStartDate(), currentShift.getEndDate(), currentShift.getId(), localeService.getMessage(ACCESS_GROUP_NOT_MATCHED)+" to " +shiftPublishDTO.getStatus()+" Request Absence" , false);
+            shiftActivityDTO.setId(currentShift.getId());
+            shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
+        }else {
+            ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), currentShift.getStartDate(), currentShift.getEndDate(), currentShift.getId(), localeService.getMessage(ACTIVITY_STATUS_INVALID) + " to " +shiftPublishDTO.getStatus()+" Request Absence", false);
+            shiftActivityDTO.setId(currentShift.getId());
+            shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
         }
+        return new ShiftAndActivtyStatusDTO(newArrayList(ObjectMapperUtils.copyPropertiesByMapper(currentShift,ShiftDTO.class)), newArrayList(shiftActivityResponseDTO));
+    }
 
-        private Object[] getActivityDetailsMap (List < Shift > shifts) {
-            Set<BigInteger> activityIds = new HashSet<>();
-            Set<Long> staffIds = new HashSet<>();
-            Set<Long> employmentIds = new HashSet<>();
-            for (Shift shift : shifts) {
-                activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
-                activityIds.addAll(shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
-                staffIds.add(shift.getStaffId());
-                if (shift.getEmploymentId() != null)
-                    employmentIds.add(shift.getEmploymentId());
-                if (isNotNull(shift.getRequestAbsence())) {
-                    activityIds.add(shift.getRequestAbsence().getActivityId());
-                }
-            }
-            List<Activity> activities = activityMongoRepository.findAllPhaseSettingsByActivityIds(activityIds);
-            Map<BigInteger, ActivityPhaseSettings> activityPhaseSettingMap = activities.stream().collect(Collectors.toMap(Activity::getId, Activity::getActivityPhaseSettings));
-            Map<BigInteger, Activity> activityIdAndActivityMap = activities.stream().collect(Collectors.toMap(Activity::getId, Function.identity()));
-            return new Object[]{activityPhaseSettingMap, activityIdAndActivityMap, staffIds, employmentIds};
+    private TodoStatus getTodoStatus(ShiftStatus shiftStatus){
+        TodoStatus todoStatus;
+        switch (shiftStatus){
+            case APPROVE:
+                todoStatus = TodoStatus.APPROVE;
+                break;
+            case DISAPPROVE:
+                todoStatus = TodoStatus.DISAPPROVE;
+                break;
+            case PENDING:
+                todoStatus = TodoStatus.PENDING;
+                break;
+            default:
+                todoStatus = TodoStatus.REQUESTED;
         }
+        return todoStatus;
+    }
+
+    private Object[] getActivityDetailsMap(List<Shift> shifts){
+        Set<BigInteger> activityIds = new HashSet<>();
+        Set<Long> staffIds = new HashSet<>();
+        Set<Long> employmentIds = new HashSet<>();
+        for (Shift shift : shifts) {
+            activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
+            activityIds.addAll(shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
+            staffIds.add(shift.getStaffId());
+            if(shift.getEmploymentId()!=null)
+            employmentIds.add(shift.getEmploymentId());
+            if(isNotNull(shift.getRequestAbsence())){
+                activityIds.add(shift.getRequestAbsence().getActivityId());
+            }
+        }
+        List<Activity> activities = activityMongoRepository.findAllPhaseSettingsByActivityIds(activityIds);
+        Map<BigInteger, ActivityPhaseSettings> activityPhaseSettingMap = activities.stream().collect(Collectors.toMap(Activity::getId, Activity::getActivityPhaseSettings));
+        Map<BigInteger, Activity> activityIdAndActivityMap = activities.stream().collect(Collectors.toMap(Activity::getId, Function.identity()));
+        return new Object[]{activityPhaseSettingMap,activityIdAndActivityMap,staffIds,employmentIds};
+    }
 
         private void updateStatusOfShiftActivity (Long unitId, ShiftPublishDTO
         shiftPublishDTO, Set < BigInteger > shiftActivitiyIds, List < ShiftActivityResponseDTO > shiftActivityResponseDTOS, Map < BigInteger, ActivityPhaseSettings > activityPhaseSettingMap, Map < BigInteger, Activity > activityIdAndActivityMap, Map < Date, Phase > phaseListByDate, StaffAccessGroupDTO
