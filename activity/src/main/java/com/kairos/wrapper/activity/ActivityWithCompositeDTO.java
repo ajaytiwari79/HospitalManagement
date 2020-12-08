@@ -2,6 +2,8 @@ package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
 import com.kairos.dto.activity.activity.activity_tabs.TimeCalculationActivityDTO;
@@ -16,10 +18,7 @@ import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by pavan on 8/2/18.
@@ -66,4 +65,9 @@ public class ActivityWithCompositeDTO {
     private TimeTypeEnum secondLevelTimtype;
     private int mostlyUsedCount;
     private BigInteger activityPriorityId;
+    private Map<String, TranslationInfo> translations;
+
+    public String getName(){
+        return TranslationUtil.getName(translations,name);
+    }
 }
