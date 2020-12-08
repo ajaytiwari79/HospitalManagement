@@ -24,6 +24,7 @@ import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
+import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
@@ -467,10 +468,11 @@ public class WorkTimeAgreementService{
 
     public WTADefaultDataInfoDTO getDefaultWtaInfoForUnit(Long unitId) {
         WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = new WTADefaultDataInfoDTO();
+        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
         List<ActivityDTO> activities = activityMongoRepository.findByDeletedFalseAndUnitId(unitId);
         List<PresenceTypeDTO> presenceTypeDTOS=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
         Map<String, Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
-        activityService.prepareFLPMap(wtaDefaultDataInfoDTO.getFieldPermissionUserData().getModelDTOS(),fieldPermissionMap);
+        activityService.prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
         activities.forEach(activity->{
             if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
                 activity.setName("XXXXX");
