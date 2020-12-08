@@ -3,10 +3,7 @@ package com.kairos.service.employment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
-import com.kairos.commons.utils.CommonsExceptionUtil;
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.*;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
@@ -541,6 +538,8 @@ public class EmploymentService {
             employment.setEmploymentLines(employmentLinesMap.get(employment.getId()));
             employment.setTotalShifts(activityIntegrationService.publishShiftCountWithEmploymentId(employment.getId()));
             setEmploymentLineDetails(hourlyCostMap, ctawtaAndAccumulatedTimebankWrapper, employment);
+            employment.getExpertise().setName(TranslationUtil.getName(employment.getExpertise().getTranslations(),employment.getExpertise().getName()));
+            employment.getExpertise().setDescription(TranslationUtil.getDescription(employment.getExpertise().getTranslations(),employment.getExpertise().getDescription()));
         });
         return new EmploymentAndPositionDTO(positionQueryResult, employmentQueryResults);
     }
