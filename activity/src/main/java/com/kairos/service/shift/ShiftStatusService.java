@@ -165,9 +165,6 @@ public class ShiftStatusService {
             ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, newHashSet(shiftPublishDTO.getStatus()));
             shiftActivityDTO.setId(currentShift.getId());
             shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
-            if(DISAPPROVE.equals(shiftPublishDTO.getStatus())){
-                currentShift.setRequestAbsence(null);
-            }
         }else if(!accessRoles.contains(staffAccessRole) || !validAccessGroup){
             ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), currentShift.getStartDate(), currentShift.getEndDate(), currentShift.getId(), localeService.getMessage(ACCESS_GROUP_NOT_MATCHED)+" to " +shiftPublishDTO.getStatus()+" Request Absence" , false);
             shiftActivityDTO.setId(currentShift.getId());
