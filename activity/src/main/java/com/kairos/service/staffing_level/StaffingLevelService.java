@@ -709,7 +709,6 @@ public class StaffingLevelService {
                 activityService.prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
                 if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
                     staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().forEach(k->k.setName("XXXXX"));
-                    staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().forEach(k->k.setName("XXXXX"));
                 }
             }
             presenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
