@@ -665,9 +665,11 @@ public class CostTimeAgreementService {
     public CTATableSettingWrapper getVersionsCTA(Long unitId, List<Long> upIds) {
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTabId(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getParentCTAByUpIds(upIds);
-        /*Map<Long, List<CTAResponseDTO>> ctaResponseMap = costTimeAgreementRepository.getVersionsCTA(upIds).stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
-        ctaResponseDTOS.forEach(c -> c.setVersions(ctaResponseMap.get(c.getEmploymentId())));
-        */return new CTATableSettingWrapper(ctaResponseDTOS, tableConfiguration);
+        if(isCollectionNotEmpty(ctaResponseDTOS)){
+            CostTimeAgreement costTimeAgreement = costTimeAgreementRepository.findOne(ctaResponseDTOS.get(0).getOrganizationParentId());
+            ctaResponseDTOS.forEach(ctaResponseDTO -> ctaResponseDTO.setTranslations(costTimeAgreement.getTranslations()));
+        }
+        return new CTATableSettingWrapper(ctaResponseDTOS, tableConfiguration);
     }
 
     public CTAResponseDTO getDefaultCTA(Long unitId, Long expertiseId) {

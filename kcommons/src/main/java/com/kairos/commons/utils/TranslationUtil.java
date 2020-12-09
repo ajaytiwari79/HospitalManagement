@@ -37,7 +37,7 @@ public class TranslationUtil {
             map.put(NAME,getName(translations,map.get(NAME).toString()));
         }
         if(map.containsKey(DESCRIPTION)){
-            map.put(DESCRIPTION,getName(translations,map.get(DESCRIPTION).toString()));
+            map.put(DESCRIPTION,getDescription(translations,map.get(DESCRIPTION).toString()));
          }
     }
 
