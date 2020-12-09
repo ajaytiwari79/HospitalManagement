@@ -1,6 +1,7 @@
 package com.kairos.controller.gap_settings;
 
 import com.kairos.dto.activity.gap_settings.GapSettingsDTO;
+import com.kairos.enums.gap_settings.GapSettingsRule;
 import com.kairos.service.gap_settings.GapSettingsService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -39,8 +40,8 @@ public class GapSettingsController {
     @ApiOperation("Get all gap settings for country")
     @GetMapping(COUNTRY_URL + GAP_FILLING_SETTINGS_URL)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getGapSettingsForCountry(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, gapSettingsService.getGapSettings(countryId, true));
+    public ResponseEntity<Map<String, Object>> getAllGapSettingsForCountry(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, gapSettingsService.getAllGapSettings(countryId, true));
     }
 
     @ApiOperation("Create gap settings for unit")
@@ -59,7 +60,15 @@ public class GapSettingsController {
     @ApiOperation("Get all gap settings for unit")
     @GetMapping(UNIT_URL + GAP_FILLING_SETTINGS_URL)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getGapSettingsForUnit(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, gapSettingsService.getGapSettings(unitId, false));
+    public ResponseEntity<Map<String, Object>> getAllGapSettingsForUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, gapSettingsService.getAllGapSettings(unitId, false));
     }
+
+    @ApiOperation("Get all gap settings for unit")
+    @GetMapping("/all_gap_setings_rules")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllGapSettingsRules() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, GapSettingsRule.getAllGapSettingsRules());
+    }
+
 }

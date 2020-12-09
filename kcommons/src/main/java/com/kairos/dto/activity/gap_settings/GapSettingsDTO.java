@@ -2,7 +2,7 @@ package com.kairos.dto.activity.gap_settings;
 
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.gap_settings.GapFillingScenario;
-import com.kairos.enums.gap_settings.GapSettingsRules;
+import com.kairos.enums.gap_settings.GapSettingsRule;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +22,7 @@ public class GapSettingsDTO {
     private LocalDate endDate;
     private BigInteger phaseId;
     private GapFillingScenario gapFillingScenario;
-    private Set<GapSettingsRules> selectedGapSettingsRules;
+    private Set<GapSettingsRule> selectedGapSettingsRules;
     private AccessGroupRole actionMadeBy;
     private Long countryId;
     private Long unitId;

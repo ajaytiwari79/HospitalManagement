@@ -16,4 +16,8 @@ public interface GapSettingsMongoRepository extends MongoBaseRepository<GapSetti
 
     @Query("{'deleted' : false,'countryId':?0}")
     List<GapSettings> getAllByUnitId(Long unitId);
+
+    GapSettings findByUnitIdAndOrganizationTypeIdAndOrganizationSubTypeIdAndPhaseIdAndGapFillingScenario(Long unitId, Long organizationTypeId, Long organizationSubTypeId, BigInteger phaseId, String gapFillingScenario);
+
+    GapSettings findByCountryIdAndOrganizationTypeIdAndOrganizationSubTypeIdAndPhaseIdAndGapFillingScenario(Long countryId, Long organizationTypeId, Long organizationSubTypeId, BigInteger phaseId, String gapFillingScenario);
 }

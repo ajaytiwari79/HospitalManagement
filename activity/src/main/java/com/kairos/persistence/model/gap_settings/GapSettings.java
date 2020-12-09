@@ -2,7 +2,7 @@ package com.kairos.persistence.model.gap_settings;
 
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.gap_settings.GapFillingScenario;
-import com.kairos.enums.gap_settings.GapSettingsRules;
+import com.kairos.enums.gap_settings.GapSettingsRule;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +26,7 @@ public class GapSettings extends MongoBaseEntity {
     private LocalDate endDate;
     private BigInteger phaseId;
     private GapFillingScenario gapFillingScenario;
-    private Set<GapSettingsRules> selectedGapSettingsRules;
+    private Set<GapSettingsRule> selectedGapSettingsRules;
     private AccessGroupRole actionMadeBy;
     private Long countryId;
     private Long unitId;
