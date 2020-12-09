@@ -37,6 +37,7 @@ try {
    print (e);
 }
 
+
 db.getCollection('kairos_sequence').update({ "sequenceName" : "DayTypeSequence"},{"$set":{"sequenceNumber" : 20490}});
 
 Step 3: http://server.kairosplanning.com/kairos/activity/api/v1/transfer_reason_code     //HttpMethod:GET
