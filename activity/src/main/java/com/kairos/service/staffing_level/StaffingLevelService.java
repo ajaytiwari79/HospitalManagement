@@ -15,6 +15,7 @@ import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDetailsByTimeSlotDTO;
+import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
@@ -23,6 +24,7 @@ import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.SkillLevel;
+import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -40,6 +42,7 @@ import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoReposi
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
@@ -145,6 +148,8 @@ public class StaffingLevelService {
     private DayTypeService dayTypeService;
     @Inject
     private TimeSlotSetService timeSlotSetService;
+    @Inject
+    private ActivityService activityService;
 
 
     /**
@@ -685,19 +690,28 @@ public class StaffingLevelService {
 
         Map<String, PresenceStaffingLevelDto> presenceStaffingLevelMap = new HashMap<String, PresenceStaffingLevelDto>();
         Map<String, AbsenceStaffingLevelDto> absenceStaffingLevelMap = new HashMap<String, AbsenceStaffingLevelDto>();
+        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
         while (!startDate.isAfter(endDate)) {
-            getStaffingLevelPerDate(unitId, startDate, presenceStaffingLevelMap, absenceStaffingLevelMap);
+            getStaffingLevelPerDate(unitId, startDate, presenceStaffingLevelMap, absenceStaffingLevelMap,fieldPermissionUserData);
             startDate = startDate.plusDays(1);
         }
         return new StaffingLevelDto(presenceStaffingLevelMap, absenceStaffingLevelMap);
     }
 
-    private LocalDate getStaffingLevelPerDate(Long unitId, LocalDate startDate, Map<String, PresenceStaffingLevelDto> presenceStaffingLevelMap, Map<String, AbsenceStaffingLevelDto> absenceStaffingLevelMap) {
+    private LocalDate getStaffingLevelPerDate(Long unitId, LocalDate startDate, Map<String, PresenceStaffingLevelDto> presenceStaffingLevelMap, Map<String, AbsenceStaffingLevelDto> absenceStaffingLevelMap, FieldPermissionUserData fieldPermissionUserData) {
         StaffingLevel staffingLevel = updateStaffingLevelAvailableStaffCount(startDate, unitId);
         if (!staffingLevel.getPresenceStaffingLevelInterval().isEmpty()) {
             PresenceStaffingLevelDto presenceStaffingLevelDto = new PresenceStaffingLevelDto();
             BeanUtils.copyProperties(staffingLevel, presenceStaffingLevelDto);
             presenceStaffingLevelDto.setUpdatedAt(staffingLevel.getUpdatedAt());
+            if(fieldPermissionUserData !=null){
+                Map<String,Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
+                activityService.prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
+                if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
+                    staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().forEach(k->k.setName("XXXXX"));
+                    staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities().forEach(k->k.setName("XXXXX"));
+                }
+            }
             presenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
             presenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(presenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), presenceStaffingLevelDto);
         }
@@ -958,7 +972,7 @@ public class StaffingLevelService {
             Map<LocalDate, Date> staffingLevelDateMap = staffingLevels.stream().collect(Collectors.toMap(k -> asLocalDate(k.getCurrentDate()), StaffingLevel::getUpdatedAt));
             for (UpdatedStaffingLevelDTO updatedStaffingLevel : updatedStaffingLevels) {
                 if (isNotNull(updatedStaffingLevel.getUpdatedAt()) && staffingLevelDateMap.containsKey(updatedStaffingLevel.getCurrentDate()) && staffingLevelDateMap.get(updatedStaffingLevel.getCurrentDate()).after(updatedStaffingLevel.getUpdatedAt())) {
-                    getStaffingLevelPerDate(unitId, updatedStaffingLevel.getCurrentDate(), presenceStaffingLevelMap, absenceStaffingLevelMap);
+                    getStaffingLevelPerDate(unitId, updatedStaffingLevel.getCurrentDate(), presenceStaffingLevelMap, absenceStaffingLevelMap, null);
                 }
             }
             staffingLevelDto = new StaffingLevelDto(presenceStaffingLevelMap, absenceStaffingLevelMap);
