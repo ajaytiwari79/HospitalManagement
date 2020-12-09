@@ -8,6 +8,8 @@ SET r.reasonCodeType='TIME_TYPE'
 
 
 
+
+
 Step 1: http://server.kairosplanning.com/kairos/activity/api/v1/time_slots_in_existing  // HttpMethod : GET
 
 
