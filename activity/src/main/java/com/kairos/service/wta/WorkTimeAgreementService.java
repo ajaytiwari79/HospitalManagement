@@ -514,14 +514,21 @@ public class WorkTimeAgreementService{
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         List<WTAQueryResultDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(employmentIds);
         List<WTAQueryResultDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(employmentIds);
+        WorkingTimeAgreement orgWTA = null;
+        if(isCollectionNotEmpty(currentWTAList)) {
+            orgWTA = wtaRepository.findOne(currentWTAList.get(0).getOrganizationParentId());
+        }
         List<WTAResponseDTO> parentWTA = ObjectMapperUtils.copyCollectionPropertiesByMapper(currentWTAList, WTAResponseDTO.class);
         Map<Long, List<WTAQueryResultDTO>> verionWTAMap = versionsOfWTAs.stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
+        WorkingTimeAgreement finalOrgWTA = orgWTA;
         parentWTA.forEach(currentWTA -> {
             List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyCollectionPropertiesByMapper(verionWTAMap.get(currentWTA.getEmploymentId()), WTAResponseDTO.class);
+            versionWTAs.forEach(wtaResponseDTO -> wtaResponseDTO.setTranslations(finalOrgWTA.getTranslations()));
             ruleTemplateService.assignCategoryToRuleTemplate(countryId, currentWTA.getRuleTemplates());
             if (versionWTAs != null && !versionWTAs.isEmpty()) {
                 currentWTA.setVersions(versionWTAs);
             }
+            currentWTA.setTranslations(finalOrgWTA.getTranslations());
         });
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTabId(unitId, ORGANIZATION_AGREEMENT_VERSION_TABLE_ID);
         return new WTATableSettingWrapper(parentWTA, tableConfiguration);
