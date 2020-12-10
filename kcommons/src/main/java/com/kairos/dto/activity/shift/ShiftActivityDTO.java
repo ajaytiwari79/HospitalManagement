@@ -126,7 +126,14 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
         this.activityName = activityName;
         this.status=status;
     }
-
+    public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success,Set<ShiftStatus> status,List<WorkTimeAgreementRuleViolation> wtaRuleViolations) {
+        this.message = message;
+        this.success = success;
+        this.id = id;
+        this.activityName = activityName;
+        this.status=status;
+        this.wtaRuleViolations=wtaRuleViolations;
+    }
     public ShiftActivityDTO() {
     }
 
