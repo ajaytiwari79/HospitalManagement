@@ -47,7 +47,7 @@ public class PresenceStaffingLevelDto {
     }
 
     public enum StaffingLevelChange{
-        ACTIVITY_BOTH,ACTIVITY_MIN,ACTIVITY_MAX,SKILL_BASIC,SKILL_ADVANCE,SKILL_EXPERT
+        ACTIVITY_MIN_AND_MAX,ACTIVITY_MIN,ACTIVITY_MAX,SKILL_BASIC,SKILL_ADVANCE,SKILL_EXPERT
     }
 
     public enum StaffingLevelAction{

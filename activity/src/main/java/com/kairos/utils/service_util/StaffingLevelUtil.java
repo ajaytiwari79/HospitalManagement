@@ -1,6 +1,5 @@
 package com.kairos.utils.service_util;
 
-import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.custom_exception.InvalidRequestException;
@@ -26,7 +25,6 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_MIN_GREATER_THAN_MAX;
-import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_RULETEMPLATE_HOURS_NOTZERO;
 import static com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto.StaffingLevelAction.REMOVE;
 import static com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto.StaffingLevelAction.UPDATE;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
@@ -578,7 +576,7 @@ public class StaffingLevelUtil {
         StaffingLevelSkill changedStaffingLevelSkillFE;
         StaffingLevelSkill staffingLevelSkill;
         switch (presenceStaffingLevelDTO.getStaffingLevelChange()) {
-            case ACTIVITY_BOTH:
+            case ACTIVITY_MIN_AND_MAX:
                 changedStaffingLevelActivityFE = presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().iterator().next();
                 staffingLevelActivity = staffingLevelInterval.getStaffingLevelActivities().stream().filter(k -> k.getActivityId().equals(changedStaffingLevelActivityFE.getActivityId())).findAny().orElse(new StaffingLevelActivity(changedStaffingLevelActivityFE.getActivityId(), 0, 0));
                 staffingLevelActivity.setMinNoOfStaff(changedStaffingLevelActivityFE.getMinNoOfStaff());
