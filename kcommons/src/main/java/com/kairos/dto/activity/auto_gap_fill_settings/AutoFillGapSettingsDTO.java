@@ -1,9 +1,9 @@
-package com.kairos.dto.activity.gap_settings;
+package com.kairos.dto.activity.auto_gap_fill_settings;
 
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.enums.gap_settings.GapFillingScenario;
-import com.kairos.enums.gap_settings.GapSettingsRule;
+import com.kairos.enums.auto_gap_fill_settings.AutoGapFillingScenario;
+import com.kairos.enums.auto_gap_fill_settings.AutoFillGapSettingsRule;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +18,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class GapSettingsDTO {
+public class AutoFillGapSettingsDTO {
     private BigInteger id;
     private Long countryId;
     private Long unitId;
@@ -31,13 +31,14 @@ public class GapSettingsDTO {
     @NotNull
     private BigInteger phaseId;
     @NotNull
-    private GapFillingScenario gapFillingScenario;
+    private AutoGapFillingScenario autoGapFillingScenario;
     @NotEmpty
-    private Set<GapSettingsRule> selectedGapSettingsRules;
+    private Set<AutoFillGapSettingsRule> selectedAutoFillGapSettingsRules;
     private AccessGroupRole gapCreatedBy;
     private Date updatedAt;
     private UserInfo lastModifiedBy;
     private String organizationTypeName;
     private String organizationSubTypeName;
     private String phaseName;
+    private boolean published;
 }
