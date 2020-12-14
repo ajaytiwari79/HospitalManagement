@@ -34,7 +34,7 @@ public class AutoFillGapSettingsDTO {
     private AutoGapFillingScenario autoGapFillingScenario;
     @NotEmpty
     private Set<AutoFillGapSettingsRule> selectedAutoFillGapSettingsRules;
-    private AccessGroupRole gapCreatedBy;
+    private AccessGroupRole gapApplicableFor;
     private Date updatedAt;
     private UserInfo lastModifiedBy;
     private String organizationTypeName;

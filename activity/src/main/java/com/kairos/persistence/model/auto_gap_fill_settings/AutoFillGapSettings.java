@@ -27,7 +27,7 @@ public class AutoFillGapSettings extends MongoBaseEntity {
     private LocalDate endDate;
     private AutoGapFillingScenario autoGapFillingScenario;
     private Set<AutoFillGapSettingsRule> selectedAutoFillGapSettingsRules;
-    private AccessGroupRole gapCreatedBy;
+    private AccessGroupRole gapApplicableFor;
     private Long countryId;
     private Long unitId;
     private String organizationTypeName;
