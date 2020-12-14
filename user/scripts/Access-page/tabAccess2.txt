@@ -371,3 +371,8 @@ Match(ap:AccessPage) where ap.moduleId="tab_22" merge (ap)-[:SUB_PAGE]->(accessP
 Match(ap:AccessPage) where ap.moduleId="tab_22" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Action Permission",isModule:false,moduleId:"tab_457",active:true,`translatedNames.english`:"Action Permission"});
 
 Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"WTA Rules Voilated",isModule:false,moduleId:"tab_458",active:true,`translatedNames.english`:"WTA Rules Voilated"});
+
+Match(ap:AccessPage) where ap.moduleId="tab_244" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Protected Days Off Settings",isModule:false,moduleId:"tab_459",active:true,`translatedNames.english`:"Protected Days Off Settings"});
+
+Match(ap:AccessPage) where ap.moduleId="tab_244" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Auto-fill gap",isModule:false,moduleId:"tab_460",active:true,`translatedNames.english`:"Auto-fill gap"});
+Match(ap:AccessPage) where ap.moduleId="tab_82" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Auto-fill gap",isModule:false,moduleId:"tab_461",active:true,`translatedNames.english`:"Auto-fill gap"});

@@ -12,7 +12,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -27,14 +26,14 @@ public class GapSettingsController {
     @ApiOperation("Create gap settings for country")
     @PostMapping(COUNTRY_URL + GAP_FILLING_SETTINGS_URL)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createGapSettingsForCountry(@PathVariable Long countryId, @RequestBody @Validated GapSettingsDTO gapSettingsDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, gapSettingsService.createGapSettings(countryId, gapSettingsDTO, true));
+    public ResponseEntity<Map<String, Object>> createGapSettingsForCountry(@RequestBody @Validated GapSettingsDTO gapSettingsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, gapSettingsService.createGapSettings(gapSettingsDTO, true));
     }
 
     @ApiOperation("update a particular gap settings for country")
-    @PutMapping(COUNTRY_URL + GAP_FILLING_SETTINGS_URL + "/{GapSettingsId}")
-    public ResponseEntity<Map<String,Object>> updateGapSettingsForCountry(@PathVariable BigInteger gapSettingsId, @RequestBody @Validated GapSettingsDTO gapSettingsDTO){
-        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true, gapSettingsService.updateGapSettings(gapSettingsId, gapSettingsDTO, true));
+    @PutMapping(COUNTRY_URL + GAP_FILLING_SETTINGS_URL)
+    public ResponseEntity<Map<String,Object>> updateGapSettingsForCountry(@RequestBody @Validated GapSettingsDTO gapSettingsDTO){
+        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true, gapSettingsService.updateGapSettings(gapSettingsDTO, true));
     }
 
     @ApiOperation("Get all gap settings for country")
@@ -47,14 +46,14 @@ public class GapSettingsController {
     @ApiOperation("Create gap settings for unit")
     @PostMapping(UNIT_URL + GAP_FILLING_SETTINGS_URL)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createGapSettingsForUnit(@PathVariable Long unitId, @RequestBody @Validated GapSettingsDTO gapSettingsDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, gapSettingsService.createGapSettings(unitId, gapSettingsDTO, false));
+    public ResponseEntity<Map<String, Object>> createGapSettingsForUnit(@RequestBody @Validated GapSettingsDTO gapSettingsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, gapSettingsService.createGapSettings(gapSettingsDTO, false));
     }
 
     @ApiOperation("update a particular gap settings for unit")
-    @PutMapping(UNIT_URL + GAP_FILLING_SETTINGS_URL + "/{GapSettingsId}")
-    public ResponseEntity<Map<String,Object>> updateGapSettingsForUnit(@PathVariable BigInteger gapSettingsId, @RequestBody @Validated GapSettingsDTO gapSettingsDTO){
-        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true, gapSettingsService.updateGapSettings(gapSettingsId, gapSettingsDTO, false));
+    @PutMapping(UNIT_URL + GAP_FILLING_SETTINGS_URL)
+    public ResponseEntity<Map<String,Object>> updateGapSettingsForUnit(@RequestBody @Validated GapSettingsDTO gapSettingsDTO){
+        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true, gapSettingsService.updateGapSettings(gapSettingsDTO, false));
     }
 
     @ApiOperation("Get all gap settings for unit")

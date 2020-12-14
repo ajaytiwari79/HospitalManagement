@@ -8,7 +8,6 @@ import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -21,9 +20,7 @@ public class GapSettingsService {
     @Inject
     private ExceptionService exceptionService;
 
-    public GapSettingsDTO createGapSettings(Long countryOrUnitId, GapSettingsDTO gapSettingsDTO, boolean forCountry) {
-        gapSettingsDTO.setCountryId(forCountry ? countryOrUnitId : null);
-        gapSettingsDTO.setUnitId(forCountry ? null : countryOrUnitId);
+    public GapSettingsDTO createGapSettings(GapSettingsDTO gapSettingsDTO, boolean forCountry) {
         validateGapSetting(gapSettingsDTO, forCountry);
         GapSettings gapSettings = ObjectMapperUtils.copyPropertiesByMapper(gapSettingsDTO, GapSettings.class);
         gapSettingsMongoRepository.save(gapSettings);
@@ -31,15 +28,14 @@ public class GapSettingsService {
         return gapSettingsDTO;
     }
 
-    public GapSettingsDTO updateGapSettings(BigInteger gapSettingsId, GapSettingsDTO gapSettingsDTO, boolean forCountry) {
-        GapSettings gapSettings = gapSettingsMongoRepository.findOne(gapSettingsId);
+    public GapSettingsDTO updateGapSettings(GapSettingsDTO gapSettingsDTO, boolean forCountry) {
+        GapSettings gapSettings = gapSettingsMongoRepository.findOne(gapSettingsDTO.getId());
         if(isNull(gapSettings)){
             exceptionService.dataNotFoundByIdException("gap filling setting not found");
         }
         validateGapSetting(gapSettingsDTO, forCountry);
-        setDataForUpdateGapSettings(gapSettings, gapSettingsDTO);
+        gapSettings = ObjectMapperUtils.copyPropertiesByMapper(gapSettingsDTO, GapSettings.class);
         gapSettingsMongoRepository.save(gapSettings);
-        gapSettingsDTO.setId(gapSettings.getId());
         return gapSettingsDTO;
     }
 
@@ -51,23 +47,17 @@ public class GapSettingsService {
             gapSettings = gapSettingsMongoRepository.findByUnitIdAndOrganizationTypeIdAndOrganizationSubTypeIdAndPhaseIdAndGapFillingScenario(gapSettingsDTO.getUnitId(), gapSettingsDTO.getOrganizationTypeId(), gapSettingsDTO.getOrganizationSubTypeId(), gapSettingsDTO.getPhaseId(), gapSettingsDTO.getGapFillingScenario().toString());
         }
         if(isNotNull(gapSettings) && gapSettingsDTO.getId() != gapSettings.getId()){
-            exceptionService.duplicateDataException("Duplicate");
+            exceptionService.duplicateDataException("Duplicate configuration for gap setting");
         }
     }
 
-    private void setDataForUpdateGapSettings(GapSettings gapSettings, GapSettingsDTO gapSettingsDTO) {
-        gapSettings.setOrganizationTypeId(gapSettingsDTO.getOrganizationTypeId());
-        gapSettings.setOrganizationSubTypeId(gapSettingsDTO.getOrganizationSubTypeId());
-        gapSettings.setActionMadeBy(gapSettingsDTO.getActionMadeBy());
-        gapSettings.setEndDate(gapSettingsDTO.getEndDate());
-        gapSettings.setStartDate(gapSettingsDTO.getStartDate());
-        gapSettings.setPhaseId(gapSettingsDTO.getPhaseId());
-        gapSettings.setGapFillingScenario(gapSettingsDTO.getGapFillingScenario());
-        gapSettings.setSelectedGapSettingsRules(gapSettingsDTO.getSelectedGapSettingsRules());
-    }
-
     public List<GapSettingsDTO> getAllGapSettings(Long countryOrUnitId, boolean forCountry) {
-        List<GapSettings> gapSettingsList = forCountry ? gapSettingsMongoRepository.getAllByCountryId(countryOrUnitId) : gapSettingsMongoRepository.getAllByUnitId(countryOrUnitId);
+        List<GapSettings> gapSettingsList;
+        if(forCountry){
+            gapSettingsList = gapSettingsMongoRepository.getAllByCountryId(countryOrUnitId);
+        } else {
+            gapSettingsList = gapSettingsMongoRepository.getAllByUnitId(countryOrUnitId);
+        }
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(gapSettingsList, GapSettingsDTO.class);
     }
 }

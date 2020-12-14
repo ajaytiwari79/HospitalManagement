@@ -22,12 +22,15 @@ import java.util.Set;
 public class GapSettings extends MongoBaseEntity {
     private Long organizationTypeId;
     private Long organizationSubTypeId;
+    private BigInteger phaseId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private BigInteger phaseId;
     private GapFillingScenario gapFillingScenario;
     private Set<GapSettingsRule> selectedGapSettingsRules;
-    private AccessGroupRole actionMadeBy;
+    private AccessGroupRole gapCreatedBy;
     private Long countryId;
     private Long unitId;
+    private String organizationTypeName;
+    private String organizationSubTypeName;
+    private String phaseName;
 }
