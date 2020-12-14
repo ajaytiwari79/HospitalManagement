@@ -14,10 +14,12 @@ public interface AutoFillGapSettingsMongoRepository extends MongoBaseRepository<
     @Query("{'deleted' : false,'countryId':?0}")
     List<AutoFillGapSettings> getAllByCountryId(Long countryId);
 
-    @Query("{'deleted' : false,'countryId':?0}")
+    @Query("{'deleted' : false,'unitId':?0}")
     List<AutoFillGapSettings> getAllByUnitId(Long unitId);
 
-    AutoFillGapSettings findByUnitIdAndOrganizationTypeIdAndOrganizationSubTypeIdAndPhaseIdAndAutoGapFillingScenario(Long unitId, Long organizationTypeId, Long organizationSubTypeId, BigInteger phaseId, String gapFillingScenario);
+    @Query("{'deleted' : false,'unitId':?0,'organizationTypeId':?1,'organizationSubTypeId':?2,'phaseId':?3,'gapFillingScenario':?4,'id':{$ne:?5}}")
+    AutoFillGapSettings getCurrentlyApplicableGapSettingsForUnit(Long unitId, Long organizationTypeId, Long organizationSubTypeId, BigInteger phaseId, String gapFillingScenario, BigInteger id);
 
-    AutoFillGapSettings findByCountryIdAndOrganizationTypeIdAndOrganizationSubTypeIdAndPhaseIdAndAutoGapFillingScenario(Long countryId, Long organizationTypeId, Long organizationSubTypeId, BigInteger phaseId, String gapFillingScenario);
+    @Query("{'deleted' : false,'countryId':?0,'organizationTypeId':?1,'organizationSubTypeId':?2,'phaseId':?3,'gapFillingScenario':?4,'id':{$ne:?5}}")
+    AutoFillGapSettings getCurrentlyApplicableGapSettingsForCountry(Long countryId, Long organizationTypeId, Long organizationSubTypeId, BigInteger phaseId, String gapFillingScenario, BigInteger id);
 }

@@ -113,7 +113,7 @@ public final class ApiConstants {
     public static final String API_EXPERTISE_URL = "/expertise/{expertiseId}";
     public static final String API_EXPERTISE_BREAK_URL = "/expertise/{expertiseId}/break";
     public static final String GET_STAFF_BY_UNITID = "/staff/get_staff_by_unitId";
-    public static final String GAP_FILLING_SETTINGS_URL = "/gap_settings";
+    public static final String AUTO_FILL_GAP_SETTINGS_URL = "/auto_fill_gap_settings";
 
     public static final String GET_ORGANIZATION_WITH_COUNTRY_ID = "/getOrganizationWithCountryId";
     public static final String COMMON_DATA = "/common_data";

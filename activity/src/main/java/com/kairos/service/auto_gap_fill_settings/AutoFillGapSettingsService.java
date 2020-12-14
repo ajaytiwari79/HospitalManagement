@@ -8,6 +8,7 @@ import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -42,11 +43,11 @@ public class AutoFillGapSettingsService {
     private void validateGapSetting(AutoFillGapSettingsDTO autoFillGapSettingsDTO, boolean forCountry) {
         AutoFillGapSettings autoFillGapSettings;
         if(forCountry) {
-            autoFillGapSettings = autoFillGapSettingsMongoRepository.findByCountryIdAndOrganizationTypeIdAndOrganizationSubTypeIdAndPhaseIdAndAutoGapFillingScenario(autoFillGapSettingsDTO.getCountryId(), autoFillGapSettingsDTO.getOrganizationTypeId(), autoFillGapSettingsDTO.getOrganizationSubTypeId(), autoFillGapSettingsDTO.getPhaseId(), autoFillGapSettingsDTO.getAutoGapFillingScenario().toString());
+            autoFillGapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForCountry(autoFillGapSettingsDTO.getCountryId(), autoFillGapSettingsDTO.getOrganizationTypeId(), autoFillGapSettingsDTO.getOrganizationSubTypeId(), autoFillGapSettingsDTO.getPhaseId(), autoFillGapSettingsDTO.getAutoGapFillingScenario().toString(), autoFillGapSettingsDTO.getId());
         } else {
-            autoFillGapSettings = autoFillGapSettingsMongoRepository.findByUnitIdAndOrganizationTypeIdAndOrganizationSubTypeIdAndPhaseIdAndAutoGapFillingScenario(autoFillGapSettingsDTO.getUnitId(), autoFillGapSettingsDTO.getOrganizationTypeId(), autoFillGapSettingsDTO.getOrganizationSubTypeId(), autoFillGapSettingsDTO.getPhaseId(), autoFillGapSettingsDTO.getAutoGapFillingScenario().toString());
+            autoFillGapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(autoFillGapSettingsDTO.getUnitId(), autoFillGapSettingsDTO.getOrganizationTypeId(), autoFillGapSettingsDTO.getOrganizationSubTypeId(), autoFillGapSettingsDTO.getPhaseId(), autoFillGapSettingsDTO.getAutoGapFillingScenario().toString(), autoFillGapSettingsDTO.getId());
         }
-        if(isNotNull(autoFillGapSettings) && autoFillGapSettingsDTO.getId() != autoFillGapSettings.getId()){
+        if(isNotNull(autoFillGapSettings)){
             exceptionService.duplicateDataException("Duplicate configuration for gap setting");
         }
     }
@@ -59,5 +60,15 @@ public class AutoFillGapSettingsService {
             autoFillGapSettingsList = autoFillGapSettingsMongoRepository.getAllByUnitId(countryOrUnitId);
         }
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(autoFillGapSettingsList, AutoFillGapSettingsDTO.class);
+    }
+
+    public Boolean deleteAutoFillGapSettings(BigInteger autoFillGapSettingsId) {
+        AutoFillGapSettings autoFillGapSettings = autoFillGapSettingsMongoRepository.findOne(autoFillGapSettingsId);
+        if(isNull(autoFillGapSettings)){
+            exceptionService.dataNotFoundByIdException("gap filling setting not found");
+        }
+        autoFillGapSettings.setDeleted(true);
+        autoFillGapSettingsMongoRepository.save(autoFillGapSettings);
+        return true;
     }
 }
