@@ -1,6 +1,5 @@
 package com.kairos.enums.auto_gap_fill_settings;
 
-import com.kairos.dto.user.access_permission.AccessGroupRole;
 
 import java.util.*;
 
@@ -14,8 +13,8 @@ public enum AutoFillGapSettingsRule {
         this.autoFillGapSettingsRule = autoFillGapSettingsRule;
     }
 
-    public static Set<AccessGroupRole> getAllAutoFillGapSettingsRules() {
-        return new HashSet<>(EnumSet.allOf(AccessGroupRole.class));
+    public static Set<AutoFillGapSettingsRule> getAllAutoFillGapSettingsRules() {
+        return new HashSet<>(EnumSet.allOf(AutoFillGapSettingsRule.class));
     }
 
 }
