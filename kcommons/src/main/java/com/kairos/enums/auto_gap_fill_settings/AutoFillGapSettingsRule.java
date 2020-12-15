@@ -1,8 +1,15 @@
 package com.kairos.enums.auto_gap_fill_settings;
 
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
 import java.util.*;
 
+@Getter
+@NoArgsConstructor
 public enum AutoFillGapSettingsRule {
     RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1("Check if either side of the activity falls in main team. If it is, fill the gap with that activity."),
     RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2("Fill the gap with the activity of main team assigned to the staff in subject (even if it is not planned in the shift)"),
@@ -31,16 +38,19 @@ public enum AutoFillGapSettingsRule {
     RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE3("Fill the gap with the same indirect activity as that in the shift."),
     RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_REAL_TIME_PHASE1("In this case, fill the gap with the activity of highest rank as per unit."),
     RULES_AS_PER_MANAGEMENT_NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE_ALL_PHASE1("The system would pick up anyone of the planned activity randomly as indirect activity will not have ranking amongst themselves.");
-    private String autoFillGapSettingsRule;
 
-    AutoFillGapSettingsRule() {}
+    private String autoFillGapSettingsRule;
 
     AutoFillGapSettingsRule(String autoFillGapSettingsRule) {
         this.autoFillGapSettingsRule = autoFillGapSettingsRule;
     }
 
-    public static Set<AutoFillGapSettingsRule> getAllAutoFillGapSettingsRules() {
-        return new HashSet<>(EnumSet.allOf(AutoFillGapSettingsRule.class));
+    public static List<NameValuePair> getAllAutoFillGapSettingsRules() {
+        List<NameValuePair> returnValue = new ArrayList<>();
+        EnumSet.allOf(AutoFillGapSettingsRule.class).forEach(autoFillGapSettingsRule -> {
+            returnValue.add(new BasicNameValuePair(autoFillGapSettingsRule.name(), autoFillGapSettingsRule.autoFillGapSettingsRule));
+        });
+        return returnValue;
     }
 
 }
