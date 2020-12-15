@@ -44,7 +44,7 @@ public class Activity {
     private String name;
     @JsonIgnore
     private Map<ConstraintSubType, ConstraintHandler> constraints;
-    private Set<Long> validDayTypeIds;
+    private Set<BigInteger> validDayTypeIds;
     private TimeType timeType;
     private int order;
     private int activityPrioritySequence;

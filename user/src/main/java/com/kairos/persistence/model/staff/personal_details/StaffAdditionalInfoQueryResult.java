@@ -5,17 +5,16 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.math.BigInteger;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by prabjot on 17/5/17.
@@ -46,4 +45,8 @@ public class StaffAdditionalInfoQueryResult {
     private List<Tag> tags;
     private StaffStatusEnum currentStatus;
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
+    private OrganizationType organizationType;
+    private OrganizationType organizationSubType;
+    private Set<BigInteger> mainTeamActivities;
+
 }
