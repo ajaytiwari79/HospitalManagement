@@ -92,7 +92,7 @@ public class ShiftStatusService {
         Shift currentShift = shiftMongoRepository.findOne(shiftPublishDTO.getShifts().get(0).getShiftId());
         List<ShiftActivityResponseDTO> shiftActivityResponseDTOS = new ArrayList<>();
         ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO=null;
-        if(isNotNull(currentShift.getRequestAbsence())){
+        if(isNotNull(currentShift.getRequestAbsence()) && newHashSet(APPROVE, DISAPPROVE, PENDING).contains(shiftPublishDTO.getStatus())){
             return updateStatusOfRequestAbsence(unitId, shiftPublishDTO, currentShift);
         }
             Activity activity = activityMongoRepository.findOne(currentShift.getActivities().get(0).getActivityId());
