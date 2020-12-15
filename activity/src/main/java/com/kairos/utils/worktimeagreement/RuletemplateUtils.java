@@ -622,7 +622,7 @@ public class RuletemplateUtils {
     public static CareDaysDTO getCareDays(List<CareDaysDTO> careDaysDTOS, int staffAge) {
         CareDaysDTO staffCareDaysDTO = null;
         for (CareDaysDTO careDaysDTO : careDaysDTOS) {
-            if (careDaysDTO.getTo() == null && staffAge > careDaysDTO.getFrom() || (isNotNull(careDaysDTO.getTo()) && careDaysDTO.getFrom() <= staffAge && careDaysDTO.getTo() > staffAge)) {
+            if (careDaysDTO.getTo() == null && staffAge >= careDaysDTO.getFrom() || (isNotNull(careDaysDTO.getTo()) && careDaysDTO.getFrom() <= staffAge && careDaysDTO.getTo() > staffAge)) {
                 staffCareDaysDTO = careDaysDTO;
             }
         }
