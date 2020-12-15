@@ -569,7 +569,7 @@ public class StaffRetrievalService {
         }
         User user=userGraphRepository.findOne(UserContext.getUserDetails().getId());
         staffAdditionalInfoQueryResult.setUnitWiseAccessRole(user.getUnitWiseAccessRole());
-        return getStaffEmploymentData(startDate, staffAdditionalInfoQueryResult, employmentId, organizationId, reasonCodeIds,null);
+        return getStaffEmploymentData(startDate, staffAdditionalInfoQueryResult, employmentId, organizationId, reasonCodeIds,startDate);
     }
 
     /**
