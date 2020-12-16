@@ -79,7 +79,7 @@ public class AutoFillGapSettingsController {
     }
 
     @ApiOperation("Get all gap settings for unit")
-    @GetMapping("/all_gap_setings_rules")
+    @GetMapping("/all_gap_settings_rules")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllAutoFillGapSettingsRules() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, AutoFillGapSettingsRule.getAllAutoFillGapSettingsRules());
