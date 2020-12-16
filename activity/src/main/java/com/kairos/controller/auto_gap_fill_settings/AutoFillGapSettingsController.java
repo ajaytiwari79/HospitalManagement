@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -24,43 +25,57 @@ public class AutoFillGapSettingsController {
     private AutoFillGapSettingsService autoFillGapSettingsService;
 
     @ApiOperation("Create gap settings for country")
-    @PostMapping(COUNTRY_URL + GAP_FILLING_SETTINGS_URL)
+    @PostMapping(COUNTRY_URL + AUTO_FILL_GAP_SETTINGS_URL)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createAutoFillGapSettingsForCountry(@RequestBody @Validated AutoFillGapSettingsDTO autoFillGapSettingsDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, autoFillGapSettingsService.createAutoFillGapSettings(autoFillGapSettingsDTO, true));
     }
 
     @ApiOperation("update a particular gap settings for country")
-    @PutMapping(COUNTRY_URL + GAP_FILLING_SETTINGS_URL)
+    @PutMapping(COUNTRY_URL + AUTO_FILL_GAP_SETTINGS_URL)
     public ResponseEntity<Map<String,Object>> updateAutoFillGapSettingsForCountry(@RequestBody @Validated AutoFillGapSettingsDTO autoFillGapSettingsDTO){
         return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true, autoFillGapSettingsService.updateAutoFillGapSettings(autoFillGapSettingsDTO, true));
     }
 
     @ApiOperation("Get all gap settings for country")
-    @GetMapping(COUNTRY_URL + GAP_FILLING_SETTINGS_URL)
+    @GetMapping(COUNTRY_URL + AUTO_FILL_GAP_SETTINGS_URL)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllAutoFillGapSettingsForCountry(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, autoFillGapSettingsService.getAllAutoFillGapSettings(countryId, true));
     }
 
+    @ApiOperation("Delete gap settings for country")
+    @DeleteMapping(COUNTRY_URL + AUTO_FILL_GAP_SETTINGS_URL + "{autoFillGapSettingsId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteAutoFillGapSettingsForCountry(@PathVariable BigInteger autoFillGapSettingsId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, autoFillGapSettingsService.deleteAutoFillGapSettings(autoFillGapSettingsId));
+    }
+
     @ApiOperation("Create gap settings for unit")
-    @PostMapping(UNIT_URL + GAP_FILLING_SETTINGS_URL)
+    @PostMapping(UNIT_URL + AUTO_FILL_GAP_SETTINGS_URL)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createAutoFillGapSettingsForUnit(@RequestBody @Validated AutoFillGapSettingsDTO autoFillGapSettingsDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, autoFillGapSettingsService.createAutoFillGapSettings(autoFillGapSettingsDTO, false));
     }
 
     @ApiOperation("update a particular gap settings for unit")
-    @PutMapping(UNIT_URL + GAP_FILLING_SETTINGS_URL)
+    @PutMapping(UNIT_URL + AUTO_FILL_GAP_SETTINGS_URL)
     public ResponseEntity<Map<String,Object>> updateAutoFillGapSettingsForUnit(@RequestBody @Validated AutoFillGapSettingsDTO autoFillGapSettingsDTO){
         return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true, autoFillGapSettingsService.updateAutoFillGapSettings(autoFillGapSettingsDTO, false));
     }
 
     @ApiOperation("Get all gap settings for unit")
-    @GetMapping(UNIT_URL + GAP_FILLING_SETTINGS_URL)
+    @GetMapping(UNIT_URL + AUTO_FILL_GAP_SETTINGS_URL)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllAutoFillGapSettingsForUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, autoFillGapSettingsService.getAllAutoFillGapSettings(unitId, false));
+    }
+
+    @ApiOperation("Delete gap settings for unit")
+    @DeleteMapping(UNIT_URL + AUTO_FILL_GAP_SETTINGS_URL + "{autoFillGapSettingsId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteAutoFillGapSettingsForUnit(@PathVariable BigInteger autoFillGapSettingsId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, autoFillGapSettingsService.deleteAutoFillGapSettings(autoFillGapSettingsId));
     }
 
     @ApiOperation("Get all gap settings for unit")
