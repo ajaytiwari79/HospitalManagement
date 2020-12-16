@@ -139,11 +139,7 @@ public class TodoService {
         }else{
             for(ShiftActivity shiftActivity :shift.getActivities()){
             if(isCollectionEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityRulesSettings().getApprovalAllowedPhaseIds()) && isCollectionNotEmpty(shiftActivity.getStatus())) {
-                if(shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)){
-                    shiftActivity.setStatus(newHashSet(ShiftStatus.PUBLISH));
-                } else {
-                    shiftActivity.setStatus(new HashSet<>());
-                }
+                shiftActivity.setStatus(shiftActivity.getStatus().contains(ShiftStatus.PUBLISH) ? newHashSet(ShiftStatus.PUBLISH) : new HashSet<>());
             }
             }
         }
