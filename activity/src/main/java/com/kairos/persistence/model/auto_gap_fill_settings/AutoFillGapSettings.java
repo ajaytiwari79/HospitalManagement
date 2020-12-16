@@ -1,8 +1,8 @@
-package com.kairos.persistence.model.gap_settings;
+package com.kairos.persistence.model.auto_gap_fill_settings;
 
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.enums.gap_settings.GapFillingScenario;
-import com.kairos.enums.gap_settings.GapSettingsRule;
+import com.kairos.enums.auto_gap_fill_settings.AutoGapFillingScenario;
+import com.kairos.enums.auto_gap_fill_settings.AutoFillGapSettingsRule;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,18 +19,19 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document
-public class GapSettings extends MongoBaseEntity {
+public class AutoFillGapSettings extends MongoBaseEntity {
     private Long organizationTypeId;
     private Long organizationSubTypeId;
     private BigInteger phaseId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private GapFillingScenario gapFillingScenario;
-    private Set<GapSettingsRule> selectedGapSettingsRules;
-    private AccessGroupRole gapCreatedBy;
+    private AutoGapFillingScenario autoGapFillingScenario;
+    private Set<AutoFillGapSettingsRule> selectedAutoFillGapSettingsRules;
+    private AccessGroupRole gapApplicableFor;
     private Long countryId;
     private Long unitId;
     private String organizationTypeName;
     private String organizationSubTypeName;
     private String phaseName;
+    private boolean published;
 }

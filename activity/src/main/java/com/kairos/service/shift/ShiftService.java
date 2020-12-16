@@ -57,9 +57,9 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.StaffActivityDetailsService;
+import com.kairos.service.auto_gap_fill_settings.AutoFillGapSettingsService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.gap_settings.GapSettingsService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
@@ -168,7 +168,7 @@ public class ShiftService extends MongoBaseService {
     private ReasonCodeRepository reasonCodeRepository;
     @Inject private TimeSlotRepository timeSlotRepository;
     @Inject private DayTypeService dayTypeService;
-    @Inject private GapSettingsService gapSettingsService;
+    @Inject private AutoFillGapSettingsService gapSettingsService;
 
     public List<ShiftWithViolatedInfoDTO> createShifts(Long unitId, List<ShiftDTO> shiftDTOS, ShiftActionType shiftActionType) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>(shiftDTOS.size());
