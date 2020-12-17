@@ -103,10 +103,13 @@ public class AutoFillGapSettingsService {
             ShiftActivityDTO shiftActivityBeforeGap = activities[0];
             ShiftActivityDTO shiftActivityAfterGap = activities[1];
             Set<BigInteger> allProductiveActivityIds = staffAdditionalInfoDTO.getTeamsData().stream().flatMap(k -> k.getActivityIds().stream()).collect(Collectors.toSet());
+            //TODO create a seperate query to fetch only specifoic data
             List<ActivityWrapper> activityList = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(allProductiveActivityIds);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activityList.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+            //TODO Don't need to send activity list along with map
             Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = updateStaffingLevelDetails(activityList, activities, phase, activityWrapperMap);
             AutoGapFillingScenario gapFillingScenario = getGapFillingScenario(shiftActivityBeforeGap, shiftActivityAfterGap);
+            //TODO merge this call with activity fetch
             AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), staffAdditionalInfoDTO.getOrganizationType().getId(), staffAdditionalInfoDTO.getOrganizationSubType().getId(), phase.getId(), gapFillingScenario.toString(), null, staffAdditionalInfoDTO.getRoles().contains(MANAGEMENT) ? MANAGEMENT.toString() : STAFF.toString());
             ShiftActivityDTO shiftActivityDTO = getActivityToFillTheGap(phase, staffAdditionalInfoDTO, shiftActivityBeforeGap, shiftActivityAfterGap, gapFillingScenario, gapSettings,staffingLevelActivityWithDurationMap);
             for (int index = 0; index < shiftDTO.getActivities().size() - 1; index++) {
@@ -140,7 +143,7 @@ public class AutoFillGapSettingsService {
     private ShiftActivityDTO[] getActivitiesAroundGap(ShiftDTO shiftDTO) {
         ShiftActivityDTO shiftActivityBeforeGap = null;
         ShiftActivityDTO shiftActivityAfterGap = null;
-        for (int i = 0; i < shiftDTO.getActivities().size(); i++) {
+        for (int i = 0; i < shiftDTO.getActivities().size()-1; i++) {
             if (!shiftDTO.getActivities().get(i).getEndDate().equals(shiftDTO.getActivities().get(i + 1).getStartDate())) {
                 shiftActivityBeforeGap = shiftDTO.getActivities().get(i);
                 shiftActivityAfterGap = shiftDTO.getActivities().get(i + 1);
@@ -265,6 +268,7 @@ public class AutoFillGapSettingsService {
     private Map<BigInteger, StaffingLevelActivityWithDuration> updateStaffingLevelDetails(List<ActivityWrapper> activityDTOList, ShiftActivityDTO[] activities, Phase phase, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         List<ShiftActivity> shiftActivities = new ArrayList<>();
         activityDTOList.forEach(k -> shiftActivities.add(new ShiftActivity(k.getActivity().getName(), activities[0].getEndDate(), activities[1].getEndDate(), k.getActivity().getId(), null)));
+        //TODO Use Builder in Shift
         Shift shift = new Shift();
         shift.setActivities(shiftActivities);
         shift.setStartDate(activities[0].getEndDate());
