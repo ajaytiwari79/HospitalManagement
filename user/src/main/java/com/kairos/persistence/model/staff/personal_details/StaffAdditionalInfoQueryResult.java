@@ -1,11 +1,14 @@
 package com.kairos.persistence.model.staff.personal_details;
 
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.staff.StaffTeamDTO;
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,5 +51,6 @@ public class StaffAdditionalInfoQueryResult {
     private OrganizationType organizationType;
     private OrganizationType organizationSubType;
     private Set<BigInteger> mainTeamActivities;
+    private List<TeamDTO> teamsData;
 
 }
