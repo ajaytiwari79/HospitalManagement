@@ -670,7 +670,7 @@ public class RuletemplateUtils {
         }
         int hours = hour / 60; //since both are ints, you get an int
         int minutes = hour % 60;
-        return hours + "." + minutes;
+        return minutes!=0? hours + "." + minutes:String.valueOf(hours);
     }
 
     public static int getValueAccordingShiftLengthAndAverageSetting(ShiftLengthAndAverageSetting shiftLengthAndAverageSetting, ShiftWithActivityDTO shift){

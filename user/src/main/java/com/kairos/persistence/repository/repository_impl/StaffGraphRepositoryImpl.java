@@ -255,7 +255,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         query.append(" WITH staff,employments,user,contactAddress,selectedTags,expertise,empType,applicableFunctions, ");
         query.append(" collect({id: id(employmentLines), startDate:employmentLines.startDate,endDate:employmentLines.endDate,totalWeeklyMinutes:employmentLines.totalWeeklyMinutes,fullTimeWeeklyMinutes:employmentLines.fullTimeWeeklyMinutes,avgDailyWorkingHours:employmentLines.avgDailyWorkingHours,workingDaysInWeek:employmentLines.workingDaysInWeek,hourlyCost:employmentLines.hourlyCost, employmentType: { id: id(empType),name:empType.name } }) as employmentLines " +
                 "MATCH(staff)-["+STAFF_HAS_EXPERTISE+"]->(expList:Expertise) " +
-                "OPTIONAL MATCH (staff)-[:"+STAFF_HAS_SKILLS+"]->(skillList:Skill) ");
+                "OPTIONAL MATCH (staff)-[:"+STAFF_HAS_SKILLS+"{isEnabled:true}]->(skillList:Skill{isEnabled:true}) ");
         returnData.append(" , collect( distinct selectedTags) as tags , collect( distinct { id : id(empType),name: empType.name}) as employmentList, collect( distinct { id : id(expList),name: expList.name}) as expertiseList , CASE WHEN skillList IS NULL THEN [] ELSE collect( distinct { id : id(skillList),name: skillList.name}) END as skillList ").append(" ORDER BY staff.currentStatus, staff.firstName");
         query.append(returnData);
         LOGGER.debug(query.toString());

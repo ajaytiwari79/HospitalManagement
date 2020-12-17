@@ -943,6 +943,7 @@ public class ActivityService {
         activityDTOMap.forEach((k,v)->{
             if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
                 v.setName("XXXXX");
+                v.getActivityGeneralSettings().setName("XXXXX");
             }
             if(fieldPermissionMap.get("ultraShortName").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("ultraShortName").isEmpty()){
                 v.getActivityGeneralSettings().setUltraShortName("XXXXX");
