@@ -619,10 +619,10 @@ public class RuletemplateUtils {
         return totalBlockingPoints >= totalVeto * VETO_BLOCKING_POINT + totalStopBricks * STOP_BRICK_BLOCKING_POINT;
     }
 
-    public static CareDaysDTO getCareDays(List<CareDaysDTO> careDaysDTOS, int staffAge) {
+    public static CareDaysDTO getCareDays(List<CareDaysDTO> careDaysDTOS, int age) {
         CareDaysDTO staffCareDaysDTO = null;
         for (CareDaysDTO careDaysDTO : careDaysDTOS) {
-            if (careDaysDTO.getTo() == null && staffAge >= careDaysDTO.getFrom() || (isNotNull(careDaysDTO.getTo()) && careDaysDTO.getFrom() <= staffAge && careDaysDTO.getTo() > staffAge)) {
+            if (careDaysDTO.getTo() == null && age >= careDaysDTO.getFrom() || (isNotNull(careDaysDTO.getTo()) && careDaysDTO.getFrom() <= age && careDaysDTO.getTo() > age)) {
                 staffCareDaysDTO = careDaysDTO;
             }
         }

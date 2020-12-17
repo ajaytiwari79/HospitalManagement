@@ -8,3 +8,5 @@ db.getCollection('staffActivitySetting').insert({
     "deleted" : false,
     "_class" : "com.kairos.persistence.model.staff_settings.StaffActivitySetting"
 })
+
+Upload AWS mail service credentials
