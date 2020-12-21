@@ -179,7 +179,8 @@ public class StaffFilterService {
     }
 
     //todo send single call for get activity data
-    private List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId) {
+    private List<FilterSelectionQueryResult>
+    getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId) {
         ObjectMapper objectMapper = new ObjectMapper();
         switch (filterType) {
             case EMPLOYMENT_TYPE:
