@@ -180,7 +180,7 @@ public class OrganizationController {
     @PutMapping(UNIT_URL + "/service")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addOrganizationService(@PathVariable long unitId, @RequestBody Map<String, Object> data) {
-        Map<String, List<OrganizationServiceDTO>> services = organizationServiceService.updateServiceToOrganization(unitId, Long.valueOf(String.valueOf(data.get("organizationServiceId"))), (boolean) data.get(IS_SELECTED));
+        Map<String, Object> services = organizationServiceService.updateServiceToOrganization(unitId, Long.valueOf(String.valueOf(data.get("organizationServiceId"))), (boolean) data.get(IS_SELECTED));
         if(services == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, true, false);
         }
