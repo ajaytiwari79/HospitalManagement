@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -27,14 +28,14 @@ public class AutoFillGapSettingsController {
     @ApiOperation("Create gap settings for country")
     @PostMapping(COUNTRY_URL + AUTO_FILL_GAP_SETTINGS_URL)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createAutoFillGapSettingsForCountry(@RequestBody @Validated AutoFillGapSettingsDTO autoFillGapSettingsDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, autoFillGapSettingsService.createAutoFillGapSettings(autoFillGapSettingsDTO, true));
+    public ResponseEntity<Map<String, Object>> createAutoFillGapSettingsForCountry(@RequestBody @Validated AutoFillGapSettingsDTO autoFillGapSettingsDTO, @RequestParam String action, @RequestParam(value = "publish_date", required = false) LocalDate publishDate) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, autoFillGapSettingsService.createAutoFillGapSettings(autoFillGapSettingsDTO, action, publishDate, true));
     }
 
     @ApiOperation("update a particular gap settings for country")
     @PutMapping(COUNTRY_URL + AUTO_FILL_GAP_SETTINGS_URL)
-    public ResponseEntity<Map<String,Object>> updateAutoFillGapSettingsForCountry(@RequestBody @Validated AutoFillGapSettingsDTO autoFillGapSettingsDTO){
-        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true, autoFillGapSettingsService.updateAutoFillGapSettings(autoFillGapSettingsDTO, true));
+    public ResponseEntity<Map<String,Object>> updateAutoFillGapSettingsForCountry(@RequestBody @Validated AutoFillGapSettingsDTO autoFillGapSettingsDTO, @RequestParam String action, @RequestParam(value = "publish_date", required = false) LocalDate publishDate){
+        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true, autoFillGapSettingsService.updateAutoFillGapSettings(autoFillGapSettingsDTO, action, publishDate, true));
     }
 
     @ApiOperation("Get all gap settings for country")
@@ -54,14 +55,14 @@ public class AutoFillGapSettingsController {
     @ApiOperation("Create gap settings for unit")
     @PostMapping(UNIT_URL + AUTO_FILL_GAP_SETTINGS_URL)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createAutoFillGapSettingsForUnit(@RequestBody @Validated AutoFillGapSettingsDTO autoFillGapSettingsDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, autoFillGapSettingsService.createAutoFillGapSettings(autoFillGapSettingsDTO, false));
+    public ResponseEntity<Map<String, Object>> createAutoFillGapSettingsForUnit(@RequestBody @Validated AutoFillGapSettingsDTO autoFillGapSettingsDTO, @RequestParam String action, @RequestParam(value = "publish_date", required = false) LocalDate publishDate) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, autoFillGapSettingsService.createAutoFillGapSettings(autoFillGapSettingsDTO, action, publishDate, false));
     }
 
     @ApiOperation("update a particular gap settings for unit")
     @PutMapping(UNIT_URL + AUTO_FILL_GAP_SETTINGS_URL)
-    public ResponseEntity<Map<String,Object>> updateAutoFillGapSettingsForUnit(@RequestBody @Validated AutoFillGapSettingsDTO autoFillGapSettingsDTO){
-        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true, autoFillGapSettingsService.updateAutoFillGapSettings(autoFillGapSettingsDTO, false));
+    public ResponseEntity<Map<String,Object>> updateAutoFillGapSettingsForUnit(@RequestBody @Validated AutoFillGapSettingsDTO autoFillGapSettingsDTO, @RequestParam String action, @RequestParam(value = "publish_date", required = false) LocalDate publishDate){
+        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED,true, autoFillGapSettingsService.updateAutoFillGapSettings(autoFillGapSettingsDTO, action, publishDate, false));
     }
 
     @ApiOperation("Get all gap settings for unit")
