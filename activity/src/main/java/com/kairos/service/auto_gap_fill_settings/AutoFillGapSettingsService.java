@@ -130,40 +130,80 @@ public class AutoFillGapSettingsService {
                 shiftActivityDTO = getApplicableActivityForProductiveTypeOnOneSide(phase, gapSettings, shiftActivityBeforeGap, shiftActivityAfterGap, staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList);
                 break;
             default:
-                shiftActivityDTO = getApplicableActivityForNonProductiveTypeOnBothSide(phase, gapSettings);
+                shiftActivityDTO = getApplicableActivityForNonProductiveTypeOnBothSide(phase, gapSettings, shiftActivityBeforeGap, shiftActivityAfterGap, staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList);
                 break;
         }
         return shiftActivityDTO;
     }
 
+    private ShiftActivityDTO getApplicableActivityForNonProductiveTypeOnBothSide(Phase phase, AutoFillGapSettings gapSettings, ShiftActivityDTO beforeGap, ShiftActivityDTO afterGap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityList) {
+        ShiftActivityDTO shiftActivityDTO = null;
+        for (AutoFillGapSettingsRule autoFillGapSettingsRule : gapSettings.getSelectedAutoFillGapSettingsRules()) {
+            switch (autoFillGapSettingsRule) {
+                case RULES_AS_PER_STAFF_NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE_ALL_PHASE1:
+                case RULES_AS_PER_MANAGEMENT_NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE_ALL_PHASE1:
+                    shiftActivityDTO= new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), beforeGap.getActivityId(), null);
+            }
+        }
+        return shiftActivityDTO;
+    }
+
     private ShiftActivityDTO getApplicableActivityForProductiveTypeOnOneSide(Phase phase, AutoFillGapSettings gapSettings, ShiftActivityDTO beforeGap, ShiftActivityDTO afterGap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityList) {
-        ShiftActivityDTO shiftActivityDTO;
-        ShiftActivityDTO productiveActivity=afterGap.getActivity().getTimeType().isPartOfTeam() ?afterGap:beforeGap;
+        ShiftActivityDTO shiftActivityDTO = null;
+        ShiftActivityDTO productiveActivity = afterGap.getActivity().getTimeType().isPartOfTeam() ? afterGap : beforeGap;
+        TeamDTO mainTeam = staffAdditionalInfoDTO.getTeamsData().stream().filter(k -> TeamType.MAIN.equals(k.getTeamType())).findAny().orElse(null);
         for (AutoFillGapSettingsRule autoFillGapSettingsRule : gapSettings.getSelectedAutoFillGapSettingsRules()) {
             switch (autoFillGapSettingsRule) {
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_REQUEST_PHASE1:
                     shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), productiveActivity.getActivityId(), null);
                     break;
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE1:
-                     if(staffingLevelActivityWithDurationMap.get(productiveActivity.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes()>0){
-                         shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), productiveActivity.getActivityId(), null);
-                         break;
-                     }
+                    if (staffingLevelActivityWithDurationMap.get(productiveActivity.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
+                        shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), productiveActivity.getActivityId(), null);
+                        break;
+                    }
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE2:
-                    if (staffingLevelActivityWithDurationMap.get(highestRankTeam.getActivityIds().iterator().next()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0 && !beforeGap.getActivity().getId().equals(highestRankTeam.getActivityIds().iterator().next()) && !afterGap.getActivity().getId().equals(highestRankTeam.getActivityIds().iterator().next())) {
-                        shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeam.getActivityIds().iterator().next(), null);
+                    List<ActivityWrapper> activityWrappers = activityList.stream().filter(k -> !k.getActivity().getId().equals(productiveActivity.getActivityId())).collect(Collectors.toList());
+                    BigInteger activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityWrappers);
+                    if (activityId != null) {
+                        shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
                         break;
                     }
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE3:
+                    shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), beforeGap.getActivity().getTimeType().isPartOfTeam() ? afterGap.getActivityId() : beforeGap.getActivityId(), null);
+                    break;
                 case RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_REQUEST_PHASE1:
+                    shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), productiveActivity.getActivityId(), null);
+                    break;
                 case RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE1:
+                    if (staffingLevelActivityWithDurationMap.get(productiveActivity.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
+                        shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), productiveActivity.getActivityId(), null);
+                        break;
+                    }
                 case RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE2:
+                    activityWrappers = activityList.stream().filter(k -> !k.getActivity().getId().equals(productiveActivity.getActivityId())).collect(Collectors.toList());
+                    activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityWrappers);
+                    if (activityId != null) {
+                        shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
+                        break;
+                    }
                 case RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE3:
+                    shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), beforeGap.getActivity().getTimeType().isPartOfTeam() ? afterGap.getActivityId() : beforeGap.getActivityId(), null);
+                    break;
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_REAL_TIME_PHASE1:
+                    if (mainTeam != null) {
+                        shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeam.getActivityIds().iterator().next(), null);
+                        break;
+                    }
                 case RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_REAL_TIME_PHASE1:
+                    activityId=afterGap.getActivity().getActivityPriority().getSequence()<beforeGap.getActivity().getActivityPriority().getSequence()?afterGap.getActivityId():beforeGap.getActivityId();
+                    shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
+                    break;
+                default:
+                    exceptionService.actionNotPermittedException("gap.filling.configuration.absent");
             }
         }
-        return null;
+        return shiftActivityDTO;
     }
 
     private boolean gapCreated(ShiftDTO shiftDTO, Shift shift) {
@@ -306,15 +346,6 @@ public class AutoFillGapSettingsService {
     }
 
 
-    private ShiftActivityDTO getApplicableActivityForNonProductiveTypeOnBothSide(Phase phase, AutoFillGapSettings gapSettings) {
-        for (AutoFillGapSettingsRule autoFillGapSettingsRule : gapSettings.getSelectedAutoFillGapSettingsRules()) {
-            switch (autoFillGapSettingsRule) {
-                case RULES_AS_PER_STAFF_NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE_ALL_PHASE1:
-                case RULES_AS_PER_MANAGEMENT_NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE_ALL_PHASE1:
-            }
-        }
-        return null;
-    }
 
     private Map<BigInteger, StaffingLevelActivityWithDuration> updateStaffingLevelDetails(List<ActivityWrapper> activityDTOList, ShiftActivityDTO[] activities, Phase phase, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         List<ShiftActivity> shiftActivities = new ArrayList<>();
@@ -337,13 +368,13 @@ public class AutoFillGapSettingsService {
         return (List<BigInteger>) solvingMostProblem.values();
     }
 
-    private BigInteger getHighestRankedActivity(Set<BigInteger> activityIds, List<TeamDTO> teamsData, List<ActivityWrapper> activityList,boolean excludeShiftActivity) {
+    private BigInteger getHighestRankedActivity(Set<BigInteger> activityIds, List<TeamDTO> teamsData, List<ActivityWrapper> activityList) {
         if (activityIds.size() == 1) {
             return activityIds.iterator().next();
         }
         List<TeamDTO> sortedData = teamsData.stream().sorted(Comparator.comparing(TeamDTO::getSequence)).collect(Collectors.toList());
         for (TeamDTO teamDTO : sortedData) {
-            if (activityIds.contains(teamDTO.getActivityIds().iterator().next()) && (excludeShiftActivity && )) {
+            if (activityIds.contains(teamDTO.getActivityIds().iterator().next())) {
                 return teamDTO.getActivityIds().iterator().next();
             }
         }
