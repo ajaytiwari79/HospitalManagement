@@ -22,7 +22,7 @@ public enum AutoFillGapSettingsRule {
     RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE1("The productive type of activity would cover up the gap if it has partial or complete understaffing."),
     RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE2("Check for the productive activities assigned to the staff other than the planned activities that solves maximum duration. If more than one solves maximum duration then pick the one with highest rank"),
     RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE3("Fill the gap with the same indirect activity as that in the shift."),
-    RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_ANY_SIDE_PUZZLE_TO_TENTATIVE_AND_REAL_TIME_PHASE1("Fill the gap with the staff’s main team’s activity."),
+    RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_REAL_TIME_PHASE1("Fill the gap with the staff’s main team’s activity."),
     RULES_AS_PER_STAFF_NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE_ALL_PHASE1("The system would pick up anyone of the planned activity randomly as indirect activity will not have ranking amongst themselves."),
     RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1("Check between the two teams that which one is of higher rank as per the unit ranking, that team will fill the gap. "),
     RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2("Fill the gap with the highest ranked productive activity assigned to the staff in subject (even if it is causing overstaffing or breaking continuity)"),

@@ -109,7 +109,7 @@ public interface CustomActivityMongoRepository {
     List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId);
     List<ActivityDTO> getActivityRankWithRankByUnitId(Long unitId);
 
-    List<ActivityDTO> findActivitiesByUnitId(Long unitId, List<BigInteger> activityIds);
+    List<ActivityDTO> findActivitiesByUnitId(Long unitId, Collection<BigInteger> activityIds);
 
     List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType, Long unitId);
 

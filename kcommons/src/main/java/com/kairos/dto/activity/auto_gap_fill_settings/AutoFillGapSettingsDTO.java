@@ -22,18 +22,20 @@ public class AutoFillGapSettingsDTO {
     private BigInteger id;
     private Long countryId;
     private Long unitId;
+    @NotNull(message = "message.start.date.not.null")
     private LocalDate startDate;
     private LocalDate endDate;
-    @NotNull
+    @NotNull(message = "message.org.type.not.null")
     private Long organizationTypeId;
-    @NotNull
+    @NotNull(message = "message.org.subtype.not.null")
     private Long organizationSubTypeId;
-    @NotNull
+    @NotNull(message = "message.phase.not.null")
     private BigInteger phaseId;
-    @NotNull
+    @NotNull(message = "message.gap.filling.scenario.not.null")
     private AutoGapFillingScenario autoGapFillingScenario;
-    @NotEmpty
+    @NotEmpty(message = "message.gap.settings.rule.not.empty")
     private Set<AutoFillGapSettingsRule> selectedAutoFillGapSettingsRules;
+    @NotNull(message = "message.gap.applicable.for.not.null")
     private AccessGroupRole gapApplicableFor;
     private Date updatedAt;
     private UserInfo lastModifiedBy;
@@ -41,4 +43,5 @@ public class AutoFillGapSettingsDTO {
     private String organizationSubTypeName;
     private String phaseName;
     private boolean published;
+    private BigInteger parentId;
 }

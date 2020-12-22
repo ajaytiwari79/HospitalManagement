@@ -506,6 +506,8 @@ public class StaffRetrievalService {
     private StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate, StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult, Long employmentId, long organizationId, Set<Long> reasonCodeIds,LocalDate activityCutOffEndDate) {
         Unit unit = unitGraphRepository.findOne(organizationId);
         Long countryId = countryService.getCountryIdByUnitId(organizationId);
+        staffAdditionalInfoQueryResult.setOrganizationType(unit.getOrganizationType());
+        staffAdditionalInfoQueryResult.setOrganizationSubType(unit.getOrganizationSubTypes().get(0));
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
         StaffEmploymentDetails employment = employmentService.getEmploymentDetails(employmentId);
         if (Optional.ofNullable(employment).isPresent()) {
