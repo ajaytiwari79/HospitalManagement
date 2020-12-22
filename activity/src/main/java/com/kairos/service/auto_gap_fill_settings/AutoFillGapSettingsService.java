@@ -2,8 +2,10 @@ package com.kairos.service.auto_gap_fill_settings;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.auto_gap_fill_settings.AutoFillGapSettingsDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftAndActivtyStatusDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivityWithDuration;
 import com.kairos.dto.user.team.TeamDTO;
@@ -158,6 +160,8 @@ public class AutoFillGapSettingsService {
             //TODO create a seperate query to fetch only specifoic data
             List<ActivityWrapper> activityList = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(allProductiveActivityIds);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activityList.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+            shiftActivityBeforeGap.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityBeforeGap.getActivityId()).getActivity(),ActivityDTO.class));
+            shiftActivityAfterGap.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityAfterGap.getActivityId()).getActivity(),ActivityDTO.class));
             //TODO Don't need to send activity list along with map
             Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = updateStaffingLevelDetails(activityList, activities, phase, activityWrapperMap);
             AutoGapFillingScenario gapFillingScenario = getGapFillingScenario(shiftActivityBeforeGap, shiftActivityAfterGap);
@@ -174,7 +178,7 @@ public class AutoFillGapSettingsService {
 
 
     private void adjustTiming(ShiftDTO shiftDTO, Shift shift) {
-        for (int i = 1; i < shiftDTO.getActivities().size() - 1; i++) {
+        for (int i = 1; i < shiftDTO.getActivities().size(); i++) {
             if (!shiftDTO.getActivities().get(i).getActivityId().equals(shift.getActivities().get(i).getActivityId())) {
                 shiftDTO.getActivities().get(i - 1).setEndDate(shift.getActivities().get(i).getStartDate());
                 break;
@@ -416,6 +420,7 @@ public class AutoFillGapSettingsService {
         shift.setActivities(shiftActivities);
         shift.setStartDate(activities[0].getEndDate());
         shift.setEndDate(activities[1].getStartDate());
+        shift.setUnitId(phase.getOrganizationId());
         Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = new HashMap<>();
         for (ShiftActivity shiftActivity : shiftActivities) {
             staffingLevelService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, null, staffingLevelActivityWithDurationMap);
