@@ -41,4 +41,5 @@ public class AutoFillGapSettingsDTO {
     private String organizationSubTypeName;
     private String phaseName;
     private boolean published;
+    private BigInteger parentId;
 }
