@@ -99,6 +99,7 @@ public class AutoFillGapSettingsService {
 
     public void adjustGapByActivity(ShiftDTO shiftDTO, Shift shift, Phase phase, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         if (gapCreated(shiftDTO, shift)) {
+            adjustTiming(shiftDTO, shift);
             ShiftActivityDTO[] activities = getActivitiesAroundGap(shiftDTO);
             ShiftActivityDTO shiftActivityBeforeGap = activities[0];
             ShiftActivityDTO shiftActivityAfterGap = activities[1];
@@ -116,6 +117,16 @@ public class AutoFillGapSettingsService {
                 if (!shiftDTO.getActivities().get(index).getEndDate().equals(shiftDTO.getActivities().get(index + 1).getStartDate())) {
                     shiftDTO.getActivities().add(index + 1, shiftActivityDTO);
                 }
+            }
+        }
+    }
+
+
+    private void adjustTiming(ShiftDTO shiftDTO, Shift shift) {
+        for (int i = 1; i < shiftDTO.getActivities().size() - 1; i++) {
+            if (!shiftDTO.getActivities().get(i).getActivityId().equals(shift.getActivities().get(i).getActivityId())) {
+                shiftDTO.getActivities().get(i - 1).setEndDate(shift.getActivities().get(i).getStartDate());
+                break;
             }
         }
     }
@@ -142,7 +153,7 @@ public class AutoFillGapSettingsService {
             switch (autoFillGapSettingsRule) {
                 case RULES_AS_PER_STAFF_NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE_ALL_PHASE1:
                 case RULES_AS_PER_MANAGEMENT_NON_PRODUCTIVE_TYPE_ON_BOTH_SIDE_ALL_PHASE1:
-                    shiftActivityDTO= new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), beforeGap.getActivityId(), null);
+                    shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), beforeGap.getActivityId(), null);
             }
         }
         return shiftActivityDTO;
@@ -196,7 +207,7 @@ public class AutoFillGapSettingsService {
                         break;
                     }
                 case RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_REAL_TIME_PHASE1:
-                    activityId=afterGap.getActivity().getActivityPriority().getSequence()<beforeGap.getActivity().getActivityPriority().getSequence()?afterGap.getActivityId():beforeGap.getActivityId();
+                    activityId = afterGap.getActivity().getActivityPriority().getSequence() < beforeGap.getActivity().getActivityPriority().getSequence() ? afterGap.getActivityId() : beforeGap.getActivityId();
                     shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
                     break;
                 default:
@@ -344,7 +355,6 @@ public class AutoFillGapSettingsService {
         }
         return shiftActivityDTO;
     }
-
 
 
     private Map<BigInteger, StaffingLevelActivityWithDuration> updateStaffingLevelDetails(List<ActivityWrapper> activityDTOList, ShiftActivityDTO[] activities, Phase phase, Map<BigInteger, ActivityWrapper> activityWrapperMap) {

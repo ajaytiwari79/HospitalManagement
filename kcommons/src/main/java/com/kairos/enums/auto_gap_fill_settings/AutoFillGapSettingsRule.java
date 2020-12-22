@@ -30,7 +30,7 @@ public enum AutoFillGapSettingsRule {
     RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE2("Fill the gap with the parent activities planned in the shift when atleast one activity is solving complete/partial understaffing."),
     RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE3("Check for the parent activities assigned to the staff other than the planned activities that solves maximum duration. If more than one solves maximum duration then pick the one with highest rank as per unit."),
     RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE4("Do not allow to delete the activity when all of the assigned activities filling the gap would only create overstaffing."),
-    RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE5("Fill the gap with the highest ranked productive activity assigned to the staff in subject (even if it is causing overstaffing or breaking continuity)"),
+    dRULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE5("Fill the gap with the highest ranked productive activity assigned to the staff in subject (even if it is causing overstaffing or breaking continuity)"),
     RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REAL_TIME_PHASE1("In this case, fill the gap with the activity assigned to the staff of highest rank as per unit."),
     RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_REQUEST_PHASE1("The productive type of activity would cover up the gap."),
     RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE1("The productive type of activity would cover up the gap if it has partial or complete understaffing."),
