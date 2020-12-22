@@ -1,8 +1,10 @@
 package com.kairos.dto.user.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
@@ -12,12 +14,14 @@ import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.utils.CPRUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -64,6 +68,10 @@ public class StaffAdditionalInfoDTO {
     private boolean nightWorker;
     private StaffStatusEnum currentStatus;
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
+    private OrganizationTypeDTO organizationType;
+    private OrganizationTypeDTO organizationSubType;
+    private Set<BigInteger> mainTeamActivities;
+    private List<TeamDTO> teamsData;
 
     public StaffAdditionalInfoDTO(String cprNumber, SeniorAndChildCareDaysDTO seniorAndChildCareDays) {
         this.cprNumber = cprNumber;

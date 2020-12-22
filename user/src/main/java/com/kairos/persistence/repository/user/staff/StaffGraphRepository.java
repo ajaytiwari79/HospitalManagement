@@ -57,7 +57,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "OPTIONAL MATCH (staff)-[:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skills:Skill{isEnabled:true}) WITH staff,COLLECT(id(skills)) AS skills,organization,user" +
             " OPTIONAL MATCH (staff)-[:" + HAS_CHILDREN + "]->(staffChildDetail:StaffChildDetail) WITH staff,skills,collect(staffChildDetail) AS staffChildDetails,organization,user" +
             " OPTIONAL MATCH (teams:Team)-[:" + TEAM_HAS_MEMBER + "{isEnabled:true}]->(staff) WITH staff,skills,COLLECT(id(teams)) AS teams,organization,user,staffChildDetails" +
-            " RETURN id(staff) AS id,staff.firstName+\" \"+staff.lastName AS name,staff.currentStatus  AS currentStatus,staff.profilePic AS profilePic,teams,skills,id(organization) AS unitId,id(user) AS staffUserId,user.cprNumber AS cprNumber,staffChildDetails order by name")
+            " RETURN id(staff) AS id,staff.firstName+\" \"+staff.lastName AS name,staff.currentStatus  AS currentStatus,mainTeamActivities AS mainTeamActivities,staff.profilePic AS profilePic,teams,skills,id(organization) AS unitId,id(user) AS staffUserId,user.cprNumber AS cprNumber,staffChildDetails order by name")
     StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndEmploymentId(long employmentId);
 
 
@@ -74,9 +74,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) WITH staff,organization,user " +
             "OPTIONAL MATCH (staff)-[skillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skills:Skill{isEnabled:true}) WHERE DATE(skillRel.startDate) <=DATE({3}) AND (skillRel.endDate IS NULL OR DATE(skillRel.endDate) >= DATE({3}) )  WITH staff,COLLECT(DISTINCT{skillId:id(skills),skillLevel:skillRel.skillLevel}) AS skillLevelDTOS,organization,user" +
             " OPTIONAL MATCH (staff)-[:" + HAS_CHILDREN + "]->(staffChildDetail:StaffChildDetail) WITH staff,skillLevelDTOS,collect(staffChildDetail) AS staffChildDetails,organization,user " +
-            " OPTIONAL MATCH (teams:Team)-[:" + TEAM_HAS_MEMBER + "{isEnabled:true}]->(staff) WITH staff,skillLevelDTOS,collect(id(teams)) AS teams,organization,user,staffChildDetails" +
-            " OPTIONAL MATCH (staff)-[:" + BELONGS_TO_TAGS + "]->(tag:Tag) WITH staff,skillLevelDTOS,staffChildDetails,teams,organization,user,COLLECT(tag) AS tags " +
-            " RETURN id(staff) AS id,staff.firstName+\" \"+staff.lastName AS name,staff.profilePic AS profilePic,teams,skillLevelDTOS,id(organization) AS unitId,id(user) AS staffUserId,user.cprNumber AS cprNumber,staffChildDetails,tags order by name")
+            " OPTIONAL MATCH (teams:Team)-[teamRel:" + TEAM_HAS_MEMBER + "{isEnabled:true}]->(staff) WITH staff,skillLevelDTOS,collect(id(teams)) AS teams,organization,user,staffChildDetails,COLLECT(DISTINCT{id:id(teams),teamType:teamRel.teamType,sequence:teamRel.sequence,activityIds:teams.activityIds}) AS teamsData" +
+            " OPTIONAL MATCH (staff)-[:" + BELONGS_TO_TAGS + "]->(tag:Tag) WITH staff,skillLevelDTOS,staffChildDetails,teams,teamsData,organization,user,COLLECT(tag) AS tags " +
+            " RETURN id(staff) AS id,staff.firstName+\" \"+staff.lastName AS name,staff.profilePic AS profilePic,teams,skillLevelDTOS,teamsData,id(organization) AS unitId,id(user) AS staffUserId,user.cprNumber AS cprNumber,staffChildDetails,tags order by name")
     StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndStaffId(long unitId, long staffId,long employmentId,String startDate );
 
     @Query("MATCH (staff:Staff) WHERE id(staff) IN {1}  " +

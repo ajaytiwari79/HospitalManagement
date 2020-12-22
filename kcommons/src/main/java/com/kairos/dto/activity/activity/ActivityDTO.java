@@ -70,10 +70,13 @@ public class ActivityDTO  {
     private Set<BigInteger> childActivityIds;
     private BigInteger activityPriorityId;
     private int activitySequence;
+    private int staffTeamSequence;
+    private boolean mainTeam;
     private BigInteger countryParentId;
     private Long teamId;
     @Builder.Default
     private Map<String, TranslationInfo> translations = new HashMap<>();
+
 
 
     public ActivityDTO() {
