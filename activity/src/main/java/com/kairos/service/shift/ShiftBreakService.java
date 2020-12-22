@@ -87,6 +87,11 @@ public class ShiftBreakService implements KPIService {
          phase = phase!=null?phase:phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
         if ((TIME_AND_ATTENDANCE.equals(phase.getName()) || REALTIME.equals(phase.getName())) && isCollectionNotEmpty(shift.getBreakActivities())) {
             validateBreakDuration(shift);
+            shift.getBreakActivities().forEach(shiftActivity -> {
+                if(isNull(shiftActivity.getId())) {
+                    shiftActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
+                }
+            });
             return shift.getBreakActivities();
             //return getBreakActivity(shift, dbShift, activityWrapperMap);
         }

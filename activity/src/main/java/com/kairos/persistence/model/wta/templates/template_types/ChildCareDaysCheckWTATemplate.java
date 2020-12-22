@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getCareDays;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByActivity;
 
 /**
@@ -92,11 +93,9 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
         long leaveCount = 0L;
         if (isCollectionNotEmpty(staffChildAges)) {
             for (Integer staffChildAge : staffChildAges) {
-                for (CareDaysDTO careDaysDTO : careDaysDTOS) {
-                    if (staffChildAge >= careDaysDTO.getFrom() && isNull(careDaysDTO.getTo()) || staffChildAge < careDaysDTO.getTo()) {
-                        leaveCount += careDaysDTO.getLeavesAllowed();
-                        break;
-                    }
+                CareDaysDTO careDaysDTO = getCareDays(careDaysDTOS,staffChildAge);
+                if(isNotNull(careDaysDTO)){
+                    leaveCount+=careDaysDTO.getLeavesAllowed();
                 }
             }
         }
