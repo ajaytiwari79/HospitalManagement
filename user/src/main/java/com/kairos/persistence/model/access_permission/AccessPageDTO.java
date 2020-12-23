@@ -1,15 +1,19 @@
 package com.kairos.persistence.model.access_permission;
 
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
+import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
 
 /**
@@ -38,4 +42,13 @@ public class AccessPageDTO {
     private String helperText;
     private String url;
     private List<AccessPageDTO> children = new ArrayList<>();
+
+    public String getName(){
+        boolean isNullOrEmptyString = isNotNull(translatedNames) && isNotNull(translatedNames.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase())) && !StringUtils.isEmpty(translatedNames.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase()).trim());
+        if(isNullOrEmptyString) {
+            return translatedNames.get(UserContext.getUserDetails().getUserLanguage().getName().toLowerCase());
+        }else {
+            return name;
+        }
+    }
 }

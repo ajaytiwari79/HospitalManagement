@@ -1065,7 +1065,7 @@ public class ShiftValidatorService {
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
                 if ((WORKING_TYPE.toString().equals(activity.getTimeType())) && shiftInterval.overlaps(existingShiftInterval)) {
                     shiftOverlapWithShiftId = shiftWithActivityDTO.getId();
-                } else if (CommonConstants.FULL_WEEK.equals(activity.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || FULL_DAY.equals(activity.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
+                } else if (CommonConstants.FULL_WEEK.equals(activity.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(activity.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime())) {
                     existingShiftInterval = new DateTimeInterval(getStartOfDay(shiftWithActivityDTO.getStartDate()), getEndOfDay(shiftWithActivityDTO.getEndDate()));
                     if (shiftInterval.overlaps(existingShiftInterval)) {
                         shiftOverlapWithShiftId = shiftWithActivityDTO.getId();

@@ -188,6 +188,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_PLANNEDTIME_LESS = "message.shift.plannedTime.less";
     public static final String MESSAGE_SHIFT_STATUS_ADDED = "message.shift.status.added";
     public static final String ERROR_SHIFT_STATUS = "error.shift.status";
+    public static final String ERROR_SHIFT_CREATION = "error.shift.creation";
     public static final String ACCESS_GROUP_NOT_MATCHED = "access.group.not.matched";
     public static final String ACTIVITY_STATUS_INVALID = "activity.status.not.invalid";
     public static final String ERROR_START_TIME_GREATER_THAN_EARLIEST_TIME = "error.start_time.greater_than.earliest_time";
@@ -398,6 +399,10 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_CTA_VALUE ="message.cta.value";
     public static final String ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL = "error.value.changed.publish.date.null";
     public static final String MESSAGE_FULLWEEK_STARTDAY_NOTFOUND = "message.fullWeek.startDay.notFound";
-
-
+    public static final String ERROR_AUTO_FILL_GAP_SETTING_NOT_FOUND = "error.auto.fill.gap.setting.not.found";
+    public static final String ERROR_DUPLICATE_AUTO_FILL_GAP_SETTING_FOUND = "error.duplicate.auto.fill.gap.setting.found";
+    public static final String ERROR_ALRADEY_AUTO_FILL_GAP_SETTING_PUBLISH = "error.already.auto.fill.gap.setting.publish";
+    public static final String ERROR_START_DATE_REQUIRED = "error.start.date.required";
+    public static final String ERROR_START_END_DATE_CANNOT_PAST_DATE = "error.start.end.date.cannot.past.date";
+    public static final String ERROR_START_DATE_CANNOT_GREATER_THAN_END_DATE = "error.start.date.not.grater.than.end.date";
 }

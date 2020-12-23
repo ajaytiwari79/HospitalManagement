@@ -603,7 +603,7 @@ public class ShiftService extends MongoBaseService {
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(shiftDTO.getShiftDate(), shiftDTO.getStaffId(), shiftDTO.getEmploymentId());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shiftDTO.getStartDate(), shiftDTO.getEndDate());
-        gapSettingsService.adjustGapByActivity(shiftDTO,shift,phase,staffAdditionalInfoDTO);
+        //gapSettingsService.adjustGapByActivity(shiftDTO,shift,phase,staffAdditionalInfoDTO);
         Shift oldShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
         boolean ruleCheckRequired = shift.isShiftUpdated(ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class));
         Date currentShiftStartDate = shift.getStartDate();
