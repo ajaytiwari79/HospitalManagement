@@ -5,6 +5,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftActionType;
@@ -28,6 +29,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.dashboard.SickService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -89,6 +91,8 @@ public class ShiftSickService extends MongoBaseService {
     @Inject
     private ShiftDetailsService shiftDetailsService;
     @Inject private SickService sickService;
+    @Inject
+    private DayTypeService dayTypeService;
 
 
     public List<ShiftWithViolatedInfoDTO> createSicknessShiftsOfStaff(ShiftDTO shiftDTO,StaffAdditionalInfoDTO staffAdditionalInfoDTO,ActivityWrapper activityWrapper) {
@@ -227,6 +231,7 @@ public class ShiftSickService extends MongoBaseService {
         shiftService.createShifts(activity.getUnitId(),ObjectMapperUtils.copyCollectionPropertiesByMapper(allShiftsToUpdate,ShiftDTO.class),ShiftActionType.SAVE);
         if(isCollectionNotEmpty(allShiftsToDelete)) {
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(allShiftsToDelete.get(0).getStartDate()), allShiftsToDelete.get(0).getStaffId(), allShiftsToDelete.get(0).getEmploymentId());
+            staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
             shiftService.deleteShifts(new ArrayList<>(), allShiftsToDelete, staffAdditionalInfoDTO);
             shiftMongoRepository.saveEntities(allShiftsToDelete);
         }
