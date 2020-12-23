@@ -46,7 +46,7 @@ public class AutoFillGapSettingsController {
     }
 
     @ApiOperation("Delete gap settings for country")
-    @DeleteMapping(COUNTRY_URL + AUTO_FILL_GAP_SETTINGS_URL + "{autoFillGapSettingsId}")
+    @DeleteMapping(COUNTRY_URL + AUTO_FILL_GAP_SETTINGS_URL + "/{autoFillGapSettingsId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteAutoFillGapSettingsForCountry(@PathVariable BigInteger autoFillGapSettingsId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, autoFillGapSettingsService.deleteAutoFillGapSettings(autoFillGapSettingsId));
@@ -73,7 +73,7 @@ public class AutoFillGapSettingsController {
     }
 
     @ApiOperation("Delete gap settings for unit")
-    @DeleteMapping(UNIT_URL + AUTO_FILL_GAP_SETTINGS_URL + "{autoFillGapSettingsId}")
+    @DeleteMapping(UNIT_URL + AUTO_FILL_GAP_SETTINGS_URL + "/{autoFillGapSettingsId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteAutoFillGapSettingsForUnit(@PathVariable BigInteger autoFillGapSettingsId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, autoFillGapSettingsService.deleteAutoFillGapSettings(autoFillGapSettingsId));
