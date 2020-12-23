@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.activity;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
@@ -335,6 +336,28 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(customAgregationForCompositeActivity);
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
+    }
+
+    @Override
+    public List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ID).in(activityIds).and(DELETED).is(false)),
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE_INFO),
+                match(Criteria.where("timeTypeInfo.partOfTeam").is(false)),
+                group().push("id").as("activityIds"),
+                lookup("staffActivitySetting","activityIds","activityId","staff"),
+                unwind("staff",true),
+                group("activityIds").push("staff.staffId").as("staffIds")
+        );
+        List<Map> result = mongoTemplate.aggregate(aggregation, Activity.class, Map.class).getMappedResults();
+        List<BigInteger> nonProductiveTypeActivityIds = null;
+        List<Long> staffIds = null;
+        if(isCollectionNotEmpty(result)){
+            Map<String,List> stringListMap = result.get(0);
+             nonProductiveTypeActivityIds = (List<BigInteger>)ObjectMapperUtils.copyCollectionPropertiesByMapper(stringListMap.get("_id"),BigInteger.class);
+            staffIds = stringListMap.get("staffIds");
+        }
+        return new List[]{nonProductiveTypeActivityIds,staffIds};
     }
 
     //Ignorecase

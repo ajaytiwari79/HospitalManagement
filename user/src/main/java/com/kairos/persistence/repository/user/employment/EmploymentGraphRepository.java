@@ -26,7 +26,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employment, Long> {
 
 
-    @Query("MATCH (employment:Employment{deleted:false}) where id(employment)={0} \n" +
+    @Query("MATCH (employment:Employment{deleted:false}) where id(employment) in {0} \n" +
             "MATCH (employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)\n" +
             "MATCH(employment)-[:"+HAS_EMPLOYMENT_LINES+"]-(employmentLine:EmploymentLine) \n" +
             "MATCH(employmentLine)-[employmentRel:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) \n" +
@@ -37,7 +37,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "CASE employmentLine when null then [] else COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),startDate:employmentLine.startDate,endDate:employmentLine.endDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60), hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,employmentType:{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)},fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes}) end as employmentLines\n" +
             "RETURN  DISTINCT expertise as expertise,employment.startDate as startDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,employment.endDate as endDate, id(employment) as id,employment.lastWorkingDate as lastWorkingDate,employment.employmentSubType as employmentSubType,employment.published as published, appliedFunctions as appliedFunctions,collect(employmentLines[0]) as employmentLines")
-    EmploymentQueryResult getEmploymentById(Long employmentId);
+    List<EmploymentQueryResult> getEmploymentDetailsByIds(List<Long> employmentIds);
 
     @Query("MATCH(staff:Staff{deleted:false})-[:"+BELONGS_TO+"]-(user:User) WHERE id(staff) IN {2}\n" +
             "MATCH (expertise:Expertise) where id(expertise)={1}\n" +

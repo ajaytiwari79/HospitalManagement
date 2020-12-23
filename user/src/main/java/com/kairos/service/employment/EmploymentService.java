@@ -658,28 +658,33 @@ public class EmploymentService {
     }
 
     // since we have employmentLine are on date so we are matching and might we wont have any active position line on date.
-    public com.kairos.dto.activity.shift.StaffEmploymentDetails getEmploymentDetails(Long employmentId) {
-        EmploymentQueryResult employment = employmentGraphRepository.getEmploymentById(employmentId);
-        com.kairos.dto.activity.shift.StaffEmploymentDetails employmentDetails = null;
-        if (employment != null) {
-            employmentDetails = convertEmploymentObject(employment);
-            List<EmploymentLinesQueryResult> employmentLinesQueryResults = employmentGraphRepository.findFunctionalHourlyCost(Arrays.asList(employmentId));
-            Map<Long, BigDecimal> hourlyCostMap = employmentLinesQueryResults.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
-            ExpertisePlannedTimeQueryResult expertisePlannedTimeQueryResult = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(employmentDetails.getExpertise().getId(),
-                    employmentDetails.getEmploymentType().getId());
-            if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
-                employmentDetails.setExcludedPlannedTime(expertisePlannedTimeQueryResult.getExcludedPlannedTime());
-                employmentDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
-            }
-            employmentDetails.getEmploymentLines().forEach(employmentLinesDTO -> {
-                if (hourlyCostMap.containsKey(employmentLinesDTO.getId())) {
-                    BigDecimal hourlyCost = employmentLinesDTO.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLinesDTO.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLinesDTO.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
-                    employmentLinesDTO.setHourlyCost(hourlyCost);
+    public List<com.kairos.dto.activity.shift.StaffEmploymentDetails> getEmploymentDetails(List<Long> employmentIds,boolean includePlannedTimeDetails) {
+        List<EmploymentQueryResult> employments = employmentGraphRepository.getEmploymentDetailsByIds(employmentIds);
+        List<com.kairos.dto.activity.shift.StaffEmploymentDetails> employmentDetails = new ArrayList<>();
+        List<EmploymentLinesQueryResult> employmentLinesQueryResults = employmentGraphRepository.findFunctionalHourlyCost(employmentIds);
+        Map<Long, BigDecimal> hourlyCostMap = employmentLinesQueryResults.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
+        for (EmploymentQueryResult employment : employments) {
+            if (employment != null) {
+                com.kairos.dto.activity.shift.StaffEmploymentDetails employmentDetail = convertEmploymentObject(employment);
+                if(includePlannedTimeDetails){
+                    ExpertisePlannedTimeQueryResult expertisePlannedTimeQueryResult = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(employmentDetail.getExpertise().getId(),
+                            employmentDetail.getEmploymentType().getId());
+                    if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
+                        employmentDetail.setExcludedPlannedTime(expertisePlannedTimeQueryResult.getExcludedPlannedTime());
+                        employmentDetail.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
+                    }
                 }
-            });
-            EmploymentLinesQueryResult employmentLinesQueryResult = ObjectMapperUtils.copyPropertiesByMapper(employment.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
-            BigDecimal hourlyCost = employmentLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLinesQueryResult.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLinesQueryResult.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
-            employmentDetails.setHourlyCost(hourlyCost);
+                employmentDetail.getEmploymentLines().forEach(employmentLinesDTO -> {
+                    if (hourlyCostMap.containsKey(employmentLinesDTO.getId())) {
+                        BigDecimal hourlyCost = employmentLinesDTO.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLinesDTO.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLinesDTO.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
+                        employmentLinesDTO.setHourlyCost(hourlyCost);
+                    }
+                });
+                EmploymentLinesQueryResult employmentLinesQueryResult = ObjectMapperUtils.copyPropertiesByMapper(employment.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
+                BigDecimal hourlyCost = employmentLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLinesQueryResult.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLinesQueryResult.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
+                employmentDetail.setHourlyCost(hourlyCost);
+                employmentDetails.add(employmentDetail);
+            }
         }
         return employmentDetails;
     }

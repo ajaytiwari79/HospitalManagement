@@ -13,6 +13,7 @@ import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ViewType;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.open_shift.OpenShiftService;
 import com.kairos.service.shift.*;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -63,6 +64,8 @@ public class ShiftController {
     private RequestAbsenceService requestAbsenceService;
     @Inject
     private ShiftBreakService shiftBreakService;
+    @Inject
+    private OpenShiftService openShiftService;
 
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
@@ -166,7 +169,7 @@ public class ShiftController {
                                                                                                 Long employmentEndDate, @PathVariable Long staffId,
                                                                                         @PathVariable Long unitId) {
 
-        shiftService.deleteShiftsAndOpenShiftsOnEmploymentEnd(staffId, DateUtils.getLocalDatetimeFromLong(employmentEndDate));
+        openShiftService.deleteShiftsAndOpenShiftsOnEmploymentEnd(staffId, DateUtils.getLocalDatetimeFromLong(employmentEndDate));
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
 
     }

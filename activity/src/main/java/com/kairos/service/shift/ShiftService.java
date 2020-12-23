@@ -32,6 +32,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
@@ -593,10 +594,7 @@ public class ShiftService extends MongoBaseService {
 
     public List<ShiftWithViolatedInfoDTO> updateShift(ShiftDTO shiftDTO, boolean byTAndAView, boolean validatedByPlanner, ShiftActionType shiftAction) {
         Long functionId = shiftDTO.getFunctionId();
-        Shift shift = shiftMongoRepository.findByIdAndDeletedFalse(byTAndAView ? shiftDTO.getShiftId() : shiftDTO.getId());
-        if (!Optional.ofNullable(shift).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_ID, shiftDTO.getId());
-        }
+        Shift shift = findOneByShiftId(byTAndAView ? shiftDTO.getShiftId() : shiftDTO.getId());
         if (shift.isDraft() && ShiftActionType.CANCEL.equals(shiftAction)) {
             shiftMongoRepository.delete(shift);
             return new ArrayList<>();
@@ -1027,18 +1025,6 @@ public class ShiftService extends MongoBaseService {
         });
     }
 
-    public void deleteShiftsAndOpenShiftsOnEmploymentEnd(Long staffId, LocalDateTime employmentEndDate) {
-        shiftMongoRepository.deleteShiftsAfterDate(staffId, employmentEndDate);
-        List<OpenShift> openShifts = openShiftMongoRepository.findAllOpenShiftsByInterestedStaff(staffId, employmentEndDate);
-        if (!openShifts.isEmpty()) {
-            for (OpenShift openShift : openShifts) {
-                openShift.getInterestedStaff().remove(staffId);
-                openShift.getAssignedStaff().remove(staffId);
-            }
-            openShiftMongoRepository.saveEntities(openShifts);
-        }
-    }
-
     public void deleteShiftsAfterEmploymentEndDate(Long employmentId, LocalDate employmentEndDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         List<Shift> shiftList = shiftMongoRepository.findAllShiftsByEmploymentIdAfterDate(employmentId, asDate(employmentEndDate));
         timeBankService.updateDailyTimebankForShifts(null, employmentId, staffAdditionalInfoDTO, shiftList);
@@ -1153,7 +1139,6 @@ public class ShiftService extends MongoBaseService {
 
     //Description this method will fetch all shifts / open shifts and shift states based on the above request param
     public Object getAllShiftAndStates(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, ViewType viewType, ShiftFilterParam shiftFilterParam, Long expertiseId, StaffFilterDTO staffFilterDTO) {
-
         Object object = null;
         if (endDate != null) {
             endDate = endDate.plusDays(1);
@@ -1237,136 +1222,19 @@ public class ShiftService extends MongoBaseService {
         return shiftList;
     }
 
+    public Shift findOneByShiftId(BigInteger shiftId){
+        Optional<Shift> shiftOptional = shiftMongoRepository.findById(shiftId);
+        if(!shiftOptional.isPresent()){
+            exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_ID, shiftId);
+        }
+        return shiftOptional.get();
+    }
+
     public List<Shift> findShiftBetweenDurationByStaffId(Long staffId, Date startDate, Date endDate){
         return shiftMongoRepository.findShiftBetweenDurationByStaffId(staffId, startDate, endDate);
     }
 
-    @Getter
-    public class ShiftHelper {
-        private Map<Long, StaffAdditionalInfoDTO> employmentIdAndstaffAdditionalInfoMap = new HashMap<>();
-        private Map<BigInteger, ActivityWrapper> activityWrapperMap = new HashMap<>();
-        private Map<LocalDate, PlanningPeriod> planningPeriodMap = new HashMap<>();
-        private Long unitId;
-        private Map<String, WTAQueryResultDTO> workTimeAgreementMap = new HashMap<>();
-        private Map<String, CTAResponseDTO> collectiveTimeAgreementMap = new HashMap<>();
-        private Map<LocalDate, Phase> phaseMap = new HashMap<>();
-        private Set<BigInteger> absenceReasonCodeIds;
-        private Map<LocalDate, StaffingLevel> staffingLevelMap = new HashMap<>();
-        private ShiftActionType shiftActionType;
-
-        public ShiftHelper(ShiftDTO shiftDTO, Shift oldShift, ShiftActionType shiftActionType) {
-            LocalDate localDate = shiftDTO.getShiftDate();
-            this.unitId = shiftDTO.getUnitId();
-            this.shiftActionType = shiftActionType;
-            updateAbsenceResonCodeIds(shiftDTO);
-            updateActivityWrapperMap(newArrayList(shiftDTO), oldShift);
-            updateShiftHelperByDetails(shiftDTO.getEmploymentId(), shiftDTO.getStaffId(), localDate);
-            getStaffingLevel(localDate);
-            if (isNotNull(oldShift) && !localDate.equals(asLocalDate(oldShift.getStartDate()))) {
-                localDate = asLocalDate(oldShift.getStartDate());
-                updateShiftHelperByDetails(oldShift.getEmploymentId(), oldShift.getStaffId(), localDate);
-                getStaffingLevel(localDate);
-            }
-
-        }
-
-        private void updateAbsenceResonCodeIds(ShiftDTO shiftDTO) {
-            absenceReasonCodeIds = shiftDTO.getActivities().stream().filter(shiftActivity -> isNotNull(shiftActivity.getAbsenceReasonCodeId())).map(ShiftActivityDTO::getAbsenceReasonCodeId).collect(Collectors.toSet());
-        }
-
-        public void updateShiftHelperByDetails(Long employmentId, Long staffId, LocalDate localDate) {
-            getPlanningPeriod(localDate);
-            updateWorkTimeAgreement(employmentId, localDate);
-            updateStaffAdditionalInfoDTO(employmentId, staffId, localDate);
-        }
-
-        public PlanningPeriod getPlanningPeriod(LocalDate localDate) {
-            if (!this.planningPeriodMap.containsKey(localDate)) {
-                PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(this.unitId, localDate);
-                if (isNull(planningPeriod)) {
-                    exceptionService.actionNotPermittedException(MESSAGE_PERIODSETTING_NOTFOUND);
-                }
-                this.planningPeriodMap.put(localDate, planningPeriod);
-            }
-            return this.planningPeriodMap.get(localDate);
-        }
-
-        public StaffingLevel getStaffingLevel(LocalDate localDate) {
-            if (!this.staffingLevelMap.containsKey(localDate)) {
-                List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateGreaterThanEqualAndCurrentDateLessThanEqualAndDeletedFalseOrderByCurrentDate(this.unitId, asDate(localDate), asDate(localDate));
-                if (CollectionUtils.isEmpty(staffingLevels)) {
-                    exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ABSENT);
-                }
-                this.staffingLevelMap.put(localDate, staffingLevels.get(0));
-            }
-            return this.staffingLevelMap.get(localDate);
-        }
-
-        public void updateStaffAdditionalInfoDTO(Long employmentId, Long staffId, LocalDate localDate) {
-            if (!employmentIdAndstaffAdditionalInfoMap.containsKey(employmentId)) {
-                StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(localDate, staffId, employmentId);
-                updateCTADetailsOfEmployement(localDate, employmentId);
-                employmentIdAndstaffAdditionalInfoMap.put(employmentId, staffAdditionalInfoDTO);
-            }
-        }
-
-        public void updateActivityWrapperMap(List<ShiftDTO> shifts, Shift oldShift) {
-            Set<BigInteger> activityIds = new HashSet<>();
-            for (ShiftDTO shift : shifts) {
-                getActivityIdsByShiftDTO(activityIds, shift);
-            }
-            if (isNotNull(oldShift)) {
-                getActivityIdsByShift(oldShift, activityIds);
-                if (isNotNull(oldShift.getDraftShift())) {
-                    getActivityIdsByShift(oldShift.getDraftShift(), activityIds);
-                }
-            }
-            activityIds.removeIf(activityId -> this.activityWrapperMap.containsKey(activityId));
-            List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
-            activities.forEach(activityWrapper -> this.activityWrapperMap.put(activityWrapper.getActivity().getId(), activityWrapper));
-        }
-
-        public void getActivityIdsByShift(Shift oldShift, Set<BigInteger> activityIds) {
-            activityIds.addAll(oldShift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivity::getActivityId).collect(Collectors.toList()));
-            activityIds.addAll(oldShift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
-            if (isCollectionNotEmpty(oldShift.getBreakActivities())) {
-                activityIds.addAll(oldShift.getBreakActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
-            }
-        }
-
-        public void getActivityIdsByShiftDTO(Set<BigInteger> activityIds, ShiftDTO shiftDTO) {
-            activityIds.addAll(shiftDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
-            activityIds.addAll(shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
-            if (isCollectionNotEmpty(shiftDTO.getBreakActivities())) {
-                activityIds.addAll(shiftDTO.getBreakActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
-            }
-        }
-
-        public void updateWorkTimeAgreement(Long employmentId, LocalDate localDate) {
-            if (!this.collectiveTimeAgreementMap.containsKey(employmentId + "-" + localDate)) {
-                WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDate(employmentId, asDate(localDate));
-                if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
-                    exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
-                }
-                this.workTimeAgreementMap.put(employmentId + "-" + localDate, wtaQueryResultDTO);
-            }
-        }
-
-        public void updateCTADetailsOfEmployement(LocalDate localDate, Long employmentId) {
-            updateCollectiveTimeAgreement(localDate, employmentId);
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = employmentIdAndstaffAdditionalInfoMap.get(employmentId);
-            staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(this.collectiveTimeAgreementMap.get(employmentId + "-" + localDate).getRuleTemplates());
-            setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-        }
-
-        public void updateCollectiveTimeAgreement(LocalDate localDate, Long employmentId) {
-            if (!this.collectiveTimeAgreementMap.containsKey(employmentId + "-" + localDate)) {
-                CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(employmentId, asDate(localDate));
-                if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
-                    exceptionService.dataNotFoundByIdException("error.cta.notFound", localDate);
-                }
-                this.collectiveTimeAgreementMap.put(employmentId + "-" + localDate, ctaResponseDTO);
-            }
-        }
+    public Set<Long> getNotEligibleStaffsForCoverShifts(Date startDate, Date endDate, CoverShiftSetting coverShiftSetting, List<Long> staffIds){
+        return shiftMongoRepository.getNotEligibleStaffsForCoverShifts(startDate,endDate,coverShiftSetting,staffIds);
     }
 }

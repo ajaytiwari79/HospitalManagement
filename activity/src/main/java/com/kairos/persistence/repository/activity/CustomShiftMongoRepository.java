@@ -11,6 +11,7 @@ import com.kairos.enums.FilterType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
+import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.wrapper.ShiftResponseDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
@@ -107,5 +108,6 @@ public interface CustomShiftMongoRepository {
     List<Shift> findShiftByStaffIdsAndDate(List<Long> staffids, Date startDate, Date endDate, StaffFilterDTO staffFilterDTO);
     List<ShiftDTO> findAllShiftsBetweenDuration(Long employmentId, Long staffId, Date startDate, Date endDate, Long unitId,StaffFilterDTO staffFilterDTO);
     <T> List<StaffShiftDetailsDTO> getStaffListFilteredByShiftCriteria(Set<Long> employmentIds, Map<FilterType, Set<T>> values, Long unitId, Date startDate, Date endDate, boolean includeDateComparison, RequiredDataForFilterDTO requiredDataForFilterDTO);
+    Set<Long> getNotEligibleStaffsForCoverShifts(Date startDate, Date endDate, CoverShiftSetting coverShiftSetting, List<Long> staffIds);
 
 }

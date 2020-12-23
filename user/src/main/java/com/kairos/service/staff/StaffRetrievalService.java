@@ -7,6 +7,7 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.activity.shift.FunctionDTO;
+import com.kairos.dto.activity.shift.NotEligibleStaffDataDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
@@ -509,9 +510,10 @@ public class StaffRetrievalService {
         staffAdditionalInfoQueryResult.setOrganizationType(unit.getOrganizationType());
         staffAdditionalInfoQueryResult.setOrganizationSubType(unit.getOrganizationSubTypes().get(0));
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
-        StaffEmploymentDetails employment = employmentService.getEmploymentDetails(employmentId);
+        List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(newArrayList(employmentId), true);
+        StaffEmploymentDetails employment = isCollectionNotEmpty(employmentDetails) ? employmentDetails.get(0) : null;
         if (Optional.ofNullable(employment).isPresent()) {
-            staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeFromCPRNumber(staffAdditionalInfoDTO.getCprNumber()));
+            staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(),shiftDate));
             setFunction(shiftDate, employmentId, staffAdditionalInfoDTO, employment);
             employment.setCountryId(countryId);
             employment.setUnitTimeZone(unit.getTimeZone());
@@ -566,7 +568,8 @@ public class StaffRetrievalService {
     }
 
     public StaffAdditionalInfoDTO getStaffEmploymentData(Long employmentId, Long unitId) {
-        StaffEmploymentDetails employmentDetails = employmentService.getEmploymentDetails(employmentId);
+        List<StaffEmploymentDetails> staffEmploymentDetails = employmentService.getEmploymentDetails(newArrayList(employmentId), true);
+        StaffEmploymentDetails employmentDetails = isCollectionNotEmpty(staffEmploymentDetails) ? staffEmploymentDetails.get(0) : null;
         if (!Optional.ofNullable(employmentDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ID_NOTEXIST, employmentId);
         }
@@ -930,5 +933,15 @@ public class StaffRetrievalService {
         organizationBaseEntity.setTranslations(translations);
         organizationBaseRepository.save(organizationBaseEntity);
         return organizationBaseEntity.getTranslatedData();
+    }
+
+    public Object getEligibleStaffsForCoverShifts(Long unitId,NotEligibleStaffDataDTO notEligibleStaffDataDTO) {
+            /*StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(organizationId, staffId, employmentId, startDate.toString());
+            if (isNull(staffAdditionalInfoQueryResult)) {
+                exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNIT_EMPLOYMENT_NOTFOUND);
+            }
+            User user=userGraphRepository.findOne(UserContext.getUserDetails().getId());
+            staffAdditionalInfoQueryResult.setUnitWiseAccessRole(user.getUnitWiseAccessRole());*/
+            return staffGraphRepository.getEligibleStaffsForCoverShift(unitId,notEligibleStaffDataDTO);
     }
 }
