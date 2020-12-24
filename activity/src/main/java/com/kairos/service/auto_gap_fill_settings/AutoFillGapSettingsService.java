@@ -74,7 +74,7 @@ public class AutoFillGapSettingsService {
             validateGapSetting(autoFillGapSettingsDTO, true, forCountry);
             autoFillGapSettingsDTO.setPublished(true);
         } else {
-            if(autoFillGapSettingsDTO.isPublished()){
+            if(autoFillGapSettings.isPublished()){
                 AutoFillGapSettings childAutoFillGapSetting = autoFillGapSettingsMongoRepository.getGapSettingsByParentId(autoFillGapSettingsDTO.getId());
                 autoFillGapSettings.setId(isNotNull(childAutoFillGapSetting) ? childAutoFillGapSetting.getId() : null);
                 autoFillGapSettingsDTO.setParentId(autoFillGapSettingsDTO.getId());
