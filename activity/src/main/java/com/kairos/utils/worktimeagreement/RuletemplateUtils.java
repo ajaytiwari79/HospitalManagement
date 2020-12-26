@@ -3,6 +3,7 @@ package com.kairos.utils.worktimeagreement;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
@@ -53,10 +54,16 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 public class RuletemplateUtils {
 
 
-    public static List<ShiftWithActivityDTO> getShiftsByIntervalAndActivityIds(Activity activity, Date shiftStartDate, List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds, Map<BigInteger, DayTypeDTO> dayTypeMap) {
+    public static List<ShiftWithActivityDTO> getShiftsByIntervalAndActivityIds(Activity activity, ShiftWithActivityDTO shiftwithactivitydto, List<ShiftWithActivityDTO> shifts, List<BigInteger> activitieIds, Map<BigInteger, DayTypeDTO> dayTypeMap) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
-        LocalDate shiftStartLocalDate = DateUtils.asLocalDate(shiftStartDate);
-        Optional<CutOffInterval> cutOffIntervalOptional = activity.getActivityRulesSettings().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate)) && (interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getEndDate().isEqual(shiftStartLocalDate)))).findAny();
+        LocalDate shiftStartLocalDate = DateUtils.asLocalDate(shiftwithactivitydto.getStartDate());
+        Optional<CutOffInterval> cutOffIntervalOptional;
+        ActivityDTO activityDTO = shiftwithactivitydto.getActivities().get(0).getActivity();
+        if(isNull(activity)){
+            cutOffIntervalOptional = activityDTO.getActivityRulesSettings().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate)) && (interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getEndDate().isEqual(shiftStartLocalDate)))).findAny();
+        }else {
+            cutOffIntervalOptional = activity.getActivityRulesSettings().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftStartLocalDate) || interval.getStartDate().isEqual(shiftStartLocalDate)) && (interval.getEndDate().isAfter(shiftStartLocalDate) || interval.getEndDate().isEqual(shiftStartLocalDate)))).findAny();
+        }
         if (cutOffIntervalOptional.isPresent()) {
             getShiftsByCutOff(shifts, activitieIds, updatedShifts, cutOffIntervalOptional);
         }
@@ -64,7 +71,8 @@ public class RuletemplateUtils {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = new ArrayList<>();
         for(ShiftWithActivityDTO shiftWithActivityDTO :updatedShifts){
             for(ShiftActivityDTO shiftActivityDTO :shiftWithActivityDTO.getActivities()) {
-                isDayTypeExist =isDayTypeValid(shiftActivityDTO.getStartDate(), activity.getActivityTimeCalculationSettings().getDayTypes(),dayTypeMap);
+                List<BigInteger> daytypeIds = isNull(activity) ? activityDTO.getActivityTimeCalculationSettings().getDayTypes() : activity.getActivityTimeCalculationSettings().getDayTypes();
+                isDayTypeExist =isDayTypeValid(shiftActivityDTO.getStartDate(), daytypeIds,dayTypeMap);
                 if (isDayTypeExist) {
                     shiftWithActivityDTOS.add(shiftWithActivityDTO);
                 }
@@ -468,13 +476,13 @@ public class RuletemplateUtils {
 
     private static DateTimeInterval getDateTimeIntervalByChildCareDaysCheckWTATemplate(ShiftWithActivityDTO shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, DateTimeInterval interval, ChildCareDaysCheckWTATemplate ruleTemplate) {
         ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = ruleTemplate;
-        interval = interval.addInterval(getIntervalByActivity(activityWrapperMap, shift.getStartDate(), childCareDaysCheckWTATemplate.getActivityIds()));
+        interval = interval.addInterval(getIntervalByActivity(activityWrapperMap, shift, childCareDaysCheckWTATemplate.getActivityIds()));
         return interval;
     }
 
     private static DateTimeInterval getDateTimeIntervalBySeniorDaysPerYearWTATemplate(ShiftWithActivityDTO shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, DateTimeInterval interval, SeniorDaysPerYearWTATemplate ruleTemplate) {
         SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = ruleTemplate;
-        interval = interval.addInterval(getIntervalByActivity(activityWrapperMap, shift.getStartDate(), seniorDaysPerYearWTATemplate.getActivityIds()));
+        interval = interval.addInterval(getIntervalByActivity(activityWrapperMap, shift, seniorDaysPerYearWTATemplate.getActivityIds()));
         return interval;
     }
 
@@ -562,13 +570,18 @@ public class RuletemplateUtils {
         return dateTimeInterval;
     }
 
-    public static DateTimeInterval getIntervalByActivity(Map<BigInteger, ActivityWrapper> activityWrapperMap, Date shiftStartDate, List<BigInteger> activityIds) {
-        LocalDate shiftDate = DateUtils.asLocalDate(shiftStartDate);
-        DateTimeInterval dateTimeInterval = new DateTimeInterval(shiftStartDate, DateUtils.asDate(shiftDate.plusDays(1)));
+    public static DateTimeInterval getIntervalByActivity(Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shiftWithActivityDTO, List<BigInteger> activityIds) {
+        LocalDate shiftDate = DateUtils.asLocalDate(shiftWithActivityDTO.getStartDate());
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(shiftWithActivityDTO.getStartDate(), DateUtils.asDate(shiftDate.plusDays(1)));
         for (BigInteger activityId : activityIds) {
-            if (activityWrapperMap.containsKey(activityId)) {
+            if (activityWrapperMap.containsKey(activityId) || shiftWithActivityDTO.getActivities().stream().anyMatch(shiftActivityDTO -> shiftActivityDTO.getActivityId().equals(activityIds))) {
                 Activity activity = activityWrapperMap.get(activityId).getActivity();
-                dateTimeInterval = getCutoffInterval(activity.getActivityRulesSettings().getCutOffStartFrom(), activity.getActivityRulesSettings().getCutOffIntervalUnit(), activity.getActivityRulesSettings().getCutOffdayValue(),shiftStartDate);
+                if(isNull(activity)){
+                    ActivityDTO activityDTO = shiftWithActivityDTO.getActivities().stream().filter(shiftActivityDTO -> shiftActivityDTO.getActivityId().equals(activityIds)).findFirst().get().getActivity();
+                    dateTimeInterval = getCutoffInterval(activityDTO.getActivityRulesSettings().getCutOffStartFrom(), activityDTO.getActivityRulesSettings().getCutOffIntervalUnit(), activityDTO.getActivityRulesSettings().getCutOffdayValue(),shiftWithActivityDTO.getStartDate());
+                }else {
+                    dateTimeInterval = getCutoffInterval(activity.getActivityRulesSettings().getCutOffStartFrom(), activity.getActivityRulesSettings().getCutOffIntervalUnit(), activity.getActivityRulesSettings().getCutOffdayValue(), shiftWithActivityDTO.getStartDate());
+                }
             }
         }
         return dateTimeInterval;

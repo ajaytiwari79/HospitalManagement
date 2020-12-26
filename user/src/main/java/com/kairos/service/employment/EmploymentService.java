@@ -658,7 +658,7 @@ public class EmploymentService {
     }
 
     // since we have employmentLine are on date so we are matching and might we wont have any active position line on date.
-    public List<com.kairos.dto.activity.shift.StaffEmploymentDetails> getEmploymentDetails(List<Long> employmentIds,boolean includePlannedTimeDetails) {
+    public List<com.kairos.dto.activity.shift.StaffEmploymentDetails> getEmploymentDetails(Collection<Long> employmentIds,boolean includePlannedTimeDetails) {
         List<EmploymentQueryResult> employments = employmentGraphRepository.getEmploymentDetailsByIds(employmentIds);
         List<com.kairos.dto.activity.shift.StaffEmploymentDetails> employmentDetails = new ArrayList<>();
         List<EmploymentLinesQueryResult> employmentLinesQueryResults = employmentGraphRepository.findFunctionalHourlyCost(employmentIds);

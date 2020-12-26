@@ -1010,6 +1010,24 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return mongoTemplate.aggregate(Aggregation.newAggregation(aggregations), "staffActivitySetting", ActivityWithCompositeDTO.class).getMappedResults();
     }
 
+    @Override
+    public List<ActivityDTO> findActivitiesWithTimeTypeByActivityId(Collection<BigInteger> activityIds) {
+        return getActivityDTOS(Criteria.where("id").in(activityIds).and(DELETED).is(false));
+    }
+
+    private List<ActivityDTO> getActivityDTOS(Criteria criteria) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id",
+                        TIME_TYPE1),
+                lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID,
+                        ACTIVITY_PRIORITY),
+                unwind(ACTIVITY_PRIORITY,true),
+                unwind(TIME_TYPE1)
+        );
+        return mongoTemplate.aggregate(aggregation, Activity.class,ActivityDTO.class).getMappedResults();
+    }
+
     private CustomAggregationOperation getCustomAggregationOperationForMatchCount() {
         return new CustomAggregationOperation("{\n" +
                 "      \"$addFields\": {\n" +

@@ -19,4 +19,5 @@ public class NotEligibleStaffDataDTO {
     private Set<Long> staffIds;
     private LocalDate shiftDate;
     private Set<BigInteger> activityIds;
+    private boolean containsWTARuleViolationCriteria;
 }

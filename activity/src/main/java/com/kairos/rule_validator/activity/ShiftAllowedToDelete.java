@@ -5,7 +5,9 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
+import com.kairos.persistence.model.shift.ShiftDataHelper;
 import com.kairos.rule_validator.AbstractSpecification;
+import com.kairos.rule_validator.RuleExecutionType;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -17,11 +19,11 @@ import static com.kairos.service.shift.ShiftValidatorService.throwException;
 
 public class ShiftAllowedToDelete extends AbstractSpecification<Shift> {
 
-    private Map<BigInteger, ActivityWrapper> activityWrapperMap;
+    private ShiftDataHelper shiftDataHelper;
     private BigInteger phaseId;
 
-    public ShiftAllowedToDelete(Map<BigInteger, ActivityWrapper> activityWrapperMap,BigInteger phaseId) {
-        this.activityWrapperMap = activityWrapperMap;
+    public ShiftAllowedToDelete(ShiftDataHelper shiftDataHelper, BigInteger phaseId) {
+        this.shiftDataHelper = shiftDataHelper;
         this.phaseId = phaseId;
     }
 
@@ -31,10 +33,10 @@ public class ShiftAllowedToDelete extends AbstractSpecification<Shift> {
     }
 
     @Override
-    public void validateRules(Shift shift) {
+    public void validateRules(Shift shift, RuleExecutionType ruleExecutionType) {
         PhaseTemplateValue currentPhase = null;
         for (ShiftActivity shiftActivity : shift.getActivities()) {
-            for (PhaseTemplateValue phaseTemplateValue : activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityPhaseSettings().getPhaseTemplateValues()) {
+            for (PhaseTemplateValue phaseTemplateValue : shiftDataHelper.getActivityById(shiftActivity.getActivityId()).getActivityPhaseSettings().getPhaseTemplateValues()) {
                 if (phaseId.equals(phaseTemplateValue.getPhaseId())) {
                     currentPhase = phaseTemplateValue;
                     break;

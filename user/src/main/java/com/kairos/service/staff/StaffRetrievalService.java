@@ -935,13 +935,21 @@ public class StaffRetrievalService {
         return organizationBaseEntity.getTranslatedData();
     }
 
-    public Object getEligibleStaffsForCoverShifts(Long unitId,NotEligibleStaffDataDTO notEligibleStaffDataDTO) {
-            /*StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(organizationId, staffId, employmentId, startDate.toString());
-            if (isNull(staffAdditionalInfoQueryResult)) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNIT_EMPLOYMENT_NOTFOUND);
+    public List<StaffAdditionalInfoDTO> getEligibleStaffsForCoverShifts(Long unitId, NotEligibleStaffDataDTO notEligibleStaffDataDTO) {
+        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = staffGraphRepository.getEligibleStaffsForCoverShift(unitId,notEligibleStaffDataDTO);
+        if(notEligibleStaffDataDTO.isContainsWTARuleViolationCriteria()){
+            Set<Long> employmentIds = staffAdditionalInfoDTOS.stream().flatMap(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getEmploymentIds().stream()).collect(Collectors.toSet());
+            List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(employmentIds,false);
+            Map<Long,StaffEmploymentDetails> staffEmploymentDetailsMap = employmentDetails.stream().collect(Collectors.toMap(staffEmploymentDetails -> staffEmploymentDetails.getId(),v->v));
+            for (StaffAdditionalInfoDTO staffAdditionalInfoDTO : staffAdditionalInfoDTOS) {
+                List<StaffEmploymentDetails> staffEmploymentDetails = staffAdditionalInfoDTO.getEmploymentIds().stream().map(employmentId->staffEmploymentDetailsMap.get(employmentId)).collect(Collectors.toList());
+                if(isCollectionNotEmpty(staffEmploymentDetails)){
+                    staffAdditionalInfoDTO.setEmployment(staffEmploymentDetails.get(0));
+                }
             }
             User user=userGraphRepository.findOne(UserContext.getUserDetails().getId());
-            staffAdditionalInfoQueryResult.setUnitWiseAccessRole(user.getUnitWiseAccessRole());*/
             return staffGraphRepository.getEligibleStaffsForCoverShift(unitId,notEligibleStaffDataDTO);
+        }
+        return staffAdditionalInfoDTOS;
     }
 }

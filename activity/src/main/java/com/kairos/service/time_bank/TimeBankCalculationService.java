@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
@@ -251,6 +252,49 @@ public class TimeBankCalculationService {
     }
 
     public void calculateScheduledAndDurationInMinutes(ShiftActivity shiftActivity, Activity activity, StaffEmploymentDetails staffEmploymentDetails,boolean calculateTimeBankOff) {
+        if (shiftActivity.getStartDate().after(shiftActivity.getEndDate())) {
+            exceptionService.invalidRequestException(ACTIVITY_END_DATE_LESS_THAN_START_DATE, activity.getName());
+        }
+        int scheduledMinutes = 0;
+        int duration = 0;
+        int weeklyMinutes;
+        switch (activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime()) {
+            case ENTERED_MANUALLY:
+                duration = shiftActivity.getDurationMinutes();
+                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
+                break;
+            case FIXED_TIME:
+                duration = activity.getActivityTimeCalculationSettings().getFixedTimeValue().intValue();
+                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
+                break;
+            case ENTERED_TIMES:
+                duration = (int) new Interval(shiftActivity.getStartDate().getTime(), shiftActivity.getEndDate().getTime()).toDuration().getStandardMinutes();
+                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
+                break;
+            case CommonConstants.FULL_DAY_CALCULATION:
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullDayCalculationType())) ? staffEmploymentDetails.getFullTimeWeeklyMinutes() : staffEmploymentDetails.getTotalWeeklyMinutes();
+                duration = Double.valueOf(weeklyMinutes * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+                break;
+            case AppConstants.WEEKLY_HOURS:
+                duration = Double.valueOf(staffEmploymentDetails.getTotalWeeklyMinutes() * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+                break;
+            case CommonConstants.FULL_WEEK:
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullWeekCalculationType())) ? staffEmploymentDetails.getFullTimeWeeklyMinutes() : staffEmploymentDetails.getTotalWeeklyMinutes();
+                duration = Double.valueOf(weeklyMinutes * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+                break;
+            default:
+                break;
+        }
+        if (TimeTypes.WORKING_TYPE.toString().equals(shiftActivity.getTimeType()) || calculateTimeBankOff) {
+            shiftActivity.setDurationMinutes(duration);
+            shiftActivity.setScheduledMinutes(scheduledMinutes);
+        }
+    }
+
+    public void calculateScheduledAndDurationInMinutes(ShiftActivityDTO shiftActivity, ActivityDTO activity, StaffEmploymentDetails staffEmploymentDetails, boolean calculateTimeBankOff) {
         if (shiftActivity.getStartDate().after(shiftActivity.getEndDate())) {
             exceptionService.invalidRequestException(ACTIVITY_END_DATE_LESS_THAN_START_DATE, activity.getName());
         }

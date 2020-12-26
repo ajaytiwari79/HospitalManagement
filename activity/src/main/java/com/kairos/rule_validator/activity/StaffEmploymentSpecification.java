@@ -7,6 +7,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.rule_validator.AbstractSpecification;
+import com.kairos.rule_validator.RuleExecutionType;
 import com.kairos.service.shift.ShiftValidatorService;
 
 import java.util.Collections;
@@ -51,7 +52,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
     }
 
     @Override
-    public void validateRules(ShiftWithActivityDTO shift) {
+    public void validateRules(ShiftWithActivityDTO shift, RuleExecutionType ruleExecutionType) {
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {
                 validateStaffEmployment(childActivity);

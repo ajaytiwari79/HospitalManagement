@@ -150,11 +150,11 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStatusService.updateStatusOfShifts(unitId, shiftPublishDTO));
     }
 
-    @ApiOperation("copy shifts from 1 employee to others")
+   /* @ApiOperation("copy shifts from 1 employee to others")
     @PutMapping(value = "/copy_shifts")
     public ResponseEntity<Map<String, Object>> copyShifts(@PathVariable long unitId, @RequestBody @Valid CopyShiftDTO copyShiftDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftCopyService.copyShifts(unitId, copyShiftDTO));
-    }
+    }*/
 
     @ApiOperation("create shift using template")
     @PostMapping(value = "shift/from_shift_template")

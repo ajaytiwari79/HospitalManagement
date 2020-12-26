@@ -57,7 +57,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
             CareDaysDTO careDays = getCareDays(infoWrapper.getSeniorCareDays(), infoWrapper.getStaffAge());
             if (isNotNull(careDays)) {
                 int leaveCount = careDays.getLeavesAllowed();
-                DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(), infoWrapper.getShift().getStartDate(), activityIds);
+                DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(), infoWrapper.getShift(), activityIds);
                 if (isNotNull(dateTimeInterval)) {
                     List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
                     ActivityCutOffCount activityLeaveCount = this.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).containsAndEqualsEndDate(asDate(asLocalDate(infoWrapper.getShift().getStartDate())))).findFirst().orElse(new ActivityCutOffCount());

@@ -9,6 +9,7 @@ import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.ShiftDataHelper;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -31,6 +32,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.phase.PhaseType.ACTUAL;
@@ -253,7 +255,28 @@ public class PhaseService extends MongoBaseService {
         else {
             List<Phase> actualPhases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalse(unitId, ACTUAL.toString());
             Map<String, Phase> phaseMap = actualPhases.stream().collect(Collectors.toMap(k->k.getPhaseEnum().toString(), Function.identity()));
-            phase= getActualPhaseApplicableForDate(startDateTime,endDateTime,phaseMap,untilTentativeDate,timeZone);
+            phase= getActualPhaseApplicableForDate(startDateTime,phaseMap,untilTentativeDate,timeZone);
+        }
+        if (isNull(phase)) {
+            exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
+        }
+        return phase;
+    }
+
+    public Phase getCurrentPhaseByUnitIdAndDate(Date startDate, Date endDate, ShiftDataHelper shiftDataHelper){
+        String timeZone= shiftDataHelper.getTimeZone();
+        Phase tentativePhase = shiftDataHelper.getPhases().stream().filter(phase -> PhaseDefaultName.TENTATIVE.equals(phase.getPhaseEnum())).findFirst().get();
+        LocalDateTime untilTentativeDate = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),tentativePhase.getUntilNextDay()==null?DayOfWeek.MONDAY:tentativePhase.getUntilNextDay()).atStartOfDay().minusSeconds(1);
+        LocalDateTime startDateTime=DateUtils.asLocalDateTime(startDate);
+        LocalDateTime endDateTime=Optional.ofNullable(endDate).isPresent()? DateUtils.asLocalDateTime(endDate):null;
+        Phase phase;
+        if(startDateTime.isAfter(untilTentativeDate)){
+            phase= shiftDataHelper.getPhases().stream().filter(phase1 -> phase1.getId().equals(shiftDataHelper.getPlanningPeriod().getCurrentPhaseId())).findFirst().get();
+        }
+        else {
+            List<Phase> actualPhases = shiftDataHelper.getPhases().stream().filter(phase1 -> phase1.getPhaseType().equals(ACTUAL)).collect(Collectors.toList());
+            Map<String, Phase> phaseMap = actualPhases.stream().collect(Collectors.toMap(k->k.getPhaseEnum().toString(), Function.identity()));
+            phase= getActualPhaseApplicableForDate(startDateTime,phaseMap,untilTentativeDate,timeZone);
         }
         if (isNull(phase)) {
             exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
@@ -289,12 +312,12 @@ public class PhaseService extends MongoBaseService {
                     phase = phaseAndIdMap.get(planningPeriodOptional.get().getCurrentPhaseId());
                 }
             } else {
-                phase = getActualPhaseApplicableForDate(requestedDate, null, phaseMap, untilTentative, timeZone);
+                phase = getActualPhaseApplicableForDate(requestedDate,  phaseMap, untilTentative, timeZone);
             }
             if(isNull(phase)){
                 exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PHASES_ON_DATE,unitId,requestedDate);
             }
-            localDatePhaseStatusMap.put(DateUtils.asDate(requestedDate), phase);
+            localDatePhaseStatusMap.put(asDate(requestedDate), phase);
         }
         }
         return localDatePhaseStatusMap;
@@ -307,15 +330,12 @@ public class PhaseService extends MongoBaseService {
      * @param untilTentativeDate
      * @return phase
      */
-    private Phase getActualPhaseApplicableForDate(LocalDateTime startDateTime,LocalDateTime endDateTime, Map<String,Phase> phaseMap, LocalDateTime untilTentativeDate,String timeZone){
+    private Phase getActualPhaseApplicableForDate(LocalDateTime startDateTime, Map<String,Phase> phaseMap, LocalDateTime untilTentativeDate,String timeZone){
         Phase phase=null;
         int minutesToCalculate=phaseMap.get(PhaseDefaultName.REALTIME.toString()).getRealtimeDuration();
         LocalDateTime realTimeStartDate=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(minutesToCalculate+1);
         LocalDateTime realTimeEndDate=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(minutesToCalculate+1);
-        DateTimeInterval shiftInterval=isNotNull(endDateTime)?new DateTimeInterval(DateUtils.asDate(startDateTime),DateUtils.asDate(endDateTime)):null;
-        DateTimeInterval realtimeInterval=(Optional.ofNullable(endDateTime).isPresent())?new DateTimeInterval(DateUtils.asDate(realTimeStartDate),DateUtils.asDate(realTimeEndDate)):null;
-        boolean realTime=isNotNull(shiftInterval)?shiftInterval.overlaps(realtimeInterval):
-                startDateTime.isAfter(realTimeStartDate) && startDateTime.isBefore(realTimeEndDate);
+        boolean realTime= new DateTimeInterval(asDate(realTimeStartDate),asDate(realTimeEndDate)).contains(asDate(startDateTime));
          if(realTime){
             phase= phaseMap.get(PhaseDefaultName.REALTIME.toString());
         }else if (startDateTime.isBefore(realTimeStartDate)) {
@@ -331,7 +351,7 @@ public class PhaseService extends MongoBaseService {
         LocalDateTime realtimePhaseStartDate = DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(realtimeDuration + 1);
         LocalDateTime realtimePhaseEndDate = DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(realtimeDuration + 1);
         DateTimeInterval shiftInterval = new DateTimeInterval(startDate,endDate);
-        DateTimeInterval realtimeInterval = new DateTimeInterval(DateUtils.asDate(realtimePhaseStartDate),DateUtils.asDate(realtimePhaseEndDate));
+        DateTimeInterval realtimeInterval = new DateTimeInterval(asDate(realtimePhaseStartDate), asDate(realtimePhaseEndDate));
         return shiftInterval.overlaps(realtimeInterval);
     }
     /**
