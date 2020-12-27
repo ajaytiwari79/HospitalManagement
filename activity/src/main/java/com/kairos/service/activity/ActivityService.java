@@ -564,10 +564,10 @@ public class ActivityService {
         FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
         Map<String,Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
         prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
-        if(fieldPermissionMap.get("activityCommunicationSettings.activityReminderSettings").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("activityCommunicationSettings.activityReminderSettings").isEmpty()){
+        if(fieldPermissionMap.get("activityReminderSettings").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("activityReminderSettings").isEmpty()){
             activity.getActivityCommunicationSettings().setActivityReminderSettings(new ArrayList<>());
         }
-        if(fieldPermissionMap.get("activityCommunicationSettings.activityCutoffReminderSettings").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("activityCommunicationSettings.activityCutoffReminderSettings").isEmpty()){
+        if(fieldPermissionMap.get("activityCutoffReminderSettings").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("activityCutoffReminderSettings").isEmpty()){
             activity.getActivityCommunicationSettings().setActivityCutoffReminderSettings(new ArrayList<>());
         }
         return new ActivitySettingsWrapper(activity.getActivityCommunicationSettings());
