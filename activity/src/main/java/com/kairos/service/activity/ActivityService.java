@@ -561,6 +561,15 @@ public class ActivityService {
     }
     public ActivitySettingsWrapper getCommunicationTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
+        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
+        Map<String,Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
+        prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
+        if(fieldPermissionMap.get("Activity.activityCommunicationSettings.activityReminderSettings").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("Activity.activityCommunicationSettings.activityReminderSettings").isEmpty()){
+            activity.getActivityCommunicationSettings().setActivityReminderSettings(new ArrayList<>());
+        }
+        if(fieldPermissionMap.get("Activity.activityCommunicationSettings.activityCutoffReminderSettings").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("Activity.activityCommunicationSettings.activityCutoffReminderSettings").isEmpty()){
+            activity.getActivityCommunicationSettings().setActivityCutoffReminderSettings(new ArrayList<>());
+        }
         return new ActivitySettingsWrapper(activity.getActivityCommunicationSettings());
     }
     public ActivitySettingsWrapper updateBonusTabOfActivity(BonusActivityDTO bonusActivityDTO) {
