@@ -30,9 +30,6 @@ public class AutoFillGapSettings extends MongoBaseEntity {
     private AccessGroupRole gapApplicableFor;
     private Long countryId;
     private Long unitId;
-    private String organizationTypeName;
-    private String organizationSubTypeName;
-    private String phaseName;
     private boolean published;
     private BigInteger parentId;
 }

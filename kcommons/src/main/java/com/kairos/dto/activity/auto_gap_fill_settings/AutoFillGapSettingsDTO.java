@@ -39,9 +39,6 @@ public class AutoFillGapSettingsDTO {
     private AccessGroupRole gapApplicableFor;
     private Date updatedAt;
     private UserInfo lastModifiedBy;
-    private String organizationTypeName;
-    private String organizationSubTypeName;
-    private String phaseName;
     private boolean published;
     private BigInteger parentId;
 }
