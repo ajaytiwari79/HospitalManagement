@@ -33,12 +33,12 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
 
 
     private StaffAdditionalInfoDTO staffAdditionalInfoDTO;
-    private Collection<ActivityDTO> activities;
+    private Collection<ActivityWrapper> activities;
     private Phase phase;
     private Shift oldShift;
 
 
-    public ActivityPhaseSettingSpecification(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Phase phase, Collection<ActivityDTO> activities, Shift oldShift) {
+    public ActivityPhaseSettingSpecification(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Phase phase, Collection<ActivityWrapper> activities, Shift oldShift) {
         this.staffAdditionalInfoDTO = staffAdditionalInfoDTO;
         this.phase = phase;
         this.activities = activities;
@@ -81,12 +81,12 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
         });
     }
 
-    private Map<BigInteger,PhaseTemplateValue>  constructMapOfActivityAndPhaseTemplateValue(Phase phase,Collection<ActivityDTO> activities){
+    private Map<BigInteger,PhaseTemplateValue>  constructMapOfActivityAndPhaseTemplateValue(Phase phase,Collection<ActivityWrapper> activities){
         Map<BigInteger,PhaseTemplateValue> phaseTemplateValueMap=new HashMap<>();
-        for(ActivityDTO activityDTO:activities){
-            for(PhaseTemplateValue phaseTemplateValue:activityDTO.getActivityPhaseSettings().getPhaseTemplateValues()){
+        for(ActivityWrapper activityDTO:activities){
+            for(PhaseTemplateValue phaseTemplateValue:activityDTO.getActivity().getActivityPhaseSettings().getPhaseTemplateValues()){
                 if(phaseTemplateValue.getPhaseId().equals(phase.getId())){
-                    phaseTemplateValueMap.put(activityDTO.getId(),phaseTemplateValue);
+                    phaseTemplateValueMap.put(activityDTO.getActivity().getId(),phaseTemplateValue);
                     break;
                 }
             }

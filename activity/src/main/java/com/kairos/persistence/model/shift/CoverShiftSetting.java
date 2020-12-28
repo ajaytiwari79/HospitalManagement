@@ -35,4 +35,5 @@ public class CoverShiftSetting {
         STAFF_WITH_ASSIGNED_SAME_FUNCTIONS,
         STAFF_WITH_EMPLOYEMENT_TYPES
     }
+
 }

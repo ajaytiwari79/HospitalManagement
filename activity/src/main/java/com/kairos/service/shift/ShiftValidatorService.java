@@ -246,7 +246,7 @@ public class ShiftValidatorService {
 
         }
         validateAbsenceReasonCodeRule(activityWrapperMap, shift, ruleTemplateSpecificInfo);
-        updateScheduledAndDurationMinutesInShift(shift, staffAdditionalInfoDTO, activityWrapperMap);
+        updateScheduledAndDurationMinutesInShift(shift, staffAdditionalInfoDTO);
         boolean gracePeriodValid = validateGracePeriod(shift.getStartDate(), UserContext.getUserDetails().isStaff(), shift.getUnitId(), phase);
         if (!gracePeriodValid) {
             exceptionService.invalidRequestException(MESSAGE_SHIFT_CANNOT_UPDATE);
@@ -255,7 +255,7 @@ public class ShiftValidatorService {
         Map<BigInteger, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         CalculatePlannedHoursAndScheduledHours calculatePlannedHoursAndScheduledHours = new CalculatePlannedHoursAndScheduledHours(staffAdditionalInfoDTO, dateTimeInterval, newArrayList(shift), false, false, dayTypeDTOMap, timeBankCalculationService).calculate();
         shift.setPlannedMinutesOfTimebank(calculatePlannedHoursAndScheduledHours.getTotalDailyPlannedMinutes());
-        Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkillLevelDTOS(), ruleTemplateSpecificInfo, exceptionService);
+        Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkillLevelDTOS(), ruleTemplateSpecificInfo);
         Specification<ShiftWithActivityDTO> tagSpecification = new TagSpecification(staffAdditionalInfoDTO.getTags(), ruleTemplateSpecificInfo, exceptionService);
         Set<BigInteger> allActivities = getAllActivitiesOfTeam(shift);
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getEmployment().getExpertise(), ruleTemplateSpecificInfo);
@@ -283,7 +283,7 @@ public class ShiftValidatorService {
             activitySpecification = activitySpecification.and(activityDayTypeSpec);
         }
         shift.setTimeType(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getTimeType());
-        activitySpecification.validateRules(shift);
+        activitySpecification.validateRules(shift,RuleExecutionType.SHIFT_CREATION);
         return new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
     }
 
@@ -302,7 +302,7 @@ public class ShiftValidatorService {
             exceptionService.invalidRequestException(MESSAGE_SHIFT_CANNOT_UPDATE);
         }
         Specification<Shift> shiftSpecification = new ShiftAllowedToDelete(activityWrapperMap, phase.getId());
-        shiftSpecification.validateRules(shift);
+        shiftSpecification.validateRules(shift,RuleExecutionType.SHIFT_DELETE);
         ViolatedRulesDTO violatedRulesDTO = new ViolatedRulesDTO();
         WTAQueryResultDTO wtaQueryResultDTO = workTimeAgreementService.getWTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), DateUtils.onlyDate(shift.getActivities().get(0).getStartDate()));
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTO.getRuleTemplates().stream().filter(this::isValidWTARuleForDelete).collect(Collectors.toList());
@@ -316,7 +316,7 @@ public class ShiftValidatorService {
             }
             verifyStaffingLevel(ruleTemplateSpecificInfo,staffingLevelActivityWithDurationMap);
             Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaBaseRuleTemplates);
-            wtaRulesSpecification.validateRules(shiftWithActivityDTO);
+            wtaRulesSpecification.validateRules(shiftWithActivityDTO,RuleExecutionType.SHIFT_DELETE);
             violatedRulesDTO = ruleTemplateSpecificInfo.getViolatedRules();
         }
         return violatedRulesDTO;
@@ -1103,7 +1103,7 @@ public class ShiftValidatorService {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PLANNING_PERIOD_EXITS, shift.getStartDate());
         }
         shift.setPhaseId(phase.getId());
-        RuleTemplateSpecificInfo ruleTemplateSpecificInfo = RuleTemplateSpecificInfo getRuleTemplateSpecificInfo(phase,shift, staffAdditionalInfoDTO, shiftDataHelper, CREATE);
+        RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase,shift, staffAdditionalInfoDTO, shiftDataHelper, CREATE);
         updateScheduledAndDurationMinutesInShift(shift, staffAdditionalInfoDTO);
         boolean gracePeriodValid = validateGracePeriod(shift.getStartDate(), UserContext.getUserDetails().isStaff(), shift.getUnitId(), phase);
         if (!gracePeriodValid) {
@@ -1113,17 +1113,18 @@ public class ShiftValidatorService {
         Map<BigInteger, DayTypeDTO> dayTypeDTOMap = shiftDataHelper.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         CalculatePlannedHoursAndScheduledHours calculatePlannedHoursAndScheduledHours = new CalculatePlannedHoursAndScheduledHours(staffAdditionalInfoDTO, dateTimeInterval, newArrayList(shift), false, false, dayTypeDTOMap, timeBankCalculationService).calculate();
         shift.setPlannedMinutesOfTimebank(calculatePlannedHoursAndScheduledHours.getTotalDailyPlannedMinutes());
-        Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkillLevelDTOS(), ruleTemplateSpecificInfo);
-        Set<BigInteger> allActivities = getAllActivitiesOfTeam(shift);
-        Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getEmployment().getExpertise(), ruleTemplateSpecificInfo);
-        Specification<ShiftWithActivityDTO> staffActivitySpecification = new StaffActivitySpecification(ruleTemplateSpecificInfo, allActivities);
+
+        //Set<BigInteger> allActivities = getAllActivitiesOfTeam(shift);
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
+        /*Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getEmployment().getExpertise(), ruleTemplateSpecificInfo);
+        Specification<ShiftWithActivityDTO> staffActivitySpecification = new StaffActivitySpecification(ruleTemplateSpecificInfo, allActivities);
+        Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkillLevelDTOS(), ruleTemplateSpecificInfo);
         Specification<ShiftWithActivityDTO> activitySpecification = activityExpertiseSpecification.and(activitySkillSpec).and(wtaRulesSpecification).and(staffActivitySpecification);
         Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, staffAdditionalInfoDTO);
-        activitySpecification = activitySpecification.and(staffEmploymentSpecification);
+        activitySpecification = activitySpecification.and(staffEmploymentSpecification);*/
         shift.setTimeType(shiftDataHelper.getActivityById(shift.getActivities().get(0).getActivityId()).getTimeType().getTimeTypes());
-        activitySpecification.validateRules(shift, RuleExecutionType.COVER_SHIFT);
-        return new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
+        wtaRulesSpecification.validateRules(shift, RuleExecutionType.COVER_SHIFT);
+        return new ShiftWithViolatedInfoDTO(newArrayList(shift),ruleTemplateSpecificInfo.getViolatedRules());
     }
 
 }

@@ -105,7 +105,13 @@ public class CoverShiftService {
             List<ShiftWithViolatedInfoDTO> kpisData = new ArrayList<>();
             for (Future<ShiftWithViolatedInfoDTO> data : shiftWithViolatedInfoDTOS) {
                 try {
-                    if(isNotNull(data))kpisData.add(data.get());
+                    if(isNotNull(data)){
+                        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = data.get();
+                        if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements())){
+                            staffAdditionalInfoDTOS.removeIf(staffAdditionalInfoDTO -> shiftWithViolatedInfoDTO.getShifts().get(0).getStaffId().equals(staffAdditionalInfoDTO.getId()));
+                        }
+                        kpisData.add(shiftWithViolatedInfoDTO);
+                    }
                 } catch (InterruptedException | ExecutionException ex) {
                     LOGGER.error("error while generate KPI  data",ex);
                 }
