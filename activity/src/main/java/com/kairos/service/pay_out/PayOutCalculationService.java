@@ -104,9 +104,9 @@ public class PayOutCalculationService {
             if (CalculationFor.CONDITIONAL_BONUS.equals(ruleTemplate.getCalculationFor())) {
                 ctaScheduledOrCompensationMinutes = calculatePlannedHoursAndScheduledHours.calculateConditionalBonus(ruleTemplate,staffAdditionalInfoDTO.getEmployment(),shift, PAID_OUT);
                 Optional<PayOutPerShiftCTADistributionDTO> payOutPerShiftCTADistributionDTO = shift.getPayoutPerShiftCTADistributions().stream().filter(distributionDTO -> distributionDTO.getCtaRuleTemplateId().equals(ruleTemplate.getId())).findAny();
-                if (payOutPerShiftCTADistributionDTO.isPresent()) {
+                if (payOutPerShiftCTADistributionDTO.isPresent() && ctaScheduledOrCompensationMinutes > 0) {
                     payOutPerShiftCTADistributionDTO.get().setMinutes(ctaScheduledOrCompensationMinutes);
-                } else {
+                } else if(ctaScheduledOrCompensationMinutes > 0){
                     PayOutPerShiftCTADistributionDTO payOutPerShiftCTADistribution = new PayOutPerShiftCTADistributionDTO(ruleTemplate.getName(),ctaScheduledOrCompensationMinutes, ruleTemplate.getId());
                     shift.getPayoutPerShiftCTADistributions().add(payOutPerShiftCTADistribution);
                 }
