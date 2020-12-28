@@ -354,6 +354,13 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "RETURN DISTINCT emp,r,exp,slRel,sl,COLLECT(empRel),COLLECT(empLine),staffRel,staff")
     List<Employment> getAllEmploymentByLevel(Long levelId,String startDate,String endDate);
 
+    @Query("MATCH(functionalPayment:FunctionalPayment)-[:"+APPLICABLE_FOR_EXPERTISE+"]->(exp:Expertise{deleted:false,published:true})-[r:"+HAS_EXPERTISE_IN+"]-(emp:Employment{deleted:false,published:true})-[empRel:"+HAS_EMPLOYMENT_LINES+"]->(empLine:EmploymentLine)-[slRel:"+HAS_SENIORITY_LEVEL+"]-(sl:SeniorityLevel) " +
+            "MATCH(emp)<-[staffRel:"+BELONGS_TO_STAFF+"]-(staff:Staff)" +
+            "WHERE id(functionalPayment)={0} AND  \n" +
+            "(( {2} IS NULL AND (emp.endDate IS NULL OR DATE(emp.endDate) > DATE({1})))\n" +
+            "OR ({2} IS NOT NULL AND  (DATE({2}) > DATE(emp.startDate) AND (emp.endDate is null OR DATE({1}) < DATE(emp.endDate)) ))) " +
+            "RETURN DISTINCT emp,r,exp,slRel,sl,COLLECT(empRel),COLLECT(empLine),staffRel,staff")
+    List<Employment> getAllEmploymentByFunctionId(Long functionId,String startDate,String endDate);
 
     @Query("MATCH(employmentLine:EmploymentLine)-[seniorityRel:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[payGradeRel:" + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) where id(employmentLine) IN  {0}\n" +
             "RETURN employmentLine,seniorityLevel,seniorityRel,payGrade,payGradeRel")
