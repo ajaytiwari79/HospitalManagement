@@ -99,13 +99,13 @@ public class AutoFillGapSettingsService {
         if(isNotNull(autoFillGapSettings.getParentId())){
             parentAutoFillGapSettings = autoFillGapSettingsMongoRepository.findOne(autoFillGapSettings.getParentId());
         }
-        LocalDate endDate = null;
+        LocalDate endDate = autoFillGapSettings.getEndDate();
         if(isNotNull(parentAutoFillGapSettings)) {
-            if(autoFillGapSettings.getStartDate().isAfter(parentAutoFillGapSettings.getStartDate())) {
+            if(autoFillGapSettings.getStartDate().isAfter(parentAutoFillGapSettings.getStartDate()) && isNull(parentAutoFillGapSettings.getEndDate()) || autoFillGapSettings.getStartDate().isBefore(parentAutoFillGapSettings.getEndDate())) {
                 endDate = parentAutoFillGapSettings.getEndDate();
                 parentAutoFillGapSettings.setEndDate(autoFillGapSettings.getStartDate().minusDays(1));
                 autoFillGapSettingsMongoRepository.save(parentAutoFillGapSettings);
-            } else {
+            } else if(autoFillGapSettings.getStartDate().isBefore(parentAutoFillGapSettings.getStartDate())) {
                 endDate = parentAutoFillGapSettings.getEndDate().minusDays(1);
             }
         }
