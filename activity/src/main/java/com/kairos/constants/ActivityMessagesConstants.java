@@ -401,8 +401,6 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_FULLWEEK_STARTDAY_NOTFOUND = "message.fullWeek.startDay.notFound";
     public static final String ERROR_AUTO_FILL_GAP_SETTING_NOT_FOUND = "error.auto.fill.gap.setting.not.found";
     public static final String ERROR_DUPLICATE_AUTO_FILL_GAP_SETTING_FOUND = "error.duplicate.auto.fill.gap.setting.found";
-    public static final String ERROR_ALRADEY_AUTO_FILL_GAP_SETTING_PUBLISH = "error.already.auto.fill.gap.setting.publish";
-    public static final String ERROR_START_DATE_REQUIRED = "error.start.date.required";
-    public static final String ERROR_START_END_DATE_CANNOT_PAST_DATE = "error.start.end.date.cannot.past.date";
-    public static final String ERROR_START_DATE_CANNOT_GREATER_THAN_END_DATE = "error.start.date.not.grater.than.end.date";
+    public static final String ERROR_ALREADY_AUTO_FILL_GAP_SETTING_PUBLISH = "error.already.auto.fill.gap.setting.publish";
+    public static final String ERROR_DRAFT_COPY_ALREADY_CREATED = "error.draft.copy.already.created";
 }

@@ -1,11 +1,9 @@
 package com.kairos.service.auto_gap_fill_settings;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.auto_gap_fill_settings.AutoFillGapSettingsDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftAndActivtyStatusDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivityWithDuration;
 import com.kairos.dto.user.team.TeamDTO;
@@ -48,96 +46,80 @@ public class AutoFillGapSettingsService {
     private ShiftValidatorService staffingLevelService;
     @Inject
     private ExceptionService exceptionService;
-    private final String PUBLISH = "PUBLISH";
 
-    public AutoFillGapSettingsDTO createAutoFillGapSettings(AutoFillGapSettingsDTO autoFillGapSettingsDTO, String action, LocalDate publishDate, boolean forCountry) {
-        if(PUBLISH.equals(action)) {
-            autoFillGapSettingsDTO.setStartDate(DateUtils.getCurrentLocalDate());
-            validateGapSetting(autoFillGapSettingsDTO, true, forCountry);
-            autoFillGapSettingsDTO.setPublished(true);
-        } else {
-            validateGapSetting(autoFillGapSettingsDTO , false, forCountry);
-        }
+    public AutoFillGapSettingsDTO createAutoFillGapSettings(AutoFillGapSettingsDTO autoFillGapSettingsDTO, boolean forCountry) {
         AutoFillGapSettings autoFillGapSettings = ObjectMapperUtils.copyPropertiesByMapper(autoFillGapSettingsDTO, AutoFillGapSettings.class);
+        if(autoFillGapSettings.isPublished()) {
+            validateGapSetting(autoFillGapSettings, forCountry);
+        }
         autoFillGapSettingsMongoRepository.save(autoFillGapSettings);
         autoFillGapSettingsDTO.setId(autoFillGapSettings.getId());
         return autoFillGapSettingsDTO;
     }
 
-    public AutoFillGapSettingsDTO updateAutoFillGapSettings(AutoFillGapSettingsDTO autoFillGapSettingsDTO, String action, LocalDate publishDate, boolean forCountry) {
-        AutoFillGapSettings autoFillGapSettings = autoFillGapSettingsMongoRepository.findOne(autoFillGapSettingsDTO.getId());
-        if (isNull(autoFillGapSettings)) {
+    public AutoFillGapSettingsDTO updateAutoFillGapSettings(AutoFillGapSettingsDTO autoFillGapSettingsDTO, boolean forCountry) {
+        AutoFillGapSettings autoFillGapSettingsFromDB = autoFillGapSettingsMongoRepository.findOne(autoFillGapSettingsDTO.getId());
+        if (isNull(autoFillGapSettingsFromDB)) {
             exceptionService.dataNotFoundByIdException(ERROR_AUTO_FILL_GAP_SETTING_NOT_FOUND);
         }
-        if(PUBLISH.equals(action)) {
-            autoFillGapSettingsDTO.setStartDate(publishDate);
-            validateGapSetting(autoFillGapSettingsDTO, true, forCountry);
-            autoFillGapSettingsDTO.setPublished(true);
-        } else {
-            if(autoFillGapSettings.isPublished()){
-                AutoFillGapSettings childAutoFillGapSetting = autoFillGapSettingsMongoRepository.getGapSettingsByParentId(autoFillGapSettingsDTO.getId());
-                autoFillGapSettings.setId(isNotNull(childAutoFillGapSetting) ? childAutoFillGapSetting.getId() : null);
-                autoFillGapSettingsDTO.setParentId(autoFillGapSettingsDTO.getId());
-                autoFillGapSettingsDTO.setPublished(false);
+        AutoFillGapSettings autoFillGapSettings = ObjectMapperUtils.copyPropertiesByMapper(autoFillGapSettingsDTO, AutoFillGapSettings.class);
+        if(autoFillGapSettings.isPublished()) {
+            if(autoFillGapSettingsFromDB.isPublished()){
+                exceptionService.actionNotPermittedException(ERROR_ALREADY_AUTO_FILL_GAP_SETTING_PUBLISH);
             }
-            validateGapSetting(autoFillGapSettingsDTO , false, forCountry);
+            validateGapSetting(autoFillGapSettings, forCountry);
+            updateEndDate(autoFillGapSettings);
+        } else {
+            if(autoFillGapSettingsFromDB.isPublished()){
+                if(isNotNull(autoFillGapSettingsMongoRepository.getGapSettingsByParentId(autoFillGapSettingsDTO.getId()))){
+                    exceptionService.actionNotPermittedException(ERROR_DRAFT_COPY_ALREADY_CREATED);
+                }
+                autoFillGapSettings.setParentId(autoFillGapSettings.getId());
+                autoFillGapSettings.setId(null);
+            }
         }
-        autoFillGapSettings = ObjectMapperUtils.copyPropertiesByMapper(autoFillGapSettingsDTO, AutoFillGapSettings.class);
         autoFillGapSettingsMongoRepository.save(autoFillGapSettings);
         return autoFillGapSettingsDTO;
     }
 
-    private void validateGapSetting(AutoFillGapSettingsDTO autoFillGapSettingsDTO, boolean publish, boolean forCountry) {
-        if(isNull(autoFillGapSettingsDTO.getStartDate())){
-            exceptionService.actionNotPermittedException(ERROR_START_DATE_REQUIRED);
+    private void validateGapSetting(AutoFillGapSettings autoFillGapSettings, boolean forCountry) {
+        AutoFillGapSettings duplicateAutoFillGapSettings;
+        if (forCountry) {
+            duplicateAutoFillGapSettings = autoFillGapSettingsMongoRepository.getGapSettingsForCountry(autoFillGapSettings.getCountryId(), autoFillGapSettings.getOrganizationTypeId(), autoFillGapSettings.getOrganizationSubTypeId(), autoFillGapSettings.getPhaseId(), autoFillGapSettings.getAutoGapFillingScenario().toString(), autoFillGapSettings.getId(), autoFillGapSettings.getGapApplicableFor().toString(), autoFillGapSettings.getStartDate());
+        } else {
+            duplicateAutoFillGapSettings = autoFillGapSettingsMongoRepository.getGapSettingsForUnit(autoFillGapSettings.getUnitId(), autoFillGapSettings.getOrganizationTypeId(), autoFillGapSettings.getOrganizationSubTypeId(), autoFillGapSettings.getPhaseId(), autoFillGapSettings.getAutoGapFillingScenario().toString(), autoFillGapSettings.getId(), autoFillGapSettings.getGapApplicableFor().toString(), autoFillGapSettings.getStartDate());
         }
-        if(autoFillGapSettingsDTO.getStartDate().isBefore(DateUtils.getCurrentLocalDate()) || (isNotNull(autoFillGapSettingsDTO.getEndDate()) && autoFillGapSettingsDTO.getEndDate().isBefore(DateUtils.getCurrentLocalDate()))){
-            exceptionService.actionNotPermittedException(ERROR_START_END_DATE_CANNOT_PAST_DATE);
-        }
-        if(isNotNull(autoFillGapSettingsDTO.getEndDate()) && autoFillGapSettingsDTO.getStartDate().isAfter(autoFillGapSettingsDTO.getEndDate())){
-            exceptionService.actionNotPermittedException(ERROR_START_DATE_CANNOT_GREATER_THAN_END_DATE);
-        }
-        AutoFillGapSettings autoFillGapSettings;
-        if(publish) {
-            if(autoFillGapSettingsDTO.isPublished()){
-                exceptionService.actionNotPermittedException(ERROR_ALRADEY_AUTO_FILL_GAP_SETTING_PUBLISH);
-            }
-            if (forCountry) {
-                autoFillGapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForCountry(autoFillGapSettingsDTO.getCountryId(), autoFillGapSettingsDTO.getOrganizationTypeId(), autoFillGapSettingsDTO.getOrganizationSubTypeId(), autoFillGapSettingsDTO.getPhaseId(), autoFillGapSettingsDTO.getAutoGapFillingScenario().toString(), autoFillGapSettingsDTO.getId(), autoFillGapSettingsDTO.getGapApplicableFor().toString(), autoFillGapSettingsDTO.getStartDate().toString(), isNull(autoFillGapSettingsDTO.getEndDate()) ? autoFillGapSettingsDTO.getStartDate().toString() : autoFillGapSettingsDTO.getEndDate().toString());
-            } else {
-                autoFillGapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(autoFillGapSettingsDTO.getUnitId(), autoFillGapSettingsDTO.getOrganizationTypeId(), autoFillGapSettingsDTO.getOrganizationSubTypeId(), autoFillGapSettingsDTO.getPhaseId(), autoFillGapSettingsDTO.getAutoGapFillingScenario().toString(), autoFillGapSettingsDTO.getId(), autoFillGapSettingsDTO.getGapApplicableFor().toString(), autoFillGapSettingsDTO.getStartDate().toString(), isNull(autoFillGapSettingsDTO.getEndDate()) ? autoFillGapSettingsDTO.getStartDate().toString() : autoFillGapSettingsDTO.getEndDate().toString());
-            }
-            if(isNotNull(autoFillGapSettings)){
-                exceptionService.duplicateDataException(ERROR_DUPLICATE_AUTO_FILL_GAP_SETTING_FOUND);
-            }
-            updateParentEndDate(autoFillGapSettingsDTO, autoFillGapSettingsDTO.getStartDate().minusDays(1));
+        if(isNotNull(duplicateAutoFillGapSettings)){
+            exceptionService.duplicateDataException(ERROR_DUPLICATE_AUTO_FILL_GAP_SETTING_FOUND);
         }
     }
 
-    private void updateParentEndDate(AutoFillGapSettingsDTO autoFillGapSettingsDTO, LocalDate endDate) {
-        AutoFillGapSettings autoFillGapSettings;
-        if(isNotNull(autoFillGapSettingsDTO.getParentId())){
-            autoFillGapSettings = autoFillGapSettingsMongoRepository.findOne(autoFillGapSettingsDTO.getParentId());
-        } else if (isNotNull(autoFillGapSettingsDTO.getCountryId())) {
-            autoFillGapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForCountry(autoFillGapSettingsDTO.getCountryId(), autoFillGapSettingsDTO.getOrganizationTypeId(), autoFillGapSettingsDTO.getOrganizationSubTypeId(), autoFillGapSettingsDTO.getPhaseId(), autoFillGapSettingsDTO.getAutoGapFillingScenario().toString(), autoFillGapSettingsDTO.getId(), autoFillGapSettingsDTO.getGapApplicableFor().toString(), autoFillGapSettingsDTO.getStartDate().toString(), isNull(autoFillGapSettingsDTO.getEndDate()) ? autoFillGapSettingsDTO.getStartDate().toString() : autoFillGapSettingsDTO.getEndDate().toString());
-        } else {
-            autoFillGapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(autoFillGapSettingsDTO.getUnitId(), autoFillGapSettingsDTO.getOrganizationTypeId(), autoFillGapSettingsDTO.getOrganizationSubTypeId(), autoFillGapSettingsDTO.getPhaseId(), autoFillGapSettingsDTO.getAutoGapFillingScenario().toString(), autoFillGapSettingsDTO.getId(), autoFillGapSettingsDTO.getGapApplicableFor().toString(), autoFillGapSettingsDTO.getStartDate().toString(), isNull(autoFillGapSettingsDTO.getEndDate()) ? autoFillGapSettingsDTO.getStartDate().toString() : autoFillGapSettingsDTO.getEndDate().toString());
+    private void updateEndDate(AutoFillGapSettings autoFillGapSettings) {
+        AutoFillGapSettings parentAutoFillGapSettings = null;
+        if(isNotNull(autoFillGapSettings.getParentId())){
+            parentAutoFillGapSettings = autoFillGapSettingsMongoRepository.findOne(autoFillGapSettings.getParentId());
         }
-        if(isNotNull(autoFillGapSettings)) {
-            autoFillGapSettingsDTO.setParentId(autoFillGapSettings.getId());
-            autoFillGapSettings.setEndDate(endDate);
-            autoFillGapSettingsMongoRepository.save(autoFillGapSettings);
+        LocalDate endDate = null;
+        if(isNotNull(parentAutoFillGapSettings)) {
+            if(autoFillGapSettings.getStartDate().isAfter(parentAutoFillGapSettings.getStartDate())) {
+                endDate = parentAutoFillGapSettings.getEndDate();
+                parentAutoFillGapSettings.setEndDate(autoFillGapSettings.getStartDate().minusDays(1));
+                autoFillGapSettingsMongoRepository.save(parentAutoFillGapSettings);
+            } else {
+                endDate = parentAutoFillGapSettings.getEndDate().minusDays(1);
+            }
         }
+        autoFillGapSettings.setEndDate(endDate);
     }
 
     public List<AutoFillGapSettingsDTO> getAllAutoFillGapSettings(Long countryOrUnitId, boolean forCountry) {
-        List<AutoFillGapSettings> autoFillGapSettingsList;
+        List<AutoFillGapSettingsDTO> autoFillGapSettingsList;
         if (forCountry) {
             autoFillGapSettingsList = autoFillGapSettingsMongoRepository.getAllByCountryId(countryOrUnitId);
         } else {
             autoFillGapSettingsList = autoFillGapSettingsMongoRepository.getAllByUnitId(countryOrUnitId);
         }
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(autoFillGapSettingsList, AutoFillGapSettingsDTO.class);
+        return autoFillGapSettingsList;
     }
 
     public Boolean deleteAutoFillGapSettings(BigInteger autoFillGapSettingsId) {
@@ -166,7 +148,7 @@ public class AutoFillGapSettingsService {
             Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = updateStaffingLevelDetails(activityList, activities, phase, activityWrapperMap);
             AutoGapFillingScenario gapFillingScenario = getGapFillingScenario(shiftActivityBeforeGap, shiftActivityAfterGap);
             //TODO merge this call with activity fetch
-            AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), staffAdditionalInfoDTO.getOrganizationType().getId(), staffAdditionalInfoDTO.getOrganizationSubType().getId(), phase.getId(), gapFillingScenario.toString(), null, staffAdditionalInfoDTO.getRoles().contains(MANAGEMENT) ? MANAGEMENT.toString() : STAFF.toString(), shiftDTO.getShiftDate().toString(), shiftDTO.getShiftDate().toString());
+            AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), staffAdditionalInfoDTO.getOrganizationType().getId(), staffAdditionalInfoDTO.getOrganizationSubType().getId(), phase.getId(), gapFillingScenario.toString(), null, staffAdditionalInfoDTO.getRoles().contains(MANAGEMENT) ? MANAGEMENT.toString() : STAFF.toString(), shiftDTO.getShiftDate(), shiftDTO.getShiftDate());
             ShiftActivityDTO shiftActivityDTO = getActivityToFillTheGap(phase, staffAdditionalInfoDTO, shiftActivityBeforeGap, shiftActivityAfterGap, gapFillingScenario, gapSettings, staffingLevelActivityWithDurationMap, activityList);
             for (int index = 0; index < shiftDTO.getActivities().size() - 1; index++) {
                 if (!shiftDTO.getActivities().get(index).getEndDate().equals(shiftDTO.getActivities().get(index + 1).getStartDate())) {
