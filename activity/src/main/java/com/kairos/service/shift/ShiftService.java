@@ -89,6 +89,7 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
+import static com.kairos.enums.FilterType.INCLUDE_DRAFT_SHIFT;
 import static com.kairos.enums.TimeTypeEnum.GAP;
 import static com.kairos.enums.reason_code.ReasonCodeType.TIME_TYPE;
 import static com.kairos.enums.shift.ShiftType.SICK;
@@ -640,8 +641,9 @@ public class ShiftService extends MongoBaseService {
 
             }
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
-
             shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
+            shift.setTimeBankCTADistributions(oldShift.getTimeBankCTADistributions());
+            shift.setPayoutPerShiftCTADistributions(oldShift.getPayoutPerShiftCTADistributions());
             ShiftType shiftType =updateShiftType(activityWrapperMap, shift);
             shift.setShiftType(shiftType);
             shift.setPhaseId(phase.getId());
@@ -767,7 +769,9 @@ public class ShiftService extends MongoBaseService {
             shifts = shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, asDate(startDate), asDate(endDate), unitId,staffFilterDTO);
         }
         updateReasonCodeAndNameInActivitiesAndUpdateSicknessDetails(reasonCodeMap, shifts);
-        shifts = updateDraftShiftToShift(shifts);
+        if(!staffFilterDTO.getFiltersData().stream().anyMatch(filterSelectionDTO -> INCLUDE_DRAFT_SHIFT.equals(filterSelectionDTO.getName()))){
+            shifts = updateDraftShiftToShift(shifts);
+        }
         shifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts);
         for(ShiftDTO shift :shifts){
             if(isNotNull(shift.getShiftViolatedRules())) {
@@ -944,7 +948,9 @@ public class ShiftService extends MongoBaseService {
         Date endDate = asDate(endLocalDate);
         List<ShiftDTO> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate,staffFilterDTO);
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessRolesOfStaff(unitId);
-        assignedShifts = updateDraftShiftToShift(assignedShifts);
+        if(!staffFilterDTO.getFiltersData().stream().anyMatch(filterSelectionDTO -> INCLUDE_DRAFT_SHIFT.equals(filterSelectionDTO.getName()))){
+            assignedShifts = updateDraftShiftToShift(assignedShifts);
+        }
         Map<Long, List<ShiftDTO>> employmentIdAndShiftsMap = assignedShifts.stream().collect(Collectors.groupingBy(ShiftDTO::getEmploymentId, Collectors.toList()));
         assignedShifts = new ArrayList<>(assignedShifts.size());
         for (Map.Entry<Long, List<ShiftDTO>> employmentIdAndShiftEntry : employmentIdAndShiftsMap.entrySet()) {
