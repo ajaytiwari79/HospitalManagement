@@ -37,6 +37,7 @@ public class EmploymentType extends UserBaseEntity {
     //Added By Pavan
     private boolean editableAtEmployment;
     private Short weeklyMinutes;
+    private boolean canRankTeam;
 
 
     public EmploymentType(Long id,@NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull") String name, String description, boolean allowedForContactPerson, boolean allowedForShiftPlan, boolean allowedForFlexPool, Set<EmploymentCategory> employmentCategories, PaidOutFrequencyEnum paymentFrequency, boolean editableAtEmployment) {
