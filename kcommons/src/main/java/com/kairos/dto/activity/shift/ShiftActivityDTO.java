@@ -90,6 +90,7 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private BigInteger shiftId;
     private BigInteger timeTypeId;
     private String methodForCalculatingTime;
+    private ViolatedRulesDTO violatedRules;
 
     public ShiftActivityDTO(Date startDate, Date endDate) {
         this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
@@ -126,13 +127,13 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
         this.activityName = activityName;
         this.status=status;
     }
-    public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success,Set<ShiftStatus> status,List<WorkTimeAgreementRuleViolation> wtaRuleViolations) {
+    public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success,Set<ShiftStatus> status,ViolatedRulesDTO violatedRules) {
         this.message = message;
         this.success = success;
         this.id = id;
         this.activityName = activityName;
         this.status=status;
-        this.wtaRuleViolations=wtaRuleViolations;
+        this.violatedRules=violatedRules;
     }
     public ShiftActivityDTO() {
     }

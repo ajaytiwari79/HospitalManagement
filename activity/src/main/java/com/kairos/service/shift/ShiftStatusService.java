@@ -8,7 +8,6 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
-import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -161,8 +160,8 @@ public class ShiftStatusService {
         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(currentShift.getId());
         List<TodoStatus> todoStatuses = newArrayList(TodoStatus.REQUESTED,TodoStatus.PENDING);
         if(todoStatuses.contains(currentShift.getRequestAbsence().getTodoStatus()) && validAccessGroup && accessRoles.contains(staffAccessRole)){
-            List<WorkTimeAgreementRuleViolation> workTimeAgreementRuleViolations = getWorkTimeAgreementRuleViolation(todoService.updateTodoStatus(null, getTodoStatus(shiftPublishDTO.getStatus()),shiftPublishDTO.getShifts().get(0).getShiftId(),null));
-            ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(isCollectionEmpty(workTimeAgreementRuleViolations) ? MESSAGE_SHIFT_STATUS_ADDED : ERROR_SHIFT_CREATION), true, newHashSet(shiftPublishDTO.getStatus()), workTimeAgreementRuleViolations);
+            ViolatedRulesDTO violatedRulesDTO = getViolatedRulesDTO(todoService.updateTodoStatus(null, getTodoStatus(shiftPublishDTO.getStatus()),shiftPublishDTO.getShifts().get(0).getShiftId(),null));
+            ShiftActivityDTO shiftActivityDTO = new ShiftActivityDTO(currentShift.getRequestAbsence().getActivityName(), null, localeService.getMessage(isCollectionEmpty(violatedRulesDTO.getWorkTimeAgreements()) ? MESSAGE_SHIFT_STATUS_ADDED : ERROR_SHIFT_CREATION), true, newHashSet(shiftPublishDTO.getStatus()), violatedRulesDTO);
             shiftActivityDTO.setId(currentShift.getId());
             shiftActivityResponseDTO.getActivities().add(shiftActivityDTO);
         }else if(!accessRoles.contains(staffAccessRole) || !validAccessGroup){
@@ -177,14 +176,15 @@ public class ShiftStatusService {
         return new ShiftAndActivtyStatusDTO(newArrayList(ObjectMapperUtils.copyPropertiesByMapper(currentShift,ShiftDTO.class)), newArrayList(shiftActivityResponseDTO));
     }
 
-    private List<WorkTimeAgreementRuleViolation> getWorkTimeAgreementRuleViolation(List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS) {
-        List<WorkTimeAgreementRuleViolation> workTimeAgreementRuleViolations = new ArrayList<>();
+    private ViolatedRulesDTO getViolatedRulesDTO(List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS) {
+        ViolatedRulesDTO violatedRulesDTO = new ViolatedRulesDTO();
         shiftWithViolatedInfoDTOS.forEach(shiftWithViolatedInfoDTO -> {
             if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements())){
-                workTimeAgreementRuleViolations.addAll(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
+                violatedRulesDTO.getWorkTimeAgreements().addAll(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
+                violatedRulesDTO.getActivities().addAll(shiftWithViolatedInfoDTO.getViolatedRules().getActivities());
             }
         });
-        return workTimeAgreementRuleViolations;
+        return violatedRulesDTO;
     }
 
     private TodoStatus getTodoStatus(ShiftStatus shiftStatus){
