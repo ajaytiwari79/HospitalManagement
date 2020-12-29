@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
@@ -69,6 +70,17 @@ public class PlanningPeriod extends MongoBaseEntity {
 
     public boolean contains(LocalDate localDate){
         return takeInterval().contains(asDate(localDate)) || endDate.equals(localDate);
+    }
+
+    public Map<LocalDate,BigInteger> getLocalDatePhaseIdMap(){
+        AtomicReference<LocalDate> start = new AtomicReference<>(startDate);
+        Map<LocalDate,BigInteger> localDateMap = new HashMap<LocalDate, BigInteger>(){{
+            while (!start.get().isAfter(endDate)){
+                put(startDate,currentPhaseId);
+                start.set(start.get().plusDays(1));
+            }
+        }};
+        return localDateMap;
     }
 
     public enum Type {

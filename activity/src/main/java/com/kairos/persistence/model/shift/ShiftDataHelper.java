@@ -13,6 +13,7 @@ import com.kairos.enums.phase.PhaseType;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.model.night_worker.NightWorker;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.wta.StaffWTACounter;
@@ -22,6 +23,7 @@ import lombok.*;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,6 +64,8 @@ public class ShiftDataHelper {
     private Phase tentativePhase;
     private List<Phase> actualPhases;
     private String timeZone;
+    private List<PlanningPeriod> planningPeriods;
+    private Map<LocalDate,BigInteger> localDatePhaseMap;
 
     public WTAQueryResultDTO getWtaByDate(LocalDate localDate,Long employmentId){
         if(isMapEmpty(workingTimeAgreementMap)) {
@@ -172,6 +176,16 @@ public class ShiftDataHelper {
             actualPhases = phases.stream().filter(phase -> phase.getPhaseType().equals(PhaseType.ACTUAL)).collect(Collectors.toList());
         }
         return actualPhases;
+    }
+
+    public Map<LocalDate,BigInteger> getDatePhaseIdMap() {
+        if(isMapEmpty(localDatePhaseMap)){
+            Map<LocalDate,BigInteger> localDatePhaseIdMap = new HashMap<>();
+            for (PlanningPeriod period : planningPeriods) {
+                localDatePhaseIdMap.putAll(period.getLocalDatePhaseIdMap());
+            }
+        }
+        return localDatePhaseMap;
     }
 }
 

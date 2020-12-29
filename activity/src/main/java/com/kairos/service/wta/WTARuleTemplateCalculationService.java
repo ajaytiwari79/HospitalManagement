@@ -21,6 +21,7 @@ import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftDataHelper;
 import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -107,6 +108,25 @@ public class WTARuleTemplateCalculationService {
                 }
                 boolean editable=shiftValidatorService.validateGracePeriod(shift.getStartDate(), true, shift.getUnitId(), phaseMapByDate.get(shift.getActivities().get(0).getStartDate()));
                 shift.setEditable(editable);
+            }
+        }
+        return shifts;
+    }
+
+    public <T extends ShiftDTO> List<T> updateRestingTimeInShifts(List<T> shifts, ShiftDataHelper shiftDataHelper) {
+        if (isCollectionNotEmpty(shifts)) {
+            if (!(shifts instanceof ArrayList)) {
+                shifts = new ArrayList<>(shifts);
+            }
+            shifts.sort(comparing(ShiftDTO::getStartDate));
+            Date endDate = getStartOfDay(plusDays(shifts.get(shifts.size() - 1).getEndDate(), 1));
+            List<WTAQueryResultDTO> workingTimeAgreements = shiftDataHelper.getWorkingTimeAgreementMap().get(shifts.get(0).getEmploymentId());
+            Map<DateTimeInterval, List<DurationBetweenShiftsWTATemplate>> intervalWTARuletemplateMap = getIntervalWTARuletemplateMap(workingTimeAgreements, asLocalDate(endDate).plusDays(1));
+            Set<LocalDateTime> dateTimes = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
+            Map<Date, Phase> phaseMapByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dateTimes,shiftDataHelper);
+            for (ShiftDTO shift : shifts) {
+                int restingMinutes = getRestingMinutes(intervalWTARuletemplateMap, phaseMapByDate, shift);
+                shift.setRestingMinutes(restingMinutes);
             }
         }
         return shifts;

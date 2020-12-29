@@ -292,35 +292,58 @@ public class PhaseService extends MongoBaseService {
      * @param dates
      * @return
      */
-    public Map<Date,Phase> getPhasesByDates(Long unitId, Set<LocalDateTime> dates) {
-        String timeZone= userIntegrationService.getTimeZoneByUnitId(unitId);
+    public Map<Date,Phase> getPhasesByDates(Long unitId, Set<LocalDateTime> dates,ShiftDataHelper shiftDataHelper) {
+        String timeZone;
+        List<Phase> phases;
+        List<PlanningPeriod> planningPeriods;
+        if(isNotNull(shiftDataHelper)){
+            timeZone = shiftDataHelper.getTimeZone();
+            phases = shiftDataHelper.getPhases();
+            planningPeriods = shiftDataHelper.getPlanningPeriods();
+        }else {
+            timeZone = userIntegrationService.getTimeZoneByUnitId(unitId);
+            phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
+            Set<LocalDate> localDates = dates.stream().map(localDateTime -> localDateTime.toLocalDate()).collect(Collectors.toSet());
+            planningPeriods = planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId,localDates);
+        }
         Map<Date,Phase> localDatePhaseStatusMap=new HashMap<>();
-        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
-        Map<String,Phase> phaseMap=phases.stream().collect(Collectors.toMap(k->k.getPhaseEnum().toString(), v->v));
-        Map<BigInteger,Phase> phaseAndIdMap=phases.stream().collect(Collectors.toMap(Phase::getId, v->v));
+        Map[] phaseDetailsMap=getPhaseMap(phases);
+        Map<BigInteger,Phase> phaseAndIdMap=(Map<BigInteger,Phase>)phaseDetailsMap[0];
+        Map<String,Phase> phaseMap = (Map<String,Phase>)phaseDetailsMap[1];
         DayOfWeek tentativeDayOfWeek = phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay() == null ? DayOfWeek.MONDAY : phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay();
         LocalDateTime untilTentative = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),tentativeDayOfWeek).atStartOfDay().minusSeconds(1);
-        Set<LocalDate> localDates=new HashSet<>();
-        dates.forEach(d->localDates.add(d.toLocalDate()));
-        if(isCollectionNotEmpty(localDates)){
-        List<PlanningPeriod> planningPeriods=planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId,localDates);
-        for(LocalDateTime requestedDate:dates){
-            Phase phase = null;
-            if (requestedDate.isAfter(untilTentative)) {
-                Optional<PlanningPeriod> planningPeriodOptional = planningPeriods.stream().filter(planningPeriod -> planningPeriod.contains(requestedDate.toLocalDate())).findAny();
-                if(planningPeriodOptional.isPresent()) {
-                    phase = phaseAndIdMap.get(planningPeriodOptional.get().getCurrentPhaseId());
+        if (isCollectionNotEmpty(dates)) {
+            for (LocalDateTime requestedDate : dates) {
+                Phase phase = null;
+                if (requestedDate.isAfter(untilTentative)) {
+                    if(isNotNull(shiftDataHelper)){
+                        phase = phaseAndIdMap.get(shiftDataHelper.getLocalDatePhaseMap().get(requestedDate.toLocalDate()));
+                    }else {
+                        Optional<PlanningPeriod> planningPeriodOptional = planningPeriods.stream().filter(planningPeriod -> planningPeriod.contains(requestedDate.toLocalDate())).findAny();
+                        if (planningPeriodOptional.isPresent()) {
+                            phase = phaseAndIdMap.get(planningPeriodOptional.get().getCurrentPhaseId());
+                        }
+                    }
+                } else {
+                    phase = getActualPhaseApplicableForDate(requestedDate, phaseMap, untilTentative, timeZone);
                 }
-            } else {
-                phase = getActualPhaseApplicableForDate(requestedDate,  phaseMap, untilTentative, timeZone);
+                if (isNull(phase)) {
+                    exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PHASES_ON_DATE, unitId, requestedDate);
+                }
+                localDatePhaseStatusMap.put(asDate(requestedDate), phase);
             }
-            if(isNull(phase)){
-                exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PHASES_ON_DATE,unitId,requestedDate);
-            }
-            localDatePhaseStatusMap.put(asDate(requestedDate), phase);
-        }
         }
         return localDatePhaseStatusMap;
+    }
+
+    private Map[] getPhaseMap(List<Phase> phases){
+        Map<BigInteger,Phase> phaseMap = new HashMap<>();
+        Map<String,Phase> phaseEnumMap = new HashMap<>();
+        for (Phase phase : phases) {
+            phaseMap.put(phase.getId(),phase);
+            phaseEnumMap.put(phase.getPhaseEnum().toString(),phase);
+        }
+        return new Map[]{phaseMap,phaseEnumMap};
     }
 
     /**
