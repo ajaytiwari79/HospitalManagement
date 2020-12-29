@@ -11,9 +11,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -29,22 +29,37 @@ public class AbsenceRankingSettingsController {
     @Inject
     private AbsenceRankingSettingsService absenceRankingSettingsService;
 
-    @ApiOperation(value = "save a senior days for expertise")
+    @ApiOperation(value = "save a absence_ranking  for expertise")
     @PostMapping(value =  "/expertise/{expertiseId}/absence_ranking")
-    public ResponseEntity<Map<String, Object>> saveSeniorDays(@PathVariable Long expertiseId, @RequestBody @Valid AbsenceRankingDTO absenceRankingDTO) {
+    public ResponseEntity<Map<String, Object>> saveAbsenceRanking(@PathVariable Long expertiseId, @RequestBody @Valid AbsenceRankingDTO absenceRankingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.saveAbsenceRankingSettings(absenceRankingDTO));
     }
 
-    @ApiOperation(value = "get  senior days  settings of expertise")
+    @ApiOperation(value = "get  absence_ranking settings of expertise")
     @GetMapping(value =   "/expertise/{expertiseId}/absence_ranking")
-    public ResponseEntity<Map<String, Object>> getSeniorDays(@PathVariable Long expertiseId) {
+    public ResponseEntity<Map<String, Object>> getAbsenceRanking(@PathVariable Long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.getAbsenceRankingSettings(expertiseId));
     }
 
-    @ApiOperation(value = "update a senior days settings for expertise")
-    @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/absence_ranking")
-    public ResponseEntity<Map<String, Object>> updateSeniorDays( @RequestBody @Valid AbsenceRankingDTO absenceRankingDTO) {
+    @ApiOperation(value = "update a absence_ranking settings for expertise")
+    @PutMapping(value = "/expertise/{expertiseId}/absence_ranking")
+    public ResponseEntity<Map<String, Object>> updateAbsenceRanking( @RequestBody @Valid AbsenceRankingDTO absenceRankingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.updateAbsenceRankingSettings(absenceRankingDTO));
+    }
+
+
+
+
+    @ApiOperation(value = "published a absence_ranking settings for expertise")
+    @PutMapping(value =  "/expertise/{expertiseId}/absence_ranking/{id}/publish")
+    public ResponseEntity<Map<String, Object>> publishAbsenceRanking(@PathVariable BigInteger id, @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.publishSeniorDays(id, publishedDate));
+    }
+
+    @ApiOperation(value = "delete a senior days for expertise")
+    @DeleteMapping(value = "/absence_ranking/{id}")
+    public ResponseEntity<Map<String, Object>> deleteSeniorDays(@PathVariable BigInteger id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.deleteAbsenceRankingSettings(id));
     }
 
 }
