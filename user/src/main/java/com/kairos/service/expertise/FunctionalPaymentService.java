@@ -20,17 +20,20 @@ import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.functional_paymment.IsFunctionalPaymentAvailable;
 import com.kairos.rule_validator.functional_paymment.IsGreaterThanStartDate;
 import com.kairos.rule_validator.functional_paymment.IsGreaterThanToday;
+import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 @Service
@@ -46,7 +49,8 @@ public class FunctionalPaymentService {
     private SeniorityLevelFunctionRelationshipGraphRepository seniorityLevelFunctionRelationshipGraphRepository;
     private FunctionalPaymentMatrixRepository functionalPaymentMatrixRepository;
     private ExpertiseLineGraphRepository expertiseLineGraphRepository;
-
+    @Inject
+    private EmploymentService employmentService;
 
 
     public FunctionalPaymentService(ExceptionService exceptionService, FunctionalPaymentGraphRepository functionalPaymentGraphRepository
@@ -265,6 +269,9 @@ public class FunctionalPaymentService {
             }
         }
         functionalPaymentGraphRepository.save(functionalPayment);
+        if(isNotNull(functionalPayment)){
+            employmentService.createEmploymentLineOnFunctionTableChanges(functionalPayment);
+        }
         return parentFunctionalPayment;
 
     }

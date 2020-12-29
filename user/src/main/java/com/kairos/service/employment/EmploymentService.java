@@ -35,6 +35,7 @@ import com.kairos.persistence.model.user.employment.query_result.EmploymentQuery
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseLine;
+import com.kairos.persistence.model.user.expertise.FunctionalPayment;
 import com.kairos.persistence.model.user.expertise.response.ExpertisePlannedTimeQueryResult;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -920,35 +921,43 @@ public class EmploymentService {
                 .build();
     }
 
-
     public void createEmploymentLineOnPayTableChanges(PayTable payTable) {
         List<Employment> employments = employmentGraphRepository.getAllEmploymentByLevel(payTable.getLevel().getId(), payTable.getStartDateMillis().toString(), payTable.getEndDateMillis() == null ? null : payTable.getEndDateMillis().toString());
-        DateTimeInterval expertiseLineInterval = new DateTimeInterval(payTable.getStartDateMillis(), payTable.getEndDateMillis());
+        createEmploymentLineOnChanges(employments, payTable.getStartDateMillis(), payTable.getEndDateMillis());
+    }
+
+    public void createEmploymentLineOnFunctionTableChanges(FunctionalPayment functionalPayment) {
+        List<Employment> employments = employmentGraphRepository.getAllEmploymentByFunctionId(functionalPayment.getId(), functionalPayment.getStartDate().toString(), isNull(functionalPayment.getEndDate()) ? null : functionalPayment.getEndDate().toString());
+        createEmploymentLineOnChanges(employments, functionalPayment.getStartDate(), functionalPayment.getEndDate());
+    }
+
+    public void createEmploymentLineOnChanges(List<Employment> employments, LocalDate startDate, LocalDate endDate) {
+        DateTimeInterval expertiseLineInterval = new DateTimeInterval(startDate, endDate);
         List<Employment> employmentList = new ArrayList<>();
         for (Employment employment : employments) {
             List<EmploymentLine> employmentLines = new CopyOnWriteArrayList<>(employment.getEmploymentLines());
             employmentLines.sort(Comparator.comparing(EmploymentLine::getStartDate));
             ListIterator iterator=employmentLines.listIterator();
             while (iterator.hasNext()){
-                updateEmploymentLines(payTable, expertiseLineInterval, employment, iterator);
+                updateEmploymentLines(startDate, endDate, expertiseLineInterval, employment, iterator);
             }
             employmentList.add(employment);
         }
         employmentGraphRepository.saveAll(employmentList);
     }
 
-    private void updateEmploymentLines(PayTable payTable, DateTimeInterval expertiseLineInterval, Employment employment, ListIterator iterator) {
+    private void updateEmploymentLines(LocalDate startDate, LocalDate endDate, DateTimeInterval expertiseLineInterval, Employment employment, ListIterator iterator) {
         EmploymentLine employmentLine=(EmploymentLine) iterator.next();
         DateTimeInterval employmentLineInterval = new DateTimeInterval(employmentLine.getStartDate(), employmentLine.getEndDate());
         if (expertiseLineInterval.overlaps(employmentLineInterval)) {
-            if (employmentLine.getStartDate().isBefore(payTable.getStartDateMillis())) {
-                employmentLine.setEndDate(payTable.getStartDateMillis().minusDays(1));
-                LocalDate endDate=payTable.getEndDateMillis();
-                if(payTable.getEndDateMillis()==null && iterator.hasNext()){
-                    endDate= ((EmploymentLine) iterator.next()).getStartDate().minusDays(1);
+            if (employmentLine.getStartDate().isBefore(startDate)) {
+                employmentLine.setEndDate(startDate.minusDays(1));
+                LocalDate localEndDate = endDate;
+                if(endDate == null && iterator.hasNext()){
+                    localEndDate= ((EmploymentLine) iterator.next()).getStartDate().minusDays(1);
                     iterator.previous();
                 }
-                EmploymentLine employmentLineToBeCreated = getEmploymentLine(null, employment, payTable.getStartDateMillis(), endDate, employmentLine, null);
+                EmploymentLine employmentLineToBeCreated = getEmploymentLine(null, employment, startDate, localEndDate, employmentLine, null);
                 employment.getEmploymentLines().add(employmentLineToBeCreated);
                 linkExistingRelations(employmentLineToBeCreated, employmentLine);
             } else {

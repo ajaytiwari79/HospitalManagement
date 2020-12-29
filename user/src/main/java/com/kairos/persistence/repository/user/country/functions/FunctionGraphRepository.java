@@ -52,8 +52,8 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "MATCH(expertiseLine)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(:FunctionalPayment)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(fpm:FunctionalPaymentMatrix) \n" +
             "MATCH(fpm)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(slf:SeniorityLevelFunction) " +
             "MATCH(slf)-[:" + HAS_FUNCTIONAL_AMOUNT + "]-(fn:Function) \n" +
-            "RETURN distinct id(fn) as id ,fn.code as code,fn.name as name")
-    List<FunctionDTO> getFunctionsByExpertiseId(Long expertiseId);
+            "RETURN distinct id(fn) as id ,fn.code as code,fn.name as name,fn.startDate as startDate,fn.endDate as endDate")
+    List<FunctionDTO> getFunctionsByExpertiseLineId(Long expertiseLineId);
 
     @Query("MATCH (unit:Unit) where id(unit)={3} \n" +
             "MATCH(unit)-[:" + CONTACT_ADDRESS + "]-(:ContactAddress)-[:" + MUNICIPALITY + "]-(municipality:Municipality)<-[rel:" + HAS_MUNICIPALITY + "]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
