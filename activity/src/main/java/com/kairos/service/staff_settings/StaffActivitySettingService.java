@@ -76,8 +76,10 @@ public class StaffActivitySettingService extends MongoBaseService {
             exceptionService.dataNotFoundException(MESSAGE_STAFF_ACTIVITY_SETTINGS_ABSENT);
         }
         ObjectMapperUtils.copyProperties(staffActivitySettingDTO,staffActivitySetting);
+        Activity activity = activityMongoRepository.findActivityByIdAndEnabled(staffActivitySettingDTO.getActivityId());
+        staffActivitySetting.setSecondLevelTimtype(activity.getActivityBalanceSettings().getTimeType());
         staffActivitySetting.setUnitId(unitId);
-        save(staffActivitySetting);
+        staffActivitySettingRepository.save(staffActivitySetting);
         return staffActivitySettingDTO;
     }
 
@@ -207,6 +209,7 @@ public class StaffActivitySettingService extends MongoBaseService {
                    unitId,activitySetting.getShortestTime(),activitySetting.getLongestTime(),activitySetting.getMinLength(),activitySetting.getMaxThisActivityPerShift(),
                    activitySetting.isEligibleForMove(),activitySetting.getEarliestStartTime(),activitySetting.getLatestStartTime(),activitySetting.getMaximumEndTime(),
                    activity.getActivityRulesSettings().getDayTypes(), activitySetting.getDefaultStartTime(),activity.getActivityBalanceSettings().getTimeType());
+           staffActivitySetting.setSecondLevelTimtype(activity.getActivityBalanceSettings().getTimeType());
            staffActivitySettingSet.add(staffActivitySetting);
            StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),newArrayList(localeService.getMessage(DEFAULT_ADDED)));
            success.add(staffActivityResponse);
