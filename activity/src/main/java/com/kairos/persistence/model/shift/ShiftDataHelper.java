@@ -67,16 +67,30 @@ public class ShiftDataHelper {
         if(isMapEmpty(workingTimeAgreementMap)) {
             workingTimeAgreementMap = workingTimeAgreements.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId(),Collectors.toList()));
         }if(workingTimeAgreementMap.containsKey(employmentId)){
-            return workingTimeAgreementMap.get(employmentId).stream().filter(wta -> wta.isValidWorkTimeAgreement(localDate)).findFirst().orElseThrow(() -> new DataNotFoundByIdException(convertMessage(MESSAGE_WTA_NOTFOUND)));
+            return workingTimeAgreementMap.get(employmentId).stream().filter(wta -> wta.isValidWorkTimeAgreement(localDate)).findFirst().orElse(null);
         }
         return null;
     }
 
-    public CTAResponseDTO getCtaByDate(LocalDate localDate,Long employmentId){
+    public Map<Long, List<WTAQueryResultDTO>> getWorkingTimeAgreementMap() {
+        if(isMapEmpty(workingTimeAgreementMap)) {
+            workingTimeAgreementMap = workingTimeAgreements.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId(),Collectors.toList()));
+        }
+        return workingTimeAgreementMap;
+    }
+
+    public Map<Long, List<CTAResponseDTO>> getCostTimeAgreementMap() {
+        if(isMapEmpty(costTimeAgreementMap)) {
+            costTimeAgreementMap = costTimeAgreements.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId(),Collectors.toList()));
+        }
+        return costTimeAgreementMap;
+    }
+
+    public CTAResponseDTO getCtaByDate(LocalDate localDate, Long employmentId){
         if(isMapEmpty(costTimeAgreementMap)) {
             costTimeAgreementMap = costTimeAgreements.stream().collect(Collectors.groupingBy(cta -> cta.getEmploymentId(),Collectors.toList()));
         }if(costTimeAgreementMap.containsKey(employmentId)){
-            return costTimeAgreementMap.get(employmentId).stream().filter(cta -> cta.isValidCostTimeAgreement(localDate)).findFirst().orElseThrow(() -> new DataNotFoundByIdException(convertMessage(ERROR_CTA_NOTFOUND,localDate)));
+            return costTimeAgreementMap.get(employmentId).stream().filter(cta -> cta.isValidCostTimeAgreement(localDate)).findFirst().orElse(null);
         }
         return null;
     }
@@ -89,6 +103,13 @@ public class ShiftDataHelper {
         }
         throwException(MESSAGE_ACTIVITY_ID,activityId);
         return null;
+    }
+
+    public Map<BigInteger, ActivityDTO> getActivityMap() {
+        if(isMapEmpty(activityMap)){
+            activityMap = activities.stream().collect(Collectors.toMap(activityDTO -> activityDTO.getId(),v->v));
+        }
+        return activityMap;
     }
 
     public NightWorker getNightWorkerByStaffId(Long staffId){

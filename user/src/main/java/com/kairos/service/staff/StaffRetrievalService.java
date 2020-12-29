@@ -941,14 +941,19 @@ public class StaffRetrievalService {
             Set<Long> employmentIds = staffAdditionalInfoDTOS.stream().flatMap(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getEmploymentIds().stream()).collect(Collectors.toSet());
             List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(employmentIds,false);
             Map<Long,StaffEmploymentDetails> staffEmploymentDetailsMap = employmentDetails.stream().collect(Collectors.toMap(staffEmploymentDetails -> staffEmploymentDetails.getId(),v->v));
-            for (StaffAdditionalInfoDTO staffAdditionalInfoDTO : staffAdditionalInfoDTOS) {
-                List<StaffEmploymentDetails> staffEmploymentDetails = staffAdditionalInfoDTO.getEmploymentIds().stream().map(employmentId->staffEmploymentDetailsMap.get(employmentId)).collect(Collectors.toList());
+            ListIterator<StaffAdditionalInfoDTO> iterator = staffAdditionalInfoDTOS.listIterator();
+            while (iterator.hasNext()){
+                StaffAdditionalInfoDTO staffAdditionalInfoDTO = iterator.next();
+                List<StaffEmploymentDetails> staffEmploymentDetails = staffAdditionalInfoDTO.getEmploymentIds().stream().filter(employmentId->staffEmploymentDetailsMap.containsKey(employmentId)).map(employmentId->staffEmploymentDetailsMap.get(employmentId)).collect(Collectors.toList());
                 if(isCollectionNotEmpty(staffEmploymentDetails)){
                     staffAdditionalInfoDTO.setEmployment(staffEmploymentDetails.get(0));
                 }
+                else {
+                    iterator.remove();
+                }
             }
-            User user=userGraphRepository.findOne(UserContext.getUserDetails().getId());
-            return staffGraphRepository.getEligibleStaffsForCoverShift(unitId,notEligibleStaffDataDTO);
+            //User user=userGraphRepository.findOne(UserContext.getUserDetails().getId());
+            return staffAdditionalInfoDTOS;
         }
         return staffAdditionalInfoDTOS;
     }

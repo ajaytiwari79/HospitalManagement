@@ -870,7 +870,7 @@ public class UserIntegrationService {
     }
 
     public List<StaffAdditionalInfoDTO> getEligibleStaffsForCoverShifts(NotEligibleStaffDataDTO notEligibleStaffDataDTO,Long unitId) {
-        return genericRestClient.publishRequest(notEligibleStaffDataDTO, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/get_eligible_staffs_for_cover_shifts", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>() {});
+        return genericRestClient.publishRequest(notEligibleStaffDataDTO, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/staff/get_eligible_staffs_for_cover_shifts", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>() {});
     }
 }
 

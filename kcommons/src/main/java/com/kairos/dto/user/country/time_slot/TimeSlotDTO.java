@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -26,7 +27,7 @@ public class TimeSlotDTO {
     private int endHour;
     private int endMinute;
     private boolean shiftStartTime;
-    private Long id;
+    private BigInteger id;
     private Long unitId;
 
     public TimeSlotDTO(String name, int startHour, int startMinute, int endHour, int endMinute) {

@@ -39,6 +39,8 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 @NoArgsConstructor
 public class StaffAdditionalInfoDTO {
 
+    private String firstName;
+    private String lastName;
     private String name;
     private long id;
     private List<Long> teams;

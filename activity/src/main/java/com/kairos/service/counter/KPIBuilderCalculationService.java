@@ -1067,7 +1067,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 for (Object timeSlotId : filterTypeListEntry.getValue()) {
                     if (isCollectionNotEmpty(timeSlotDTOS)) {
                         for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
-                            if (timeSlotDTO.getId().equals(((Integer) timeSlotId).longValue())) {
+                            if (timeSlotDTO.getId().equals(BigInteger.valueOf((Integer) timeSlotId).longValue())) {
                                 timeSlotName.add(timeSlotDTO.getName());
                             }
                         }

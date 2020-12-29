@@ -295,6 +295,9 @@ public class TimeBankCalculationService {
     }
 
     public void calculateScheduledAndDurationInMinutes(ShiftActivityDTO shiftActivity, ActivityDTO activity, StaffEmploymentDetails staffEmploymentDetails, boolean calculateTimeBankOff) {
+        if(isNull(activity)){
+            activity = shiftActivity.getActivity();
+        }
         if (shiftActivity.getStartDate().after(shiftActivity.getEndDate())) {
             exceptionService.invalidRequestException(ACTIVITY_END_DATE_LESS_THAN_START_DATE, activity.getName());
         }

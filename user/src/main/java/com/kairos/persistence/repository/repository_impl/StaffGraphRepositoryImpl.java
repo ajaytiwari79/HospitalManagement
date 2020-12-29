@@ -641,7 +641,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }else {
             query.append(" MATCH (staff)-[:BELONGS_TO_TAGS]->(tag:Tag)");
         }
-        query.append(" WITH staff,staffChildDetails,teams,organization,employmentIds,user,COLLECT(tag) AS tags RETURN id(staff) AS id,staff.firstName AS name,staff.profilePic AS profilePic,teams,id(organization) AS unitId,employmentIds as employmentIds,id(user) AS staffUserId,user.cprNumber AS cprNumber,staffChildDetails,tags order by name");
+        query.append(" WITH staff,staffChildDetails,teams,organization,employmentIds,user,COLLECT(tag) AS tags RETURN id(staff) AS id,staff.firstName AS firstName,staff.lastName as lastName,staff.profilePic AS profilePic,teams,id(organization) AS unitId,employmentIds as employmentIds,id(user) AS staffUserId,user.cprNumber AS cprNumber,staffChildDetails,tags");
         Result result = session.query(query.toString(), queryParameters);
         Iterator si = result.iterator();
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = new ArrayList<>();

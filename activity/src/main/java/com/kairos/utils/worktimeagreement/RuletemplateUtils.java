@@ -14,6 +14,7 @@ import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -136,11 +137,11 @@ public class RuletemplateUtils {
         return interval;
     }
 
-    public static List<TimeInterval> getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotDTO> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
+    public static List<TimeInterval> getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlot> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
         List<TimeInterval> timeIntervals = new ArrayList<>();
         for (PartOfDay partOfDay : partOfDays) {
             if (timeSlotWrapperMap.containsKey(partOfDay.getValue())) {
-                TimeSlotDTO timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
+                TimeSlot timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
                 if (partOfDay.getValue().equals(timeSlotWrapper.getName())) {
                     int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
                     int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();
@@ -160,13 +161,13 @@ public class RuletemplateUtils {
         return timeIntervals;
     }
 
-    public static TimeInterval[] getTimeSlotsByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotDTO> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
+    public static TimeInterval[] getTimeSlotsByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlot> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
         TimeInterval[] timeIntervals = new TimeInterval[partOfDays.size()];
         int i=0;
         boolean valid = false;
         for (PartOfDay partOfDay : partOfDays) {
             if (timeSlotWrapperMap.containsKey(partOfDay.getValue())) {
-                TimeSlotDTO timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
+                TimeSlot timeSlotWrapper = timeSlotWrapperMap.get(partOfDay.getValue());
                 if (partOfDay.getValue().equals(timeSlotWrapper.getName())) {
                     int endMinutesOfInterval = (timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute();
                     int startMinutesOfInterval = (timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute();

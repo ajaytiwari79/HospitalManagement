@@ -23,10 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -52,17 +49,15 @@ public class CoverShiftService {
     @Inject private ExecutorService executorService;
 
 
-    public CoverShiftSetting getCoverShiftSettingsForUnit(Long unitId){
-        Set<CoverShiftSetting.CoverShiftCriteria> coverShiftCriteria = newHashSet(CoverShiftSetting.CoverShiftCriteria.values());
-        CoverShiftSetting coverShiftSetting = new CoverShiftSetting();
+    public CoverShiftSetting getCoverShiftSettingsForUnit(Long unitId,CoverShiftSetting coverShiftSetting){
         coverShiftSetting.setUnitId(unitId);
-        coverShiftSetting.setCoverShiftCriteria(coverShiftCriteria);
+        //coverShiftSetting.setCoverShiftCriteria(coverShiftCriteria);
         return coverShiftSetting;
     }
 
-    public List<Staff> getEligibleStaffs(BigInteger shiftId){
+    public List<Staff> getEligibleStaffs(BigInteger shiftId,CoverShiftSetting coverShiftSetting){
         Shift shift = shiftService.findOneByShiftId(shiftId);
-        CoverShiftSetting coverShiftSetting = getCoverShiftSettingsForUnit(shift.getUnitId());
+        coverShiftSetting = getCoverShiftSettingsForUnit(shift.getUnitId(),coverShiftSetting);
         Set<BigInteger> activityIds = getActivityIdsByShift(shift);
         List[] nonProductiveTypeActivityIdsAndAssignedStaffIds = activityService.findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(activityIds);
         List<BigInteger> nonProductiveTypeActivityIds = nonProductiveTypeActivityIdsAndAssignedStaffIds[0];
@@ -83,26 +78,27 @@ public class CoverShiftService {
 
     private void removeStaffWhichHaveWTAViolation(CoverShiftSetting coverShiftSetting, Shift shift, List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, Set<BigInteger> activityIds,Long countryId,boolean userAccessRole) {
         if(coverShiftSetting.getCoverShiftCriteria().contains(CoverShiftSetting.CoverShiftCriteria.STAFF_WITH_WTA_RULE_VIOLATION)){
-            Set<Long> employmentIds = new HashSet<>();
-            Set<Long> expertiseIds = new HashSet<>();
-            Set<Long> staffIds = new HashSet<>();
-            for (StaffAdditionalInfoDTO staffAdditionalInfoDTO : staffAdditionalInfoDTOS) {
-                employmentIds.add(staffAdditionalInfoDTO.getEmployment().getId());
-                expertiseIds.add(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
-                staffIds.add(staffAdditionalInfoDTO.getId());
-            }
-            ShiftDataHelper shiftDataHelper = planningPeriodService.getDataForShiftOperation(shift.getStartDate(), shift.getUnitId(), employmentIds,expertiseIds,staffIds,countryId, activityIds,null, userAccessRole);
+            ShiftDataHelper shiftDataHelper = getShiftDataHelperForCoverShift(coverShiftSetting, shift, staffAdditionalInfoDTOS, activityIds, countryId, userAccessRole);
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getActivities().get(0).getStartDate(), null,shiftDataHelper);
             ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(null,shiftDataHelper.getActivityMap(),shift);
             List<Future<ShiftWithViolatedInfoDTO>> shiftWithViolatedInfoDTOS = new ArrayList<>();
-            for (StaffAdditionalInfoDTO staffAdditionalInfoDTO : staffAdditionalInfoDTOS) {
-                shiftWithActivityDTO.setStaffId(staffAdditionalInfoDTO.getId());
-                shiftWithActivityDTO.setEmploymentId(staffAdditionalInfoDTO.getEmployment().getId());
-                Callable<ShiftWithViolatedInfoDTO> data = () -> shiftValidatorService.validateShiftWithActivity(phase, shiftWithActivityDTO, staffAdditionalInfoDTO, shiftDataHelper);
+            Iterator<StaffAdditionalInfoDTO> staffAdditionalInfoDTOIterator = staffAdditionalInfoDTOS.iterator();
+            while (staffAdditionalInfoDTOIterator.hasNext()){
+                StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffAdditionalInfoDTOIterator.next();
+                if(shiftDataHelper.getWtaByDate(asLocalDate(shift.getStartDate()),staffAdditionalInfoDTO.getEmployment().getId())==null || shiftDataHelper.getCtaByDate(asLocalDate(shift.getStartDate()),staffAdditionalInfoDTO.getEmployment().getId())==null){
+                    staffAdditionalInfoDTOIterator.remove();
+                    continue;
+                }
+                Callable<ShiftWithViolatedInfoDTO> data = () -> {
+                    ShiftWithActivityDTO shift1 = ObjectMapperUtils.copyPropertiesByMapper(shiftWithActivityDTO,ShiftWithActivityDTO.class);
+                    shift1.setStaffId(staffAdditionalInfoDTO.getId());
+                    shift1.setEmploymentId(staffAdditionalInfoDTO.getEmployment().getId());
+                    return shiftValidatorService.validateShiftWithActivity(phase, shift1, staffAdditionalInfoDTO, shiftDataHelper);
+                };
                 Future<ShiftWithViolatedInfoDTO> responseData = executorService.submit(data);
                 shiftWithViolatedInfoDTOS.add(responseData);
             }
-            List<ShiftWithViolatedInfoDTO> kpisData = new ArrayList<>();
+            List<ShiftWithViolatedInfoDTO> withViolatedInfoDTOS = new ArrayList<>();
             for (Future<ShiftWithViolatedInfoDTO> data : shiftWithViolatedInfoDTOS) {
                 try {
                     if(isNotNull(data)){
@@ -110,7 +106,7 @@ public class CoverShiftService {
                         if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements())){
                             staffAdditionalInfoDTOS.removeIf(staffAdditionalInfoDTO -> shiftWithViolatedInfoDTO.getShifts().get(0).getStaffId().equals(staffAdditionalInfoDTO.getId()));
                         }
-                        kpisData.add(shiftWithViolatedInfoDTO);
+                        withViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
                     }
                 } catch (InterruptedException | ExecutionException ex) {
                     LOGGER.error("error while generate KPI  data",ex);
@@ -118,6 +114,21 @@ public class CoverShiftService {
             }
 
         }
+    }
+
+    private ShiftDataHelper getShiftDataHelperForCoverShift(CoverShiftSetting coverShiftSetting, Shift shift, List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, Set<BigInteger> activityIds, Long countryId, boolean userAccessRole) {
+        String timeZone = userIntegrationService.getTimeZoneByUnitId(coverShiftSetting.getUnitId());
+        Set<Long> employmentIds = new HashSet<>();
+        Set<Long> expertiseIds = new HashSet<>();
+        Set<Long> staffIds = new HashSet<>();
+        for (StaffAdditionalInfoDTO staffAdditionalInfoDTO : staffAdditionalInfoDTOS) {
+            employmentIds.add(staffAdditionalInfoDTO.getEmployment().getId());
+            expertiseIds.add(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
+            staffIds.add(staffAdditionalInfoDTO.getId());
+        }
+        ShiftDataHelper shiftDataHelper = planningPeriodService.getDataForShiftOperation(shift.getStartDate(), shift.getUnitId(), employmentIds,expertiseIds,staffIds,countryId, activityIds,null, userAccessRole);
+        shiftDataHelper.setTimeZone(timeZone);
+        return shiftDataHelper;
     }
 
     private Set<BigInteger> getActivityIdsByShift(Shift shift) {

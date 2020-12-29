@@ -10,6 +10,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -157,7 +158,7 @@ public class WTARuleTemplateCalculationService {
         existingShifts.addAll(shifts);
         shiftValidatorService.updateFullDayAndFullWeekActivityShifts(existingShifts);
         Map<BigInteger, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
-        Map<String, TimeSlotDTO> timeSlotWrapperMap = staffAdditionalInfoDTO.getTimeSlotSets().stream().collect(Collectors.toMap(TimeSlotDTO::getName, v -> v));
+        Map<String, TimeSlot> timeSlotWrapperMap = staffAdditionalInfoDTO.getTimeSlotSets().stream().collect(Collectors.toMap(TimeSlotDTO::getName, v -> new TimeSlot(v)));
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = getExpertiseNightWorkerSetting(shift, staffAdditionalInfoDTO);
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(shift.getStaffId());
         Map<Date, Phase> phaseMapByDate = getDateWisePhaseMap(shift, shifts);
@@ -170,7 +171,7 @@ public class WTARuleTemplateCalculationService {
         return phaseService.getPhasesByDates(shift.getUnitId(), dates);
     }
 
-    private void updateWTACounter(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, List<PlanningPeriodDTO> planningPeriodDTOS, List<WTAQueryResultDTO> wtaQueryResultDTOS, List<ShiftWithActivityDTO> shifts, List<StaffWTACounter> staffWTACounters, List<ShiftWithActivityDTO> existingShifts, PlanningPeriod lastPlanningPeriod, Map<BigInteger, DayTypeDTO> dayTypeDTOMap, Map<String, TimeSlotDTO> timeSlotWrapperMap, ExpertiseNightWorkerSetting expertiseNightWorkerSetting, NightWorker nightWorker, Map<Date, Phase> phaseMapByDate) {
+    private void updateWTACounter(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, List<PlanningPeriodDTO> planningPeriodDTOS, List<WTAQueryResultDTO> wtaQueryResultDTOS, List<ShiftWithActivityDTO> shifts, List<StaffWTACounter> staffWTACounters, List<ShiftWithActivityDTO> existingShifts, PlanningPeriod lastPlanningPeriod, Map<BigInteger, DayTypeDTO> dayTypeDTOMap, Map<String, TimeSlot> timeSlotWrapperMap, ExpertiseNightWorkerSetting expertiseNightWorkerSetting, NightWorker nightWorker, Map<Date, Phase> phaseMapByDate) {
         for (ShiftWithActivityDTO updateShiftWithActivityDTO : shifts) {
             Phase phase = phaseMapByDate.get(updateShiftWithActivityDTO.getStartDate());
             LocalDate shiftStartDate = asLocalDate(updateShiftWithActivityDTO.getStartDate());

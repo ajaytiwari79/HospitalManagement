@@ -644,53 +644,59 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
     private AggregationOperation getCustomOperationForActivities(Collection<BigInteger> activityIds) {
         return new CustomAggregationOperation("{\n" +
-                "  \"$lookup\": {\n" +
-                "    \"from\": \"activities\",\n" +
-                "    \"let\": {\n" +
-                "      \"ids\" : "+getBigIntegerString(activityIds.iterator())+"\n" +
-                "    },\n" +
-                "    \"pipeline\": [\n" +
-                "      {\n" +
-                "        \"$match\": {\n" +
-                "          \"$expr\": {\n" +
-                "            \"$or\": [\n" +
-                "              {\n" +
-                "                \"$in\": [\n" +
-                "                  \"$_id\",\n" +
-                "                  \"$$ids\"\n" +
-                "                ]\n" +
-                "              }\n" +
-                "            ]\n" +
+                "    \"$lookup\": {\n" +
+                "      \"from\": \"activities\",\n" +
+                "      \"let\": {\n" +
+                "        \"ids\": "+
+                getBigIntegerString(activityIds.iterator())+
+                "      },\n" +
+                "      \"pipeline\": [\n" +
+                "        {\n" +
+                "          \"$match\": {\n" +
+                "            \"$expr\": {\n" +
+                "              \"$or\": [\n" +
+                "                {\n" +
+                "                  \"$in\": [\n" +
+                "                    \"$_id\",\n" +
+                "                    \"$$ids\"\n" +
+                "                  ]\n" +
+                "                }\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"$lookup\": {\n" +
+                "            \"from\": \"time_Type\",\n" +
+                "            \"localField\": \"activityBalanceSettings.timeTypeId\",\n" +
+                "            \"foreignField\": \"_id\",\n" +
+                "            \"as\": \"timeType\"\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"$lookup\": {\n" +
+                "            \"from\": \"activityPriority\",\n" +
+                "            \"localField\": \"activityPriorityId\",\n" +
+                "            \"foreignField\": \"_id\",\n" +
+                "            \"as\": \"activityPriority\"\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"$unwind\": {\n" +
+                "            \"path\": \"$timeType\",\n" +
+                "            \"preserveNullAndEmptyArrays\": true\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"$unwind\": {\n" +
+                "            \"path\": \"$activityPriority\",\n" +
+                "            \"preserveNullAndEmptyArrays\": true\n" +
                 "          }\n" +
                 "        }\n" +
-                "      },\n" +
-                "         {\n" +
-                "     $lookup:\n" +
-                "       {\n" +
-                "         from: \"time_Type\",\n" +
-                "         localField: \"activityBalanceSettings.timeTypeId\",\n" +
-                "         foreignField: \"_id\",\n" +
-                "         as: \"timeType\"\n" +
-                "       }\n" +
-                "  },\n" +
-                "  {\n" +
-                "     $lookup:\n" +
-                "       {\n" +
-                "         from: \"activityPriority\",\n" +
-                "         localField: \"activityPriorityId\",\n" +
-                "         foreignField: \"_id\",\n" +
-                "         as: \"activityPriority\"\n" +
-                "       }\n" +
-                "  },{\n" +
-                "    \"$unwind\": \"$timeType\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"$unwind\": \"$activityPriority\"\n" +
-                "  }\n" +
-                "    ],\n" +
-                "    \"as\": \"activities\"\n" +
-                "  }\n" +
-                "}");
+                "      ],\n" +
+                "      \"as\": \"activities\"\n" +
+                "    }\n" +
+                "  }");
     }
 
     private AggregationOperation getCustomActivityConfigurationOperationForShift(Long unitId) {
