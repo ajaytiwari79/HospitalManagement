@@ -354,7 +354,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "RETURN DISTINCT emp,r,exp,slRel,sl,COLLECT(empRel),COLLECT(empLine),staffRel,staff")
     List<Employment> getAllEmploymentByLevel(Long levelId,String startDate,String endDate);
 
-    @Query("MATCH(functionalPayment:FunctionalPayment)-[:"+APPLICABLE_FOR_EXPERTISE+"]->(exp:Expertise{deleted:false,published:true})-[r:"+HAS_EXPERTISE_IN+"]-(emp:Employment{deleted:false,published:true})-[empRel:"+HAS_EMPLOYMENT_LINES+"]->(empLine:EmploymentLine)-[slRel:"+HAS_SENIORITY_LEVEL+"]-(sl:SeniorityLevel) " +
+    @Query("MATCH(functionalPayment:FunctionalPayment)-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertiseLine:ExpertiseLine{deleted:false})<-[:"+HAS_EXPERTISE_LINES+"]-(exp:Expertise{deleted:false,published:true})-[r:"+HAS_EXPERTISE_IN+"]-(emp:Employment{deleted:false,published:true})-[empRel:"+HAS_EMPLOYMENT_LINES+"]->(empLine:EmploymentLine)-[slRel:"+HAS_SENIORITY_LEVEL+"]-(sl:SeniorityLevel) " +
             "MATCH(emp)<-[staffRel:"+BELONGS_TO_STAFF+"]-(staff:Staff)" +
             "WHERE id(functionalPayment)={0} AND  \n" +
             "(( {2} IS NULL AND (emp.endDate IS NULL OR DATE(emp.endDate) > DATE({1})))\n" +
