@@ -53,7 +53,7 @@ public class AbsenceRankingSettingsService {
     }
 
     public List<AbsenceRankingDTO> getAbsenceRankingSettings(){
-        return absenceRankingSettingsRepository.getAbsenceRankingSettingsDeletedFalse();
+        return absenceRankingSettingsRepository.getAbsenceRankingSettingsByDeletedFalse();
     }
 
     public List<AbsenceRankingDTO> getAbsenceRankingSettings(Long expertiseId){

@@ -13,7 +13,7 @@ public interface AbsenceRankingSettingsRepository extends MongoBaseRepository<Ab
 
     List<AbsenceRankingDTO> getAbsenceRankingSettingsByExpertiseIdAndDeletedFalse(Long expertiseId);
 
-    List<AbsenceRankingDTO> getAbsenceRankingSettingsDeletedFalse();
+    List<AbsenceRankingDTO> getAbsenceRankingSettingsByDeletedFalse();
 
     AbsenceRankingSettings findByDraftIdAndDeletedFalse(BigInteger draftId);
 
