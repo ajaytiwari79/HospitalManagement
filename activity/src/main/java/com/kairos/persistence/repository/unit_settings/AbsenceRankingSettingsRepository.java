@@ -17,6 +17,6 @@ public interface AbsenceRankingSettingsRepository extends MongoBaseRepository<Ab
 
     AbsenceRankingSettings findByDraftIdAndDeletedFalse(BigInteger draftId);
 
-    AbsenceRankingSettings findByExpertiseIdAndDeletedFalseOrderByStartDateDescLimitOne(Long expertiseId);
+    AbsenceRankingSettings findByTopExpertiseIdAndDeletedFalseOrderByStartDateDesc(Long expertiseId);
 
 }
