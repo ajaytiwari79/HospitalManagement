@@ -83,7 +83,7 @@ public class AbsenceRankingSettingsService {
         absenceRankingSettings.setPublished(true);
         absenceRankingSettings.setStartDate(publishedDate); // changing
         AbsenceRankingSettings parentAbsenceRanking = absenceRankingSettingsRepository.findByDraftIdAndDeletedFalse(absenceRankingSettings.getId());
-        AbsenceRankingSettings lastAbsenceRanking = absenceRankingSettingsRepository.findByTopExpertiseIdAndDeletedFalseOrderByStartDateDesc(absenceRankingSettings.getExpertiseId());
+        AbsenceRankingSettings lastAbsenceRanking = absenceRankingSettingsRepository.findTopByExpertiseIdAndDeletedFalseOrderByStartDateDesc(absenceRankingSettings.getExpertiseId());
         boolean onGoingUpdated = false;
         if (lastAbsenceRanking != null && publishedDate.isAfter(lastAbsenceRanking.getStartDate()) && lastAbsenceRanking.getEndDate() == null) {
             lastAbsenceRanking.setEndDate(publishedDate.minusDays(1));
