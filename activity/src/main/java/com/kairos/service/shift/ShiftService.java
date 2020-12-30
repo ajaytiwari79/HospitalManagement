@@ -280,13 +280,14 @@ public class ShiftService extends MongoBaseService {
         if(isNull(shift.getDraftShift())) {
             if (!shift.isSickShift() && isValidForDraftShiftFunctionality(staffAdditionalInfoDTO, updateShift, phase, shiftAction, planningPeriod)) {
                 Shift draftShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
-                ShiftType draftShiftType =updateShiftType(activityWrapperMap, draftShift);
+                ShiftType draftShiftType = updateShiftType(activityWrapperMap, draftShift);
                 draftShift.setShiftType(draftShiftType);
                 draftShift.setDraft(true);
                 shift.setDraftShift(draftShift.getDraftShift());
                 shift.setDraft(true);
             }
         }
+        updateTimeTypeDetails(activityWrapperMap,shift);
         shift.setOldShiftTimeSlot(isNotNull(oldShift) ? staffAdditionalInfoDTO.getTimeSlotByShiftStartTime(oldShift.getActivities().get(0).getStartDate()) : null);
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         shift.setId(isNull(shift.getId()) ? shiftMongoRepository.nextSequence(Shift.class.getSimpleName()) : shift.getId());
@@ -298,6 +299,23 @@ public class ShiftService extends MongoBaseService {
         staffActivityDetailsService.updateStaffActivityDetails(shift.getStaffId(), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()), (isNull(shift.getId()) || isNull(oldShift) || isCollectionEmpty(oldShift.getActivities())) ? null : oldShift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
         shiftStateService.createShiftStateByPhase(Arrays.asList(shift), phase);
         return shift;
+    }
+
+    private void updateTimeTypeDetails(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
+        for (ShiftActivity shiftActivity : shift.getActivities()) {
+            ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
+            shiftActivity.setTimeTypeId(activityWrapper.getTimeTypeInfo().getId());
+            shiftActivity.setSecondLevelTimeType(activityWrapper.getTimeTypeInfo().getSecondLevelType());
+            shiftActivity.setTimeType(activityWrapper.getTimeTypeInfo().getTimeTypes().toValue());
+            shiftActivity.setMethodForCalculatingTime(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime());
+            shiftActivity.getChildActivities().forEach(shiftActivity1 -> {
+                ActivityWrapper wrapper = activityWrapperMap.get(shiftActivity1.getActivityId());
+                shiftActivity1.setTimeTypeId(wrapper.getTimeTypeInfo().getId());
+                shiftActivity.setSecondLevelTimeType(activityWrapper.getTimeTypeInfo().getSecondLevelType());
+                shiftActivity.setTimeType(activityWrapper.getTimeTypeInfo().getTimeTypes().toValue());
+                shiftActivity.setMethodForCalculatingTime(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime());
+            });
+        }
     }
 
     private boolean isValidForDraftShiftFunctionality(StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift, Phase phase, ShiftActionType shiftAction, PlanningPeriod planningPeriod) {
@@ -369,6 +387,7 @@ public class ShiftService extends MongoBaseService {
             shift.setStartDate(shift.getActivities().get(0).getStartDate());
             shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
             activityConfigurationService.addPlannedTimeInShift(shift, activityWrapperMap, staffAdditionalInfoDTO, false);
+            updateTimeTypeDetails(activityWrapperMap,shift);
         }
         shifts.forEach(shift -> {
             timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
