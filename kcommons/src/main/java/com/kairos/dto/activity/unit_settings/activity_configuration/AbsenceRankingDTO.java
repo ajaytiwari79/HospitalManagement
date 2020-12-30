@@ -17,6 +17,7 @@ public class AbsenceRankingDTO {
     private LocalDate endDate;
     private Map<BigInteger,Integer> activityRankings;
     private Long countryId;
+    private boolean published;
 
     @AssertTrue(message = "Rank Must be Unique")
     public boolean isValid() {
