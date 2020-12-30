@@ -4,7 +4,6 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.unit_settings.activity_configuration.AbsenceRankingDTO;
-import com.kairos.dto.user.country.experties.CareDaysDetails;
 import com.kairos.persistence.model.unit_settings.AbsenceRankingSettings;
 import com.kairos.persistence.repository.unit_settings.AbsenceRankingSettingsRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -16,7 +15,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_DATANOTFOUND;
 
@@ -36,7 +34,6 @@ public class AbsenceRankingSettingsService {
 
     public AbsenceRankingDTO updateAbsenceRankingSettings(AbsenceRankingDTO absenceRankingDTO){
         AbsenceRankingSettings absenceRankingSettings = absenceRankingSettingsRepository.findById(absenceRankingDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Absence Ranking", absenceRankingDTO.getId())));
-
         if (absenceRankingSettings.getDraftId()!=null) {
             exceptionService.dataNotFoundByIdException("MESSAGE_DRAFT_COPY_CREATED");
         }
