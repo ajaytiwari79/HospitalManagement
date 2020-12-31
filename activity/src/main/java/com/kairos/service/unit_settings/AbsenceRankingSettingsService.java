@@ -5,7 +5,6 @@ import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.AbsenceRankingDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.unit_settings.AbsenceRankingSettings;
 import com.kairos.persistence.repository.unit_settings.AbsenceRankingSettingsRepository;
 import com.kairos.service.activity.ActivityService;
@@ -20,7 +19,6 @@ import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_DATANOTFOUND;
-import static com.kairos.enums.TimeTypeEnum.ABSENCE;
 
 @Service
 public class AbsenceRankingSettingsService {
@@ -74,7 +72,7 @@ public class AbsenceRankingSettingsService {
     }
 
 
-    public AbsenceRankingDTO publishSeniorDays(BigInteger id, LocalDate publishedDate) {
+    public AbsenceRankingDTO publishAbsenceRanking(BigInteger id, LocalDate publishedDate) {
         AbsenceRankingSettings absenceRankingSettings = absenceRankingSettingsRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Absence Ranking Settings", id)));
         if (absenceRankingSettings.getActivityRankings().isEmpty()) {
             exceptionService.actionNotPermittedException("MESSAGE_RANKING_EMPTY");
