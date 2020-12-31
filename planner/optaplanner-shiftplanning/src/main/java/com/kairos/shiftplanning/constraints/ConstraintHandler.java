@@ -31,6 +31,8 @@ public interface ConstraintHandler {
     int verifyConstraints(Unit unit, Shift shiftImp, List<Shift> shiftImps);
 
     ScoreLevel getLevel();
+
+    //aa
     int getWeight();
     default void breakLevelConstraints(HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int contraintPenality){
             switch (getLevel()){
