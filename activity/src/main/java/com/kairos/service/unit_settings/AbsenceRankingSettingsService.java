@@ -3,9 +3,12 @@ package com.kairos.service.unit_settings;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.AbsenceRankingDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.unit_settings.AbsenceRankingSettings;
 import com.kairos.persistence.repository.unit_settings.AbsenceRankingSettingsRepository;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,7 @@ import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_DATANOTFOUND;
+import static com.kairos.enums.TimeTypeEnum.ABSENCE;
 
 @Service
 public class AbsenceRankingSettingsService {
@@ -24,6 +28,8 @@ public class AbsenceRankingSettingsService {
     private AbsenceRankingSettingsRepository absenceRankingSettingsRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private ActivityService activityService;
 
     public AbsenceRankingDTO saveAbsenceRankingSettings(AbsenceRankingDTO absenceRankingDTO){
         AbsenceRankingSettings absenceRankingSettings= ObjectMapperUtils.copyPropertiesByMapper(absenceRankingDTO,AbsenceRankingSettings.class);
@@ -104,5 +110,9 @@ public class AbsenceRankingSettingsService {
         absenceRankingSettingsRepository.saveEntities(newArrayList(absenceRankingSettings,parentAbsenceRanking));
         return ObjectMapperUtils.copyPropertiesByMapper(parentAbsenceRanking,AbsenceRankingDTO.class);
 
+    }
+
+    public List<ActivityDTO> findAllAbsenceActivities(){
+        return activityService.findAllAbsenceActivities();
     }
 }

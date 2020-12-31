@@ -99,8 +99,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{'activityGeneralSettings.tags':?0}")
     List<Activity> findActivitiesByTagId(BigInteger tagId);
 
-    @Query(value = "{unitId:?0, 'activityTimeCalculationSettings.methodForCalculatingTime':{$in:?1 }, 'activityRulesSettings.approvalAllowedPhaseIds':?2, deleted:false}")
-    List<Activity> findAllAbsenceActivities(Long unitId, Set<String> methodForCalculatingTimes, BigInteger phaseId);
+    @Query(value = "{unitId:?0, 'activityBalanceSettings.timeType':?1 , 'activityRulesSettings.approvalAllowedPhaseIds':?2, deleted:false}")
+    List<Activity> findAllAbsenceActivities(Long unitId, TimeTypeEnum timeType, BigInteger phaseId);
 
     @Query(value = "{'activityRulesSettings.sicknessSettingValid':true,deleted:false ,unitId:?0}",fields ="{'_id':1,'activityRulesSettings':1}")
     List<Activity> findAllSicknessActivity(Long unitId);
@@ -114,5 +114,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{unitId:?0, 'activityBalanceSettings.timeTypeId':{$in:?1 }, deleted:false}")
     List<Activity>  findAllByUnitIdAndTimeTypeIds(Long unitId, Collection<BigInteger> timeTypeIds);
+
+    @Query(value = "{countryId:?0, 'activityBalanceSettings.timeType':?1 , deleted:false}",fields ="{'_id':1,'name':1,'countryParentId':1}" )
+    List<ActivityDTO> findAllAbsenceActivitiesByCountryId(Long countryId, TimeTypeEnum timeType);
 
 }

@@ -84,6 +84,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.CommonsExceptionUtil.convertMessage;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.enums.TimeTypeEnum.ABSENCE;
 import static com.kairos.service.activity.ActivityUtil.*;
 
 /*** Created by pawanmandhan on 17/8/17.*/
@@ -923,7 +924,7 @@ public class ActivityService {
     }
     public Set<BigInteger> getAbsenceActivityIds(Long unitId, Date date) {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, date, null);
-        List<Activity> activities = activityMongoRepository.findAllAbsenceActivities(unitId,newHashSet(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK), phase.getId());
+        List<Activity> activities = activityMongoRepository.findAllAbsenceActivities(unitId,ABSENCE, phase.getId());
         return activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
     }
     public Activity findActivityById(BigInteger activityId){
@@ -961,5 +962,9 @@ public class ActivityService {
 
     public List<Activity> findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum timeTypeEnum, Set<Long> unitIds){
         return activityMongoRepository.findAllBySecondLevelTimeTypeAndUnitIds(timeTypeEnum, unitIds);
+    }
+
+    public List<ActivityDTO> findAllAbsenceActivities(){
+        return activityMongoRepository.findAllAbsenceActivitiesByCountryId(UserContext.getUserDetails().getCountryId(),ABSENCE);
     }
 }
