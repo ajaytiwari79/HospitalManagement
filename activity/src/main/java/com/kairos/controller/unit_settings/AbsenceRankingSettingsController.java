@@ -63,7 +63,7 @@ public class AbsenceRankingSettingsController {
     }
 
     @ApiOperation(value = "get absence activities")
-    @DeleteMapping(value = "/absence_ranking/activities")
+    @GetMapping(value = "/absence_ranking/activities")
     public ResponseEntity<Map<String, Object>> getAllAbsenceActivities() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.findAllAbsenceActivities());
     }
