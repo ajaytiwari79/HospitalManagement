@@ -34,6 +34,8 @@ public interface ConstraintHandler {
 
     //aa
     int getWeight();
+
+    //bb
     default void breakLevelConstraints(HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int contraintPenality){
             switch (getLevel()){
                 case HARD:scoreHolder.addHardConstraintMatch(kContext,getWeight()*contraintPenality);
