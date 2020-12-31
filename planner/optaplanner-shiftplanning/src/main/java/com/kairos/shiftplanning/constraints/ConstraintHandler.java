@@ -31,8 +31,6 @@ public interface ConstraintHandler {
     int verifyConstraints(Unit unit, Shift shiftImp, List<Shift> shiftImps);
 
     ScoreLevel getLevel();
-
-    //aa
     int getWeight();
 
     //bb
