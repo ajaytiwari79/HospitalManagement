@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.period;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.CommonConstants;
-import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
@@ -20,11 +19,13 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.getBigIntegerString;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -208,7 +209,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                         and(START_DATE).lte(dateLiesInPeriod).and(END_DATE).gte(dateLiesInPeriod)),
                 lookup(PHASES, CURRENT_PHASE_ID, "_id", PHASE),
                 project().and(PHASE).arrayElementAt(0).as(PHASE),
-                project("phase._id", "phase.name","phase.phaseEnum","phase.accessGroupIds")
+                project("phase._id", "phase.name","phase.phaseEnum","phase.accessGroupIds","phase.organizationId")
         );
         AggregationResults<Phase> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, Phase.class);
         return results.getMappedResults().isEmpty() ? null : results.getMappedResults().get(0);
@@ -287,8 +288,8 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
     @Override
     public ShiftPlanningProblemSubmitDTO findDataForAutoPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO){
-        String breakActivityIdString = getBreakActivityIdsString(shiftPlanningProblemSubmitDTO.getBreakSettingMap().values().iterator());
-        Aggregation aggregation = Aggregation.newAggregation(
+        String breakActivityIdString = getBigIntegerString(shiftPlanningProblemSubmitDTO.getBreakSettingMap().values().stream().map(breakSettingsDTO -> breakSettingsDTO.getActivityId()).collect(Collectors.toSet()).iterator());
+        Aggregation aggregation = newAggregation(
                 match(Criteria.where("_id").is(shiftPlanningProblemSubmitDTO.getPlanningPeriodId())),
                 getlookupOperationOfShiftsForPlanning(shiftPlanningProblemSubmitDTO.getStaffIds()),
                 getStaffingLevelLookupForPlanning(),
@@ -312,24 +313,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return shiftPlanningProblemSubmitDTO;
     }
 
-    public String getBreakActivityIdsString(Iterator<BreakSettingsDTO> iterator) {
-        if (!iterator.hasNext()) {
-            return "[]";
-        } else {
-            StringBuilder var2 = new StringBuilder();
-            var2.append("['");
 
-            while(true) {
-                BigInteger var3 = iterator.next().getActivityId();
-                var2.append(var3);
-                if (!iterator.hasNext()) {
-                    return var2.append("']").toString();
-                }
-
-                var2.append("','").append(' ');
-            }
-        }
-    }
 
     private CustomAggregationOperation getProjectionForPlanning() {
         return new CustomAggregationOperation(Document.parse("{$project:{\n" +
@@ -348,7 +332,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     private CustomAggregationOperation getActivityConfigurationLookupForPlanning() {
         return new CustomAggregationOperation(Document.parse("{\n" +
                 "        $lookup:{\n" +
-                "            \n" +
                 "         from: \"activityConfiguration\",\n" +
                 "            let: { unitId: \"$unitId\",phaseId:\"$currentPhaseId\" },\n" +
                 "         pipeline: [\n" +
@@ -359,7 +342,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 "                         {$eq:[\"$presencePlannedTime.phaseId\",\"$$phaseId\"]},\n" +
                 "                         {$eq:[\"$absencePlannedTime.phaseId\",\"$$phaseId\"]},\n" +
                 "                         {$eq:[\"$nonWorkingPlannedTime.phaseId\",\"$$phaseId\"]}\n" +
-                "                        \n" +
                 "                       ]\n" +
                 "                    }\n" +
                 "                 }\n" +
@@ -369,7 +351,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 "                      \"absencePlannedTime\":1,\n" +
                 "                      \"nonWorkingPlannedTime\":1,\n" +
                 "                      \"_id\":0\n" +
-                "                      \n" +
                 "                      }\n" +
                 "                  }\n" +
                 "           ],\n" +
@@ -392,6 +373,12 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 "                         { $gte: [ \"$currentDate\",  \"$$startDate\" ] },\n" +
                 "                         { $lte: [ \"$currentDate\", \"$$endDate\" ] },\n" +
                 "                         {$eq:[\"$unitId\",\"$$unitId\"]}\n" +
+                "{\n" +
+                        "                  \"$eq\": [\n" +
+                        "                    \"$deleted\",\n" +
+                        "                    false\n" +
+                        "                  ]\n" +
+                        "                }"+
                 "                       ]\n" +
                 "                    }\n" +
                 "                 }\n" +

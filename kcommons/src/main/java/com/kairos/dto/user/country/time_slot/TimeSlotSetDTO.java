@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -23,4 +24,5 @@ public class TimeSlotSetDTO {
     private List<TimeSlotDTO> timeSlots;
     private TimeSlotMode timeSlotMode;
     private TimeSlotType timeSlotType;
+    private BigInteger id;
 }

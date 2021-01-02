@@ -27,6 +27,7 @@ import java.util.Set;
 public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
+    protected Integer consecutiveDays;
 
     private Set<BigInteger> plannedTimeIds = new HashSet<>();
     private Set<BigInteger> timeTypeIds = new HashSet<>();

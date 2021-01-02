@@ -4,7 +4,6 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
-import com.kairos.dto.activity.shift.ProtectedDaysOffSetting;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
@@ -17,6 +16,7 @@ import com.kairos.dto.activity.wta.templates.ActivityCutOffCount;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.shift.ShiftStatus;
@@ -38,11 +38,13 @@ import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMo
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.counter.KPIService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import com.kairos.utils.CPRUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -85,6 +87,8 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject
+    private DayTypeService dayTypeService;
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
@@ -182,6 +186,8 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
 
     public WorkTimeAgreementBalance getWorkTimeAgreementBalance(Long unitId, Long employmentId, LocalDate startDate, LocalDate endDate, Set<WTATemplateType> wtaTemplateTypes, BigInteger activityId) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, startDate, ORGANIZATION, employmentId, new HashSet<>(),endDate);
+        staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
+        staffAdditionalInfoDTO.getEmployment().getExpertise().setProtectedDaysOffSettings(protectedDaysOffService.getProtectedDaysOffByExpertiseId(UserContext.getUserDetails().getCountryId()));
         if (staffAdditionalInfoDTO == null) {
             exceptionService.invalidRequestException(MESSAGE_STAFF_NOTFOUND);
         }
@@ -205,7 +211,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
         Set<BigInteger> timeTypeIds = activityWrappers.stream().map(activityWrapper -> activityWrapper.getActivity().getActivityBalanceSettings().getTimeTypeId()).collect(Collectors.toSet());
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllByTimeTypeIds(timeTypeIds);
         Map<BigInteger, TimeType> timeTypeMap = timeTypes.stream().collect(Collectors.toMap(TimeType::getId, v -> v));
-        List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances = getWorkTimeAgreementRuleTemplateBalancesDtos(unitId, startDate, endDate, staffAdditionalInfoDTO, wtaBaseRuleTemplates, activityWrapperMap, planningPeriod, validShiftActivityDTOSByDayType, timeTypeMap,wtaTemplateTypes);
+        List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances = getWorkTimeAgreementRuleTemplateBalances(unitId, startDate, endDate, staffAdditionalInfoDTO, wtaBaseRuleTemplates, activityWrapperMap, planningPeriod, validShiftActivityDTOSByDayType, timeTypeMap,wtaTemplateTypes);
         WorkTimeAgreementBalance workTimeAgreementBalance = new WorkTimeAgreementBalance(workTimeAgreementRuleTemplateBalances);
         return workTimeAgreementBalance;
     }
@@ -213,7 +219,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
     private List<ShiftWithActivityDTO> getShiftWithActivityDTOS(Long employmentId, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Set<BigInteger> activityIds, Map<BigInteger, ActivityWrapper> activityWrapperMap, DateTimeInterval dateTimeInterval) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentAndActivityIds(employmentId, dateTimeInterval.getStartDate(), dateTimeInterval.getEndDate(), activityIds);
         List<ShiftWithActivityDTO> validShiftActivityDTOSByDayType =new ArrayList<>();
-        Map<Long , DayTypeDTO> dayTypeDTOMap =staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, dayTypeDTO -> dayTypeDTO));
+        Map<BigInteger , DayTypeDTO> dayTypeDTOMap =staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, dayTypeDTO -> dayTypeDTO));
         for(ShiftWithActivityDTO shiftWithActivityDTO :shiftWithActivityDTOS){
             for(ShiftActivityDTO shiftActivityDTO :shiftWithActivityDTO.getActivities()) {
                 if (activityWrapperMap.containsKey(shiftActivityDTO.getActivityId()) && isDayTypeValid(shiftWithActivityDTO.getStartDate(), activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getActivityTimeCalculationSettings().getDayTypes(),dayTypeDTOMap)) {
@@ -225,31 +231,26 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
     }
 
 
-    public List<WorkTimeAgreementRuleTemplateBalancesDTO> getWorkTimeAgreementRuleTemplateBalancesDtos(Long unitId, LocalDate startDate, LocalDate endDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<WTABaseRuleTemplate> wtaBaseRuleTemplates, Map<BigInteger, ActivityWrapper> activityWrapperMap, PlanningPeriod planningPeriod, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Map<BigInteger, TimeType> timeTypeMap,Set<WTATemplateType> wtaTemplateTypes) {
+    public List<WorkTimeAgreementRuleTemplateBalancesDTO> getWorkTimeAgreementRuleTemplateBalances(Long unitId, LocalDate startDate, LocalDate endDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<WTABaseRuleTemplate> wtaBaseRuleTemplates, Map<BigInteger, ActivityWrapper> activityWrapperMap, PlanningPeriod planningPeriod, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Map<BigInteger, TimeType> timeTypeMap, Set<WTATemplateType> wtaTemplateTypes) {
         List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances=new ArrayList<>();
         WorkTimeAgreementRuleTemplateBalancesDTO workTimeAgreementRuleTemplateBalancesDTO;
         for (WTABaseRuleTemplate ruleTemplate : wtaBaseRuleTemplates) {
             if(isCollectionEmpty(wtaTemplateTypes) || wtaTemplateTypes.contains(ruleTemplate.getWtaTemplateType())) {
                 switch (ruleTemplate.getWtaTemplateType()) {
                     case VETO_AND_STOP_BRICKS:
-                        VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = (VetoAndStopBricksWTATemplate) ruleTemplate;
-                        workTimeAgreementRuleTemplateBalancesDTO = getVetoRuleTemplateBalance(vetoAndStopBricksWTATemplate, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, timeTypeMap, planningPeriod.getEndDate());
+                        workTimeAgreementRuleTemplateBalancesDTO = getVetoRuleTemplateBalance((VetoAndStopBricksWTATemplate) ruleTemplate, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, timeTypeMap, planningPeriod.getEndDate());
                         break;
                     case SENIOR_DAYS_PER_YEAR:
-                        SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) ruleTemplate;
-                        workTimeAgreementRuleTemplateBalancesDTO = getseniorDayRuleTemplateBalance(seniorDaysPerYearWTATemplate, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, staffAdditionalInfoDTO, timeTypeMap, planningPeriod.getEndDate());
+                        workTimeAgreementRuleTemplateBalancesDTO = getseniorDayRuleTemplateBalance((SeniorDaysPerYearWTATemplate) ruleTemplate, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, staffAdditionalInfoDTO, timeTypeMap, planningPeriod.getEndDate());
                         break;
                     case CHILD_CARE_DAYS_CHECK:
-                        ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate) ruleTemplate;
-                        workTimeAgreementRuleTemplateBalancesDTO = getchildCareDayRuleTemplateBalance(childCareDaysCheckWTATemplate, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, staffAdditionalInfoDTO, timeTypeMap, planningPeriod.getEndDate());
+                        workTimeAgreementRuleTemplateBalancesDTO = getchildCareDayRuleTemplateBalance((ChildCareDaysCheckWTATemplate) ruleTemplate, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, staffAdditionalInfoDTO, timeTypeMap, planningPeriod.getEndDate());
                         break;
                     case WTA_FOR_CARE_DAYS:
-                        WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
-                        workTimeAgreementRuleTemplateBalancesDTO = getWtaForCareDayRuleTemplateBalance(wtaForCareDays, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, timeTypeMap, planningPeriod.getEndDate());
+                        workTimeAgreementRuleTemplateBalancesDTO = getWtaForCareDayRuleTemplateBalance((WTAForCareDays) ruleTemplate, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, timeTypeMap, planningPeriod.getEndDate());
                         break;
                     case PROTECTED_DAYS_OFF:
-                        ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = (ProtectedDaysOffWTATemplate) ruleTemplate;
-                        workTimeAgreementRuleTemplateBalancesDTO = getProtectedDaysOffBalance(unitId, protectedDaysOffWTATemplate, shiftWithActivityDTOS, activityWrapperMap, timeTypeMap, staffAdditionalInfoDTO, startDate, endDate, planningPeriod.getEndDate());
+                        workTimeAgreementRuleTemplateBalancesDTO = getProtectedDaysOffBalance(unitId, (ProtectedDaysOffWTATemplate) ruleTemplate, shiftWithActivityDTOS, activityWrapperMap, timeTypeMap, staffAdditionalInfoDTO, startDate, endDate, planningPeriod.getEndDate());
                         break;
                     default:
                         workTimeAgreementRuleTemplateBalancesDTO = null;
@@ -266,6 +267,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
 
     public boolean isLeaveCountAvailable(Map<BigInteger, ActivityWrapper> activityWrapperMap, BigInteger activityId, ShiftWithActivityDTO shift, DateTimeInterval dateTimeInterval, LocalDate lastPlanningPeriodEndDat, WTATemplateType wtaTemplateType, long leaveCount,LocalDate endDateOfActivityCutOff) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(shift.getUnitId(), dateTimeInterval.getStartLocalDate().plusDays(1), ORGANIZATION, shift.getEmploymentId(), new HashSet<>(),endDateOfActivityCutOff);
+        staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         boolean isLeaveCountAvailable = false;
         List<WTAQueryResultDTO> workingTimeAgreements = wtaRepository.getWTAByEmploymentIdAndDatesWithRuleTemplateType(shift.getEmploymentId(), shift.getStartDate(), shift.getEndDate(), wtaTemplateType);
         List<WTABaseRuleTemplate> ruleTemplates = workingTimeAgreements.get(0).getRuleTemplates();
@@ -323,7 +325,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
         if (!ProtectedDaysOffUnitSettings.UPDATE_IN_TIMEBANK_ON_FIRST_DAY_OF_YEAR.equals(protectedDaysOffSettingOfUnit.getProtectedDaysOffUnitSettings())) {
             ActivityWrapper activityWrapper = activityWrapperMap.get(protectedDaysOffWTATemplate.getActivityId());
             CutOffIntervalUnit cutOffIntervalUnit = activityWrapper.getActivity().getActivityRulesSettings().getCutOffIntervalUnit();
-            List<ProtectedDaysOffSetting> protectedDaysOffSettings = staffAdditionalInfoDTO.getEmployment().getExpertise().getProtectedDaysOffSettings();
+            List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings = protectedDaysOffService.getProtectedDaysOffByExpertiseId(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
             protectedDaysOffSettings = protectedDaysOffSettings.stream().filter(protectedDaysOffSetting -> isEqualOrAfter(protectedDaysOffSetting.getPublicHolidayDate(),staffAdditionalInfoDTO.getEmployment().getStartDate()) && (isNull(staffAdditionalInfoDTO.getEmployment().getEndDate()) || !protectedDaysOffSetting.getPublicHolidayDate().isAfter(staffAdditionalInfoDTO.getEmployment().getEndDate()))).collect(Collectors.toList());
             String activityName = activityWrapper.getActivity().getName();
             String timetypeColor = timeTypeMap.containsKey(activityWrapper.getActivity().getActivityBalanceSettings().getTimeTypeId()) ? timeTypeMap.get(activityWrapper.getActivity().getActivityBalanceSettings().getTimeTypeId()).getBackgroundColor() : "";
@@ -336,7 +338,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
         return workTimeAgreementRuleTemplateBalancesDTO;
     }
 
-    private void getProtectedDaysOffIntervalbalance(ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, List<ShiftWithActivityDTO> shiftWithActivityDTOS, StaffAdditionalInfoDTO staffAdditionalInfoDTO, LocalDate startDate, LocalDate endDate, LocalDate planningPeriodEndDate, ProtectedDaysOffSettingDTO protectedDaysOffSettingOfUnit, List<IntervalBalance> intervalBalances, ActivityWrapper activityWrapper, CutOffIntervalUnit cutOffIntervalUnit, List<ProtectedDaysOffSetting> protectedDaysOffSettings) {
+    private void getProtectedDaysOffIntervalbalance(ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, List<ShiftWithActivityDTO> shiftWithActivityDTOS, StaffAdditionalInfoDTO staffAdditionalInfoDTO, LocalDate startDate, LocalDate endDate, LocalDate planningPeriodEndDate, ProtectedDaysOffSettingDTO protectedDaysOffSettingOfUnit, List<IntervalBalance> intervalBalances, ActivityWrapper activityWrapper, CutOffIntervalUnit cutOffIntervalUnit, List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings) {
         while (!startDate.isAfter(endDate)) {
             if (!containsInInterval(intervalBalances, startDate)) {
                 DateTimeInterval dateTimeInterval = getCutoffInterval(activityWrapper.getActivity().getActivityRulesSettings().getCutOffStartFrom(), activityWrapper.getActivity().getActivityRulesSettings().getCutOffIntervalUnit(), activityWrapper.getActivity().getActivityRulesSettings().getCutOffdayValue(), asDate(startDate), planningPeriodEndDate);
@@ -346,7 +348,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
         }
     }
 
-    private List<ShiftWithActivityDTO> getProtectedDaysOfCountByInterval(ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, List<ShiftWithActivityDTO> shiftWithActivityDTOS, StaffAdditionalInfoDTO staffAdditionalInfoDTO, LocalDate startDate, ProtectedDaysOffSettingDTO protectedDaysOffSettingOfUnit, List<IntervalBalance> intervalBalances, ActivityWrapper activityWrapper, CutOffIntervalUnit cutOffIntervalUnit, List<ProtectedDaysOffSetting> protectedDaysOffSettings, DateTimeInterval dateTimeInterval) {
+    private List<ShiftWithActivityDTO> getProtectedDaysOfCountByInterval(ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, List<ShiftWithActivityDTO> shiftWithActivityDTOS, StaffAdditionalInfoDTO staffAdditionalInfoDTO, LocalDate startDate, ProtectedDaysOffSettingDTO protectedDaysOffSettingOfUnit, List<IntervalBalance> intervalBalances, ActivityWrapper activityWrapper, CutOffIntervalUnit cutOffIntervalUnit, List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings, DateTimeInterval dateTimeInterval) {
         if (isNotNull(dateTimeInterval)) {
             Object[] countAndDate = getProtectedDaysOffCountAndDate(protectedDaysOffSettings, dateTimeInterval, protectedDaysOffSettingOfUnit.getProtectedDaysOffUnitSettings(), cutOffIntervalUnit, activityWrapper.getActivity().getActivityRulesSettings().getCutOffdayValue(), startDate);
             long count = Long.valueOf(countAndDate[0].toString());
@@ -356,7 +358,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
             }
             int[] scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS, newHashSet(protectedDaysOffWTATemplate.getActivityId()));
             long scheduled = count > 0 ? scheduledAndApproveActivityCount[0] : count;
-            long available = (count - scheduledAndApproveActivityCount[0]) > 0 ? count - scheduledAndApproveActivityCount[0] : 0;
+            long available = (count - scheduledAndApproveActivityCount[0]) > 0 ? count - scheduledAndApproveActivityCount[0]+scheduledAndApproveActivityCount[1] : 0;
             long approved = count > 0 ? scheduledAndApproveActivityCount[1] : count;
                 if(count!=0) {
                     intervalBalances.add(new IntervalBalance(count, scheduled, available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), approved));
@@ -365,7 +367,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
         return shiftWithActivityDTOS;
     }
 
-    public Object[] getProtectedDaysOffCountAndDate(List<ProtectedDaysOffSetting> protectedDaysOffSettings, DateTimeInterval dateTimeInterval, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings, CutOffIntervalUnit cutOffIntervalUnit, Integer cutOffdayValue, LocalDate startDate) {
+    public Object[] getProtectedDaysOffCountAndDate(List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings, DateTimeInterval dateTimeInterval, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings, CutOffIntervalUnit cutOffIntervalUnit, Integer cutOffdayValue, LocalDate startDate) {
         long count;
         LocalDate protectedDaysOfDate = null;
         if (ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR.equals(protectedDaysOffUnitSettings)) {
@@ -496,7 +498,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
             if (isNotNull(careDays)) {
                 ActivityCutOffCount activityLeaveCount = seniorDaysPerYearWTATemplate.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).contains(dateTimeInterval.getStartLocalDate())).findFirst().orElse(new ActivityCutOffCount());
                 int total = careDays.getLeavesAllowed() + activityLeaveCount.getTransferLeaveCount();
-                int available = (careDays.getLeavesAllowed() + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount()) - scheduledAndApproveActivityCount[0];
+                int available = (careDays.getLeavesAllowed() + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount()) - (scheduledAndApproveActivityCount[0]+scheduledAndApproveActivityCount[1]);
                 if(total !=0) {
                     intervalBalances.add(new IntervalBalance(total, scheduledAndApproveActivityCount[0], available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
                 }
@@ -538,7 +540,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
                     long totalLeaves = childCareDaysCheckWTATemplate.calculateChildCareDaysLeaveCount(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), shiftValidatorService.getChildAges(asDate(startDate), staffAdditionalInfoDTO));
                     ActivityCutOffCount activityLeaveCount = childCareDaysCheckWTATemplate.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).contains(dateTimeInterval.getStartLocalDate())).findFirst().orElse(new ActivityCutOffCount());
                     long total = totalLeaves + activityLeaveCount.getTransferLeaveCount();
-                    long available = (totalLeaves + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount()) - scheduledAndApproveActivityCount[0];
+                    long available = (totalLeaves + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount()) - (scheduledAndApproveActivityCount[0]+scheduledAndApproveActivityCount[1]);
                     if (total != 0) {
                         intervalBalances.add(new IntervalBalance(total, scheduledAndApproveActivityCount[0], available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
                     }
@@ -584,7 +586,7 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
             int[] scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS, newHashSet(wtaForCareDays.getCareDayCounts().get(0).getActivityId()));
             ActivityCutOffCount activityLeaveCount = wtaForCareDays.getCareDayCounts().get(0).getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).contains(dateTimeInterval.getStartLocalDate())).findFirst().orElse(new ActivityCutOffCount());
             int total = activityLeaveCount.getCount() + activityLeaveCount.getTransferLeaveCount();
-            int available = (activityLeaveCount.getCount() + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount()) - scheduledAndApproveActivityCount[0];
+            int available = (activityLeaveCount.getCount() + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount()) - (scheduledAndApproveActivityCount[0]+scheduledAndApproveActivityCount[1]);
             intervalBalances.add(new IntervalBalance(total, scheduledAndApproveActivityCount[0], available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
         }
     }
@@ -592,12 +594,15 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
     public int[] getShiftsActivityCountByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Set<BigInteger> activityIds) {
         int activityCount = 0;
         int approveCount = 0;
+        Set<ShiftStatus> shiftStatuses = newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH);
         for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
                 if ((dateTimeInterval.contains(activity.getStartDate())) && activityIds.contains(activity.getActivityId())) {
-                    activityCount++;
-                    if (activity.getStatus().contains(ShiftStatus.APPROVE)&&!shiftWithActivityDTO.isDraft()) {
+                    if (!shiftWithActivityDTO.isDraft() && CollectionUtils.containsAny(shiftStatuses,activity.getStatus())) {
                         approveCount++;
+                    }
+                    if(activity.getStatus().contains(ShiftStatus.REQUEST)&&!shiftWithActivityDTO.isDraft()){
+                        activityCount++;
                     }
                 }
             }
@@ -804,8 +809,8 @@ public class WorkTimeAgreementBalancesCalculationService implements KPIService {
         return shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate()) && shiftWithActivityDTO.getActivities().stream().anyMatch(shiftActivityDTO -> shiftActivityDTO.getActivityId().equals(activityId))).collect(Collectors.toList());
     }
 
-    public static boolean isDayTypeValid(Date shiftDate, List<Long> daytypeIds, Map<Long, DayTypeDTO> dayTypeDTOMap) {
-        List<DayTypeDTO> dayTypeDTOS = daytypeIds.stream().map(dayTypeDTOMap::get).collect(Collectors.toList());
+    public static boolean isDayTypeValid(Date shiftDate, List<BigInteger> daytypeIds, Map<BigInteger, DayTypeDTO> dayTypeDTOMap) {
+        List<DayTypeDTO> dayTypeDTOS =dayTypeDTOMap.values().stream().filter(k->daytypeIds.contains(k.getId())).collect(Collectors.toList());
         boolean valid = false;
         for (DayTypeDTO dayTypeDTO : dayTypeDTOS) {
             if (dayTypeDTO.isHolidayType()) {

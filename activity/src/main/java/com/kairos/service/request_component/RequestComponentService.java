@@ -42,18 +42,14 @@ public class RequestComponentService extends MongoBaseService {
                     for(Long staff : staffs){
                         notificationService.addNewRequestNotification(organizationId, requestComponent, staff, source);
                     }
-
                     break;
                 case ORGANIZATION:
                     organization = userIntegrationService.getParentOfOrganization(requestComponent.getRequestSentId());
-
                     source=MODULE_3;
                     break;
                 default:
-                    break;
             }
             if (organization != null) {
-
                 List<Long> unitManagerList = userIntegrationService.getUnitManagerIds(organization.getId());
                 if (unitManagerList.size() != 0) {
                     for (Long unitManager : unitManagerList) {

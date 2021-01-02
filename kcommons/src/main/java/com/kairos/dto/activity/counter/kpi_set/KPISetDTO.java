@@ -5,6 +5,8 @@ package com.kairos.dto.activity.counter.kpi_set;
  */
 
 import com.kairos.commons.utils.NotNullOrEmpty;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.KPISetType;
 import com.kairos.enums.TimeTypeEnum;
@@ -14,6 +16,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import java.math.BigInteger;
+import java.util.Map;
 import java.util.Set;
 @Getter
 @Setter
@@ -30,8 +33,9 @@ public class KPISetDTO {
     private ConfLevel confLevel;
     private KPISetType kpiSetType;
     private String shortName;
+    private Map<String, TranslationInfo> translations;
 
     public String getName() {
-        return name.trim();
+        return TranslationUtil.getName(translations,name).trim();
     }
 }

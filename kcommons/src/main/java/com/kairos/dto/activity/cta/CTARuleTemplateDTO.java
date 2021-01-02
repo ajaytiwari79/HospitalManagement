@@ -2,6 +2,7 @@ package com.kairos.dto.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.shift.PlannedTime;
@@ -67,7 +68,7 @@ public class CTARuleTemplateDTO {
     private Set<BigInteger> timeTypeIds;
     private Set<BigInteger> plannedTimeIds;
 
-    private List<Long> dayTypeIds;
+    private List<BigInteger> dayTypeIds;
     private List<DayOfWeek> days;
     private List<LocalDate> publicHolidays;
     @NotNull
@@ -84,12 +85,12 @@ public class CTARuleTemplateDTO {
         this.phaseInfo = Optional.ofNullable(phaseInfo).orElse(new ArrayList<>());
     }
 
-    public List<Long> getDayTypeIds() {
+    public List<BigInteger> getDayTypeIds() {
         this.dayTypeIds = isNull(dayTypeIds) ? new ArrayList<>() : this.dayTypeIds;
         return dayTypeIds;
     }
 
-    public void setDayTypeIds(List<Long> dayTypeIds) {
+    public void setDayTypeIds(List<BigInteger> dayTypeIds) {
         this.dayTypeIds = isNull(dayTypeIds) ? new ArrayList<>() : dayTypeIds;
     }
 
@@ -127,6 +128,14 @@ public class CTARuleTemplateDTO {
 
     public boolean isRuleTemplateValid(Long employmentTypeId,BigInteger shiftPhaseId,Set<BigInteger> activityIds,Set<BigInteger> timeTypeIds,List<PlannedTime> plannedTimes){
         return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentTypeId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityIds,timeTypeIds,plannedTimes) || this.getCalculationFor().equals(FUNCTIONS));
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
+    public String getDescription() {
+        return  TranslationUtil.getDescription(translations,description);
     }
 
     @Override

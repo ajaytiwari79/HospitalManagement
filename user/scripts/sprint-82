@@ -26,4 +26,4 @@ Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(acces
 //create access group relationship for country admin
 MATCH(p:Position)-[:HAS_UNIT_PERMISSIONS]->(up:UnitPermission) WHERE p.name="working as country admin" WITH up
 MATCH(ag:AccessGroup) WHERE ag.name="Hub Manager" WITH up,ag
-CREATE(up)-[:HAS_ACCESS_GROUP]->(ag)
+CREATE(up)-[:HAS_ACCESS_GROUP]->(ag);

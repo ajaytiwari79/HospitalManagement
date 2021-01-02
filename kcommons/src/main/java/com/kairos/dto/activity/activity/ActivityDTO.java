@@ -3,6 +3,7 @@ package com.kairos.dto.activity.activity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.annotation.PermissionClass;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
@@ -70,10 +71,13 @@ public class ActivityDTO implements Serializable {
     private Set<BigInteger> childActivityIds;
     private BigInteger activityPriorityId;
     private int activitySequence;
+    private int staffTeamSequence;
+    private boolean mainTeam;
     private BigInteger countryParentId;
     private Long teamId;
     @Builder.Default
     private Map<String, TranslationInfo> translations = new HashMap<>();
+
 
 
     public ActivityDTO() {
@@ -103,9 +107,16 @@ public class ActivityDTO implements Serializable {
     }
 
     public boolean isFullDayOrFullWeekActivity() {
-        return isNotNull(this.getActivityTimeCalculationSettings()) && ((CommonConstants.FULL_WEEK).equals(this.getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(this.getActivityTimeCalculationSettings().getMethodForCalculatingTime())); }
+        return isNotNull(this.getActivityTimeCalculationSettings()) && ((CommonConstants.FULL_WEEK).equals(this.getActivityTimeCalculationSettings().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(this.getActivityTimeCalculationSettings().getMethodForCalculatingTime()));
+    }
 
+    public String getName(){
+        return TranslationUtil.getName(translations,name);
+    }
 
+    public String getDescription(){
+        return TranslationUtil.getDescription(translations,description);
+    }
 
 
 }

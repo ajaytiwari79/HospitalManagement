@@ -17,7 +17,9 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.*;
 
@@ -70,6 +72,9 @@ public class SeniorDaysService {
 
     //Validating age range
     private void validateAgeRange(List<AgeRangeDTO> ageRangeDTO) {
+        if(ageRangeDTO.stream().filter(ageRange -> isNull(ageRange.getTo())).collect(Collectors.toList()).size() > 1){
+            exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_AGE_OVERLAP);
+        }
         Collections.sort(ageRangeDTO);
         for (int i = 0; i < ageRangeDTO.size(); i++) {
             if (ageRangeDTO.get(i).getTo() != null && (ageRangeDTO.get(i).getFrom() > ageRangeDTO.get(i).getTo()))
@@ -117,8 +122,8 @@ public class SeniorDaysService {
 
     public CareDaysDetails publishSeniorDays(Long seniorDaysId, LocalDate publishedDate) {
         SeniorDays seniorDays = seniorDaysGraphRepository.findById(seniorDaysId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, FUNCTIONALPAYMENT, seniorDaysId)));
-        if (seniorDays.getCareDays().isEmpty()) {
-            exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX);
+        if (isCollectionEmpty(seniorDays.getCareDays())) {
+            exceptionService.actionNotPermittedException(MESSAGE_SENIOR_DAY_EMPTY);
         }
         if (seniorDays.isPublished()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_FUNCTIONALPAYMENT_ALREADYPUBLISHED);

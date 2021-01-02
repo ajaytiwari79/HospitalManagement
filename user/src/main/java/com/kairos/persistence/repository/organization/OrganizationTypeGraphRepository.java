@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
 import com.kairos.persistence.model.organization_type.OrganizationTypeSubTypeAndServicesQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
+import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -28,7 +28,9 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     List<OrganizationType> findByIdIn(List<Long> ids);
 
     @Query("MATCH (ot:OrganizationType{isEnable:true})-[:" + BELONGS_TO + "]->(c:Country) WHERE id(c)= {0}\n" +
-            "Optional Match (ot)-[:" + HAS_LEVEL + "]->(level:Level{deleted:false,isEnabled:true}) return ot.name as name,id(ot) as id,collect(level) as levels")
+            "Optional Match (ot)-[:" + HAS_LEVEL + "]->(level:Level{deleted:false,isEnabled:true}) return " +
+            "ot.translations as translations,  " +
+            "ot.name as name,id(ot) as id,collect(level) as levels")
     List<OrgTypeLevelWrapper> getOrganizationTypeByCountryId(Long countryId);
 
     OrganizationType findByName(OrganizationType.OrganizationTypeEnum name);
@@ -51,8 +53,9 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("Match (o:OrganizationType)-[rel:" + ORGANIZATION_TYPE_HAS_SERVICES + "]->(os:OrganizationService) where id(o) IN {0}  AND  id(os)={1} DELETE rel ")
     void deleteRelOrganizationTypeWithService(Set<Long> orgTypeId, long serviceId);
 
-    @Query("MATCH (pot:OrganizationType {isEnable:true})-[:HAS_SUB_TYPE]-(ot:OrganizationType{isEnable:true}) WHERE id(pot)={0} return {name:ot.name,id:id(ot),description:ot.description } as result")
-    List<Map<String, Object>> getOrganizationSubTypeByTypeId(Long organizationTypeId);
+    @Query("MATCH (pot:OrganizationType {isEnable:true})-[:HAS_SUB_TYPE]-(ot:OrganizationType{isEnable:true}) WHERE id(pot)={0} return ot.translations as translations,\n" +
+            "ot.name as name,id(ot) as id,ot.description as description")
+    List<OrgTypeLevelWrapper> getOrganizationSubTypeByTypeId(Long organizationTypeId);
 
     @Query("MATCH (pot:OrganizationType),(ot:OrganizationType) WHERE id(ot)={0} AND id(pot)={1} Create (pot)-[:HAS_SUB_TYPE]->(ot) return ot")
     OrganizationType createSubTypeRelation(Long subTypeId, Long parentTypeId);
@@ -61,7 +64,10 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "match(country)<-[:" + BELONGS_TO + "]-(organizationType:OrganizationType{isEnable:true})\n" +
             "optional match(organizationType)-[:" + HAS_SUB_TYPE + "]->(organizationSubType:OrganizationType{isEnable:true}) " +
             "with DISTINCT organizationType, organizationSubType " +
-            "return id(organizationType) as id, organizationType.name as name , CASE WHEN organizationSubType IS NOT NULL THEN collect({id:id(organizationSubType),name:organizationSubType.name}) ELSE [] END as children \n")
+            "return organizationType.translations as translations,\n" +
+            "id(organizationType) as id, organizationType.name as name , CASE WHEN organizationSubType IS NOT NULL THEN collect({" +
+            "translations:organizationSubType.translations,\n" +
+            "id:id(organizationSubType),name:organizationSubType.name}) ELSE [] END as children \n")
     List<OrganizationTypeAndSubType> getAllOrganizationTypeAndSubType(long countryId);
 
     @Query("Match (organization:Organization) where id(organization)={0} \n" +
@@ -91,8 +97,9 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
 
     @Query("Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_SKILL{deleted:false}]->(skill{isEnabled:true}) where id(orgType)={0} " +
             "MATCH (skillCategory:SkillCategory)<-[:HAS_CATEGORY]-(skill) \n" +
-            "return  case when skill is NULL then [] else collect({id:id(skill),name:skill.name}) END as  skillList  ,skillCategory.name as name ,id(skillCategory) as id,skillCategory.description as description")
-    List<OrgTypeSkillQueryResult> getSkillsOfOrganizationType(long orgTypeId);
+            "return  case when skill is NULL then [] else collect(skill) END as  skillList  ,skillCategory.name as name ,id(skillCategory) as id,skillCategory.description as description," +
+            "skillCategory.translations as translations")
+    List<SkillCategoryQueryResults> getSkillsOfOrganizationType(long orgTypeId);
 
     @Query("Match (n:Unit{isEnable:true,union:false,boardingCompleted:true,isKairosHub:false,gdprUnit:false})-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) where id(organizationType)={0} return DISTINCT n")
     List<Unit> getOrganizationsByOrganizationType(long orgTypeId);

@@ -3,6 +3,7 @@ package com.kairos.dto.activity.wta.rule_template_category;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
@@ -48,8 +49,9 @@ public class RuleTemplateCategoryDTO {
     private List<TagDTO> tags = new ArrayList<>();
 
     public String getName() {
-        return name;
+        return TranslationUtil.getName(translations,name);
     }
+
 
     @JsonSetter("categoryName")
     public void setCategoryategoryName(String name) {
@@ -62,6 +64,8 @@ public class RuleTemplateCategoryDTO {
     public void setName(String name) {
         this.name = name;
     }
+
+
 
 }
 

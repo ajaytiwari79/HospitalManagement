@@ -56,7 +56,7 @@ public class PublicLegalDocumentService {
                 return null;
             }
         }
-        String fileName = DateUtils.getCurrentDate().getTime() + file.getOriginalFilename();
+        String fileName = DateUtils.getDate().getTime() + file.getOriginalFilename();
         final String path = PUBLIC_LEGAL_DOCUMENT_LOGO_PATH + File.separator + fileName;
         try (InputStream inputStream = file.getInputStream();
              FileOutputStream fileOutputStream = new FileOutputStream(new File(path))) {

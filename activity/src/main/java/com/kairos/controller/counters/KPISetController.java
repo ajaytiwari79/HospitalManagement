@@ -4,7 +4,9 @@ package com.kairos.controller.counters;
  *
  */
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
+import com.kairos.dto.response.ResponseDTO;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -77,5 +79,14 @@ public class KPISetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.getKPISetCalculationData(unitId,startDate,endDate));
     }
 
+    @PutMapping(UNIT_URL+KPI_SET+"/{kpiSetId}/language_settings")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfKPISetAtCountry(@PathVariable BigInteger kpiSetId,@RequestBody Map<String,TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.updateTranslationData(kpiSetId,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL+KPI_SET+"/{kpiSetId}/language_settings")
+    public ResponseEntity<ResponseDTO<Object>> updateTranslationDataFibonacciKPIAtCountry(@PathVariable BigInteger kpiSetId, @RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, kpiSetService.updateTranslationData(kpiSetId,translations));
+    }
 
 }

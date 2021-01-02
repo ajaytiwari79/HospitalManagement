@@ -2,7 +2,6 @@ package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
-import com.kairos.enums.LocationEnum;
 import lombok.Getter;
 import lombok.Setter;
 

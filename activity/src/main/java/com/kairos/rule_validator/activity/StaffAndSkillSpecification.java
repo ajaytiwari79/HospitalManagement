@@ -1,5 +1,6 @@
 package com.kairos.rule_validator.activity;
 
+import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.dto.activity.activity.activity_tabs.ActivitySkill;
 import com.kairos.dto.activity.activity.activity_tabs.SkillActivityDTO;
 import com.kairos.dto.activity.shift.ActivityRuleViolation;
@@ -49,8 +50,8 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
-        List<String> errorMessages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
+            List<String> errorMessages = new ArrayList<>();
             for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {
                 validateStaffSkills(errorMessages, childActivity);
             }
@@ -63,7 +64,7 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
         ActivityRuleViolation activityRuleViolation;
         if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getActivitySkillSettings().getActivitySkillIds()) &&
                 (CollectionUtils.isEmpty(skillLevelDTOS) || !isSkillSatisfied(shiftActivityDTO.getActivity().getActivitySkillSettings()))) {
-            errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_SKILL_MATCH, shiftActivityDTO.getActivity().getName()));
+            errorMessages.add(CommonsExceptionUtil.convertMessage(MESSAGE_ACTIVITY_SKILL_MATCH, shiftActivityDTO.getActivity().getName()));
             activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
             if(activityRuleViolation==null){
                 activityRuleViolation=new ActivityRuleViolation(shiftActivityDTO.getActivity().getId(),shiftActivityDTO.getActivity().getName(),0,new HashSet<>(errorMessages));

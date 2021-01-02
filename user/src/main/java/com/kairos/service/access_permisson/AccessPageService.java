@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -22,15 +21,14 @@ import com.kairos.persistence.repository.user.access_permission.AccessPageReposi
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.translation.TranslationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ResourceUtils;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -62,6 +60,8 @@ public class AccessPageService {
     @Inject
     private ExceptionService exceptionService;
     @Inject private AccessPageLanguageRelationShipRepository accessPageLanguageRelationShipRepository;
+
+    @Inject private TranslationService translationService;
 
     public synchronized AccessPage createAccessPage(AccessPageDTO accessPageDTO){
         AccessPage accessPage = new AccessPage(accessPageDTO.getName(),accessPageDTO.isModule(),
@@ -267,12 +267,9 @@ public class AccessPageService {
        return accessPageRepository.getAccessPermission(userId,  organizationIds);
     }
 
-    public Map<String, TranslationInfo> updateTranslation(Long accessPageId, TranslationDTO translationData) {
-        AccessPage accessPage = accessPageRepository.findOne(accessPageId);
-        accessPage.setTranslatedNames(translationData.getTranslatedNames());
-        accessPage.setTranslatedDescriptions(translationData.getTranslatedDescriptions());
-        accessPageRepository.save(accessPage);
-        return accessPage.getTranslatedData();
+    public Map<String, TranslationInfo> updateTranslation(String moduleId, Map<String,TranslationInfo> translationData) {
+        AccessPage accessPage = accessPageRepository.findByModuleId(moduleId);
+        return translationService.updateTranslation(accessPage.getId(), translationData);
     }
 
     public Map<String, TranslationInfo> getTranslatedData(Long accessPageId) {

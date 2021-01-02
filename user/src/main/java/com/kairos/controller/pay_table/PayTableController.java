@@ -1,9 +1,11 @@
 package com.kairos.controller.pay_table;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.pay_table.PayTableDTO;
 import com.kairos.dto.user.country.pay_table.PayTableUpdateDTO;
 import com.kairos.persistence.model.country.pay_table.PayGradeDTO;
 import com.kairos.service.pay_table.PayTableService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -32,6 +34,8 @@ public class PayTableController {
 
     @Inject
     private PayTableService payTableService;
+
+    @Inject private TranslationService translationService;
 
     @RequestMapping(value = "/pay_table_data", method = GET)
     public ResponseEntity<Map<String, Object>> getPayTablesByOrganizationLevel(@PathVariable Long countryId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
@@ -104,6 +108,11 @@ public class PayTableController {
     @PutMapping(value = "/pay_table/{payTableId}/amount")
     public ResponseEntity<Map<String,Object>> updatePayTableAmount(@PathVariable @NotNull Long payTableId,@RequestBody PayTableDTO payTableDTO){
        return ResponseHandler.generateResponse(HttpStatus.OK,true,payTableService.updatePayTableAmountByPercentage(payTableId,payTableDTO));
+    }
+
+    @RequestMapping(value = "/pay_table/{payTableId}/language_settings", method = PUT)
+    public ResponseEntity<Map<String, Object>> updateTranslationOfPaytable(@PathVariable Long payTableId,@RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(payTableId, translations));
     }
 
 }

@@ -60,9 +60,8 @@ public class ActivityUtil {
         return new ActivityLocationSettings(activityGlideTimeDetailsForCheckIn, activityGlideTimeDetailsForCheckOut);
     }
 
-    public static List<CutOffInterval> getCutoffInterval(LocalDate dateFrom, CutOffIntervalUnit cutOffIntervalUnit, Integer dayValue) {
+    public static List<CutOffInterval> getCutoffInterval(LocalDate dateFrom, CutOffIntervalUnit cutOffIntervalUnit, Integer dayValue,LocalDate endDate) {
         LocalDate startDate = dateFrom;
-        LocalDate endDate = startDate.plusYears(1);
         List<CutOffInterval> cutOffIntervals = new ArrayList<>();
         updateCutOff(cutOffIntervalUnit, dayValue, startDate, endDate, cutOffIntervals);
         return cutOffIntervals;

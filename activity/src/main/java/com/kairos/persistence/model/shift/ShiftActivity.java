@@ -36,9 +36,9 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
     private Integer endTime;
     private String activityName;
     //used in T&A view
-    private Long reasonCodeId;
+    private BigInteger reasonCodeId;
     //used for adding absence type of activities.
-    private Long absenceReasonCodeId;
+    private BigInteger absenceReasonCodeId;
     private String remarks;
     //please don't use this id for any functionality this on ly for frontend
     private BigInteger id;
@@ -62,6 +62,8 @@ public class ShiftActivity implements Comparable<ShiftActivity> {
     private transient BigInteger plannedTimeId;
     private boolean breakInterrupt;
     private TimeTypeEnum secondLevelTimeType;
+    private BigInteger timeTypeId;
+    private String methodForCalculatingTime;
 
 
     @IgnoreLogging

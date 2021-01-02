@@ -88,11 +88,10 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "MATCH(org)-[:"+HAS_UNIT+"]->(subOrg:Unit)  \n" +
             "OPTIONAL MATCH(subOrg)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false})<-[:"+BELONGS_TO_STAFF+"]-(staff) WITH employment,org,subOrg,staff,position \n" +
             "MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE())) \n" +
-            "OPTIONAL MATCH (employment)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (exl)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "RETURN expertise as expertise,unionData as union, id(employment) as id,\n" +
             " employment.startDate as startDate,employment.employmentSubType as employmentSubType,employment.taxDeductionPercentage as taxDeductionPercentage, employment.endDate as endDate, \n" +
-            "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name,code:reasonCode.code} END as reasonCode,employment.history as history,employment.editable as editable,employment.published as published, \n" +
+            " employment.reasonCodeId as reasonCodeId,employment.history as history,employment.editable as editable,employment.published as published, \n" +
             "employment.lastWorkingDate as lastWorkingDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo ")
     List<EmploymentQueryResult> getAllEmploymentsByUser(long userId);
 //Date is not supported as a return type in Bolt protocol version 1.
@@ -125,10 +124,9 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 
     @Query("MATCH(org:Unit)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false})<-[:"+BELONGS_TO_STAFF+"]-(staff) WHERE id(staff)={0} AND id(org)={1}\n" +
             "MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE()))  \n" +
-            "OPTIONAL MATCH (employment)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (exl)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "RETURN id(employment) as id,employment.startDate as startDate, employment.endDate as endDate,employment.employmentSubType as employmentSubType,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes, \n" +
-            "CASE WHEN reasonCode IS NULL THEN null else {id:id(reasonCode),name:reasonCode.name,code:reasonCode.code} END as reasonCode, employment.history as history,employment.taxDeductionPercentage as taxDeductionPercentage,employment.editable as editable,employment.published as published,\n" +
+            "employment.reasonCodeId AS  reasonCodeId , employment.history as history,employment.taxDeductionPercentage as taxDeductionPercentage,employment.editable as editable,employment.published as published,\n" +
             "employment.lastWorkingDate as lastWorkingDate,id(org)  as unitId,{id:id(org),name:org.name} as unitInfo,expertise as expertise,unionData as union")
     List<EmploymentQueryResult> getAllEmploymentsForCurrentOrganization(long staffId, Long unitId);
 
@@ -145,12 +143,13 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     List<Map<Long, Long>> getMapOfEmploymentAndExpertiseId(Long unitId);
 
 
-    @Query("MATCH (user:User)-[:"+BELONGS_TO+"]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:"+HAS_POSITIONS+"]-(org:Organization) where id(user)={0}\n" +
+    @Query("MATCH (staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:"+HAS_POSITIONS+"]-(org:Organization) where id(staff)={0}\n" +
             "MATCH(org)-[:"+HAS_UNIT+"]->(subOrg:Unit)\n" +
             "MATCH(subOrg)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false,published:true})<-[:"+BELONGS_TO_STAFF+"]-(staff)\n" +
             "return  id(employment) as id,employment.history as history, \n" +
             "id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo ORDER BY employment.creationDate")
-    List<EmploymentQueryResult> getAllEmploymentsBasicDetailsAndWTAByUser(long userId);
+    List<EmploymentQueryResult> getAllEmploymentsBasicDetailsByStaffId(Long staffId);
+
 
     @Query( "MATCH(staff:Staff)-[expertise_from_date:STAFF_HAS_EXPERTISE]->(expertise:Expertise) \n" +
             "WITH staff,expertise,expertise_from_date.expertiseStartDate as expertise_from_date \n" +
@@ -344,7 +343,6 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query("MATCH(exp:Expertise)-[:"+HAS_EXPERTISE_IN+"]-(e:Employment)-[r:"+HAS_EMPLOYMENT_LINES+"]-(el:EmploymentLine) WHERE id(exp)={0}" +
             "MATCH(e)-[unitRel:"+IN_UNIT+"]-(unit:Unit) " +
             "MATCH(e)-[staffRel:"+BELONGS_TO_STAFF+"]-(s:Staff) " +
-            "MATCH(exp)-[prRel:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]->(pr:ProtectedDaysOffSetting)" +
             "RETURN e,r,el,exp,unitRel,unit,staffRel,s,COLLECT(prRel),COLLECT(pr)")
     List<Employment> findAllEmploymentByExpertiseId(Long expertiseId);
 
@@ -356,29 +354,26 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "RETURN DISTINCT emp,r,exp,slRel,sl,COLLECT(empRel),COLLECT(empLine),staffRel,staff")
     List<Employment> getAllEmploymentByLevel(Long levelId,String startDate,String endDate);
 
-    @Query("MATCH (employment:Employment{deleted:false})-[:"+BELONGS_TO_STAFF+"]-(staff:Staff) where id(employment) IN  {0} \n" +
-            "MATCH(employment)-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine) WHERE (DATE(employmentLine.startDate)<=Date({1}) AND (employmentLine.endDate IS NULL OR Date({1}) <= Date(employmentLine.endDate))) \n" +
-            "MATCH(employmentLine)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]-(pg:PayGrade)\n" +
-            "MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{published:true})-[:" + HAS_EXPERTISE_LINES + "]-(exl:ExpertiseLine) \n" +
-            "OPTIONAL MATCH(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)-[:" + IN_ORGANIZATION_LEVEL + "]-(pt:PayTable)-[:" + HAS_PAY_GRADE + "]-(payGrade:PayGrade) " +
-            "WHERE payGrade.payGradeLevel=pg.payGradeLevel\n" +
-            "OPTIONAL MATCH(employment)-[:" + IN_UNIT + "]-(org:Unit)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality)-[:" + HAS_MUNICIPALITY + "]-(pga:PayGroupArea)<-[pgaRel:" + HAS_PAY_GROUP_AREA + "]-(payGrade) \n" +
-            "WITH  employment,employmentLine,staff,payGrade,exl,seniorityLevel, CASE when pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END as hourlyCost\n" +
-            "RETURN id(staff) as id,sum(toInteger(hourlyCost)) as  payTableAmount")
-    List<EmploymentLinesQueryResult> findSum(List<Long> employmentIds,String selectedDate);
+    @Query("MATCH(functionalPayment:FunctionalPayment)-[:"+APPLICABLE_FOR_EXPERTISE+"]->(expertiseLine:ExpertiseLine{deleted:false})<-[:"+HAS_EXPERTISE_LINES+"]-(exp:Expertise{deleted:false,published:true})-[r:"+HAS_EXPERTISE_IN+"]-(emp:Employment{deleted:false,published:true})-[empRel:"+HAS_EMPLOYMENT_LINES+"]->(empLine:EmploymentLine)-[slRel:"+HAS_SENIORITY_LEVEL+"]-(sl:SeniorityLevel) " +
+            "MATCH(emp)<-[staffRel:"+BELONGS_TO_STAFF+"]-(staff:Staff)" +
+            "WHERE id(functionalPayment)={0} AND  \n" +
+            "(( {2} IS NULL AND (emp.endDate IS NULL OR DATE(emp.endDate) > DATE({1})))\n" +
+            "OR ({2} IS NOT NULL AND  (DATE({2}) > DATE(emp.startDate) AND (emp.endDate is null OR DATE({1}) < DATE(emp.endDate)) ))) " +
+            "RETURN DISTINCT emp,r,exp,slRel,sl,COLLECT(empRel),COLLECT(empLine),staffRel,staff")
+    List<Employment> getAllEmploymentByFunctionId(Long functionId,String startDate,String endDate);
 
     @Query("MATCH(employmentLine:EmploymentLine)-[seniorityRel:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[payGradeRel:" + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) where id(employmentLine) IN  {0}\n" +
             "RETURN employmentLine,seniorityLevel,seniorityRel,payGrade,payGradeRel")
     List<EmploymentLine> getEmploymentLineByIds(List<Long> employmentLineIds);
 
-    @Query("match (e:Employment)<-[staffRel:BELONGS_TO_STAFF]-(s:Staff) where id(s) in {0}\n" +
-            "match(e)-[expRel:HAS_EXPERTISE_IN]-(ex:Expertise)\n" +
-            "match(e)-[empLineRel:HAS_EMPLOYMENT_LINES]-(em:EmploymentLine)\n" +
-            "match(s)-[tagRel:BELONGS_TO_TAGS]-(tag:Tag)\n" +
+    @Query("match (e:Employment)<-[staffRel:BELONGS_TO_STAFF]-(s:Staff) where id(s) in {0} " +
+            "match(e)-[expRel:HAS_EXPERTISE_IN]-(ex:Expertise) match(e)-[empLineRel:HAS_EMPLOYMENT_LINES]-(em:EmploymentLine) \n" +
             "match(s)-[userRel:BELONGS_TO]-(user:User)\n" +
-            "Optional Match(s)-[childRel:HAS_CHILDREN]-(child:StaffChildDetail)\n" +
+            "optional match(s)-[tagRel:BELONGS_TO_TAGS]-(tag:Tag) with e,staffRel,s,expRel,ex,empLineRel,em,tagRel,tag,userRel,user\n" +
+            "Optional Match(s)-[childRel:HAS_CHILDREN]-(child:StaffChildDetail) with e,staffRel,s,expRel,ex,empLineRel,em,tagRel,tag,userRel,user,childRel,child\n" +
             "return e,staffRel,s,expRel,ex,empLineRel,em,tagRel,tag,userRel,user,childRel,child")
     List<Employment> getEmploymentByStaffIds(List<Long> staffIds);
+
 
 }
 

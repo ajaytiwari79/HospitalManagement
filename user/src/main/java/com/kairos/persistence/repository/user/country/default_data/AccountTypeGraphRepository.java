@@ -11,7 +11,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCOUNT_TYPE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.IN_COUNTRY;
 
 @Repository
 public interface AccountTypeGraphRepository extends Neo4jBaseRepository<AccountType, Long> {
@@ -32,13 +33,13 @@ public interface AccountTypeGraphRepository extends Neo4jBaseRepository<AccountT
 
     @Query("MATCH(country:Country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) where id(country)={0} " +
             "OPTIONAL MATCH (ag:AccessGroup{deleted:false})-[:" + HAS_ACCOUNT_TYPE + "]->(accountType)" +
-            "RETURN id(accountType) as id,accountType.name as name,count(ag) as count")
+            "RETURN accountType.translations as translations,\n" +
+            "id(accountType) as id,accountType.name as name,count(ag) as count")
     List<AccountTypeAccessGroupCountQueryResult> getAllAccountTypeWithAccessGroupCountByCountryId(Long countryId);
 
     @Query("MATCH (accountType:AccountType{deleted:false}) where id(accountType)={0} " +
             "MATCH (ag:AccessGroup{deleted:false})-[:" + HAS_ACCOUNT_TYPE + "]->(accountType) WHERE (ag.endDate IS NULL OR date(ag.endDate) >= date())" +
-            "OPTIONAL MATCH(ag)-[:"+DAY_TYPES+"]->(dayType:DayType)" +
-            "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted, ag.role as role, ag.enabled as enabled,ag.startDate as startDate, ag.endDate as endDate, collect(dayType) as dayTypes,ag.allowedDayTypes as allowedDayTypes")
+            "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted, ag.role as role, ag.enabled as enabled,ag.startDate as startDate, ag.endDate as endDate, ag.dayTypeIds as dayTypeIds,ag.allowedDayTypes as allowedDayTypes")
     List<AccessGroupQueryResult> getAccessGroupsByAccountTypeId(Long accountTypeId);
 
 }

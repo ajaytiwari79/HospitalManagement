@@ -64,4 +64,6 @@ public class TagDTO {
         Date intervalEndDate = isNull(this.endDate) ? dateTimeInterval.getEndDate() : this.endDate.after(endDate) ? dateTimeInterval.getEndDate() : this.endDate;
         return new DateTimeInterval(intervalStartDate,intervalEndDate);
     }
+
+
 }

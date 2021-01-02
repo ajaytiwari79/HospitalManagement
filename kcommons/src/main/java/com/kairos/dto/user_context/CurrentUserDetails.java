@@ -2,6 +2,7 @@ package com.kairos.dto.user_context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.enums.OrganizationCategory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.STAFF;
 
@@ -33,6 +35,7 @@ public class CurrentUserDetails {
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
     private String profilePic;
     private boolean systemAdmin;
+    private SystemLanguageDTO userLanguage;
 
 
     public CurrentUserDetails(Long id, String userName, String nickName,
@@ -54,7 +57,7 @@ public class CurrentUserDetails {
 
     @JsonIgnore
     public boolean isManagement(){
-        return MANAGEMENT.name().equalsIgnoreCase(unitWiseAccessRole.get(lastSelectedOrganizationId.toString()));
+        return (isNotNull(unitWiseAccessRole) && isNotNull(lastSelectedOrganizationId) && MANAGEMENT.name().equalsIgnoreCase(unitWiseAccessRole.get(lastSelectedOrganizationId.toString()))) || this.systemAdmin;
     }
 
     @JsonIgnore

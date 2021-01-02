@@ -2,6 +2,7 @@ package com.kairos.shiftplanning.utils;
 
 import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
@@ -14,6 +15,7 @@ import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.phase.PhaseType;
@@ -64,6 +66,8 @@ public class ShiftPlanningInitializer {
 
         ShiftPlanningSolution shiftPlanningSolution = new ShiftPlanningSolution();
         updateUnit(shiftPlanningProblemSubmitDTO.getUnitId(), shiftPlanningProblemSubmitDTO, shiftPlanningSolution);
+        List<LocalDate> localDates = shiftPlanningProblemSubmitDTO.getStaffingLevels().stream().map(presenceStaffingLevelDto -> asLocalDate(presenceStaffingLevelDto.getCurrentDate())).collect(Collectors.toList());
+        shiftPlanningSolution.setWeekDates(localDates);
         updateEmployees(shiftPlanningProblemSubmitDTO, shiftPlanningSolution);
         Map<BigInteger, Activity> activityMap = updateActivityRelatedDetails(shiftPlanningProblemSubmitDTO, shiftPlanningSolution);
         List<ShiftImp> shiftImp = getShiftRequestPhase(shiftPlanningProblemSubmitDTO, shiftPlanningSolution,activityMap);
@@ -101,6 +105,10 @@ public class ShiftPlanningInitializer {
                 EmploymentType employmentType = getEmploymentType(employmentDTO);
                 Map<LocalDate, Function> dateWiseFunctionMap = ObjectMapperUtils.copyPropertiesByMapper(employmentDTO.getDateWiseFunctionMap(),Map.class);
                 Expertise expertise = ObjectMapperUtils.copyPropertiesByMapper(employmentDTO.getExpertise(),Expertise.class);
+                DateTimeInterval dateTimeInterval = isNull(employmentDTO.getEndDate()) ? null : new DateTimeInterval(employmentDTO.getStartDate(),employmentDTO.getEndDate());
+                if(isNotNull(employmentDTO.getEndDate()) && !shiftPlanningSolution.getWeekDates().stream().anyMatch(localDate -> dateTimeInterval.contains(localDate))){
+                    continue;
+                }
                 Employment employment = getEmployment(employmentDTO, employmentType, dateWiseFunctionMap, expertise);
                 Employee employee = Employee.builder()
                         .id(staffDTO.getId())
@@ -156,9 +164,9 @@ public class ShiftPlanningInitializer {
             Map<LocalDate, Map<ConstraintSubType, WTABaseRuleTemplate>> localDateWTARuletemplateMap = new HashMap<>();
             while (!startDate.isAfter(endDate)){
                 AtomicReference<ZonedDateTime> zonedDateTimeAtomicReference = new AtomicReference<>(startDate);
-                WTAResponseDTO wtaResponseDTO = wtaResponseDTOS.stream().filter(wtaResponse -> wtaResponse.isValidWorkTimeAgreement(zonedDateTimeAtomicReference.get().toLocalDate())).findFirst().orElseThrow(()->new DataNotFoundByIdException("WTA Not Found for employmentId "+employmentIdAndCtaResponse.getKey()+" Date "+zonedDateTimeAtomicReference.get()));
+                WTAResponseDTO wtaResponseDTO = wtaResponseDTOS.stream().filter(wtaResponse -> wtaResponse.isValidWorkTimeAgreement(zonedDateTimeAtomicReference.get().toLocalDate())).findFirst().orElse(new WTAResponseDTO(new ArrayList<>()));//Throw(()->new DataNotFoundByIdException("WTA Not Found for employmentId "+employmentIdAndCtaResponse.getKey()+" Date "+zonedDateTimeAtomicReference.get()));
                 localDateWTARuletemplateMap.put(startDate.toLocalDate(),getWTARuletemplateMap(wtaResponseDTO));
-                CTAResponseDTO ctaResponseDTO = employmentIdAndCtaResponse.getValue().stream().filter(ctaResponse -> ctaResponse.isValidCostTimeAgreement(zonedDateTimeAtomicReference.get().toLocalDate())).findFirst().orElseThrow(()->new DataNotFoundByIdException("CTA not Found for employmentId "+employmentIdAndCtaResponse.getKey()+" Date "+zonedDateTimeAtomicReference.get()));
+                CTAResponseDTO ctaResponseDTO = employmentIdAndCtaResponse.getValue().stream().filter(ctaResponse -> ctaResponse.isValidCostTimeAgreement(zonedDateTimeAtomicReference.get().toLocalDate())).findFirst().orElse(new CTAResponseDTO(new ArrayList<>()));//.orElseThrow(()->new DataNotFoundByIdException("CTA not Found for employmentId "+employmentIdAndCtaResponse.getKey()+" Date "+zonedDateTimeAtomicReference.get()));
                 ctaRuleTemplatesMap.put(startDate.toLocalDate(),ObjectMapperUtils.copyCollectionPropertiesByMapper(ctaResponseDTO.getRuleTemplates(),CTARuleTemplate.class));
                 startDate = startDate.plusDays(1);
             }
@@ -234,7 +242,7 @@ public class ShiftPlanningInitializer {
                 .methodForCalculatingTime(activityDTO.getActivityTimeCalculationSettings().getMethodForCalculatingTime())
                 .multiplyWithValue(activityDTO.getActivityTimeCalculationSettings().getMultiplyWithValue())
                 .name(activityDTO.getName())
-                .validDayTypeIds(isNull(activityDTO.getActivityRulesSettings().getDayTypes()) ? new HashSet<>() : new HashSet<>(activityDTO.getActivityRulesSettings().getDayTypes()))
+                .validDayTypeIds(isNull(activityDTO.getActivityRulesSettings().getDayTypes()) ? new HashSet<>() : new HashSet<BigInteger>(activityDTO.getActivityRulesSettings().getDayTypes()))
                 .skills(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getActivitySkillSettings().getActivitySkills(), Skill.class))
             //    .tags(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getTags(), Tag.class))
                 .timeType(timeType).teamId(activityDTO.getTeamId()).constraints(getActivityConstrainsts(activityDTO)).order(activityOrderMap.get(activityDTO.getId())).activityPrioritySequence(activityDTO.getActivitySequence()).build();
@@ -319,7 +327,8 @@ public class ShiftPlanningInitializer {
                     if(activityMap.containsKey(shiftActivity.getActivityId())){
                         shiftActivity.setActivity(activityMap.get(shiftActivity.getActivityId()));
                     }else {
-                        throw new RuntimeException("Activity not Found"+shiftActivity.getActivityId());
+                        shiftActivity.setActivity(null);
+                        //throw new RuntimeException("Activity not Found"+shiftActivity.getActivityId());
                     }
                 });
                 LocalDate startDate = asLocalDate(shiftDTO.getStartDate());
@@ -354,7 +363,7 @@ public class ShiftPlanningInitializer {
         LocalDate startDate = asLocalDate(shiftDTO.getStartDate());
         LocalDate endDate = asLocalDate(shiftDTO.getEndDate());
         List<ActivityLineInterval> activityLineIntervals = activityLineIntervalMap.get(startDate);
-        if(!startDate.equals(endDate)){
+        if(!startDate.equals(endDate) && activityLineIntervalMap.entrySet().size()>1){
             activityLineIntervals.addAll(activityLineIntervalMap.get(endDate));
         }
         List<ActivityLineInterval> overallActivityLineIntervals = new ArrayList<>();

@@ -2,11 +2,14 @@ package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
@@ -19,8 +22,10 @@ import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
+import com.kairos.persistence.repository.time_slot.TimeSlotRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.attendence_setting.TimeAndAttendanceService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
@@ -41,7 +46,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_SHIFT_IDS;
 import static com.kairos.constants.ActivityMessagesConstants.PAST_DATE_ALLOWED;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
-import static java.util.stream.Collectors.groupingBy;
 
 /*
  *Created By Pavan on 21/12/18
@@ -67,6 +71,8 @@ public class ShiftStateService {
     @Inject private ShiftService shiftService;
     @Inject private TimeAndAttendanceService timeAndAttendanceService;
     @Inject private ShiftValidatorService shiftValidatorService;
+    @Inject private DayTypeService dayTypeService;
+    @Inject private TimeSlotRepository timeSlotRepository;
 
 
     public boolean sendShiftInTimeAndAttendancePhase(Long unitId, Date startDate,Long staffId){
@@ -122,8 +128,9 @@ public class ShiftStateService {
     }
 
     public List<ShiftState> createTimeAndAttendanceShiftState(List<Shift> shifts,Phase phase){
+        //TODO Need to check the workflow of shift state
         List<ShiftState> oldTimeAndAttendanceShiftStates=shiftStateMongoRepository.findAllByShiftIdInAndShiftStatePhaseIdAndValidatedNotNull(shifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet()),phase.getId());
-        Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=oldTimeAndAttendanceShiftStates.stream().filter(shiftState -> shiftState.getShiftStatePhaseId().equals(phase.getId())).collect(Collectors.toMap(ShiftState::getShiftId, v->v));
+        Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=oldTimeAndAttendanceShiftStates.stream().filter(shiftState -> shiftState.getShiftStatePhaseId().equals(phase.getId())).collect(Collectors.toMap(ShiftState::getShiftId, v->v,(s1, s2) -> s2));
         List<ShiftState> timeAndAttendanceShiftStates = getShiftStateLists( shifts, phase.getId(), timeAndAttendanceShiftStateMap);
         for (ShiftState timeAndAttendanceShiftState : timeAndAttendanceShiftStates) {
             if(shiftValidatorService.validateGracePeriod(timeAndAttendanceShiftState.getStartDate(),true,timeAndAttendanceShiftState.getUnitId(),phase)){
@@ -231,6 +238,10 @@ public class ShiftStateService {
         requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
         requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
+        List<DayTypeDTO> dayTypeDTOS=dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId());
+        staffAdditionalInfoDTOS.forEach(staff-> staff.setDayTypes(dayTypeDTOS));
+        List<TimeSlotDTO> timeSlotDTOS= timeSlotRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(unitId, TimeSlotType.SHIFT_PLANNING).getTimeSlots();
+        staffAdditionalInfoDTOS.forEach(staff-> staff.setTimeSlotSets(timeSlotDTOS));
         shifts.sort(Comparator.comparing(Shift::getStartDate));
         shiftsList.sort((shift, shiftSecond) -> shift.getStartDate().compareTo(shiftSecond.getStartDate()));
         Date startDate = shifts.get(0).getStartDate();
@@ -239,16 +250,6 @@ public class ShiftStateService {
         Date shiftEndDate = shiftsList.get(shiftsList.size() - 1).getEndDate();
         startDate = startDate.before(shiftStartDate) ? startDate : shiftStartDate;
         endDate = endDate.after(shiftEndDate) ? endDate : shiftEndDate;
-        /*List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(employmentIds, startDate, endDate);
-        Map<Long, List<CTAResponseDTO>> employmentAndCTAResponseMap = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getEmploymentId));
-        staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
-            if (employmentAndCTAResponseMap.get(staffAdditionalInfoDTO.getEmployment().getId()) != null) {
-                List<CTAResponseDTO> ctaResponseDTOSList = employmentAndCTAResponseMap.get(staffAdditionalInfoDTO.getEmployment().getId());
-                List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ctaResponseDTOSList.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
-                staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaRuleTemplateDTOS);
-                setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-            }
-        });*/
         timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, startDate, endDate);
 
     }

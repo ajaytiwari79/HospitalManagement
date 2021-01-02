@@ -2,6 +2,7 @@ package com.kairos.service.pay_table;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.pay_table.PayTableDTO;
 import com.kairos.dto.user.country.pay_table.PayTableUpdateDTO;
 import com.kairos.persistence.model.country.Country;
@@ -249,7 +250,6 @@ public class PayTableService {
         if (payGradeDTO != null) {
             payGradeResponses.add(addPayGradeInCurrentPayTable(copiedPayTable, payGradeDTO));
         }
-        payTable.setHasTempCopy(true);
         copiedPayTable.setPublished(false);
         payTableGraphRepository.save(copiedPayTable);
         //copying all previous and then adding in pay Table as well.
@@ -492,14 +492,15 @@ public class PayTableService {
         payTableByMapper.setPayTable(payTable);
         payTableByMapper.setPayGrades(null);
         payTableByMapper.setPublished(false);
-        payTable.setHasTempCopy(true);
         payTable.setEditable(false);
-        payTableByMapper.setHasTempCopy(false);
         payTableGraphRepository.save(payTableByMapper);
         return payTableByMapper;
     }
 
     public List<PayTable> publishPayTable(Long payTableId, LocalDate publishedDate) {
+//        if(DateUtils.getCurrentLocalDate().isAfter(publishedDate)){
+//            exceptionService.actionNotPermittedException(MESSAGE_PUBLISHDATE_NOTLESSTHAN_CURRENTDATE);
+//        }
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         validateDetails(payTable);
         List<PayTable> response = new ArrayList<>();
@@ -509,7 +510,6 @@ public class PayTableService {
             payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), endDate.toString());
             validatePayTableToPublish(payTableId, publishedDate);
             parentPayTable.setEndDateMillis(endDate);
-            parentPayTable.setHasTempCopy(false);
             parentPayTable.setPayTable(null);
             response.add(parentPayTable);
         } else if (!payTable.getStartDateMillis().equals(publishedDate)) {

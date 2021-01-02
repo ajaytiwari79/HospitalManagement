@@ -1,19 +1,23 @@
 
 package com.kairos.shiftplanning.executioner;
 
-import com.kairos.dto.planner.solverconfig.ConstraintDTO;
-import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
-import com.kairos.enums.constraint.ConstraintSubType;
-import com.kairos.enums.constraint.ConstraintType;
-import com.kairos.enums.constraint.ScoreLevel;
+import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
+import com.kairos.dto.user_context.CurrentUserDetails;
+import com.kairos.dto.user_context.UserContext;
+import com.kairos.shiftplanningNewVersion.entity.ALI;
+import com.kairos.shiftplanningNewVersion.generator.StaffingLevelGenerator;
+import com.kairos.shiftplanningNewVersion.solver.StaffingLevelSolver;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import static com.kairos.enums.constraint.ConstraintSubType.*;
-
+import java.util.Map;
 
 //@PropertySource("/media/pradeep/bak/multiOpta/task-shiftplanning/src/main/resources/taskplanner.properties")
 public class ShiftPlanningSolverTest {
@@ -28,6 +32,59 @@ public class ShiftPlanningSolverTest {
     public static final String MAX_NUMBER_OF_ALLOCATIONS_PR_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF = "Max number of allocations pr. shift for this activity per staff";
     public static final String SHORTEST_DURATION_FOR_THIS_ACTIVITY_RELATIVE_TO_SHIFT_LENGTH = "Shortest duration for this activity, relative to shift length";
     public static final String ACTIVITY_MUST_CONTINOUS_FOR_NUMBER_OF_HOURS_RELATIVE_TO_SHIFT_LENGTH = "Activity must continous for number of Hours, relative to shift length";
+    static{
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
+        System.setProperty("user.timezone", "UTC");
+        CurrentUserDetails currentUserDetails  = new CurrentUserDetails();
+        UserContext.setUserDetails(currentUserDetails);
+    }
+
+    @Test
+    public void solveStaffingLevelProblem(){
+        try {
+            new StaffingLevelSolver().run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void mergedInterval(){
+        Map<LocalDate,Map<BigInteger, List<ALI>>> localDateMapMap = new HashMap<>();
+        Map<BigInteger, List<ALI>> bigIntegerTreeSetMap = new HashMap<>();
+        List<ALI> aliTreeSet = new ArrayList<>();
+        ZonedDateTime zonedDateTime = ZonedDateTime.now().with(LocalTime.MIN);
+        aliTreeSet.add(new ALI(zonedDateTime,false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(15),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(30),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(45),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(60),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(90),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(105),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(120),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(135),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(150),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(165),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(180),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(195),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(210),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(225),false,15));
+        bigIntegerTreeSetMap.put(BigInteger.valueOf(6),aliTreeSet);
+        aliTreeSet = new ArrayList<>();
+        aliTreeSet.add(new ALI(zonedDateTime,false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(15),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(30),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(45),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(75),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(105),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(120),false,15));
+        aliTreeSet.add(new ALI(zonedDateTime.plusMinutes(135),false,15));
+        bigIntegerTreeSetMap.put(BigInteger.valueOf(7),aliTreeSet);
+        localDateMapMap.put(LocalDate.now(),bigIntegerTreeSetMap);
+        Object[] objects = new StaffingLevelGenerator().getMergedALI(localDateMapMap);
+        List<ALI> alis = (List<ALI>)objects[0];
+        Assert.assertEquals(alis.size(),8);
+    }
 
    /* @Test
     //@Ignore

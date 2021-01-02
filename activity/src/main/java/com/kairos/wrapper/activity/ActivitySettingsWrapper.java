@@ -7,8 +7,8 @@ import com.kairos.dto.activity.activity.activity_tabs.GeneralActivityWithTagDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
-import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
 import lombok.Getter;
@@ -44,11 +44,11 @@ public class ActivitySettingsWrapper {
     private ActivityCTAAndWTASettings activityCTAAndWTASettings;
     private BigInteger activityId;
     private PresenceTypeWithTimeTypeDTO presenceTypeWithTimeType;
-    private List<DayType> dayTypes;
+    private List<DayTypeDTO> dayTypes;
     private List<TimeTypeDTO> timeTypes;
     private ActivityLocationSettings activityLocationSettings;
     private List<EmploymentTypeDTO> employmentTypes;
-    private List<Long> rulesTabDayTypes= new ArrayList<>();
+    private List<BigInteger> rulesTabDayTypes= new ArrayList<>();
     private ActivityPhaseSettings activityPhaseSettings;
     private Set<AccessGroupRole> roles;
     private boolean sicknessSettingValid;
@@ -98,13 +98,13 @@ public class ActivitySettingsWrapper {
         this.activityNotesSettings = activityNotesSettings;
     }
 
-    public ActivitySettingsWrapper(ActivityRulesSettings rulesTab, List<DayType> dayTypes, List<EmploymentTypeDTO> employmentTypes) {
+    public ActivitySettingsWrapper(ActivityRulesSettings rulesTab, List<DayTypeDTO> dayTypes, List<EmploymentTypeDTO> employmentTypes) {
         this.rulesTab = rulesTab;
         this.dayTypes = dayTypes;
         this.employmentTypes=employmentTypes;
     }
 
-    public ActivitySettingsWrapper(Set<AccessGroupRole> accessGroupRoles, ActivityPhaseSettings activityPhaseSettings, List<DayType> dayTypes, List<EmploymentTypeDTO> employmentTypes) {
+    public ActivitySettingsWrapper(Set<AccessGroupRole> accessGroupRoles, ActivityPhaseSettings activityPhaseSettings, List<DayTypeDTO> dayTypes, List<EmploymentTypeDTO> employmentTypes) {
         this.roles=accessGroupRoles;
         this.activityPhaseSettings = activityPhaseSettings;
         this.dayTypes = dayTypes;
@@ -122,7 +122,7 @@ public class ActivitySettingsWrapper {
         this.activityCategories=activityCategories;
     }
 
-    public ActivitySettingsWrapper(ActivityTimeCalculationSettings activityTimeCalculationSettings, List<DayType> dayTypes, List<Long> rulesTabDayTypes) {
+    public ActivitySettingsWrapper(ActivityTimeCalculationSettings activityTimeCalculationSettings, List<DayTypeDTO> dayTypes, List<BigInteger> rulesTabDayTypes) {
         this.activityTimeCalculationSettings = activityTimeCalculationSettings;
         this.dayTypes = dayTypes;
         this.rulesTabDayTypes=rulesTabDayTypes;

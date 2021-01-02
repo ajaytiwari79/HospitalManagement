@@ -3,6 +3,7 @@ package com.kairos.controller.cta;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
+import com.kairos.dto.activity.cta_compensation_setting.CTACompensationConfiguration;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.cta.CountryCTAService;
@@ -308,6 +309,13 @@ public class CostTimeAgreementController {
     public ResponseEntity<Map<String, Object>> getCTACompensationSettingByCountryId(@PathVariable Long countryId)  {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 ctaCompensationSettingService.getCTACompensationSettingByCountryId(countryId));
+    }
+
+    @PutMapping(value = "/validate_cta_compensations")
+    @ApiOperation("Cta Compensation of expertise in Country")
+    public ResponseEntity<Map<String, Object>> validateCTACompensationSetting(@RequestBody List<CTACompensationConfiguration> ctaCompensationConfigurations)  {
+        ctaCompensationSettingService.validateInterval(ctaCompensationConfigurations);
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,null);
     }
 
     @GetMapping(value =UNIT_URL+API_EXPERTISE_URL + "/cta_compensation")

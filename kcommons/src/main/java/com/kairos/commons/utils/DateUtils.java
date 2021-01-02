@@ -187,7 +187,7 @@ public  class DateUtils {
         return TimeUnit.MILLISECONDS.toMinutes(duration);
     }
 
-    public static Date getCurrentDate() {
+    public static Date getDate() {
         return new Date();
     }
 
@@ -315,9 +315,6 @@ public  class DateUtils {
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR));
     }
 
-    public static Date getDate() {
-        return new Date();
-    }
 
     public static LocalDate getLocalDate(){
         return LocalDate.now();
@@ -927,6 +924,27 @@ public  class DateUtils {
 
     public static boolean isEqualOrAfter(LocalDate date1,LocalDate date2){
         return date1.equals(date2) || date1.isAfter(date2);
+    }
+
+    public static ZonedDateTime getDateByIntervalType(DurationType durationType, int value, ZonedDateTime zonedDateTime){
+        switch (durationType){
+            case DAYS: return zonedDateTime.plusDays(value).with(LocalTime.MIN);
+            case HOURS:return zonedDateTime.plusMinutes(value);
+            case MONTHS:return zonedDateTime.plusMonths(value).with(LocalTime.MIN);
+            case WEEKS:return zonedDateTime.plusWeeks(value).with(LocalTime.MIN);
+            case YEAR:return zonedDateTime.plusYears(value).with(LocalTime.MIN);
+            default: return null;
+        }
+    }
+
+    public  static  int getMinutesFromTime(String time){
+        if(!time.contains(".")){
+            return Integer.parseInt(time)*60;
+        }
+        int indexOfDot=time.indexOf(".");
+        String hrs=time.substring(0,indexOfDot);
+        int minutes=Integer.parseInt(hrs)*60;
+        return minutes+Integer.parseInt(time.substring(indexOfDot+1));
     }
 
 }

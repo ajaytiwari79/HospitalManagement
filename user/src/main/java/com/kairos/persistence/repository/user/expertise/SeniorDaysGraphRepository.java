@@ -14,7 +14,7 @@ public interface SeniorDaysGraphRepository  extends Neo4jBaseRepository<SeniorDa
 
     @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]->(seniorDays:SeniorDays{deleted:false}) WHERE id(expertise)={0} " +
             "OPTIONAL MATCH(seniorDays)-[careDayRel:"+HAS_CARE_DAYS+"]-(careDays:CareDays) " +
-            " RETURN seniorDays, COLLECT(careDayRel) , COLLECT(careDays) ORDER BY seniorDays.startDate ASC")
+            " RETURN seniorDays, COLLECT(careDayRel) , COLLECT(careDays) ORDER BY seniorDays.startDate,seniorDays.creationDate")
     List<SeniorDays> getSeniorDaysOfExpertise(Long expertiseId);
 
     @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]-(seniorDays:SeniorDays{deleted:false,published:true})-[r:"+HAS_CARE_DAYS+"]-(careDays:CareDays) WHERE id(expertise)={0} RETURN seniorDays,expRel,expertise,COLLECT(r),COLLECT(careDays) ORDER BY seniorDays.startDate DESC LIMIT 1 ")
@@ -30,8 +30,8 @@ public interface SeniorDaysGraphRepository  extends Neo4jBaseRepository<SeniorDa
             "set seniorDays.endDate={2} detach delete relation")
     void setEndDateToSeniorDays(Long id, Long parentSeniorDaysId, String endDate);
 
-    @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]->(seniorDays:SeniorDays{deleted:false})-[careDayRel:"+HAS_CARE_DAYS+"]-(careDays:CareDays) " +
-            "WHERE id(expertise)={0} AND seniorDays.startDate <= DATE({1}) AND (seniorDays.endDate IS NULL  OR DATE({1})<=seniorDays.endDate) " +
+    @Query("MATCH(expertise:Expertise{deleted:false})<-[expRel:" + BELONGS_TO_EXPERTISE + "]->(seniorDays:SeniorDays{deleted:false,published:true})-[careDayRel:"+HAS_CARE_DAYS+"]-(careDays:CareDays) " +
+            "WHERE id(expertise)={0} AND DATE(seniorDays.startDate) <= DATE({1}) AND (seniorDays.endDate IS NULL  OR DATE({1})<=DATE(seniorDays.endDate)) " +
             " RETURN seniorDays,COLLECT(careDayRel),COLLECT(careDays)")
     SeniorDays findSeniorDaysBySelectedDate(Long expertiseId, String selectedDate);
 

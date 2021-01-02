@@ -1,0 +1,45 @@
+db.shifts.find({"deleted":false,"unitId":2403}).forEach(function(shift){
+    shift.activities.forEach(function(ac){
+     var activity = db.activities.findOne({"_id":ac.activityId});
+     ac.timeTypeId= activity.activityBalanceSettings.timeTypeId;
+     ac.methodForCalculatingTime = activity.activityTimeCalculationSettings.methodForCalculatingTime
+     });
+        var shiftViolated = db.shiftViolatedRules.findOne({"shiftId":shift._id});
+        if(!shiftViolated){
+            shiftViolated = {
+                    workTimeAgreements:[],
+                    activities:[],
+                    escalationReasons:[]
+                };
+            }
+            shift.shiftViolatedRules = shiftViolated;
+            if(shift.draftShift){
+                var shiftViolated = db.shiftViolatedRules.findOne({"shiftId":shift._id,"draft":true});
+                if(!shiftViolated){
+                shiftViolated = {
+                    workTimeAgreements:[],
+                    activities:[],
+                    escalationReasons:[]
+                    };
+                }
+                shift.draftShift.shiftViolatedRules = shiftViolated;
+            }
+            shift.createdBy = {
+                    _id : NumberLong(18728),
+                    email : "ulrik@kairosplanning.com",
+                    fullName : "Ulrik Rasmussen",
+                    accessGroupRole:"MANAGEMENT"
+                }
+        db.shifts.save(shift);
+});
+
+db.getCollection('staffActivitySetting').find({}).forEach(function(ac){
+    if(ac.activityId){
+    var activity = db.activities.findOne({"_id":ac.activityId});
+
+        if(activity){
+        ac.secondLevelTimtype = activity.activityBalanceSettings.timeType
+    db.staffActivitySetting.save(ac);
+        }
+        }
+    })

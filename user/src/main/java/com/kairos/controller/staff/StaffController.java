@@ -1,6 +1,7 @@
 package com.kairos.controller.staff;
 
 import com.kairos.annotations.KPermissionActions;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
@@ -24,6 +25,7 @@ import com.kairos.service.employment.EmploymentJobService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.*;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import io.swagger.annotations.Api;
@@ -75,7 +77,7 @@ public class StaffController {
     private EmploymentJobService employmentJobService;
     @Inject private StaffCreationService staffCreationService;
     @Inject private ClientService clientService;
-
+    @Inject private TranslationService translationService;
 
     @RequestMapping(value = "/{staffId}/position_details", method = RequestMethod.PUT)
     @ApiOperation("update staff employment details")
@@ -660,9 +662,9 @@ public class StaffController {
 
     @PostMapping(value = "/get_all_planning_staff")
     @ApiOperation("Get all staff eligible for planning")
-    public ResponseEntity<Map<String, Object>> getStaffEligibleForPlanning(@PathVariable Long unitId, @RequestBody StaffFilterDTO staffFilterDetails) {
+    public ResponseEntity<Map<String, Object>> getStaffEligibleForPlanning(@PathVariable Long unitId, @RequestBody StaffFilterDTO staffFilterDetails,@RequestParam boolean showAllStaffs) {
         Long loggedInUserId = UserContext.getUserDetails().getId();
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getAllStaffForUnitWithEmploymentStatus(loggedInUserId, unitId, staffFilterDetails));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getAllStaffForUnitWithEmploymentStatus(loggedInUserId, unitId, staffFilterDetails,showAllStaffs));
     }
 
     @GetMapping(value = "/end_position_process")
@@ -677,5 +679,19 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>>  getStaffsByIds(@PathVariable Long unitId, @RequestBody List<Long> staffIds){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsByIds(unitId,staffIds));
     }
+
+    @PutMapping(value ="/organization/language_settings" )
+    @ApiOperation("update organization staff translation data")
+    public ResponseEntity<Map<String, Object>>  updateStaffOrganizationTranslations(@PathVariable Long unitId,@RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(unitId,translations));
+    }
+
+    @PutMapping(value ="/{staffId}/staff_child/{staffChildId}/language_settings" )
+    @ApiOperation("update staff child translation data")
+    public ResponseEntity<Map<String, Object>>  updateStaffChildTranslations(@PathVariable Long staffChildId,@RequestBody Map<String, TranslationInfo> translations){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(staffChildId,translations));
+    }
+
+
 
 }

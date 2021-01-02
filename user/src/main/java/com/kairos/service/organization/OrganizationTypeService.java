@@ -2,12 +2,16 @@ package com.kairos.service.organization;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.user.country.LevelDTO;
+import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
 import com.kairos.persistence.model.organization_type.OrganizationTypeSubTypeAndServicesQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
+import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -20,6 +24,7 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -36,7 +41,6 @@ public class OrganizationTypeService{
     private ExceptionService exceptionService;
 
     public List<OrgTypeLevelWrapper> getOrgTypesByCountryId(Long countryId) {
-
         return organizationTypeGraphRepository.getOrganizationTypeByCountryId(countryId);
     }
 
@@ -83,8 +87,10 @@ public class OrganizationTypeService{
 
     }
 
-    public List<OrganizationTypeAndSubType> getAllOrganizationTypeAndSubType(long countryId) {
-        return organizationTypeGraphRepository.getAllOrganizationTypeAndSubType(countryId);
+    public List<OrganizationTypeDTO> getAllOrganizationTypeAndSubType(long countryId) {
+        List<OrganizationTypeAndSubType> organizationTypeAndSubTypes = organizationTypeGraphRepository.getAllOrganizationTypeAndSubType(countryId);
+        List<OrganizationTypeDTO> organizationTypeDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationTypeAndSubTypes,OrganizationTypeDTO.class);
+        return organizationTypeDTOS;
     }
 
 
@@ -125,16 +131,9 @@ public class OrganizationTypeService{
         return null;
     }
 
-    public List<Object> getOrgSubTypesByTypeId(Long organizationTypeId) {
-        List<Object> response = new ArrayList<>();
-        List<Map<String, Object>> queryResponse = organizationTypeGraphRepository.getOrganizationSubTypeByTypeId(organizationTypeId);
-        if (!queryResponse.isEmpty()) {
-            for (Map<String, Object> map : queryResponse) {
-                Object o = map.get("result");
-                response.add(o);
-            }
-        }
-        return response;
+    public List<OrgTypeLevelWrapper> getOrgSubTypesByTypeId(Long organizationTypeId) {
+        List<OrgTypeLevelWrapper> organizationSubTypes = organizationTypeGraphRepository.getOrganizationSubTypeByTypeId(organizationTypeId);
+        return organizationSubTypes;
     }
 
     /**
@@ -146,7 +145,7 @@ public class OrganizationTypeService{
      * new relationship b/w skill and organization type will be created or updated(if relationship already exist) if parameter value is false
      * then relationship will be inactive (deleted param of relationship will set to true)
      */
-    public List<OrgTypeSkillQueryResult> addSkillInOrgType(long orgTypeId, long skillId, boolean isSelected) {
+    public List<SkillCategoryQueryResults> addSkillInOrgType(long orgTypeId, long skillId, boolean isSelected) {
         if (isSelected) {
             organizationTypeGraphRepository.addSkillInOrgType(orgTypeId, skillId, DateUtils.getCurrentDateMillis(), DateUtils.getCurrentDateMillis());
         } else {
@@ -161,7 +160,7 @@ public class OrganizationTypeService{
      * @param orgTypeId
      * @return
      */
-    public List<OrgTypeSkillQueryResult> getSkillsByOrganizationTypeId( long orgTypeId) {
+    public List<SkillCategoryQueryResults> getSkillsByOrganizationTypeId( long orgTypeId) {
         return organizationTypeGraphRepository.getSkillsOfOrganizationType(orgTypeId);
     }
 
@@ -197,4 +196,5 @@ public class OrganizationTypeService{
     public List<Long> getOrganizationIdsByOrgSubTypeIdsAndSubServiceIds(List<Long> organizationSubTypeIds, List<Long> organizationSubServicesIds) {
         return organizationTypeGraphRepository.getOrganizationIdsByOrgSubTypeIdsAndOrgSubServiceIds(organizationSubTypeIds, organizationSubServicesIds);
     }
+
 }

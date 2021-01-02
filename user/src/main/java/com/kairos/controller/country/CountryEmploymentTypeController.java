@@ -5,6 +5,7 @@ import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.service.country.EmploymentTypeService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +30,7 @@ public class CountryEmploymentTypeController {
 
     @Inject
     private EmploymentTypeService employmentTypeService;
+    @Inject private TranslationService translationService;
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type", method = RequestMethod.POST)
     @ApiOperation("Add employment type in country")
@@ -148,6 +150,13 @@ public class CountryEmploymentTypeController {
     @ApiOperation("update translation data")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTranslationOfEmploymentTypes(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.updateTranslationOfEmploymentType(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
+    @RequestMapping(value = UNIT_URL+"/employment_type/{id}/language_settings", method = RequestMethod.PUT)
+    @ApiOperation("update translation data")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfEmploymentTypesOfOrganization(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+    }
+
 }

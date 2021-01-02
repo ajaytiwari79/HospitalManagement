@@ -1,11 +1,11 @@
 package com.kairos.service.cta_compensation_settings;
 
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationConfiguration;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.dto.activity.shift.Expertise;
-import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.cta.CompensationType;
 import com.kairos.persistence.cta_compensation_setting.CTACompensationSetting;
@@ -15,13 +15,16 @@ import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_EXPERTISE_NOTFOUND;
+import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_OVERLAP_INTERVAL;
 
 @Service
 public class CTACompensationSettingService {
@@ -34,6 +37,7 @@ public class CTACompensationSettingService {
     private UserIntegrationService userIntegrationService;
 
     public CTACompensationSettingDTO updateCTACompensationSetting(Long countryId, Long expertiseId, CTACompensationSettingDTO ctaCompensationSettingDTO) {
+        validateInterval(ctaCompensationSettingDTO.getConfigurations());
         CTACompensationSetting ctaCompensationSetting = ctaCompensationSettingMongoRepository.findByDeletedFalseAndCountryIdAndExpertiseIdAndPrimaryTrue(countryId, expertiseId);
         if(isNotNull(ctaCompensationSetting)){
             ctaCompensationSettingDTO.setId(ctaCompensationSetting.getId());
@@ -46,6 +50,7 @@ public class CTACompensationSettingService {
     }
 
     public CTACompensationSettingDTO updateCTACompensationSettingByUnit(Long unitId, Long expertiseId, CTACompensationSettingDTO ctaCompensationSettingDTO) {
+        validateInterval(ctaCompensationSettingDTO.getConfigurations());
         CTACompensationSetting ctaCompensationSetting = ctaCompensationSettingMongoRepository.findByDeletedFalseAndUnitIdAndExpertiseIdAndPrimaryTrue(unitId, expertiseId);
         if(isNotNull(ctaCompensationSetting)){
             ctaCompensationSettingDTO.setId(ctaCompensationSetting.getId());
@@ -55,6 +60,19 @@ public class CTACompensationSettingService {
         ctaCompensationSetting.setExpertiseId(expertiseId);
         ctaCompensationSettingMongoRepository.save(ctaCompensationSetting);
         return ctaCompensationSettingDTO;
+    }
+
+    public void validateInterval(List<CTACompensationConfiguration> configurations){
+        ZonedDateTime zonedDateTime = ZonedDateTime.now().with(LocalTime.MIN);
+        configurations.forEach(ctaCompensationConfiguration -> {
+            configurations.forEach(ctaCompensationConfiguration1 -> {
+                DateTimeInterval interval = ctaCompensationConfiguration.getInterval(zonedDateTime);
+                DateTimeInterval nextInterval = ctaCompensationConfiguration1.getInterval(zonedDateTime);
+                if(!ctaCompensationConfiguration.equals(ctaCompensationConfiguration1) && interval.overlaps(nextInterval)){
+                    exceptionService.invalidRequestException(EXCEPTION_OVERLAP_INTERVAL);
+                }
+            });
+        });
     }
 
     public CTACompensationSettingDTO getCTACompensationSetting(Long countryId, Long expertiseId) {

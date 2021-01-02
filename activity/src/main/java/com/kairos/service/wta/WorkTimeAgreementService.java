@@ -3,13 +3,13 @@ package com.kairos.service.wta;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
@@ -24,14 +24,19 @@ import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
+import com.kairos.dto.kpermissions.FieldPermissionUserData;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.StaffWorkingType;
+import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
@@ -39,7 +44,6 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
@@ -53,8 +57,11 @@ import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.cta.CostTimeAgreementService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.night_worker.NightWorkerService;
@@ -63,6 +70,7 @@ import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.tag.TagService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -154,6 +162,13 @@ public class WorkTimeAgreementService{
 
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
+    @Inject
+    private PlannedTimeTypeService plannedTimeTypeService;
+    @Inject
+    private DayTypeService dayTypeService;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
+    @Inject private ActivityService activityService;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
@@ -380,6 +395,9 @@ public class WorkTimeAgreementService{
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByCountryId(countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
+            if(isNull(wta.getTranslations())){
+                wta.setTranslations(new HashMap<>());
+            }
             WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
             wtaResponseDTO.setCountryId(countryId);
             wtaResponseDTOS.add(wtaResponseDTO);
@@ -438,18 +456,35 @@ public class WorkTimeAgreementService{
     public WTADefaultDataInfoDTO getDefaultWtaInfo(Long countryId) {
         List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndCountryId(countryId);
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
-        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = userIntegrationService.getWtaTemplateDefaultDataInfo(countryId);
+        List<PresenceTypeDTO> plannedTimeTypes=plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
+        List<DayTypeDTO> dayTypeDTOS=dayTypeService.getAllDayTypeByCountryId(countryId);
+        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = new WTADefaultDataInfoDTO();
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);
         wtaDefaultDataInfoDTO.setActivityList(activityDTOS);
+        wtaDefaultDataInfoDTO.setPresenceTypes(plannedTimeTypes);
+        wtaDefaultDataInfoDTO.setDayTypes(dayTypeDTOS);
         return wtaDefaultDataInfoDTO;
     }
 
     public WTADefaultDataInfoDTO getDefaultWtaInfoForUnit(Long unitId) {
-        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = userIntegrationService.getWtaTemplateDefaultDataInfoByUnitId();
+        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = new WTADefaultDataInfoDTO();
+        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
         List<ActivityDTO> activities = activityMongoRepository.findByDeletedFalseAndUnitId(unitId);
+        List<PresenceTypeDTO> presenceTypeDTOS=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
+        Map<String, Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
+        activityService.prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
+        activities.forEach(activity->{
+            if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
+                activity.setName("XXXXX");
+            }
+        });
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, wtaDefaultDataInfoDTO.getCountryID());
+        List<TimeSlotDTO> timeSlotDTOS=timeSlotSetService.getShiftPlanningTimeSlotByUnit(unitId);
+        wtaDefaultDataInfoDTO.setDayTypes(dayTypeService.getAllDayTypeByCountryId(UserContext.getUserDetails().getCountryId()));
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);
         wtaDefaultDataInfoDTO.setActivityList(activities);
+        wtaDefaultDataInfoDTO.setTimeSlots(timeSlotDTOS);
+        wtaDefaultDataInfoDTO.setPresenceTypes(presenceTypeDTOS);
         return wtaDefaultDataInfoDTO;
     }
 
@@ -479,14 +514,21 @@ public class WorkTimeAgreementService{
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         List<WTAQueryResultDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(employmentIds);
         List<WTAQueryResultDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(employmentIds);
+        WorkingTimeAgreement orgWTA = null;
+        if(isCollectionNotEmpty(currentWTAList)) {
+            orgWTA = wtaRepository.findOne(currentWTAList.get(0).getOrganizationParentId());
+        }
         List<WTAResponseDTO> parentWTA = ObjectMapperUtils.copyCollectionPropertiesByMapper(currentWTAList, WTAResponseDTO.class);
         Map<Long, List<WTAQueryResultDTO>> verionWTAMap = versionsOfWTAs.stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
+        WorkingTimeAgreement finalOrgWTA = orgWTA;
         parentWTA.forEach(currentWTA -> {
             List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyCollectionPropertiesByMapper(verionWTAMap.get(currentWTA.getEmploymentId()), WTAResponseDTO.class);
+            versionWTAs.forEach(wtaResponseDTO -> wtaResponseDTO.setTranslations(finalOrgWTA.getTranslations()));
             ruleTemplateService.assignCategoryToRuleTemplate(countryId, currentWTA.getRuleTemplates());
             if (versionWTAs != null && !versionWTAs.isEmpty()) {
                 currentWTA.setVersions(versionWTAs);
             }
+            currentWTA.setTranslations(finalOrgWTA.getTranslations());
         });
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTabId(unitId, ORGANIZATION_AGREEMENT_VERSION_TABLE_ID);
         return new WTATableSettingWrapper(parentWTA, tableConfiguration);
@@ -680,7 +722,7 @@ public class WorkTimeAgreementService{
         logger.info("Inside wtaservice");
         List<Long> oldEmploymentIds = employmentIds.stream().map(employmentIdDTO -> employmentIdDTO.getOldEmploymentId()).collect(Collectors.toList());
         Map<Long, Long> newOldemploymentIdMap = employmentIds.stream().collect(toMap(k -> k.getOldEmploymentId(), v -> v.getNewEmploymentId()));
-        List<WTAQueryResultDTO> oldWtas = wtaRepository.getWTAByEmploymentIds(oldEmploymentIds, DateUtils.getCurrentDate());
+        List<WTAQueryResultDTO> oldWtas = wtaRepository.getWTAByEmploymentIds(oldEmploymentIds, DateUtils.getDate());
         List<WorkingTimeAgreement> newWtas = new ArrayList<>();
         for (WTAQueryResultDTO wta : oldWtas) {
             List<WTABaseRuleTemplate> ruleTemplates = wta.getRuleTemplates();
@@ -809,6 +851,7 @@ public class WorkTimeAgreementService{
         newWta.setParentId(oldWta.getId());
         wtaRepository.save(newWta);
         wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(newWta, WTAResponseDTO.class);
+        wtaResponseDTO.setTranslations(newWta.getTranslations());
         WTAResponseDTO version = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
         wtaResponseDTO.setParentId(oldWta.getId());
         List<WTABaseRuleTemplate> existingWtaBaseRuleTemplates = wtaBaseRuleTemplateRepository.findAllByIdInAndDeletedFalse(oldWta.getRuleTemplateIds());
@@ -988,6 +1031,7 @@ public class WorkTimeAgreementService{
                 updateWTADates(workTimeAgreements1, employmentLinesDTO);
             }
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentDTO.getId(), new HashSet<>(),null);
+            staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
             costTimeAgreementRepository.saveEntities(costTimeAgreements);
             for (CostTimeAgreement costTimeAgreement : costTimeAgreements) {
                 CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.findCTAById(costTimeAgreement.getId());

@@ -10,7 +10,9 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.wrapper.shift.StaffShiftDetails;
+import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.time_slot.TimeSlotSetService;
+import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.Document;
@@ -34,6 +36,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
 
     private static final String ACTIVITY_STATUS = "activities.status";
     private static final String ACTIVITY_IDS = "activities.activityId";
+    private static final String TIMETYPE_IDS = "activities.timeTypeId";
     private static final String PLANNED_TIME_IDS = "activities.plannedTimes.plannedTimeId";
     private static final String VALIDATED_BY_ROLES = "accessGroupRole";
     private static final String UNIT_ID = "unitId";
@@ -41,6 +44,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     private static final String START_DATE = "startDate";
     private static final String END_DATE = "endDate";
     private static final String START_TIME = "shiftStartTime";
+    private static final String END_TIME = "shiftEndTime";
     private static final String STAFF_ID = "staffId";
     private static final String SHIFTS = "shifts";
     private static final String CTA_TEMPLATES_COLLECTION = "cTARuleTemplate";
@@ -54,34 +58,28 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     private UserIntegrationService userIntegrationService;
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
+    @Inject private TimeTypeService timeTypeService;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
     @Override
-    public <T> List<StaffShiftDetails> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate,boolean includeDateComparison) {
+    public <T> List<StaffShiftDetailsDTO> getFilteredShiftsGroupedByStaff(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate, boolean includeDateComparison) {
 
         List<AggregationOperation> aggregationOperations = prepareOperationsListForCriteria(employmentIds, filterTypes, unitId, startDate, endDate,includeDateComparison);
         GroupOperation groupOperation = group(STAFF_ID).addToSet("$$ROOT").as(SHIFTS);
         aggregationOperations.add(groupOperation);
         Aggregation aggregations = Aggregation.newAggregation(aggregationOperations);
-        return mongoTemplate.aggregate(aggregations, Shift.class, StaffShiftDetails.class).getMappedResults();
+        return mongoTemplate.aggregate(aggregations, Shift.class, StaffShiftDetailsDTO.class).getMappedResults();
     }
 
-    @Override
-    public <T> List<StaffShiftDetails> getStaffListFilteredByShiftCriteria(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate,boolean includeDateComparison) {
-        List<AggregationOperation> aggregationOperations = prepareOperationsListForCriteria(employmentIds, filterTypes, unitId, startDate, endDate,includeDateComparison);
-        GroupOperation groupOperation = group(STAFF_ID);
-        aggregationOperations.add(groupOperation);
-        Aggregation aggregations = Aggregation.newAggregation(aggregationOperations);
-        return mongoTemplate.aggregate(aggregations, Shift.class, StaffShiftDetails.class).getMappedResults();
-    }
-
-    private <T> List<AggregationOperation> prepareOperationsListForCriteria(Set<Long> employmentIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate,boolean includeDateComparison) {
+    private <T> List<AggregationOperation> prepareOperationsListForCriteria(Set<Long> staffIds, Map<FilterType, Set<T>> filterTypes, final Long unitId, Date startDate, Date endDate,boolean includeDateComparison) {
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         List<Criteria> criteriaArrayList = new ArrayList<>();
 
         Criteria criteria = new Criteria();
         criteria.and(UNIT_ID).is(unitId);
         criteria.and(DELETED).is(false);
-        criteria.and(EMPLOYMENT_ID).in(employmentIds);
+        criteria.and(STAFF_ID).in(staffIds);
         if(includeDateComparison) {
             criteria.and(START_DATE).gte(startDate).and(END_DATE).lte(endDate);
         }
@@ -195,7 +193,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
     }
 
     private void prepareTimeSlotCriteria(final Criteria criteria, final Set<String> values, final List<Criteria> criteriaArrayList, final Long unitId) {
-        List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlotByNames(unitId, values);
+        List<TimeSlotDTO> timeSlotDTOS = timeSlotSetService.getUnitTimeSlotByNames(unitId, values);
         Criteria timeslotCriteria;
         for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
             timeslotCriteria = new Criteria();
@@ -219,30 +217,33 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         }
         Set<Long> staffIds = new HashSet<>();
         for (String filterValue : filterValues) {
-
-            switch (filterValue) {
-                case "ON_BREAK":
-                    staffIds.addAll(getStaffIdsOnBreak(unitId, dateWithoutTime));
-                    break;
-                case "SICK":
-                    staffIds.addAll(getStaffSickForSelectedDay(unitId, dateWithoutTime));
-                    break;
-                case "CURRENTLY_WORKING":
-                    staffIds.addAll(getStaffCurrentlyWorking(unitId, dateWithoutTime));
-                    break;
-                case "ON_LEAVE":
-                    staffIds.addAll(getStaffIdsOnLeave(unitId, today));
-                    break;
-                case "UPCOMING":
-                    staffIds.addAll(getStaffForUpcomingShift(unitId, dateWithoutTime));
-                    break;
-                case "RESTING":
-                    staffIds.addAll(getStaffIdsOnRest(unitId, today));
-                    break;
-                default:
-            }
+            addStaffIds(unitId, today, dateWithoutTime, staffIds, filterValue);
         }
         return staffIds;
+    }
+
+    private void addStaffIds(Long unitId, String today, Date dateWithoutTime, Set<Long> staffIds, String filterValue) {
+        switch (filterValue) {
+            case "ON_BREAK":
+                staffIds.addAll(getStaffIdsOnBreak(unitId, dateWithoutTime));
+                break;
+            case "SICK":
+                staffIds.addAll(getStaffSickForSelectedDay(unitId, dateWithoutTime));
+                break;
+            case "CURRENTLY_WORKING":
+                staffIds.addAll(getStaffCurrentlyWorking(unitId, dateWithoutTime));
+                break;
+            case "ON_LEAVE":
+                staffIds.addAll(getStaffIdsOnLeave(unitId, today));
+                break;
+            case "UPCOMING":
+                staffIds.addAll(getStaffForUpcomingShift(unitId, dateWithoutTime));
+                break;
+            case "RESTING":
+                staffIds.addAll(getStaffIdsOnRest(unitId, today));
+                break;
+            default:
+        }
     }
 
     public Set<Long> getStaffCurrentlyWorking(Long unitId, Date date) {
@@ -364,6 +365,8 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
                 "  }";
 
     }
+
+
 
     @Getter
     @Setter

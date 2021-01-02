@@ -5,6 +5,7 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
+import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -16,13 +17,13 @@ import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftState;
-import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffDTO;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.service.time_slot.TimeSlotSetService;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,8 @@ public class ShiftFilterService {
     private TimeBankService timeBankService;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
+    @Inject
+    private TimeSlotSetService timeSlotSetService;
 
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO,List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
@@ -64,7 +67,7 @@ public class ShiftFilterService {
             staffFilterDTO = new StaffFilterDTO();
             staffFilterDTO.setFiltersData(new ArrayList<>());
         }
-        List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(unitId);
+        List<TimeSlotDTO> timeSlotDTOS = timeSlotSetService.getShiftPlanningTimeSlotByUnit(unitId);
         Map<FilterType, Set<T>> filterTypeMap = staffFilterDTO.getFiltersData().stream().filter(distinctByKey(filterSelectionDTO -> filterSelectionDTO.getName())).collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
         ShiftFilter timeTypeFilter = getTimeTypeFilter(filterTypeMap);
         ShiftFilter activityTimecalculationTypeFilter = new ActivityTimeCalculationTypeFilter(filterTypeMap);
@@ -198,14 +201,7 @@ public class ShiftFilterService {
         return employmentIdAndEmploymentSubTypeIdMap;
     }
 
-    private <T> List<BigInteger> getBigInteger(Collection<T> objects) {
-        List<BigInteger> ids = new ArrayList<>();
-        for (T object : objects) {
-            String id = (object instanceof String) ? (String) object : ""+object;
-            ids.add(new BigInteger(id));
-        }
-        return ids;
-    }
+
 
     private <G> ShiftFilter getPlannedByFilter(Long unitId,Map<FilterType, Set<G>> filterTypeMap) {
         Set<Long> staffUserIds = new HashSet<>();

@@ -31,7 +31,7 @@ public class ActivityRulesSettingsDTO implements Serializable {
     private boolean eligibleForRequest;
     private boolean lockLengthPresent;
     private boolean eligibleToBeForced;
-    private List<Long> dayTypes;
+    private List<BigInteger> dayTypes;
     private boolean eligibleForStaffingLevel;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;

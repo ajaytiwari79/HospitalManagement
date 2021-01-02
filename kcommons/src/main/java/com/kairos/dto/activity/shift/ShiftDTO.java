@@ -6,10 +6,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.common.UserInfo;
+import com.kairos.dto.activity.pay_out.PayOutPerShiftCTADistributionDTO;
+import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
@@ -17,7 +20,6 @@ import org.joda.time.Interval;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,7 +38,8 @@ import static com.kairos.constants.CommonConstants.MULTIPLE_ACTIVITY;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class ShiftDTO implements Comparable<ShiftDTO>, Serializable {
+@NoArgsConstructor
+public class ShiftDTO implements Comparable<ShiftDTO>{
 
     protected BigInteger id;
     protected Date startDate;
@@ -90,12 +93,10 @@ public class ShiftDTO implements Comparable<ShiftDTO>, Serializable {
     private boolean sickShift;
     protected UserInfo createdBy;
     private boolean disabled;
-    private ViolatedRulesDTO shiftViolatedRules;
-
-
-    public ShiftDTO() {
-        //default Const
-    }
+    private ShiftViolatedRules shiftViolatedRules;
+    private Map<String,Object> changes;
+    protected List<TimeBankDistributionDTO> timeBankCTADistributions = new ArrayList<>();
+    protected List<PayOutPerShiftCTADistributionDTO> payoutPerShiftCTADistributions = new ArrayList<>();
 
     public ShiftDTO(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivityDTO> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
         this.startDate = startDate;
@@ -145,6 +146,15 @@ public class ShiftDTO implements Comparable<ShiftDTO>, Serializable {
         this.employmentId = employmentId;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+    public List<TimeBankDistributionDTO> getTimeBankCTADistributions() {
+        this.timeBankCTADistributions = Optional.ofNullable(this.timeBankCTADistributions).orElse(new ArrayList<>());
+        return this.timeBankCTADistributions;
+    }
+
+    public List<PayOutPerShiftCTADistributionDTO> getPayoutPerShiftCTADistributions() {
+        this.payoutPerShiftCTADistributions = Optional.ofNullable(this.payoutPerShiftCTADistributions).orElse(new ArrayList<>());
+        return this.payoutPerShiftCTADistributions;
     }
 
     @JsonIgnore

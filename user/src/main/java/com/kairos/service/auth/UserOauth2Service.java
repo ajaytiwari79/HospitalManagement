@@ -5,6 +5,8 @@ import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.auth.UserPrincipal;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.system_setting.SystemLanguage;
+import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -45,6 +47,8 @@ public class UserOauth2Service implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
     @Inject private StaffGraphRepository staffGraphRepository;
     @Inject
+    private SystemLanguageGraphRepository systemLanguageGraphRepository;
+    @Inject
     private EnvConfig envConfig;
 
     @Override
@@ -55,6 +59,11 @@ public class UserOauth2Service implements UserDetailsService {
         }
         user.setHubMember(accessPageService.isHubMember(user.getId()));
         user.setSystemAdmin(userGraphRepository.isSystemAdmin(user.getId()));
+        SystemLanguage systemLanguage = userGraphRepository.getUserSystemLanguage(user.getId());
+        if(isNull(systemLanguage)){
+            systemLanguage = new SystemLanguage("English","en",true,true);
+        }
+        user.setUserLanguage(systemLanguage);
         updateLastSelectedOrganization(user);
         Optional<User> loggedUser = Optional.ofNullable(user);
         String otpString = HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");

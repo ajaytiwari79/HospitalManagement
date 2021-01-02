@@ -4,6 +4,8 @@ import com.kairos.annotations.KPermissionRelatedModel;
 import com.kairos.annotations.KPermissionRelationshipFrom;
 import com.kairos.annotations.KPermissionRelationshipTo;
 import com.kairos.commons.annotation.PermissionClass;
+import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.kpermissions.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
@@ -22,6 +24,7 @@ import com.kairos.persistence.model.kpermissions.*;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.repository.custom_repository.CommonRepositoryImpl;
+import com.kairos.persistence.repository.kpermissions.KPermissionActionGraphRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionFieldRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionModelRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
@@ -63,6 +66,8 @@ public class PermissionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PermissionService.class);
     public static final String GET_ID = "getId";
+    public static final String TRANSLATED_NAMES = "translatedNames";
+    public static final String TRANSLATED_DESCRIPTIONS = "translatedDescriptions";
 
     @Inject
     private PermissionFieldRepository permissionFieldRepository;
@@ -82,6 +87,8 @@ public class PermissionService {
     private static StaffService staffService;
     private static AccessGroupService accessGroupService;
     private static PermissionModelRepository permissionModelRepository;
+    @Inject
+    private KPermissionActionGraphRepository kPermissionActionGraphRepository;
     @Inject
     private AccessPageRepository accessPageRepository;
     @Inject
@@ -186,17 +193,24 @@ public class PermissionService {
     }
 
     public List<ModelPermissionQueryResult> getPermissionActions(Long accessGroupId, Long staffId,Long unitId) {
+            List<ModelPermissionQueryResult> modelPermissionQueryResults;
             if(isNotNull(staffId)){
-                return permissionModelRepository.getActionPermissionsForStaff(accessGroupId,staffId,unitId);
+                modelPermissionQueryResults = permissionModelRepository.getActionPermissionsForStaff(accessGroupId,staffId,unitId);
             }else {
-                return permissionModelRepository.getActionPermissions(accessGroupId);
+                modelPermissionQueryResults = permissionModelRepository.getActionPermissions(accessGroupId);
             }
+            modelPermissionQueryResults.forEach(modelPermissionQueryResult -> {
+                modelPermissionQueryResult.getActions().forEach(mapObjects->{
+                    TranslationUtil.convertTranslationFromStringToMap(mapObjects);
+                });
+            });
+            return modelPermissionQueryResults;
     }
 
     public Map<String, Object> getPermissionActionsSchema() {
         Map<String, Object> permissionSchemaMap = new HashMap<>();
         permissionSchemaMap.put(PERMISSIONS_SCHEMA,getkPermissionModels());
-        permissionSchemaMap.put(ACTIONS,PermissionAction.values());
+        permissionSchemaMap.put(ACTIONS,PermissionAction.getValues());
         return permissionSchemaMap;
     }
 
@@ -618,8 +632,8 @@ public class PermissionService {
 
     public void assignActionPermission(Long unitId, Long accessGroupId, CustomPermissionDTO customPermissionDTO) {
         LOGGER.info("actions permissions are {}", customPermissionDTO.getActions());
-        accessGroupRepository.disableActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId,customPermissionDTO.getId());
-        accessGroupRepository.setActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId, customPermissionDTO.getActions());
+        //accessGroupRepository.disableActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId,customPermissionDTO.getId());
+        accessGroupRepository.setActionPermissions(customPermissionDTO.getStaffId(), unitId, accessGroupId, customPermissionDTO.getActions(),customPermissionDTO.isHasPermission());
     }
 
     public boolean validPermissionAction(String modelName, PermissionAction action, Long unitId){
@@ -628,7 +642,7 @@ public class PermissionService {
         unitAccessGroupIds.addAll(accessGroups.stream().map(UserBaseEntity::getId).collect(Collectors.toSet()));
         Organization organization=organizationService.fetchParentOrganization(unitId);
         Long loggedInStaffId=staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
-        return permissionModelRepository.hasActionPermission(modelName,action,unitAccessGroupIds,loggedInStaffId,unitId);
+        return permissionModelRepository.hasActionPermission(modelName,action,unitAccessGroupIds,loggedInStaffId,unitId).contains(true);
     }
 
     public void createActions(List<KPermissionAction> permissionActions) {

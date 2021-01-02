@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.region.RegionQueryResult;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class OrganizationMappingDTO {
     private List<EmploymentType> employmentTypes;
     private List<Expertise> expertise;
     private List<Level> levels;
-    private List<Object> regions;
+    private List<RegionQueryResult> regions;
     private List<Map<String, Object>> organizationTypeHierarchy;
 
     public List<EmploymentType> getEmploymentTypes() {
@@ -45,11 +46,11 @@ public class OrganizationMappingDTO {
         this.levels = levels;
     }
 
-    public List<Object> getRegions() {
+    public List<RegionQueryResult> getRegions() {
         return regions;
     }
 
-    public void setRegions(List<Object> regions) {
+    public void setRegions(List<RegionQueryResult> regions) {
         this.regions = regions;
     }
 

@@ -16,10 +16,12 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.GdprIntegrationService;
-import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.util.IterableUtils;
@@ -30,7 +32,8 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -63,6 +66,10 @@ public class OrganizationServiceService {
     private ExceptionService exceptionService;
     @Inject
     private GdprIntegrationService gdprIntegrationService;
+    @Inject
+    private UserGraphRepository userGraphRepository;
+    @Inject
+    private SystemLanguageGraphRepository systemLanguageGraphRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationServiceService.class);
 
@@ -90,28 +97,11 @@ public class OrganizationServiceService {
     }
 
 
-    public List<Map<String,Object>> getAllOrganizationService(long countryId) {
+    public List<OrganizationServiceDTO> getAllOrganizationService(long countryId) {
         Set<Long> serviceIds=organizationServiceRepository.getOrganizationServicesIdsByCountryId(countryId);
         List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(serviceIds));
-        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
-        List<Map<String,Object>> mapList =new ArrayList<>();
-        Map<String,Object> data = new HashMap<>();
-        for (OrganizationServiceDTO result : organizationServiceDTOS) {
-            result.getOrganizationSubService().forEach(organizationServiceDTO -> {
-                organizationServiceDTO.setTranslations(TranslationUtil.getTranslatedData(organizationServiceDTO.getTranslatedNames(),organizationServiceDTO.getTranslatedDescriptions()));
-            });
-            result.setTranslations(result.getTranslatedData());
-            data.put("id", result.getId());
-            data.put("name", result.getName());
-            data.put("description", result.getDescription());
-            data.put("children", result.getOrganizationSubService());
-            data.put("translations", result.getTranslations());
-            mapList.add(data);
-            data = new HashMap<>();
-        }
-        return mapList;
-    }
-
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
+     }
 
     public boolean deleteOrganizationServiceById(Long id) {
         OrganizationService organizationService = organizationServiceRepository.findOne(id);
@@ -197,7 +187,7 @@ public class OrganizationServiceService {
         if (isSelected) {
             LOGGER.info("check if already exist-------> ");
             if (unitGraphRepository.isServiceAlreadyExist(id, organizationService.getId()) == 0) {
-                unitGraphRepository.addOrganizationServiceInUnit(id, Arrays.asList(organizationService.getId()), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                unitGraphRepository.addOrganizationServiceInUnit(id, Arrays.asList(organizationService.getId()), DateUtils.getDate().getTime(), DateUtils.getDate().getTime());
             } else {
                 unitGraphRepository.updateServiceFromOrganization(id, organizationService.getId());
             }
@@ -212,16 +202,10 @@ public class OrganizationServiceService {
     }
 
 
-    public List<Object> getOrgServicesByOrgType(long orgType) {
-        List<Object> objectList = new ArrayList<>();
-        List<Map<String, Object>> organizationServices = organizationServiceRepository.getOrgServicesByOrgType(orgType);
-        if (organizationServices != null) {
-            for (Map<String, Object> map : organizationServices) {
-                Object o = map.get(RESULT);
-                objectList.add(o);
-            }
-        }
-        return objectList;
+    public List<OrganizationServiceDTO> getOrgServicesByOrgType(long orgType) {
+        List<Long> organizationServiceIds = organizationServiceRepository.getAllOrganizationServiceId(orgType);
+        List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(organizationServiceIds));
+        return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
     }
 
     public List<Object> linkOrgServiceWithOrgType(long orgTypeId, long serviceId) {
@@ -231,7 +215,7 @@ public class OrganizationServiceService {
             if (checkIfServiceExistsWithOrganizationType(orgTypeId, serviceId) != 0) {
                 LOGGER.info("Already Selected now Deselecting ");
                 organizationTypeGraphRepository.deleteService(orgTypeId, serviceId);
-                List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
+                List<Map<String, Object>> mapList = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceRepository.getOrgServicesByOrgType(orgTypeId), HashedMap.class);
                 for (Map<String, Object> map : mapList) {
                     Object o = map.get(RESULT);
                     objectList.add(o);
@@ -240,12 +224,20 @@ public class OrganizationServiceService {
             } else {
                 LOGGER.info("Not  Selected now Selecting ");
                 organizationTypeGraphRepository.selectService(orgTypeId, serviceId);
-                List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
+                List<Map<String, Object>> mapList = ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServiceRepository.getOrgServicesByOrgType(orgTypeId), HashedMap.class);
                 for (Map<String, Object> map : mapList) {
                     Object o = map.get(RESULT);
                     objectList.add(o);
                 }
             }
+            objectList.forEach(objectMap->{
+                Map<String, Object> map = (Map<String, Object>)objectMap;
+                ((List)map.get("children")).forEach(child->{
+                    Map<String, Object> childMap = (Map<String, Object>)child;
+                    TranslationUtil.convertTranslationFromStringToMap(childMap);
+                });
+                TranslationUtil.convertTranslationFromStringToMap(map);
+            });
         }
         return objectList;
     }
@@ -277,9 +269,26 @@ public class OrganizationServiceService {
     public Map<String, Object> organizationServiceData(long id) {
         List<Long> allUnitIds=organizationBaseRepository.fetchAllUnitIds(id);
         List<Map<String, Object>> services=(allUnitIds.size()==1 && allUnitIds.get(0).equals(id))?unitGraphRepository.getServicesForUnit(id):unitGraphRepository.getServicesForUnits(allUnitIds);
-        return filterSkillData(services);
+        services = ObjectMapperUtils.copyCollectionPropertiesByMapper(services, HashedMap.class);
+        List<Map<String, Object>> avialableService = null;
+        List<Map<String, Object>> selectedService = null;
+        for(Map<String,Object> map : services){
+            Map<String, Object> service =(Map<String, Object>) map.get("data");
+            if(isNotNull(service.get(AVAILABLE_SERVICES))){
+                avialableService = (List<Map<String,Object>>)service.get(AVAILABLE_SERVICES);
+            }
+            if(isNotNull(service.get(SELECTED_SERVICES))){
+                selectedService = (List<Map<String,Object>>)service.get(SELECTED_SERVICES);
+            }
+            TranslationUtil.convertTranslationFromStringToMap(service);
+        }
+        Map<String,Object> organizationServiceMap = new HashMap<>();
+        organizationServiceMap.put(AVAILABLE_SERVICES,avialableService);
+        organizationServiceMap.put(SELECTED_SERVICES,selectedService);
+        return organizationServiceMap;
 
     }
+
 
     private Map<String, Object> filterSkillData(List<Map<String, Object>> skillData) {
         Map<String, Object> response = new HashMap<>();
@@ -353,26 +362,5 @@ public class OrganizationServiceService {
     public List<OrganizationServiceQueryResult> getAllOrganizationServicesByUnitId(Long unitId){
         return organizationServiceRepository.getAllOrganizationServicesByUnitId(unitId);
     }
-
-    public Map<String, TranslationInfo> updateTranslation(Long serviceId, Map<String,TranslationInfo> translationInfoMap) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translationInfoMap.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        OrganizationService service = organizationServiceRepository.findOne(serviceId);
-        service.setTranslatedNames(translatedNames);
-        service.setTranslatedDescriptions(translatedDescriptios);
-        organizationServiceRepository.save(service);
-        return service.getTranslatedData();
-    }
-
-    public Map<String, TranslationInfo> getTranslatedData(Long serviceId) {
-        OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
-        return organizationService.getTranslatedData();
-    }
-
-
 
 }

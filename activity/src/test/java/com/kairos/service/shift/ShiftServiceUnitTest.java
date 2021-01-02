@@ -5,6 +5,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.ButtonConfig;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
@@ -13,12 +14,10 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
-import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.phase.PhaseService;
 import org.junit.Assert;
@@ -37,7 +36,6 @@ import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 /**
@@ -61,8 +59,6 @@ public class ShiftServiceUnitTest {
     private ShiftMongoRepository shiftMongoRepository;
     @Mock
     private ActivityMongoRepository activityMongoRepository;
-    @Mock
-    private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @Mock private PhaseService phaseService;
     public ShiftDTO shiftDTO;
     public ShiftActivity activity;
@@ -218,7 +214,6 @@ public class ShiftServiceUnitTest {
         List<Shift> overLappedShifts=ObjectMapperUtils.jsonStringToList(getOverLappedShift(),Shift.class);
         when(shiftMongoRepository.findOne(any(BigInteger.class))).thenReturn(shift);
         when(activityMongoRepository.findActivityAndTimeTypeByActivityId(any(BigInteger.class))).thenReturn(activityWrapper);
-        when(shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(anyList())).thenReturn(shiftViolatedRules);
         when(shiftMongoRepository.findShiftBetweenDurationByEmploymentId(any(Long.class), any(Date.class),any(Date.class))).thenReturn(overLappedShifts);
         shiftDTO.setStartDate(updatedStartDate);
         shiftDTO.setEndDate(updatedEndDate);

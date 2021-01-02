@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.region;
 
 import com.kairos.persistence.model.user.region.Region;
+import com.kairos.persistence.model.user.region.RegionQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -20,8 +21,10 @@ public interface RegionGraphRepository extends Neo4jBaseRepository<Region,Long> 
     @Query("Match (region:Region{isEnable:true}) return region")
     List<Region> findAll();
 
-    @Query("MATCH (r:Region{isEnable:true})-[:BELONGS_TO]->(c:Country) where id(c)={0} return {name:r.name, code:r.code, geoFence:r.geoFence, latitude:r.latitude, longitude:r.longitude ,id: id(r)} as result")
-    List<Map<String,Object>> findAllRegionsByCountryId(Long countryId);
+    @Query("MATCH (r:Region{isEnable:true})-[:BELONGS_TO]->(c:Country) where id(c)={0}" +
+            " return r.translations as translations,\n" +
+            "r.name as name, r.code as code, r.geoFence as geoFence, r.latitude   as latitude, r.longitude as longitude ,id(r) as id")
+    List<RegionQueryResult> findAllRegionsByCountryId(Long countryId);
 
     @Query("MATCH (n:Region)  WITH n as r  " +
             "OPTIONAL MATCH (r)-[:MUNICIPALITY_LIST]->(m:Municipality) return { " +

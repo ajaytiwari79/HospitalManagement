@@ -2,10 +2,7 @@ package com.kairos.service.staff;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.SendGridMailService;
-import com.kairos.commons.utils.CommonsExceptionUtil;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.commons.utils.*;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
@@ -42,7 +39,6 @@ import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -184,7 +180,7 @@ public class StaffService {
             return null;
         }
         createDirectory(IMAGES_PATH);
-        String fileName = DateUtils.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtils.getDate().getTime() + multipartFile.getOriginalFilename();
         final String path = IMAGES_PATH + File.separator + fileName;
         FileUtil.writeFile(path, multipartFile);
         staff.setProfilePic(fileName);
@@ -283,7 +279,7 @@ public class StaffService {
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
         }
         List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
-        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), SkillLevel.ADVANCE);
+        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getDate().getTime(), DateUtils.getDate().getTime(), SkillLevel.ADVANCE);
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = copyCollectionPropertiesByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffDTO.setSectorWiseExpertise(copyCollectionPropertiesByMapper(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults), SectorAndStaffExpertiseDTO.class));
         teamService.assignStaffInTeams(staff, staffDTO.getTeams(), unitId);
@@ -332,7 +328,7 @@ public class StaffService {
     }
 
     private void updateUserDetails(StaffDTO staffDTO, UserAccessRoleDTO userAccessRoleDTO, Staff staffToUpdate) {
-        if (userAccessRoleDTO.getManagement() || staffToUpdate.getUser().getId().equals(UserContext.getUserDetails().getId())) {
+        if (userAccessRoleDTO.isManagement() || staffToUpdate.getUser().getId().equals(UserContext.getUserDetails().getId())) {
             if (isNull(staffToUpdate.getUser().getUserName()) || !staffToUpdate.getUser().getUserName().equalsIgnoreCase(staffDTO.getUserName()) && !staffToUpdate.getUser().isUserNameUpdated()) {
                 User user = userGraphRepository.findUserByUserName("(?i)" + staffDTO.getUserName());
                 if (!Optional.ofNullable(user).isPresent()) {
@@ -349,7 +345,7 @@ public class StaffService {
     public List<Expertise> assignExpertise(long staffId, StaffDTO staffDTO, UserAccessRoleDTO userAccessRoleDTO, Staff staffToUpdate) {
         List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
         List<Long> expertises = staffDTO.getExpertiseWithExperience().stream().map(StaffExpertiseDTO::getExpertiseId).collect(Collectors.toList());
-        if (!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.getManagement()) {
+        if (!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.isManagement()) {
             exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_EXPERTISE_NOTCHANGED);
         }
         List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
@@ -866,8 +862,6 @@ public class StaffService {
         if (isCollectionNotEmpty(employmentQueryResults)) {
             EmploymentQueryResult employment = employmentQueryResults.stream().filter(employmentQueryResult -> EmploymentSubType.MAIN.equals(employmentQueryResult.getEmploymentSubType())).findAny().orElse(null);
             if (isNotNull(employment)) {
-                List<ProtectedDaysOffSetting> protectedDaysOffSettings = expertiseGraphRepository.findProtectedDaysOffSettingByExpertiseId(employment.getExpertise().getId());
-                employment.getExpertise().setProtectedDaysOffSettings(copyCollectionPropertiesByMapper(protectedDaysOffSettings, ProtectedDaysOffSetting.class));
                 employmentDetails = new StaffEmploymentDetails(employment.getId(), ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class), employment.getEndDate(), employment.getStartDate(), employment.getUnitId(), employment.getEmploymentSubType());
             }
         }

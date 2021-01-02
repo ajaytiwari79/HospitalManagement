@@ -8,19 +8,21 @@ import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.organization.OrgTypeLevelWrapper;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.model.user.skill.SkillCategoryQueryResults;
-import com.kairos.service.country.CountryHolidayCalenderService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.CompanyCreationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationTypeService;
+import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.UpdateOrganizationTypeDTO;
 import io.swagger.annotations.Api;
@@ -38,8 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 @RequestMapping(API_V1)
 @Api(API_V1)
@@ -49,8 +50,6 @@ public class CountryController {
     private CountryService countryService;
     @Inject
     private SkillCategoryService skillCategoryService;
-    @Inject
-    private CountryHolidayCalenderService countryHolidayCalenderService;
     @Inject
     private OrganizationTypeService organizationTypeService;
     @Inject
@@ -62,6 +61,9 @@ public class CountryController {
     @Inject
     private CompanyCreationService companyCreationService;
     @Inject private BootDataService bootDataService;
+    @Inject private TranslationService translationService;
+    @Inject
+    private RegionService regionService;
 
     @PostMapping(value = "/country")
     @ApiOperation("Create a new Country")
@@ -85,6 +87,14 @@ public class CountryController {
                 return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
+    }
+
+
+    @GetMapping(UNIT_URL + "/zipcode/{zipCodeId}/address")
+    @ApiOperation("get location of organization")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAddressByZipCode(@PathVariable long zipCodeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.getAllZipCodesData(zipCodeId));
     }
 
     @GetMapping(value = "/country")
@@ -162,7 +172,7 @@ public class CountryController {
     @GetMapping(value = COUNTRY_URL + "/organization_type/sub_type/{organizationTypeId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrgTypesSubByCountryId(@PathVariable Long countryId, @PathVariable long organizationTypeId) {
-        List<Object> response = organizationTypeService.getOrgSubTypesByTypeId(organizationTypeId);
+        List<OrgTypeLevelWrapper> response = organizationTypeService.getOrgSubTypesByTypeId(organizationTypeId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
     }
 
@@ -179,7 +189,7 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllSkillCategory(@PathVariable Long countryId) {
         if (countryId != null) {
-            List<SkillCategoryQueryResults> skillCategory = skillCategoryService.getAllSkillCategoryOfCountry(countryId);
+            List<SkillCategoryQueryResults> skillCategory = skillCategoryService.getAllSkillCategoryOfCountryOrUnit(countryId, true);
             if (skillCategory != null) {
                 return ResponseHandler.generateResponse(HttpStatus.OK, true, skillCategory);
             }
@@ -400,13 +410,14 @@ public class CountryController {
 
     }
 
-    @ApiOperation(value = "Get DayType and Presence Type")
-    @GetMapping(value = COUNTRY_URL + "/getWtaTemplateDefaultDataInfo")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getWtaTemplateDefaultDataInfo(countryId));
-
-    }
+    //TODO Integrated
+//    @ApiOperation(value = "Get DayType and Presence Type")
+//    @GetMapping(value = COUNTRY_URL + "/getWtaTemplateDefaultDataInfo")
+//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long countryId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getWtaTemplateDefaultDataInfo(countryId));
+//
+//    }
 
     @ApiOperation(value = "Map Selected Payroll Types to country ")
     @PutMapping(value = COUNTRY_URL + "/map_pay_rolls_country")
@@ -433,21 +444,34 @@ public class CountryController {
     @PostMapping(value = COUNTRY_URL + "/admin")
     public ResponseEntity<Map<String, Object>> createDefaultCountryAdmin(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, bootDataService.createDefaultCountryAdmin());
-
     }
 
     @RequestMapping(value = COUNTRY_URL+"/skill_Category/{id}/languageSettings", method = RequestMethod.PUT)
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfSkillCategory(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillCategoryService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 
     @RequestMapping(value = COUNTRY_URL+"/expertise/{id}/languageSettings", method = RequestMethod.PUT)
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfExpertise(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+    }
+
+    @RequestMapping(value = COUNTRY_URL+"/organization_type/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
+    }
+
+    @RequestMapping(value = COUNTRY_URL+"/organization_sub_type/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationSubType(@PathVariable Long id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 
 

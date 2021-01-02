@@ -3,12 +3,14 @@ package com.kairos.service.activity;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
-import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
@@ -17,12 +19,16 @@ import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.ActivitySkillSettings;
 import com.kairos.persistence.model.activity.tabs.ActivityTimeCalculationSettings;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.period.PlanningPeriodService;
+import com.kairos.service.reason_code.ReasonCodeService;
 import com.kairos.wrapper.activity.ActivitySettingsWrapper;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +51,8 @@ public class TimeTypeService extends MongoBaseService {
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
+    private DayTypeService dayTypeService;
+    @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
     private ExceptionService exceptionService;
@@ -55,6 +63,8 @@ public class TimeTypeService extends MongoBaseService {
     @Inject private ShiftMongoRepository shiftMongoRepository;
     @Inject private ActivityService activityService;
     @Inject private ExecutorService executorService;
+    @Inject private PlanningPeriodService planningPeriodService;
+    @Inject private ReasonCodeService reasonCodeService;
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
         List<String> timeTypeLabels = timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
@@ -342,7 +352,7 @@ public class TimeTypeService extends MongoBaseService {
     public boolean deleteTimeType(BigInteger timeTypeId, Long countryId) {
         List<Activity> activity = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllChildByParentId(timeTypeId, countryId);
-        boolean reasonCodeExists = userIntegrationService.isReasonCodeLinkedToTimeType(countryId, timeTypeId);
+        boolean reasonCodeExists = reasonCodeService.anyReasonCodeLinkedWithTimeType(timeTypeId);
         if (reasonCodeExists) {
             exceptionService.actionNotPermittedException(MESSAGE_TIMETYPE_LINKED_REASON_CODE);
         }
@@ -456,10 +466,10 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public ActivitySettingsWrapper getTimeCalculationTabOfTimeType(BigInteger timeTypeId, Long countryId) {
-        List<DayType> dayTypes = userIntegrationService.getDayTypesByCountryId(countryId);
+        List<DayTypeDTO> dayTypes = dayTypeService.getDayTypeWithCountryHolidayCalender(countryId);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         ActivityTimeCalculationSettings activityTimeCalculationSettings = timeType.getActivityTimeCalculationSettings();
-        List<Long> rulesTabDayTypes = timeType.getActivityRulesSettings().getDayTypes();
+        List<BigInteger> rulesTabDayTypes = timeType.getActivityRulesSettings().getDayTypes();
         return new ActivitySettingsWrapper(activityTimeCalculationSettings, dayTypes, rulesTabDayTypes);
     }
 
@@ -474,7 +484,8 @@ public class TimeTypeService extends MongoBaseService {
             if (CutOffIntervalUnit.DAYS.equals(rulesActivityDTO.getCutOffIntervalUnit()) && rulesActivityDTO.getCutOffdayValue() == 0) {
                 exceptionService.invalidRequestException(ERROR_DAYVALUE_ZERO);
             }
-            List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(), rulesActivityDTO.getCutOffIntervalUnit(), rulesActivityDTO.getCutOffdayValue());
+            PlanningPeriod planningPeriod = planningPeriodService.getLastPlanningPeriod(UserContext.getUserDetails().getLastSelectedOrganizationId());
+            List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(), rulesActivityDTO.getCutOffIntervalUnit(), rulesActivityDTO.getCutOffdayValue(),planningPeriod.getEndDate());
             activityRulesSettings.setCutOffIntervals(cutOffIntervals);
             rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
         }
@@ -493,7 +504,7 @@ public class TimeTypeService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
         }
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
-        List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<DayTypeDTO> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
         ActivityPhaseSettings activityPhaseSettings = timeType.getActivityPhaseSettings();
@@ -512,7 +523,7 @@ public class TimeTypeService extends MongoBaseService {
 
     public ActivitySettingsWrapper getRulesTabOfTimeType(BigInteger timeTypeId, Long countryId) {
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
-        List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<DayTypeDTO> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         ActivityRulesSettings activityRulesSettings = timeType.getActivityRulesSettings();
@@ -583,6 +594,13 @@ public class TimeTypeService extends MongoBaseService {
                 getAllLeafTimeTypeByParentTimeTypeIds(timeType.getChildTimeTypeIds(), leafTimeTypes);
             }
         }
+    }
+
+    public Map<String, TranslationInfo> updateTranslation(BigInteger timeTypeId, Map<String,TranslationInfo> translations) {
+        TimeType timeType =timeTypeMongoRepository.findOne(timeTypeId);
+        timeType.setTranslations(translations);
+        timeTypeMongoRepository.save(timeType);
+        return timeType.getTranslations();
     }
 
 }

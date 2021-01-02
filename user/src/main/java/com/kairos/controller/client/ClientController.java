@@ -1,7 +1,6 @@
 package com.kairos.controller.client;
 
 import com.kairos.commons.service.mail.SendGridMailService;
-import com.kairos.dto.activity.task.TaskDemandRequestWrapper;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.staff.ContactPersonDTO;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
@@ -33,7 +32,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -528,35 +526,6 @@ public class ClientController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getClientAddressInfo(citizenId));
     }
 
-    /**
-     * @auther anil maurya
-     * this endpoint is called from task micro service
-     * @param taskDemandWrapper
-
-     * @return
-     */
-    @RequestMapping(method = RequestMethod.POST, value = "/getClientInfo")
-    @ApiOperation("get client and staff info")
-    private ResponseEntity<Map<String, Object>> getClientDetailsForTaskDemandVisit(@RequestBody TaskDemandRequestWrapper taskDemandWrapper){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.getClientDetailsForTaskDemandVisit(taskDemandWrapper));
-    }
-
-
-    /**
-     * called this endpoints from task micro service
-     * @param citizenId
-     * @param unitId
-     * @return
-     */
-    @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}/{unitId}/task_prerequisites")
-    @ApiOperation("get required data for task creation")
-    private ResponseEntity<Map<String, Object>> generateIndividualTask(@PathVariable Long  citizenId
-            , @PathVariable Long  unitId, OAuth2Authentication authentication){
-                    return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.getPrerequisitesForTaskCreation(authentication.getUserAuthentication().getPrincipal().toString(),unitId,citizenId));
-    }
-
 
     /**
      * this method will be called from  task micro service in planner service
@@ -584,14 +553,6 @@ public class ClientController {
 
 
 
-    @ApiOperation(value = "Get Organization Clients with min details")
-    @RequestMapping(value = "/unit/{unitId}/client", method = RequestMethod.GET)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationClients( @PathVariable Long unitId) throws InterruptedException, ExecutionException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.getOrganizationClients(unitId));
-    }
-
 
     @RequestMapping(value = "/{accessToLocationId}/accessLocation/image", method = RequestMethod.DELETE)
     @ApiOperation("delete  access to location image")
@@ -610,47 +571,6 @@ public class ClientController {
     public ResponseEntity<Map<String, Object>> getClientTaskData(@PathVariable long organizationId1, @PathVariable long clientId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getClientServiceData(clientId, organizationId1));
 
-    }
-
-
-    /**
-     * TODO need to verify
-     * @auther anil maurya
-     *  this endpoint is called from planner service in task micro service
-     *
-     * @param unitId
-     * @param auth2Authentication
-     * @return
-     */
-
-    @RequestMapping(value = "/organization_clients", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long unitId, OAuth2Authentication auth2Authentication) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrgnizationClients(unitId,auth2Authentication));
-
-    }
-
-
-    /** TODO need to verify
-     * @auther anil maurya
-     *  this endpoint is called from planner service in task micro service
-
-     * @param organizationId
-     *
-     * @return
-     */
-
-    @RequestMapping(value = "/organization_clients/ids", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> getOrganizationClientsByIds(@PathVariable Long organizationId, @RequestBody List<Long> citizenId) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrgnizationClients(organizationId,citizenId));
-
-    }
-
-
-    @RequestMapping(value = "/clientAggregation",method = RequestMethod.GET)
-    public ResponseEntity<Map<String,Object>> getClientAggregation(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,clientExtendedService.getClientAggregation(unitId));
     }
 
     @RequestMapping(value = "/clientsByIds",method = RequestMethod.POST)
@@ -678,32 +598,12 @@ public class ClientController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.updateContactPerson(clientId,contactPersonDTO));
     }
 
-    //Prefer Staff
-    @ApiOperation("Get personal_calander_prerequisite of citizen")
-    @RequestMapping(value = "/{clientId}/personal_calander_prerequisite",method = RequestMethod.GET)
-    ResponseEntity<Map<String,Object>> getPrerequisiteForPersonalCalender(@PathVariable Long unitId,@PathVariable Long clientId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getPrerequisiteForPersonalCalender(unitId,clientId));
-    }
 
     @PostMapping("/upload")
     @ApiOperation("Upload XLSX file ")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> batchCreateClient(@PathVariable long unitId, @RequestParam("file") MultipartFile multipartFile) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientBatchService.batchAddClientsToDatabase(multipartFile, unitId));
-    }
-
-    @ApiOperation(value = "Get Organization Clients with min details")
-    @GetMapping
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getClientsOrganization(@PathVariable Long unitId) throws InterruptedException, ExecutionException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrganizationClients(unitId));
-    }
-
-    @ApiOperation(value = "Get Organization Clients with min details")
-    @GetMapping("/planner")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationClientsWithPlanning(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrganizationClientsWithPlanning(unitId));
     }
 
     @ApiOperation(value = "Get Organization Clients with max details")

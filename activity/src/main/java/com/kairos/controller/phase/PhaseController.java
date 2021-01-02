@@ -1,5 +1,6 @@
 package com.kairos.controller.phase;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.utils.response.ResponseHandler;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
@@ -68,6 +68,13 @@ public class PhaseController {
     @GetMapping(value = "/all")
     public ResponseEntity<Map<String, Object>> getDefaultPhasesByUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getDefaultPhasesByUnit(unitId));
+    }
+
+    @RequestMapping(value = "phase/{id}/languageSettings", method = RequestMethod.PUT)
+    @ApiOperation("Add translated data")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationPhase(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.updateTranslations(id,translations));
     }
 }
 

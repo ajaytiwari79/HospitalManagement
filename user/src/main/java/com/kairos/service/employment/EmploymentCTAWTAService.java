@@ -15,7 +15,6 @@ import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.query_result.CtaWtaQueryResult;
@@ -33,7 +32,6 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
-import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -53,7 +51,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
 import static com.kairos.constants.ApiConstants.GET_VERSION_WTA;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -148,8 +146,7 @@ public class EmploymentCTAWTAService {
     }
 
     public CTATableSettingWrapper getAllCTAOfStaff(Long unitId, Long staffId) {
-        User user = userGraphRepository.getUserByStaffId(staffId);
-        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsAndWTAByUser(user.getId());
+        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsByStaffId(staffId);
         List<Long> employmentIds = employmentQueryResults.stream().map(EmploymentQueryResult::getId).collect(Collectors.toList());
         List<NameValuePair> requestParam = Collections.singletonList(new BasicNameValuePair("employmentIds", employmentIds.toString().replace("[", "").replace("]", "")));
         CTATableSettingWrapper ctaTableSettingWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_CTA, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTATableSettingWrapper>>() {
@@ -165,8 +162,7 @@ public class EmploymentCTAWTAService {
         return ctaTableSettingWrapper;
     }
     public WTATableSettingWrapper getAllWTAOfStaff(Long unitId, Long staffId) {
-        User user = userGraphRepository.getUserByStaffId(staffId);
-        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsAndWTAByUser(user.getId());
+        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsByStaffId(staffId);
         List<Long> employmentIds = employmentQueryResults.stream().map(EmploymentQueryResult::getId).collect(Collectors.toList());
 
         List<NameValuePair> param = Collections.singletonList(new BasicNameValuePair("employmentIds", employmentIds.toString().replace("[", "").replace("]", "")));

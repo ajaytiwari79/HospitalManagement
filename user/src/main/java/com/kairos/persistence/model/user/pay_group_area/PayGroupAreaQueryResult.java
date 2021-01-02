@@ -2,11 +2,14 @@ package com.kairos.persistence.model.user.pay_group_area;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
+import com.kairos.persistence.model.common.TranslationConverter;
 import com.kairos.persistence.model.user.region.Municipality;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.Map;
@@ -33,6 +36,7 @@ public class PayGroupAreaQueryResult {
     private Long countryId;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
 
@@ -44,6 +48,14 @@ public class PayGroupAreaQueryResult {
         this.municipality = municipality.retrieveBasicDetails();
         this.startDateMillis = relationship.getStartDateMillis();
         this.endDateMillis = relationship.getEndDateMillis();
+    }
+
+    public String getName() {
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
+    }
+
+    public String getDescription() {
+        return TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
     }
 
 

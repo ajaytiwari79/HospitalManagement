@@ -7,7 +7,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
-import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.BreakAction;
 import com.kairos.persistence.model.activity.Activity;
@@ -21,7 +21,6 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.counter.KPIService;
 import com.kairos.service.exception.ExceptionService;
@@ -67,8 +66,6 @@ public class ShiftBreakService implements KPIService {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private PhaseService phaseService;
-    @Inject
-    private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @Inject private KPIBuilderCalculationService kpiBuilderCalculationService;
     @Inject private TimeBankService timeBankService;
 
@@ -86,10 +83,15 @@ public class ShiftBreakService implements KPIService {
 
 
 
-    public List<ShiftActivity> updateBreakInShift(boolean shiftUpdated, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot, Shift dbShift,Phase phase) {
+    public List<ShiftActivity> updateBreakInShift(boolean shiftUpdated, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotDTO> timeSlot, Shift dbShift, Phase phase) {
          phase = phase!=null?phase:phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
         if ((TIME_AND_ATTENDANCE.equals(phase.getName()) || REALTIME.equals(phase.getName())) && isCollectionNotEmpty(shift.getBreakActivities())) {
             validateBreakDuration(shift);
+            shift.getBreakActivities().forEach(shiftActivity -> {
+                if(isNull(shiftActivity.getId())) {
+                    shiftActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
+                }
+            });
             return shift.getBreakActivities();
             //return getBreakActivity(shift, dbShift, activityWrapperMap);
         }
@@ -205,6 +207,10 @@ public class ShiftBreakService implements KPIService {
         ActivityWrapper activityWrapper = activityWrapperMap.get(breakSettings.getActivityId());
         ShiftActivity shiftActivity = new ShiftActivity(activityWrapper.getActivity().getName(), startDate, endDate, activityWrapper.getActivity().getId(), activityWrapper.getTimeType());
         timeBankService.updateScheduledHoursAndActivityDetailsInShiftActivity(shiftActivity, activityWrapperMap, staffAdditionalInfoDTO);
+        shiftActivity.setTimeTypeId(activityWrapper.getTimeTypeInfo().getId());
+        shiftActivity.setSecondLevelTimeType(activityWrapper.getTimeTypeInfo().getSecondLevelType());
+        shiftActivity.setTimeType(activityWrapper.getTimeTypeInfo().getTimeTypes().toValue());
+        shiftActivity.setMethodForCalculatingTime(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime());
         return shiftActivity;
     }
 
@@ -241,9 +247,9 @@ public class ShiftBreakService implements KPIService {
         return new DateTimeInterval(startDate, endDate);
     }
 
-    private BreakAvailabilitySettings findCurrentBreakAvailability(Date startDate, List<TimeSlotWrapper> timeSlots, BreakWTATemplate breakWTATemplate) {
+    private BreakAvailabilitySettings findCurrentBreakAvailability(Date startDate, List<TimeSlotDTO> timeSlots, BreakWTATemplate breakWTATemplate) {
         BreakAvailabilitySettings breakAvailabilitySettings = null;
-        TimeSlotWrapper currentTimeSlot = timeSlots.stream().filter(current -> new TimeInterval((current.getStartHour() * ONE_HOUR_MINUTES) + current.getStartMinute(), (current.getEndHour() * ONE_HOUR_MINUTES) + current.getEndMinute() - 1).contains(asZonedDateTime(startDate).get(ChronoField.MINUTE_OF_DAY))).findFirst().orElse(null);
+        TimeSlotDTO currentTimeSlot = timeSlots.stream().filter(current -> new TimeInterval((current.getStartHour() * ONE_HOUR_MINUTES) + current.getStartMinute(), (current.getEndHour() * ONE_HOUR_MINUTES) + current.getEndMinute() - 1).contains(asZonedDateTime(startDate).get(ChronoField.MINUTE_OF_DAY))).findFirst().orElse(null);
         if (currentTimeSlot != null && breakWTATemplate != null && !breakWTATemplate.isDisabled()) {
             breakAvailabilitySettings = breakWTATemplate.getBreakAvailability().stream().filter(currentAvailability -> (currentAvailability.getTimeSlot().toString().equalsIgnoreCase(currentTimeSlot.getName()))).findFirst().get();
         }

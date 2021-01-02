@@ -1,26 +1,34 @@
 package com.kairos.service.unit_settings;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.unit_settings.PhaseSettingsDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.phase.PhaseService;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PhaseSettingsService extends MongoBaseService {
     @Inject private PhaseSettingsRepository phaseSettingsRepository;
     @Inject private PhaseService phaseService;
     public List<PhaseSettingsDTO> getPhaseSettings(Long unitId){
-        return phaseSettingsRepository.findAllByUnitIdAndDeletedFalse(unitId, Sort.by(Sort.Direction.ASC, "sequence"));
+        List<PhaseSettingsDTO> phaseSettingsDTOS = phaseSettingsRepository.findAllByUnitIdAndDeletedFalse(unitId, Sort.by(Sort.Direction.ASC, "sequence"));
+        Map<BigInteger,PhaseDTO> phaseDTOMap = phaseService.getPhasesByUnit(unitId).stream().collect(Collectors.toMap(k->k.getId(), v->v));
+        phaseSettingsDTOS.forEach(phaseSettingsDTO -> {
+            phaseSettingsDTO.setTranslations(phaseDTOMap.get(phaseSettingsDTO.getPhaseId()).getTranslations());
+        });
+        return phaseSettingsDTOS;
     }
 
     public List<PhaseSettingsDTO> updatePhaseSettings(Long unitId, List<PhaseSettingsDTO> phaseSettingsDTOS) {
@@ -45,5 +53,12 @@ public class PhaseSettingsService extends MongoBaseService {
         });
         phaseSettingsRepository.saveEntities(phaseSettings);
         return true;
+    }
+
+    public Map<String, TranslationInfo> updatePhaseSettingTranslations(Long unitId, BigInteger phaseId,Map<String,TranslationInfo> translations){
+        PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(unitId,phaseId);
+        phaseSettings.setTranslations(translations);
+        phaseSettingsRepository.save(phaseSettings);
+        return phaseSettings.getTranslations();
     }
 }

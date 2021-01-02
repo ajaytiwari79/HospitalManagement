@@ -1,11 +1,13 @@
 package com.kairos.shiftplanning.constraints.unitconstraint;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.constraint.ScoreLevel;
 import com.kairos.shiftplanning.constraints.ConstraintHandler;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
-import com.kairos.shiftplanning.domain.unit.TimeSlot;
+import com.kairos.shiftplanning.domain.unit.Unit;
+import com.kairos.shiftplanningNewVersion.entity.Shift;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static com.kairos.commons.utils.DateUtils.getStartOfDay;
+
 
 @Getter
 @Setter
@@ -45,4 +48,7 @@ public class MaxLengthOfShiftInNightTimeSlot implements ConstraintHandler {
     private boolean shiftTimeContainsInNightInterval(ZonedDateTime shiftTime){
         return new DateTimeInterval(getStartOfDay(shiftTime).plusHours(nightTimeSlot.getStartHour()).plusMinutes(nightTimeSlot.getStartMinute()),getStartOfDay(shiftTime).plusDays(1).plusHours(nightTimeSlot.getStartHour()).plusMinutes(nightTimeSlot.getStartMinute())).contains(shiftTime);
     }
+
+    @Override
+    public int verifyConstraints(Unit unit, Shift shiftImp, List<Shift> shiftImps){return 0;};
 }

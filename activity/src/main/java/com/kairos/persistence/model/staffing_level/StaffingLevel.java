@@ -33,8 +33,8 @@ public class StaffingLevel extends MongoBaseEntity {
     private Long unitId;
     private BigInteger phaseId;
     private StaffingLevelSetting staffingLevelSetting;
-    private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
-    private List<StaffingLevelInterval> absenceStaffingLevelInterval =new ArrayList<>();
+    private List<StaffingLevelInterval> presenceStaffingLevelInterval = new ArrayList<>();
+    private List<StaffingLevelInterval> absenceStaffingLevelInterval = new ArrayList<>();
 
     public StaffingLevel(Date currentDate, Integer weekCount,
                          Long organizationId, BigInteger phaseId, StaffingLevelSetting staffingLevelSetting) {
@@ -44,6 +44,7 @@ public class StaffingLevel extends MongoBaseEntity {
         this.phaseId = phaseId;
         this.staffingLevelSetting = staffingLevelSetting;
     }
+
     public StaffingLevel(Date currentDate, int weekCount,
                          Long organizationId, BigInteger phaseId) {
         this.currentDate = currentDate;
@@ -52,11 +53,10 @@ public class StaffingLevel extends MongoBaseEntity {
         this.phaseId = phaseId;
     }
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     public Date getCurrentDate() {
         return currentDate;
     }
-
 
 
     public void addStaffingLevelTimeSlot(Set<StaffingLevelInterval> staffingLevelTimeSlots) {
@@ -67,7 +67,9 @@ public class StaffingLevel extends MongoBaseEntity {
 
     }
 
-
+    public StaffingLevelSetting getStaffingLevelSetting() {
+        return staffingLevelSetting = staffingLevelSetting == null ? new StaffingLevelSetting() : staffingLevelSetting;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -107,7 +109,7 @@ public class StaffingLevel extends MongoBaseEntity {
                 .toString();
     }
 
-    public enum Type{
-        PRESENCE,ABSENCE
+    public enum Type {
+        PRESENCE, ABSENCE
     }
 }

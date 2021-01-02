@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.organization;
 
-import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -38,8 +36,18 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
 
     @Query(" MATCH  (o:OrganizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]->(ss:OrganizationService{isEnabled:true}) where id(o)={0} " +
             "MATCH (ss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService {isEnabled:true} ) " +
-            " RETURN {children: case when os  is NULL then [] else collect({id:id(ss),name:ss.name,description:ss.description}) END, id:id(os),name:os.name,description:os.description} as result ")
+            " RETURN {" +
+            "translations:os.translations,\n" +
+            "children: case when os  is NULL then [] else collect({" +
+            "translations:ss.translations,\n" +
+            "id:id(ss),name:ss.name,description:ss.description}) END, id:id(os),name:os.name,description:os.description} as result ")
     List<Map<String,Object>> getOrgServicesByOrgType(long organizationType);
+
+    @Query("MATCH  (o:OrganizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]->(ss:OrganizationService{isEnabled:true}) where id(o)={0}\n" +
+            " MATCH (ss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService {isEnabled:true} )  \n" +
+            " RETURN distinct id(os)")
+    List<Long> getAllOrganizationServiceId(long organizationType);
+
 
     @Override
     OrganizationService findOne(Long aLong);
@@ -50,13 +58,6 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
     @Query("MATCH (os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ss:OrganizationService{isEnabled:true}) WHERE id(os)={0} AND ss.name=~ {1} return ss")
     OrganizationService checkDuplicateSubService(Long id, String name);
 
-    @Query("MATCH (os:OrganizationService)-[:"+ORGANIZATION_SUB_SERVICE+"]->(ss:OrganizationService) WHERE id(os)={0} AND ss.name= {1} return ss")
-    Optional<OrganizationService> checkDuplicateSubServiceWithSpecialCharacters(Long id, String name);
-
-    OrganizationService findByKmdExternalId(String kmdExternalId);
-
-    @Query("MATCH (o:Unit)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}  return id(os) as id, r.customName as name, os.description as description")
-    List<OrganizationServiceQueryResult> getOrganizationServiceByOrgId(Long organizationId);
 
     @Query("MATCH (o:Unit)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0} AND id(os) IN {1} return id(os) as id, r.customName as name, os.description as description")
     List<OrganizationServiceQueryResult> getOrganizationServiceByOrgIdAndServiceIds(Long organizationId, List<Long> serviceId);

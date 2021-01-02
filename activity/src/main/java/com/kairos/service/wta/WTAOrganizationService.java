@@ -29,12 +29,12 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 
@@ -76,6 +76,9 @@ public class WTAOrganizationService extends MongoBaseService {
         List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWtaByOrganization(unitId);
         List<WTAResponseDTO> wtaResponseDTOs = new ArrayList<>();
         workingTimeAgreements.forEach(wta -> {
+            if(isNull(wta.getTranslations())){
+                wta.setTranslations(new HashMap<>());
+            }
             WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
             ruleTemplateService.assignCategoryToRuleTemplate(organization.getCountryId(), wtaResponseDTO.getRuleTemplates());
             wtaResponseDTOs.add(wtaResponseDTO);

@@ -73,7 +73,14 @@ public class PayRollController {
     @PutMapping(value = "payroll/{id}/language_settings")
     @ApiOperation("update translation data")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateTranslationOfSystemLanguage(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+    public ResponseEntity<Map<String, Object>> updateTranslationOfPayroll(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payRollService.updateTranslation(id,translations));
+    }
+
+    @PutMapping(value = COUNTRY_URL + "/payroll/{id}/language_settings")
+    @ApiOperation("update translation data")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationOfPayrollOnCountryLevel(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payRollService.updateTranslation(id,translations));
     }
 

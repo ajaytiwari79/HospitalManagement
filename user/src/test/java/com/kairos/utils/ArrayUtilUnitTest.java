@@ -1,13 +1,17 @@
 package com.kairos.utils;
 
 import com.kairos.commons.utils.ArrayUtil;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -37,5 +41,20 @@ public class ArrayUtilUnitTest {
         assertEquals(previousRes, utilRes);
         utilRes = ArrayUtil.getUniqueElementWhichIsNotInFirst(original, previous);
         assertEquals(originalRes, utilRes);
+    }
+
+    @Test
+    public void testing(){
+
+        Map<String, TranslationInfo> stringTranslationInfoMap=new HashMap<>();
+        TranslationInfo translationInfo=new TranslationInfo("pawan","pd");
+        stringTranslationInfoMap.put("english",translationInfo);
+        stringTranslationInfoMap.put("hindi",translationInfo);
+        stringTranslationInfoMap.put("danish",translationInfo);
+        stringTranslationInfoMap.put("urdu",translationInfo);
+        String str= ObjectMapperUtils.objectToJsonString(stringTranslationInfoMap);
+        Map<String, TranslationInfo> again=ObjectMapperUtils.jsonStringToObject(str,Map.class);
+        System.out.println(again);
+
     }
 }

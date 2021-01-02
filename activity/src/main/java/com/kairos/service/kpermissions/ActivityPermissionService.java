@@ -121,8 +121,7 @@ public class ActivityPermissionService {
                     Collection<E> databaseObject = commonRepository.findAllByIds(classIdSetEntry.getKey(),classIdSetEntry.getValue());
                     for (E object : databaseObject) {
                         try {
-                            ID id = (ID) object.getClass().getMethod("getId").invoke(object);
-                            mapOfDataBaseObject.put(id,object);
+                            mapOfDataBaseObject.put((ID) object.getClass().getMethod("getId").invoke(object),object);
                         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                             e.printStackTrace();
                         }
@@ -130,9 +129,6 @@ public class ActivityPermissionService {
                 }
             }
             Map<Long, OtherPermissionDTO> staffPermissionRelatedDataQueryResultMap = new HashMap<>();
-//            if(objectIdsMap.containsKey(Staff.class)){
-//                 staffPermissionRelatedDataQueryResultMap = staffService.getStaffDataForPermissionByStaffIds((Set<Long>)objectIdsMap.get(Staff.class));
-//            }
             return new Map[]{mapOfDataBaseObject,staffPermissionRelatedDataQueryResultMap};
         }
 

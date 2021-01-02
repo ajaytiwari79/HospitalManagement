@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.enums.SkillLevel;
-import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.organization.Unit;
@@ -75,9 +74,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) WITH staff,organization,user " +
             "OPTIONAL MATCH (staff)-[skillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skills:Skill{isEnabled:true}) WHERE DATE(skillRel.startDate) <=DATE({3}) AND (skillRel.endDate IS NULL OR DATE(skillRel.endDate) >= DATE({3}) )  WITH staff,COLLECT(DISTINCT{skillId:id(skills),skillLevel:skillRel.skillLevel}) AS skillLevelDTOS,organization,user" +
             " OPTIONAL MATCH (staff)-[:" + HAS_CHILDREN + "]->(staffChildDetail:StaffChildDetail) WITH staff,skillLevelDTOS,collect(staffChildDetail) AS staffChildDetails,organization,user " +
-            " OPTIONAL MATCH (teams:Team)-[:" + TEAM_HAS_MEMBER + "{isEnabled:true}]->(staff) WITH staff,skillLevelDTOS,collect(id(teams)) AS teams,organization,user,staffChildDetails" +
-            " OPTIONAL MATCH (staff)-[:" + BELONGS_TO_TAGS + "]->(tag:Tag) WITH staff,skillLevelDTOS,staffChildDetails,teams,organization,user,COLLECT(tag) AS tags " +
-            " RETURN id(staff) AS id,staff.firstName+\" \"+staff.lastName AS name,staff.profilePic AS profilePic,teams,skillLevelDTOS,id(organization) AS unitId,id(user) AS staffUserId,user.cprNumber AS cprNumber,staffChildDetails,tags order by name")
+            " OPTIONAL MATCH (teams:Team)-[teamRel:" + TEAM_HAS_MEMBER + "{isEnabled:true}]->(staff) WITH staff,skillLevelDTOS,collect(id(teams)) AS teams,organization,user,staffChildDetails,COLLECT(DISTINCT{id:id(teams),teamType:teamRel.teamType,sequence:teamRel.sequence,activityIds:teams.activityIds}) AS teamsData" +
+            " OPTIONAL MATCH (staff)-[:" + BELONGS_TO_TAGS + "]->(tag:Tag) WITH staff,skillLevelDTOS,staffChildDetails,teams,teamsData,organization,user,COLLECT(tag) AS tags " +
+            " RETURN id(staff) AS id,staff.firstName+\" \"+staff.lastName AS name,staff.profilePic AS profilePic,teams,skillLevelDTOS,teamsData,id(organization) AS unitId,id(user) AS staffUserId,user.cprNumber AS cprNumber,staffChildDetails,tags order by name")
     StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndStaffId(long unitId, long staffId,long employmentId,String startDate );
 
     @Query("MATCH (staff:Staff) WHERE id(staff) IN {1}  " +
@@ -104,7 +103,11 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + ORGANIZATION_HAS_TAG + "]-(unit) WITH  skill,staff, orgSkillRelation,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END AS otags\n" +
             "OPTIONAL MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill{isEnabled:true}) WITH skill,r,orgSkillRelation, ctags,otags\n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH skill,skillCategory,r,orgSkillRelation,ctags,otags\n" +
-            "RETURN {children:COLLECT(DISTINCT {id:id(skill),name:case WHEN orgSkillRelation is null or orgSkillRelation.customName is null then skill.name else orgSkillRelation.customName end ,isSelected:r.isEnabled, tags:ctags+otags}),id:id(skillCategory),name:skillCategory.name} AS data")
+            "RETURN {children:COLLECT(DISTINCT {" +
+            "translations:skill.translations,\n" +
+            "id:id(skill),name:case WHEN orgSkillRelation is null or orgSkillRelation.customName is null then skill.name else orgSkillRelation.customName end ,isSelected:r.isEnabled, tags:ctags+otags})," +
+            "translations:skillCategory.translations,\n" +
+            "id:id(skillCategory),name:skillCategory.name} AS data")
     List<Map<String, Object>> getSkills(long staffId, long unitId);
 
     @Query("MATCH (o:Unit)-[*..5]->(s:Staff) WHERE id(o)= {0}  WITH s AS staff " +
@@ -276,19 +279,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN staff,id(contactAddress) AS contactAddressId,id(contactDetail) AS contactDetailId LIMIT 1")
     StaffQueryResult getStaffByExternalIdInOrganization(Long organizationId, Long externalId);
 
-
-    //TODO unable to find the exact usage of this Query and relationships
-    @Query("MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit) WHERE id(organization)={0} WITH unitPermission ,organization\n" +
-            "MATCH (o:Unit) - [r:" + BELONGS_TO + "] -> (c:Country)-[r1:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType) WHERE id(o)={0} WITH et\n" +
-            "OPTIONAL MATCH (o)-[r:" + EMPLOYMENT_TYPE_SETTINGS + "]->(et) WITH \n" +
-            "COLLECT(CASE WHEN r IS NULL AND  et.allowedForContactPerson =true THEN  {id:id(et),allowedForContactPerson:et.allowedForContactPerson} \n" +
-            "ELSE {id:id(et),allowedForContactPerson:r.allowedForContactPerson} END) AS employmentTypeSettings WITH filter\n" +
-            "(x IN employmentTypeSettings WHERE x.allowedForContactPerson=true) AS filteredEmploymentType WITH extract(n IN filteredEmploymentType| n.id) AS extractedEmploymentTypeId \n" +
-            "MATCH (staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Position)-[:HAS_UNIT_PERMISSIONS]->(unitPermission)\n" +
-            "MATCH (unitPermission)-[:HAS_UNIT_EMPLOYMENT_POSITION]->(p:Position)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType) WHERE id(et) IN extractedEmploymentTypeId\n" +
-            "RETURN distinct id(staff) AS id, staff.firstName AS firstName,staff.lastName AS lastName")
-    List<StaffPersonalDetailQueryResult> getAllMainEmploymentStaffDetailByUnitId(long unitId);
-
     @Query("MATCH (staff:Staff)-[:" + HAS_FAVOURITE_FILTERS + "]->(staffFavouriteFilters:StaffFavouriteFilter{deleted:false}) WHERE id(staff)={0} WITH staffFavouriteFilters \n" +
             "MATCH (staffFavouriteFilters)-[:HAS_FILTER_GROUP]->(filterGroup:FilterGroup)-[:APPLICABLE_FOR]-(accessPage:AccessPage) WHERE accessPage.moduleId={1} \n" +
             "MATCH (staffFavouriteFilters)-[:FILTER_DETAIL]-(filterDetail:FilterSelection) WITH staffFavouriteFilters, COLLECT({id:id(filterDetail), name:filterDetail.name, value:filterDetail.value,sequence:filterDetail.sequence}) AS filterDetails\n" +
@@ -376,9 +366,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "MATCH(staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true}) WITH staff,employment \n" +
             "MATCH(employment)-[: " + IN_UNIT + " ]-(org:Unit{deleted:false}) WITH staff,employment,org\n" +
             "MATCH (employment)-[: " + HAS_EXPERTISE_IN + "]-(exp:Expertise) WITH staff,employment,org,exp \n" +
-            "OPTIONAL MATCH (org)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) WHERE reasonCode.reasonCodeType={1} WITH staff,employment,org,exp,reasonCode \n " +
-            "RETURN id(staff) AS staffId,id(org) AS unitId,org.name AS unitName,org.timeZone AS timeZone,COLLECT(DISTINCT reasonCode) AS reasonCodes,COLLECT(DISTINCT {id:id(employment),expertiseName:exp.name}) AS employment")
-    List<StaffInformationQueryResult> getStaffAndUnitTimezoneByUserIdAndReasonCode(Long id, ReasonCodeType reasonCodeType);
+            "RETURN id(staff) AS staffId,id(org) AS unitId,org.name AS unitName,org.timeZone AS timeZone,COLLECT(DISTINCT {id:id(employment),expertiseName:exp.name}) AS employment")
+    List<StaffInformationQueryResult> getStaffAndUnitTimezoneByUserId(Long id);
 
     @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) WHERE id(user)={0} WITH staff\n" +
             "MATCH(staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true}) WITH staff,employment \n" +

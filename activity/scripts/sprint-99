@@ -1,0 +1,12 @@
+db.getCollection('staffActivitySetting').insert({
+    "_id" : "0",
+    "staffId" : NumberLong(0),
+    "activityId" : "0",
+    "unitId" : NumberLong(2403),
+    "createdAt" : ISODate("2020-01-02T11:58:06.357Z"),
+    "updatedAt" : ISODate("2020-01-02T11:58:06.357Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.staff_settings.StaffActivitySetting"
+})
+
+Upload AWS mail service credentials

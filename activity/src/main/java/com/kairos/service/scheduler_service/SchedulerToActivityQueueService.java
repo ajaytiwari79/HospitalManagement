@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.getStartOfDay;
@@ -76,7 +77,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 break;
             case PROTECTED_DAYS_OFF:
                 LOGGER.info("Job to protected days off ");
-                new CalculatePlannedHoursAndScheduledHours(timeBankCalculationService).updateTimeBankAgainstProtectedDaysOffSetting();
+                new CalculatePlannedHoursAndScheduledHours(timeBankCalculationService,new HashMap<>(),null).updateTimeBankAgainstProtectedDaysOffSetting();
                 break;
             case WTA_LEAVE_COUNT:
                 LOGGER.info("Job to protected days off ");

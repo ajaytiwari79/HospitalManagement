@@ -3,18 +3,13 @@ package com.kairos.service.counter;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.service.shift.ShiftValidatorService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.dto.activity.counter.enums.XAxisConfig.PERCENTAGE;
 import static com.kairos.enums.kpi.CalculationType.ESCALATED_SHIFTS;
 import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
@@ -45,12 +40,10 @@ public class ShiftEscalationService implements KPIService{
     }
 
     private void setEscalationDetailInShift(List<ShiftWithActivityDTO> shifts) {
-        List<ShiftViolatedRules> shiftViolatedRules = shiftValidatorService.findAllViolatedRulesByShiftIds(shifts.stream().map(ShiftDTO::getId).collect(Collectors.toList()), false);
-        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(ShiftViolatedRules::getShiftId, v -> v));
         for (ShiftWithActivityDTO shift : shifts) {
-            if (shiftViolatedRulesMap.containsKey(shift.getId())) {
-                shift.setEscalationReasons(shiftViolatedRulesMap.get(shift.getId()).getEscalationReasons());
-                shift.setEscalationResolved(shiftViolatedRulesMap.get(shift.getId()).isEscalationResolved());
+            if (isNotNull(shift.getShiftViolatedRules())) {
+                shift.setEscalationReasons(shift.getShiftViolatedRules().getEscalationReasons());
+                shift.setEscalationResolved(shift.getShiftViolatedRules().isEscalationResolved());
             } else {
                 shift.setEscalationReasons(newHashSet());
                 shift.setEscalationResolved(false);

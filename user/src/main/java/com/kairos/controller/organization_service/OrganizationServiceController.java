@@ -1,9 +1,10 @@
 package com.kairos.controller.organization_service;
 
 import com.kairos.dto.TranslationInfo;
-import com.kairos.dto.user.TranslationDTO;
+import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
+import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +33,7 @@ public class OrganizationServiceController {
     @Inject
     OrganizationServiceService organizationServiceService;
 
+    @Inject private TranslationService translationService;
 
     // GET by id
     @RequestMapping(value = COUNTRY_URL+"/organization_service/{id}", method = RequestMethod.GET)
@@ -44,8 +45,8 @@ public class OrganizationServiceController {
     // PUT by id
     @RequestMapping(value = COUNTRY_URL+"/organization_service/{id}", method = RequestMethod.PUT)
     @ApiOperation("Update a  organization_service by id")
-    public ResponseEntity<Map<String, Object>> updateOrganizationService(@PathVariable long id, @PathVariable Long countryId,@RequestBody Map<String, String> data) {
-        Map<String,Object> organizationService = organizationServiceService.updateOrganizationService(id, data.get("name"), data.get("description"),countryId);
+    public ResponseEntity<Map<String, Object>> updateOrganizationService(@PathVariable long id, @PathVariable Long countryId,@RequestBody Map<String, Object> data) {
+        Map<String,Object> organizationService = organizationServiceService.updateOrganizationService(id, data.get("name").toString(), data.get("description").toString(),countryId);
         if (organizationService == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
@@ -70,7 +71,7 @@ public class OrganizationServiceController {
     @RequestMapping(value = COUNTRY_URL+"/organization_type/{orgTypeId}/organization_service", method = RequestMethod.GET)
     @ApiOperation("get organization sub services by organization type")
     public ResponseEntity<Map<String, Object>> getOrganizationServices(@PathVariable long orgTypeId) {
-        List<Object> organizationServices = organizationServiceService.getOrgServicesByOrgType(orgTypeId);
+        List<OrganizationServiceDTO> organizationServices = organizationServiceService.getOrgServicesByOrgType(orgTypeId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServices);
     }
 
@@ -135,7 +136,7 @@ public class OrganizationServiceController {
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfActivity(@PathVariable Long id, @RequestBody Map<String,TranslationInfo> translations) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.updateTranslation(id,translations));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id,translations));
     }
 
 //  Todo please do not remove this commited code I am working On it later

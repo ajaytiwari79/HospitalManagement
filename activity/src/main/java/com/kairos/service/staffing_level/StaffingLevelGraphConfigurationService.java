@@ -10,7 +10,6 @@ import com.kairos.persistence.repository.staffing_level.StaffingLevelGraphConfig
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +25,8 @@ public class StaffingLevelGraphConfigurationService {
         StaffingLevelGraphConfiguration staffingLevelGraphConfiguration = Optional.ofNullable(staffingLevelGraphConfigurationMongoRepository.findOneByUnitIdAndUserId(unitId,userId)).orElse(getDefaultConfiguration(unitId,userId));
         if(isNotNull(staffingLevelGraphConfigurationDTO.getDailyGraphConfiguration())){
             staffingLevelGraphConfiguration.setDailyGraphConfiguration(staffingLevelGraphConfigurationDTO.getDailyGraphConfiguration());
-        }if (isNotNull(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration())){
+        }
+        if (isNotNull(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration())){
             staffingLevelGraphConfiguration.getWeeklyGraphConfiguration().setOverStaffingConfigurations(isCollectionNotEmpty(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration().getOverStaffingConfigurations()) ? staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration().getOverStaffingConfigurations() : getOverStaffingConfigurations());
             staffingLevelGraphConfiguration.getWeeklyGraphConfiguration().setUnderStaffingConfigurations(isCollectionNotEmpty(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration().getUnderStaffingConfigurations()) ? staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration().getUnderStaffingConfigurations() : getUnderStaffingConfigurations());
             staffingLevelGraphConfiguration.setWeeklyGraphConfiguration(staffingLevelGraphConfigurationDTO.getWeeklyGraphConfiguration());
@@ -44,11 +44,11 @@ public class StaffingLevelGraphConfigurationService {
     }
 
     private List<GraphIntervalConfiguration> getUnderStaffingConfigurations() {
-        return newArrayList(new GraphIntervalConfiguration(0,30,"#4dd2fa"),new GraphIntervalConfiguration(31,60,"#3768cb"),new GraphIntervalConfiguration(61,100,"#1c52b0"));
+        return newArrayList(new GraphIntervalConfiguration(0,30,"#4dd2fa"),new GraphIntervalConfiguration(31,50,"#3768cb"),new GraphIntervalConfiguration(51,100,"#1c52b0"));
     }
 
     private List<GraphIntervalConfiguration> getOverStaffingConfigurations() {
-        return newArrayList(new GraphIntervalConfiguration(0,30,"#ffc13d"),new GraphIntervalConfiguration(31,60,"#fb743f"),new GraphIntervalConfiguration(61,100,"#e06b4c"));
+        return newArrayList(new GraphIntervalConfiguration(0,20,"#ffc13d"),new GraphIntervalConfiguration(21,40,"#fb743f"),new GraphIntervalConfiguration(41,100,"#e06b4c"));
     }
 
     public StaffingLevelGraphConfigurationDTO getStaffingLevelGraphConfiguration(Long unitId,Long userId){

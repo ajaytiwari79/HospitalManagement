@@ -6,6 +6,7 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
@@ -101,7 +102,13 @@ public class KPISetService {
 
 
     public List<KPISetDTO> getAllKPISetByReferenceId(Long referenceId) {
-        return kpiSetRepository.findAllByReferenceIdAndDeletedFalse(referenceId);
+        List<KPISetDTO> kpiSetDTOS = kpiSetRepository.findAllByReferenceIdAndDeletedFalse(referenceId);
+        kpiSetDTOS.forEach(kpiSetDTO -> {
+            if(isNull(kpiSetDTO.getTranslations())){
+                kpiSetDTO.setTranslations(new HashMap<>());
+            }
+        });
+        return kpiSetDTOS;
     }
 
     public KPISetDTO findById(BigInteger kpiSetId) {
@@ -246,5 +253,12 @@ public class KPISetService {
             }
         }
         return filterCriteriaDTO;
+    }
+
+    public Map<String, TranslationInfo> updateTranslationData(BigInteger kpiSetId, Map<String,TranslationInfo> translations){
+        KPISet kpiSet = kpiSetRepository.findOne(kpiSetId);
+        kpiSet.setTranslations(translations);
+        kpiSetRepository.save(kpiSet);
+        return kpiSet.getTranslations();
     }
 }

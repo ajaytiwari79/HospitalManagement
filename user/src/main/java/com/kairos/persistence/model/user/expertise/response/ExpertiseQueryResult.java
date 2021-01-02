@@ -2,9 +2,11 @@ package com.kairos.persistence.model.user.expertise.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.cta_compensation_setting.CTACompensationSettingDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
+import com.kairos.persistence.model.common.TranslationConverter;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
@@ -14,6 +16,7 @@ import com.kairos.persistence.model.pay_table.PayTable;
 import com.kairos.persistence.model.user.expertise.CareDays;
 import lombok.Getter;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
@@ -58,6 +61,7 @@ public class ExpertiseQueryResult {
     private CTACompensationSettingDTO ctaCompensationSetting;
     private Long countryId;
     private Long unitId;
+    @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations;
 
     @JsonIgnore
@@ -76,4 +80,13 @@ public class ExpertiseQueryResult {
         expertiseLines.forEach(k->k.setBreakPaymentSetting(this.breakPaymentSetting));
         return expertiseLines;
     }
+
+    public String getName() {
+        return TranslationUtil.getName(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),name);
+    }
+
+    public String getDescription() {
+        return  TranslationUtil.getDescription(TranslationUtil.convertUnmodifiableMapToModifiableMap(translations),description);
+    }
+
 }

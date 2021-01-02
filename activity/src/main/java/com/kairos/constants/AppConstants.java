@@ -262,5 +262,13 @@ public class AppConstants {
     public static final int NOT_VALID_VALUE = -1;
     public static final String PLANNING_PERIOD="Planning_Period";
 
+    public static final String TIME_SLOT_SET_NAME = "Time slot 1";
+    public static final int DAY_START_HOUR = 7;
+    public static final int DAY_END_HOUR = 17;
+    public static final int EVENING_START_HOUR = 17;
+    public static final int EVENING_END_HOUR = 23;
+    public static final int NIGHT_START_HOUR = 23;
+    public static final int NIGHT_END_HOUR = 7;
+
 
 }

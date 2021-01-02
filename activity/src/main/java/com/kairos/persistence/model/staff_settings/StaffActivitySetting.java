@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.staff_settings;
 
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,12 +27,13 @@ public class StaffActivitySetting extends MongoBaseEntity {
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
     private LocalTime maximumEndTime;
-    private List<Long> dayTypeIds;
+    private List<BigInteger> dayTypeIds;
     private LocalTime defaultStartTime;
+    private TimeTypeEnum secondLevelTimtype;
 
     public StaffActivitySetting(Long staffId, BigInteger activityId, Long employmentId, Long unitId,
                                 Short shortestTime, Short longestTime, Integer minLength, Integer maxThisActivityPerShift,
-                                boolean eligibleForMove, LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, List<Long> dayTypeIds, LocalTime defaultStartTime) {
+                                boolean eligibleForMove, LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, List<BigInteger> dayTypeIds, LocalTime defaultStartTime,TimeTypeEnum secondLevelTimtype) {
         this.staffId = staffId;
         this.activityId = activityId;
         this.employmentId = employmentId;
@@ -46,6 +48,7 @@ public class StaffActivitySetting extends MongoBaseEntity {
         this.maximumEndTime=maximumEndTime;
         this.dayTypeIds=dayTypeIds;
         this.defaultStartTime = defaultStartTime;
+        this.secondLevelTimtype = secondLevelTimtype;
     }
 
 

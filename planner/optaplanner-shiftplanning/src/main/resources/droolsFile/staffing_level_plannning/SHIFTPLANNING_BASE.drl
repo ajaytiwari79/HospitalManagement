@@ -1,0 +1,54 @@
+package com.kairos.shiftplanning.rules;
+    dialect "java"
+import com.kairos.shiftplanning.domain.activity.*;
+import com.kairos.shiftplanningNewVersion.entity.*;
+import com.kairos.shiftplanning.domain.staffing_level.*;
+import com.kairos.shiftplanning.domain.skill.*;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import java.util.ArrayList;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+global HardMediumSoftLongScoreHolder scoreHolder;
+rule "Empty activity line"
+salience 20
+    when
+        $shifts:ArrayList() from collect (Shift(getInterval()!=null));
+        $matrix:StaffingLevelMatrix();
+    then
+        int[] arr=$matrix.getMissingMinAndMax($shifts);
+        scoreHolder.addSoftConstraintMatch(kcontext,  arr[0]*-2 + arr[1]*-1);
+end
+
+rule "Ali not assigned"
+salience 20
+    when
+        $ali:ALI(shift==null)
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,  -1);
+end
+
+rule "Unassigned skill interval"
+salience 20
+    when
+        SkillLineInterval(shift==null)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,  - 1);
+end
+rule "Misassigned skill interval"
+salience 20
+    when
+        SkillLineInterval(shift!=null && !start.toLocalDate().equals(shift.startDate))
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,  - 1);
+end
+
+
+//This should not be a constraint if ali null is already a hard constraint
+rule "Missing Shift intervals"
+salience 20
+    when
+        $shift:Shift(!locked)
+        $total: Integer(intValue>0) from ($shift.missingIntervals())
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,  -$total);
+end
+

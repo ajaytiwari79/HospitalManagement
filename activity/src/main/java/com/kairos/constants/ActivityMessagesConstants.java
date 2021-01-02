@@ -50,6 +50,7 @@ public class ActivityMessagesConstants {
     public static final String ERROR_REGION_CODE_NOTEMPTY = "error.Region.code.notEmpty";
     public static final String ERROR_REGION_GEOFENCE_NOTEMPTY = "error.Region.geoFence.notEmpty";
     public static final String ERROR_PROVINCE_NAME_NOTEMPTY = "error.Province.name.notEmpty";
+    public static final String ERROR_DAYTYPE_NAME_NOTEMPTY  = "error.DayType.name.notEmpty ";
     public static final String ERROR_PROVINCE_CODE_NOTEMPTY = "error.Province.code.notEmpty";
     public static final String ERROR_PROVINCE_GEOFENCE_NOTEMPTY = "error.Province.geoFence.notEmpty";
     public static final String ERROR_MUNICIPALITY_NAME_NOTEMPTY = "error.Municipality.name.notEmpty";
@@ -187,6 +188,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_PLANNEDTIME_LESS = "message.shift.plannedTime.less";
     public static final String MESSAGE_SHIFT_STATUS_ADDED = "message.shift.status.added";
     public static final String ERROR_SHIFT_STATUS = "error.shift.status";
+    public static final String ERROR_SHIFT_CREATION = "error.shift.creation";
     public static final String ACCESS_GROUP_NOT_MATCHED = "access.group.not.matched";
     public static final String ACTIVITY_STATUS_INVALID = "activity.status.not.invalid";
     public static final String ERROR_START_TIME_GREATER_THAN_EARLIEST_TIME = "error.start_time.greater_than.earliest_time";
@@ -308,6 +310,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL  = "message.ruleTemplate.counter.value.notNull";
     public static final String MESSAGE_RULETEMPLATE_COUNTER_EXHAUSTED  = "message.ruleTemplate.counter.exhausted";
     public static final String MESSAGE_RULETEMPLATE_HOURS_NOTZERO  = "message.ruleTemplate.hours.notzero";
+    public static final String MESSAGE_MIN_GREATER_THAN_MAX  = "min.greater.max";
     public static final String MESSAGE_COUNTER_KPI_NOTFOUND = "message.counter.kpi.notfound";
     public static final String MESSAGE_ACCESSGROUP_KPI_NOTFOUND = "message.accessgroup.kpi.notfound";
     public static final String MESSAGE_ORGTYPE_KPI_NOTFOUND = "message.orgtype.kpi.notfound";
@@ -386,6 +389,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_ACTIVITY_USEDON_FREEDAY= "message.activity.used.on.freedays";
     public static final String MESSAGE_ACTIVITY_USEDON_PROTECTEDDAYSOFF= "message.activity.used.on.protecteddaysoff";
     public static final String MESSAGE_PROTECTEDDAYSOFF_ACTIVITY_NOT_FOUND="message.protected.day.off.activity.not.found";
+    public static final String PLEASE_SELECT_REPLACE_SETTINGS="message.replace_setting.absent";
     public static final String MESSAGE_ACTIVITY_USEDON_APPROVEABSENCES= "message.activity.usedon.approve.absences";
     public static final String MESSAGE_NON_WORKING_SICKNESS_ACTIVITY_NOT_FOUND= "message.activity.nonworking.sickness.activity.not.found";
     public static final String EMPLOYMENT_NOT_VALID_TO_MARK_SICK = "employment.not.valid.to.mark.sick";
@@ -395,6 +399,8 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_CTA_VALUE ="message.cta.value";
     public static final String ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL = "error.value.changed.publish.date.null";
     public static final String MESSAGE_FULLWEEK_STARTDAY_NOTFOUND = "message.fullWeek.startDay.notFound";
-
-
+    public static final String ERROR_AUTO_FILL_GAP_SETTING_NOT_FOUND = "error.auto.fill.gap.setting.not.found";
+    public static final String ERROR_DUPLICATE_AUTO_FILL_GAP_SETTING_FOUND = "error.duplicate.auto.fill.gap.setting.found";
+    public static final String ERROR_ALREADY_AUTO_FILL_GAP_SETTING_PUBLISH = "error.already.auto.fill.gap.setting.publish";
+    public static final String ERROR_DRAFT_COPY_ALREADY_CREATED = "error.draft.copy.already.created";
 }

@@ -8,7 +8,6 @@ import com.kairos.dto.user.country.experties.CareDaysDetails;
 import com.kairos.persistence.model.user.expertise.CareDays;
 import com.kairos.persistence.model.user.expertise.ChildCareDays;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.SeniorDays;
 import com.kairos.persistence.repository.user.expertise.ChildCareDaysGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,9 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.*;
 
@@ -71,6 +72,9 @@ public class ChildCareDaysService {
 
     //Validating age range
     private void validateAgeRange(List<AgeRangeDTO> ageRangeDTO) {
+        if(ageRangeDTO.stream().filter(ageRange -> isNull(ageRange.getTo())).collect(Collectors.toList()).size() > 1){
+            exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_AGE_OVERLAP);
+        }
         Collections.sort(ageRangeDTO);
         for (int i = 0; i < ageRangeDTO.size(); i++) {
             if (ageRangeDTO.get(i).getTo() != null && (ageRangeDTO.get(i).getFrom() > ageRangeDTO.get(i).getTo()))
@@ -119,8 +123,8 @@ public class ChildCareDaysService {
 
     public CareDaysDetails publishChildCareDays(Long childCareDaysId, LocalDate publishedDate) {
         ChildCareDays childCareDays = childCareDaysGraphRepository.findById(childCareDaysId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, FUNCTIONALPAYMENT, childCareDaysId)));
-        if (childCareDays.getCareDays().isEmpty()) {
-            exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX);
+        if (isCollectionEmpty(childCareDays.getCareDays())) {
+            exceptionService.actionNotPermittedException(MESSAGE_CHILD_CARE_EMPTY);
         }
         if (childCareDays.isPublished()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_FUNCTIONALPAYMENT_ALREADYPUBLISHED);

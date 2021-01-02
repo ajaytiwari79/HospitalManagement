@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 
 /**
  * Created By G.P.Ranjan on 1/7/19
@@ -17,6 +18,11 @@ public class ProtectedDaysOffSettingDTO {
     private BigInteger id;
     private Long unitId;
     private ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings;
+    private BigInteger holidayId;
+    private LocalDate publicHolidayDate;
+    private boolean protectedDaysOff;
+    private BigInteger dayTypeId;
+    private Long expertiseId;
 
     public ProtectedDaysOffSettingDTO(BigInteger id, Long unitId, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
         this.id=id;

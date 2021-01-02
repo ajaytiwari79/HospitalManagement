@@ -121,7 +121,6 @@ public class UserMessagesConstants {
     public static final String ERROR_CLINICTYPE_NAME_NOTEMPTY  = "error.ClinicType.name.notEmpty ";
     public static final String ERROR_CLINICTYPE_NOTFOUND  = "error.ClinicType.notfound ";
     public static final String ERROR_CLINICTYPE_NAME_EXIST  = "error.ClinicType.name.exist ";
-    public static final String ERROR_DAYTYPE_NAME_NOTEMPTY  = "error.DayType.name.notEmpty ";
     public static final String ERROR_COUNTRY_NAME_NOTEMPTY  = "error.Country.name.notEmpty ";
     public static final String ERROR_COUNTRY_CODE_NOTEMPTY  = "error.Country.code.notEmpty ";
     public static final String ERROR_SKILLCATEGORY_NAME_NOTEMPTY  = "error.SkillCategory.name.notEmpty ";
@@ -409,6 +408,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_EMAIL_ALREADYEXIST = "message.email.alreadyExist";
     public static final String MESSAGE_FUNCTIONALPAYMENT_ALREADYPUBLISHED = "message.functionalPayment.alreadyPublished";
     public static final String MESSAGE_PUBLISHDATE_NOTLESSTHAN_STARTDATE = "message.publishDate.notlessthan.startDate";
+    public static final String MESSAGE_PUBLISHDATE_NOTLESSTHAN_CURRENTDATE = "message.publishDate.notlessthan.currentDate";
     public static final String MESSAGE_PUBLISHDATE_NOTLESSTHAN_OR_EQUALS_PARENT_STARTDATE = "message.publishDate.notlessthan_or_equals.parent_startDate";
     public static final String MESSAGE_MAIN_EMPLOYMENT_EXISTS_WITH_END_DATE = "message.main_employment.exists_with_end_date";
     public static final String MESSAGE_MAIN_EMPLOYMENT_EXISTS = "message.main_employment.exists";
@@ -430,6 +430,8 @@ public class UserMessagesConstants {
     public static final String MESSAGE_EMPLOYMENT_WTAMISSING  = "message.employment.wtamissing ";
     public static final String MESSAGE_EMPLOYMENT_CONTAIN_SHIFT = "message.employment.contain.shift";
     public static final String MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX = "message_functional_Payment_empty_matrix";
+    public static final String MESSAGE_CHILD_CARE_EMPTY = "message.child.care.empty";
+    public static final String MESSAGE_SENIOR_DAY_EMPTY = "message.senior.day.empty";
     public static final String MESSAGE_HOUSENUMBER_NULL = "message.houseNumber.null";
     public static final String MESSAGE_PROVINCE_NULL  = "message.province.null ";
     public static final String MESSAGE_STREET_NULL  = "message.street.null ";
@@ -476,4 +478,6 @@ public class UserMessagesConstants {
     public static final String STAFF_SKILL_DOES_NOT_MATCHED = "team.skill.not.matched";
     public static final String UNIT_IS_MANDATORY = "error.unit.mandatory";
     public static final String SHIFT_PERCENTAGE_CAN_NOT_BE_LESS_THEN_ZERO_OR_GREATER_THEN_HUNDRED ="shift.percentage.can.not.be.less.then.zero";
+    public static final String STAFF_EMPLOYMENT_NOT_MATCH ="staff.employment.not_matched";
+
 }

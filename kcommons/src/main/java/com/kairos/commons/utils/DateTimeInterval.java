@@ -187,6 +187,17 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
         }
     }
 
+    public final boolean fullyOverlaps(DateTimeInterval interval) {
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        if (interval != null) {
+            long otherStart = interval.getStartMillis();
+            long otherEnd = interval.getEndMillis();
+            return (thisStart < otherEnd && otherStart < thisEnd) && interval.getMinutes()==this.getMinutes();
+        }
+        return false;
+    }
+
     public final DateTimeInterval gap(DateTimeInterval interval) {
         long otherStart = interval.getStartMillis();
         long otherEnd = interval.getEndMillis();

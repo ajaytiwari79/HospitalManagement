@@ -6,7 +6,6 @@ import com.kairos.commons.utils.TimeInterval;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
-import com.kairos.shiftplanning.domain.unit.TimeSlot;
 import com.kairos.shiftplanning.domain.unit.Unit;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

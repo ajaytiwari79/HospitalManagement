@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.wta.rule_template_category;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.tags.TagDTO;
 import lombok.Getter;
@@ -26,4 +27,9 @@ public class RuleTemplateCategoryTagDTO {
     private List<BigInteger> ruleTemplateIds;
     private Map<String, TranslationInfo> translations;
     private Long countryId;
+
+    public String getName() {
+        return TranslationUtil.getName(translations,name);
+    }
+
 }

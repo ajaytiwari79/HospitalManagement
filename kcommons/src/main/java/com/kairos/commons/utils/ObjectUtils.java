@@ -141,4 +141,31 @@ public class ObjectUtils {
         return objects.toArray();
     }
 
+    public static <T> List<BigInteger> getBigInteger(Collection<T> objects) {
+        List<BigInteger> ids = new ArrayList<>();
+        for (T object : objects) {
+            String id = (object instanceof String) ? (String) object : ""+object;
+            ids.add(new BigInteger(id));
+        }
+        return ids;
+    }
+
+    public static String getBigIntegerString(Iterator<BigInteger> iterator) {
+        if (!iterator.hasNext()) {
+            return "[]";
+        } else {
+            StringBuilder var2 = new StringBuilder();
+            var2.append("['");
+
+            while(true) {
+                BigInteger var3 = iterator.next();
+                var2.append(var3);
+                if (!iterator.hasNext()) {
+                    return var2.append("']").toString();
+                }
+
+                var2.append("','");
+            }
+        }
+    }
 }

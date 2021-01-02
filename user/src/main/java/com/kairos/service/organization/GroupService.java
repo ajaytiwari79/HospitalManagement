@@ -11,7 +11,6 @@ import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.ModuleId;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.group.GroupDTO;
@@ -106,10 +105,6 @@ public class GroupService {
         for(Group group : groups){
             groupDTOS.add(getGroupDTOFromGroup(group));
         }
-        groupDTOS.forEach(groupDTO -> {
-            groupDTO.setUnitId(unitId);
-            groupDTO.setTranslations(TranslationUtil.getTranslatedData(groupDTO.getTranslatedNames(),groupDTO.getTranslatedDescriptions()));
-        });
         return groupDTOS;
     }
 
@@ -148,7 +143,7 @@ public class GroupService {
 
     public List<Map> getStaffListByGroupFilter(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS){
         List<Map> filteredStaff = new ArrayList<>();
-        for(Map staff : staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value,filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false,null).getStaffList()){
+        for(Map staff : staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.GROUP_TAB_ID.value,filterSelectionDTOS),  ModuleId.GROUP_TAB_ID.value, null, null,false,null).getStaffList()){
             if(StaffStatusEnum.ACTIVE.toString().equals(staff.get("currentStatus"))) {
                 Map<String, Object> fStaff = new HashMap<>();
                 fStaff.put("id", staff.get("id"));
@@ -173,7 +168,7 @@ public class GroupService {
         for(Group group : groups){
             GroupDTO groupDTO = getGroupDTOFromGroup(group);
             List<FilterSelectionDTO> filterSelectionDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(groupDTO.getFiltersData(), FilterSelectionDTO.class);
-            List<Map> staffs = staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value, filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false,null).getStaffList();
+            List<Map> staffs = staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.GROUP_TAB_ID.value, filterSelectionDTOS),  ModuleId.GROUP_TAB_ID.value, null, null,false,null).getStaffList();
             staffIds.addAll(staffs.stream().map(map-> Long.valueOf(map.get("id").toString())).collect(Collectors.toSet()));
             excludedStaffs.addAll(groupDTO.getExcludedStaffs());
             groupDTOS.add(groupDTO);
@@ -181,19 +176,5 @@ public class GroupService {
 
         staffIds.removeAll(excludedStaffs);
         return staffIds;
-    }
-
-    public Map<String, TranslationInfo> updateTranslationOfGroup(Long groupId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Group group =groupGraphRepository.findOne(groupId);
-        group.setTranslatedNames(translatedNames);
-        group.setTranslatedDescriptions(translatedDescriptios);
-        groupGraphRepository.save(group);
-        return group.getTranslatedData();
     }
 }

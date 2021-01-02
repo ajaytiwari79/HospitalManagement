@@ -423,6 +423,15 @@
     "tab_213": "/questionnaires",
     "tab_304": "/data-management",
     "tab_305": "/data-category",
-    "tab_306": "/data-subject-mapping"
+    "tab_306": "/data-subject-mapping",
+
+    "tab_453": "/action-permissions",
+    "tab_454": "/action-permissions",
+
+    "tab_455": "/tab-permissions",
+    "tab_456": "/field-permissions",
+    "tab_457": "/action-permissions",
+
+    "tab_459": "/protected-days-off-settings"
 
 }

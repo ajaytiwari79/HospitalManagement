@@ -9,7 +9,6 @@ import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.PlannedTime;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staff.BreakSettings;
-import com.kairos.shiftplanning.domain.unit.TimeSlot;
 import com.kairos.shiftplanning.domain.wta_ruletemplates.BreakWTATemplate;
 
 import java.time.ZonedDateTime;

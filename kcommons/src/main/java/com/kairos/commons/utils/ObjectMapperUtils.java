@@ -33,7 +33,7 @@ public class ObjectMapperUtils {
     public static final DateTimeFormatter LOCALTIME_FORMATTER = ofPattern("HH:mm");
     public static final String ERROR = "error {}";
 
-    private static ObjectMapper mapper;
+    public static ObjectMapper mapper;
 
     private static  final Logger LOGGER = LoggerFactory.getLogger(ObjectMapperUtils.class);
 
@@ -78,6 +78,7 @@ public class ObjectMapperUtils {
 
     public static <E extends Object,T extends Object> T copyPropertiesByMapper(E object, Class<T> valueType){
         try {
+
             String json = mapper.writeValueAsString(object);
             return mapper.readValue(json, valueType);
         } catch (IOException e) {

@@ -1,5 +1,6 @@
 package com.kairos.controller.priority_group;
 
+import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.service.priority_group.PriorityGroupService;
 import com.kairos.utils.response.ResponseHandler;
@@ -119,6 +120,20 @@ public class PriorityGroupController {
     public ResponseEntity<Map<String, Object>> getStaffByPriorityGroups(@PathVariable Long unitId,@PathVariable BigInteger priorityGroupId) {
         priorityGroupService.notifyStaffByPriorityGroup(priorityGroupId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = COUNTRY_URL+"/priority_groups/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfPriorityGroup(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,priorityGroupService.updateTranslation(id,translations));
+    }
+
+    @ApiOperation(value = "update translation data")
+    @PutMapping(value = UNIT_URL+"/priority_groups/{id}/language_settings")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTranslationDataOfPriorityGroupOfOrganization(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,priorityGroupService.updateTranslation(id,translations));
     }
 
 

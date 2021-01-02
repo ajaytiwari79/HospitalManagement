@@ -1,13 +1,11 @@
 package com.kairos.service.country;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
@@ -83,7 +81,6 @@ public class FunctionService {
         List<com.kairos.persistence.model.country.functions.FunctionDTO> functionDTOS = functionGraphRepository.findFunctionsByCountry(countryId);
         functionDTOS.forEach(functionDTO -> {
             functionDTO.setCountryId(countryId);
-            functionDTO.setTranslations(TranslationUtil.getTranslatedData(functionDTO.getTranslatedNames(),functionDTO.getTranslatedDescriptions()));
         });
         return functionDTOS;
     }
@@ -146,7 +143,7 @@ public class FunctionService {
     }
 
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsByExpertiseId(long expertiseId) {
-        return functionGraphRepository.getFunctionsByExpertiseId(expertiseId);
+        return functionGraphRepository.getFunctionsByExpertiseLineId(expertiseId);
 
     }
 
@@ -240,22 +237,5 @@ public class FunctionService {
         Function function = functionGraphRepository.findOne(functionId);
         return function.getTranslatedData();
     }
-
-    public Map<String, TranslationInfo> updateTranslationOfCountryFunctions(Long functionId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
-        Function function =functionGraphRepository.findOne(functionId);
-        function.setTranslatedNames(translatedNames);
-        function.setTranslatedDescriptions(translatedDescriptios);
-        functionGraphRepository.save(function);
-        return function.getTranslatedData();
-    }
-
-
-
 
 }

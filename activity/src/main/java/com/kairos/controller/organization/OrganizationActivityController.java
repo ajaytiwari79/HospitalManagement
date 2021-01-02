@@ -396,4 +396,11 @@ public class OrganizationActivityController {
     public ResponseEntity<Map<String, Object>> getShowOnCallAndStandByActivityId(@PathVariable long unitId,@RequestParam boolean showStandBy,@RequestParam boolean showOnCall) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getShowOnCallAndStandByActivityId(unitId,showStandBy,showOnCall));
     }
+
+    @ApiOperation("Update Translations of ActivityCategory in a unit ")
+    @PutMapping(value = "/activityCategory/{activityCategoryId}/unit_language_settings")
+    @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
+    ResponseEntity<Map<String, Object>> updateLanguageSettingsOfActivityCategory(@NotEmpty @PathVariable BigInteger activityCategoryId, @NotNull @RequestBody Map<String, TranslationInfo> translationMap) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.updateUnitActivityCategoryTranslationDetails(activityCategoryId,translationMap));
+    }
 }

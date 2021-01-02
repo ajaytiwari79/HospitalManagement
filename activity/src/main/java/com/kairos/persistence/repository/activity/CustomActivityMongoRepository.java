@@ -81,6 +81,7 @@ public interface CustomActivityMongoRepository {
     List<ActivityDTO> findAllByTimeTypeIdAndUnitId(Set<BigInteger> timeTypeIds,Long unitId) ;
 
     List<ActivityWrapper> findActivitiesAndTimeTypeByActivityId(Collection<BigInteger> activityIds);
+    List<Activity> findActivitiesSickSettingByActivityIds(Collection<BigInteger> activityIds);
     List<ActivityWrapper> findActivitiesAndTimeTypeByParentIdsAndUnitId(List<BigInteger> activityIds,Long unitId);
     List<ActivityDTO> findAllActivitiesByCountryIdAndTimeTypes(Long countryId,List<BigInteger> timeTypeIds);
 
@@ -108,7 +109,7 @@ public interface CustomActivityMongoRepository {
     List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId);
     List<ActivityDTO> getActivityRankWithRankByUnitId(Long unitId);
 
-    List<ActivityDTO> findActivitiesByUnitId(Long unitId, List<BigInteger> activityIds);
+    List<ActivityDTO> findActivitiesByUnitId(Long unitId, Collection<BigInteger> activityIds);
 
     List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType, Long unitId);
 
@@ -119,4 +120,6 @@ public interface CustomActivityMongoRepository {
     List<Activity> findAllBreakActivitiesByOrganizationId(Long unitId);
 
     Set<BigInteger> findAllShowOnCallAndStandByActivitiesByUnitId(Long unitId, boolean showStandBy, boolean showOnCall);
+
+    List<ActivityWithCompositeDTO> findAllActivityByIdsAndIncludeChildActivitiesWithMostUsedCountOfActivity(Collection<BigInteger> activityIds,Long unitId,Long staffId,boolean isActivityType);
 }

@@ -5,11 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivityLineInterval;
+import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
+import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,10 +22,12 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.addMinutes;
+import static com.kairos.commons.utils.DateUtils.asZonedDateTime;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.shift.ShiftType.SICK;
 
@@ -32,12 +38,13 @@ import static com.kairos.enums.shift.ShiftType.SICK;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = "shifts")
+@NoArgsConstructor
 public class Shift extends MongoBaseEntity {
 
     protected Date startDate;
     protected Date endDate;
-    protected Integer shiftStartTime;
-    protected Integer shiftEndTime;
+    protected Integer shiftStartTime;//In Second
+    protected Integer shiftEndTime;//In Second
     protected boolean disabled = false;
     @NotNull(message = "error.ShiftDTO.staffId.notnull")
     protected Long staffId;
@@ -74,11 +81,9 @@ public class Shift extends MongoBaseEntity {
     protected LocalDate validated;
     private ShiftViolatedRules shiftViolatedRules;
     private transient String oldShiftTimeSlot;//it is only for conditional CTA calculation
-
-    public Shift() {
-        //Default Constructor
-    }
-
+    private boolean planningPeriodPublished;
+    private List<TimeBankCTADistribution> timeBankCTADistributions;
+    private List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions;
 
     public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
         this.startDate = startDate;
@@ -213,7 +218,7 @@ public class Shift extends MongoBaseEntity {
                 shiftActivitiesForCheckingStaffingLevel.add(new ShiftActivity(activityLineInterval.getActivityId(),activityLineInterval.getStartDate(),activityLineInterval.getEndDate(),activityLineInterval.getActivityName()));
             }
         }
-        if(isCollectionNotEmpty(shiftActivitiesForCheckingStaffingLevel))
+        if(shiftActivitiesForCheckingStaffingLevel.size()>1)
             shiftActivitiesForCheckingStaffingLevel= mergeShiftActivityList(shiftActivitiesForCheckingStaffingLevel);
         return shiftActivitiesForCheckingStaffingLevel;
     }
@@ -279,7 +284,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     private Integer timeInSeconds(Date date) {
-        return ((date.getHours() * 60 * 60) + (date.getMinutes() * 60));
+        return asZonedDateTime(date).get(ChronoField.SECOND_OF_DAY);
     }
 
     @Override

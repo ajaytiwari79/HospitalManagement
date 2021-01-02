@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.cta;
 
 import com.kairos.persistence.model.cta.CostTimeAgreement;
-import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

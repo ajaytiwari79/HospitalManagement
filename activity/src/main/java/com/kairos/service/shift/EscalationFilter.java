@@ -1,8 +1,8 @@
 package com.kairos.service.shift;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftViolatedRules;
 import com.kairos.enums.FilterType;
-import com.kairos.persistence.model.shift.ShiftViolatedRules;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

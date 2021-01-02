@@ -54,7 +54,10 @@ public interface SystemLanguageGraphRepository extends Neo4jBaseRepository<Syste
 
 
     @Query("MATCH (c:Country)-[rel:"+ HAS_SYSTEM_LANGUAGE +"]->(language:SystemLanguage{active:true}) WHERE id(c)={0} AND language.active=true " +
-            "RETURN id(language) as id,language.name as name,language.code as code ,language.active as active,rel.defaultLanguage as defaultLanguage")
+            "RETURN language.translations as translations,\n" +
+            "id(language) as id,language.name as name,language.code as code ,language.active as active,rel.defaultLanguage as defaultLanguage")
     List<SystemLanguageQueryResult> findSystemLanguagesByCountryId(Long countryId);
 
+    @Query("MATCH (node) where id(node)={0} SET node.translations={1}")
+    void updateTranslation(Long id, String jsonStr);
 }

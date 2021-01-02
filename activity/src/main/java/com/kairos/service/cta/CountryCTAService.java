@@ -4,6 +4,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
 import com.kairos.dto.activity.tags.TagDTO;
+import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
@@ -19,6 +20,7 @@ import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.cta_compensation_settings.CTACompensationSettingService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
@@ -63,6 +65,7 @@ public class CountryCTAService extends MongoBaseService {
 
     @Inject
     private TagMongoRepository tagMongoRepository;
+    @Inject private CTACompensationSettingService ctaCompensationSettingService;
 
     /**
      * @param countryId
@@ -139,6 +142,9 @@ public class CountryCTAService extends MongoBaseService {
         List<BigInteger> ruleTemplateIds = new ArrayList<>();
         if (!ruleTemplates.isEmpty()) {
             ruleTemplates.forEach(ctaRuleTemplate -> {
+                if(CalculationFor.CONDITIONAL_BONUS.equals(ctaRuleTemplate.getCalculationFor())){
+                    ctaCompensationSettingService.validateInterval(ctaRuleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations());
+                }
                 ctaRuleTemplate.setId(null);
                 if (!doUpdate && !creatingFromCountry && Optional.ofNullable(unitPhaseIdsMap).isPresent()) {
                     ctaRuleTemplate.getPhaseInfo().forEach(ctaRuleTemplatePhaseInfo -> {

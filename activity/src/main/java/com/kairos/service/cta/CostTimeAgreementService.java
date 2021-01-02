@@ -9,11 +9,13 @@ import com.kairos.dto.activity.cta.*;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
+import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.cta.ActivityTypeForCostCalculation;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -29,9 +31,12 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.cta_compensation_settings.CTACompensationSettingService;
+import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +89,11 @@ public class CostTimeAgreementService {
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
     private TimeBankService timeBankService;
+    @Inject private CTACompensationSettingService ctaCompensationSettingService;
+    @Inject
+    private DayTypeService dayTypeService;
+    @Inject
+    private ProtectedDaysOffService protectedDaysOffService;
 
 
     /**
@@ -124,6 +134,9 @@ public class CostTimeAgreementService {
         this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, false, countryDTO);
         ctaRuleTemplate.setCountryId(countryId);
         ctaRuleTemplate.setStaffFunctions(null);
+        if(CalculationFor.CONDITIONAL_BONUS.equals(ctaRuleTemplate.getCalculationFor())){
+            ctaCompensationSettingService.validateInterval(ctaRuleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations());
+        }
         ctaRuleTemplateRepository.save(ctaRuleTemplate);
         ctaRuleTemplateDTO.setId(ctaRuleTemplate.getId());
         return ctaRuleTemplateDTO;
@@ -214,6 +227,9 @@ public class CostTimeAgreementService {
             ctaRuleTemplateDTOS = ctaResponseDTO.getRuleTemplates();
         }
         ctaRuleTemplateDTOS.forEach(ctaRuleTemplateDTO -> {
+            if(isNull(ctaRuleTemplateDTO.getTranslations())){
+                ctaRuleTemplateDTO.setTranslations(new HashMap<>());
+            }
             ctaRuleTemplateDTO.setUnitId(unitId);
         });
         return ctaRuleTemplateDTOS;
@@ -231,6 +247,11 @@ public class CostTimeAgreementService {
         if (ctaResponseDTO != null) {
             ctaRuleTemplateDTOS = ctaResponseDTO.getRuleTemplates();
         }
+        ctaRuleTemplateDTOS.forEach(ctaRuleTemplateDTO -> {
+             if(isNull(ctaRuleTemplateDTO.getTranslations())){
+                 ctaRuleTemplateDTO.setTranslations(new HashMap<>());
+             }
+        });
         return ctaRuleTemplateDTOS;
     }
 
@@ -247,6 +268,8 @@ public class CostTimeAgreementService {
 
     public StaffEmploymentDetails updateCostTimeAgreementForEmployment(Long unitId, Long employmentId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO,Boolean save) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>(),null);
+        staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
+        staffAdditionalInfoDTO.getEmployment().getExpertise().setProtectedDaysOffSettings(protectedDaysOffService.getProtectedDaysOffByExpertiseId(UserContext.getUserDetails().getCountryId()));
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         validateEmploymentCTAWhileUpdate(ctaDTO,staffAdditionalInfoDTO,oldCTA);
         CTAResponseDTO responseCTA = null;
@@ -270,7 +293,12 @@ public class CostTimeAgreementService {
 
     private CTAResponseDTO updateEmploymentCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO ctaDTO) {
         List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyCollectionPropertiesByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
-        ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
+        ctaRuleTemplates.forEach(ctaRuleTemplate -> {
+            if(CalculationFor.CONDITIONAL_BONUS.equals(ctaRuleTemplate.getCalculationFor())){
+                ctaCompensationSettingService.validateInterval(ctaRuleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations());
+            }
+            ctaRuleTemplate.setId(null);
+        });
         if (CollectionUtils.isNotEmpty(ctaRuleTemplates)) {
             ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
         }
@@ -296,6 +324,24 @@ public class CostTimeAgreementService {
         oldCTA.setId(null);
         oldCTA.setEndDate(publishDate.equals(oldCTA.getStartDate()) ? oldCTA.getStartDate() : publishDate.minusDays(1));
         costTimeAgreementRepository.save(oldCTA);
+        setDataInCostTimeAgreement(oldCTA, ctaDTO, costTimeAgreement);
+        costTimeAgreementRepository.save(costTimeAgreement);
+        List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
+        ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
+        CTAResponseDTO responseCTA = new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false, oldCTA.getEmploymentId(), costTimeAgreement.getDescription());
+        responseCTA.setEndDate((isNotNull(responseCTA.getEndDate())&&responseCTA.getStartDate().isBefore(responseCTA.getEndDate()))?responseCTA.getEndDate():null);
+        responseCTA.setParentId(oldCTA.getId());
+        responseCTA.setOrganizationParentId(oldCTA.getOrganizationParentId());
+        responseCTA.setTranslations(costTimeAgreement.getTranslations());
+        CTAResponseDTO versionCTA = ObjectMapperUtils.copyPropertiesByMapper(oldCTA, CTAResponseDTO.class);
+        List<CTARuleTemplate> existingCtaRuleTemplates = ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(oldCTA.getRuleTemplateIds());
+        List<CTARuleTemplateDTO> existingCtaRuleTemplatesDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(existingCtaRuleTemplates, CTARuleTemplateDTO.class);
+        versionCTA.setRuleTemplates(existingCtaRuleTemplatesDTOS);
+        responseCTA.setVersions(Arrays.asList(versionCTA));
+        return responseCTA;
+    }
+
+    private void setDataInCostTimeAgreement(CostTimeAgreement oldCTA, CollectiveTimeAgreementDTO ctaDTO, CostTimeAgreement costTimeAgreement) {
         costTimeAgreement.setStartDate(oldCTA.getEndDate().plusDays(1));
         costTimeAgreement.setParentId(oldCTA.getId());
         costTimeAgreement.setOrganizationParentId(oldCTA.getOrganizationParentId());
@@ -305,19 +351,6 @@ public class CostTimeAgreementService {
         costTimeAgreement.setOrganization(oldCTA.getOrganization());
         costTimeAgreement.setEmploymentId(oldCTA.getEmploymentId());
         costTimeAgreement.setDescription(ctaDTO.getDescription());
-        costTimeAgreementRepository.save(costTimeAgreement);
-        List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
-        ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
-        CTAResponseDTO responseCTA = new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false, oldCTA.getEmploymentId(), costTimeAgreement.getDescription());
-        responseCTA.setEndDate((isNotNull(responseCTA.getEndDate())&&responseCTA.getStartDate().isBefore(responseCTA.getEndDate()))?responseCTA.getEndDate():null);
-        responseCTA.setParentId(oldCTA.getId());
-        responseCTA.setOrganizationParentId(oldCTA.getOrganizationParentId());
-        CTAResponseDTO versionCTA = ObjectMapperUtils.copyPropertiesByMapper(oldCTA, CTAResponseDTO.class);
-        List<CTARuleTemplate> existingCtaRuleTemplates = ctaRuleTemplateRepository.findAllByIdAndDeletedFalse(oldCTA.getRuleTemplateIds());
-        List<CTARuleTemplateDTO> existingCtaRuleTemplatesDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(existingCtaRuleTemplates, CTARuleTemplateDTO.class);
-        versionCTA.setRuleTemplates(existingCtaRuleTemplatesDTOS);
-        responseCTA.setVersions(Arrays.asList(versionCTA));
-        return responseCTA;
     }
 
     private void validateEmploymentCTAWhileUpdate(CollectiveTimeAgreementDTO collectiveTimeAgreementDTO,StaffAdditionalInfoDTO staffAdditionalInfoDTO,CostTimeAgreement oldCTA){
@@ -364,7 +397,13 @@ public class CostTimeAgreementService {
     private List<CTARuleTemplate> getCtaRuleTemplates(CollectiveTimeAgreementDTO ctaDTO, CostTimeAgreement costTimeAgreement) {
         List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyCollectionPropertiesByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
         if (!ctaRuleTemplates.isEmpty()) {
-            ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
+            ctaRuleTemplates.forEach(ctaRuleTemplate -> {
+                if(CalculationFor.CONDITIONAL_BONUS.equals(ctaRuleTemplate.getCalculationFor())){
+                    ctaCompensationSettingService.validateInterval(ctaRuleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations());
+                }
+                ctaRuleTemplate.setId(null);
+                ctaRuleTemplate.setCountryId(null);
+            });
             ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
             List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
             costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
@@ -391,7 +430,7 @@ public class CostTimeAgreementService {
     }
 
     public Map<Long,CostTimeAgreement> updateWTACTA(List<Long> oldEmploymentIds, Map<Long, Long> newOldemploymentIdMap){
-        List<CTAResponseDTO> ctaResponseDTOs = costTimeAgreementRepository.getCTAByEmploymentIds(oldEmploymentIds, DateUtils.getCurrentDate());
+        List<CTAResponseDTO> ctaResponseDTOs = costTimeAgreementRepository.getCTAByEmploymentIds(oldEmploymentIds, DateUtils.getDate());
         List<CostTimeAgreement> newCTAs = new ArrayList<>();
         for (CTAResponseDTO cta : ctaResponseDTOs) {
             CostTimeAgreement newCTA = ObjectMapperUtils.copyPropertiesByMapper(cta, CostTimeAgreement.class);
@@ -474,7 +513,13 @@ public class CostTimeAgreementService {
      * @return List<CTAResponseDTO>
      */
     public List<CTAResponseDTO> loadAllCTAByCountry(Long countryId) {
-       return costTimeAgreementRepository.findCTAByCountryId(countryId);
+       List<CTAResponseDTO> ctaResponseDTOS =costTimeAgreementRepository.findCTAByCountryId(countryId);
+       ctaResponseDTOS.forEach(ctaResponseDTO -> {
+           if(isNull(ctaResponseDTO.getTranslations())){
+               ctaResponseDTO.setTranslations(new HashMap<>());
+           }
+       });
+       return ctaResponseDTOS;
     }
 
     /**
@@ -484,6 +529,9 @@ public class CostTimeAgreementService {
     public List<CTAResponseDTO> loadAllCTAByUnit(Long unitId) {
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.findCTAByUnitId(unitId);
         ctaResponseDTOS.forEach(ctaResponseDTO -> {
+            if(isNull(ctaResponseDTO.getTranslations())){
+                ctaResponseDTO.setTranslations(new HashMap<>());
+            }
             ctaResponseDTO.setUnitId(unitId);
         });
         return ctaResponseDTOS;
@@ -501,6 +549,9 @@ public class CostTimeAgreementService {
         collectiveTimeAgreementDTO.setTags(tagDTOS);
         List<CTARuleTemplate> ctaRuleTemplates = new ArrayList<>(collectiveTimeAgreementDTO.getRuleTemplates().size());
         for (CTARuleTemplateDTO ctaRuleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()) {
+            if(CalculationFor.CONDITIONAL_BONUS.equals(ctaRuleTemplateDTO.getCalculationFor())){
+                ctaCompensationSettingService.validateInterval(ctaRuleTemplateDTO.getCalculateValueAgainst().getCtaCompensationConfigurations());
+            }
             CTARuleTemplate ctaRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ctaRuleTemplateDTO, CTARuleTemplate.class);
             ctaRuleTemplate.setId(null);
             setActivityBasesCostCalculationSettings(ctaRuleTemplate);
@@ -567,7 +618,6 @@ public class CostTimeAgreementService {
         logger.info("saving CostTimeAgreement unit {}", unitId);
         if (costTimeAgreementRepository.isCTAExistWithSameNameInUnit(unitId, collectiveTimeAgreementDTO.getName().trim(), new BigInteger("1"))) {
             exceptionService.duplicateDataException(MESSAGE_CTA_NAME_ALREADYEXIST, collectiveTimeAgreementDTO.getName());
-
         }
         OrganizationDTO organization = userIntegrationService.getOrganization();
         collectiveTimeAgreementDTO.setId(null);
@@ -615,9 +665,11 @@ public class CostTimeAgreementService {
     public CTATableSettingWrapper getVersionsCTA(Long unitId, List<Long> upIds) {
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTabId(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getParentCTAByUpIds(upIds);
-        /*Map<Long, List<CTAResponseDTO>> ctaResponseMap = costTimeAgreementRepository.getVersionsCTA(upIds).stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
-        ctaResponseDTOS.forEach(c -> c.setVersions(ctaResponseMap.get(c.getEmploymentId())));
-        */return new CTATableSettingWrapper(ctaResponseDTOS, tableConfiguration);
+        if(isCollectionNotEmpty(ctaResponseDTOS)){
+            CostTimeAgreement costTimeAgreement = costTimeAgreementRepository.findOne(ctaResponseDTOS.get(0).getOrganizationParentId());
+            ctaResponseDTOS.forEach(ctaResponseDTO -> ctaResponseDTO.setTranslations(costTimeAgreement.getTranslations()));
+        }
+        return new CTATableSettingWrapper(ctaResponseDTOS, tableConfiguration);
     }
 
     public CTAResponseDTO getDefaultCTA(Long unitId, Long expertiseId) {
@@ -684,6 +736,9 @@ public class CostTimeAgreementService {
             for (CTARuleTemplatePhaseInfo ctaRuleTemplatePhaseInfo : ctaRuleTemplate.getPhaseInfo()) {
                 BigInteger phaseId = parentPhasesAndUnitPhaseIdMap.getOrDefault(phaseDefaultNameMap.get(ctaRuleTemplatePhaseInfo.getPhaseId()), ctaRuleTemplatePhaseInfo.getPhaseId());
                 ctaRuleTemplatePhaseInfo.setPhaseId(phaseId);
+            }
+            if(CalculationFor.CONDITIONAL_BONUS.equals(ctaRuleTemplate.getCalculationFor())){
+                ctaCompensationSettingService.validateInterval(ctaRuleTemplate.getCalculateValueAgainst().getCtaCompensationConfigurations());
             }
         }
     }
