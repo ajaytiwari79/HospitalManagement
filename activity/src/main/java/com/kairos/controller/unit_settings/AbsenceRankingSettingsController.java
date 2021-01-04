@@ -1,8 +1,6 @@
 package com.kairos.controller.unit_settings;
 
 import com.kairos.dto.activity.unit_settings.activity_configuration.AbsenceRankingDTO;
-import com.kairos.dto.user.country.experties.AgeRangeDTO;
-import com.kairos.dto.user.country.experties.CareDaysDetails;
 import com.kairos.service.unit_settings.AbsenceRankingSettingsService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -15,11 +13,9 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 @RestController
 @RequestMapping(API_V1)
@@ -53,7 +49,7 @@ public class AbsenceRankingSettingsController {
     @ApiOperation(value = "published a absence_ranking settings for expertise")
     @PutMapping(value =  "/expertise/{expertiseId}/absence_ranking/{id}/publish")
     public ResponseEntity<Map<String, Object>> publishAbsenceRanking(@PathVariable BigInteger id, @RequestParam("publishedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate publishedDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.publishSeniorDays(id, publishedDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.publishAbsenceRanking(id, publishedDate));
     }
 
     @ApiOperation(value = "delete a senior days for expertise")

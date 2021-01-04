@@ -220,8 +220,9 @@ public class ShiftStatusService {
             activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
             activityIds.addAll(shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
             staffIds.add(shift.getStaffId());
-            if(shift.getEmploymentId()!=null)
-            employmentIds.add(shift.getEmploymentId());
+            if(shift.getEmploymentId()!=null){
+                employmentIds.add(shift.getEmploymentId());
+            }
             if(isNotNull(shift.getRequestAbsence())){
                 activityIds.add(shift.getRequestAbsence().getActivityId());
             }

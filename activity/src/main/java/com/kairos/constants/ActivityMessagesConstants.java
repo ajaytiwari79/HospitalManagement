@@ -403,4 +403,12 @@ public class ActivityMessagesConstants {
     public static final String ERROR_DUPLICATE_AUTO_FILL_GAP_SETTING_FOUND = "error.duplicate.auto.fill.gap.setting.found";
     public static final String ERROR_ALREADY_AUTO_FILL_GAP_SETTING_PUBLISH = "error.already.auto.fill.gap.setting.publish";
     public static final String ERROR_DRAFT_COPY_ALREADY_CREATED = "error.draft.copy.already.created";
+
+
+    //Ranking Error Messages
+    public static final String MESSAGE_RANKING_EMPTY="ranking.absent";
+    public static final String MESSAGE_DRAFT_COPY_CREATED="draft.already.exists";
+    public static final String MESSAGE_RANKING_ALREADY_PUBLISHED="ranking.already.published";
+    public static final String MESSAGE_PUBLISH_DATE_NOT_LESS_THAN_OR_EQUALS_PARENT_START_DATE="draft.copy.overlapped.published";
+
 }
