@@ -463,6 +463,7 @@ public class ActivityService {
         activityMongoRepository.save(activity);
         return new ActivitySettingsWrapper(activityIndividualPointsSettings);
     }
+
     public ActivityIndividualPointsSettings getIndividualPointsTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
         return activity.getActivityIndividualPointsSettings();
