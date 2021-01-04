@@ -37,8 +37,8 @@ public class AbsenceRankingSettingsController {
 
     @ApiOperation(value = "get  absence_ranking settings of expertise")
     @GetMapping(value =   "/expertise/{expertiseId}/absence_ranking")
-    public ResponseEntity<Map<String, Object>> getAbsenceRanking(@PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.getAbsenceRankingSettings(expertiseId));
+    public ResponseEntity<Map<String, Object>> getAbsenceRanking(@PathVariable Long expertiseId, @RequestParam(value = "published", required = false) Boolean published) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, absenceRankingSettingsService.getAbsenceRankingSettings(expertiseId, published));
     }
 
     @ApiOperation(value = "update a absence_ranking settings for expertise")

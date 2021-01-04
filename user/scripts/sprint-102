@@ -1,0 +1,5 @@
+//Add new tab
+Match(ap:AccessPage) where ap.moduleId="tab_244" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Auto-fill gap",isModule:false,moduleId:"tab_460",active:true,`translatedNames.english`:"Auto-fill gap"});
+Match(ap:AccessPage) where ap.moduleId="tab_82" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Auto-fill gap",isModule:false,moduleId:"tab_461",active:true,`translatedNames.english`:"Auto-fill gap"});
+
+Match(ap:AccessPage) where ap.moduleId="tab_244" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Activity Ranking",isModule:false,moduleId:"tab_462",active:true,`translatedNames.english`:"Activity Ranking"});
