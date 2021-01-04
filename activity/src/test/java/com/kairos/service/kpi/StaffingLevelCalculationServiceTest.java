@@ -9,6 +9,7 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.counter.StaffingLevelCalculationKPIService;
+import com.kairos.service.staffing_level.StaffingLevelAvailableCountService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import org.joda.time.DateTimeZone;
 import org.junit.Assert;
@@ -40,6 +41,8 @@ public class StaffingLevelCalculationServiceTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffingLevelCalculationServiceTest.class);
 
     @Mock
+    private StaffingLevelAvailableCountService staffingLevelAvailableCountService;
+    @Mock
     private StaffingLevelService staffingLevelService;
 
     @Mock
@@ -70,7 +73,7 @@ public class StaffingLevelCalculationServiceTest {
     public void testPresenceStaffingLevelDataPerHour(){
         Mockito.when(staffingLevelService.findByUnitIdAndDates(anyLong(),any(Date.class),any(Date.class))).thenReturn(getStaffingLevelList());
         Mockito.when(kpiBuilderCalculationService.getShiftActivityCriteria(any(KPIBuilderCalculationService.KPICalculationRelatedInfo.class))).thenReturn(KPIBuilderCalculationService.ShiftActivityCriteria.builder().teamActivityIds(new HashSet<>()).build());
-        Mockito.when(staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(any(), any(),any())).thenReturn(null);
+        Mockito.when(staffingLevelAvailableCountService.updatePresenceStaffingLevelAvailableStaffCount(any(), any())).thenReturn(null);
         Map<Integer, Long> staffingLevelData = staffingLevelCalculationKPIService.getPresenceStaffingLevelDataPerHour(dateTimeInterval, kpiCalculationRelatedInfo);
         Assert.assertEquals(180L,Long.parseLong(staffingLevelData.get(0).toString()));
     }

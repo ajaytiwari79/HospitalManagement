@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalTime;
 import static com.kairos.commons.utils.ObjectUtils.*;
@@ -136,6 +137,10 @@ public class StaffAdditionalInfoDTO {
             }
         }
         return roles;
+    }
+
+    public List<SkillLevelDTO> getSkillsByLocalDate(LocalDate localDate){
+        return isCollectionNotEmpty(this.skillLevelDTOS) ? this.skillLevelDTOS.stream().filter(skillLevelDTO -> skillLevelDTO.isValidSkillsByLocalDate(localDate)).collect(Collectors.toList()) : new ArrayList<>();
     }
 
     public Long getUnitId() {
