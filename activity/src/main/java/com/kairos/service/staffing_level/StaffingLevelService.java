@@ -909,6 +909,7 @@ public class StaffingLevelService {
         List<StaffingLevel> staffingLevels = isCollectionNotEmpty(staffingLevelPublishDTO.getWeekDates()) ? staffingLevelMongoRepository.findByUnitIdAndDates(unitId, staffingLevelPublishDTO.getWeekDates()) : staffingLevelMongoRepository.findByUnitIdAndDates(unitId, staffingLevelPublishDTO.getStartDate(), staffingLevelPublishDTO.getEndDate());
         for (StaffingLevel staffingLevel : staffingLevels) {
             StaffingLevelUtil.updateStaffingLevelToPublish(staffingLevelPublishDTO, staffingLevel);
+            staffingLevelAvailableCountService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel);
         }
         staffingLevelMongoRepository.saveEntities(staffingLevels);
         DateTimeInterval presenceInterval = new DateTimeInterval(staffingLevelPublishDTO.getSelectedDateForPresence(), staffingLevelPublishDTO.getSelectedEndDateForPresence());
@@ -1130,8 +1131,7 @@ public class StaffingLevelService {
     public boolean updateInitialInStaffingLevel() {
         List<StaffingLevel> staffingLevels=staffingLevelMongoRepository.findAllByDeletedFalse();
         for (StaffingLevel staffingLevel : staffingLevels) {
-            List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(getStartOfDay(staffingLevel.getCurrentDate()), getEndOfDay(staffingLevel.getCurrentDate()), newArrayList(staffingLevel.getUnitId()));
-            staffingLevelAvailableCountService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, shifts);
+            staffingLevelAvailableCountService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel);
             StaffingLevelUtil.setStaffingLevelDetails(staffingLevel);
         }
         //staffingLevelMongoRepository.saveEntities(staffingLevels);
