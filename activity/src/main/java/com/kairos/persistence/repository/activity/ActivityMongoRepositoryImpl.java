@@ -499,7 +499,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public List<ActivityWrapper> findParentActivitiesAndTimeTypeByActivityId(Collection<BigInteger> activityIds) {
-        return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false).and(IS_PARENT_ACTIVITY).is(true));
+        return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false).and(CHILD_ACTIVITY_IDS).nin(activityIds));
     }
 
     @Override
