@@ -498,6 +498,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
+    public List<ActivityWrapper> findParentActivitiesAndTimeTypeByActivityId(Collection<BigInteger> activityIds) {
+        return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false).and(IS_PARENT_ACTIVITY).is(true));
+    }
+
+    @Override
     public List<Activity> findActivitiesSickSettingByActivityIds(Collection<BigInteger> activityIds){
         Query query = new Query(Criteria.where("id").in(activityIds).and(DELETED).is(false));
         query.fields().include("activityRulesSettings");
