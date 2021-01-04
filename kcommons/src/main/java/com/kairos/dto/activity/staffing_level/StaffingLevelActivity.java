@@ -21,7 +21,6 @@ public class StaffingLevelActivity {
     private boolean includeInMin;
     private int minNoOfStaff;
     private int maxNoOfStaff;
-    @Transient
     private  int availableNoOfStaff;
     private Date minUpdatedAt;
     private Date maxUpdatedAt;

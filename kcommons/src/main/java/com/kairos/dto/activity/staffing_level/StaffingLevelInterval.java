@@ -25,7 +25,6 @@ public class StaffingLevelInterval {
     private int sequence;
     private int minNoOfStaff;
     private int maxNoOfStaff;
-    @Transient
     private int availableNoOfStaff;
     private Duration staffingLevelDuration;
     private Set<StaffingLevelActivity> staffingLevelActivities=new LinkedHashSet<>();
