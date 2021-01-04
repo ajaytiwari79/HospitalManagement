@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
-import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_DATANOTFOUND;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
 public class AbsenceRankingSettingsService {
@@ -39,7 +39,7 @@ public class AbsenceRankingSettingsService {
     public AbsenceRankingDTO updateAbsenceRankingSettings(AbsenceRankingDTO absenceRankingDTO){
         AbsenceRankingSettings absenceRankingSettings = absenceRankingSettingsRepository.findById(absenceRankingDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Absence Ranking", absenceRankingDTO.getId())));
         if (absenceRankingSettings.getDraftId()!=null) {
-            exceptionService.dataNotFoundByIdException("MESSAGE_DRAFT_COPY_CREATED");
+            exceptionService.dataNotFoundByIdException(MESSAGE_DRAFT_COPY_CREATED);
         }
         if (absenceRankingSettings.isPublished()) {
             // current is published so we need to create a  new copy and update in same
@@ -75,15 +75,15 @@ public class AbsenceRankingSettingsService {
     public AbsenceRankingDTO publishAbsenceRanking(BigInteger id, LocalDate publishedDate) {
         AbsenceRankingSettings absenceRankingSettings = absenceRankingSettingsRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND, "Absence Ranking Settings", id)));
         if (absenceRankingSettings.getActivityRankings().isEmpty()) {
-            exceptionService.actionNotPermittedException("MESSAGE_RANKING_EMPTY");
+            exceptionService.actionNotPermittedException(MESSAGE_RANKING_EMPTY);
         }
         if (absenceRankingSettings.isPublished()) {
-            exceptionService.dataNotFoundByIdException("MESSAGE_RANKING_ALREADYPUBLISHED");
+            exceptionService.dataNotFoundByIdException(MESSAGE_RANKING_ALREADY_PUBLISHED);
         }
-        if (absenceRankingSettings.getStartDate().isAfter(publishedDate) ||
-                (absenceRankingSettings.getEndDate()!=null && absenceRankingSettings.getEndDate().isBefore(publishedDate))) {
-            exceptionService.dataNotFoundByIdException("MESSAGE_PUBLISHDATE_NOTLESSTHAN_STARTDATE");
-        }
+//        if (absenceRankingSettings.getStartDate().isAfter(publishedDate) ||
+//                (absenceRankingSettings.getEndDate()!=null && absenceRankingSettings.getEndDate().isBefore(publishedDate))) {
+//            exceptionService.dataNotFoundByIdException("MESSAGE_PUBLISHDATE_NOTLESSTHAN_STARTDATE");
+//        }
         absenceRankingSettings.setPublished(true);
         absenceRankingSettings.setStartDate(publishedDate); // changing
         AbsenceRankingSettings parentAbsenceRanking = absenceRankingSettingsRepository.findByDraftIdAndDeletedFalse(absenceRankingSettings.getId());
@@ -97,7 +97,7 @@ public class AbsenceRankingSettingsService {
         }
         if (!onGoingUpdated && Optional.ofNullable(parentAbsenceRanking).isPresent()) {
             if (parentAbsenceRanking.getStartDate().isEqual(publishedDate) || parentAbsenceRanking.getStartDate().isAfter(publishedDate)) {
-                exceptionService.dataNotFoundByIdException("MESSAGE_PUBLISHDATE_NOTLESSTHAN_OR_EQUALS_PARENT_STARTDATE");
+                exceptionService.dataNotFoundByIdException(MESSAGE_PUBLISH_DATE_NOT_LESS_THAN_OR_EQUALS_PARENT_START_DATE);
             }
             parentAbsenceRanking.setEndDate(publishedDate.minusDays(1L));
             if (lastAbsenceRanking == null && absenceRankingSettings.getEndDate() != null && absenceRankingSettings.getEndDate().isBefore(publishedDate)) {
