@@ -76,11 +76,32 @@ public class PlanningPeriod extends MongoBaseEntity {
         AtomicReference<LocalDate> start = new AtomicReference<>(startDate);
         Map<LocalDate,BigInteger> localDateMap = new HashMap<LocalDate, BigInteger>(){{
             while (!start.get().isAfter(endDate)){
-                put(startDate,currentPhaseId);
+                put(start.get(),currentPhaseId);
                 start.set(start.get().plusDays(1));
             }
         }};
         return localDateMap;
+    }
+
+    public Map<LocalDate,Boolean> getLocalDatePublishPlanningMap(Long employmentTypeId){
+        AtomicReference<LocalDate> start = new AtomicReference<>(startDate);
+        Map<LocalDate,Boolean> localDateMap = new HashMap<LocalDate, Boolean>(){{
+            while (!start.get().isAfter(endDate)){
+                put(start.get(),publishEmploymentIds.contains(employmentTypeId));
+                start.set(start.get().plusDays(1));
+            }
+        }};
+        return localDateMap;
+    }
+
+    public Set<LocalDate> getLocalDates(){
+        LocalDate start = startDate;
+        Set<LocalDate> localDates = new HashSet<>();
+        while (!start.isAfter(endDate)){
+            localDates.add(start);
+            start = start.plusDays(1);
+        }
+        return localDates;
     }
 
     public enum Type {

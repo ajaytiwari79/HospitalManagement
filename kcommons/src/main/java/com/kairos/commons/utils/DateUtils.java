@@ -273,6 +273,10 @@ public  class DateUtils {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
+    public static LocalDateTime asLocalDateTime(LocalDate date) {
+        return LocalDateTime.of(date,LocalTime.MIN);
+    }
+
     public static Date onlyDate(Date date) {
         return getDateByZoneDateTime(asZonedDateTime(date).truncatedTo(ChronoUnit.DAYS));
     }

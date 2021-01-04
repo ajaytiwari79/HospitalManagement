@@ -37,10 +37,11 @@ db.getCollection('staffActivitySetting').find({}).forEach(function(ac){
 
     if(ac.activityId){
     var activity = db.activities.findOne({"_id":ac.activityId});
-
+    if(activity){
         print(activity._id);
         print(activity.activityBalanceSettings.timeType);
         ac.secondLevelTimtype = activity.activityBalanceSettings.timeType
     db.staffActivitySetting.save(ac);
+    }
         }
     })

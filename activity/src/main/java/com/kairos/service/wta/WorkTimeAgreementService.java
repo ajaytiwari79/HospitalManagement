@@ -523,12 +523,14 @@ public class WorkTimeAgreementService{
         WorkingTimeAgreement finalOrgWTA = orgWTA;
         parentWTA.forEach(currentWTA -> {
             List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyCollectionPropertiesByMapper(verionWTAMap.get(currentWTA.getEmploymentId()), WTAResponseDTO.class);
-            versionWTAs.forEach(wtaResponseDTO -> wtaResponseDTO.setTranslations(finalOrgWTA.getTranslations()));
+            if(isNotNull(finalOrgWTA)) {
+                versionWTAs.forEach(wtaResponseDTO -> wtaResponseDTO.setTranslations(finalOrgWTA.getTranslations()));
+                currentWTA.setTranslations(finalOrgWTA.getTranslations());
+            }
             ruleTemplateService.assignCategoryToRuleTemplate(countryId, currentWTA.getRuleTemplates());
             if (versionWTAs != null && !versionWTAs.isEmpty()) {
                 currentWTA.setVersions(versionWTAs);
             }
-            currentWTA.setTranslations(finalOrgWTA.getTranslations());
         });
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTabId(unitId, ORGANIZATION_AGREEMENT_VERSION_TABLE_ID);
         return new WTATableSettingWrapper(parentWTA, tableConfiguration);

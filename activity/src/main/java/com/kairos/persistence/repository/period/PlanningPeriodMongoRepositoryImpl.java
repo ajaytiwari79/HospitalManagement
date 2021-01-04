@@ -337,9 +337,38 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 getCustomOperationForExpertiseNightWorkSetting(expertiseIds,unitId),
                 getCustomOperationForCountryExpertiseNightWorkSetting(expertiseIds,countryId),
                 getCustomAggregationForPhases(unitId),
-                getCustomAggregationForBreakActivities(unitId,expertiseIds)
+                getCustomAggregationForBreakActivities(unitId,expertiseIds),
+                getCustomAggregationOperationForPlanningPeriods(unitId)
         );
         return mongoTemplate.aggregate(aggregation,PlanningPeriod.class, ShiftDataHelper.class).getMappedResults().get(0);
+    }
+
+    private CustomAggregationOperation getCustomAggregationOperationForPlanningPeriods(Long unitId) {
+        return new CustomAggregationOperation("{\n" +
+                "    \"$lookup\": {\n" +
+                "      \"from\": \"planningPeriod\",\n" +
+                "      \"let\": {\n" +
+                "        \"unitId\":" +unitId+
+                "      },\n" +
+                "      \"pipeline\": [\n" +
+                "        {\n" +
+                "          \"$match\": {\n" +
+                "            \"$expr\": {\n" +
+                "              \"$and\": [\n" +
+                "                {\n" +
+                "                  \"$eq\": [\n" +
+                "                    \"$unitId\",\n" +
+                "                    \"$$unitId\"\n" +
+                "                  ]\n" +
+                "                }\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }" +
+                "      ],\n" +
+                "      \"as\": \"planningPeriods\"\n" +
+                "    }\n" +
+                "  }");
     }
 
     private AggregationOperation getCustomAggregationForBreakActivities(Long unitId,Collection<Long> expertiseIds) {

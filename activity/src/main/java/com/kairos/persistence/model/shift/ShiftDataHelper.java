@@ -1,8 +1,7 @@
 package com.kairos.persistence.model.shift;
 
-import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.break_settings.BreakSettingAndActivitiesWrapper;
 import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
@@ -10,7 +9,6 @@ import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConf
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
-import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.period.PlanningPeriod;
@@ -30,7 +28,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 
 @Getter
@@ -66,6 +63,10 @@ public class ShiftDataHelper {
     private String timeZone;
     private List<PlanningPeriod> planningPeriods;
     private Map<LocalDate,BigInteger> localDatePhaseMap;
+    private DateTimeInterval planningPeriodInterval;
+    private Map<LocalDate, Boolean> dateAndPublishPlanningPeriod;
+    private Map<LocalDate, PhaseDefaultName> dateAndPhaseDefaultName;
+    private Map<LocalDate,Phase> phaseMap;
 
     public WTAQueryResultDTO getWtaByDate(LocalDate localDate,Long employmentId){
         if(isMapEmpty(workingTimeAgreementMap)) {
@@ -180,12 +181,51 @@ public class ShiftDataHelper {
 
     public Map<LocalDate,BigInteger> getDatePhaseIdMap() {
         if(isMapEmpty(localDatePhaseMap)){
-            Map<LocalDate,BigInteger> localDatePhaseIdMap = new HashMap<>();
+            localDatePhaseMap = new HashMap<>();
             for (PlanningPeriod period : planningPeriods) {
-                localDatePhaseIdMap.putAll(period.getLocalDatePhaseIdMap());
+                localDatePhaseMap.putAll(period.getLocalDatePhaseIdMap());
             }
         }
         return localDatePhaseMap;
+    }
+
+    public DateTimeInterval getPlanningPeriodDateTimeInterval() {
+        if(isNull(planningPeriodInterval)){
+            planningPeriodInterval = new DateTimeInterval(planningPeriods.get(0).getStartDate(),planningPeriods.get(planningPeriods.size()-1).getEndDate());
+        }
+        return planningPeriodInterval;
+    }
+
+    public Map<java.time.LocalDate, Boolean> getDateWisePublishPlanningPeriod(Long employmentTypeId, java.time.LocalDate startDate, java.time.LocalDate endDate, Long unitId) {
+        if(isMapEmpty(dateAndPublishPlanningPeriod)){
+            Map<java.time.LocalDate, Boolean> dateAndPublishPlanningPeriod = new HashMap<>();
+            boolean publish;
+            for (PlanningPeriod planningPeriod : this.planningPeriods) {
+                publish = planningPeriod.getPublishEmploymentIds().contains(employmentTypeId);
+                startDate = planningPeriod.getStartDate();
+                endDate = planningPeriod.getEndDate();
+                while (!startDate.isAfter(endDate)) {
+                    dateAndPublishPlanningPeriod.put(startDate, publish);
+                    startDate = startDate.plusDays(1);
+                }
+            }
+        }
+        return dateAndPublishPlanningPeriod;
+    }
+
+    public Map<java.time.LocalDate, PhaseDefaultName> getDatePhaseDefaultName() {
+        if(isMapEmpty(dateAndPhaseDefaultName)){
+            dateAndPhaseDefaultName = phaseMap.entrySet().stream().collect(Collectors.toMap(localDatePhaseEntry -> localDatePhaseEntry.getKey(),v->v.getValue().getPhaseEnum()));
+        }
+        return dateAndPhaseDefaultName;
+    }
+
+    public Map<java.time.LocalDate, Boolean> getDateAndPublishPlanningPeriod(Long employmentTypeId) {
+        if(isMapEmpty(dateAndPublishPlanningPeriod)){
+            dateAndPublishPlanningPeriod = new HashMap<>();
+            planningPeriods.forEach(planningPeriod1 -> dateAndPublishPlanningPeriod.putAll(planningPeriod1.getLocalDatePublishPlanningMap(employmentTypeId)));
+        }
+        return dateAndPublishPlanningPeriod;
     }
 }
 
