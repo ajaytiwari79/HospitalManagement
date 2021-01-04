@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -53,6 +54,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -315,7 +317,9 @@ public class AccessGroupService {
         ObjectMapper objectMapper = new ObjectMapper();
         List<AccessPageQueryResult> queryResults = new ArrayList<>();
         for (Map<String, Object> accessPage : accessPages) {
-            AccessPageQueryResult accessPageQueryResult = objectMapper.convertValue((Map<String, Object>) accessPage.get("data"), AccessPageQueryResult.class);
+            Map<String, Object> data = ObjectMapperUtils.copyPropertiesByMapper(accessPage.get("data"), HashedMap.class);
+            TranslationUtil.convertTranslationFromStringToMap(data);
+            AccessPageQueryResult accessPageQueryResult = objectMapper.convertValue(data, AccessPageQueryResult.class);
             queryResults.add(accessPageQueryResult);
         }
         List<AccessPageQueryResult> treeData = getAccessPageHierarchy(queryResults, queryResults);
