@@ -69,6 +69,9 @@ public class StaffingLevelActivity {
         return Math.min(maxNoOfStaff+initialOverStaffing-availableNoOfStaff,initialOverStaffing);
     }
 
+    public void setAvailableNoOfStaff(int availableNoOfStaff) {
+        this.availableNoOfStaff = availableNoOfStaff < 0 ? 0 : availableNoOfStaff;
+    }
 
     @Override
     public boolean equals(Object o) {
