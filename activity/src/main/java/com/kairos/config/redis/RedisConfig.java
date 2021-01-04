@@ -15,7 +15,6 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.Map;
 
@@ -52,10 +51,9 @@ public class RedisConfig {
     @Bean
     @ConditionalOnMissingBean
     public RedisConnectionFactory redisConnectionFactory() {
-
-        JedisPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setTestOnBorrow(true);
-        poolConfig.setTestOnReturn(true);
+//        JedisPoolConfig poolConfig = new JedisPoolConfig();
+//        poolConfig.setTestOnBorrow(true);
+//        poolConfig.setTestOnReturn(true);
         RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration(redisHostName, redisPort);
         standaloneConfiguration.setPassword(RedisPassword.of(passcode));
         return new JedisConnectionFactory(standaloneConfiguration);
@@ -76,13 +74,12 @@ public class RedisConfig {
     public RedisTemplate<Object, Object> redisTemplate() {
         RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
-        redisTemplate.setExposeConnection(true);
         return redisTemplate;
     }
 
     @Bean
     public CacheManager cacheManager() {
-        RedisCacheManager redisCacheManager = RedisCacheManager.builder(redisConnectionFactory()).build();
+        RedisCacheManager redisCacheManager = RedisCacheManager.create(redisConnectionFactory());
         redisCacheManager.setTransactionAware(true);
         return redisCacheManager;
     }

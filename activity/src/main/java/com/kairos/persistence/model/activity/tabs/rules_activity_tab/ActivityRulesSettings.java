@@ -8,6 +8,7 @@ import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,7 +20,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class ActivityRulesSettings {
+public class ActivityRulesSettings implements Serializable {
 
 
     private boolean eligibleForFinalSchedule;
@@ -28,7 +29,7 @@ public class ActivityRulesSettings {
     private boolean lockLengthPresent;
     private boolean eligibleToBeForced;
     @KPermissionField
-    private List<BigInteger> dayTypes= new ArrayList<>();
+    private List<BigInteger> dayTypes = new ArrayList<>();
     @KPermissionField
     private boolean eligibleForStaffingLevel;
     @KPermissionField
