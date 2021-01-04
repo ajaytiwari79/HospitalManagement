@@ -1134,7 +1134,7 @@ public class StaffingLevelService {
             staffingLevelAvailableCountService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, shifts);
             StaffingLevelUtil.setStaffingLevelDetails(staffingLevel);
         }
-        staffingLevelMongoRepository.saveEntities(staffingLevels);
+        //staffingLevelMongoRepository.saveEntities(staffingLevels);
         return true;
     }
 }

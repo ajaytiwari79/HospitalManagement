@@ -174,6 +174,7 @@ public class StaffingLevelAvailableCountService {
                 }
             }
         }
+        staffingLevelMongoRepository.save(staffingLevel);
         return staffingLevel;
     }
 }
