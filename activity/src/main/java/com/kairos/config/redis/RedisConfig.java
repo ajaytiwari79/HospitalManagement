@@ -11,7 +11,7 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -51,24 +51,11 @@ public class RedisConfig {
     @Bean
     @ConditionalOnMissingBean
     public RedisConnectionFactory redisConnectionFactory() {
-//        JedisPoolConfig poolConfig = new JedisPoolConfig();
-//        poolConfig.setTestOnBorrow(true);
-//        poolConfig.setTestOnReturn(true);
         RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration(redisHostName, redisPort);
         standaloneConfiguration.setPassword(RedisPassword.of(passcode));
-        return new JedisConnectionFactory(standaloneConfiguration);
+        return new LettuceConnectionFactory(standaloneConfiguration);
     }
 
-
-   /* @Bean
-    public JedisConnectionFactory jedisConnectionFactory(){
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(this.redisHostName);
-        redisStandaloneConfiguration.setPort(this.redisPort);
-        redisStandaloneConfiguration.setPassword(RedisPassword.of(this.passcode));
-        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
-        return jedisConnectionFactory;
-    }*/
 
     @Bean
     public RedisTemplate<Object, Object> redisTemplate() {
