@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_DATANOTFOUND;
 import static com.kairos.enums.TimeTypeEnum.ABSENCE;
@@ -62,8 +63,12 @@ public class AbsenceRankingSettingsService {
         return absenceRankingSettingsRepository.getAbsenceRankingSettingsByDeletedFalse();
     }
 
-    public List<AbsenceRankingDTO> getAbsenceRankingSettings(Long expertiseId){
-        return absenceRankingSettingsRepository.getAbsenceRankingSettingsByExpertiseIdAndDeletedFalse(expertiseId);
+    public List<AbsenceRankingDTO> getAbsenceRankingSettings(Long expertiseId, Boolean published){
+        if(isNotNull(published)){
+            return absenceRankingSettingsRepository.getAbsenceRankingSettingsByExpertiseIdAndPublishedAndDeletedFalse(expertiseId, published);
+        } else {
+            return absenceRankingSettingsRepository.getAbsenceRankingSettingsByExpertiseIdAndDeletedFalse(expertiseId);
+        }
     }
 
     public boolean deleteAbsenceRankingSettings(BigInteger id){
