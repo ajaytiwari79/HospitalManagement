@@ -2,6 +2,7 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
@@ -48,6 +49,7 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
     private int restingTime;
     private PartOfDay sequenceShiftFrom;
     private PartOfDay sequenceShiftTo;
+    private transient DateTimeInterval interval;
 
     private List<BigInteger> timeTypeIds = new ArrayList<>();
 
@@ -60,16 +62,15 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
         if(!isDisabled() && CollectionUtils.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())){
             TimeSlot timeSlotWrapper = getTimeSlotWrapper(infoWrapper, infoWrapper.getShift());
             if(isNotNull(timeSlotWrapper)) {
-                int totalOccurrencesSequenceShift = getOccurrencesSequenceShift(infoWrapper);
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
-                boolean isValid = isValid(MAXIMUM, limitAndCounter[0], totalOccurrencesSequenceShift);
+                boolean isValid = getOccurrencesSequenceShift(infoWrapper,limitAndCounter[0]);
                 brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
                         limitAndCounter[2], DurationType.DAYS.toValue(),String.valueOf(limitAndCounter[0]));
             }
         }
     }
 
-    private int getOccurrencesSequenceShift(RuleTemplateSpecificInfo infoWrapper){
+    private boolean getOccurrencesSequenceShift(RuleTemplateSpecificInfo infoWrapper,int value){
         int totalOccurrencesSequenceShift = 0;
         List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts();
         shifts.add(infoWrapper.getShift());
@@ -82,10 +83,13 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
                 Period period = Period.between(asLocalDate(shifts.get(i).getStartDate()), asLocalDate(shifts.get(i+1).getStartDate()));
                 if(period.getDays() < 2) {
                     totalOccurrencesSequenceShift++;
+                    if(!isValid(MAXIMUM, value, totalOccurrencesSequenceShift)){
+                        return false;
+                    }
                 }
             }
         }
-        return totalOccurrencesSequenceShift;
+        return true;
     }
 
     private TimeSlot getTimeSlotWrapper(RuleTemplateSpecificInfo infoWrapper, ShiftWithActivityDTO shift){

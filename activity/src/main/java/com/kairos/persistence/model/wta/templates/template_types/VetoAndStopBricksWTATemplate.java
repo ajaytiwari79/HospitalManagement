@@ -45,6 +45,7 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
     private BigInteger stopBrickActivityId;
     @Positive(message = "message.ruleTemplate.blocking.point")
     private float totalBlockingPoints; // It's for a duration from @validationStartDate  till the @numberOfWeeks
+    private transient DateTimeInterval interval;
 
     public VetoAndStopBricksWTATemplate() {
         this.wtaTemplateType = WTATemplateType.VETO_AND_STOP_BRICKS;
@@ -62,12 +63,10 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled() && CollectionUtils.containsAny(infoWrapper.getShift().getActivityIds(),getActivityIds()) && validationStartDate.minusDays(1).isBefore(DateUtils.asLocalDate(infoWrapper.getShift().getStartDate()))) {
-            DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift().getStartDate(), numberOfWeeks, validationStartDate,infoWrapper.getLastPlanningPeriodEndDate());
             int totalVeto = 0;
             int totalStopBricks = 0;
-            List<ShiftWithActivityDTO> shifts = new ArrayList<>(infoWrapper.getShifts());
-            shifts.add(infoWrapper.getShift());
-            for (ShiftWithActivityDTO shift : shifts) {
+            boolean isValid = true;
+            for (ShiftWithActivityDTO shift : infoWrapper.getShifts()) {
                 if(interval.contains(shift.getStartDate())){
                     if (shift.getActivityIds().contains(vetoActivityId)) {
                         totalVeto++;
@@ -75,8 +74,10 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
                         totalStopBricks++;
                     }
                 }
+                if(!validateVetoAndStopBrickRules(totalBlockingPoints, totalVeto, totalStopBricks)){
+                    isValid = false;
+                }
             }
-            boolean isValid = validateVetoAndStopBrickRules(totalBlockingPoints, totalVeto, totalStopBricks);
             if (!isValid) {
                 WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                         new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
