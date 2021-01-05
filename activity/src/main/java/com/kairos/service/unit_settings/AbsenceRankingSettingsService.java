@@ -17,8 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
@@ -109,6 +108,7 @@ public class AbsenceRankingSettingsService {
                 absenceRankingSettings.setEndDate(null);
             }
         }
+        if(isNull(parentAbsenceRanking))
         parentAbsenceRanking.setDraftId(null);
         absenceRankingSettingsRepository.saveEntities(newArrayList(absenceRankingSettings,parentAbsenceRanking));
         return ObjectMapperUtils.copyPropertiesByMapper(parentAbsenceRanking,AbsenceRankingDTO.class);
