@@ -108,9 +108,11 @@ public class AbsenceRankingSettingsService {
                 absenceRankingSettings.setEndDate(null);
             }
         }
-        if(isNull(parentAbsenceRanking))
-        parentAbsenceRanking.setDraftId(null);
-        absenceRankingSettingsRepository.saveEntities(newArrayList(absenceRankingSettings,parentAbsenceRanking));
+        if(isNotNull(parentAbsenceRanking)){
+            parentAbsenceRanking.setDraftId(null);
+            absenceRankingSettingsRepository.save(parentAbsenceRanking);
+        }
+        absenceRankingSettingsRepository.save(absenceRankingSettings);
         return ObjectMapperUtils.copyPropertiesByMapper(parentAbsenceRanking,AbsenceRankingDTO.class);
 
     }
