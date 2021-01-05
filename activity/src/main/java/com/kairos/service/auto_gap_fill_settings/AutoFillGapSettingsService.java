@@ -22,6 +22,7 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.gap_settings.AutoFillGapSettingsMongoRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftValidatorService;
+import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -31,8 +32,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.STAFF;
@@ -51,7 +51,7 @@ public class AutoFillGapSettingsService {
 
     public AutoFillGapSettingsDTO createAutoFillGapSettings(AutoFillGapSettingsDTO autoFillGapSettingsDTO, boolean forCountry) {
         AutoFillGapSettings autoFillGapSettings = ObjectMapperUtils.copyPropertiesByMapper(autoFillGapSettingsDTO, AutoFillGapSettings.class);
-        if(autoFillGapSettings.isPublished()) {
+        if (autoFillGapSettings.isPublished()) {
             validateGapSetting(autoFillGapSettings, forCountry);
         }
         autoFillGapSettingsMongoRepository.save(autoFillGapSettings);
@@ -65,15 +65,15 @@ public class AutoFillGapSettingsService {
             exceptionService.dataNotFoundByIdException(ERROR_AUTO_FILL_GAP_SETTING_NOT_FOUND);
         }
         AutoFillGapSettings autoFillGapSettings = ObjectMapperUtils.copyPropertiesByMapper(autoFillGapSettingsDTO, AutoFillGapSettings.class);
-        if(autoFillGapSettings.isPublished()) {
-            if(autoFillGapSettingsFromDB.isPublished()){
+        if (autoFillGapSettings.isPublished()) {
+            if (autoFillGapSettingsFromDB.isPublished()) {
                 exceptionService.actionNotPermittedException(ERROR_ALREADY_AUTO_FILL_GAP_SETTING_PUBLISH);
             }
             validateGapSetting(autoFillGapSettings, forCountry);
             updateEndDate(autoFillGapSettings);
         } else {
-            if(autoFillGapSettingsFromDB.isPublished()){
-                if(isNotNull(autoFillGapSettingsMongoRepository.getGapSettingsByParentId(autoFillGapSettingsDTO.getId()))){
+            if (autoFillGapSettingsFromDB.isPublished()) {
+                if (isNotNull(autoFillGapSettingsMongoRepository.getGapSettingsByParentId(autoFillGapSettingsDTO.getId()))) {
                     exceptionService.actionNotPermittedException(ERROR_DRAFT_COPY_ALREADY_CREATED);
                 }
                 autoFillGapSettings.setParentId(autoFillGapSettings.getId());
@@ -91,23 +91,23 @@ public class AutoFillGapSettingsService {
         } else {
             duplicateAutoFillGapSettings = autoFillGapSettingsMongoRepository.getGapSettingsForUnit(autoFillGapSettings.getUnitId(), autoFillGapSettings.getOrganizationTypeId(), autoFillGapSettings.getOrganizationSubTypeId(), autoFillGapSettings.getPhaseId(), autoFillGapSettings.getAutoGapFillingScenario().toString(), autoFillGapSettings.getId(), autoFillGapSettings.getGapApplicableFor().toString(), autoFillGapSettings.getStartDate());
         }
-        if(isNotNull(duplicateAutoFillGapSettings)){
+        if (isNotNull(duplicateAutoFillGapSettings)) {
             exceptionService.duplicateDataException(ERROR_DUPLICATE_AUTO_FILL_GAP_SETTING_FOUND);
         }
     }
 
     private void updateEndDate(AutoFillGapSettings autoFillGapSettings) {
         AutoFillGapSettings parentAutoFillGapSettings = null;
-        if(isNotNull(autoFillGapSettings.getParentId())){
+        if (isNotNull(autoFillGapSettings.getParentId())) {
             parentAutoFillGapSettings = autoFillGapSettingsMongoRepository.findOne(autoFillGapSettings.getParentId());
         }
         LocalDate endDate = autoFillGapSettings.getEndDate();
-        if(isNotNull(parentAutoFillGapSettings)) {
-            if(autoFillGapSettings.getStartDate().isAfter(parentAutoFillGapSettings.getStartDate()) && isNull(parentAutoFillGapSettings.getEndDate()) || autoFillGapSettings.getStartDate().isBefore(parentAutoFillGapSettings.getEndDate())) {
+        if (isNotNull(parentAutoFillGapSettings)) {
+            if (autoFillGapSettings.getStartDate().isAfter(parentAutoFillGapSettings.getStartDate()) && isNull(parentAutoFillGapSettings.getEndDate()) || autoFillGapSettings.getStartDate().isBefore(parentAutoFillGapSettings.getEndDate())) {
                 endDate = parentAutoFillGapSettings.getEndDate();
                 parentAutoFillGapSettings.setEndDate(autoFillGapSettings.getStartDate().minusDays(1));
                 autoFillGapSettingsMongoRepository.save(parentAutoFillGapSettings);
-            } else if(autoFillGapSettings.getStartDate().isBefore(parentAutoFillGapSettings.getStartDate())) {
+            } else if (autoFillGapSettings.getStartDate().isBefore(parentAutoFillGapSettings.getStartDate())) {
                 endDate = parentAutoFillGapSettings.getEndDate().minusDays(1);
             }
         }
@@ -141,19 +141,13 @@ public class AutoFillGapSettingsService {
             ShiftActivityDTO shiftActivityBeforeGap = activities[0];
             ShiftActivityDTO shiftActivityAfterGap = activities[1];
             Set<BigInteger> allProductiveActivityIds = staffAdditionalInfoDTO.getTeamsData().stream().flatMap(k -> k.getActivityIds().stream()).collect(Collectors.toSet());
-            //TODO create a seperate query to fetch only specifoic data
+            allProductiveActivityIds.addAll(newHashSet(shiftActivityBeforeGap.getActivityId(),shiftActivityAfterGap.getActivityId()));
             List<ActivityWrapper> activityList = activityMongoRepository.findParentActivitiesAndTimeTypeByActivityId(allProductiveActivityIds);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activityList.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-            shiftActivityBeforeGap.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityBeforeGap.getActivityId()).getActivity(),ActivityDTO.class));
-            shiftActivityBeforeGap.getActivity().setTimeType(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityBeforeGap.getActivityId()).getTimeTypeInfo(), TimeTypeDTO.class));
-            shiftActivityAfterGap.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityAfterGap.getActivityId()).getActivity(),ActivityDTO.class));
-            shiftActivityAfterGap.getActivity().setTimeType(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityAfterGap.getActivityId()).getTimeTypeInfo(), TimeTypeDTO.class));
-            shiftActivityBeforeGap.getActivity().setActivityPriority(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityBeforeGap.getActivityId()), ActivityPriorityDTO.class));
-            shiftActivityAfterGap.getActivity().setActivityPriority(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityAfterGap.getActivityId()), ActivityPriorityDTO.class));
-            //TODO Don't need to send activity list along with map
+            filterActivities(staffAdditionalInfoDTO.getTeamsData(), activityWrapperMap, shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet()));
+            setBasicDetails(shiftActivityBeforeGap, shiftActivityAfterGap, activityWrapperMap);
             Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = updateStaffingLevelDetails(activityList, activities, phase, activityWrapperMap);
             AutoGapFillingScenario gapFillingScenario = getGapFillingScenario(shiftActivityBeforeGap, shiftActivityAfterGap);
-            //TODO merge this call with activity fetch
             AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), staffAdditionalInfoDTO.getOrganizationType().getId(), staffAdditionalInfoDTO.getOrganizationSubType().getId(), phase.getId(), gapFillingScenario.toString(), null, staffAdditionalInfoDTO.getRoles().contains(MANAGEMENT) ? MANAGEMENT.toString() : STAFF.toString(), shiftDTO.getShiftDate(), shiftDTO.getShiftDate());
             ShiftActivityDTO shiftActivityDTO = getActivityToFillTheGap(staffAdditionalInfoDTO, shiftActivityBeforeGap, shiftActivityAfterGap, gapFillingScenario, gapSettings, staffingLevelActivityWithDurationMap, activityList);
             for (int index = 0; index < shiftDTO.getActivities().size() - 1; index++) {
@@ -164,6 +158,15 @@ public class AutoFillGapSettingsService {
             }
             shiftDTO.setActivities(shiftDTO.getActivities());
         }
+    }
+
+    public void setBasicDetails(ShiftActivityDTO shiftActivityBeforeGap, ShiftActivityDTO shiftActivityAfterGap, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        shiftActivityBeforeGap.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityBeforeGap.getActivityId()).getActivity(), ActivityDTO.class));
+        shiftActivityBeforeGap.getActivity().setTimeType(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityBeforeGap.getActivityId()).getTimeTypeInfo(), TimeTypeDTO.class));
+        shiftActivityAfterGap.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityAfterGap.getActivityId()).getActivity(), ActivityDTO.class));
+        shiftActivityAfterGap.getActivity().setTimeType(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityAfterGap.getActivityId()).getTimeTypeInfo(), TimeTypeDTO.class));
+        shiftActivityBeforeGap.getActivity().setActivityPriority(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityBeforeGap.getActivityId()), ActivityPriorityDTO.class));
+        shiftActivityAfterGap.getActivity().setActivityPriority(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityAfterGap.getActivityId()), ActivityPriorityDTO.class));
     }
 
 
@@ -183,11 +186,14 @@ public class AutoFillGapSettingsService {
                 shiftActivityDTO = getApplicableActivityForProductiveTypeOnBothSide(gapSettings, shiftActivityBeforeGap, shiftActivityAfterGap, staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList);
                 break;
             case ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE:
-                shiftActivityDTO = getApplicableActivityForProductiveTypeOnOneSide( gapSettings, shiftActivityBeforeGap, shiftActivityAfterGap, staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList);
+                shiftActivityDTO = getApplicableActivityForProductiveTypeOnOneSide(gapSettings, shiftActivityBeforeGap, shiftActivityAfterGap, staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList);
                 break;
             default:
-                shiftActivityDTO =  new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), shiftActivityBeforeGap.getActivityId(), null);
+                shiftActivityDTO = new ShiftActivityDTO("", shiftActivityBeforeGap.getEndDate(), shiftActivityAfterGap.getStartDate(), shiftActivityBeforeGap.getActivityId(), null);
                 break;
+        }
+        if(isNull(shiftActivityDTO)){
+            exceptionService.actionNotPermittedException("gap.filling.configuration.absent");
         }
         return shiftActivityDTO;
     }
@@ -210,7 +216,7 @@ public class AutoFillGapSettingsService {
                     break;
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE2:
                     List<ActivityWrapper> activityWrappers = activityList.stream().filter(k -> !k.getActivity().getId().equals(productiveActivity.getActivityId())).collect(Collectors.toList());
-                    BigInteger activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityWrappers);
+                    BigInteger activityId = staffingLevelActivityWithDurationMap.isEmpty() ? null : getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityWrappers);
                     if (activityId != null) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
                     }
@@ -220,7 +226,7 @@ public class AutoFillGapSettingsService {
                     return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), beforeGap.getActivity().getTimeType().isPartOfTeam() ? afterGap.getActivityId() : beforeGap.getActivityId(), null);
                 case RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE2:
                     activityWrappers = activityList.stream().filter(k -> !k.getActivity().getId().equals(productiveActivity.getActivityId())).collect(Collectors.toList());
-                    activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityWrappers);
+                    activityId =staffingLevelActivityWithDurationMap.isEmpty() ? null : getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityWrappers);
                     if (activityId != null) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
                     }
@@ -269,7 +275,9 @@ public class AutoFillGapSettingsService {
     private ShiftActivityDTO getApplicableActivityForProductiveTypeOnBothSide(AutoFillGapSettings gapSettings, ShiftActivityDTO beforeGap, ShiftActivityDTO afterGap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityList) {
         ShiftActivityDTO shiftActivityDTO = null;
         TeamDTO mainTeam = staffAdditionalInfoDTO.getTeamsData().stream().filter(k -> TeamType.MAIN.equals(k.getTeamType())).findAny().orElse(null);
-        TeamDTO highestRankTeam = staffAdditionalInfoDTO.getTeamsData().stream().sorted(Comparator.comparing(TeamDTO::getSequence)).collect(Collectors.toList()).get(0);
+        staffAdditionalInfoDTO.setTeamsData(staffAdditionalInfoDTO.getTeamsData().stream().sorted(Comparator.comparing(TeamDTO::getSequence)).collect(Collectors.toList()));
+        TeamDTO highestRankTeam = staffAdditionalInfoDTO.getTeamsData().get(0);
+        TeamDTO highestRankTeamApartFromShift = staffAdditionalInfoDTO.getTeamsData().stream().filter(k -> !k.getActivityIds().contains(beforeGap.getActivityId()) && !k.getActivityIds().contains(afterGap.getActivityId())).findFirst().orElse(null);
         for (AutoFillGapSettingsRule autoFillGapSettingsRule : gapSettings.getSelectedAutoFillGapSettingsRules()) {
             switch (autoFillGapSettingsRule) {
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1:
@@ -281,8 +289,13 @@ public class AutoFillGapSettingsService {
                     break;
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE3:
                 case RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1:
+                    BigInteger activityId = afterGap.getActivity().getActivityPriority().getSequence() < beforeGap.getActivity().getActivityPriority().getSequence() ? afterGap.getActivityId() : beforeGap.getActivityId();
+                    return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
                 case RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2:
-                    return beforeGap.getActivity().getActivityPriority().getSequence() < afterGap.getActivity().getActivityPriority().getSequence() ? new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), beforeGap.getActivityId(), null) : new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), afterGap.getActivityId(), null);
+                    if(highestRankTeam!=null){
+                        return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), highestRankTeam.getActivityIds().iterator().next(), null);
+                    }
+                    break;
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE1:
                     if (mainTeam != null && staffingLevelActivityWithDurationMap.get(mainTeam.getActivityIds().iterator().next()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeam.getActivityIds().iterator().next(), null);
@@ -294,7 +307,7 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE3:
-                    BigInteger activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, new ArrayList<>());
+                    activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, new ArrayList<>());
                     if (activityId != null) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
                     }
@@ -306,13 +319,13 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE1:
-                    if (staffingLevelActivityWithDurationMap.get(highestRankTeam.getActivityIds().iterator().next()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0 && !beforeGap.getActivity().getId().equals(highestRankTeam.getActivityIds().iterator().next()) && !afterGap.getActivity().getId().equals(highestRankTeam.getActivityIds().iterator().next())) {
-                        return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeam.getActivityIds().iterator().next(), null);
+                    if (highestRankTeamApartFromShift != null && staffingLevelActivityWithDurationMap.get(highestRankTeamApartFromShift.getActivityIds().iterator().next()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
+                        return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), highestRankTeamApartFromShift.getActivityIds().iterator().next(), null);
                     }
                     break;
                 case RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE2:
-                    short durationOfBefore = staffingLevelActivityWithDurationMap.get(beforeGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes();
-                    short durationOfAfter = staffingLevelActivityWithDurationMap.get(afterGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes();
+                    short durationOfBefore = staffingLevelActivityWithDurationMap.containsKey(beforeGap.getActivityId()) ? staffingLevelActivityWithDurationMap.get(beforeGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() : 0;
+                    short durationOfAfter = staffingLevelActivityWithDurationMap.containsKey(afterGap.getActivityId()) ? staffingLevelActivityWithDurationMap.get(afterGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() : 0;
                     if (durationOfBefore != 0 || durationOfAfter != 0) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), durationOfBefore > durationOfAfter ? beforeGap.getActivityId() : afterGap.getActivityId(), null);
                     }
@@ -339,6 +352,9 @@ public class AutoFillGapSettingsService {
 
     private BigInteger getHighestRankActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityWrappers) {
         List<BigInteger> allActivitySolvingMaxDuration = getActivitiesResolvingMostProblem(staffingLevelActivityWithDurationMap);
+        if(allActivitySolvingMaxDuration.isEmpty()){
+            return null;
+        }
         short solvedDuration = staffingLevelActivityWithDurationMap.get(allActivitySolvingMaxDuration.get(0)).getResolvingUnderOrOverStaffingDurationInMinutes();
         Set<BigInteger> solvingEqualProblems = new HashSet<>();
         solvingEqualProblems.add(allActivitySolvingMaxDuration.get(0));
@@ -380,7 +396,7 @@ public class AutoFillGapSettingsService {
         shift.setUnitId(phase.getOrganizationId());
         Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = new HashMap<>();
         for (ShiftActivity shiftActivity : shiftActivities) {
-            staffingLevelService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, null, staffingLevelActivityWithDurationMap);
+            staffingLevelService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, new RuleTemplateSpecificInfo(), staffingLevelActivityWithDurationMap);
         }
         return staffingLevelActivityWithDurationMap;
     }
@@ -388,7 +404,7 @@ public class AutoFillGapSettingsService {
     private List<BigInteger> getActivitiesResolvingMostProblem(Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap) {
         Map<Short, BigInteger> solvingMostProblem = new TreeMap<>(Collections.reverseOrder());
         staffingLevelActivityWithDurationMap.forEach((k, v) -> solvingMostProblem.put(v.getResolvingUnderOrOverStaffingDurationInMinutes(), v.getActivityId()));
-        return (List<BigInteger>) solvingMostProblem.values();
+        return new ArrayList<>(solvingMostProblem.values());
     }
 
     private BigInteger getHighestRankedActivity(Set<BigInteger> activityIds, List<TeamDTO> teamsData, List<ActivityWrapper> activityList) {
@@ -408,6 +424,16 @@ public class AutoFillGapSettingsService {
             }
         }
         return null;
+    }
+
+    private void filterActivities(List<TeamDTO> teamDTOS, Map<BigInteger, ActivityWrapper> activityWrapperMap, Set<BigInteger> activityIds, Set<BigInteger> activityIdsDB) {
+        teamDTOS.forEach(team -> {
+            team.getActivityIds().removeIf(k -> !activityWrapperMap.containsKey(k));
+            activityIdsDB.removeAll(activityIds);
+            team.getActivityIds().removeAll(activityIdsDB);
+        });
+        teamDTOS.removeIf(k -> k.getActivityIds().isEmpty());
+
     }
 
 
