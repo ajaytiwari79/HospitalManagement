@@ -375,6 +375,10 @@ Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]->(acces
 Match(ap:AccessPage) where ap.moduleId="tab_244" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Protected Days Off Settings",isModule:false,moduleId:"tab_459",active:true,`translatedNames.english`:"Protected Days Off Settings"});
 
 Match(ap:AccessPage) where ap.moduleId="tab_244" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Auto-fill gap",isModule:false,moduleId:"tab_460",active:true,`translatedNames.english`:"Auto-fill gap"});
-Match(ap:AccessPage) where ap.moduleId="tab_82" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Auto-fill gap",isModule:false,moduleId:"tab_461",active:true,`translatedNames.english`:"Auto-fill gap"});
+Match(ap:AccessPage) where ap.moduleId="tab_161" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Auto-fill gap",isModule:false,moduleId:"tab_461",active:true,`translatedNames.english`:"Auto-fill gap"});
 
 Match(ap:AccessPage) where ap.moduleId="tab_244" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Activity Ranking",isModule:false,moduleId:"tab_462",active:true,`translatedNames.english`:"Activity Ranking"});
+
+Match(ap:AccessPage) where ap.moduleId="module_3" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Cover Shift",isModule:false,moduleId:"tab_463",active:true,`translatedNames.english`:"Cover Shift"});
+Match(ap:AccessPage) where ap.moduleId="tab_463" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Settings",isModule:false,moduleId:"tab_464",active:true,`translatedNames.english`:"Settings"});
+
