@@ -41,7 +41,6 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
@@ -167,8 +166,6 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
-    private ActivityPriorityService activityPriorityService;
-    @Inject
     private OpenShiftRuleTemplateService openShiftRuleTemplateService;
     @Inject
     private KPISetService kpiSetService;
@@ -264,11 +261,6 @@ public class OrganizationActivityService extends MongoBaseService {
         ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
         activityDTO.setActivityBalanceSettings(ObjectMapperUtils.copyPropertiesByMapper(activity.getActivityBalanceSettings(), ActivityBalanceSettingDTO.class));
         BeanUtils.copyProperties(activity, activityDTO);
-        /*Optional<TimeType> timeType=timeTypeMongoRepository.findById(activity.getActivityBalanceSettings().getTimeTypeId());
-        if(timeType.isPresent()){
-            activityDTO.setActivityCanBeCopied(timeType.get().isActivityCanBeCopied());
-        }*/
-        activityDTO.setActivityPriorityId(activity.getActivityPriorityId());
         return activityDTO;
 
     }
@@ -380,22 +372,6 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setCountryId(null);
         //TODO Refactor below query or might need to add parent id in activity priority domain while copying from country to organization
         TimeType timeType = timeTypeMongoRepository.findOneById(activity.getActivityBalanceSettings().getTimeTypeId());
-
-//        if (isNotNull(timeType.getActivityPriorityId())) {
-//            ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(timeType.getActivityPriorityId());
-//            ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
-//            if (isNotNull(unitActivityPriority)) {
-//                activityCopied.setActivityPriorityId(unitActivityPriority.getId());
-//            }
-//        }
-
-        if (isNotNull(timeType.getActivityPriorityId())) {
-            ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(timeType.getActivityPriorityId());
-            ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
-            if (isNotNull(unitActivityPriority)) {
-                activityCopied.setActivityPriorityId(unitActivityPriority.getId());
-            }
-        }
         updateSkills(activityCopied);
         // activityCopied.setCompositeActivities(null);
         return activityCopied;
@@ -571,7 +547,6 @@ public class OrganizationActivityService extends MongoBaseService {
         createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
         TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
         timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
-        activityPriorityService.createActivityPriorityForNewOrganization(unitId, orgTypeAndSubTypeDTO.getCountryId());
         periodSettingsService.createDefaultPeriodSettings(unitId);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
         openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId, orgTypeAndSubTypeDTO);

@@ -41,6 +41,7 @@ public class EmploymentTypeDTO {
     private Map<String,String> translatedDescriptions;
     @Convert(TranslationConverter.class)
     private Map<String, TranslationInfo> translations ;
+    private boolean canRankTeam;
 
     public EmploymentTypeDTO() {
         //Default Constructor

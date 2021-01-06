@@ -42,7 +42,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "WITH team,COLLECT(DISTINCT{staffId:id(teamMembers),teamType:staffRel.teamType,startDate:staffRel.startDate,endDate:staffRel.endDate,sequence:staffRel.sequence,teamMembership:staffRel.teamMembership}) as staffDetails\n" +
             "OPTIONAL MATCH (team)-[:"+TEAM_HAS_SKILLS+"]->(skills:Skill) with team, COLLECT (id(skills)) as skillIds ,staffDetails\n" +
             "RETURN team.translations as translations,\n" +
-            "id(team) as id, team.name as name, team.description as description, team.activityIds as activityIds, skillIds as skillIds,staffDetails as staffDetails")
+            "id(team) as id, team.name as name, team.description as description, team.activityId as activityId, skillIds as skillIds,staffDetails as staffDetails")
     TeamDTO getTeamDetailsById(long teamId);
 
     @Query(" MATCH (t:Team),(s:Skill) WHERE id(s) IN {1} AND id(t)={0}  " +
@@ -120,9 +120,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     List<FilterSelectionQueryResult> getTeamsByUnitIdForFilters(long organizationId);
 
     @Query("MATCH (team:Team{isEnabled:true,deleted:false}) WHERE id(team) IN {0} " +
-            "WITH team.activityIds AS activityIds\n" +
-            "UNWIND activityIds AS activities\n" +
-            "RETURN DISTINCT activities")
+            "RETURN COLLECT(team.activityId)")
     List<BigInteger> getTeamActivityIdsByTeamIds(List<Long> teamIds);
 
     @Query("MATCH (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) WHERE id(team)={0} AND id(os)={1} SET r.customName={2} \n"+
@@ -139,24 +137,17 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     Boolean teamExistInOrganizationByName(Long organizationId, Long teamId, String teamName);
 
     @Query("MATCH(staff:Staff)-[:TEAM_HAS_MEMBER]-(team:Team{isEnabled:true}) WHERE id(staff)={0} \n" +
-            "WITH team.activityIds AS activityIds\n" +
-            "UNWIND activityIds AS activities\n" +
-            "RETURN DISTINCT activities")
+            "RETURN COLLECT(team.activityId)")
     List<BigInteger> getTeamActivitiesOfStaff(Long staffId);
 
-    @Query("MATCH(team:Team{deleted:false}) WHERE ANY(activity IN team.activityIds WHERE activity=toString({0})) " +
+    @Query("MATCH(team:Team{deleted:false}) team.activityId =toString({0}) " +
             "RETURN count(team)>0")
     boolean activityExistInTeamByActivityId(BigInteger activityId);
 
-    List<Team> findAllByDeletedFalseAndIsEnabledTrue();
-
     @Query("MATCH (unit:Unit)-[:" + HAS_TEAMS + "]->(team:Team)-[:" + TEAM_HAS_MEMBER + "]->(teamMembers:Staff) \n" +
-            "WHERE id(unit) = {0} AND ANY(activityId IN team.activityIds WHERE toInteger(activityId) IN {1}) \n" +
+            "WHERE id(unit) = {0} AND team.activityId  IN {1}) \n" +
             "RETURN DISTINCT id(teamMembers)")
     List<Long> getAllStaffToAssignActivitiesByTeam(Long unitId, Collection<BigInteger> activityIds);
-
-    @Query("MATCH(team:Team) WHERE ANY(activityId IN team.activityIds WHERE toInteger(activityId) IN {0}) return team ")
-    List<Team> findAllTeamByActivityId(BigInteger activityId);
 
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(team)={1} AND id(staff) IN {0} SET staffTeamRel.teamMembership=false")
     void assignStaffAsTeamLeaderOnly(List<Long> staffIds, Long teamId);

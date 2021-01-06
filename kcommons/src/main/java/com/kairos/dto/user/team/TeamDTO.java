@@ -17,7 +17,7 @@ public class TeamDTO {
     private String name;
     private TeamType teamType;
     private LeaderType leaderType;
-    private Set<BigInteger> activityIds;
+    private BigInteger activityId;
     private LocalDate startDate;
     private LocalDate endDate;
     private int sequence;

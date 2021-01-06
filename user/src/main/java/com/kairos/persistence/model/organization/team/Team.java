@@ -44,7 +44,7 @@ public class Team extends UserBaseEntity {
     private ContactAddress contactAddress;
 
     private boolean isEnabled = true;
-    private Set<BigInteger> activityIds=new HashSet<>();
+    private BigInteger activityId;
 
 
     public Team(String name, String description,  ContactAddress contactAddress) {

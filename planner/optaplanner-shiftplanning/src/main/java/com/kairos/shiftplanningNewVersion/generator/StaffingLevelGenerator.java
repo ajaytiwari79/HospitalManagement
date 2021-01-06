@@ -220,7 +220,7 @@ public class StaffingLevelGenerator {
         List<ALI> alis = (List<ALI>)objects[0];
         List<List<ALI>> aliPerDayByActivity = (List<List<ALI>>)objects[1];
         staffingLevelSolution.setActivityLineIntervals(alis);
-        List<Activity> activityList = dateActivityMap.values().stream().flatMap(activities -> activities.stream()).distinct().sorted(Comparator.comparing(Activity::getActivityPrioritySequence)).collect(Collectors.toList());
+        List<Activity> activityList = dateActivityMap.values().stream().flatMap(activities -> activities.stream()).distinct().sorted(Comparator.comparing(Activity::getRanking)).collect(Collectors.toList());
         staffingLevelSolution.setActivities(activityList);
         staffingLevelSolution.setWeekDates(new ArrayList<>(localDates));
         staffingLevelSolution.setActivitiesPerDay(activitiesPerDay);
@@ -326,7 +326,7 @@ public class StaffingLevelGenerator {
                 .validDayTypeIds(isNull(activityDTO.getActivityRulesSettings().getDayTypes()) ? new HashSet<>() : new HashSet<>(activityDTO.getActivityRulesSettings().getDayTypes()))
                 .skills(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getActivitySkillSettings().getActivitySkills(), Skill.class))
                 //    .tags(ObjectMapperUtils.copyCollectionPropertiesByMapper(activityDTO.getTags(), Tag.class))
-                .timeType(timeType).teamId(activityDTO.getTeamId()).constraints(getActivityConstrainsts(activityDTO)).order(activityOrderMap.get(activityDTO.getId())).activityPrioritySequence(activityDTO.getActivitySequence()).build();
+                .timeType(timeType).teamId(activityDTO.getTeamId()).constraints(getActivityConstrainsts(activityDTO)).order(activityOrderMap.get(activityDTO.getId())).ranking(activityDTO.getActivitySequence()).build();
     }
 
     private TimeType getTimeType(ActivityDTO activityDTO, Map<BigInteger, TimeTypeDTO> timeTypeMap) {

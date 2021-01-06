@@ -423,12 +423,9 @@ public class ActivityService {
         organizationActivityService.verifyChildActivity(activityMatched, activity);
         activity.setChildActivityIds(childActivitiesIds);
         activityMongoRepository.save(activity);
-        assignChildActivitiesInTeam(activityId,childActivitiesIds);
         return childActivitiesIds;
     }
-    private void assignChildActivitiesInTeam(BigInteger activityId,Set<BigInteger> childActivityIds) {
-        userIntegrationService.assignChildActivitiesInTeam(activityId,childActivityIds);
-    }
+
     public ActivitySettingsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
         List<DayTypeDTO> dayTypes = dayTypeService.getDayTypeWithCountryHolidayCalender(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);

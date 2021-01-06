@@ -52,7 +52,6 @@ public class TimeType extends MongoBaseEntity{
     private List<Long> levels;
     private List<Long> employmentTypes;
     private boolean breakNotHeldValid;
-    private BigInteger activityPriorityId;
     private PriorityFor priorityFor = PRESENCE;
     private boolean sicknessSettingValid;
     private Map<String,BigInteger> upperLevelTimeTypeDetails;

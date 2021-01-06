@@ -71,7 +71,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public static final String TIME_TYPE = "timeType";
     public static final String DRAFT ="draft";
     public static final String MOSTLY_USED_COUNT = "mostlyUsedCount";
-    public static final String ACTIVITY_PRIORITY = "activityPriority";
     public static final String SHIFTS ="shifts";
     private static final String ACTIVITY_STATUS = "activities.status";
     private static final String ACTIVITY_IDS = "activities.activityId";
@@ -699,19 +698,11 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ActivityWithCompositeDTO> findMostlyUsedActivityByStaffId(Long staffId){
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(DISABLED).is(false).and(STAFF_ID).is(staffId)),
-               /* new CustomAggregationOperation(Document.parse("{\n" +
-                        "      $group :\n" +
-                        "        {\n" +
-                        "          _id : \"$activities.activityId\",\n" +
-                        "          count: { $sum: 1 }\n" +
-                        "        }\n" +
-                        "     }")),*/
                unwind(ACTIVITIES),
                group(ACTIVITIES_ACTIVITY_ID).count().as(MOSTLY_USED_COUNT),
                 lookup(ACTIVITIES, "_id", "_id", ACTIVITY)
-                ,project("_id", MOSTLY_USED_COUNT).and("activity.activityPriorityId").arrayElementAt(0).as("activityPriorityId").and("activity.activityBalanceSettings.timeType").arrayElementAt(0).as("secondLevelTimtype"),
-                lookup(ACTIVITY_PRIORITY, "activityPriorityId", "_id", ACTIVITY_PRIORITY),
-                project("_id", MOSTLY_USED_COUNT,"secondLevelTimtype").and("activityPriority.sequence").arrayElementAt(0).as(ACTIVITY_PRIORITY)
+                ,project("_id", MOSTLY_USED_COUNT).and("activity.activityBalanceSettings.timeType").arrayElementAt(0).as("secondLevelTimtype"),
+                project("_id", MOSTLY_USED_COUNT,"secondLevelTimtype")
         );
         return mongoTemplate.aggregate(aggregation, Shift.class, ActivityWithCompositeDTO.class).getMappedResults();
     }

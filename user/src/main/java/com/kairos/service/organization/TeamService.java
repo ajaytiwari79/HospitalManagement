@@ -137,10 +137,9 @@ public class TeamService {
         return teamDTO;
     }
 
-    public boolean updateActivitiesOfTeam(Long unitId , Long teamId, Set<BigInteger> activityIds) {
+    public boolean updateActivitiesOfTeam(Long unitId , Long teamId, BigInteger activityId) {
         Team team = teamGraphRepository.findOne(teamId);
-        Set<BigInteger> activityIdsToSet=activityIntegrationService.getActivitiesWithAllChildren(unitId,activityIds);
-        team.setActivityIds(activityIdsToSet);
+        team.setActivityId(activityId);
         teamGraphRepository.save(team);
         return true;
     }
@@ -341,14 +340,6 @@ public class TeamService {
 
     public boolean isActivityAssignedToTeam(BigInteger activityId) {
         return teamGraphRepository.activityExistInTeamByActivityId(activityId);
-
-    }
-
-    public boolean assignChildActivitiesToTeam(BigInteger activityId,Set<BigInteger> childActivityIds) {
-        List<Team> teamList= teamGraphRepository.findAllTeamByActivityId(activityId);
-        teamList.forEach(team-> team.getActivityIds().addAll(childActivityIds));
-        teamGraphRepository.saveAll(teamList);
-        return true;
 
     }
 

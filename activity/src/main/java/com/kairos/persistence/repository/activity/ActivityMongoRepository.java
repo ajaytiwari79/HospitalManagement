@@ -49,9 +49,6 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{childActivityIds:?0, deleted:false}")
     Activity findByChildActivityId(BigInteger childActivityId);
 
-    @Query(value = "{childActivityIds:{$in:?0}, deleted:false}",fields ="{'_id':1,'childActivityIds':1}")
-    List<Activity> findByChildActivityIds(Collection<BigInteger> childActivityIds);
-
     @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "{'_id':1, 'activityPhaseSettings':1 ,'activityRulesSettings':1,'name':1,'activityBalanceSettings':1,'activityTimeCalculationSettings':1}")
     List<Activity> findAllPhaseSettingsByActivityIds(Collection<BigInteger> activityIds);
 
@@ -69,12 +66,6 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{'activityBalanceSettings.timeTypeId':?0, deleted:false}",exists = true)
     boolean existsByTimeTypeId(BigInteger timeTypeId);
 
-    @Query(value = "{'deleted' : false, 'unitId' :?0,'activityPriorityId':?1 }",exists = true)
-    boolean existsActivitiesByActivityPriorityIdAndUnitId(Long unitId,BigInteger activityPriorityId);
-
-    @Query(value = "{'deleted' : false, 'countryId' :?0,'activityPriorityId':?1 }",exists = true)
-    boolean existsActivitiesByActivityPriorityIdAndCountryId(Long countryId,BigInteger activityPriorityId);
-
     @Query(value = "{deleted: false, parentId :?0,unitId:{$in:?1 }}",exists = true)
     boolean existsByParentIdAndDeletedFalse( BigInteger activityId,List<Long> unitIds);
 
@@ -89,9 +80,6 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{'activityRulesSettings.sicknessSettingValid':true,deleted:false ,unitId:?0}",fields ="{'_id':1,'activityRulesSettings':1}")
     List<Activity> findAllSicknessActivity(Long unitId);
-
-    @Query(value = "{'activityBalanceSettings.priorityFor':?0,activityPriorityId:?1,_id:{$ne: ?2}}",exists = true)
-    boolean isActivityPriorityIdIsExistOrNot(PriorityFor priorityFor,BigInteger priorityId,BigInteger activityId);
 
     @Query(value = "{unitId:?0, 'activityBalanceSettings.timeTypeId':{$in:?1 }, deleted:false}")
     List<Activity>  findAllByUnitIdAndTimeTypeIds(Long unitId, Collection<BigInteger> timeTypeIds);

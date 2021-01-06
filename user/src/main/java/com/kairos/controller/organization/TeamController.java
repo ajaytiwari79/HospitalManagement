@@ -81,9 +81,9 @@
         @ApiOperation(value = "Update Activities in Team")
         @PutMapping(value = "/team/{teamId}/update_activities")
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> updateActivitiesOfTeam(@PathVariable Long unitId,@PathVariable Long teamId,  @RequestBody Set<BigInteger> activityIds) {
+        public ResponseEntity<Map<String, Object>> updateActivitiesOfTeam(@PathVariable Long unitId,@PathVariable Long teamId,  @RequestBody BigInteger activityId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.updateActivitiesOfTeam(unitId,teamId, activityIds));
+                    teamService.updateActivitiesOfTeam(unitId,teamId, activityId));
         }
 
         @ApiOperation(value = "Get Team Selected Skills")
@@ -188,13 +188,6 @@
                     teamService.isActivityAssignedToTeam(activityId));
         }
 
-        @PutMapping("/team/activity/{activityId}/assign_child_activities")
-        @ApiOperation("verify is activity assign to any team")
-        //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> assignChildActivitiesToTeam(@PathVariable BigInteger activityId,@RequestBody Set<BigInteger> childActivityIds) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.assignChildActivitiesToTeam(activityId,childActivityIds));
-        }
 
         @PutMapping(value = "/team/{id}/language_settings")
         @ApiOperation("Add translated data")

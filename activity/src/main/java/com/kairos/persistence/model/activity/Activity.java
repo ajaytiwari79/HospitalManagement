@@ -87,8 +87,6 @@ public class Activity extends MongoBaseEntity {
     private BigInteger countryParentId;
     @JsonIgnore
     private boolean disabled;
-    private BigInteger activityPriorityId;
-
     //time care id
     private String externalId;
     private String path;
