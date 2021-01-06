@@ -949,7 +949,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID, ACTIVITY_PRIORITY),
                 project(NAME, GENERAL_ACTIVITY_TAB)
                         .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY),
-                project(NAME, GENERAL_ACTIVITY_TAB)
+                project(NAME, GENERAL_ACTIVITY_TAB,TRANSLATIONS)
                         .and(ACTIVITY_PRIORITY_SEQUENCE).as(ACTIVITY_SEQUENCE)
         );
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
