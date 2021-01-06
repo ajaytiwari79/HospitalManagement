@@ -494,12 +494,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public List<ActivityWrapper> findActivitiesAndTimeTypeByActivityId(Collection<BigInteger> activityIds) {
-        return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false));
+        return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false), activityIds);
     }
 
     @Override
     public List<ActivityWrapper> findParentActivitiesAndTimeTypeByActivityId(Collection<BigInteger> activityIds) {
-        return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false).and(CHILD_ACTIVITY_IDS).in(activityIds));
+        return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false),activityIds);
     }
 
     @Override
@@ -509,7 +509,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return mongoTemplate.find(query,Activity.class);
     }
 
-    private List<ActivityWrapper> getActivityWrappersByCriteria(Criteria criteria) {
+    private List<ActivityWrapper> getActivityWrappersByCriteria(Criteria criteria, Collection<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id",
@@ -524,7 +524,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     private ProjectionOperation getProjectForActivityWrapper() {
         return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
-                .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
+                .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES).and(CHILD_ACTIVITY_IDS).as("activity.childActivityIds")
                 .and(ID).as("activity.id").and(ACTIVITY_PRIORITY_ID).as("activity.activityPriorityId")
                 .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
                 .and("regions").as("activity.regions").and("levels").as("activity.levels")
@@ -548,7 +548,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
     @Override
     public List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType,Long unitId){
-        return getActivityWrappersByCriteria(Criteria.where(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).is(secondLevelTimeType).and(UNIT_ID).is(unitId).and(DELETED).is(false));
+        return getActivityWrappersByCriteria(Criteria.where(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).is(secondLevelTimeType).and(UNIT_ID).is(unitId).and(DELETED).is(false), new ArrayList<>());
     }
 
     public List<TimeTypeAndActivityIdDTO> findAllTimeTypeByActivityIds(Set<BigInteger> activityIds) {
