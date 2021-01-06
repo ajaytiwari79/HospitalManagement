@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -26,7 +27,7 @@ public class AutoFillGapSettings extends MongoBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private AutoGapFillingScenario autoGapFillingScenario;
-    private Set<AutoFillGapSettingsRule> selectedAutoFillGapSettingsRules;
+    private List<AutoFillGapSettingsRule> selectedAutoFillGapSettingsRules;
     private AccessGroupRole gapApplicableFor;
     private Long countryId;
     private Long unitId;

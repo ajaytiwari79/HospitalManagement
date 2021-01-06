@@ -499,7 +499,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public List<ActivityWrapper> findParentActivitiesAndTimeTypeByActivityId(Collection<BigInteger> activityIds) {
-        return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false).and(CHILD_ACTIVITY_IDS).in(activityIds));
+        return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false));
     }
 
     @Override
@@ -524,7 +524,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     private ProjectionOperation getProjectForActivityWrapper() {
         return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
-                .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
+                .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES).and(CHILD_ACTIVITY_IDS).as("activity.childActivityIds")
                 .and(ID).as("activity.id").and(ACTIVITY_PRIORITY_ID).as("activity.activityPriorityId")
                 .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
                 .and("regions").as("activity.regions").and("levels").as("activity.levels")
