@@ -84,6 +84,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.CommonsExceptionUtil.convertMessage;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.enums.TimeTypeEnum.ABSENCE;
 import static com.kairos.service.activity.ActivityUtil.*;
 
 /*** Created by pawanmandhan on 17/8/17.*/
@@ -462,6 +463,7 @@ public class ActivityService {
         activityMongoRepository.save(activity);
         return new ActivitySettingsWrapper(activityIndividualPointsSettings);
     }
+
     public ActivityIndividualPointsSettings getIndividualPointsTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
         return activity.getActivityIndividualPointsSettings();
@@ -923,7 +925,7 @@ public class ActivityService {
     }
     public Set<BigInteger> getAbsenceActivityIds(Long unitId, Date date) {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, date, null);
-        List<Activity> activities = activityMongoRepository.findAllAbsenceActivities(unitId,newHashSet(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK), phase.getId());
+        List<Activity> activities = activityMongoRepository.findAllAbsenceActivities(unitId,ABSENCE, phase.getId());
         return activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
     }
     public Activity findActivityById(BigInteger activityId){
@@ -963,7 +965,10 @@ public class ActivityService {
         return activityMongoRepository.findAllBySecondLevelTimeTypeAndUnitIds(timeTypeEnum, unitIds);
     }
 
-    public List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds){
+    public List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds) {
         return activityMongoRepository.findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(activityIds);
+    }
+    public List<ActivityDTO> findAllAbsenceActivities(){
+        return activityMongoRepository.findAllAbsenceActivitiesByCountryId(UserContext.getUserDetails().getCountryId(),ABSENCE);
     }
 }

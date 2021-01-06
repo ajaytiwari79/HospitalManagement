@@ -478,4 +478,6 @@ public class UserMessagesConstants {
     public static final String STAFF_SKILL_DOES_NOT_MATCHED = "team.skill.not.matched";
     public static final String UNIT_IS_MANDATORY = "error.unit.mandatory";
     public static final String SHIFT_PERCENTAGE_CAN_NOT_BE_LESS_THEN_ZERO_OR_GREATER_THEN_HUNDRED ="shift.percentage.can.not.be.less.then.zero";
+    public static final String STAFF_EMPLOYMENT_NOT_MATCH ="staff.employment.not_matched";
+
 }

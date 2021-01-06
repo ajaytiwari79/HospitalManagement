@@ -1,7 +1,6 @@
 package com.kairos.service.country;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.user.TranslationDTO;
@@ -144,7 +143,7 @@ public class FunctionService {
     }
 
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsByExpertiseId(long expertiseId) {
-        return functionGraphRepository.getFunctionsByExpertiseId(expertiseId);
+        return functionGraphRepository.getFunctionsByExpertiseLineId(expertiseId);
 
     }
 

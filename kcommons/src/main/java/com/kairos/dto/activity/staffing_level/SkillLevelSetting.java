@@ -29,6 +29,10 @@ SkillLevelSetting {
         this.availableNoOfStaff = availableNoOfStaff;
     }
 
+    public void setAvailableNoOfStaff(int availableNoOfStaff) {
+        this.availableNoOfStaff = availableNoOfStaff < 0 ? 0 : availableNoOfStaff;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

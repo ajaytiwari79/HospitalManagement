@@ -25,7 +25,6 @@ public class StaffingLevelInterval {
     private int sequence;
     private int minNoOfStaff;
     private int maxNoOfStaff;
-    @Transient
     private int availableNoOfStaff;
     private Duration staffingLevelDuration;
     private Set<StaffingLevelActivity> staffingLevelActivities=new LinkedHashSet<>();
@@ -93,6 +92,10 @@ public class StaffingLevelInterval {
             throw new NullPointerException(CAN_T_ADD_NULL_STAFF_LEVEL_ACTIVITY);
         this.getStaffingLevelSkills().addAll(staffLevelSkills);
 
+    }
+
+    public void setAvailableNoOfStaff(int availableNoOfStaff) {
+        this.availableNoOfStaff = availableNoOfStaff < 0 ? 0 : availableNoOfStaff;
     }
 
     @Override

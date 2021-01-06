@@ -8,6 +8,7 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
+import com.kairos.service.staffing_level.StaffingLevelAvailableCountService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,8 @@ public class StaffingLevelCalculationKPIService implements KPIService{
     private StaffingLevelService staffingLevelService;
     @Inject
     private KPIBuilderCalculationService kpiBuilderCalculationService;
+    @Inject private
+    StaffingLevelAvailableCountService staffingLevelAvailableCountService;
 
     public double getStaffingLevelCalculationData(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShifts().stream().filter(shift -> dateTimeInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());
@@ -66,13 +69,6 @@ public class StaffingLevelCalculationKPIService implements KPIService{
     }
 
     private long getStaffingLevelData(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, Set<BigInteger> activityIds, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity, boolean isPresenceStaffingLevelData, StaffingLevel staffingLevel) {
-        if (isCollectionNotEmpty(filterShiftActivity.getShifts())) {
-            DateTimeInterval staffingLevelInterval = new DateTimeInterval(asLocalDate(staffingLevel.getCurrentDate()), asLocalDate(staffingLevel.getCurrentDate()).plusDays(1));
-            List<ShiftWithActivityDTO> currentDateShifts = filterShiftActivity.getShifts().stream().filter(shift -> staffingLevelInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());
-            if (isCollectionNotEmpty(currentDateShifts)) {
-                staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyCollectionPropertiesByMapper(currentDateShifts, Shift.class),kpiCalculationRelatedInfo);
-            }
-        }
         long staffingLevelData;
         if (isPresenceStaffingLevelData) {
             staffingLevelData = getStaffingLevelCalculationData(staffingLevel.getPresenceStaffingLevelInterval(), PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()), activityIds, staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes());
@@ -134,13 +130,6 @@ public class StaffingLevelCalculationKPIService implements KPIService{
     }
 
     private void setStaffingLevelDataPerHour(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, Set<BigInteger> activityIds, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity, StaffingLevel staffingLevel, Map<Integer,Long> staffingLevelDataMap) {
-        if (isCollectionNotEmpty(filterShiftActivity.getShifts())) {
-            DateTimeInterval staffingLevelInterval = new DateTimeInterval(asLocalDate(staffingLevel.getCurrentDate()), asLocalDate(staffingLevel.getCurrentDate()).plusDays(1));
-            List<ShiftWithActivityDTO> currentDateShifts = filterShiftActivity.getShifts().stream().filter(shift -> staffingLevelInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());
-            if (isCollectionNotEmpty(currentDateShifts)) {
-                staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyCollectionPropertiesByMapper(currentDateShifts, Shift.class),kpiCalculationRelatedInfo);
-            }
-        }
         if (isCollectionNotEmpty(staffingLevel.getPresenceStaffingLevelInterval())) {
             updateCountForPresenceStaffingLevel(kpiCalculationRelatedInfo, activityIds, staffingLevel, staffingLevelDataMap);
         }

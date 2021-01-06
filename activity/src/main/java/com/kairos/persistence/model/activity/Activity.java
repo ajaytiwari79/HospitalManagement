@@ -100,8 +100,6 @@ public class Activity extends MongoBaseEntity {
     }
 
 
-
-
     public Activity(ActivityBalanceSettings activityBalanceSettings) {
         this.activityBalanceSettings = activityBalanceSettings;
     }

@@ -207,6 +207,10 @@ public class ShiftBreakService implements KPIService {
         ActivityWrapper activityWrapper = activityWrapperMap.get(breakSettings.getActivityId());
         ShiftActivity shiftActivity = new ShiftActivity(activityWrapper.getActivity().getName(), startDate, endDate, activityWrapper.getActivity().getId(), activityWrapper.getTimeType());
         timeBankService.updateScheduledHoursAndActivityDetailsInShiftActivity(shiftActivity, activityWrapperMap, staffAdditionalInfoDTO);
+        shiftActivity.setTimeTypeId(activityWrapper.getTimeTypeInfo().getId());
+        shiftActivity.setSecondLevelTimeType(activityWrapper.getTimeTypeInfo().getSecondLevelType());
+        shiftActivity.setTimeType(activityWrapper.getTimeTypeInfo().getTimeTypes().toValue());
+        shiftActivity.setMethodForCalculatingTime(activityWrapper.getActivity().getActivityTimeCalculationSettings().getMethodForCalculatingTime());
         return shiftActivity;
     }
 

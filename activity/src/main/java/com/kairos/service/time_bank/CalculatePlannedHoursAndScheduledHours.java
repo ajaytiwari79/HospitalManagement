@@ -94,12 +94,12 @@ public class CalculatePlannedHoursAndScheduledHours {
         boolean ruleTemplateValid = false;
         for (CTARuleTemplateDTO ruleTemplate : staffAdditionalInfoDTO.getEmployment().getCtaRuleTemplates()) {
             for (ShiftWithActivityDTO shift : shifts) {
-                if (shift.getStatuses().contains(ShiftStatus.PUBLISH) && CalculationFor.CONDITIONAL_BONUS.equals(ruleTemplate.getCalculationFor())) {
+                Optional<TimeBankDistributionDTO> optionalTimeBankDistributionDTO = shift.getTimeBankCTADistributions().stream().filter(distributionDTO -> distributionDTO.getCtaRuleTemplateId().equals(ruleTemplate.getId())).findAny();
+                if (shift.getStatuses().contains(ShiftStatus.PUBLISH) && CalculationFor.CONDITIONAL_BONUS.equals(ruleTemplate.getCalculationFor()) && (isTimeSlotChanged(shift) || isNull(shift.getId()) || optionalTimeBankDistributionDTO.isPresent())) {
                     int compensation = calculateConditionalBonus(ruleTemplate,staffAdditionalInfoDTO.getEmployment(),shift, TIMEBANK_ACCOUNT);
-                    Optional<TimeBankDistributionDTO> optionalTimeBankDistributionDTO = shift.getTimeBankCTADistributions().stream().filter(distributionDTO -> distributionDTO.getCtaRuleTemplateId().equals(ruleTemplate.getId())).findAny();
-                    if (optionalTimeBankDistributionDTO.isPresent()) {
+                    if (optionalTimeBankDistributionDTO.isPresent() && compensation > 0) {
                         optionalTimeBankDistributionDTO.get().setMinutes(compensation);
-                    } else {
+                    } else if(compensation > 0){
                         TimeBankDistributionDTO timeBankDistributionDTO = new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(getDate()), compensation);
                         shift.getTimeBankCTADistributions().add(timeBankDistributionDTO);
                     }

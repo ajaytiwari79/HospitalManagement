@@ -13,6 +13,7 @@ import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.phase.PhaseType;
@@ -292,6 +293,8 @@ public class StaffingLevelGenerator {
                     ali.setDuration(15);
                     alis.add(ali);
                 break;
+                default:
+                    break;
             }
         }else {
             ALI ali = ObjectMapperUtils.copyPropertiesByMapper(needToAdd, ALI.class);
