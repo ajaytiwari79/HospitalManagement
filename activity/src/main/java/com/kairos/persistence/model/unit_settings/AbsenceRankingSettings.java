@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.unit_settings;
 
+import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,5 +22,7 @@ public class AbsenceRankingSettings extends MongoBaseEntity {
     private boolean published;
     // it's used to check in case of having draft copy
     private BigInteger draftId;
+    private Long unitId;
+    private PriorityFor priorityFor;
 
 }

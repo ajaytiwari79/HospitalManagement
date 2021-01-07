@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.unit_settings.activity_configuration;
 
+import com.kairos.enums.PriorityFor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +19,8 @@ public class AbsenceRankingDTO {
     private Map<BigInteger,Integer> activityRankings;
     private Long countryId;
     private boolean published;
+    private Long unitId;
+    private PriorityFor priorityFor;
 
     @AssertTrue(message = "Rank Must be Unique")
     public boolean isValid() {

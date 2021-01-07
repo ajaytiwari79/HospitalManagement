@@ -68,6 +68,14 @@ public class AbsenceRankingSettingsService {
         }
     }
 
+    public List<AbsenceRankingDTO> getAbsenceRankingSettings(Boolean published,Long unitId){
+        if(isNotNull(published)){
+            return absenceRankingSettingsRepository.getAbsenceRankingSettingsByPublishedAndUnitIdAndDeletedFalse(published, unitId);
+        } else {
+            return absenceRankingSettingsRepository.getAbsenceRankingSettingsByUnitIdAndDeletedFalse(unitId);
+        }
+    }
+
     public boolean deleteAbsenceRankingSettings(BigInteger id){
         AbsenceRankingSettings absenceRankingSettings=absenceRankingSettingsRepository.findOne(id);
         absenceRankingSettings.setDeleted(true);
@@ -90,8 +98,8 @@ public class AbsenceRankingSettingsService {
 //        }
         absenceRankingSettings.setPublished(true);
         absenceRankingSettings.setStartDate(publishedDate); // changing
-        AbsenceRankingSettings parentAbsenceRanking = absenceRankingSettingsRepository.findByDraftIdAndDeletedFalse(absenceRankingSettings.getId());
-        AbsenceRankingSettings lastAbsenceRanking = absenceRankingSettingsRepository.findTopByExpertiseIdAndDeletedFalseOrderByStartDateDesc(absenceRankingSettings.getExpertiseId());
+        AbsenceRankingSettings parentAbsenceRanking = absenceRankingSettingsRepository.findByDraftIdAndPriorityForAndDeletedFalse(absenceRankingSettings.getId(),absenceRankingSettings.getPriorityFor());
+        AbsenceRankingSettings lastAbsenceRanking = absenceRankingSettingsRepository.findTopByExpertiseIdAndPriorityForAndDeletedFalseOrderByStartDateDesc(absenceRankingSettings.getExpertiseId(),absenceRankingSettings.getPriorityFor());
         boolean onGoingUpdated = false;
         if (lastAbsenceRanking != null && publishedDate.isAfter(lastAbsenceRanking.getStartDate()) && lastAbsenceRanking.getEndDate() == null) {
             lastAbsenceRanking.setEndDate(publishedDate.minusDays(1));

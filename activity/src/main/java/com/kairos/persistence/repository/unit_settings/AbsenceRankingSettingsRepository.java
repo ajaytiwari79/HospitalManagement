@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.unit_settings;
 
 import com.kairos.dto.activity.unit_settings.activity_configuration.AbsenceRankingDTO;
+import com.kairos.enums.PriorityFor;
 import com.kairos.persistence.model.unit_settings.AbsenceRankingSettings;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -17,8 +18,12 @@ public interface AbsenceRankingSettingsRepository extends MongoBaseRepository<Ab
 
     List<AbsenceRankingDTO> getAbsenceRankingSettingsByDeletedFalse();
 
-    AbsenceRankingSettings findByDraftIdAndDeletedFalse(BigInteger draftId);
+    AbsenceRankingSettings findByDraftIdAndPriorityForAndDeletedFalse(BigInteger draftId, PriorityFor priorityFor);
 
-    AbsenceRankingSettings findTopByExpertiseIdAndDeletedFalseOrderByStartDateDesc(Long expertiseId);
+    AbsenceRankingSettings findTopByExpertiseIdAndPriorityForAndDeletedFalseOrderByStartDateDesc(Long expertiseId,PriorityFor priorityFor);
+
+    List<AbsenceRankingDTO> getAbsenceRankingSettingsByPublishedAndUnitIdAndDeletedFalse(Boolean published,Long unitId);
+
+    List<AbsenceRankingDTO> getAbsenceRankingSettingsByUnitIdAndDeletedFalse(Long unitId);
 
 }
