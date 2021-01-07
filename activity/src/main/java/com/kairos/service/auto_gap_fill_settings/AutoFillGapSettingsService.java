@@ -143,6 +143,7 @@ public class AutoFillGapSettingsService {
             Set<BigInteger> allProductiveActivityIds = staffAdditionalInfoDTO.getTeamsData().stream().flatMap(k -> k.getActivityIds().stream()).collect(Collectors.toSet());
             allProductiveActivityIds.addAll(newHashSet(shiftActivityBeforeGap.getActivityId(),shiftActivityAfterGap.getActivityId()));
             List<ActivityWrapper> activityList = activityMongoRepository.findParentActivitiesAndTimeTypeByActivityId(allProductiveActivityIds);
+            activityList=filterParentActivities(activityList);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activityList.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
             filterActivities(staffAdditionalInfoDTO.getTeamsData(), activityWrapperMap, shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet()));
             setBasicDetails(shiftActivityBeforeGap, shiftActivityAfterGap, activityWrapperMap);
@@ -210,7 +211,7 @@ public class AutoFillGapSettingsService {
                     return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), productiveActivity.getActivityId(), null);
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE1:
                 case RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE1:
-                    if (staffingLevelActivityWithDurationMap.get(productiveActivity.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
+                    if (staffingLevelActivityWithDurationMap.containsKey(productiveActivity.getActivityId()) && staffingLevelActivityWithDurationMap.get(productiveActivity.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), productiveActivity.getActivityId(), null);
                     }
                     break;
@@ -434,6 +435,12 @@ public class AutoFillGapSettingsService {
         });
         teamDTOS.removeIf(k -> k.getActivityIds().isEmpty());
 
+    }
+
+    private List<ActivityWrapper> filterParentActivities(List<ActivityWrapper> activityWrappers){
+        List<ActivityWrapper> temp=ObjectMapperUtils.copyCollectionPropertiesByMapper(activityWrappers,ActivityWrapper.class);
+        temp.removeIf(current -> activityWrappers.stream().anyMatch(k -> k.getActivity().getChildActivityIds().contains(current.getActivity().getId())));
+        return temp;
     }
 
 

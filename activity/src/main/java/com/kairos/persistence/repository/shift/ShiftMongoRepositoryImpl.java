@@ -795,13 +795,16 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         for (int i = 0; i < criteriaList.size(); i++) {
             criterias[i] = criteriaList.get(i);
         }
-        criteria.orOperator(criterias);
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(criteria),
-                project("staffId"),
-                group().push("staffId").as("staffIds")
-        );
-        return new HashSet<>(((List<Long>)mongoTemplate.aggregate(aggregation,Shift.class,Map.class).getMappedResults().get(0).get("staffIds")));
+        if(criterias.length>0){
+            criteria.orOperator(criterias);
+            Aggregation aggregation = Aggregation.newAggregation(
+                    match(criteria),
+                    project("staffId"),
+                    group().push("staffId").as("staffIds")
+            );
+            return new HashSet<>(((List<Long>)mongoTemplate.aggregate(aggregation,Shift.class,Map.class).getMappedResults().get(0).get("staffIds")));
+        }
+        return new HashSet<>();
     }
 
     private List<Criteria> getConverShiftCriteria(CoverShiftSetting coverShiftSetting,Date startDate,Date endDate) {

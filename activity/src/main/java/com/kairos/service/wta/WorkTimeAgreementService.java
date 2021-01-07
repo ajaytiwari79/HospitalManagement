@@ -522,15 +522,16 @@ public class WorkTimeAgreementService{
         Map<Long, List<WTAQueryResultDTO>> verionWTAMap = versionsOfWTAs.stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
         WorkingTimeAgreement finalOrgWTA = orgWTA;
         parentWTA.forEach(currentWTA -> {
-            List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyCollectionPropertiesByMapper(verionWTAMap.get(currentWTA.getEmploymentId()), WTAResponseDTO.class);
-            if(isNotNull(finalOrgWTA)) {
-                versionWTAs.forEach(wtaResponseDTO -> wtaResponseDTO.setTranslations(finalOrgWTA.getTranslations()));
-                currentWTA.setTranslations(finalOrgWTA.getTranslations());
-            }
+
             ruleTemplateService.assignCategoryToRuleTemplate(countryId, currentWTA.getRuleTemplates());
-            if (versionWTAs != null && !versionWTAs.isEmpty()) {
+            if (isCollectionNotEmpty(versionsOfWTAs)) {
+                List<WTAResponseDTO> versionWTAs = ObjectMapperUtils.copyCollectionPropertiesByMapper(verionWTAMap.get(currentWTA.getEmploymentId()), WTAResponseDTO.class);
+                if(isNotNull(finalOrgWTA)) {
+                    versionWTAs.forEach(wtaResponseDTO -> wtaResponseDTO.setTranslations(finalOrgWTA.getTranslations()));
+                }
                 currentWTA.setVersions(versionWTAs);
             }
+            currentWTA.setTranslations(finalOrgWTA.getTranslations());
         });
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTabId(unitId, ORGANIZATION_AGREEMENT_VERSION_TABLE_ID);
         return new WTATableSettingWrapper(parentWTA, tableConfiguration);
@@ -1124,42 +1125,4 @@ public class WorkTimeAgreementService{
         wtaBaseRuleTemplateRepository.save(wtaBaseRuleTemplate);
         return wtaBaseRuleTemplate.getTranslations();
     }
-
-    public <T> Map<BigInteger, ActivityDTO> getActivityMapByWTARuleTemplate(List<T> wtaBaseRuleTemplateDTOS) {
-        Set<BigInteger> activityIds = new HashSet<>();
-        for (T ruleTemplate : wtaBaseRuleTemplateDTOS) {
-            boolean instanceOfWTABaseTemplate = ruleTemplate instanceof WTABaseRuleTemplate;
-            WTATemplateType wtaTemplateType = ruleTemplate instanceof WTABaseRuleTemplate ?  ((WTABaseRuleTemplate)ruleTemplate).getWtaTemplateType() : ((WTABaseRuleTemplateDTO)ruleTemplate).getWtaTemplateType();
-            switch (wtaTemplateType) {
-                case VETO_AND_STOP_BRICKS:
-                    VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = instanceOfWTABaseTemplate ? (VetoAndStopBricksWTATemplate) ruleTemplate :ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, VetoAndStopBricksWTATemplate.class);
-                    CollectionUtils.addIgnoreNull(activityIds, vetoAndStopBricksWTATemplate.getStopBrickActivityId());
-                    CollectionUtils.addIgnoreNull(activityIds, vetoAndStopBricksWTATemplate.getVetoActivityId());
-                    break;
-                case SENIOR_DAYS_PER_YEAR:
-                    SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = instanceOfWTABaseTemplate ? (SeniorDaysPerYearWTATemplate) ruleTemplate: ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, SeniorDaysPerYearWTATemplate.class);
-                    activityIds.addAll(seniorDaysPerYearWTATemplate.getActivityIds());
-                    break;
-                case CHILD_CARE_DAYS_CHECK:
-                    ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = instanceOfWTABaseTemplate ? (ChildCareDaysCheckWTATemplate)ruleTemplate : ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ChildCareDaysCheckWTATemplate.class);
-                    activityIds.addAll(childCareDaysCheckWTATemplate.getActivityIds());
-                    break;
-                case WTA_FOR_CARE_DAYS:
-                    WTAForCareDays wtaForCareDays = instanceOfWTABaseTemplate ? (WTAForCareDays) ruleTemplate: ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, WTAForCareDays.class);
-                    activityIds.addAll(wtaForCareDays.getCareDayCounts().stream().map(activityCareDayCount -> activityCareDayCount.getActivityId()).collect(Collectors.toSet()));
-                    break;
-                case PROTECTED_DAYS_OFF:
-                    ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = instanceOfWTABaseTemplate ? (ProtectedDaysOffWTATemplate) ruleTemplate : ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ProtectedDaysOffWTATemplate.class);
-                    CollectionUtils.addIgnoreNull(activityIds,protectedDaysOffWTATemplate.getActivityId());
-                    break;
-                default:
-                    break;
-            }
-
-        }
-
-        List<ActivityDTO> activities = activityMongoRepository.findActivitiesWithTimeTypeByActivityId(activityIds);
-        return activities.stream().collect(toMap(k->k.getId(),v->v));
-    }
-
 }
