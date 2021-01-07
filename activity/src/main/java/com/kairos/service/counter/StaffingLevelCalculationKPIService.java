@@ -6,6 +6,7 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.service.staffing_level.StaffingLevelAvailableCountService;
@@ -49,9 +50,9 @@ public class StaffingLevelCalculationKPIService implements KPIService{
             if(isCollectionEmpty(staff.getTeams())){
                 return 0;
             }else if(kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(TEAM_TYPE) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(TEAM_TYPE).size() == 1){
-                activityIds = staff.getTeams().stream().filter(teamDTO -> teamDTO.getTeamType().toString().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(TEAM_TYPE).get(0))).flatMap(teamDTO -> teamDTO.getActivityIds().stream()).collect(Collectors.toSet());
+                activityIds = staff.getTeams().stream().filter(teamDTO -> teamDTO.getTeamType().toString().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(TEAM_TYPE).get(0))).map(TeamDTO::getActivityId).collect(Collectors.toSet());
             } else{
-                activityIds = staff.getTeams().stream().flatMap(teamDTO -> teamDTO.getActivityIds().stream()).collect(Collectors.toSet());
+                activityIds = staff.getTeams().stream().map(TeamDTO::getActivityId).collect(Collectors.toSet());
             }
             if(isCollectionEmpty(activityIds)){
                 return 0;

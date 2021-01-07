@@ -951,8 +951,8 @@ public class StaffingLevelService {
                         if (isNull(activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getRanking()) || isNull(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getRanking())) {
                             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
                         }
-                        int rankOfOld = activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getRanking().getSequence();
-                        int rankOfNew = activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getRanking().getSequence();
+                        int rankOfOld = activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getRanking();
+                        int rankOfNew = activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getRanking();
                         if (isNewShiftVerifyStaffingLevel || isOldShiftVerifyStaffingLevel) {
                             validateRankOfActivity(rankOfOld, rankOfNew);
                         }
