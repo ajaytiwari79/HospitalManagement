@@ -11,7 +11,7 @@ import java.util.*;
 
 @Getter
 @Setter
-public class AbsenceRankingDTO {
+public class ActivityRankingDTO {
     private BigInteger id;
     private Long expertiseId;
     private LocalDate startDate;

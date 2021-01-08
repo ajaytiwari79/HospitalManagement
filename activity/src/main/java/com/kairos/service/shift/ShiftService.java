@@ -697,8 +697,6 @@ public class ShiftService extends MongoBaseService {
                 if (ShiftActionType.SAVE.equals(shiftAction)) {
                     shiftStateService.createShiftState(Arrays.asList(shift), true, shift.getUnitId());
                 }
-                // TODO VIPUL WE WILL UNCOMMENTS AFTER FIX mailing servive
-                //shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
                 if (ruleCheckRequired) {
                     activityConfigurationService.addPlannedTimeInShift(shift, activityWrapperMap, staffAdditionalInfoDTO, !oldStateOfShift.getShiftType().equals(shift.getShiftType()));
                     shiftValidatorService.validateShiftViolatedRules(shift, (boolean) shiftOverlapInfo[0], shiftWithViolatedInfoDTO, shiftAction);

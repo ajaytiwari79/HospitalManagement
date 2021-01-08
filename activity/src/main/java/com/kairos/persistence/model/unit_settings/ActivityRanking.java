@@ -13,7 +13,7 @@ import java.util.TreeMap;
 
 @Getter
 @Setter
-public class AbsenceRankingSettings extends MongoBaseEntity {
+public class ActivityRanking extends MongoBaseEntity {
     private Long expertiseId;
     private LocalDate startDate;
     private LocalDate endDate;
