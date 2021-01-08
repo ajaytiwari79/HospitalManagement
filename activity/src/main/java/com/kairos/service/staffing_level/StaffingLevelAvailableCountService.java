@@ -168,6 +168,7 @@ public class StaffingLevelAvailableCountService {
     @Async
     public StaffingLevel updatePresenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel) {
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(getStartOfDay(staffingLevel.getCurrentDate()), getEndOfDay(staffingLevel.getCurrentDate()), newArrayList(staffingLevel.getUnitId()));
+        resetAvailableCount(staffingLevel);
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
                 if ((FULL_WEEK.equals(shiftActivity.getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(shiftActivity.getMethodForCalculatingTime()))) {
@@ -180,5 +181,12 @@ public class StaffingLevelAvailableCountService {
         }
         staffingLevelMongoRepository.save(staffingLevel);
         return staffingLevel;
+    }
+
+    private void resetAvailableCount(StaffingLevel staffingLevel) {
+        staffingLevel.getPresenceStaffingLevelInterval().parallelStream().forEach(staffingLevelInterval -> {
+            staffingLevelInterval.setAvailableNoOfStaff(0);
+            staffingLevelInterval.getStaffingLevelActivities().stream().forEach(staffingLevelActivity -> staffingLevelActivity.setAvailableNoOfStaff(0));
+        });
     }
 }

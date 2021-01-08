@@ -27,7 +27,7 @@ jar{
 
 dependencies {
     implementation project(':kcommons')
-    compile("org.aspectj:aspectjweaver:1.8.8")
+    //compile("org.aspectj:aspectjweaver:1.9.0")
     compile 'javax.validation:validation-api:2.0.0.Final'
     compile 'org.apache.commons:commons-lang3:3.7'
     compile group: 'org.springframework', name: 'spring-context', version: '5.0.9.RELEASE'

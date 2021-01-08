@@ -93,7 +93,7 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.5'
     
     //this is for hot swaping in intelij
-    compile('org.springframework.boot:spring-boot-devtools')
+    //compile('org.springframework.boot:spring-boot-devtools')
 
 
 }

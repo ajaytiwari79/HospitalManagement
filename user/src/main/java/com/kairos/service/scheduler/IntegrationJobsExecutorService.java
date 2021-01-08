@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.ByteArrayInputStream;
+//import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.time.LocalDateTime;
@@ -139,17 +136,17 @@ public class IntegrationJobsExecutorService {
         if (importResult.getStatusCodeValue() == 200) {
             ResponseEntity<String> resultStatusXml = restTemplate.exchange(importShiftStatusXMLURI, HttpMethod.GET, entity, String.class);
             LocalDateTime stopped = LocalDateTime.now();
-            try {
+            /*try {
                 updateJobForTimeCareShifts(job, started, resultStatusXml, stopped);
             } catch (JAXBException | IOException exception ) {
                 logger.info("trans status---exception > {}" , exception);
-            }
+            }*/
         }
         return;
     }
 
-    private void updateJobForTimeCareShifts(KairosSchedulerExecutorDTO job, LocalDateTime started, ResponseEntity<String> resultStatusXml, LocalDateTime stopped) throws JAXBException, IOException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(Transstatus.class);
+    private void updateJobForTimeCareShifts(KairosSchedulerExecutorDTO job, LocalDateTime started, ResponseEntity<String> resultStatusXml, LocalDateTime stopped) throws IOException {
+        /*JAXBContext jaxbContext = JAXBContext.newInstance(Transstatus.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         StringReader reader = new StringReader(resultStatusXml.getBody());
         Transstatus transstatus = (Transstatus) jaxbUnmarshaller.unmarshal(reader);
@@ -161,7 +158,7 @@ public class IntegrationJobsExecutorService {
         try(GZIPInputStream zi = new GZIPInputStream(new ByteArrayInputStream(bytes))) {
             unzipped = IOUtils.toString(zi);
         }
-        userSchedulerJobService.updateJobForTimecareShift(job, started, stopped, transstatus, unzipped);
+        userSchedulerJobService.updateJobForTimecareShift(job, started, stopped, transstatus, unzipped);*/
     }
 
 }
