@@ -72,6 +72,7 @@ dependencies {
     //send grid
     compile ('com.sendgrid:sendgrid-java:4.0.1')
 
+    compile("org.aspectj:aspectjweaver:1.8.8")
 
 
     compile('org.springframework.boot:spring-boot-starter-websocket')
@@ -108,7 +109,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.mockito/mockito-core
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.21.0'
     //this is for hot swaping in intelij
-    //compile('org.springframework.boot:spring-boot-devtools')
+    compile('org.springframework.boot:spring-boot-devtools')
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jdbc
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: "${springBootVersion}"
     // https://mvnrepository.com/artifact/org.liquigraph/liquigraph-spring-boot-starter
