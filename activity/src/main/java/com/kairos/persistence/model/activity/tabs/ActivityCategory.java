@@ -11,6 +11,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
@@ -23,13 +24,12 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ActivityCategory extends MongoBaseEntity{
+public class ActivityCategory extends MongoBaseEntity implements Serializable {
 
     private String name;
     private String description;
     private Long countryId;
     private BigInteger timeTypeId;
-
 
 
     public ActivityCategory(String name, String description, Long countryId, BigInteger timeTypeId) {

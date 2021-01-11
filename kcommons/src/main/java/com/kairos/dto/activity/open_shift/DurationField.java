@@ -4,9 +4,11 @@ import com.kairos.enums.DurationType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
-public class DurationField  {
+public class DurationField implements Serializable {
     private Integer value;
     private DurationType type;
 }

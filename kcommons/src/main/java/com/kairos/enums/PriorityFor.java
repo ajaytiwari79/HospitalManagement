@@ -1,6 +1,8 @@
 package com.kairos.enums;
 
-public enum PriorityFor {
+import java.io.Serializable;
+
+public enum PriorityFor implements Serializable {
     PRESENCE,
     ABSENCE,
     NONE

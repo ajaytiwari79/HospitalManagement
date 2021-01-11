@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
@@ -18,7 +19,7 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ActivityBalanceSettingDTO {
+public class ActivityBalanceSettingDTO implements Serializable {
 
 
     private Long activityId;
