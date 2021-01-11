@@ -922,8 +922,8 @@ public class StaffingLevelService {
         staffingLevels.parallelStream().forEach(staffingLevel -> {
             for (StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()) {
                 for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
-                    staffingLevelActivity.setInitialOverStaffing(staffingLevelActivity.getAvailableNoOfStaff());
-                    staffingLevelActivity.setInitialUnderStaffing(staffingLevelActivity.getAvailableNoOfStaff());
+                    staffingLevelActivity.setInitialOverStaffing(Math.max(staffingLevelActivity.getAvailableNoOfStaff()-staffingLevelActivity.getMaxNoOfStaff(),0));
+                    staffingLevelActivity.setInitialUnderStaffing(Math.max(staffingLevelActivity.getMinNoOfStaff() - staffingLevelActivity.getAvailableNoOfStaff(),0));
                 }
             }
         });
