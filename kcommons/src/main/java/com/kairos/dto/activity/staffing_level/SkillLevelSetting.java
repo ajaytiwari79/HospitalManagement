@@ -30,7 +30,7 @@ SkillLevelSetting {
     }
 
     public void setAvailableNoOfStaff(int availableNoOfStaff) {
-        this.availableNoOfStaff = availableNoOfStaff < 0 ? 0 : availableNoOfStaff;
+        this.availableNoOfStaff = Math.max(availableNoOfStaff,0);
     }
 
     @Override

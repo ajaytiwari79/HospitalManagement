@@ -42,35 +42,48 @@ public class StaffingLevelActivity {
         this.maxNoOfStaff = maxNoOfStaff;
     }
 
+    public int getInitialUnderStaffing() {
+        return Math.min(initialUnderStaffing,availableNoOfStaff);
+    }
+
+    public int getInitialOverStaffing() {
+        return Math.min(initialOverStaffing,availableNoOfStaff);
+    }
+
     public StaffingLevelActivity(BigInteger activityId, int minNoOfStaff, int maxNoOfStaff) {
         this.activityId = activityId;
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;
     }
 
-    public void setInitialStaffingLevelDetails(){
-        this.initialUnderStaffing = Math.max(this.minNoOfStaff-this.availableNoOfStaff,0);
-        this.initialOverStaffing =  Math.max(this.availableNoOfStaff-this.maxNoOfStaff,0);
-    }
-
-    public int getRemainingUnderStaffingToResolve(){
+    public int getRemainingUnderStaffing(){
         return Math.max(minNoOfStaff-availableNoOfStaff,0);
     }
 
-    public int getRemainingOverStaffingToResolve(){
+    public int getRemainingOverStaffing(){
         return Math.max(availableNoOfStaff-maxNoOfStaff,0);
     }
 
-    public int getResolvedUnderStaffingAfterPublish(){
-        return Math.min(availableNoOfStaff+initialUnderStaffing-minNoOfStaff,initialUnderStaffing);
+
+    public int getSolvedUnderStaffing() {
+        return Math.max(availableNoOfStaff - initialUnderStaffing,0);
     }
 
-    public int getResolvedOverStaffingAfterPublish(){
-        return Math.min(maxNoOfStaff+initialOverStaffing-availableNoOfStaff,initialOverStaffing);
+    public int getSolvedlOverStaffing() {
+        return Math.max(initialOverStaffing-availableNoOfStaff,0);
     }
+
+    public int getUnderStaffingProblemInCurrentPhase() {
+        return Math.max(minNoOfStaff - initialUnderStaffing,0);
+    }
+
+    public int getOverStaffingProblemInCurrentPhase() {
+        return Math.max(availableNoOfStaff - maxNoOfStaff,0);
+    }
+
 
     public void setAvailableNoOfStaff(int availableNoOfStaff) {
-        this.availableNoOfStaff = availableNoOfStaff < 0 ? 0 : availableNoOfStaff;
+        this.availableNoOfStaff = Math.max(availableNoOfStaff,0);
     }
 
     @Override
