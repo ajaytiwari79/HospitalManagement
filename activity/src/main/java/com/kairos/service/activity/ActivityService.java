@@ -161,6 +161,8 @@ public class ActivityService {
         }
         ActivityUtil.initializeActivitySettings(activity, phaseTemplateValues, glideTimeSettingsDTO);
     }
+
+    //    @Cacheable(value = "countryActivities", key = "#countryId", cacheManager = "cacheManager")
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
         List<ActivityTagDTO> activityTagDTOS = activityMongoRepository.findAllActivityByCountry(countryId);
@@ -170,6 +172,7 @@ public class ActivityService {
         response.put("activityCategories", acivitityCategories);
         return response;
     }
+
     public Set<BigInteger> checkActivityAllowForChildActivities(List<ActivityTagDTO> activities, ActivityWithCompositeDTO activityWithCompositeDTO) {
         Set<BigInteger> allowChildActivityIds = new HashSet<>();
         Set<BigInteger> childActivitiesIds = activities.stream().flatMap(activityTagDTO -> activityTagDTO.getChildActivityIds().stream()).collect(Collectors.toSet());
@@ -746,8 +749,10 @@ public class ActivityService {
             activityMongoRepository.saveEntities(organizationActivities);
         }
     }
+
+    //    @CacheEvict(value = "countryActivities")
     public Boolean publishActivity(BigInteger activityId) {
-        Activity activity =findActivityById(activityId);
+        Activity activity = findActivityById(activityId);
         if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PUBLISHED, activityId);
         }

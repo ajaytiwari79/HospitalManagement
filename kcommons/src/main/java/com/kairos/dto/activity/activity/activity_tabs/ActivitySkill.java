@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -13,8 +14,8 @@ import java.util.Map;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ActivitySkill  {
-    private  String name;
+public class ActivitySkill implements Serializable {
+    private String name;
     private String level;
     private Long skillId;
     private Map<String, TranslationInfo> translations;

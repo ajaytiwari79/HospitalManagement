@@ -6,10 +6,11 @@ package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.kairos.enums.shift.ShiftStatus;
 
+import java.io.Serializable;
 import java.util.Set;
 
 
-public class ActivityShiftStatusSettings {
+public class ActivityShiftStatusSettings implements Serializable {
 
     private ShiftStatus shiftStatus;
     private Set<Long> accessGroupIds;

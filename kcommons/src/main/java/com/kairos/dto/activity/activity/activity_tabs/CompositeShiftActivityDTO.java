@@ -2,13 +2,14 @@ package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
  * Created by vipul on 23/8/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CompositeShiftActivityDTO {
+public class CompositeShiftActivityDTO implements Serializable {
 
     private BigInteger activityId;
     private boolean allowedBefore;

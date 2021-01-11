@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.*;
@@ -29,15 +30,15 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ActivityWithCompositeDTO {
+public class ActivityWithCompositeDTO implements Serializable {
 
     private BigInteger id;
     private String name;
     private ActivityGeneralSettings activityGeneralSettings;
     private TimeCalculationActivityDTO activityTimeCalculationSettings;
-    private List<CompositeActivityDTO> compositeActivities= new ArrayList<>();
-    private List<Long> expertises= new ArrayList<>();
-    private List<Long> employmentTypes= new ArrayList<>();
+    private List<CompositeActivityDTO> compositeActivities = new ArrayList<>();
+    private List<Long> expertises = new ArrayList<>();
+    private List<Long> employmentTypes = new ArrayList<>();
     private ActivityRulesSettings activityRulesSettings;
     private ActivitySkillSettings activitySkillSettings;
     private ActivityPhaseSettings activityPhaseSettings;

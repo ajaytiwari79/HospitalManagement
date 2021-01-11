@@ -1,7 +1,9 @@
 package com.kairos.enums.shift;
 
-public enum ShiftEscalationReason {
+import java.io.Serializable;
 
-    WORK_TIME_AGREEMENT,ACTIVITY,SHIFT_OVERLAPPING,BREAK_NOT_HELD
+public enum ShiftEscalationReason implements Serializable {
+
+    WORK_TIME_AGREEMENT, ACTIVITY, SHIFT_OVERLAPPING, BREAK_NOT_HELD
 
 }
