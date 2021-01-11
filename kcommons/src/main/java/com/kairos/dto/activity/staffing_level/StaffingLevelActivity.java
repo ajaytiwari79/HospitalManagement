@@ -43,11 +43,13 @@ public class StaffingLevelActivity {
     }
 
     public int getInitialUnderStaffing() {
-        return Math.min(initialUnderStaffing,availableNoOfStaff);
+        int currentUnderStaffing = Math.max(this.getMinNoOfStaff() - this.getAvailableNoOfStaff(), 0);
+        return Math.max(initialUnderStaffing, currentUnderStaffing);
     }
 
     public int getInitialOverStaffing() {
-        return Math.min(initialOverStaffing,availableNoOfStaff);
+        int currentOverStaffing = Math.max(this.getAvailableNoOfStaff()-this.getMaxNoOfStaff(),0);
+        return Math.min(initialOverStaffing,currentOverStaffing);
     }
 
     public StaffingLevelActivity(BigInteger activityId, int minNoOfStaff, int maxNoOfStaff) {
@@ -66,11 +68,17 @@ public class StaffingLevelActivity {
 
 
     public int getSolvedUnderStaffing() {
-        return Math.max(availableNoOfStaff - initialUnderStaffing,0);
+        if(initialUnderStaffing > (minNoOfStaff - availableNoOfStaff)){
+            return initialUnderStaffing - (minNoOfStaff - availableNoOfStaff);
+        }
+        return 0;
     }
 
     public int getSolvedlOverStaffing() {
-        return Math.max(initialOverStaffing-availableNoOfStaff,0);
+        if(initialOverStaffing > (availableNoOfStaff - maxNoOfStaff)){
+            return initialOverStaffing - (availableNoOfStaff - maxNoOfStaff);
+        }
+        return 0;
     }
 
     public int getUnderStaffingProblemInCurrentPhase() {
