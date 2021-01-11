@@ -1181,7 +1181,7 @@ public class ShiftService extends MongoBaseService {
         Map<LocalDate, List<FunctionDTO>> functionDTOMap = userIntegrationService.getFunctionsOfEmployment(unitId, asLocalDate(shiftStartDate), asLocalDate(endDate));
         return new CompactViewDTO(shiftDetailViewDTOMap, reasonCodeDTOS, functionDTOMap);
     }
-    @Cacheable(value = "shifts", key = "#p0", cacheManager = "cacheManager")
+    //@Cacheable(value = "shifts", key = "#p0", cacheManager = "cacheManager")
     public Object getAllShiftAndStates(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, ViewType viewType, ShiftFilterParam shiftFilterParam, Long expertiseId, StaffFilterDTO staffFilterDTO) {
 
         Object object = null;
