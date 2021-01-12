@@ -49,6 +49,7 @@ import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
+import lombok.Getter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -88,6 +89,7 @@ import static java.util.stream.Collectors.*;
  *  Date-27/01/2018
  *
  * */
+@Getter
 @Service
 public class TimeBankCalculationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeBankCalculationService.class);
@@ -951,45 +953,6 @@ public class TimeBankCalculationService {
         return quaterDateTime;
     }
 
-
-    //Calculating schedule Minutes for Open Shift
-    private int calculateScheduleAndDurationHourForOpenShift(OpenShift openShift, Activity activity, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
-        int scheduledMinutes = 0;
-        int duration;
-        int weeklyMinutes;
-        switch (activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime()) {
-            case ENTERED_MANUALLY:
-                duration = (int) MINUTES.between(DateUtils.asLocalTime(openShift.getStartDate()), DateUtils.asLocalTime(openShift.getStartDate()));
-                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
-                break;
-            case FIXED_TIME:
-                duration = activity.getActivityTimeCalculationSettings().getFixedTimeValue().intValue();
-                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
-                break;
-            case ENTERED_TIMES:
-                duration = (int) new Interval(openShift.getStartDate().getTime(), openShift.getEndDate().getTime()).toDuration().getStandardMinutes();
-                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
-                break;
-            case CommonConstants.FULL_DAY_CALCULATION:
-                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullDayCalculationType())) ? employmentWithCtaDetailsDTO.getFullTimeWeeklyMinutes() : employmentWithCtaDetailsDTO.getTotalWeeklyMinutes();
-                duration = Double.valueOf(weeklyMinutes * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
-                scheduledMinutes = duration;
-                break;
-            case AppConstants.WEEKLY_HOURS:
-                duration = Double.valueOf(employmentWithCtaDetailsDTO.getTotalWeeklyMinutes() * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
-                scheduledMinutes = duration;
-                break;
-            case CommonConstants.FULL_WEEK:
-                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullWeekCalculationType())) ? employmentWithCtaDetailsDTO.getFullTimeWeeklyMinutes() : employmentWithCtaDetailsDTO.getTotalWeeklyMinutes();
-                duration = Double.valueOf(weeklyMinutes * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
-                scheduledMinutes = duration;
-                break;
-            default:
-                break;
-        }
-        return scheduledMinutes;
-    }
-
     public TreeMap<java.time.LocalDate, TimeBankIntervalDTO> getAccumulatedTimebankDTO(java.time.LocalDate firstRequestPhasePlanningPeriodEndDate, DateTimeInterval planningPeriodInterval, List<DailyTimeBankEntry> dailyTimeBankEntries, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, java.time.LocalDate startDate, java.time.LocalDate endDate, long actualTimebankMinutes, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS) {
         long expectedTimebankMinutes = actualTimebankMinutes;
         java.time.LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate();
@@ -1162,16 +1125,5 @@ public class TimeBankCalculationService {
             employmentStartDate = employmentStartDate.plusDays(1);
         }
         return actualTimebank;
-    }
-
-    public void addBonusForProtectedDaysOff(boolean addValueInProtectedDaysOff, PayOutPerShift payOutPerShift, int value) {
-        if (isNotNull(payOutPerShift)) {
-            if(addValueInProtectedDaysOff){
-                payOutPerShift.setProtectedDaysOffMinutes(payOutPerShift.getProtectedDaysOffMinutes()+value);
-            }
-            payOutPerShift.setCtaBonusMinutesOfPayOut(value);
-            payOutPerShift.setScheduledMinutes(0);
-            payOutPerShift.setTotalPayOutMinutes(value);
-        }
     }
 }

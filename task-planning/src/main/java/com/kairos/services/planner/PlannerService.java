@@ -2017,20 +2017,6 @@ public class PlannerService extends MongoBaseService {
 
     private boolean skipTaskOnPublicHoliday(TaskDemand taskDemand, TaskDemandVisit taskDemandVisit) {
         return false;
-        /*int weekdayFrequency = getWeekFrequencyAsInt(taskDemand.getWeekdayFrequency().toString());
-
-        int visitCount = taskDemandVisit.getVisitCount();
-
-        if(weekdayFrequency == 1 && visitCount==5){
-            return false;
-        }else if(weekdayFrequency == 2 && visitCount==10){
-            return false;
-        }else if(weekdayFrequency == 3 && visitCount==15){
-            return false;
-        }else if(weekdayFrequency == 4 && visitCount==20){
-            return false;
-        }
-        return true;*/
     }
 
 }
