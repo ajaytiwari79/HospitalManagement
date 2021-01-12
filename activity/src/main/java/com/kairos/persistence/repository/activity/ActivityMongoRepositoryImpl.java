@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
@@ -137,14 +138,24 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     @Inject
     private MongoTemplate mongoTemplate;
 
-    public List<ActivityDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {
+    public List<ActivityCategoryListDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {
         List<AggregationOperation> customAgregationForCompositeActivity = new ArrayList<>();
         customAgregationForCompositeActivity.add(match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(deleted).and("activityRulesSettings.eligibleForStaffingLevel").is(true)));
         customAgregationForCompositeActivity.add(lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE_INFO));
         customAgregationForCompositeActivity.add(lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID, ACTIVITY_PRIORITY));
-        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(true));
+        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(true,true));
+        customAgregationForCompositeActivity.add(new CustomAggregationOperation("{\n" +
+                "     $group : { _id : \"$activityCategory\", activities: { $push: \"$$ROOT\" } }\n" +
+                "   }"));
+        customAgregationForCompositeActivity.add(new CustomAggregationOperation("{$project:{\n" +
+                "       \"activityCategory._id\": \"$_id.categoryId\",\n" +
+                "        \"activityCategory.name\": \"$_id.categoryName\",\n" +
+                "       \"activities\":1,\n" +
+                "       \"_id\":0\n" +
+                "       }}"));
         Aggregation aggregation = Aggregation.newAggregation(customAgregationForCompositeActivity);
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+
+        AggregationResults<ActivityCategoryListDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityCategoryListDTO.class);
         return result.getMappedResults();
     }
 
@@ -331,7 +342,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         customAgregationForCompositeActivity.add(match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(deleted)));
         customAgregationForCompositeActivity.add(lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE_INFO));
         customAgregationForCompositeActivity.add(lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID, ACTIVITY_PRIORITY));
-        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(false));
+        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(false,false));
         customAgregationForCompositeActivity.add(match(Criteria.where("timeTypeInfo.partOfTeam").is(true)));
         Aggregation aggregation = Aggregation.newAggregation(customAgregationForCompositeActivity);
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
@@ -692,9 +703,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return mongoTemplate.find(query, Activity.class);
     }
 
-    private List<AggregationOperation> getCustomAgregationForCompositeActivityWithCategory(boolean isChildActivityEligibleForStaffingLevel) {
+    private List<AggregationOperation> getCustomAgregationForCompositeActivityWithCategory(boolean isChildActivityEligibleForStaffingLevel,boolean groupByCategory) {
         String group = getGroup();
-        String projection = new StringBuffer("{'$project':{'childActivities':").append(isChildActivityEligibleForStaffingLevel ? "{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.activityRulesSettings.eligibleForStaffingLevel',true]} }}" : "'$childActivities'").append(",'activityTimeCalculationSettings':'$_id.activityTimeCalculationSettings','activityBalanceSettings':'$_id.activityBalanceSettings','_id':'$_id.id','name':'$_id.name','activityPriorityId':'$_id.activityPriorityId','activityPriority':'$_id.activityPriority','timeTypeInfo':'$_id.timeTypeInfo','allowChildActivities':'$_id.timeTypeInfo.allowChildActivities','categoryId':'$_id.categoryId','categoryName':'$_id.categoryName','translations':'$_id.translations'}}").toString();
+        String projection = getProjection(isChildActivityEligibleForStaffingLevel,groupByCategory);
 
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         aggregationOperations.add(lookup("activity_category", GENERAL_ACTIVITY_TAB_CATEGORY_ID, UNDERSCORE_ID,
@@ -724,6 +735,13 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         aggregationOperations.add(new CustomAggregationOperation(Document.parse(group)));
         aggregationOperations.add(new CustomAggregationOperation(Document.parse(projection)));
         return aggregationOperations;
+    }
+
+    private String getProjection(boolean isChildActivityEligibleForStaffingLevel, boolean groupByCategory) {
+        if(groupByCategory){
+            return new StringBuffer("{'$project':{'childActivities':").append(isChildActivityEligibleForStaffingLevel ? "{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.activityRulesSettings.eligibleForStaffingLevel',true]} }}" : "'$childActivities'").append(",'activityTimeCalculationSettings':'$_id.activityTimeCalculationSettings','activityBalanceSettings':'$_id.activityBalanceSettings','_id':'$_id.id','name':'$_id.name','activityPriorityId':'$_id.activityPriorityId','activityPriority':'$_id.activityPriority','timeTypeInfo':'$_id.timeTypeInfo','allowChildActivities':'$_id.timeTypeInfo.allowChildActivities','activityCategory.categoryId':'$_id.categoryId','activityCategory.categoryName':'$_id.categoryName','translations':'$_id.translations'}}").toString();
+        }
+        return new StringBuffer("{'$project':{'childActivities':").append(isChildActivityEligibleForStaffingLevel ? "{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.activityRulesSettings.eligibleForStaffingLevel',true]} }}" : "'$childActivities'").append(",'activityTimeCalculationSettings':'$_id.activityTimeCalculationSettings','activityBalanceSettings':'$_id.activityBalanceSettings','_id':'$_id.id','name':'$_id.name','activityPriorityId':'$_id.activityPriorityId','activityPriority':'$_id.activityPriority','timeTypeInfo':'$_id.timeTypeInfo','allowChildActivities':'$_id.timeTypeInfo.allowChildActivities','categoryId':'$_id.categoryId','categoryName':'$_id.categoryName','translations':'$_id.translations'}}").toString();
     }
 
     private String getGroup() {

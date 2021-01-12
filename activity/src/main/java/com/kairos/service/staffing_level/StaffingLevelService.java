@@ -275,15 +275,9 @@ public class StaffingLevelService {
     public Map<String, Object> getActivityTypesAndSkillsByUnitId(Long unitId) {
         OrganizationSkillAndOrganizationTypesDTO organizationSkillAndOrganizationTypesDTO =
                 userIntegrationService.getOrganizationSkillOrganizationSubTypeByUnitId(unitId);
-        List<ActivityDTO> activityTypeList = activityMongoRepository.findAllActivityByOrganizationGroupWithCategoryName(unitId, false);
-
-        Map<ActivityCategoryDTO, List<ActivityDTO>> activityTypeCategoryListMap = activityTypeList.stream().collect(
-                Collectors.groupingBy(activityType -> new ActivityCategoryDTO(activityType.getCategoryId(), activityType.getCategoryName()))
-        );
-        List<ActivityCategoryListDTO> activityCategoryListDTOS = activityTypeCategoryListMap.entrySet().stream().map(activity -> new ActivityCategoryListDTO(activity.getKey(),
-                activity.getValue())).collect(Collectors.toList());
+        List<ActivityCategoryListDTO> activityTypeList = activityMongoRepository.findAllActivityByOrganizationGroupWithCategoryName(unitId, false);
         Map<String, Object> activityTypesAndSkills = new HashMap<>();
-        activityTypesAndSkills.put("activities", activityCategoryListDTOS);
+        activityTypesAndSkills.put("activities", activityTypeList);
         activityTypesAndSkills.put("orgazationSkill", organizationSkillAndOrganizationTypesDTO.getAvailableSkills());
         return activityTypesAndSkills;
     }
