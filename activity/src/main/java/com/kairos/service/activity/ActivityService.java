@@ -682,7 +682,7 @@ public class ActivityService {
         return new ActivitySettingsWrapper(activity.getActivityOptaPlannerSetting());
     }
     public ActivitySettingsWrapper getCtaAndWtaSettingsTabOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
+        Activity activity = findActivityById(activityId);
         return new ActivitySettingsWrapper(activity.getActivityCTAAndWTASettings());
     }
 

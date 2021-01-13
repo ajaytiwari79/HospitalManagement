@@ -3,6 +3,7 @@ package com.kairos.service.widget;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.ActivityMessagesConstants;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
@@ -10,6 +11,7 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.widget.DashboardWidgetDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -42,6 +44,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.REALTIME_DURATION_NOT_CONFIGURED;
+import static com.kairos.constants.ActivityMessagesConstants.TIMESLOT_NOT_FOUND_FOR_UNIT;
 import static com.kairos.enums.widget.WidgetFilterType.*;
 import static java.util.Comparator.comparing;
 
@@ -89,7 +92,11 @@ public class WidgetService {
         requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
         List<DayTypeDTO> dayTypeDTOS=dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId());
-        List<TimeSlotDTO> timeSlotDTOS=timeSlotRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(unitId, TimeSlotType.SHIFT_PLANNING).getTimeSlots();
+        TimeSlotSetDTO timeSlotSetDTO = timeSlotRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(unitId, TimeSlotType.SHIFT_PLANNING);
+        if(isNull(timeSlotSetDTO)){
+            exceptionService.dataNotFoundException(TIMESLOT_NOT_FOUND_FOR_UNIT);
+        }
+        List<TimeSlotDTO> timeSlotDTOS= timeSlotSetDTO.getTimeSlots();
         staffAdditionalInfoDTOS.forEach(staff-> {staff.setDayTypes(dayTypeDTOS);staff.setTimeSlotSets(timeSlotDTOS);});
         Phase realTimePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, organizationDTO.getCountryId());

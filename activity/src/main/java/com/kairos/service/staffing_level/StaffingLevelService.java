@@ -461,7 +461,7 @@ public class StaffingLevelService {
         if (!staffingLevel.getPresenceStaffingLevelInterval().isEmpty()) {
             PresenceStaffingLevelDto presenceStaffingLevelDto = ObjectMapperUtils.copyPropertiesByMapper(staffingLevel,PresenceStaffingLevelDto.class);
             presenceStaffingLevelDto.setUpdatedAt(staffingLevel.getUpdatedAt());
-            if (fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()) {
+            if (fieldPermissionMap.containsKey("name") && fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()) {
                 staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().forEach(k -> k.setName("XXXXX"));
             }
             presenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
