@@ -28,14 +28,14 @@ public class UnavailabilityCalculationKPIService implements KPIService{
     @Inject private KPIBuilderCalculationService kpiBuilderCalculationService;
 
 
-    public double getUnavailabilityCalculationData(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+    public double getUnavailabilityCalculationData(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval,true);
         KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
         KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
         return getTotalOfUnavailabilityShift(kpiCalculationRelatedInfo, filterShiftActivity,shiftWithActivityDTOS);
     }
 
-    private double getTotalOfUnavailabilityShift(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity,List<ShiftWithActivityDTO> shiftWithActivityDTOS) {
+    private double getTotalOfUnavailabilityShift(KPICalculationRelatedInfo kpiCalculationRelatedInfo, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity,List<ShiftWithActivityDTO> shiftWithActivityDTOS) {
         List<ShiftActivityDTO> shifts = new CopyOnWriteArrayList<>(shiftWithActivityDTOS.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).collect(Collectors.toList()));
         List<ShiftActivityDTO> shiftActivityDTOS = new ArrayList<>();
         double total = 0;
@@ -53,7 +53,7 @@ public class UnavailabilityCalculationKPIService implements KPIService{
         return getTotalByCalculationUnitOfUnavailibilityShift(kpiCalculationRelatedInfo, filterShiftActivity, shiftActivityDTOS, total);
     }
 
-    private double getTotalByCalculationUnitOfUnavailibilityShift(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity, List<ShiftActivityDTO> shiftActivityDTOS, double total) {
+    private double getTotalByCalculationUnitOfUnavailibilityShift(KPICalculationRelatedInfo kpiCalculationRelatedInfo, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity, List<ShiftActivityDTO> shiftActivityDTOS, double total) {
         XAxisConfig calculationUnit = (XAxisConfig) ((List) copyCollectionPropertiesByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
         switch (calculationUnit) {
             case COUNT:
@@ -75,7 +75,7 @@ public class UnavailabilityCalculationKPIService implements KPIService{
     }
 
     @Override
-    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
         return getUnavailabilityCalculationData(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
     }
 }

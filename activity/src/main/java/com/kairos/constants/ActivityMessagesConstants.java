@@ -410,5 +410,9 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_DRAFT_COPY_CREATED="draft.already.exists";
     public static final String MESSAGE_RANKING_ALREADY_PUBLISHED="ranking.already.published";
     public static final String MESSAGE_PUBLISH_DATE_NOT_LESS_THAN_OR_EQUALS_PARENT_START_DATE="draft.copy.overlapped.published";
+    public static final String MESSAGE_TIMESLOT_ID_NOTFOUND = "message.timeslot.id.notfound";
+    public static final String MESSAGE_REASONCODE_NAME_ALREADYEXIST = "message.reasonCode.name.alreadyExist";
+    public static final String MESSAGE_REASONCODE_ID_NOTFOUND = "message.reasonCode.id.notFound";
+    public static final String GAP_FILLING_SETTING_NOT_CONFIGURED = "gap.filling.configuration.absent";
 
 }

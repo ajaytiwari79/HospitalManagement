@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.reason_code.ReasonCodeType.TIME_TYPE;
 
 @Service
@@ -30,7 +31,7 @@ public class ReasonCodeService {
 
         boolean isAlreadyExists = reasonCodeRepository.existsByCountryIdAndIdNotInAndNameOrReasonCodeTypeOrCode(countryId, new BigInteger("-1"), "(?i)" + reasonCodeDTO.getName().trim(), reasonCodeDTO.getReasonCodeType(),reasonCodeDTO.getCode());
         if (isAlreadyExists) {
-            exceptionService.duplicateDataException("MESSAGE_REASONCODE_NAME_ALREADYEXIST", reasonCodeDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_REASONCODE_NAME_ALREADYEXIST, reasonCodeDTO.getName());
         }
         validateReasonCode(reasonCodeDTO);
         ReasonCode reasonCode = new ReasonCode(reasonCodeDTO.getName(), reasonCodeDTO.getCode(), reasonCodeDTO.getDescription(), reasonCodeDTO.getReasonCodeType(), countryId, reasonCodeDTO.getTimeTypeId());
@@ -42,7 +43,7 @@ public class ReasonCodeService {
     public ReasonCodeDTO createReasonCodeForUnit(long unitId, ReasonCodeDTO reasonCodeDTO) {
         boolean isAlreadyExists = reasonCodeRepository.existsByUnitIdAndNameOrReasonCodeTypeOrCodeAndIdNotIn(unitId,  reasonCodeDTO.getName().trim(), reasonCodeDTO.getReasonCodeType(),reasonCodeDTO.getCode(),new BigInteger("-1"));
         if (isAlreadyExists) {
-            exceptionService.duplicateDataException("MESSAGE_REASONCODE_NAME_ALREADYEXIST", reasonCodeDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_REASONCODE_NAME_ALREADYEXIST, reasonCodeDTO.getName());
         }
         ReasonCode reasonCode = new ReasonCode(reasonCodeDTO.getName(), reasonCodeDTO.getCode(), reasonCodeDTO.getDescription(), reasonCodeDTO.getReasonCodeType(), reasonCodeDTO.getTimeTypeId(),unitId);
         reasonCodeRepository.save(reasonCode);
@@ -66,12 +67,12 @@ public class ReasonCodeService {
     public ReasonCodeDTO updateReasonCodeForCountry(long countryId, ReasonCodeDTO reasonCodeDTO) {
         boolean isNameAlreadyExists = reasonCodeRepository.existsByCountryIdAndIdNotInAndNameOrReasonCodeTypeOrCode(countryId, reasonCodeDTO.getId(), "(?i)" + reasonCodeDTO.getName(), reasonCodeDTO.getReasonCodeType(),reasonCodeDTO.getCode());
         if (isNameAlreadyExists) {
-            exceptionService.duplicateDataException("MESSAGE_REASONCODE_NAME_ALREADYEXIST", reasonCodeDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_REASONCODE_NAME_ALREADYEXIST, reasonCodeDTO.getName());
         }
         validateReasonCode(reasonCodeDTO);
         ReasonCode reasonCode = reasonCodeRepository.findOne(reasonCodeDTO.getId());
         if (!Optional.ofNullable(reasonCode).isPresent()) {
-            exceptionService.dataNotFoundByIdException("MESSAGE_REASONCODE_ID_NOTFOUND", reasonCodeDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, reasonCodeDTO.getId());
 
         }
         return updateReasonCode(reasonCode, reasonCodeDTO);
@@ -80,11 +81,11 @@ public class ReasonCodeService {
     public ReasonCodeDTO updateReasonCodeForUnit(long unitId, ReasonCodeDTO reasonCodeDTO) {
         boolean isNameAlreadyExists = reasonCodeRepository.existsByUnitIdAndNameOrReasonCodeTypeOrCodeAndIdNotIn(unitId,  "(?i)" + reasonCodeDTO.getName(), reasonCodeDTO.getReasonCodeType(),reasonCodeDTO.getCode(),reasonCodeDTO.getId());
         if (isNameAlreadyExists) {
-            exceptionService.duplicateDataException("MESSAGE_REASONCODE_NAME_ALREADYEXIST", reasonCodeDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_REASONCODE_NAME_ALREADYEXIST, reasonCodeDTO.getName());
         }
         ReasonCode reasonCode = reasonCodeRepository.findOne(reasonCodeDTO.getId());
         if (!Optional.ofNullable(reasonCode).isPresent()) {
-            exceptionService.dataNotFoundByIdException("MESSAGE_REASONCODE_ID_NOTFOUND", reasonCodeDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, reasonCodeDTO.getId());
 
         }
         return updateReasonCode(reasonCode, reasonCodeDTO);
@@ -102,7 +103,7 @@ public class ReasonCodeService {
     public boolean deleteReasonCode(BigInteger reasonCodeId) {
         ReasonCode reasonCode = reasonCodeRepository.findOne(reasonCodeId);
         if (!Optional.ofNullable(reasonCode).isPresent()) {
-            exceptionService.dataNotFoundByIdException("MESSAGE_REASONCODE_ID_NOTFOUND", reasonCodeId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, reasonCodeId);
 
         }
         reasonCode.setDeleted(true);
@@ -125,7 +126,7 @@ public class ReasonCodeService {
 
     private void validateReasonCode(ReasonCodeDTO reasonCodeDTO){
         if(TIME_TYPE.equals(reasonCodeDTO.getReasonCodeType()) && isNull(reasonCodeDTO.getTimeTypeId())){
-                exceptionService.actionNotPermittedException("ERROR_TIMETYPE_UNSELECTED");
+                exceptionService.actionNotPermittedException(ERROR_TIMETYPE_UNSELECTED);
         }
     }
 
