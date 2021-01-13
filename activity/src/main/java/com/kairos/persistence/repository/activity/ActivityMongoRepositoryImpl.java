@@ -421,7 +421,29 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public List<ActivityWrapper> findParentActivitiesAndTimeTypeByActivityId(Collection<BigInteger> activityIds) {
-        return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false));
+        return getParentActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false));
+    }
+
+    private List<ActivityWrapper> getParentActivityWrappersByCriteria(Criteria criteria) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id",
+                        TIME_TYPE1),
+                lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID,
+                        ACTIVITY_PRIORITY),
+                getProjectForParentActivityWrapper()
+        );
+        AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
+        return result.getMappedResults();
+    }
+
+    private ProjectionOperation getProjectForParentActivityWrapper() {
+        return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(CHILD_ACTIVITY_IDS).as("activity.childActivityIds")
+                .and(ID).as("activity.id").and(ACTIVITY_PRIORITY_ID).as("activity.activityPriorityId").and(UNIT_ID).as(ACTIVITY_UNIT_ID)
+                .and(BALANCE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_BALANCE_SETTINGS_ACTIVITY_TAB).and(RULES_ACTIVITY_TAB).as(ACTIVITY_RULES_ACTIVITY_TAB)
+                .and(TIME_CALCULATION_ACTIVITY_TAB).as(ACTIVITY_TIME_CALCULATION_ACTIVITY_TAB).and(BONUS_ACTIVITY_TAB).as(ACTIVITY_BONUS_ACTIVITY_TAB)
+                .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1).and(TIME_TYPE_TIME_TYPES).as(TIME_TYPE1).and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE_INFO)
+                .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY);
     }
 
     @Override
@@ -443,6 +465,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
         return result.getMappedResults();
     }
+
+
 
     private ProjectionOperation getProjectForActivityWrapper() {
         return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
