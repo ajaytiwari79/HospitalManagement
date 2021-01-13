@@ -1,9 +1,11 @@
 package com.kairos.controller.exception_handler;
 
+import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.service.mail.SendGridMailService;
 import com.mindscapehq.raygun4java.core.RaygunClient;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.core.annotation.Order;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -33,6 +36,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -46,6 +51,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.kairos.constants.ActivityMessagesConstants.INTERNAL_SERVER_ERROR;
+import static com.kairos.constants.CommonConstants.LOCAL_PROFILE;
 
 @RestControllerAdvice
 @Order(1)
@@ -64,6 +70,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     private SendGridMailService sendGridMailService;
     @Inject
     private RaygunClient raygunClient;
+    @Inject private EnvConfigCommon envConfigCommon;
 
     private String convertMessage(String message, Object... params) {
         for (int i = 0; i < params.length; i++) {
@@ -396,8 +403,10 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
         errorMessage.setData(ex.getMessage());
         errorMessage.setPath(httprequest.getRequestURL().toString());
-        sendGridMailService.sendMailToBackendOnException(ex);
-        raygunClient.send(ex);
+        if(!envConfigCommon.getCurrentProfile().equals(LOCAL_PROFILE) && !(ex instanceof CannotCreateTransactionException) && !(ex instanceof HttpServerErrorException) && !(ex instanceof ClientAbortException) && !(ex instanceof ResourceAccessException)) {
+            raygunClient.send(ex);
+            sendGridMailService.sendMailToBackendOnException(ex);
+        }
         logger.error("exception {}", ex.getCause());
         return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
