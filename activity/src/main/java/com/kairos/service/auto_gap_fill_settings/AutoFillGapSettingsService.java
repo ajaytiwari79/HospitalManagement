@@ -147,7 +147,7 @@ public class AutoFillGapSettingsService {
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activityList.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
             filterActivities(staffAdditionalInfoDTO.getTeamsData(), activityWrapperMap, shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet()));
             setBasicDetails(shiftActivityBeforeGap, shiftActivityAfterGap, activityWrapperMap);
-            Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = updateStaffingLevelDetails(activityList, activities, phase, activityWrapperMap);
+            Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = updateStaffingLevelDetails(activities, phase, activityWrapperMap);
             AutoGapFillingScenario gapFillingScenario = getGapFillingScenario(shiftActivityBeforeGap, shiftActivityAfterGap);
             AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), staffAdditionalInfoDTO.getOrganizationType().getId(), staffAdditionalInfoDTO.getOrganizationSubType().getId(), phase.getId(), gapFillingScenario.toString(), null, staffAdditionalInfoDTO.getRoles().contains(MANAGEMENT) ? MANAGEMENT.toString() : STAFF.toString(), shiftDTO.getShiftDate(), shiftDTO.getShiftDate());
             if(isNull(gapSettings)){
@@ -389,10 +389,9 @@ public class AutoFillGapSettingsService {
     }
 
 
-    private Map<BigInteger, StaffingLevelActivityWithDuration> updateStaffingLevelDetails(List<ActivityWrapper> activityDTOList, ShiftActivityDTO[] activities, Phase phase, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+    private Map<BigInteger, StaffingLevelActivityWithDuration> updateStaffingLevelDetails(ShiftActivityDTO[] activities, Phase phase, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         List<ShiftActivity> shiftActivities = new ArrayList<>();
-        activityDTOList.forEach(k -> shiftActivities.add(new ShiftActivity(k.getActivity().getName(), activities[0].getEndDate(), activities[1].getEndDate(), k.getActivity().getId(), null)));
-        //TODO Use Builder in Shift
+        activityWrapperMap.forEach((k,v)->shiftActivities.add(new ShiftActivity(v.getActivity().getName(), activities[0].getEndDate(), activities[1].getEndDate(), k, null)));
         Shift shift = new Shift();
         shift.setActivities(shiftActivities);
         shift.setStartDate(activities[0].getEndDate());
