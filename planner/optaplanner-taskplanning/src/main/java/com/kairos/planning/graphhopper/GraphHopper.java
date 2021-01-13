@@ -38,7 +38,7 @@ public class GraphHopper {
 		try {
 			response =  api.matrixGet(getApiKey(), point, fromPoint, toPoint, requiredFields, vehicle);
 		} catch (ApiException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		return response;
 	}
@@ -69,7 +69,7 @@ public class GraphHopper {
 			response = geoApi.geocodeGet(getApiKey(), address, "en", 1, false, "", "default");
 			log.info("latitude "+response.getHits().get(0).getPoint().getLat()+" longitude "+response.getHits().get(0).getPoint().getLat());
 		} catch (ApiException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		return null;
 	}
@@ -88,7 +88,7 @@ public class GraphHopper {
 			  prop.load(new FileInputStream(new File("/media/pradeep/bak/multiOpta/task-planner/src/main/resources/taskplanner.properties")));
 		 String key = prop.getProperty("graphhopper.key"); 
 		 
-		  } catch (IOException e) { e.printStackTrace(); }*/
+		  } catch (IOException e) { logger.error(e.getMessage()); }*/
 		 
 		log.info(matrixKey);
 		return matrixKey;

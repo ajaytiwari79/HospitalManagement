@@ -40,7 +40,7 @@ public class XmlConfigServiceUnitTest {
             transformer.transform(source, result);
             InputStream stream = new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8.name()));
         } catch (ParserConfigurationException | IOException | SAXException | TransformerException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

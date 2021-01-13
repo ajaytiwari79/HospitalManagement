@@ -11,6 +11,8 @@ import com.kairos.persistence.model.counter.FibonacciKPI;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.mongodb.client.MongoDatabase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -35,6 +37,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	private final MongoOperations mongoOperations;
 	private final MongoEntityInformation<T, ID> entityInformation;
 	MongoDatabase mongoDatabase;
+	private final Logger logger = LoggerFactory.getLogger(MongoBaseRepositoryImpl.class);
 
 	/**
 	 *  Sequence collection name prefix
@@ -169,7 +172,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 		try {
 			oldEntity = (S) entity.getClass().newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		return oldEntity;
 	}

@@ -79,7 +79,7 @@ public class TasksMergingService extends MongoBaseService {
             try {
                 startDate = executionDateFormat.parse(taskData.get("resource").toString());
             } catch (ParseException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
         LOGGER.debug("taskIds <><><><><><><><>" + taskIds);

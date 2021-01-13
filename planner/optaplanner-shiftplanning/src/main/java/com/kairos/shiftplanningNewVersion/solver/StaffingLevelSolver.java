@@ -332,7 +332,7 @@ public class StaffingLevelSolver {
                 unSolvedsolution = staffingLevelSolver.runSolverOnRequest(unSolvedsolution);
                 //writeSolutionToFile(unSolvedsolution);
             }catch (Exception e){
-                e.printStackTrace();
+                logger.error(e.getMessage());
                 File file = new File(System.getProperty(USER_HOME) + "/" + "exception.text");
                 if(!file.exists()){
                     file.createNewFile();

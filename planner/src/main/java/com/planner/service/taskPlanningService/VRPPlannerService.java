@@ -124,7 +124,7 @@ public class VRPPlannerService {
             ;
         }*/
         }catch(Exception e){
-            e.printStackTrace();
+            logger.error(e.getMessage());
             log.error("Continuing with no drls.");
         }
         return drlFiles;

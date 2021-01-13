@@ -320,7 +320,7 @@ public class StaffingLevelService {
         try {
             response = client.execute(request);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         try (BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));) {
             String line = "";
@@ -328,7 +328,7 @@ public class StaffingLevelService {
                 result.append(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         try {
             postBody = new JSONObject(result.toString());
@@ -352,7 +352,7 @@ public class StaffingLevelService {
                 UrlEncodedFormEntity entity = new UrlEncodedFormEntity(parametersList);
                 postRequest.setEntity(entity);
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
             }
         }
         if (body != null) {
@@ -461,7 +461,7 @@ public class StaffingLevelService {
         if (!staffingLevel.getPresenceStaffingLevelInterval().isEmpty()) {
             PresenceStaffingLevelDto presenceStaffingLevelDto = ObjectMapperUtils.copyPropertiesByMapper(staffingLevel,PresenceStaffingLevelDto.class);
             presenceStaffingLevelDto.setUpdatedAt(staffingLevel.getUpdatedAt());
-            if (fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()) {
+            if (fieldPermissionMap.containsKey("name") && fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()) {
                 staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities().forEach(k -> k.setName("XXXXX"));
             }
             presenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());

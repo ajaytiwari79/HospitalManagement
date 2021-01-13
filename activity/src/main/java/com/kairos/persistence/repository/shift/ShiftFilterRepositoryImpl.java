@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.LOGGER;
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.constants.AppConstants.DELETED;
 import static com.kairos.enums.FilterType.ABSENCE_ACTIVITY;
@@ -213,7 +214,7 @@ public class ShiftFilterRepositoryImpl implements ShiftFilterRepository {
         try {
             dateWithoutTime = DateUtils.convertToOnlyDate(today, "yyyy-MM-dd");
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         Set<Long> staffIds = new HashSet<>();
         for (String filterValue : filterValues) {

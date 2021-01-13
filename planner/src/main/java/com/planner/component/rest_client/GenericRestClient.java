@@ -71,7 +71,7 @@ public class GenericRestClient {
             }
             responseData = response.getData();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             /*logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
             throw new RuntimeException(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(), ResponseEnvelope.class).getMessage());*/

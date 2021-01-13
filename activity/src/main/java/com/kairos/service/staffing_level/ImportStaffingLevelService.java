@@ -167,7 +167,7 @@ public class ImportStaffingLevelService {
         try {
             date = sourceFormat.parse(firstData.get(FOR_DAY));
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         LocalDate dateInLocal = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();

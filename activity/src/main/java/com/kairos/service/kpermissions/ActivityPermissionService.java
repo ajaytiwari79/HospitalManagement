@@ -112,7 +112,7 @@ public class ActivityPermissionService {
                             objectIdsMap.put(object.getClass(), ids);
                         }
                     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage());
                     }
             }
             Map<ID,E> mapOfDataBaseObject = new HashMap<>();
@@ -123,7 +123,7 @@ public class ActivityPermissionService {
                         try {
                             mapOfDataBaseObject.put((ID) object.getClass().getMethod("getId").invoke(object),object);
                         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                            e.printStackTrace();
+                            LOGGER.error(e.getMessage());
                         }
                     }
                 }

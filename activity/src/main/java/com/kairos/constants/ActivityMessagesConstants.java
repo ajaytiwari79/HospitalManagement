@@ -414,5 +414,6 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_REASONCODE_NAME_ALREADYEXIST = "message.reasonCode.name.alreadyExist";
     public static final String MESSAGE_REASONCODE_ID_NOTFOUND = "message.reasonCode.id.notFound";
     public static final String GAP_FILLING_SETTING_NOT_CONFIGURED = "gap.filling.configuration.absent";
+    public static final String TIMESLOT_NOT_FOUND_FOR_UNIT = "timeslot.not.found";
 
 }
