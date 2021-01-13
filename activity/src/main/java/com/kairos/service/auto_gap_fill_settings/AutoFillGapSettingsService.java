@@ -151,7 +151,7 @@ public class AutoFillGapSettingsService {
             AutoGapFillingScenario gapFillingScenario = getGapFillingScenario(shiftActivityBeforeGap, shiftActivityAfterGap);
             AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), staffAdditionalInfoDTO.getOrganizationType().getId(), staffAdditionalInfoDTO.getOrganizationSubType().getId(), phase.getId(), gapFillingScenario.toString(), null, staffAdditionalInfoDTO.getRoles().contains(MANAGEMENT) ? MANAGEMENT.toString() : STAFF.toString(), shiftDTO.getShiftDate(), shiftDTO.getShiftDate());
             if(isNull(gapSettings)){
-                exceptionService.dataNotFoundException("gap.filling.configuration.absent");
+                exceptionService.dataNotFoundException(GAP_FILLING_SETTING_NOT_CONFIGURED);
             }
             ShiftActivityDTO shiftActivityDTO = getActivityToFillTheGap(staffAdditionalInfoDTO, shiftActivityBeforeGap, shiftActivityAfterGap, gapFillingScenario, gapSettings, staffingLevelActivityWithDurationMap, activityList);
             for (int index = 0; index < shiftDTO.getActivities().size() - 1; index++) {
@@ -197,7 +197,7 @@ public class AutoFillGapSettingsService {
                 break;
         }
         if(isNull(shiftActivityDTO)){
-            exceptionService.actionNotPermittedException("gap.filling.configuration.absent");
+            exceptionService.actionNotPermittedException(GAP_FILLING_SETTING_NOT_CONFIGURED);
         }
         return shiftActivityDTO;
     }
@@ -244,7 +244,7 @@ public class AutoFillGapSettingsService {
                     activityId = afterGap.getActivity().getActivityPriority().getSequence() < beforeGap.getActivity().getActivityPriority().getSequence() ? afterGap.getActivityId() : beforeGap.getActivityId();
                     return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
                 default:
-                    exceptionService.actionNotPermittedException("gap.filling.configuration.absent");
+                    exceptionService.actionNotPermittedException(GAP_FILLING_SETTING_NOT_CONFIGURED);
             }
         }
         return shiftActivityDTO;

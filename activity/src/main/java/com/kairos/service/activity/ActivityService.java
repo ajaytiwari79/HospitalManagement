@@ -91,6 +91,7 @@ import static com.kairos.service.activity.ActivityUtil.*;
 @Transactional
 @Service
 public class ActivityService {
+    public static final String XXXXX = "XXXXX";
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private ActivityCategoryRepository activityCategoryRepository;
     @Inject private ShiftService shiftService;
@@ -949,11 +950,11 @@ public class ActivityService {
         Map<BigInteger,ActivityDTO> activityDTOMap= activityMongoRepository.getActivityDetailsWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v));
         activityDTOMap.forEach((k,v)->{
             if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
-                v.setName("XXXXX");
-                v.getActivityGeneralSettings().setName("XXXXX");
+                v.setName(XXXXX);
+                v.getActivityGeneralSettings().setName(XXXXX);
             }
             if(fieldPermissionMap.get("ultraShortName").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("ultraShortName").isEmpty()){
-                v.getActivityGeneralSettings().setUltraShortName("XXXXX");
+                v.getActivityGeneralSettings().setUltraShortName(XXXXX);
             }
         });
         return activityDTOMap;

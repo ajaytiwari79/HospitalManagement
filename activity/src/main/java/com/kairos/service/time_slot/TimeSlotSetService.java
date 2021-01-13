@@ -26,6 +26,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_TIMESLOT_ID_NOTFOUND;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.TimeSlotType.SHIFT_PLANNING;
 import static com.kairos.enums.TimeSlotType.TASK_PLANNING;
@@ -73,7 +74,7 @@ public class TimeSlotSetService {
     public TimeSlotDTO createTimeSlot(BigInteger timeSlotSetId, TimeSlotDTO timeSlotDTO) {
         TimeSlotSet timeSlotSet = timeSlotRepository.findOne(timeSlotSetId);
         if (!Optional.ofNullable(timeSlotSet).isPresent()) {
-            exceptionService.dataNotFoundByIdException("MESSAGE_TIMESLOT_ID_NOTFOUND");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMESLOT_ID_NOTFOUND);
         }
         TimeSlot timeSlot = new TimeSlot(null,timeSlotDTO.getName(),timeSlotDTO.getStartHour(),timeSlotDTO.getStartMinute(),timeSlotDTO.getEndHour(),timeSlotDTO.getEndMinute(),false);
         timeSlotSet.getTimeSlots().add(timeSlot);
@@ -107,7 +108,7 @@ public class TimeSlotSetService {
         TimeSlotSet timeSlotSetToDelete = timeSlotRepository.findOne(timeSlotSetId);
         if (!Optional.ofNullable(timeSlotSetToDelete).isPresent()) {
             logger.error("Invalid time slot id {}" , timeSlotSetId);
-            exceptionService.dataNotFoundByIdException("MESSAGE_TIMESLOT_ID_NOTFOUND");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMESLOT_ID_NOTFOUND);
 
         }
         timeSlotSetToDelete.setDeleted(true);
