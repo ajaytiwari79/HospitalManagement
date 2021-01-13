@@ -145,7 +145,7 @@ public class AuditLogging {
             deleted = (boolean)newEntity.getClass().getMethod("isDeleted").invoke(newEntity);
 
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         if(isNull(id)) {
             return LoggingType.CREATED;

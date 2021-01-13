@@ -51,7 +51,7 @@ public class TaskPlanningGenerator {
             //unresolvedSolution = (TaskPlanningSolution) xstream.fromXML("");//unplannedTask.xml
             unresolvedSolution = (TaskPlanningSolution) xstream.fromXML(this.getClass().getClassLoader().getResourceAsStream(FILE_TO_USE));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             throw e;
         }
         return unresolvedSolution;

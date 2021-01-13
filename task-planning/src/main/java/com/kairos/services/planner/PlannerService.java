@@ -884,7 +884,7 @@ public class PlannerService extends MongoBaseService {
         try {
             updatedDate = executionDateFormat.parse(taskData.getResource());
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         Task task = taskMongoRepository.findOne(new BigInteger(taskData.getId()));
         TaskType taskType = taskTypeMongoRepository.findOne(task.getTaskTypeId());
@@ -1065,7 +1065,7 @@ public class PlannerService extends MongoBaseService {
                 }
 
             } catch (ParseException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
             if (Optional.ofNullable(taskData.getTimeWindow()).isPresent()) {
                 Map<String, Object> timeWindow = taskData.getTimeWindow();
@@ -2008,7 +2008,7 @@ public class PlannerService extends MongoBaseService {
         try {
             s = objectMapper.writeValueAsString(clientAggregator);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("citizenDataList", Arrays.asList(s));

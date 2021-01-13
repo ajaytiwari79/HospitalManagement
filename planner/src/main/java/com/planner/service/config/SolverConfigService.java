@@ -74,11 +74,11 @@ public class SolverConfigService {
             FileIOUtil.copyFileContent(baseFile,file);
             doc = docBuilder.parse(file);
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } catch (SAXException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return doc;
     }
@@ -242,7 +242,7 @@ public class SolverConfigService {
                     List.class, Rule.class);
             rules = mapper.readValue(new File("files/Rule.json"), collectionType);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         solverConfigRepository.saveList(rules);
         return true;
@@ -257,7 +257,7 @@ public class SolverConfigService {
                     List.class, RuleDTO.class);
             ruleDTOS = mapper.readValue(new File("files/updateRules.json"), collectionType);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         saveRules(ruleDTOS);
         return true;
@@ -282,7 +282,7 @@ public class SolverConfigService {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.writeValue(new File("files/rule.json"), rules);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -334,7 +334,7 @@ public class SolverConfigService {
                     List.class, SolverConfigWTADTO.class);
             rules = mapper.readValue( mapper.writeValueAsString(map), collectionType);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         //solverConfigRepository.saveList(rules);
         return true;*//*

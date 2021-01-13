@@ -44,7 +44,7 @@ public class ShiftPlanningSolverTest {
         try {
             new StaffingLevelSolver().run();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

@@ -497,7 +497,7 @@ public class PermissionService {
                     S startNode = (S) field.get(entity);
                     id = (Long) startNode.getClass().getMethod(GET_ID).invoke(startNode);
                 } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                    e.printStackTrace();
+                    LOGGER.error(e.getMessage());
                 }
                 modelName = field.getType().getSimpleName();
             }
@@ -562,7 +562,7 @@ public class PermissionService {
                             objectIdsMap.put(object.getClass(), ids);
                         }
                     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage());
                     }
                 }
             }
@@ -585,7 +585,7 @@ public class PermissionService {
                         ID id = (ID) object.getClass().getMethod(GET_ID).invoke(object);
                         mapOfDataBaseObject.put(id, object);
                     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage());
                     }
                 }
             }
