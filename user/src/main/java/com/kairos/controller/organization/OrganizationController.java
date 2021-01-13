@@ -183,68 +183,6 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, services);
     }
 
-   //TODO Below 4 Integrated
-//    @ApiOperation(value = "Get Organization Time Slots")
-//    @GetMapping(UNIT_URL + "/time_slot_set/{timeSlotSetId}/time_slot")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> getTimeSlots(@PathVariable Long timeSlotSetId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByTimeSlotSet(timeSlotSetId));
-//    }
-
-//    @ApiOperation(value = "Get Organization Time Slot sets")
-//    @GetMapping(UNIT_URL + "/time_slot_set")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> getTimeSlotSets(@PathVariable Long unitId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotSets(unitId));
-//    }
-
-//    @ApiOperation(value = "create new time slot set")
-//    @PostMapping(UNIT_URL + "/time_slot")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> createTimeSlotSet(@PathVariable long unitId, @Validated @RequestBody TimeSlotSetDTO timeSlotSetDTO) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.createTimeSlotSet(unitId, timeSlotSetDTO));
-//    }
-
-//    @ApiOperation(value = "create new time slot set")
-//    @PostMapping(UNIT_URL + "/time_slot_set/{timeSlotSetId}/time_slot")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> createTimeSlot(@PathVariable Long timeSlotSetId, @Validated @RequestBody TimeSlotDTO timeSlotDTO) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.createTimeSlot(timeSlotSetId, timeSlotDTO));
-//    }
-
-//    @ApiOperation(value = "delete time slot set")
-//    @DeleteMapping(UNIT_URL + "/time_slot_set/{timeSlotId}")
-//    public ResponseEntity<Map<String, Object>> deleteTimeSlotSet(@PathVariable Long unitId, @PathVariable Long timeSlotId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.deleteTimeSlotSet(unitId, timeSlotId));
-//    }
-
-//    @ApiOperation(value = "update time slot set")
-//    @PutMapping(UNIT_URL + "/time_slot_set/{timeSlotSetId}")
-//    public ResponseEntity<Map<String, Object>> updateTimeSlotSet(@PathVariable Long unitId, @PathVariable Long timeSlotSetId, @Validated @RequestBody TimeSlotSetDTO timeSlotSetDTO) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.updateTimeSlotSet(unitId, timeSlotSetId, timeSlotSetDTO));
-//    }
-
-//    @ApiOperation(value = "update time slot type")
-//    @PutMapping(UNIT_URL + "/time_slot_type")
-//    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> updateTimeSlotType(@PathVariable long unitId, @RequestBody Map<String, Object> timeSlotType) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.updateTimeSlotType(unitId, (boolean) timeSlotType.get("standardTimeSlot")));
-//    }
-
-//    @ApiOperation(value = "Update time slot")
-//    @PutMapping(UNIT_URL + "/time_slot_set/{timeSlotId}/time_slot")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> updateTimeSlot(@Validated @RequestBody List<TimeSlotDTO> timeSlotDTO, @PathVariable Long timeSlotId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.updateTimeSlot(timeSlotDTO, timeSlotId));
-//    }
-
-//    @ApiOperation(value = "Delete time slot")
-//    @DeleteMapping(UNIT_URL + "/time_slot_set/{timeSlotSetId}/time_slot/{timeSlotId}")
-//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> deleteTimeSlot(@PathVariable long timeSlotId, @PathVariable Long timeSlotSetId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.deleteTimeSlot(timeSlotId, timeSlotSetId));
-//    }
-
     @ApiOperation(value = "Get Organization Hierarchy")
     @GetMapping("/organization_flow/hierarchy")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
