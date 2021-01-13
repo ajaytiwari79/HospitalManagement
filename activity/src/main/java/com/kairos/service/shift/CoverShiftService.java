@@ -1,19 +1,23 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.shift.CoverShiftSettingDTO;
 import com.kairos.dto.activity.shift.NotEligibleStaffDataDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.user.staff.staff.Staff;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftDataHelper;
+import com.kairos.persistence.repository.shift.CoverShiftSettingMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import org.apache.commons.collections.CollectionUtils;
@@ -33,8 +37,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.persistence.model.shift.CoverShiftSetting.CoverShiftCriteria.STAFF_WITH_EMPLOYEMENT_TYPES;
-import static com.kairos.persistence.model.shift.CoverShiftSetting.CoverShiftCriteria.STAFF_WITH_TAGS;
+import static com.kairos.enums.shift.CoverShiftCriteria.STAFF_WITH_EMPLOYEMENT_TYPES;
+import static com.kairos.enums.shift.CoverShiftCriteria.STAFF_WITH_TAGS;
 
 @Service
 public class CoverShiftService {
@@ -48,7 +52,30 @@ public class CoverShiftService {
     @Inject private PlanningPeriodService planningPeriodService;
     @Inject private PhaseService phaseService;
     @Inject private ExecutorService executorService;
+    @Inject private CoverShiftSettingMongoRepository coverShiftSettingMongoRepository;
+    @Inject private ExceptionService exceptionService;
 
+    public CoverShiftSettingDTO createCoverShiftSettingByUnit(CoverShiftSettingDTO coverShiftSettingDTO) {
+        CoverShiftSetting coverShiftSetting = ObjectMapperUtils.copyPropertiesByMapper(coverShiftSettingDTO, CoverShiftSetting.class);
+        coverShiftSettingMongoRepository.save(coverShiftSetting);
+        coverShiftSettingDTO.setId(coverShiftSetting.getId());
+        return coverShiftSettingDTO;
+    }
+
+    public CoverShiftSettingDTO updateCoverShiftSettingByUnit(CoverShiftSettingDTO coverShiftSettingDTO) {
+        CoverShiftSetting coverShiftSetting = coverShiftSettingMongoRepository.findOne(coverShiftSettingDTO.getId());
+        if(isNull(coverShiftSetting)){
+            exceptionService.dataNotFoundByIdException("Cover Shift Setting Not Found");
+        }
+        coverShiftSetting = ObjectMapperUtils.copyPropertiesByMapper(coverShiftSettingDTO, CoverShiftSetting.class);
+        coverShiftSettingMongoRepository.save(coverShiftSetting);
+        return coverShiftSettingDTO;
+    }
+
+    public CoverShiftSettingDTO getCoverShiftSettingByUnit(Long unitId) {
+        CoverShiftSetting coverShiftSetting = coverShiftSettingMongoRepository.getCoverShiftSettingByUnitId(unitId);
+        return ObjectMapperUtils.copyPropertiesByMapper(coverShiftSetting, CoverShiftSettingDTO.class);
+    }
 
     public CoverShiftSetting getCoverShiftSettingsForUnit(Long unitId,CoverShiftSetting coverShiftSetting){
         coverShiftSetting.setUnitId(unitId);
@@ -71,14 +98,14 @@ public class CoverShiftService {
         Set<Long> employmentTypeIds = coverShiftSetting.getCoverShiftCriteria().contains(STAFF_WITH_EMPLOYEMENT_TYPES) ? coverShiftSetting.getEmploymentTypeIds() : new HashSet<>();
         Set<Long> tagIds = coverShiftSetting.getCoverShiftCriteria().contains(STAFF_WITH_TAGS) ? coverShiftSetting.getTagIds() : new HashSet<>();
         notEligibleStaffIdsForCoverShifts.add(shift.getStaffId());
-        NotEligibleStaffDataDTO notEligibleStaffDataDTO = new NotEligibleStaffDataDTO(employmentTypeIds,tagIds, notEligibleStaffIdsForCoverShifts,asLocalDate(shift.getStartDate()),new HashSet<>(productiveTypeActivityIds),coverShiftSetting.getCoverShiftCriteria().contains(CoverShiftSetting.CoverShiftCriteria.STAFF_WITH_WTA_RULE_VIOLATION));
+        NotEligibleStaffDataDTO notEligibleStaffDataDTO = new NotEligibleStaffDataDTO(employmentTypeIds,tagIds, notEligibleStaffIdsForCoverShifts,asLocalDate(shift.getStartDate()),new HashSet<>(productiveTypeActivityIds),coverShiftSetting.getCoverShiftCriteria().contains(CoverShiftCriteria.STAFF_WITH_WTA_RULE_VIOLATION));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getEligibleStaffsForCoverShifts(notEligibleStaffDataDTO,coverShiftSetting.getUnitId());
         removeStaffWhichHaveWTAViolation(coverShiftSetting,shift,staffAdditionalInfoDTOS,activityIds, UserContext.getUserDetails().getCountryId(),UserContext.getUserDetails().isManagement());
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(staffAdditionalInfoDTOS,Staff.class);
     }
 
     private void removeStaffWhichHaveWTAViolation(CoverShiftSetting coverShiftSetting, Shift shift, List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, Set<BigInteger> activityIds,Long countryId,boolean userAccessRole) {
-        if(coverShiftSetting.getCoverShiftCriteria().contains(CoverShiftSetting.CoverShiftCriteria.STAFF_WITH_WTA_RULE_VIOLATION)){
+        if(coverShiftSetting.getCoverShiftCriteria().contains(CoverShiftCriteria.STAFF_WITH_WTA_RULE_VIOLATION)){
             ShiftDataHelper shiftDataHelper = getShiftDataHelperForCoverShift(coverShiftSetting, shift, staffAdditionalInfoDTOS, activityIds, countryId, userAccessRole);
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getActivities().get(0).getStartDate(), null,shiftDataHelper);
             ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(null,shiftDataHelper.getActivityMap(),shift);

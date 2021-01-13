@@ -1,22 +1,18 @@
-package com.kairos.persistence.model.shift;
+package com.kairos.dto.activity.shift;
 
 import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.enums.shift.GeneralCoverShiftCriteria;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
 import java.util.Map;
 import java.util.Set;
 
-@NoArgsConstructor
-@Setter
 @Getter
-@AllArgsConstructor
-public class CoverShiftSetting extends MongoBaseEntity {
+@Setter
+public class CoverShiftSettingDTO {
+    private BigInteger id;
     private Long unitId;
     private Long countryId;
     private Set<Long> employmentTypeIds;

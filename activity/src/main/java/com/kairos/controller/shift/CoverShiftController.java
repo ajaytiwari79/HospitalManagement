@@ -1,7 +1,6 @@
 package com.kairos.controller.shift;
 
-import com.kairos.dto.activity.shift.ShiftActivitiesIdDTO;
-import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.dto.activity.shift.CoverShiftSettingDTO;
 import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.service.shift.CoverShiftService;
 import com.kairos.utils.response.ResponseHandler;
@@ -30,5 +29,26 @@ public class CoverShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEligibleStaffs(@PathVariable Long unitId, @RequestParam BigInteger shiftId, @RequestBody CoverShiftSetting coverShiftSetting) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getEligibleStaffs(shiftId,coverShiftSetting).stream().map(staff -> staff.getFirstName()+" "+staff.getLastName()).collect(Collectors.toSet()));
+    }
+
+    @ApiOperation("update cover shift setting by unit")
+    @PostMapping(value = "/cover_shift_setting")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createCoverShiftSettingByUnit(@RequestBody CoverShiftSettingDTO coverShiftSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.createCoverShiftSettingByUnit(coverShiftSettingDTO));
+    }
+
+    @ApiOperation("update cover shift setting by unit")
+    @PutMapping(value = "/cover_shift_setting")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateCoverShiftSettingByUnit(@RequestBody CoverShiftSettingDTO coverShiftSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.updateCoverShiftSettingByUnit(coverShiftSettingDTO));
+    }
+
+    @ApiOperation("get cover shift setting by unit")
+    @GetMapping(value = "/cover_shift_setting")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCoverShiftSettingByUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, coverShiftService.getCoverShiftSettingByUnit(unitId));
     }
 }

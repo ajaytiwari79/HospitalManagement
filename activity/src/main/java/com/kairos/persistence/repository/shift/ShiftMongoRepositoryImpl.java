@@ -11,6 +11,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
@@ -809,7 +810,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     private List<Criteria> getConverShiftCriteria(CoverShiftSetting coverShiftSetting,Date startDate,Date endDate) {
         List<Criteria> criterias = new ArrayList<>();
-        for (CoverShiftSetting.CoverShiftCriteria coverShiftCriterion : coverShiftSetting.getCoverShiftCriteria()) {
+        for (CoverShiftCriteria coverShiftCriterion : coverShiftSetting.getCoverShiftCriteria()) {
             switch (coverShiftCriterion){
                 case STAFF_WITH_SICKNESS:
                     criterias.add(Criteria.where("shiftType").is(SICK.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
