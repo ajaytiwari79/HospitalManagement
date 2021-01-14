@@ -9,6 +9,7 @@ import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.organization.SelfRosteringMetaData;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.day_type.CountryHolidayCalender;
@@ -44,6 +45,8 @@ public class DayTypeService {
     private ExceptionService exceptionService;
     @Inject
     private CountryCalenderRepo countryCalenderRepo;
+    @Inject
+    private CountryHolidayCalenderService countryHolidayCalenderService;
     @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
     @Inject
@@ -167,4 +170,14 @@ public class DayTypeService {
         List<TimeSlotDTO> timeSlotDTOS =country?timeSlotService.getDefaultTimeSlot(): timeSlotService.getShiftPlanningTimeSlotByUnit(unitId);
         return new WTADefaultDataInfoDTO(dayTypes, presenceTypeDTOS, timeSlotDTOS, countryId);
     }
+
+    public SelfRosteringMetaData getDayTypesAndPublicHoliday(Long countryId) {
+        SelfRosteringMetaData publicHolidayDayTypeWrapper = new SelfRosteringMetaData();
+        publicHolidayDayTypeWrapper.setDayTypes(getAllDayTypeByCountryId(countryId));
+        publicHolidayDayTypeWrapper.setPublicHolidays(countryHolidayCalenderService.getAllCountryAllHolidaysByCountryId(countryId));
+        return publicHolidayDayTypeWrapper;
+    }
+
+
+
 }

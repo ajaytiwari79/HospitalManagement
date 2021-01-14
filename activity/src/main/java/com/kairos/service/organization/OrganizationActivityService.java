@@ -690,7 +690,6 @@ public class OrganizationActivityService extends MongoBaseService {
         // Creating dummy next remaining 2 years as PHASE with lowest sequence
         createDummyPhase(year, currentWeek, phaseDTOs, phaseWeeklyDTOS);
         return getPhaseActivityDTO(unitId, publicHolidayDayTypeWrapper, dayTypes, reasonCodeWrapper, phaseDTOs, phaseWeeklyDTOS);
-
     }
 
     private SelfRosteringMetaData getSelfRosteringMetaData(long unitId) {

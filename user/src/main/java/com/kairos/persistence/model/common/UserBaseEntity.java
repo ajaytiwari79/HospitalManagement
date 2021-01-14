@@ -6,6 +6,7 @@ import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.Properties;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.annotation.CreatedBy;
@@ -28,7 +29,8 @@ import java.util.Map;
 public abstract class UserBaseEntity  {
 
     //@GeneratedValue
-    @GraphId protected Long id;
+    @Id
+    protected Long id;
     @JsonIgnore
     protected boolean deleted;
     @JsonIgnore
