@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -18,7 +19,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class TimeSlotDTO {
+public class TimeSlotDTO implements Serializable {
     @NotBlank(message = "error.name.notnull")
     private String name;
     private int startHour;
