@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class TimeSlotSetDTO {
+public class TimeSlotSetDTO implements Serializable {
 
     @NotEmpty(message = "Time slot set name can't be empty")
     private String name;

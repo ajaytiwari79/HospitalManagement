@@ -101,9 +101,12 @@ public class DayTypeController {
 
     }
 
+    @ApiOperation(value = "get DayTypes And Public Holiday")
+    @GetMapping(UNIT_URL + "/get_dayTypes_and_public_holiday")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDayTypesAndPublicHoliday(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypesAndPublicHoliday(UserContext.getUserDetails().getCountryId()));
 
-
-
-
+    }
 
 }
