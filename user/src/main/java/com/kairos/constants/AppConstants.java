@@ -16,6 +16,9 @@ import java.util.List;
  */
 public class AppConstants {
     public static final String SHIFT_S = "Shift(s)";
+    public static final String ACTIVITY_ID = "activity.id";
+    public static final String UNIT_ID = "unitId";
+    public static final String TIME_SLOT_SET = "timeSlotSet";
 
     private AppConstants() {
     }

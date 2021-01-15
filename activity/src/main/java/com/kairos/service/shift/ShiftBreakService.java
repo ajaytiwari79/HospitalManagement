@@ -106,28 +106,7 @@ public class ShiftBreakService implements KPIService {
             Date placeBreakAfterThisDate = shift.getStartDate();
             if (isNotNull(breakSettings) && shift.getMinutes() >= breakSettings.getShiftDurationInMinute()) {
                 if (isCollectionEmpty(shift.getBreakActivities()) || shiftUpdated) {
-                    if (isNotNull(breakWTATemplate)) {
-                        BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);
-                        if (isNotNull(breakAvailabilitySettings) && (breakAvailabilitySettings.getShiftPercentage() <= 0 || breakAvailabilitySettings.getShiftPercentage() >= 100)) {
-                            exceptionService.actionNotPermittedException(SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE, breakAvailabilitySettings.getShiftPercentage());
-                        }
-                        placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes() + breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
-                        eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings, breakSettings, activityWrapperMap);
-                        placeBreakAnyWhereInShift = placeBreakAnyWhereInShift ? placeBreakAnyWhereInShift : eligibleBreakInterval.getMinutes() < breakSettings.getBreakDurationInMinute();
-                        placeBreakAfterThisDate = isNotNull(eligibleBreakInterval) ? roundDateByMinutes(eligibleBreakInterval.getStartDate(), 15) : placeBreakAfterThisDate;
-                    }
-                    breakActivity = getBreakByShiftActivity(shift, activityWrapperMap, staffAdditionalInfoDTO, breakSettings, placeBreakAnyWhereInShift, breakActivity, placeBreakAfterThisDate);
-                    if (isNull(breakActivity)) {
-                        Date breakStartDate = placeBreakAfterThisDate;
-                        Optional<ShiftActivity> shiftActivityOptional = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getInterval().containsAndEqualsEndDate(breakStartDate)).findAny();
-                        Date breakEndDate = asDate(asZonedDateTime(placeBreakAfterThisDate).plusMinutes(breakSettings.getBreakDurationInMinute()));
-                        breakActivity = buildBreakActivity(placeBreakAfterThisDate, breakEndDate, breakSettings, staffAdditionalInfoDTO, activityWrapperMap);
-                        ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivityOptional.get().getActivityId());
-                        breakActivity.setBreakNotHeld(!activityWrapper.getActivity().getActivityRulesSettings().isBreakAllowed());
-                        if (shiftActivityOptional.isPresent() && breakActivity.isBreakNotHeld() && !activityWrapper.getTimeTypeInfo().isBreakNotHeldValid()) {
-                            breakActivity = null;
-                        }
-                    }
+                    breakActivity = getBreakOnUpdateOrCreateShift(shift, activityWrapperMap, staffAdditionalInfoDTO, breakWTATemplate, timeSlot, breakSettings, placeBreakAnyWhereInShift, breakActivity, placeBreakAfterThisDate);
                 } else if (isCollectionNotEmpty(shift.getBreakActivities()) && !shiftUpdated) {
                     breakActivity = validateBreakOnUpdateShift(shift, eligibleBreakInterval, placeBreakAfterThisDate, breakSettings);
                 }
@@ -141,6 +120,33 @@ public class ShiftBreakService implements KPIService {
             }
         }
         return breakActivities;
+    }
+
+    private ShiftActivity getBreakOnUpdateOrCreateShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotDTO> timeSlot, BreakSettings breakSettings, boolean placeBreakAnyWhereInShift, ShiftActivity breakActivity, Date placeBreakAfterThisDate) {
+        DateTimeInterval eligibleBreakInterval;
+        if (isNotNull(breakWTATemplate)) {
+            BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);
+            if (isNotNull(breakAvailabilitySettings) && (breakAvailabilitySettings.getShiftPercentage() <= 0 || breakAvailabilitySettings.getShiftPercentage() >= 100)) {
+                exceptionService.actionNotPermittedException(SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE, breakAvailabilitySettings.getShiftPercentage());
+            }
+            placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes() + breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
+            eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings, breakSettings, activityWrapperMap);
+            placeBreakAnyWhereInShift = placeBreakAnyWhereInShift ? placeBreakAnyWhereInShift : eligibleBreakInterval.getMinutes() < breakSettings.getBreakDurationInMinute();
+            placeBreakAfterThisDate = isNotNull(eligibleBreakInterval) ? roundDateByMinutes(eligibleBreakInterval.getStartDate(), 15) : placeBreakAfterThisDate;
+        }
+        breakActivity = getBreakByShiftActivity(shift, activityWrapperMap, staffAdditionalInfoDTO, breakSettings, placeBreakAnyWhereInShift, breakActivity, placeBreakAfterThisDate);
+        if (isNull(breakActivity)) {
+            Date breakStartDate = placeBreakAfterThisDate;
+            Optional<ShiftActivity> shiftActivityOptional = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getInterval().containsAndEqualsEndDate(breakStartDate)).findAny();
+            Date breakEndDate = asDate(asZonedDateTime(placeBreakAfterThisDate).plusMinutes(breakSettings.getBreakDurationInMinute()));
+            breakActivity = buildBreakActivity(placeBreakAfterThisDate, breakEndDate, breakSettings, staffAdditionalInfoDTO, activityWrapperMap);
+            ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivityOptional.get().getActivityId());
+            breakActivity.setBreakNotHeld(!activityWrapper.getActivity().getActivityRulesSettings().isBreakAllowed());
+            if (shiftActivityOptional.isPresent() && breakActivity.isBreakNotHeld() && !activityWrapper.getTimeTypeInfo().isBreakNotHeldValid()) {
+                breakActivity = null;
+            }
+        }
+        return breakActivity;
     }
 
     private void validateBreakDuration(Shift shift) {

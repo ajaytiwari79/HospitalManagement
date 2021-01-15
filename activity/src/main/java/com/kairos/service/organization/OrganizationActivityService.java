@@ -241,34 +241,36 @@ public class OrganizationActivityService extends MongoBaseService {
             activity.getActivityPhaseSettings().setPhaseTemplateValues(phaseTemplateValues);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
         } else {
-            activityCopied = Optional.ofNullable(activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId)).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_ACTIVITY_ID, activityId)));
-            if (!userIntegrationService.isUnit(unitId)) {
-                List<Long> childUnitIds = userIntegrationService.getAllOrganizationIds(unitId);
-                if (activityMongoRepository.existsByParentIdAndDeletedFalse(activityCopied.getId(), childUnitIds)) {
-                    exceptionService.actionNotPermittedException(ACTIVITY_USED_AT_UNIT);
-                }
-            }
-            long activityCount = shiftService.countByActivityId(activityCopied.getId());
-            if (activityCount > 0) {
-                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE, activityCopied.getName());
-            }
-            if (isNotNull(activityCopied)) {
-                activityCopied.setDeleted(true);
-            }
+            activityCopied = removeActivityFromUnity(unitId, activityId);
         }
         activityCopied.setState(ActivityStateEnum.PUBLISHED);
         activityMongoRepository.save(activityCopied);
         return retrieveBasicDetails(activityCopied);
     }
 
+    private Activity removeActivityFromUnity(Long unitId, BigInteger activityId) {
+        Activity activityCopied;
+        activityCopied = Optional.ofNullable(activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId)).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_ACTIVITY_ID, activityId)));
+        if (!userIntegrationService.isUnit(unitId)) {
+            List<Long> childUnitIds = userIntegrationService.getAllOrganizationIds(unitId);
+            if (activityMongoRepository.existsByParentIdAndDeletedFalse(activityCopied.getId(), childUnitIds)) {
+                exceptionService.actionNotPermittedException(ACTIVITY_USED_AT_UNIT);
+            }
+        }
+        long activityCount = shiftService.countByActivityId(activityCopied.getId());
+        if (activityCount > 0) {
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE, activityCopied.getName());
+        }
+        if (isNotNull(activityCopied)) {
+            activityCopied.setDeleted(true);
+        }
+        return activityCopied;
+    }
+
     private ActivityDTO retrieveBasicDetails(Activity activity) {
         ActivityDTO activityDTO = new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId());
         activityDTO.setActivityBalanceSettings(ObjectMapperUtils.copyPropertiesByMapper(activity.getActivityBalanceSettings(), ActivityBalanceSettingDTO.class));
         BeanUtils.copyProperties(activity, activityDTO);
-        /*Optional<TimeType> timeType=timeTypeMongoRepository.findById(activity.getActivityBalanceSettings().getTimeTypeId());
-        if(timeType.isPresent()){
-            activityDTO.setActivityCanBeCopied(timeType.get().isActivityCanBeCopied());
-        }*/
         activityDTO.setActivityPriorityId(activity.getActivityPriorityId());
         return activityDTO;
 
@@ -403,27 +405,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public ActivitySettingsWrapper updateGeneralTab(ActivityGeneralSettingsDTO generalDTO, Long unitId) {
-        boolean isPartOfTeam = timeTypeMongoRepository.existsByIdAndPartOfTeam(generalDTO.getTimeTypeId(), true);
-        if (!isPartOfTeam) {
-            boolean isActivityPresent = userIntegrationService.verifyingIsActivityAlreadyAssigned(generalDTO.getActivityId(), unitId);
-            if (isActivityPresent) {
-                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_ALREADY_IN_TEAM);
-            }
-        }
-        if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ENDDATE_GREATERTHAN_STARTDATE);
-        }
-        Activity isActivityAlreadyExist = activityMongoRepository.findByNameExcludingCurrentInUnitAndDate(generalDTO.getName(), generalDTO.getActivityId(), unitId, generalDTO.getStartDate(), generalDTO.getEndDate());
-        if (Optional.ofNullable(isActivityAlreadyExist).isPresent() && generalDTO.getStartDate().isBefore(isActivityAlreadyExist.getActivityGeneralSettings().getStartDate())) {
-            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_OVERLAPING);
-        }
-        if (Optional.ofNullable(isActivityAlreadyExist).isPresent()) {
-            exceptionService.dataNotFoundException(isActivityAlreadyExist.getActivityGeneralSettings().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
-        }
-        ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
-        if (activityCategory == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_CATEGORY_NOTEXIST);
-        }
+        validateActivityOnGeneralDetailsUpdate(generalDTO, unitId);
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
         generalDTO.setBackgroundColor(activity.getActivityGeneralSettings().getBackgroundColor());
         ActivityGeneralSettings generalTab = new ActivityGeneralSettings();
@@ -455,6 +437,36 @@ public class OrganizationActivityService extends MongoBaseService {
         activityService.updateNotesTabOfActivity(generalDTO, activity);
         activitySettingsService.updateTimeTypePathInActivity(activity);
         activityMongoRepository.save(activity);
+        getGeneralActivityWithTagDTO(activity, generalActivityWithTagDTO);
+        return new ActivitySettingsWrapper(generalActivityWithTagDTO, generalDTO.getActivityId(), activityCategories);
+
+    }
+
+    private void validateActivityOnGeneralDetailsUpdate(ActivityGeneralSettingsDTO generalDTO, Long unitId) {
+        boolean isPartOfTeam = timeTypeMongoRepository.existsByIdAndPartOfTeam(generalDTO.getTimeTypeId(), true);
+        if (!isPartOfTeam) {
+            boolean isActivityPresent = userIntegrationService.verifyingIsActivityAlreadyAssigned(generalDTO.getActivityId(), unitId);
+            if (isActivityPresent) {
+                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_ALREADY_IN_TEAM);
+            }
+        }
+        if (generalDTO.getEndDate() != null && generalDTO.getEndDate().isBefore(generalDTO.getStartDate())) {
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ENDDATE_GREATERTHAN_STARTDATE);
+        }
+        Activity isActivityAlreadyExist = activityMongoRepository.findByNameExcludingCurrentInUnitAndDate(generalDTO.getName(), generalDTO.getActivityId(), unitId, generalDTO.getStartDate(), generalDTO.getEndDate());
+        if (Optional.ofNullable(isActivityAlreadyExist).isPresent() && generalDTO.getStartDate().isBefore(isActivityAlreadyExist.getActivityGeneralSettings().getStartDate())) {
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_OVERLAPING);
+        }
+        if (Optional.ofNullable(isActivityAlreadyExist).isPresent()) {
+            exceptionService.dataNotFoundException(isActivityAlreadyExist.getActivityGeneralSettings().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
+        }
+        ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
+        if (activityCategory == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_CATEGORY_NOTEXIST);
+        }
+    }
+
+    private void getGeneralActivityWithTagDTO(Activity activity, GeneralActivityWithTagDTO generalActivityWithTagDTO) {
         generalActivityWithTagDTO.setAddTimeTo(activity.getActivityBalanceSettings().getAddTimeTo());
         generalActivityWithTagDTO.setTimeTypeId(activity.getActivityBalanceSettings().getTimeTypeId());
         generalActivityWithTagDTO.setOnCallTimePresent(activity.getActivityBalanceSettings().isOnCallTimePresent());
@@ -464,8 +476,6 @@ public class OrganizationActivityService extends MongoBaseService {
         generalActivityWithTagDTO.setOriginalDocumentName(activity.getActivityNotesSettings().getOriginalDocumentName());
         generalActivityWithTagDTO.setModifiedDocumentName(activity.getActivityNotesSettings().getModifiedDocumentName());
         generalActivityWithTagDTO.setBackgroundColor(activity.getActivityGeneralSettings().getBackgroundColor());
-        return new ActivitySettingsWrapper(generalActivityWithTagDTO, generalDTO.getActivityId(), activityCategories);
-
     }
 
 

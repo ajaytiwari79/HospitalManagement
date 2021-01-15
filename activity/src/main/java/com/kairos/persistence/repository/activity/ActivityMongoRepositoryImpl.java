@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.activity;
 
+import com.kairos.constants.AppConstants;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -392,7 +393,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private ProjectionOperation getProject() {
         return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
                 .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
-                .and(ID).as("activity.id")
+                .and(ID).as(AppConstants.ACTIVITY_ID)
                 .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
                 .and("regions").as("activity.regions").and("levels").as("activity.levels")
                 .and(EMPLOYMENT_TYPES).as(ACTIVITY_EMPLOYMENT_TYPES).and("tags").as("activity.tags")
@@ -438,7 +439,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     private ProjectionOperation getProjectForParentActivityWrapper() {
         return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(CHILD_ACTIVITY_IDS).as("activity.childActivityIds")
-                .and(ID).as("activity.id").and(ACTIVITY_PRIORITY_ID).as("activity.activityPriorityId").and(UNIT_ID).as(ACTIVITY_UNIT_ID)
+                .and(ID).as(AppConstants.ACTIVITY_ID).and(ACTIVITY_PRIORITY_ID).as("activity.activityPriorityId").and(UNIT_ID).as(ACTIVITY_UNIT_ID)
                 .and(BALANCE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_BALANCE_SETTINGS_ACTIVITY_TAB).and(RULES_ACTIVITY_TAB).as(ACTIVITY_RULES_ACTIVITY_TAB)
                 .and(TIME_CALCULATION_ACTIVITY_TAB).as(ACTIVITY_TIME_CALCULATION_ACTIVITY_TAB).and(BONUS_ACTIVITY_TAB).as(ACTIVITY_BONUS_ACTIVITY_TAB)
                 .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1).and(TIME_TYPE_TIME_TYPES).as(TIME_TYPE1).and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE_INFO)
@@ -470,7 +471,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private ProjectionOperation getProjectForActivityWrapper() {
         return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
                 .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES).and(CHILD_ACTIVITY_IDS).as("activity.childActivityIds")
-                .and(ID).as("activity.id").and(ACTIVITY_PRIORITY_ID).as("activity.activityPriorityId")
+                .and(ID).as(AppConstants.ACTIVITY_ID).and(ACTIVITY_PRIORITY_ID).as("activity.activityPriorityId")
                 .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
                 .and("regions").as("activity.regions").and("levels").as("activity.levels")
                 .and(EMPLOYMENT_TYPES).as(ACTIVITY_EMPLOYMENT_TYPES).and("tags").as("activity.tags")
