@@ -355,5 +355,6 @@ public class AppConstants {
     public static final String TRANSLATIONS="translations";
     public static final String ACTIVITY_PRIORITY_SEQUENCE="activityPriority.sequence";
     public static final String ACTIVITY_SEQUENCE ="activitySequence";
+    public static final String TIME_SLOT_SET = "timeSlotSet";
 
 }

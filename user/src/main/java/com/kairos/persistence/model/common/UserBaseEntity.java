@@ -29,7 +29,7 @@ import java.util.Map;
 public abstract class UserBaseEntity  {
 
     //@GeneratedValue
-    @Id
+    @GraphId
     protected Long id;
     @JsonIgnore
     protected boolean deleted;
