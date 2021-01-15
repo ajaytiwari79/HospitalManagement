@@ -3,6 +3,7 @@ package com.kairos.persistence.model.country.experties;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class UnionServiceWrapper {
     private List<UnionQueryResult> unions;
-    private List<OrganizationServiceDTO> services;
+    private Iterable<OrganizationService> services;
     private List<Level> organizationLevels;
     private List<SectorDTO> sectors;
 
