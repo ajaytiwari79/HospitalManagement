@@ -88,6 +88,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -200,6 +202,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         Activity activityCopied;
         if (checked) {
@@ -248,6 +251,8 @@ public class OrganizationActivityService extends MongoBaseService {
         return retrieveBasicDetails(activityCopied);
     }
 
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
     private Activity removeActivityFromUnity(Long unitId, BigInteger activityId) {
         Activity activityCopied;
         activityCopied = Optional.ofNullable(activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId)).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_ACTIVITY_ID, activityId)));
@@ -276,14 +281,13 @@ public class OrganizationActivityService extends MongoBaseService {
 
     }
 
+    @Cacheable(value = "getActivityMappingDetails", key = "#unitId", cacheManager = "cacheManager")
     public ActivityWithSelectedDTO getActivityMappingDetails(Long unitId) {
         ActivityWithSelectedDTO activityDetails = new ActivityWithSelectedDTO();
         ActivityWithUnitIdDTO activities = activityService.getActivityByUnitId(unitId);
         if (Optional.ofNullable(activities).isPresent() && Optional.ofNullable(activities.getActivityDTOList()).isPresent()) {
             activityDetails.setAllActivities(activities.getActivityDTOList());
         }
-        List<ActivityTagDTO> activityTagDTOS = activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false);
-        activityDetails.setSelectedActivities(activityTagDTOS);
         return activityDetails;
     }
 
@@ -296,26 +300,19 @@ public class OrganizationActivityService extends MongoBaseService {
             if(isNull(activityTagDTO.getTranslations())){
                 activityTagDTO.setTranslations(new HashMap<>());
             }
-            boolean activityCanBeCopied = false;
             Set<OrganizationHierarchy> hierarchies = activityTagDTO.getActivityCanBeCopiedForOrganizationHierarchy();
-            if ((isCollectionNotEmpty(hierarchies)) && ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
-                    (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT)))) {
-                activityCanBeCopied = true;
-            }
+            boolean activityCanBeCopied = ((isCollectionNotEmpty(hierarchies)) && ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
+                    (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT))));
             activityTagDTO.setActivityCanBeCopied(activityCanBeCopied);
         }
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
-        activityCategories.forEach(activityCategory -> {
-            if(isNull(activityCategory.getTranslations())){
-                activityCategory.setTranslations(new HashMap<>());
-            }
-        });
-        List<ActivityCategoryDTO> activityCategoryDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(activityCategories,ActivityCategoryDTO.class);
+        List<ActivityCategoryDTO> activityCategoryDTOS = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
         response.put("activities", activities);
         response.put("activityCategories", activityCategoryDTOS);
         return response;
     }
 
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
     public Map<String, TranslationInfo> updateUnitActivityTranslationDetails(BigInteger activityId, Long unitId, Map<String, TranslationInfo> activityTranslationMap){
         Activity activity = activityMongoRepository.findByIdAndUnitIdAndDeleted(activityId,unitId,false);
         if(isNull(activity)) {
@@ -331,7 +328,6 @@ public class OrganizationActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
         }
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
         ActivityGeneralSettings generalTab = activity.getActivityGeneralSettings();
         generalTab.setTranslations(activity.getTranslations());
         logger.info("activity.getTags() ================ > " + activity.getTags());
@@ -349,7 +345,7 @@ public class OrganizationActivityService extends MongoBaseService {
         PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, organizationDTO.getCountryId());
         ActivityBalanceSettings activityBalanceSettings = activity.getActivityBalanceSettings();
         setDataInGeneralActivityWithTagDTO(activity, generalActivityWithTagDTO, activityBalanceSettings);
-        ActivitySettingsWrapper activitySettingsWrapper = new ActivitySettingsWrapper(generalActivityWithTagDTO, activityId, activityCategories);
+        ActivitySettingsWrapper activitySettingsWrapper = new ActivitySettingsWrapper(generalActivityWithTagDTO, activityId, activityCategoryRepository.findByCountryId(organizationDTO.getCountryId()));
         activitySettingsWrapper.setTimeTypes(timeTypeService.getAllTimeType(activityBalanceSettings.getTimeTypeId(), presenceType.getCountryId()));
         activitySettingsWrapper.setPresenceTypeWithTimeType(presenceType);
         return activitySettingsWrapper;
@@ -368,6 +364,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     //TODO Need to make sure that its fine to not copy expertise/skills/employmentTypes
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
     private Activity copyAllActivitySettingsInUnit(Activity activity, Long unitId) {
         Activity activityCopied = new Activity();
         Activity.copyProperties(activity, activityCopied, "id", "organizationTypes", "organizationSubTypes");
@@ -404,6 +401,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityCopied;
     }
 
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
     public ActivitySettingsWrapper updateGeneralTab(ActivityGeneralSettingsDTO generalDTO, Long unitId) {
         validateActivityOnGeneralDetailsUpdate(generalDTO, unitId);
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
@@ -424,7 +422,6 @@ public class OrganizationActivityService extends MongoBaseService {
         // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         generalTab.setTags(null);
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
         GeneralActivityWithTagDTO generalActivityWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityWithTagDTO.class);
         if (!activity.getTags().isEmpty()) {
             List<TagDTO> tags = new ArrayList<>();
@@ -438,7 +435,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activitySettingsService.updateTimeTypePathInActivity(activity);
         activityMongoRepository.save(activity);
         getGeneralActivityWithTagDTO(activity, generalActivityWithTagDTO);
-        return new ActivitySettingsWrapper(generalActivityWithTagDTO, generalDTO.getActivityId(), activityCategories);
+        return new ActivitySettingsWrapper(generalActivityWithTagDTO, generalDTO.getActivityId(), activityCategoryRepository.findByCountryId(organizationDTO.getCountryId()));
 
     }
 
@@ -509,6 +506,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return new ActivitySettingsWrapper(roles, activityPhaseSettings, dayTypes, employmentTypeDTOS);
     }
 
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
     public ActivityDTO copyActivityDetails(Long unitId, BigInteger activityId, ActivityDTO activityDTO) {
         Activity activity = activityMongoRepository.
                 findByNameIgnoreCaseAndUnitIdAndByDate(activityDTO.getName().trim(), unitId, activityDTO.getStartDate(), activityDTO.getEndDate());
@@ -573,7 +571,6 @@ public class OrganizationActivityService extends MongoBaseService {
     public boolean createDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
         logger.info("I am going to create default data or organization {}" , unitId);
         //unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
-
         List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
         unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
@@ -593,6 +590,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return true;
     }
 
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
     private void createActivityforOrganisation(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, List<Phase> phases) {
         List<Activity> existingActivities;
         if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
@@ -674,6 +672,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setExpertises(expertiseIds);
     }
 
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
     public ActivityGeneralSettings addIconInActivity(BigInteger activityId, MultipartFile file) throws IOException {
         Activity activity =activityService.findActivityById(activityId);
         byte[] bytes = file.getBytes();
@@ -684,6 +683,14 @@ public class OrganizationActivityService extends MongoBaseService {
         activity.getActivityGeneralSettings().setModifiedIconName(modifiedFileName);
         activityMongoRepository.save(activity);
         return activity.getActivityGeneralSettings();
+    }
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public ActivityGeneralSettings addIconInActivity(Long unitId,BigInteger activityId, MultipartFile file) throws IOException {
+        return this.addIconInActivity(activityId,file);
+    }
+
+    public ActivityGeneralSettings addIconInActivity(BigInteger activityId, MultipartFile file,Long countryId) throws IOException {
+        return this.addIconInActivity(activityId,file);
     }
 
     public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId) {
@@ -775,7 +782,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return endDate.toLocalDate();
     }
 
-    @CacheEvict(value = "findAllActivityByCountry")
+
     public ActivityNotesSettings addDocumentInNotesTab(BigInteger activityId, MultipartFile file) throws IOException {
         Activity activity =activityService.findActivityById(activityId);
         byte[] bytes = file.getBytes();
@@ -787,7 +794,17 @@ public class OrganizationActivityService extends MongoBaseService {
         activityMongoRepository.save(activity);
         return activity.getActivityNotesSettings();
     }
-    @CacheEvict(value = "findAllActivityByCountry")
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public ActivityNotesSettings addDocumentInNotesTab(Long unitId, BigInteger activityId, MultipartFile file) throws IOException{
+        return this.addDocumentInNotesTab(activityId,file);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public ActivityNotesSettings addDocumentInNotesTab(BigInteger activityId, MultipartFile file,Long countryId) throws IOException{
+        return this.addDocumentInNotesTab(activityId,file);
+    }
+
     public ActivitySettingsWrapper updateCommunicationTabOfActivity(CommunicationActivityDTO communicationActivityDTO, boolean updateFromOrg) {
         validateReminderSettings(communicationActivityDTO.getActivityReminderSettings());
         validateReminderSettings(communicationActivityDTO.getActivityCutoffReminderSettings());
@@ -802,6 +819,15 @@ public class OrganizationActivityService extends MongoBaseService {
             activitySchedulerJobService.registerJobForActivityCutoff(newArrayList(activity));
         }
         return new ActivitySettingsWrapper(activityCommunicationSettings);
+    }
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public ActivitySettingsWrapper updateCommunicationTabOfActivity(Long unitId,CommunicationActivityDTO communicationActivityDTO, boolean updateFromOrg){
+        return this.updateCommunicationTabOfActivity(communicationActivityDTO,updateFromOrg);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public ActivitySettingsWrapper updateCommunicationTabOfActivity(CommunicationActivityDTO communicationActivityDTO, boolean updateFromOrg,Long countryId){
+        return this.updateCommunicationTabOfActivity(communicationActivityDTO,updateFromOrg);
     }
 
     private boolean validateReminderSettings(List<ActivityReminderSettings> activityReminderSettings) {
