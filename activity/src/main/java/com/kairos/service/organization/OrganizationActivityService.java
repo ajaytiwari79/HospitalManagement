@@ -714,7 +714,7 @@ public class OrganizationActivityService extends MongoBaseService {
         if (!Optional.ofNullable(publicHolidayDayTypeWrapper).isPresent()) {
             exceptionService.internalServerError(MESSAGE_SELFROSTERING_METADATA_NULL);
         }
-        publicHolidayDayTypeWrapper.setDayTypes(dayTypeService.getAllDayTypeByCountryId(UserContext.getUserDetails().getCountryId()));
+        publicHolidayDayTypeWrapper.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         publicHolidayDayTypeWrapper.setPublicHolidays(countryHolidayCalenderService.getAllCountryAllHolidaysByCountryId(UserContext.getUserDetails().getCountryId()));
         return publicHolidayDayTypeWrapper;
     }
