@@ -109,7 +109,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.mockito/mockito-core
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.21.0'
     //this is for hot swaping in intelij
-    compile('org.springframework.boot:spring-boot-devtools')
+    //compile('org.springframework.boot:spring-boot-devtools')
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jdbc
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: "${springBootVersion}"
     // https://mvnrepository.com/artifact/org.liquigraph/liquigraph-spring-boot-starter

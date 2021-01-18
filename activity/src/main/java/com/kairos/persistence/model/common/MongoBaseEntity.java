@@ -14,6 +14,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.isMapNotEmpty;
+
 /**
  * Created by oodles on 4/1/17.
  */
@@ -35,6 +37,10 @@ public abstract class MongoBaseEntity {
 
     public UserInfo getCreatedBy() {
         return createdBy;
+    }
+
+    public Map<String, TranslationInfo> getTranslations() {
+        return isMapNotEmpty(translations) ? translations : new HashMap<>();
     }
 
     @JsonIgnore
