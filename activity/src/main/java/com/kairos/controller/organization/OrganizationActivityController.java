@@ -5,6 +5,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.tabs.ActivityOptaPlannerSetting;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.service.activity.ActivityService;
@@ -27,6 +28,7 @@ import java.math.BigInteger;
 import java.util.Map;
 import java.util.Set;
 
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /**
@@ -403,5 +405,12 @@ public class OrganizationActivityController {
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
     ResponseEntity<Map<String, Object>> updateLanguageSettingsOfActivityCategory(@PathVariable Long unitId,@NotEmpty @PathVariable BigInteger activityCategoryId, @NotNull @RequestBody Map<String, TranslationInfo> translationMap) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.updateUnitActivityCategoryTranslationDetails(activityCategoryId,translationMap));
+    }
+
+    @ApiOperation("Get all activities by time type in a unit")
+    @GetMapping(value = "/all_activities")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllActivitiesByTimeType(@PathVariable long unitId, @RequestParam TimeTypeEnum timeType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllBySecondLevelTimeTypeAndUnitIds(timeType, newHashSet(unitId)));
     }
 }
