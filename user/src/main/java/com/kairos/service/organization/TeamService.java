@@ -172,9 +172,10 @@ public class TeamService {
             }else {
                 if (!isSequenceExistOrNot(staffTeamDTO.getStaffId(),staffTeamDTO.getSequence(),teamId)) {
                     staffTeamRelationship.setSequence(staffTeamDTO.getSequence());
-                } else {
-                    exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
                 }
+//                } else {
+//                    exceptionService.actionNotPermittedException(RANKING_SHOULD_BE_UNIQUE);
+//                }
             }
             staffTeamRelationshipGraphRepository.save(staffTeamRelationship);
         }
