@@ -97,6 +97,8 @@ import static com.kairos.service.activity.ActivityUtil.*;
 @Service
 public class ActivityService {
     public static final String XXXXX = "XXXXX";
+    public static final String NAME = "name";
+    public static final String ULTRA_SHORT_NAME = "ultraShortName";
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private ActivityCategoryRepository activityCategoryRepository;
     @Inject private ShiftService shiftService;
@@ -1113,11 +1115,11 @@ public class ActivityService {
         prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
         Map<BigInteger,ActivityDTO> activityDTOMap= activityMongoRepository.getActivityDetailsWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v));
         activityDTOMap.forEach((k,v)->{
-            if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
+            if(fieldPermissionMap.containsKey(NAME) && (fieldPermissionMap.get(NAME).contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get(NAME).isEmpty())){
                 v.setName(XXXXX);
                 v.getActivityGeneralSettings().setName(XXXXX);
             }
-            if(fieldPermissionMap.get("ultraShortName").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("ultraShortName").isEmpty()){
+            if(fieldPermissionMap.containsKey(ULTRA_SHORT_NAME) && (fieldPermissionMap.get(ULTRA_SHORT_NAME).contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get(ULTRA_SHORT_NAME).isEmpty())){
                 v.getActivityGeneralSettings().setUltraShortName(XXXXX);
             }
         });
