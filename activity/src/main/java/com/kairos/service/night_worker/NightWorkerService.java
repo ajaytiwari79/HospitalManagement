@@ -38,6 +38,8 @@ import com.kairos.rule_validator.night_worker.NightWorkerAgeEligibilitySpecifica
 import com.kairos.rule_validator.night_worker.StaffNonPregnancySpecification;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftFilterService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -112,6 +114,7 @@ public class NightWorkerService {
         }
     }
 
+    @CacheEvict(value = "findByStaffId", key = "#staffId")
     public NightWorkerGeneralResponseDTO updateNightWorkerGeneralDetails(Long unitId, Long staffId, NightWorkerGeneralResponseDTO nightWorkerDTO) {
 
         validateNightWorkerGeneralDetails(nightWorkerDTO);
@@ -163,6 +166,7 @@ public class NightWorkerService {
     }
 
     // Function will called for scheduled job
+    @CacheEvict(value = "findByStaffId", key = "#staffId")
     public void createNightWorkerQuestionnaireForStaff(Long staffId, Long unitId) {
 
         // Add default questionnaire
@@ -195,6 +199,7 @@ public class NightWorkerService {
         nightWorkers.add(nightWorker);
     }
 
+    @CacheEvict(value = "findByStaffId", allEntries = true)
     public void updateNightWorkerEligibilityOfStaffInUnit(Map<Long, List<Long>> staffEligibleForNightWorker, Map<Long, List<Long>> staffNotEligibleForNightWorker) {
 
         List<NightWorker> nightWorkers = new ArrayList<>();
@@ -260,6 +265,7 @@ public class NightWorkerService {
         return true;
     }
 
+    @CacheEvict(value = "findByStaffId", allEntries = true)
     public void updateNightWorkers(List<Map> staffAndEmploymentIdMap) {
         Map[] staffAndEmploymentAndExpertiseIdArray = getEmploymentAndExpertiseIdMap(staffAndEmploymentIdMap);
         Map<Long, Long> employmentAndExpertiseIdMap = staffAndEmploymentAndExpertiseIdArray[0];

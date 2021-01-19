@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,7 +22,7 @@ import static com.kairos.commons.utils.ObjectUtils.isMapNotEmpty;
  */
 @Getter
 @Setter
-public abstract class MongoBaseEntity {
+public abstract class MongoBaseEntity implements Serializable {
 
     @Id
     protected BigInteger id;

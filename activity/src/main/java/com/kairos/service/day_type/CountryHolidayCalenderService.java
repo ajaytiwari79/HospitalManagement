@@ -11,6 +11,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -44,6 +45,7 @@ public class CountryHolidayCalenderService {
         return countryCalenderRepo.getCountryAllHolidays(isNull(countyId) ? UserContext.getUserDetails().getCountryId() : countyId);
     }
 
+    @CacheEvict(value = "getDayTypeWithCountryHolidayCalender",allEntries = true)
     public CountryHolidayCalenderDTO createHolidayCalenderByCountryId(Long countryId, CountryHolidayCalenderDTO countryHolidayCalenderDTO) {
         CountryHolidayCalender countryHolidayCalender = ObjectMapperUtils.copyPropertiesByMapper(countryHolidayCalenderDTO, CountryHolidayCalender.class);
         countryHolidayCalender.setCountryId(countryId);
@@ -55,6 +57,7 @@ public class CountryHolidayCalenderService {
         return countryHolidayCalenderDTO;
     }
 
+    @CacheEvict(value = "getDayTypeWithCountryHolidayCalender",allEntries = true)
     public CountryHolidayCalenderDTO updateCountryCalender(CountryHolidayCalenderDTO countryHolidayCalenderDTO) {
         LOGGER.info("Data Received: " + countryHolidayCalenderDTO);
         CountryHolidayCalender calender = countryCalenderRepo.findOne(countryHolidayCalenderDTO.getId());
@@ -68,6 +71,7 @@ public class CountryHolidayCalenderService {
         return countryHolidayCalenderDTO;
     }
 
+    @CacheEvict(value = "getDayTypeWithCountryHolidayCalender",allEntries = true)
     public boolean safeDeleteCountryCalender(BigInteger id) {
         CountryHolidayCalender calender = countryCalenderRepo.findOne(id);
         if (calender != null) {

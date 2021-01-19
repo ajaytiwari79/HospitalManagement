@@ -5,6 +5,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.constants.UserMessagesConstants;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
@@ -733,7 +734,7 @@ public class OrganizationService {
     }
 
     public OrganizationSettingDTO updateOrganizationSettings(OrganizationSettingDTO organizationSettingDTO, Long unitId) {
-        OrganizationSetting organizationSetting = unitGraphRepository.getOrganisationSettingByOrgId(unitId);
+        OrganizationSetting organizationSetting = getOrganizationSettingByUnitId(unitId);
         organizationSetting.setWalkingMeter(organizationSettingDTO.getWalkingMeter());
         organizationSetting.setWalkingMinutes(organizationSettingDTO.getWalkingMinutes());
         openingSettingsGraphRepository.save(organizationSetting);
@@ -741,8 +742,16 @@ public class OrganizationService {
     }
 
     public OrganizationSettingDTO getOrganizationSettings(Long unitId) {
-        OrganizationSetting organizationSetting = unitGraphRepository.getOrganisationSettingByOrgId(unitId);
+        OrganizationSetting organizationSetting = getOrganizationSettingByUnitId(unitId);
         return new OrganizationSettingDTO(organizationSetting.getWalkingMeter(), organizationSetting.getWalkingMinutes());
+    }
+
+    private OrganizationSetting getOrganizationSettingByUnitId(Long unitId) {
+        OrganizationSetting organizationSetting = unitGraphRepository.getOrganisationSettingByOrgId(unitId);
+        if(isNull(organizationSetting)){
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND);
+        }
+        return organizationSetting;
     }
 
     public List<UnitAndParentOrganizationAndCountryDTO> getParentOrganizationAndCountryIdsOfUnit() {

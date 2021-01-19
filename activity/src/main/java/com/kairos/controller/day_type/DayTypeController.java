@@ -38,14 +38,14 @@ public class DayTypeController {
     @GetMapping(value = COUNTRY_URL + "/dayType")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDayType(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeByCountryId(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypeWithCountryHolidayCalender(countryId));
     }
 
     @ApiOperation(value = "Get DayType for unit")
     @GetMapping(value = UNIT_URL + "/dayType")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDayTypeForUnit() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getAllDayTypeByCountryId(UserContext.getUserDetails().getCountryId()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
     }
 
     @ApiOperation(value = "Update DayType")

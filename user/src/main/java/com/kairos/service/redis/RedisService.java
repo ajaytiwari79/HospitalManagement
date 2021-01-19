@@ -74,11 +74,13 @@ public class RedisService extends CommonsExceptionUtil {
                 String tokenKey = getTokenKey(accessToken);
                 if(userTokensFromDifferentMachine.size() == 1) valueOperations.delete(userName);
                 else {
-                    if(!userTokensFromDifferentMachine.get(tokenKey).equalsIgnoreCase(accessToken)) {
-                        internalServerError("message.redis.perssistedtoken.notEqualToRequestedToken");
+                    if(userTokensFromDifferentMachine.containsKey(tokenKey)) {
+                        if (!userTokensFromDifferentMachine.get(tokenKey).equalsIgnoreCase(accessToken)) {
+                            internalServerError("message.redis.perssistedtoken.notEqualToRequestedToken");
+                        }
+                        userTokensFromDifferentMachine.remove(tokenKey);
+                        valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
                     }
-                    userTokensFromDifferentMachine.remove(tokenKey);
-                    valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
                 }
                 tokenRemoved = true;
             } else {
