@@ -156,7 +156,7 @@ public class DayTypeService {
         Long countryId = UserContext.getUserDetails().getCountryId();
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
         List<DayTypeDTO> dayTypes = getDayTypeWithCountryHolidayCalender(countryId);
-        List<TimeSlotDTO> timeSlotDTOS =country?timeSlotService.getDefaultTimeSlot(): timeSlotService.getShiftPlanningTimeSlotByUnit(unitId);
+        List<TimeSlotDTO> timeSlotDTOS = country?timeSlotService.getDefaultTimeSlot(): timeSlotService.getShiftPlanningTimeSlotByUnit(unitId);
         return new WTADefaultDataInfoDTO(dayTypes, presenceTypeDTOS, timeSlotDTOS, countryId);
     }
 

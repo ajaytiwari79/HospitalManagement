@@ -27,7 +27,9 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_TIMESLOT_ID_NOTFOUND;
+import static com.kairos.constants.ActivityMessagesConstants.TIMESLOT_NOT_FOUND_FOR_UNIT;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.TimeSlotType.SHIFT_PLANNING;
 import static com.kairos.enums.TimeSlotType.TASK_PLANNING;
@@ -172,8 +174,11 @@ public class TimeSlotSetService {
     }
 
     public List<TimeSlotDTO> getShiftPlanningTimeSlotByUnit(Long unitId) {
-        UnitSetting unitSetting=unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
-        return timeSlotRepository.findByUnitIdAndTimeSlotModeAndTimeSlotTypeOrderByStartDate(unitSetting.getUnitId(), unitSetting.getTimeSlotMode(), SHIFT_PLANNING).get(0).getTimeSlots();
+        List<TimeSlotSetDTO> timeSlot = getShiftPlanningTimeSlotSetsByUnit(unitId);
+        if(isCollectionEmpty(timeSlot)){
+            exceptionService.dataNotFoundException(TIMESLOT_NOT_FOUND_FOR_UNIT);
+        }
+        return timeSlot.get(0).getTimeSlots();
     }
 
     public TimeSlotsDeductionDTO saveTimeSlotPercentageDeduction(Long unitId, TimeSlotsDeductionDTO timeSlotsDeductionDTO) {

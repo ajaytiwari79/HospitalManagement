@@ -2,6 +2,7 @@ package com.kairos.dto.user.country.time_slot;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 @Getter
@@ -9,7 +10,7 @@ import java.math.BigInteger;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TimeSlot {
+public class TimeSlot implements Serializable {
     private BigInteger id;
     private String name;
     private int startHour;

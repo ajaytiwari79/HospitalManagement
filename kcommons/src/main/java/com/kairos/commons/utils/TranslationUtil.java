@@ -31,14 +31,19 @@ public class TranslationUtil {
         }catch (Exception ex) {
             translations = new HashMap<>();
         }
-        map.put(TRANSLATIONS, translations);
+        try{
+            map.put(TRANSLATIONS, translations);
+        }catch (UnsupportedOperationException e){
+            map = new HashMap<>(map);
+            map.put(TRANSLATIONS, translations);
+        }
         if(isMapEmpty(translations))return;
         if(map.containsKey(NAME)){
             map.put(NAME,getName(translations,map.get(NAME).toString()));
         }
         if(map.containsKey(DESCRIPTION)){
             map.put(DESCRIPTION,getDescription(translations,map.get(DESCRIPTION).toString()));
-         }
+        }
     }
 
     public static String getName(Map<String, TranslationInfo> translations, String name) {
