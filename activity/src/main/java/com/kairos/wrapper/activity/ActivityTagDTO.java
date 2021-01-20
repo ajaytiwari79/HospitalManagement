@@ -28,6 +28,7 @@ import java.util.*;
 @Setter
 @PermissionClass(name = "Activity")
 public class ActivityTagDTO implements Serializable {
+    private static final long serialVersionUID = -8814717901742581421L;
     private BigInteger id;
     private String name;
     private String description;

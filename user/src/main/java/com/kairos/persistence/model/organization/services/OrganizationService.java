@@ -25,6 +25,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.ORGAN
 @Setter
 @NoArgsConstructor
 public class OrganizationService extends UserBaseEntity {
+    private static final long serialVersionUID = 6470037280579995989L;
     @NotBlank(message = ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY)
     private String name;
 

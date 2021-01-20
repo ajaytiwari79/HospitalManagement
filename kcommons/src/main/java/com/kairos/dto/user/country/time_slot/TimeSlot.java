@@ -11,6 +11,7 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @Builder
 public class TimeSlot implements Serializable {
+    private static final long serialVersionUID = 9044160737660519975L;
     private BigInteger id;
     private String name;
     private int startHour;

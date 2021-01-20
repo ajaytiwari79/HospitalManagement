@@ -11,6 +11,7 @@ import lombok.Setter;
 @Setter
 public class ExpertiseNightWorkerSetting extends MongoBaseEntity {
 
+    private static final long serialVersionUID = -351941897142204264L;
     private TimeSlot timeSlot;
     private int minMinutesToCheckNightShift;
     private DurationType intervalUnitToCheckNightWorker;

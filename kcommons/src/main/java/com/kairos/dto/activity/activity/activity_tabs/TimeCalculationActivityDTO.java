@@ -19,6 +19,8 @@ import java.util.List;
 @Setter
 public class TimeCalculationActivityDTO implements Serializable {
 
+
+    private static final long serialVersionUID = 8745825684079591322L;
     private Long activityId;
     private String methodForCalculatingTime;
     private TimeCalaculationType fullDayCalculationType;

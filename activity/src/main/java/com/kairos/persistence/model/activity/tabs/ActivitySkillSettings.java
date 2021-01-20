@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ActivitySkillSettings implements Serializable {
 
+    private static final long serialVersionUID = -3961674525289551697L;
     private List<ActivitySkill> activitySkills = new ArrayList<>();
 
     public List<Long> getActivitySkillIds() {

@@ -10,6 +10,7 @@ import java.time.LocalDate;
 
 public class CutOffInterval implements Serializable {
 
+    private static final long serialVersionUID = 2435203302227263141L;
     private LocalDate startDate;
     private LocalDate endDate;
 

@@ -11,6 +11,7 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CompositeShiftActivityDTO implements Serializable {
 
+    private static final long serialVersionUID = -3680317563247048594L;
     private BigInteger activityId;
     private boolean allowedBefore;
     private boolean allowedAfter;

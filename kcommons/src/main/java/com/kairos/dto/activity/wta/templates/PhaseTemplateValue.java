@@ -16,6 +16,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PhaseTemplateValue implements Serializable {
+    private static final long serialVersionUID = 213213212232l;
     private BigInteger phaseId;
     private String phaseName;
     private short staffValue;
