@@ -157,7 +157,7 @@ public class StaffController {
              startDate= LocalDate.parse((CharSequence) unitPermissionDetails.get("startDate"));
              endDate= unitPermissionDetails.get("endDate")==null?null:LocalDate.parse((CharSequence) unitPermissionDetails.get("endDate"));
         }
-        Map<String, Object> response = positionService.createUnitPermission(unitId, staffId, accessGroupId, isCreated,startDate,endDate);
+        Map<String, Object> response = positionService.createUnitPermission(unitId, staffId, accessGroupId, isCreated,startDate,endDate,UserContext.getUserDetails().getId());
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }
@@ -423,7 +423,7 @@ public class StaffController {
         long accessGroupId = Long.parseLong((String) permission.get("accessGroupId"));
         long tabId = Long.parseLong((String) permission.get("tabId"));
         long unitId = Long.parseLong((String) permission.get("unitId"));
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setPagePermissionToUser(staffId, unitId, accessGroupId, tabId, read, write));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setPagePermissionToUser(staffId, unitId, accessGroupId, tabId, read, write,UserContext.getUserDetails().getId()));
     }
 
     @RequestMapping(value = "/{staffId}/external_id", method = RequestMethod.POST)

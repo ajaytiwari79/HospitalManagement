@@ -94,7 +94,7 @@ public class PermissionController {
 
     @PostMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/field_level_permission")
     public ResponseEntity<Map<String, Object>> assignPermissionToModel(@PathVariable Long unitId,@PathVariable Long accessGroupId, @RequestBody CustomPermissionDTO customPermissionDTO) {
-        permissionService.assignPermission(unitId,accessGroupId,customPermissionDTO);
+        permissionService.assignPermission(unitId,accessGroupId,customPermissionDTO,UserContext.getUserDetails().getId());
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 

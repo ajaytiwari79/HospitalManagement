@@ -55,6 +55,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -179,7 +181,8 @@ public class PositionService {
     }
 
 
-    public Map<String, Object> createUnitPermission(Long unitId, Long staffId, Long accessGroupId, boolean created,LocalDate startDate,LocalDate endDate) {
+    @CacheEvict(value = "getPermission", key = "{#unitId, #userId}")
+    public Map<String, Object> createUnitPermission(Long unitId, Long staffId, Long accessGroupId, boolean created,LocalDate startDate,LocalDate endDate,Long userId) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
@@ -655,7 +658,8 @@ public class PositionService {
             deleteAuthTokenOfUsersByPositionIds(positionIds);
             for (ExpiredPositionsQueryResult expiredPositionsQueryResult : expiredPositionsQueryResults) {
                 for (OrganizationBaseEntity unit : expiredPositionsQueryResult.getUnits()) {
-                    createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true,null,null);
+                    User user = userGraphRepository.getUserByStaffId(expiredPositionsQueryResult.getPosition().getStaff().getId());
+                    createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true,null,null,user.getId());
                 }
             }
         }

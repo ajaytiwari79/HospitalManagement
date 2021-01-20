@@ -55,6 +55,7 @@ import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -148,11 +149,9 @@ public class AccessGroupService {
         AccessGroup accessGrpToUpdate = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGrpToUpdate).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId);
-
         }
         if (accessGroupRepository.isOrganizationAccessGroupExistWithNameExceptId(unitId, accessGroupDTO.getName(), accessGroupId)) {
             exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, accessGroupDTO.getName());
-
         }
         accessGrpToUpdate.setName(accessGroupDTO.getName());
         accessGrpToUpdate.setRole(accessGroupDTO.getRole());
@@ -166,6 +165,7 @@ public class AccessGroupService {
         accessGroupDTO.setId(accessGrpToUpdate.getId());
         return accessGroupDTO;
     }
+
 
     public boolean deleteAccessGroup(long accessGroupId) {
         AccessGroup objectToDelete = accessGroupRepository.findOne(accessGroupId);
@@ -273,15 +273,20 @@ public class AccessGroupService {
         return accessGroupRepository.getAccessGroups(organization.getId());
     }
 
-    public boolean assignAccessGroupToStaff(List<String> accessGroupIds, long staffId) {
 
+    public boolean assignAccessGroupToStaff(List<String> accessGroupIds, Long staffId,Long unitId) {
         List<Long> accessGroupLongValue = new ArrayList<Long>(accessGroupIds.size());
         for (String accessGroupId : accessGroupIds) {
             accessGroupLongValue.add(Long.valueOf(accessGroupId));
         }
-
         Staff staff = accessGroupRepository.assignGroupToStaff(staffId, accessGroupLongValue);
+        resetPermission(unitId,userGraphRepository.getUserIdByStaffId(staffId));
         return staff != null;
+    }
+
+    @CacheEvict(value = "getPermission", key = "{#unitId, #userId}")
+    public boolean resetPermission(Long unitId,Long userId){
+        return true;
     }
 
     public AccessPage createAccessPage(String name, List<Map<String, Object>> childPage, boolean isModule) {
@@ -359,17 +364,13 @@ public class AccessGroupService {
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ACESSGROUPID_INCORRECT, accessGroupId);
-
             }
         }
         long creationDate = DateUtils.getDate().getTime();
         long lastModificationDate = DateUtils.getDate().getTime();
         Boolean read = isSelected;
         Boolean write = isSelected;
-
-
         accessGroupRepository.updateAccessPagePermission(accessGroupId, accessPageIds, isSelected, creationDate, lastModificationDate, read, write);
-
         // Update read/write permission of successive parent tabs
         updateReadWritePermissionOfSuccessiveParentTabForAccessGroup(accessGroupId, accessPageIds.get(0));
         // Remove customized permission for accessPageIds of accessGroupId
@@ -377,19 +378,17 @@ public class AccessGroupService {
         return true;
     }
 
-    public Map<String, Object> setPagePermissionToUser(long staffId, long unitId, long accessGroupId, long tabId, boolean read, boolean write) {
-
+    public Map<String, Object> setPagePermissionToUser(Long staffId, Long unitId, Long accessGroupId, Long tabId, boolean read, boolean write,Long userId) {
+        resetPermission(unitId,userGraphRepository.getUserIdByStaffId(staffId));
         return accessPermissionGraphRepository.setPagePermissionToUser(unitId, staffId, accessGroupId, tabId, read, write);
 
     }
 
     public List<AccessPageQueryResult> getAccessPageHierarchy(List<AccessPageQueryResult> allResults, List<AccessPageQueryResult> accessPageQueryResults) {
-
         for (AccessPageQueryResult accessPageQueryResult : accessPageQueryResults) {
             accessPageQueryResult.setChildren(getChilds(allResults, accessPageQueryResult));
             getAccessPageHierarchy(allResults, accessPageQueryResult.getChildren());
         }
-
         return allResults;
     }
 
@@ -438,6 +437,7 @@ public class AccessGroupService {
         accessPageRepository.updateAccessPagePermissionsForAccessGroup(accessGroupId, parentTabId, parentTabRead, parentTabWrite);
         updateReadWritePermissionOfSuccessiveParentTabForAccessGroup(parentTabId, accessGroupId);
     }
+
 
     public void updateReadWritePermissionOfParentTab(Long accessGroupId, Boolean read, Boolean write, Long tabId, Long orgId, Long unitId, Long staffId) {
 
@@ -500,14 +500,12 @@ public class AccessGroupService {
         }
     }
 
-    public Boolean updatePermissionsForAccessTabsOfAccessGroup(Long accessGroupId, Long accessPageId, AccessPermissionDTO accessPermissionDTO, Boolean updateChildren) {
-
+    @CacheEvict(value = "getPermission", key = "{#unitId, #userId}")
+    public Boolean updatePermissionsForAccessTabsOfAccessGroup(Long accessGroupId, Long accessPageId, AccessPermissionDTO accessPermissionDTO, Boolean updateChildren,Long unitId,Long userId) {
         AccessPageQueryResult readAndWritePermissionOfAccessPage = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, accessPageId);
         List<Long> organizationAccessGroupIds = accessGroupRepository.getOrganizationAccessGroupIdsList(accessGroupId);
-
         Boolean write = accessPermissionDTO.isWrite();
         Boolean read = accessPermissionDTO.isRead();
-
         // If change has been done in read and if it is false then set write as false too
         if (readAndWritePermissionOfAccessPage.isRead() != read && !read) {
             write = false;
@@ -521,11 +519,9 @@ public class AccessGroupService {
                 accessGroupRepository.updatePermissionsForAccessTabsAndChildrenOfAccessGroup(accessPageId, organizationAccessGroupId, read, write);
             }
         }
-
         if (updateChildren) {
             // Update read/write permission of tab and its children
             return accessGroupRepository.updatePermissionsForAccessTabsAndChildrenOfAccessGroup(accessPageId, accessGroupId, read, write);
-
         } else {
             // Update read/write permission of tab itself
             return accessGroupRepository.updatePermissionsForAccessTabOfAccessGroup(accessPageId, accessGroupId, accessPermissionDTO.isRead(), accessPermissionDTO.isWrite());
@@ -533,7 +529,6 @@ public class AccessGroupService {
     }
 
     /***** Access group - COUNTRY LEVEL - STARTS HERE ******************/
-
     private void setAccessPageRelationshipWithAccessGroupByOrgCategory(Long countryId, Long accessGroupId, OrganizationCategory organizationCategory) {
         switch (organizationCategory) {
             case HUB:

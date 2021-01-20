@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.repository.custom_repository.CommonRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -14,6 +15,7 @@ public class TranslationService {
     @Inject
     private SystemLanguageGraphRepository systemLanguageGraphRepository;
 
+    @CacheEvict(value = {"getPermission","generateHierarchy"}, allEntries = true)
     public Map<String, TranslationInfo> updateTranslation(Long id, Map<String, TranslationInfo> translation){
         String jsonString;
         try{

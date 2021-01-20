@@ -42,6 +42,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -617,7 +618,8 @@ public class PermissionService {
         return unitAccessGroupIds;
     }
 
-    public void assignPermission(Long unitId, Long accessGroupId, CustomPermissionDTO customPermissionDTO) {
+    @CacheEvict(value = "getPermission", key = "{#unitId, #userId}")
+    public void assignPermission(Long unitId, Long accessGroupId, CustomPermissionDTO customPermissionDTO,Long userId) {
         Set<Long> kPermissionModelIds = permissionModelRepository.kPermissionModelIds(customPermissionDTO.getId());
         OtherPermissionDTO forOtherPermissions = customPermissionDTO.getForOtherPermissions();
         LOGGER.info("other permissions are {}", customPermissionDTO.getForOtherPermissions().toString());
