@@ -143,7 +143,7 @@ public class DayTypeService {
         return dayType.getTranslations();
     }
 
-    @Cacheable(value = "getDayTypeWithCountryHolidayCalender", key = "#countryId", cacheManager = "cacheManager")
+    //@Cacheable(value = "getDayTypeWithCountryHolidayCalender", key = "#countryId", cacheManager = "cacheManager")
     public List<DayTypeDTO> getDayTypeWithCountryHolidayCalender(Long countryId) {
         return dayTypeRepository.findAllByCountryIdAndDeletedFalse(countryId);
     }

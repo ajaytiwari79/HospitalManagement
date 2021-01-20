@@ -8,6 +8,7 @@ import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.OrganizationGeneral;
@@ -187,7 +188,7 @@ public class OrganizationController {
     @GetMapping("/organization_flow/hierarchy")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationHierarchyForOrganizationTab() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationHierarchyService.generateHierarchy());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationHierarchyService.generateHierarchy(UserContext.getUserDetails().getId()));
     }
 
     @GetMapping("/staff/available/{organizationId}")

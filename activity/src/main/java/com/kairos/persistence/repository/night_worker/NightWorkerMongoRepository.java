@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface NightWorkerMongoRepository extends MongoBaseRepository<NightWorker, BigInteger>, CustomNightWorkerMongoRepository{
 
-    @Cacheable(value = "findByStaffId", key = "#staffId", cacheManager = "cacheManager")
+    //@Cacheable(value = "findByStaffId", key = "#staffId", cacheManager = "cacheManager")
     @Query(value = "{ staffId:?0, deleted:false }")
     NightWorker findByStaffId(Long staffId);
 

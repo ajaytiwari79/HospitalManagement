@@ -17,6 +17,7 @@ import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.tree_structure.TreeStructureService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,9 +48,10 @@ public class OrganizationHierarchyService {
     @Inject
     private OrganizationService organizationService;
 
-    public List<QueryResult> generateHierarchy() {
-        List<OrganizationWrapper> organizationWrappers = userGraphRepository.getOrganizations(UserContext.getUserDetails().getId());
-        boolean isHubMember = accessPageService.isHubMember(UserContext.getUserDetails().getId());
+    //@Cacheable(value = "generateHierarchy", key = "#userId", cacheManager = "cacheManager")
+    public List<QueryResult> generateHierarchy(Long userId) {
+        List<OrganizationWrapper> organizationWrappers = userGraphRepository.getOrganizations(userId);
+        boolean isHubMember = accessPageService.isHubMember(userId);
         List<QueryResult> queryResults = new ArrayList<>();
         for (OrganizationWrapper organizationWrapper : organizationWrappers) {
             Organization hierarchy = organizationGraphRepository.generateHierarchy(organizationWrapper.getId()).get(0);
@@ -62,7 +64,7 @@ public class OrganizationHierarchyService {
 
     public QueryResult generateOrganizationHierarchyByFilter() {
         //TODO need to fix the complete query as per the current structure, currently filters won't work
-       return generateHierarchy().get(0);
+       return generateHierarchy(UserContext.getUserDetails().getId()).get(0);
     }
 
 

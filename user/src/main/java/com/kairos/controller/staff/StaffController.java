@@ -424,7 +424,7 @@ public class StaffController {
         long accessGroupId = Long.parseLong((String) permission.get("accessGroupId"));
         long tabId = Long.parseLong((String) permission.get("tabId"));
         long unitId = Long.parseLong((String) permission.get("unitId"));
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setPagePermissionToUser(staffId, unitId, accessGroupId, tabId, read, write));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setPagePermissionToUser(staffId, unitId, accessGroupId, tabId, read, write,UserContext.getUserDetails().getId()));
     }
 
     @RequestMapping(value = "/{staffId}/external_id", method = RequestMethod.POST)

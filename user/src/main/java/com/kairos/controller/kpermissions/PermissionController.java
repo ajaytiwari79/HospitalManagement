@@ -66,7 +66,7 @@ public class PermissionController {
 
     @PutMapping(value = "/update_permission")
     public ResponseEntity<Map<String, Object>> createFieldPermissions(@Valid @RequestBody PermissionDTO permissionDTO,@RequestParam boolean updateOrganisationCategories)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissions(permissionDTO,updateOrganisationCategories));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissions(UserContext.getUserDetails().getLastSelectedOrganizationId(),permissionDTO,updateOrganisationCategories));
     }
 
     @PutMapping(value = "/update_action_permission")
