@@ -213,6 +213,7 @@ public class AbsenceShiftService {
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
             ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(shiftDTO, activityWrapperMap,null);
             ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false, true);
+            updatedShiftWithViolatedInfoDTO.setShifts(newArrayList(shiftDTO));
             Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
             Optional<PlanningPeriod> planningPeriodByShift = planningPeriods.stream().filter(planningPeriod -> new DateTimeInterval(asDate(planningPeriod.getStartDate()), asDate(planningPeriod.getEndDate())).contains(shift.getStartDate()) || planningPeriod.getEndDate().equals(asLocalDate(shift.getStartDate()))).findAny();
             if (!planningPeriodByShift.isPresent()) {
@@ -224,8 +225,6 @@ public class AbsenceShiftService {
             shifts.add(shift);
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             shiftWithViolatedInfoDTOS.add(updatedShiftWithViolatedInfoDTO);
-            /*shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getActivities());
-            shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());*/
         }
         Phase phase = phaseMapByDate.get(shiftDTOS.get(0).getActivities().get(0).getStartDate());
         if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || !isRuleViolated(shiftWithViolatedInfoDTOS)) {
@@ -233,9 +232,8 @@ public class AbsenceShiftService {
             shiftDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(shifts, ShiftDTO.class);
             shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
             shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS);
-            shiftDTOS.forEach(shiftDTO -> shiftWithViolatedInfoDTOS.add(new ShiftWithViolatedInfoDTO(newArrayList(shiftDTO))));
+            //shiftDTOS.forEach(shiftDTO -> shiftWithViolatedInfoDTOS.add(new ShiftWithViolatedInfoDTO(newArrayList(shiftDTO))));
         }
-        //shiftWithViolatedInfoDTO.setShifts(shiftDTOS);
         return shiftWithViolatedInfoDTOS;
     }
 
