@@ -20,7 +20,7 @@ public class FileReaderUtil {
             bufferedReader.lines().forEach(line->stringBuffer.append(line));
             json = stringBuffer.toString();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return json;
     }

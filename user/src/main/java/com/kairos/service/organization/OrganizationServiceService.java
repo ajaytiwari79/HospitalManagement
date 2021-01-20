@@ -24,6 +24,8 @@ import com.kairos.service.integration.GdprIntegrationService;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.neo4j.util.IterableUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,6 +76,7 @@ public class OrganizationServiceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationServiceService.class);
 
 
+    @CacheEvict(value = "findAllActivityByCountry", key = "#countryId")
     public Map<String, Object> updateOrganizationService(long id, String name, String description, Long countryId) {
         if (isNull(name) || name.trim().isEmpty()) {
             exceptionService.actionNotPermittedException(ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY);
@@ -96,13 +99,13 @@ public class OrganizationServiceService {
         return organizationServiceRepository.findOne(id);
     }
 
-
-    public List<OrganizationServiceDTO> getAllOrganizationService(long countryId) {
+    @Cacheable(value = "getAllOrganizationService", key = "#countryId", cacheManager = "cacheManager")
+    public Iterable<OrganizationService> getAllOrganizationService(Long countryId) {
         Set<Long> serviceIds=organizationServiceRepository.getOrganizationServicesIdsByCountryId(countryId);
-        List<OrganizationService> organizationServices = IterableUtils.toList(organizationServiceRepository.findAllById(serviceIds));
-        return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
+        return organizationServiceRepository.findAllById(serviceIds);
      }
 
+    @CacheEvict(value = "findAllActivityByCountry", allEntries = true)
     public boolean deleteOrganizationServiceById(Long id) {
         OrganizationService organizationService = organizationServiceRepository.findOne(id);
         if (organizationService == null) {
@@ -144,6 +147,7 @@ public class OrganizationServiceService {
 
     }
 
+    @CacheEvict(value = "findAllActivityByCountry", allEntries = true)
     public Map<String, Object> addCountrySubService(final long serviceId, OrganizationService subService) {
         OrganizationService organizationService = organizationServiceRepository.findById(serviceId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND)));
         String name = "(?i)" + subService.getName();
@@ -166,6 +170,7 @@ public class OrganizationServiceService {
 
     }
 
+    @CacheEvict(value = "findAllActivityByCountry", allEntries = true)
     public OrganizationServiceQueryResult updateCustomNameOfService(long serviceId, long organizationId, String customName) {
 
         return unitGraphRepository.addCustomNameOfServiceForOrganization(serviceId, organizationId, customName);
@@ -173,15 +178,18 @@ public class OrganizationServiceService {
 
     }
 
+    @CacheEvict(value = "findAllActivityByCountry", allEntries = true)
     public OrganizationServiceQueryResult updateCustomNameOfSubService(long subServiceId, long organizationId, String customName) {
             return teamGraphRepository.addCustomNameOfSubServiceForTeam(organizationId, subServiceId, customName);
     }
 
+    @CacheEvict(value = "findAllActivityByCountry", allEntries = true)
     private Boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId) {
         return unitGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId, organizationId);
     }
 
-    public Map<String, Object> updateServiceToOrganization(long id, long organizationServiceId, boolean isSelected) {
+
+    public Map<String, Object> updateServiceToOrganization(Long id, Long organizationServiceId, boolean isSelected) {
         Unit unit=unitGraphRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_DATANOTFOUND,"Unit",id)));
         OrganizationService organizationService = organizationServiceRepository.findById(organizationServiceId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND)));
         if (isSelected) {
@@ -208,6 +216,7 @@ public class OrganizationServiceService {
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(organizationServices, OrganizationServiceDTO.class);
     }
 
+    @CacheEvict(value = "findAllActivityByCountry", allEntries = true)
     public List<Object> linkOrgServiceWithOrgType(long orgTypeId, long serviceId) {
         OrganizationType organizationType = organizationTypeGraphRepository.findOne(orgTypeId);
         List<Object> objectList = new ArrayList<>();
@@ -247,8 +256,8 @@ public class OrganizationServiceService {
 
     }
 
-
-    public OrganizationService createCountryOrganizationService(long countryId, OrganizationService organizationService) {
+    @CacheEvict(value = "findAllActivityByCountry", key = "#countryId")
+    public OrganizationService createCountryOrganizationService(Long countryId, OrganizationService organizationService) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             return null;

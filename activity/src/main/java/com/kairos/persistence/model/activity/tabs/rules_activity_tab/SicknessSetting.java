@@ -5,13 +5,14 @@ import com.kairos.enums.sickness.SickStaffNotApplicableFor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
 //Todo Team A
-public class SicknessSetting {
+public class SicknessSetting implements Serializable {
 
 
     private boolean canOnlyUsedOnMainEmployment;
@@ -19,7 +20,7 @@ public class SicknessSetting {
     private boolean validForChildCare;
     private boolean usedOnFreeDays;
     private boolean usedOnProtecedDaysOff;
-    private Set<SickStaffNotApplicableFor> sickStaffNotApplicableFor=new HashSet<>();
+    private Set<SickStaffNotApplicableFor> sickStaffNotApplicableFor = new HashSet<>();
     private boolean showAslayerOnTopOfPublishedShift;
     private boolean showAslayerOnTopOfUnPublishedShift;
     private ReplaceSickShift replaceSickShift;

@@ -43,7 +43,7 @@ public class CountryCalenderService {
             AppConstants.HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             AppConstants.DATA_STORE_FACTORY = new FileDataStoreFactory(AppConstants.DATA_STORE_DIR);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             System.exit(1);
         }
     }
@@ -98,7 +98,7 @@ public class CountryCalenderService {
 
         } catch (IOException e) {
             logger.info("Exception occured: {}",e.getCause());
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return itemsList;
     }

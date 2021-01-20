@@ -19,6 +19,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -26,6 +27,9 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_TIMESLOT_ID_NOTFOUND;
+import static com.kairos.constants.ActivityMessagesConstants.TIMESLOT_NOT_FOUND_FOR_UNIT;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.TimeSlotType.SHIFT_PLANNING;
 import static com.kairos.enums.TimeSlotType.TASK_PLANNING;
@@ -60,7 +64,8 @@ public class TimeSlotSetService {
         return timeSlotSetData;
     }
 
-    public TimeSlotSetDTO createTimeSlotSet(long unitId, TimeSlotSetDTO timeSlotSetDTO) {
+    @CacheEvict(value = "findByUnitIdAndTimeSlotTypeOrderByStartDate",key = "#unitId")
+    public TimeSlotSetDTO createTimeSlotSet(Long unitId, TimeSlotSetDTO timeSlotSetDTO) {
         UnitSetting unitSetting=unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
         TimeSlotSet timeSlotSet = new TimeSlotSet(timeSlotSetDTO.getName(), timeSlotSetDTO.getStartDate(), unitSetting.getTimeSlotMode(),unitId);
         timeSlotSet.setEndDate(timeSlotSetDTO.getEndDate());
@@ -70,10 +75,11 @@ public class TimeSlotSetService {
         return timeSlotSetDTO;
     }
 
+    @CacheEvict(value = "findByUnitIdAndTimeSlotTypeOrderByStartDate",allEntries = true)
     public TimeSlotDTO createTimeSlot(BigInteger timeSlotSetId, TimeSlotDTO timeSlotDTO) {
         TimeSlotSet timeSlotSet = timeSlotRepository.findOne(timeSlotSetId);
         if (!Optional.ofNullable(timeSlotSet).isPresent()) {
-            exceptionService.dataNotFoundByIdException("MESSAGE_TIMESLOT_ID_NOTFOUND");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMESLOT_ID_NOTFOUND);
         }
         TimeSlot timeSlot = new TimeSlot(null,timeSlotDTO.getName(),timeSlotDTO.getStartHour(),timeSlotDTO.getStartMinute(),timeSlotDTO.getEndHour(),timeSlotDTO.getEndMinute(),false);
         timeSlotSet.getTimeSlots().add(timeSlot);
@@ -81,7 +87,7 @@ public class TimeSlotSetService {
         return timeSlotDTO;
     }
 
-
+    @CacheEvict(value = "findByUnitIdAndTimeSlotTypeOrderByStartDate",allEntries = true)
     public List<TimeSlotSet> updateTimeSlotSet(BigInteger timeSlotSetId, TimeSlotSetDTO timeSlotSetDTO) {
         TimeSlotSet timeSlotSet = timeSlotRepository.findById(timeSlotSetId).orElseThrow(()->new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage("MESSAGE_TIMESLOT_ID_NOTFOUND")));
         timeSlotSet.setTimeSlots(ObjectMapperUtils.copyCollectionPropertiesByMapper(timeSlotSetDTO.getTimeSlots(),TimeSlot.class));
@@ -93,7 +99,7 @@ public class TimeSlotSetService {
         return Arrays.asList(timeSlotSet);
     }
 
-
+    @CacheEvict(value = "findByUnitIdAndTimeSlotTypeOrderByStartDate",key = "#unitId")
     public Map<String, Object> updateTimeSlotType(long unitId, boolean standardTimeSlot) {
         UnitSetting unitSetting = unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
         unitSetting.setTimeSlotMode((standardTimeSlot) ? STANDARD : ADVANCE);
@@ -102,36 +108,17 @@ public class TimeSlotSetService {
 
     }
 
-
+    @CacheEvict(value = "findByUnitIdAndTimeSlotTypeOrderByStartDate",allEntries = true)
     public boolean deleteTimeSlotSet(BigInteger timeSlotSetId) {
         TimeSlotSet timeSlotSetToDelete = timeSlotRepository.findOne(timeSlotSetId);
         if (!Optional.ofNullable(timeSlotSetToDelete).isPresent()) {
             logger.error("Invalid time slot id {}" , timeSlotSetId);
-            exceptionService.dataNotFoundByIdException("MESSAGE_TIMESLOT_ID_NOTFOUND");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMESLOT_ID_NOTFOUND);
 
         }
         timeSlotSetToDelete.setDeleted(true);
         timeSlotRepository.save(timeSlotSetToDelete);
         return true;
-    }
-
-
-    private Map<String, Object> prepareTimeSlotResponse(UnitSetting unitSetting) {
-        List<TimeSlotSetDTO> timeSlotWrappers = timeSlotRepository.getByUnitIdAndTimeSlotMode(unitSetting.getUnitId(), unitSetting.getTimeSlotMode());
-        Map<String, Object> response = new HashMap<>();
-        response.put("timeSlots", timeSlotWrappers);
-        response.put("standardTimeSlot", STANDARD.equals(unitSetting.getTimeSlotMode()));
-        response.put("timeZone", unitSetting.getTimeZone() != null ? unitSetting.getTimeZone().getId() : null);
-        return response;
-    }
-
-    public void createDefaultTimeSlots(Long unitId, TimeSlotType timeSlotType) {
-        TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), STANDARD,unitId);
-        timeSlotSet.setDefaultSet(true);
-        timeSlotSet.setTimeSlotType(timeSlotType);
-        List<TimeSlot> timeSlotList = prepareDefaultTimeSlot();
-        timeSlotSet.setTimeSlots(timeSlotList);
-        timeSlotRepository.save(timeSlotSet);
     }
 
     public List<TimeSlot> prepareDefaultTimeSlot() {
@@ -150,6 +137,7 @@ public class TimeSlotSetService {
         }
     }
 
+    @CacheEvict(value = "findByUnitIdAndTimeSlotTypeOrderByStartDate",key = "#unitId")
     public void createDefaultTimeSlots(Long unitId) {
         boolean alreadyCreated=timeSlotRepository.existsByUnitId(unitId);
         if(!alreadyCreated) {
@@ -161,21 +149,13 @@ public class TimeSlotSetService {
         }
     }
 
-
-
-    /**
-     * @param unitId
-     * @return
-     * @auther anil maurya
-     */
     public List<TimeSlotDTO> getCurrentTimeSlotOfUnit(Long unitId) {
         UnitSetting unit = unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
         return timeSlotRepository.getByUnitIdAndTimeSlotMode(unitId, unit.getTimeSlotMode()).get(0).getTimeSlots();
     }
 
     public List<TimeSlotDTO> getUnitTimeSlot(Long unitId) {
-        UnitSetting unit = unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
-        return timeSlotRepository.findByUnitIdAndTimeSlotModeAndTimeSlotTypeOrderByStartDate(unitId, unit.getTimeSlotMode(),SHIFT_PLANNING).get(0).getTimeSlots();
+        return getShiftPlanningTimeSlotSetsByUnit(unitId).get(0).getTimeSlots();
     }
 
     public List<TimeSlotDTO> getUnitTimeSlotByNames(Long unitId, Set<String> timeslotNames) {
@@ -185,11 +165,8 @@ public class TimeSlotSetService {
         return Collections.emptyList();
 
     }
-
-
     public List<TimeSlotSetDTO> getShiftPlanningTimeSlotSetsByUnit(Long unitId) {
-        UnitSetting unitSetting=unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
-        return timeSlotRepository.findByUnitIdAndTimeSlotModeAndTimeSlotTypeOrderByStartDate(unitId, unitSetting.getTimeSlotMode(), SHIFT_PLANNING);
+        return timeSlotRepository.findByUnitIdAndTimeSlotType(unitId,  SHIFT_PLANNING);
     }
 
     public List<TimeSlot> getShiftPlanningTimeSlotsById(BigInteger timeSlotSetId) {
@@ -197,8 +174,11 @@ public class TimeSlotSetService {
     }
 
     public List<TimeSlotDTO> getShiftPlanningTimeSlotByUnit(Long unitId) {
-        UnitSetting unitSetting=unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
-        return timeSlotRepository.findByUnitIdAndTimeSlotModeAndTimeSlotTypeOrderByStartDate(unitSetting.getUnitId(), unitSetting.getTimeSlotMode(), SHIFT_PLANNING).get(0).getTimeSlots();
+        List<TimeSlotSetDTO> timeSlot = getShiftPlanningTimeSlotSetsByUnit(unitId);
+        if(isCollectionEmpty(timeSlot)){
+            exceptionService.dataNotFoundException(TIMESLOT_NOT_FOUND_FOR_UNIT);
+        }
+        return timeSlot.get(0).getTimeSlots();
     }
 
     public TimeSlotsDeductionDTO saveTimeSlotPercentageDeduction(Long unitId, TimeSlotsDeductionDTO timeSlotsDeductionDTO) {

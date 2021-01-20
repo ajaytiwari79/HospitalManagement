@@ -12,10 +12,13 @@ import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDT
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.FilterType;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.cta.ActivityTypeForCostCalculation;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -53,6 +56,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
+import static com.kairos.enums.FilterType.CTA_ACCOUNT_TYPE;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -767,6 +771,65 @@ public class CostTimeAgreementService {
         costTimeAgreement.setTranslations(translations);
         costTimeAgreementRepository.save(costTimeAgreement);
         return costTimeAgreement.getTranslations();
+    }
+
+    public void updateCTADates(List<CostTimeAgreement> costTimeAgreements1, EmploymentLinesDTO employmentLinesDTO) {
+        for (CostTimeAgreement costTimeAgreement : costTimeAgreements1) {
+            if(costTimeAgreement.getStartDate().isAfter(employmentLinesDTO.getStartDate())){
+                costTimeAgreement.setStartDate(employmentLinesDTO.getStartDate());
+            }
+            break;
+        }
+        if(isNull(employmentLinesDTO.getEndDate()) && !costTimeAgreements1.isEmpty()){
+            costTimeAgreements1.get(costTimeAgreements1.size()-1).setEndDate(null);
+        }else {
+            for (CostTimeAgreement costTimeAgreement : costTimeAgreements1) {
+                if(isNull(costTimeAgreement.getEndDate())){
+                    break;
+                }else if(costTimeAgreement.getEndDate().isBefore(employmentLinesDTO.getEndDate())){
+                    costTimeAgreement.setEndDate(employmentLinesDTO.getEndDate());
+                    break;
+                }
+            }
+        }
+    }
+
+    public void updateDatesOnCTA(List<CostTimeAgreement> costTimeAgreements1) {
+        for (int i = 1; i < costTimeAgreements1.size(); i++) {
+            CostTimeAgreement first = costTimeAgreements1.get(i-1);
+            CostTimeAgreement second = costTimeAgreements1.get(i);
+            first.setEndDate(second.getStartDate().minusDays(1));
+            if(first.getStartDate().equals(second.getStartDate())){
+                first.setEndDate(first.getStartDate());
+                second.setStartDate(first.getEndDate().plusDays(1));
+            }
+        }
+    }
+
+    public Set<Long> filterStaffByCTATemplateAccountType(StaffFilterDTO staffFilterDTO, Set<Long> staffIds, Map<FilterType, Set<String>> filterTypeMap) {
+        Set<Long> filteredStaffIds = staffIds;
+        if(filterTypeMap.containsKey(CTA_ACCOUNT_TYPE)){
+            List<CTAResponseDTO> allCTAs = costTimeAgreementRepository.getParentCTAByUpIds(staffFilterDTO.getMapOfStaffAndEmploymentIds().values().stream().flatMap(longs -> longs.stream()).filter(longs -> isNotNull(longs)).collect(Collectors.toList()));
+            Map<Long,List<CTAResponseDTO>>  ctagroup = allCTAs.stream().collect(Collectors.groupingBy(ctaResponseDTO -> ctaResponseDTO.getEmploymentId(),Collectors.toList()));
+            Set<Long> staffFilterDTOList = new HashSet<>();
+            for(Long staffId:staffIds) {
+                List<Long> employmentIDs=staffFilterDTO.getMapOfStaffAndEmploymentIds().get(staffId);
+                for(Long employmentID:employmentIDs) {
+                    List<CTAResponseDTO> CTAs=ctagroup.getOrDefault(employmentID,new ArrayList<>());
+                    for(CTAResponseDTO ctaResponseDTO:CTAs) {
+                        for(CTARuleTemplateDTO CTARule:ctaResponseDTO.getRuleTemplates()) {
+                            if(filterTypeMap.get(CTA_ACCOUNT_TYPE).contains(CTARule.getPlannedTimeWithFactor().getAccountType().toString())){
+                                staffFilterDTOList.add(staffId);
+                            }
+
+                        }
+                    }
+                }
+            }
+            filteredStaffIds = staffFilterDTOList;
+
+        }
+        return filteredStaffIds;
     }
 
 }

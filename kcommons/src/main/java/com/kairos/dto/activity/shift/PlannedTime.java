@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -18,13 +19,13 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlannedTime {
+public class PlannedTime implements Serializable {
     private BigInteger plannedTimeId;
     private Date startDate;
     private Date endDate;
 
     @JsonIgnore
     public DateTimeInterval getInterval() {
-        return new DateTimeInterval(startDate,endDate);
+        return new DateTimeInterval(startDate, endDate);
     }
 }

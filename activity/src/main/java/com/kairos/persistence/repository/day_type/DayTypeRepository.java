@@ -10,15 +10,13 @@ import java.util.Collection;
 import java.util.List;
 
 @Repository
-public interface DayTypeRepository extends MongoBaseRepository<DayType, BigInteger> {
+public interface DayTypeRepository extends MongoBaseRepository<DayType, BigInteger>,CustomDayTypeRepository {
 
     boolean existsByCountryIdAndNameOrColorCodeIgnoreCaseAndIdNotIn(Long countryId,  String name, int colorCode, BigInteger id);
-
-    List<DayTypeDTO> findAllByCountryIdAndDeletedFalse(Long countryId);
 
     List<DayTypeDTO> findByValidDaysContains(List<String> validDays);
 
     DayTypeDTO getById(BigInteger id);
 
-    List<DayTypeDTO> findAllByIdInAndDeletedFalse(Collection<BigInteger> ids);
+
 }

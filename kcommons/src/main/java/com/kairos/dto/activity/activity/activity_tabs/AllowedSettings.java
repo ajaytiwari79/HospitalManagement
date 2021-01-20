@@ -5,11 +5,12 @@ package com.kairos.dto.activity.activity.activity_tabs;/*
 
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public class AllowedSettings {
+public class AllowedSettings implements Serializable {
     private Set<AccessGroupRole> canEdit;
 
     public AllowedSettings() {

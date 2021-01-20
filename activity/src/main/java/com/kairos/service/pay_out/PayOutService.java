@@ -223,6 +223,17 @@ public class PayOutService extends MongoBaseService {
         return activityIds;
     }
 
+    public void addBonusForProtectedDaysOff(boolean addValueInProtectedDaysOff, PayOutPerShift payOutPerShift, int value) {
+        if (isNotNull(payOutPerShift)) {
+            if(addValueInProtectedDaysOff){
+                payOutPerShift.setProtectedDaysOffMinutes(payOutPerShift.getProtectedDaysOffMinutes()+value);
+            }
+            payOutPerShift.setCtaBonusMinutesOfPayOut(value);
+            payOutPerShift.setScheduledMinutes(0);
+            payOutPerShift.setTotalPayOutMinutes(value);
+        }
+    }
+
     /**
      * @param shiftId
      */

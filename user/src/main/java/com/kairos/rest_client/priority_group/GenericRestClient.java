@@ -122,7 +122,7 @@ public class GenericRestClient {
         try {
             uri= uri+builder.build().toString();
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return uri;
     }

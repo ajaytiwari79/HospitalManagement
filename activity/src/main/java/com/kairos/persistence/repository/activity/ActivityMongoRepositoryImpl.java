@@ -1,7 +1,9 @@
 package com.kairos.persistence.repository.activity;
 
+import com.kairos.constants.AppConstants;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
@@ -23,6 +25,7 @@ import com.kairos.wrapper.activity.ActivityTimeTypeWrapper;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -38,6 +41,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
 import static com.kairos.enums.TimeTypeEnum.UNPAID_BREAK;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
@@ -46,111 +50,35 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepository {
 
-    public static final String ACTIVITY_RULES_ACTIVITY_TAB = "activity.activityRulesSettings";
-    public static final String ACTIVITY_INDIVIDUAL_POINTS_ACTIVITY_TAB = "activity.activityIndividualPointsSettings";
-    public static final String UNIT_ID = "unitId";
-    public static final String TIME_TYPE = "time_Type";
-    public static final String DELETED = "deleted";
-    public static final String BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID = "activityBalanceSettings.timeTypeId";
-    public static final String TIME_TYPE_INFO = "timeTypeInfo";
-    public static final String IS_PARENT_ACTIVITY = "isParentActivity";
-    public static final String ORGANIZATION_TYPES = "organizationTypes";
-    public static final String ORGANIZATION_SUB_TYPES = "organizationSubTypes";
-    public static final String STATE = "state";
-    public static final String TAGS_DATA = "tags_data";
-    public static final String DESCRIPTION = "description";
-    public static final String PARENT_ID = "parentId";
-    public static final String GENERAL_ACTIVITY_TAB = "activityGeneralSettings";
-    public static final String ACTIVITY_PRIORITY_ID = "activityPriorityId";
-    public static final String TIME_TYPE1 = "timeType";
-    public static final String RULES_ACTIVITY_TAB = "activityRulesSettings";
-    public static final String TIME_TYPE_ALLOW_CHILD_ACTIVITIES = "timeType.allowChildActivities";
-    public static final String TIME_TYPE_SICKNESS_SETTING="timeType.sicknessSettingValid";
-    public static final String ALLOW_CHILD_ACTIVITIES = "allowChildActivities";
-    public static final String SICKNESS_SETTING = "sicknessSettingValid";
-    public static final String CHILD_ACTIVITY_IDS = "childActivityIds";
-    public static final String APPLICABLE_FOR_CHILD_ACTIVITIES = "applicableForChildActivities";
-    public static final String TIME_CALCULATION_ACTIVITY_TAB_METHOD_FOR_CALCULATING_TIME = "activityTimeCalculationSettings.methodForCalculatingTime";
-    public static final String ACTIVITIES = "activities";
-    public static final String CTA_AND_WTA_SETTINGS_ACTIVITY_TAB = "activityCTAAndWTASettings";
-    public static final String GENERAL_ACTIVITY_TAB_CATEGORY_ID = "activityGeneralSettings.categoryId";
-    public static final String TIME_TYPE_TIME_TYPES = "timeType.timeTypes";
-    public static final String BALANCE_SETTINGS_ACTIVITY_TAB = "activityBalanceSettings";
-    public static final String EXPERTISES = "expertises";
-    public static final String SKILL_ACTIVITY_TAB = "activitySkillSettings";
-    public static final String BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_INFO = "activityBalanceSettings.timeTypeInfo";
-    public static final String TIME_TYPE_INFO_LABEL = "timeTypeInfo.label";
-    public static final String GENERAL_ACTIVITY_TAB_START_DATE = "activityGeneralSettings.startDate";
-    public static final String GENERAL_ACTIVITY_TAB_END_DATE = "activityGeneralSettings.endDate";
-    public static final String ACTIVITY_ID = "activity._id";
-    public static final String ACTIVITY_NAME = "activity.name";
-    public static final String ACTIVITY_COUNTRY_ID = "activity.countryId";
-    public static final String ACTIVITY_EXPERTISES = "activity.expertises";
-    public static final String EMPLOYMENT_TYPES = "employmentTypes";
-    public static final String ACTIVITY_EMPLOYMENT_TYPES = "activity.employmentTypes";
-    public static final String ACTIVITY_STATE = "activity.state";
-    public static final String ACTIVITY_UNIT_ID = "activity.unitId";
-    public static final String ACTIVITY_PARENT_ID = "activity.parentId";
-    public static final String ACTIVITY_IS_PARENT_ACTIVITY = "activity.isParentActivity";
-    public static final String ACTIVITY_GENERAL_ACTIVITY_TAB = "activity.activityGeneralSettings";
-    public static final String ACTIVITY_BALANCE_SETTINGS_ACTIVITY_TAB = "activity.activityBalanceSettings";
-    public static final String INDIVIDUAL_POINTS_ACTIVITY_TAB = "activityIndividualPointsSettings";
-    public static final String TIME_CALCULATION_ACTIVITY_TAB = "activityTimeCalculationSettings";
-    public static final String ACTIVITY_TIME_CALCULATION_ACTIVITY_TAB = "activity.activityTimeCalculationSettings";
-    public static final String NOTES_ACTIVITY_TAB = "activityNotesSettings";
-    public static final String ACTIVITY_NOTES_ACTIVITY_TAB = "activity.activityNotesSettings";
-    public static final String COMMUNICATION_ACTIVITY_TAB = "activityCommunicationSettings";
-    public static final String ACTIVITY_COMMUNICATION_ACTIVITY_TAB = "activity.activityCommunicationSettings";
-    public static final String BONUS_ACTIVITY_TAB = "activityBonusSettings";
-    public static final String ACTIVITY_BONUS_ACTIVITY_TAB = "activity.activityBonusSettings";
-    public static final String ACTIVITY_SKILL_ACTIVITY_TAB = "activity.activitySkillSettings";
-    public static final String OPTA_PLANNER_SETTING_ACTIVITY_TAB = "activityOptaPlannerSetting";
-    public static final String ACTIVITY_OPTA_PLANNER_SETTING_ACTIVITY_TAB = "activity.activityOptaPlannerSetting";
-    public static final String LOCATION_ACTIVITY_TAB = "activityLocationSettings";
-    public static final String ACTIVITY_CTA_AND_WTA_SETTINGS_ACTIVITY_TAB = "activity.activityCTAAndWTASettings";
-    public static final String ACTIVITY_LOCATION_ACTIVITY_TAB = "activity.activityLocationSettings";
-    public static final String PHASE_SETTINGS_ACTIVITY_TAB = "activityPhaseSettings";
-    public static final String ACTIVITY_PHASE_SETTINGS_ACTIVITY_TAB = "activity.activityPhaseSettings";
-    public static final String CATEGORY = "category";
-    public static final String CATEGORY_ID = "categoryId";
-    public static final String CATEGORY_NAME = "categoryName";
-    public static final String CHILD_ACTIVITIES = "childActivities";
-    public static final String COMPOSITE_TIME_TYPE_INFO = "compositeTimeTypeInfo";
-    public static final String CHILD_ACTIVITIES_ID = "childActivities._id";
-    public static final String PHASE_TEMPLATE_VALUES_ACTIVITY_SHIFT_STATUS_SETTINGS = "phaseTemplateValues.activityShiftStatusSettings";
-    public static final String ACTIVITY_SHIFT_STATUS_SETTINGS = "activityShiftStatusSettings";
-    public static final String PHASE_ID = "phaseId";
-    public static final String ACTIVITY_PRIORITY = "activityPriority";
-    public static final String CHILD_ACTIVITY_PRIORITY = "childActivityPriority";
-    public static final String COUNTRY_ID = "countryId";
-    private static final String PARENT_ACTIVITY_ID = "parentActivityId";
-    private static final String NAME = "name";
-    private static final String UNDERSCORE_ID = "_id";
-    private static final String COUNTRY_PARENT_ID = "countryParentId";
-    private static final String ID = "id";
-    private static final String DOLLAR_ID = "$id";
-    public static final String BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE = "activityBalanceSettings.timeType";
-    public static final String TRANSLATIONS="translations";
-    public static final String ACTIVITY_PRIORITY_SEQUENCE="activityPriority.sequence";
-    public static final String ACTIVITY_SEQUENCE ="activitySequence";
 
+    public static final String CHILD_ACTIVITIES_ACTIVITY_PRIORITY_ID = "childActivities.activityPriorityId";
+    public static final String CHILD_ACTIVITIES_CATEGORY_ID = "childActivities.categoryId";
+    public static final String STAFF_ID = "staffId";
     @Inject
     private MongoTemplate mongoTemplate;
 
-    public List<ActivityDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {
+    public List<ActivityCategoryListDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {
         List<AggregationOperation> customAgregationForCompositeActivity = new ArrayList<>();
         customAgregationForCompositeActivity.add(match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(deleted).and("activityRulesSettings.eligibleForStaffingLevel").is(true)));
         customAgregationForCompositeActivity.add(lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE_INFO));
         customAgregationForCompositeActivity.add(lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID, ACTIVITY_PRIORITY));
-        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(true));
+        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(true,true));
+        customAgregationForCompositeActivity.add(new CustomAggregationOperation("{\n" +
+                "     $group : { _id : \"$activityCategory\", activities: { $push: \"$$ROOT\" } }\n" +
+                "   }"));
+        customAgregationForCompositeActivity.add(new CustomAggregationOperation("{$project:{\n" +
+                "       \"activityCategory._id\": \"$_id.categoryId\",\n" +
+                "        \"activityCategory.name\": \"$_id.categoryName\",\n" +
+                "       \"activities\":1,\n" +
+                "       \"_id\":0\n" +
+                "       }}"));
         Aggregation aggregation = Aggregation.newAggregation(customAgregationForCompositeActivity);
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+
+        AggregationResults<ActivityCategoryListDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityCategoryListDTO.class);
         return result.getMappedResults();
     }
 
-
     public List<ActivityTagDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds) {
-
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(IS_PARENT_ACTIVITY).is(true)
                         .and(ORGANIZATION_TYPES).in(orgTypeIds).orOperator(Criteria.where(ORGANIZATION_SUB_TYPES).in(orgSubTypeIds))
@@ -168,14 +96,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .push(TAGS_DATA).as("tags")
 
         );
-
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();
-
     }
 
     public List<CompositeActivityDTO> getCompositeActivities(BigInteger activityId) {
-
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(UNDERSCORE_ID).is(activityId).and(DELETED).is(false))
         );
@@ -196,7 +121,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<ActivityTagDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityTagDTO.class);
         return result.getMappedResults();
-
     }
 
     public List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted) {
@@ -331,7 +255,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         customAgregationForCompositeActivity.add(match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(deleted)));
         customAgregationForCompositeActivity.add(lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE_INFO));
         customAgregationForCompositeActivity.add(lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID, ACTIVITY_PRIORITY));
-        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(false));
+        customAgregationForCompositeActivity.addAll(getCustomAgregationForCompositeActivityWithCategory(false,false));
         customAgregationForCompositeActivity.add(match(Criteria.where("timeTypeInfo.partOfTeam").is(true)));
         Aggregation aggregation = Aggregation.newAggregation(customAgregationForCompositeActivity);
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
@@ -494,7 +418,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     private ProjectionOperation getProject() {
         return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
                 .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
-                .and(ID).as("activity.id")
+                .and(ID).as(AppConstants.ACTIVITY_ID)
                 .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
                 .and("regions").as("activity.regions").and("levels").as("activity.levels")
                 .and(EMPLOYMENT_TYPES).as(ACTIVITY_EMPLOYMENT_TYPES).and("tags").as("activity.tags")
@@ -522,7 +446,29 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public List<ActivityWrapper> findParentActivitiesAndTimeTypeByActivityId(Collection<BigInteger> activityIds) {
-        return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false));
+        return getParentActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false));
+    }
+
+    private List<ActivityWrapper> getParentActivityWrappersByCriteria(Criteria criteria) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id",
+                        TIME_TYPE1),
+                lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID,
+                        ACTIVITY_PRIORITY),
+                getProjectForParentActivityWrapper()
+        );
+        AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
+        return result.getMappedResults();
+    }
+
+    private ProjectionOperation getProjectForParentActivityWrapper() {
+        return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(CHILD_ACTIVITY_IDS).as("activity.childActivityIds")
+                .and(ID).as(AppConstants.ACTIVITY_ID).and(ACTIVITY_PRIORITY_ID).as("activity.activityPriorityId").and(UNIT_ID).as(ACTIVITY_UNIT_ID)
+                .and(BALANCE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_BALANCE_SETTINGS_ACTIVITY_TAB).and(RULES_ACTIVITY_TAB).as(ACTIVITY_RULES_ACTIVITY_TAB)
+                .and(TIME_CALCULATION_ACTIVITY_TAB).as(ACTIVITY_TIME_CALCULATION_ACTIVITY_TAB).and(BONUS_ACTIVITY_TAB).as(ACTIVITY_BONUS_ACTIVITY_TAB)
+                .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1).and(TIME_TYPE_TIME_TYPES).as(TIME_TYPE1).and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE_INFO)
+                .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY);
     }
 
     @Override
@@ -545,10 +491,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
+
+
     private ProjectionOperation getProjectForActivityWrapper() {
         return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
                 .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES).and(CHILD_ACTIVITY_IDS).as("activity.childActivityIds")
-                .and(ID).as("activity.id").and(ACTIVITY_PRIORITY_ID).as("activity.activityPriorityId")
+                .and(ID).as(AppConstants.ACTIVITY_ID).and(ACTIVITY_PRIORITY_ID).as("activity.activityPriorityId")
                 .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
                 .and("regions").as("activity.regions").and("levels").as("activity.levels")
                 .and(EMPLOYMENT_TYPES).as(ACTIVITY_EMPLOYMENT_TYPES).and("tags").as("activity.tags")
@@ -714,9 +662,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return mongoTemplate.find(query, Activity.class);
     }
 
-    private List<AggregationOperation> getCustomAgregationForCompositeActivityWithCategory(boolean isChildActivityEligibleForStaffingLevel) {
+    private List<AggregationOperation> getCustomAgregationForCompositeActivityWithCategory(boolean isChildActivityEligibleForStaffingLevel,boolean groupByCategory) {
         String group = getGroup();
-        String projection = new StringBuffer("{'$project':{'childActivities':").append(isChildActivityEligibleForStaffingLevel ? "{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.activityRulesSettings.eligibleForStaffingLevel',true]} }}" : "'$childActivities'").append(",'activityTimeCalculationSettings':'$_id.activityTimeCalculationSettings','activityBalanceSettings':'$_id.activityBalanceSettings','_id':'$_id.id','name':'$_id.name','activityPriorityId':'$_id.activityPriorityId','activityPriority':'$_id.activityPriority','timeTypeInfo':'$_id.timeTypeInfo','allowChildActivities':'$_id.timeTypeInfo.allowChildActivities','categoryId':'$_id.categoryId','categoryName':'$_id.categoryName','translations':'$_id.translations'}}").toString();
+        String projection = getProjection(isChildActivityEligibleForStaffingLevel,groupByCategory);
 
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         aggregationOperations.add(lookup("activity_category", GENERAL_ACTIVITY_TAB_CATEGORY_ID, UNDERSCORE_ID,
@@ -728,7 +676,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 CHILD_ACTIVITIES));
         aggregationOperations.add(lookup(TIME_TYPE, "childActivities.activityBalanceSettings.timeTypeId", UNDERSCORE_ID,
                 COMPOSITE_TIME_TYPE_INFO));
-        aggregationOperations.add(lookup(ACTIVITY_PRIORITY, "childActivities.activityPriorityId", UNDERSCORE_ID, CHILD_ACTIVITY_PRIORITY));
+        aggregationOperations.add(lookup(ACTIVITY_PRIORITY, CHILD_ACTIVITIES_ACTIVITY_PRIORITY_ID, UNDERSCORE_ID, CHILD_ACTIVITY_PRIORITY));
 
         aggregationOperations.add(project(CHILD_ACTIVITIES, TIME_CALCULATION_ACTIVITY_TAB,TRANSLATIONS, TIME_TYPE_INFO, ACTIVITY_PRIORITY, BALANCE_SETTINGS_ACTIVITY_TAB, NAME, ACTIVITY_PRIORITY_ID, CATEGORY_ID, CATEGORY_NAME).and(CHILD_ACTIVITIES).arrayElementAt(0).as(CHILD_ACTIVITIES).and(COMPOSITE_TIME_TYPE_INFO).arrayElementAt(0).as(COMPOSITE_TIME_TYPE_INFO).and(CHILD_ACTIVITY_PRIORITY).arrayElementAt(0).as(CHILD_ACTIVITY_PRIORITY));
         aggregationOperations.add(project(TIME_CALCULATION_ACTIVITY_TAB,TRANSLATIONS, COMPOSITE_TIME_TYPE_INFO, TIME_TYPE_INFO, ACTIVITY_PRIORITY, CHILD_ACTIVITY_PRIORITY, BALANCE_SETTINGS_ACTIVITY_TAB, NAME, ACTIVITY_PRIORITY_ID, CATEGORY_ID, CATEGORY_NAME, CHILD_ACTIVITIES));
@@ -738,14 +686,21 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 .and("childActivities.activityRulesSettings").as("childActivities.activityRulesSettings")
                 .and(CHILD_ACTIVITIES_ID).as(CHILD_ACTIVITIES_ID)
                 .and("childActivities.name").as("childActivities.name")
-                .and("childActivities.activityPriorityId").as("childActivities.activityPriorityId")
+                .and(CHILD_ACTIVITIES_ACTIVITY_PRIORITY_ID).as(CHILD_ACTIVITIES_ACTIVITY_PRIORITY_ID)
                 .and(CHILD_ACTIVITY_PRIORITY).as("childActivities.activityPriority")
-                .and("childActivities.categoryId").as("childActivities.categoryId")
-                .and("childActivities.categoryId").as("childActivities.categoryId")
+                .and(CHILD_ACTIVITIES_CATEGORY_ID).as(CHILD_ACTIVITIES_CATEGORY_ID)
+                .and(CHILD_ACTIVITIES_CATEGORY_ID).as(CHILD_ACTIVITIES_CATEGORY_ID)
                 .and("childActivities.translations").as("childActivities.translations"));
         aggregationOperations.add(new CustomAggregationOperation(Document.parse(group)));
         aggregationOperations.add(new CustomAggregationOperation(Document.parse(projection)));
         return aggregationOperations;
+    }
+
+    private String getProjection(boolean isChildActivityEligibleForStaffingLevel, boolean groupByCategory) {
+        if(groupByCategory){
+            return new StringBuffer("{'$project':{'childActivities':").append(isChildActivityEligibleForStaffingLevel ? "{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.activityRulesSettings.eligibleForStaffingLevel',true]} }}" : "'$childActivities'").append(",'activityTimeCalculationSettings':'$_id.activityTimeCalculationSettings','activityBalanceSettings':'$_id.activityBalanceSettings','_id':'$_id.id','name':'$_id.name','activityPriorityId':'$_id.activityPriorityId','activityPriority':'$_id.activityPriority','timeTypeInfo':'$_id.timeTypeInfo','allowChildActivities':'$_id.timeTypeInfo.allowChildActivities','activityCategory.categoryId':'$_id.categoryId','activityCategory.categoryName':'$_id.categoryName','translations':'$_id.translations'}}").toString();
+        }
+        return new StringBuffer("{'$project':{'childActivities':").append(isChildActivityEligibleForStaffingLevel ? "{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.activityRulesSettings.eligibleForStaffingLevel',true]} }}" : "'$childActivities'").append(",'activityTimeCalculationSettings':'$_id.activityTimeCalculationSettings','activityBalanceSettings':'$_id.activityBalanceSettings','_id':'$_id.id','name':'$_id.name','activityPriorityId':'$_id.activityPriorityId','activityPriority':'$_id.activityPriority','timeTypeInfo':'$_id.timeTypeInfo','allowChildActivities':'$_id.timeTypeInfo.allowChildActivities','categoryId':'$_id.categoryId','categoryName':'$_id.categoryName','translations':'$_id.translations'}}").toString();
     }
 
     private String getGroup() {
@@ -771,6 +726,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                     "   }";
     }
 
+    //@Cacheable(value = "activities", key = "#unitId")
     public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId) {
         Criteria criteria = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false);
         Aggregation aggregation = getParentActivityAggregation(criteria);
@@ -998,12 +954,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         String activityIdString = getBigIntegerString(activityIds.iterator());
         AggregationOperation[] aggregations = new AggregationOperation[10];
         int i=0;
-        if(!mongoTemplate.exists(new Query(Criteria.where("staffId").is(staffId).and(DELETED).is(false)),
+        if(!mongoTemplate.exists(new Query(Criteria.where(STAFF_ID).is(staffId).and(DELETED).is(false)),
                 StaffActivitySetting.class)){
             staffId = 0l;
         }
-        aggregations[i++] = match(Criteria.where("staffId").in(staffId).and(DELETED).is(false));
-        aggregations[i++] = group("staffId").addToSet("activityId").as("activityIds");
+        aggregations[i++] = match(Criteria.where(STAFF_ID).in(staffId).and(DELETED).is(false));
+        aggregations[i++] = group(STAFF_ID).addToSet("activityId").as("activityIds");
         aggregations[i++] = getCustomLookUpForActivityAggregationOperation(activityIdString,isActivityType,unitId);
         aggregations[i++] = getCustomAggregationOperationForChildActivitiyIds();
         aggregations[i++] = getCustomAggregationOperationForConcatArray();
@@ -1190,6 +1146,5 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 "    }\n" +
                 "  }");
     }
-
 
 }

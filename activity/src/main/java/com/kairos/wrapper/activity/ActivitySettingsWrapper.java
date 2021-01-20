@@ -7,6 +7,7 @@ import com.kairos.dto.activity.activity.activity_tabs.GeneralActivityWithTagDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.persistence.model.activity.tabs.*;
@@ -32,7 +33,7 @@ import java.util.Set;
 public class ActivitySettingsWrapper {
 
     private GeneralActivityWithTagDTO generalTab;
-    private List<ActivityCategory> activityCategories;
+    private List<ActivityCategoryDTO> activityCategories;
     private ActivityRulesSettings rulesTab;
     private ActivityIndividualPointsSettings individualPointsTab;
     private ActivityTimeCalculationSettings activityTimeCalculationSettings;
@@ -111,12 +112,12 @@ public class ActivitySettingsWrapper {
         this.employmentTypes=employmentTypes;
     }
 
-    public ActivitySettingsWrapper(GeneralActivityWithTagDTO generalTab, List<ActivityCategory> activityCategories) {
+    public ActivitySettingsWrapper(GeneralActivityWithTagDTO generalTab, List<ActivityCategoryDTO> activityCategories) {
         this.generalTab = generalTab;
         this.activityCategories = activityCategories;
     }
 
-    public ActivitySettingsWrapper(GeneralActivityWithTagDTO generalTab, BigInteger activityId, List<ActivityCategory> activityCategories) {
+    public ActivitySettingsWrapper(GeneralActivityWithTagDTO generalTab, BigInteger activityId, List<ActivityCategoryDTO> activityCategories) {
         this.generalTab = generalTab;
         this.activityId = activityId;
         this.activityCategories=activityCategories;

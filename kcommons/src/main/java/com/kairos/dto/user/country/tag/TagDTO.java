@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +23,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TagDTO {
+public class TagDTO  implements Serializable {
 
     private Long id;
     private String name;

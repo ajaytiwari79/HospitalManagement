@@ -5,6 +5,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.TranslationUtil;
+import com.kairos.constants.UserMessagesConstants;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
@@ -561,19 +562,9 @@ public class OrganizationService {
     }
 
     public OrganizationSkillAndOrganizationTypesDTO getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(Long unitId) {
-        OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = this.getOrganizationTypeAndSubTypes(unitId);
-        return new OrganizationSkillAndOrganizationTypesDTO(organizationTypeAndSubTypeDTO, skillService.getSkillsOfOrganization(unitId));
-    }
-   // TODO All 2 below Integrated
-//    public List<DayType> getDayType(Date date) {
-//        Long countryId = UserContext.getUserDetails().getCountryId();
-//        return dayTypeService.getDayTypeByDate(countryId, date);
-//    }
 
-//    public List<DayType> getAllDayTypeofOrganization() {
-//        Long countryId = UserContext.getUserDetails().getCountryId();
-//        return dayTypeGraphRepository.findByCountryId(countryId);
-//    }
+        return new OrganizationSkillAndOrganizationTypesDTO(new OrganizationTypeAndSubTypeDTO(), skillService.getSkillsOfOrganization(unitId));
+    }
 
     public List<Map<String, Object>> getUnitsByOrganizationIs(Long orgID) {
         return unitGraphRepository.getOrganizationChildList(orgID);
@@ -743,7 +734,7 @@ public class OrganizationService {
     }
 
     public OrganizationSettingDTO updateOrganizationSettings(OrganizationSettingDTO organizationSettingDTO, Long unitId) {
-        OrganizationSetting organizationSetting = unitGraphRepository.getOrganisationSettingByOrgId(unitId);
+        OrganizationSetting organizationSetting = getOrganizationSettingByUnitId(unitId);
         organizationSetting.setWalkingMeter(organizationSettingDTO.getWalkingMeter());
         organizationSetting.setWalkingMinutes(organizationSettingDTO.getWalkingMinutes());
         openingSettingsGraphRepository.save(organizationSetting);
@@ -751,8 +742,16 @@ public class OrganizationService {
     }
 
     public OrganizationSettingDTO getOrganizationSettings(Long unitId) {
-        OrganizationSetting organizationSetting = unitGraphRepository.getOrganisationSettingByOrgId(unitId);
+        OrganizationSetting organizationSetting = getOrganizationSettingByUnitId(unitId);
         return new OrganizationSettingDTO(organizationSetting.getWalkingMeter(), organizationSetting.getWalkingMinutes());
+    }
+
+    private OrganizationSetting getOrganizationSettingByUnitId(Long unitId) {
+        OrganizationSetting organizationSetting = unitGraphRepository.getOrganisationSettingByOrgId(unitId);
+        if(isNull(organizationSetting)){
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND);
+        }
+        return organizationSetting;
     }
 
     public List<UnitAndParentOrganizationAndCountryDTO> getParentOrganizationAndCountryIdsOfUnit() {

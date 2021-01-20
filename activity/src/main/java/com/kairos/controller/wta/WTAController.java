@@ -270,7 +270,7 @@ public class WTAController {
     @ApiOperation(value = "Update Phases in Ruletemplates")
     @GetMapping(value =  UNIT_URL+ "/get_protected_days_off_count")
     public ResponseEntity<Map<String, Object>> getProtectedDaysOffCount(@PathVariable long unitId ,@RequestParam Long staffId,@RequestParam BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getProtectedDaysOffCount(unitId,null,staffId,activityId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementBalancesCalculationService.getProtectedDaysOffCount(unitId,null,staffId,activityId));
     }
 
     @ApiOperation(value = "Update Phases in Ruletemplates")

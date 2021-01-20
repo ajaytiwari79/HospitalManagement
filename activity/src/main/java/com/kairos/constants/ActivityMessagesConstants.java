@@ -396,11 +396,12 @@ public class ActivityMessagesConstants {
     public static final String CUT_OFF_CONFIGUATION = "activity.cutoff.configuration";
     public static final String ACTIVITY_NOT_ASSIGN_IN_PROTECTED_DAYS_OFF_RULE_TEMPLATE = "activity.not.assign.in.protected.days.off.rule.template";
     public static final String STAFF_ALREADY_SICK="staff.already.sick";
+    public static final String SICK_ACTIVITY_NOT_FOUND="sick.not.found";
     public static final String MESSAGE_CTA_VALUE ="message.cta.value";
     public static final String ERROR_VALUE_CHANGED_PUBLISH_DATE_NULL = "error.value.changed.publish.date.null";
     public static final String MESSAGE_FULLWEEK_STARTDAY_NOTFOUND = "message.fullWeek.startDay.notFound";
     public static final String ERROR_AUTO_FILL_GAP_SETTING_NOT_FOUND = "error.auto.fill.gap.setting.not.found";
-    public static final String ERROR_DUPLICATE_AUTO_FILL_GAP_SETTING_FOUND = "error.duplicate.auto.fill.gap.setting.found";
+    public static final String ERROR_AUTO_FILL_GAP_SETTING_PUBLISH_DATE_INVALID = "error.auto.fill.gap.setting.publish.date.invalid";
     public static final String ERROR_ALREADY_AUTO_FILL_GAP_SETTING_PUBLISH = "error.already.auto.fill.gap.setting.publish";
     public static final String ERROR_DRAFT_COPY_ALREADY_CREATED = "error.draft.copy.already.created";
 
@@ -410,5 +411,10 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_DRAFT_COPY_CREATED="draft.already.exists";
     public static final String MESSAGE_RANKING_ALREADY_PUBLISHED="ranking.already.published";
     public static final String MESSAGE_PUBLISH_DATE_NOT_LESS_THAN_OR_EQUALS_PARENT_START_DATE="draft.copy.overlapped.published";
+    public static final String MESSAGE_TIMESLOT_ID_NOTFOUND = "message.timeslot.id.notfound";
+    public static final String MESSAGE_REASONCODE_NAME_ALREADYEXIST = "message.reasonCode.name.alreadyExist";
+    public static final String MESSAGE_REASONCODE_ID_NOTFOUND = "message.reasonCode.id.notFound";
+    public static final String GAP_FILLING_SETTING_NOT_CONFIGURED = "gap.filling.configuration.absent";
+    public static final String TIMESLOT_NOT_FOUND_FOR_UNIT = "timeslot.not.found";
 
 }

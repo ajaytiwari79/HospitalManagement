@@ -125,34 +125,37 @@ public class ShiftStatusService {
             staffAdditionalInfoDTOS.forEach(staff -> staff.setDayTypes(dayTypeDTOS));
             Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap = staffAdditionalInfoDTOS.stream().filter(distinctByKey(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getEmployment().getId())).collect(Collectors.toMap(s -> s.getEmployment().getId(), v -> v));
             if (isCollectionNotEmpty(shifts) && objects[1] != null) {
-                Set<LocalDateTime> dates = shifts.stream().flatMap(shift -> shift.getActivities().stream()).map(shiftActivity -> DateUtils.asLocalDateTime(shiftActivity.getStartDate())).collect(Collectors.toSet());
-                Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, dates);
-                StaffAccessGroupDTO staffAccessGroupDTO = userIntegrationService.getStaffAccessGroupDTO(unitId);
-                for (Shift shift : shifts) {
-                    List<ShiftActivity> oldActivity = new CopyOnWriteArrayList<>(shift.getActivities());
-                    for (ShiftActivity shiftActivity : oldActivity) {
-                        updateStatusOfShiftActivity(unitId, shiftPublishDTO, shiftActivitiyIds, shiftActivityResponseDTOS, activityPhaseSettingMap, activityIdAndActivityMap, phaseListByDate, staffAccessGroupDTO, shift, shiftActivity, staffAdditionalInfoMap);
-                        for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
-                            updateStatusOfShiftActivity(unitId, shiftPublishDTO, shiftActivitiyIds, shiftActivityResponseDTOS, activityPhaseSettingMap, activityIdAndActivityMap, phaseListByDate, staffAccessGroupDTO, shift, childActivity, staffAdditionalInfoMap);
-                        }
-                    }
-                    if (shift.isDeleted()) {
-                        shiftDTOS.addAll(shiftService.deleteAllLinkedShifts(shift.getId()).getShifts());
-                    } else {
-                        shiftDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class));
-                    }
+                updateStatusInShifts(unitId, shiftPublishDTO, shiftActivityResponseDTOS, shiftAndActivtyStatusDTO, shiftActivitiyIds, shifts, shiftDTOS, activityPhaseSettingMap, activityIdAndActivityMap, staffAdditionalInfoMap);
+            }
+            return new ShiftAndActivtyStatusDTO(shiftDTOS, shiftActivityResponseDTOS);
+    }
 
-                }
-                shiftMongoRepository.saveEntities(shifts);
-                timeBankService.updateDailyTimeBankEntriesForStaffs(shifts, null);
-                wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
-                if (isNotNull(shiftAndActivtyStatusDTO)) {
-                    shiftDTOS.add(shiftAndActivtyStatusDTO.getShifts().get(0));
-                    shiftActivityResponseDTOS.add(shiftAndActivtyStatusDTO.getShiftActivityStatusResponse().get(0));
+    private void updateStatusInShifts(Long unitId, ShiftPublishDTO shiftPublishDTO, List<ShiftActivityResponseDTO> shiftActivityResponseDTOS, ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO, Set<BigInteger> shiftActivitiyIds, List<Shift> shifts, List<ShiftDTO> shiftDTOS, Map<BigInteger, ActivityPhaseSettings> activityPhaseSettingMap, Map<BigInteger, Activity> activityIdAndActivityMap, Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap) {
+        Set<LocalDateTime> dates = shifts.stream().flatMap(shift -> shift.getActivities().stream()).map(shiftActivity -> DateUtils.asLocalDateTime(shiftActivity.getStartDate())).collect(Collectors.toSet());
+        Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, dates);
+        StaffAccessGroupDTO staffAccessGroupDTO = userIntegrationService.getStaffAccessGroupDTO(unitId);
+        for (Shift shift : shifts) {
+            List<ShiftActivity> oldActivity = new CopyOnWriteArrayList<>(shift.getActivities());
+            for (ShiftActivity shiftActivity : oldActivity) {
+                updateStatusOfShiftActivity(unitId, shiftPublishDTO, shiftActivitiyIds, shiftActivityResponseDTOS, activityPhaseSettingMap, activityIdAndActivityMap, phaseListByDate, staffAccessGroupDTO, shift, shiftActivity, staffAdditionalInfoMap);
+                for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
+                    updateStatusOfShiftActivity(unitId, shiftPublishDTO, shiftActivitiyIds, shiftActivityResponseDTOS, activityPhaseSettingMap, activityIdAndActivityMap, phaseListByDate, staffAccessGroupDTO, shift, childActivity, staffAdditionalInfoMap);
                 }
             }
+            if (shift.isDeleted()) {
+                shiftDTOS.addAll(shiftService.deleteAllLinkedShifts(shift.getId()).getShifts());
+            } else {
+                shiftDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class));
+            }
 
-            return new ShiftAndActivtyStatusDTO(shiftDTOS, shiftActivityResponseDTOS);
+        }
+        shiftMongoRepository.saveEntities(shifts);
+        timeBankService.updateDailyTimeBankEntriesForStaffs(shifts, null);
+        wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
+        if (isNotNull(shiftAndActivtyStatusDTO)) {
+            shiftDTOS.add(shiftAndActivtyStatusDTO.getShifts().get(0));
+            shiftActivityResponseDTOS.add(shiftAndActivtyStatusDTO.getShiftActivityStatusResponse().get(0));
+        }
     }
 
     private ShiftAndActivtyStatusDTO updateStatusOfRequestAbsence(Long unitId, ShiftPublishDTO shiftPublishDTO, Shift currentShift) {
@@ -320,29 +323,7 @@ public class ShiftStatusService {
         private void removeOppositeStatus (Shift shift, ShiftActivity shiftActivity, ShiftStatus
         shiftStatus, Map < BigInteger, Activity > activityIdAndActivityMap, Map < Long, StaffAdditionalInfoDTO > staffAdditionalInfoMap, String
         comment){
-            Todo todo = null;
-
-            if (newHashSet(PENDING, APPROVE, DISAPPROVE).contains(shiftStatus)) {
-                TodoStatus todoStatus = null;
-                if (shiftStatus.equals(PENDING)) {
-                    todoStatus = TodoStatus.PENDING;
-                } else {
-                    todoStatus = shiftStatus.equals(APPROVE) ? TodoStatus.APPROVE : TodoStatus.DISAPPROVE;
-                }
-                todo = todoRepository.findAllByEntityIdAndSubEntityAndTypeAndStatus(shift.getId(), TodoType.APPROVAL_REQUIRED, newHashSet(TodoStatus.PENDING, TodoStatus.VIEWED, TodoStatus.REQUESTED), shiftActivity.getActivityId());
-                if (isNotNull(todo)) {
-                    todo.setStatus(todoStatus);
-                    todo.setComment(comment);
-                    if (TodoStatus.APPROVE.equals(todo.getStatus())) {
-                        todo.setApprovedOn(getDate());
-                    } else if (TodoStatus.DISAPPROVE.equals(todo.getStatus())) {
-                        todo.setDisApproveOn(getDate());
-                    } else if (TodoStatus.PENDING.equals(todo.getStatus())) {
-                        todo.setPendingOn(getDate());
-                    }
-                    todoRepository.save(todo);
-                }
-            }
+            Todo todo = updateTodoStatus(shift, shiftActivity, shiftStatus, comment);
             switch (shiftStatus) {
                 case LOCK:
                     shiftActivity.getStatus().removeAll(Arrays.asList(UNLOCK, REQUEST));
@@ -386,7 +367,33 @@ public class ShiftStatusService {
             }
         }
 
-        private void updateShiftOnDisapprove (Shift shift, ShiftActivity shiftActivity){
+    private Todo updateTodoStatus(Shift shift, ShiftActivity shiftActivity, ShiftStatus shiftStatus, String comment) {
+        Todo todo = null;
+        if (newHashSet(PENDING, APPROVE, DISAPPROVE).contains(shiftStatus)) {
+            TodoStatus todoStatus = null;
+            if (shiftStatus.equals(PENDING)) {
+                todoStatus = TodoStatus.PENDING;
+            } else {
+                todoStatus = shiftStatus.equals(APPROVE) ? TodoStatus.APPROVE : TodoStatus.DISAPPROVE;
+            }
+            todo = todoRepository.findAllByEntityIdAndSubEntityAndTypeAndStatus(shift.getId(), TodoType.APPROVAL_REQUIRED, newHashSet(TodoStatus.PENDING, TodoStatus.VIEWED, TodoStatus.REQUESTED), shiftActivity.getActivityId());
+            if (isNotNull(todo)) {
+                todo.setStatus(todoStatus);
+                todo.setComment(comment);
+                if (TodoStatus.APPROVE.equals(todo.getStatus())) {
+                    todo.setApprovedOn(getDate());
+                } else if (TodoStatus.DISAPPROVE.equals(todo.getStatus())) {
+                    todo.setDisApproveOn(getDate());
+                } else if (TodoStatus.PENDING.equals(todo.getStatus())) {
+                    todo.setPendingOn(getDate());
+                }
+                todoRepository.save(todo);
+            }
+        }
+        return todo;
+    }
+
+    private void updateShiftOnDisapprove (Shift shift, ShiftActivity shiftActivity){
             if (shift.getActivities().size() > 1) {
                 int indexOfShiftActivity = shift.getActivities().indexOf(shiftActivity);
                 if (indexOfShiftActivity == 0 || indexOfShiftActivity == (shift.getActivities().size() - 1)) {

@@ -67,6 +67,11 @@ subprojects{
         compile( group: 'commons-beanutils', name: 'commons-beanutils', version: '1.8.3'){
             exclude group: "commons-logging", module: "commons-logging"
         }
+        compile('javax.xml.bind:jaxb-api:2.3.0')
+        compile('javax.activation:activation:1.1')
+        compile('org.glassfish.jaxb:jaxb-runtime:2.3.0')
+        compile("org.aspectj:aspectjweaver:1.9.0")
+        compile('org.aspectj:aspectjrt:1.9.0')
         compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '2.0.2.RELEASE'
         compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.5'
         compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'

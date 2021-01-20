@@ -9,6 +9,7 @@ import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.organization.SelfRosteringMetaData;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.day_type.CountryHolidayCalender;
@@ -19,6 +20,8 @@ import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.time_slot.TimeSlotSetService;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -45,10 +48,13 @@ public class DayTypeService {
     @Inject
     private CountryCalenderRepo countryCalenderRepo;
     @Inject
+    private CountryHolidayCalenderService countryHolidayCalenderService;
+    @Inject
     private PlannedTimeTypeService plannedTimeTypeService;
     @Inject
     private TimeSlotSetService timeSlotService;
 
+    @CacheEvict(value = "getDayTypeWithCountryHolidayCalender",allEntries = true)
     public DayTypeDTO createDayType(DayTypeDTO dayTypeDTO, long countryId) {
         boolean dayTypeExistInCountryByNameOrCode = dayTypeRepository.existsByCountryIdAndNameOrColorCodeIgnoreCaseAndIdNotIn(countryId, dayTypeDTO.getName(), dayTypeDTO.getCode(), new BigInteger("-1"));
         if (dayTypeExistInCountryByNameOrCode) {
@@ -60,10 +66,7 @@ public class DayTypeService {
         return dayTypeDTO;
     }
 
-    public List<DayTypeDTO> getAllDayTypeByCountryId(Long countryId) {
-        return dayTypeRepository.findAllByCountryIdAndDeletedFalse(countryId);
-    }
-
+    @CacheEvict(value = "getDayTypeWithCountryHolidayCalender",allEntries = true)
     public DayTypeDTO updateDayType(DayTypeDTO dayTypeDTO) {
         DayType dayType = dayTypeRepository.findById(dayTypeDTO.getId()).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage("MESSAGE_EXPERTISE_ID_NOTFOUND")));
         //If there's a change in DayType name or in DayType then only verify existing DayTypes
@@ -85,6 +88,7 @@ public class DayTypeService {
         return dayTypeDTO;
     }
 
+    @CacheEvict(value = "getDayTypeWithCountryHolidayCalender",allEntries = true)
     public boolean deleteDayType(BigInteger dayTypeId) {
         DayType dayType = dayTypeRepository.findById(dayTypeId).orElseThrow(() -> new DataNotFoundByIdException(CommonsExceptionUtil.convertMessage("MESSAGE_EXPERTISE_ID_NOTFOUND")));
         dayType.setDeleted(true);
@@ -117,10 +121,6 @@ public class DayTypeService {
         return dayTypeRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
     }
 
-    public List<DayTypeDTO> getDayTypes(List<BigInteger> dayTypeIds) {
-        return dayTypeRepository.findAllByIdInAndDeletedFalse(dayTypeIds);
-    }
-
     public List<BigInteger> getCurrentApplicableDayType(Long countryId) {
         CountryHolidayCalender countryHolidayCalenderDTO = countryCalenderRepo.findActiveByCountryId(countryId,getCurrentLocalDate(),getCurrentLocalTime());
         List<BigInteger> dayTypes=new ArrayList<>();
@@ -135,6 +135,7 @@ public class DayTypeService {
         return dayTypes;
     }
 
+    @CacheEvict(value = "getDayTypeWithCountryHolidayCalender",allEntries = true)
     public Map<String, TranslationInfo> updateTranslation(BigInteger dayTypeId, Map<String,TranslationInfo> translations) {
         DayType dayType =dayTypeRepository.findOne(dayTypeId);
         dayType.setTranslations(translations);
@@ -142,29 +143,30 @@ public class DayTypeService {
         return dayType.getTranslations();
     }
 
+    @Cacheable(value = "getDayTypeWithCountryHolidayCalender", key = "#countryId", cacheManager = "cacheManager")
     public List<DayTypeDTO> getDayTypeWithCountryHolidayCalender(Long countryId) {
-        List<CountryHolidayCalenderDTO> publicHolidaysResult = countryCalenderRepo.getCountryAllHolidays(countryId);
-        Map<BigInteger, List<CountryHolidayCalenderDTO>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.getDayTypeId() != null).collect(Collectors.groupingBy(CountryHolidayCalenderDTO::getDayTypeId, Collectors.toList()));
-        List<DayTypeDTO> dayTypes = dayTypeRepository.findAllByCountryIdAndDeletedFalse(countryId);
-        return dayTypes.stream().map(dayType ->
-                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), copyCollectionPropertiesByMapper(publicHolidayMap.getOrDefault(dayType.getId(),new ArrayList<>()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings())
-        ).collect(Collectors.toList());
+        return dayTypeRepository.findAllByCountryIdAndDeletedFalse(countryId);
     }
 
     public List<DayTypeDTO> getDayTypeWithCountryHolidayCalender(Set<BigInteger> dayTypeIds) {
-        List<CountryHolidayCalenderDTO> publicHolidaysResult = countryCalenderRepo.getCountryAllHolidays(UserContext.getUserDetails().getCountryId());
-        Map<BigInteger, List<CountryHolidayCalenderDTO>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.getDayTypeId() != null).collect(Collectors.groupingBy(CountryHolidayCalenderDTO::getDayTypeId, Collectors.toList()));
-        List<DayTypeDTO> dayTypes = dayTypeRepository.findAllByIdInAndDeletedFalse(dayTypeIds);
-        return dayTypes.stream().map(dayType ->
-                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), copyCollectionPropertiesByMapper(publicHolidayMap.getOrDefault(dayType.getId(),new ArrayList<>()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings())
-        ).collect(Collectors.toList());
+        return dayTypeRepository.findAllByIdInAndDeletedFalse(dayTypeIds);
     }
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long unitId, boolean country) {
         Long countryId = UserContext.getUserDetails().getCountryId();
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
-        List<DayTypeDTO> dayTypes = dayTypeRepository.findAllByCountryIdAndDeletedFalse(countryId);
-        List<TimeSlotDTO> timeSlotDTOS =country?timeSlotService.getDefaultTimeSlot(): timeSlotService.getShiftPlanningTimeSlotByUnit(unitId);
+        List<DayTypeDTO> dayTypes = getDayTypeWithCountryHolidayCalender(countryId);
+        List<TimeSlotDTO> timeSlotDTOS = country?timeSlotService.getDefaultTimeSlot(): timeSlotService.getShiftPlanningTimeSlotByUnit(unitId);
         return new WTADefaultDataInfoDTO(dayTypes, presenceTypeDTOS, timeSlotDTOS, countryId);
     }
+
+    public SelfRosteringMetaData getDayTypesAndPublicHoliday(Long countryId) {
+        SelfRosteringMetaData publicHolidayDayTypeWrapper = new SelfRosteringMetaData();
+        publicHolidayDayTypeWrapper.setDayTypes(getDayTypeWithCountryHolidayCalender(countryId));
+        publicHolidayDayTypeWrapper.setPublicHolidays(countryHolidayCalenderService.getAllCountryAllHolidaysByCountryId(countryId));
+        return publicHolidayDayTypeWrapper;
+    }
+
+
+
 }

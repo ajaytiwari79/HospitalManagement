@@ -324,8 +324,8 @@ public class PositionService {
         List<Map<String, Object>> workPlaces = new ArrayList<>();
         // This is for parent organization i.e if unit is itself parent organization
         if (units.isEmpty() && unit instanceof Organization) {
-            positions = new ArrayList<>();
             for (AccessGroup accessGroup : accessGroups) {
+                positions=new ArrayList<>();
                 QueryResult queryResult = new QueryResult();
                 queryResult.setId(unit.getId());
                 queryResult.setName(unit.getName());

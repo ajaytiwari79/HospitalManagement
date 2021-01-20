@@ -114,7 +114,7 @@ public class AbsenceShiftService {
         List<ShiftDTO> shiftDTOS = new ArrayList<>(7);
         //As we support create Fullweek Shift from Monday to sunday
         if (!shiftDTO.getShiftDate().getDayOfWeek().equals(activity.getActivityTimeCalculationSettings().getFullWeekStart())) {
-            exceptionService.actionNotPermittedException("error.activity.fullweek.start", StringUtils.capitalize(activity.getActivityTimeCalculationSettings().getFullWeekStart().toString().toLowerCase()));
+            exceptionService.actionNotPermittedException("error.activity.fullweek.start", isNotNull(activity.getActivityTimeCalculationSettings().getFullWeekStart()) ? StringUtils.capitalize(activity.getActivityTimeCalculationSettings().getFullWeekStart().toString().toLowerCase()) : "");
         }
         for (int day = 0; day < 7; day++) {
             ShiftDTO newShiftDTO;

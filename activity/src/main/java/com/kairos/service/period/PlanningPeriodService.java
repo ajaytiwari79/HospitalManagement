@@ -57,6 +57,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftStateService;
+import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -125,6 +126,7 @@ public class PlanningPeriodService extends MongoBaseService {
     @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject private ActivityService activityService;
+    @Inject private StaffingLevelService staffingLevelService;
 
     // To get list of phases with duration in days
     public Map<Long, List<PhaseDTO>> getPhasesWithDurationInDays(List<Long> unitIds) {
@@ -558,6 +560,7 @@ public class PlanningPeriodService extends MongoBaseService {
             flipPlanningPeriodToNextPhase(unitId, periodId, planningPeriod, initialNextPhase);
         }
         planningPeriodMongoRepository.save(planningPeriod);
+        staffingLevelService.setIntialValueOfStaffingLevel(planningPeriod);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 

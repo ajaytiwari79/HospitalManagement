@@ -1,11 +1,14 @@
 package com.kairos.enums;
 
-public enum TimeTypes {
+import java.io.Serializable;
 
-    WORKING_TYPE("Working time"),NON_WORKING_TYPE("Non working time");
+public enum TimeTypes implements Serializable {
+
+    WORKING_TYPE("Working time"), NON_WORKING_TYPE("Non working time");
 
     private String value;
-    TimeTypes(String value){
+
+    TimeTypes(String value) {
         this.value = value;
     }
 

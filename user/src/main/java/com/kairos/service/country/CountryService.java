@@ -225,7 +225,7 @@ public class CountryService {
 //            }
 //        } catch (Exception e) {
 //            logger.info("Exception occured: {}" , e.getCause());
-//            e.printStackTrace();
+//            logger.error(e.getMessage());
 //        }
 //
 //    }
@@ -273,7 +273,7 @@ public class CountryService {
 //            }
 //
 //        } catch (Exception e) {
-//            e.printStackTrace();
+//            logger.error(e.getMessage());
 //        }
 //        return false;
 //

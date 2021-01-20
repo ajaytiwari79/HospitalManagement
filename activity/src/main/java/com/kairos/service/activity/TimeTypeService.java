@@ -603,4 +603,8 @@ public class TimeTypeService extends MongoBaseService {
         return timeType.getTranslations();
     }
 
+    public List<TimeType> getAllSickTimeTypes(){
+        return timeTypeMongoRepository.findAllSickTimeTypes();
+    }
+
 }

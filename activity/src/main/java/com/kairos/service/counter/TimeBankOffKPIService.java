@@ -25,7 +25,7 @@ import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
 
 @Service
 public class TimeBankOffKPIService implements KPIService{
-    public double getCountAndHoursAndPercentageOfTODOSByActivityAndTimeType(Long staffId,DateTimeInterval dateTimeInterval,KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
+    public double getCountAndHoursAndPercentageOfTODOSByActivityAndTimeType(Long staffId,DateTimeInterval dateTimeInterval,KPICalculationRelatedInfo kpiCalculationRelatedInfo){
         int totalTodos=0;
         double todoStatusCount=0;
         Map<BigInteger,List<TodoDTO>> idTodoListMap  = getBigIntegerTodoListMap(staffId,kpiCalculationRelatedInfo);
@@ -49,7 +49,7 @@ public class TimeBankOffKPIService implements KPIService{
         }
 
     }
-    public Map<BigInteger,List<TodoDTO>> getBigIntegerTodoListMap(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
+    public Map<BigInteger,List<TodoDTO>> getBigIntegerTodoListMap(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo){
         boolean isActivityExist =kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ACTIVITY_IDS);
         Map<BigInteger,List<TodoDTO>> bigIntegerTodoListMap = getBigIntegerListMap(staffId, kpiCalculationRelatedInfo, isActivityExist);
         if(isNotNull(bigIntegerTodoListMap)) {
@@ -59,7 +59,7 @@ public class TimeBankOffKPIService implements KPIService{
         }
     }
 
-    private Map<BigInteger, List<TodoDTO>> getBigIntegerListMap(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, boolean isActivityExist) {
+    private Map<BigInteger, List<TodoDTO>> getBigIntegerListMap(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo, boolean isActivityExist) {
         Map<BigInteger, List<TodoDTO>> bigIntegerTodoListMap;
         if(isNotNull(staffId)){
             if(isActivityExist){
@@ -79,14 +79,14 @@ public class TimeBankOffKPIService implements KPIService{
     }
 
 
-    private List<TodoDTO> getTodoDTOListIfStaffIsNotExist(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, Map.Entry<BigInteger, List<TodoDTO>> entry) {
+    private List<TodoDTO> getTodoDTOListIfStaffIsNotExist(KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, Map.Entry<BigInteger, List<TodoDTO>> entry) {
         boolean isActivityExist =kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ACTIVITY_IDS);
         List<TodoDTO> activityTodoList =kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getActivityIdAndTodoListMap().getOrDefault(entry.getKey(),new ArrayList<>()));
         List<TodoDTO> timeTypeTodoList =kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getTimeTypeTodoListMap().getOrDefault(entry.getKey(),new ArrayList<>()));
         return isActivityExist?activityTodoList:timeTypeTodoList;
     }
 
-    private List<Shift> getShiftListIfStaffIsNotExist(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, Map.Entry<BigInteger, List<Shift>> entry) {
+    private List<Shift> getShiftListIfStaffIsNotExist(KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval, Map.Entry<BigInteger, List<Shift>> entry) {
         boolean isActivityExist =kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ACTIVITY_IDS)&&YAxisConfig.ACTIVITY.name().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().getOrDefault(CALCULATION_BASED_ON,new ArrayList()).get(0));
         List<Shift> activityShiftList =kpiCalculationRelatedInfo.getShiftsByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getActivityIdAndShiftListMap().getOrDefault(entry.getKey(),new ArrayList<>()));
         List<Shift> timeTypeShiftList =kpiCalculationRelatedInfo.getShiftsByInterval(dateTimeInterval, kpiCalculationRelatedInfo.getTimeTypeIdAndShiftListMap().getOrDefault(entry.getKey(),new ArrayList<>()));
@@ -94,7 +94,7 @@ public class TimeBankOffKPIService implements KPIService{
     }
 
 
-    public double getActivityStatusCount(Long staffId,List<TodoDTO> todoDTOS, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo,XAxisConfig xAxisConfig,DateTimeInterval dateTimeInterval) {
+    public double getActivityStatusCount(Long staffId,List<TodoDTO> todoDTOS, KPICalculationRelatedInfo kpiCalculationRelatedInfo,XAxisConfig xAxisConfig,DateTimeInterval dateTimeInterval) {
         if(PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))){
             return getStatusCountByPercentage(todoDTOS,kpiCalculationRelatedInfo);
         }
@@ -103,7 +103,7 @@ public class TimeBankOffKPIService implements KPIService{
         }
     }
 
-    public double getHoursOfTheTodos(Long staffId,KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo,DateTimeInterval dateTimeInterval){
+    public double getHoursOfTheTodos(Long staffId,KPICalculationRelatedInfo kpiCalculationRelatedInfo,DateTimeInterval dateTimeInterval){
         boolean isActivityExist =kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ACTIVITY_IDS)&& YAxisConfig.ACTIVITY.name().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_BASED_ON).get(0));
         Map<BigInteger,List<Shift>> bigIntegerAndShiftMap =isActivityExist?kpiCalculationRelatedInfo.getStaffIdAndActivityIdAndShiftMap().get(staffId):kpiCalculationRelatedInfo.getStaffIdAndTimeTypeIdAndShiftMap().get(staffId);
         Map<BigInteger,List<Shift>> bigIntegerAndShiftListMap =isActivityExist?kpiCalculationRelatedInfo.getActivityIdAndShiftListMap():kpiCalculationRelatedInfo.getTimeTypeIdAndShiftListMap();
@@ -122,7 +122,7 @@ public class TimeBankOffKPIService implements KPIService{
         return shiftHours;
     }
 
-    public double getStatusCountByPercentage(List<TodoDTO> todoDTOS, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
+    public double getStatusCountByPercentage(List<TodoDTO> todoDTOS, KPICalculationRelatedInfo kpiCalculationRelatedInfo){
         double statusPercentage = 0;
         if(isCollectionNotEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS))) {
             if (ShiftStatus.APPROVE.name().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).get(0)) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_STATUS).size() < 2) {
@@ -140,7 +140,7 @@ public class TimeBankOffKPIService implements KPIService{
     }
 
     @Override
-    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
         return getCountAndHoursAndPercentageOfTODOSByActivityAndTimeType(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
     }
 }

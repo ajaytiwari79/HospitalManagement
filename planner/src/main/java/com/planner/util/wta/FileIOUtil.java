@@ -77,7 +77,7 @@ public class FileIOUtil {
         try(PrintWriter out=new PrintWriter(new File("" +fileName+".xml"))) {
             out.write(xmlString);
         } catch (FileNotFoundException | NullPointerException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -88,9 +88,9 @@ public class FileIOUtil {
                 fw.write(b);
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
     }

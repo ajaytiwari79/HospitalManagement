@@ -5,6 +5,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.tabs.ActivityOptaPlannerSetting;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.service.activity.ActivityService;
@@ -27,6 +28,7 @@ import java.math.BigInteger;
 import java.util.Map;
 import java.util.Set;
 
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /**
@@ -67,9 +69,9 @@ public class OrganizationActivityController {
     @ApiOperation("Update icon  in Activity")
     @PostMapping(value = "/activity/{activityId}/icon")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> addIconInActivity(@PathVariable BigInteger activityId, @RequestParam("file") MultipartFile file) throws
+    ResponseEntity<Map<String, Object>> addIconInActivity(@PathVariable Long unitId,@PathVariable BigInteger activityId, @RequestParam("file") MultipartFile file) throws
             IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.addIconInActivity(activityId, file));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.addIconInActivity(unitId,activityId, file));
     }
 
     @ApiOperation("Update ActivityGeneralSettings Tab of Activity")
@@ -104,8 +106,8 @@ public class OrganizationActivityController {
     @ApiOperation("Update Rules Tab of Activity")
     @PutMapping(value = "/activity/rules")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody ActivityRulesSettingsDTO rulesDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateRulesTab(rulesDTO,true));
+    ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody ActivityRulesSettingsDTO rulesDTO,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateRulesTab(unitId,rulesDTO,true));
     }
 
     // Phase Settings
@@ -119,8 +121,8 @@ public class OrganizationActivityController {
     @ApiOperation("Update Phase setting Tab of Activity")
     @PutMapping(value = "/activity/phase_settings")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> updatePhaseSetticopyngTab(@RequestBody ActivityPhaseSettings activityPhaseSettings) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatePhaseSettingTab(activityPhaseSettings));
+    ResponseEntity<Map<String, Object>> updatePhaseSetticopyngTab(@PathVariable Long unitId,@RequestBody ActivityPhaseSettings activityPhaseSettings) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatePhaseSettingTab(unitId,activityPhaseSettings));
     }
 
     @ApiOperation("get getTime Calculation Tab of Activity")
@@ -133,16 +135,16 @@ public class OrganizationActivityController {
     @ApiOperation("Update Time calculation Tab of Activity")
     @PutMapping(value = "/activity/timeCalculation")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> updateTimeCalculationTabOfActivity(@RequestBody TimeCalculationActivityDTO timeCalculationActivityDTO,@RequestParam boolean availableAllowActivity) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateTimeCalculationTabOfActivity(timeCalculationActivityDTO,availableAllowActivity));
+    ResponseEntity<Map<String, Object>> updateTimeCalculationTabOfActivity(@PathVariable Long unitId,@RequestBody TimeCalculationActivityDTO timeCalculationActivityDTO,@RequestParam boolean availableAllowActivity) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateTimeCalculationTabOfActivity(unitId,timeCalculationActivityDTO,availableAllowActivity));
     }
 
 
     @ApiOperation("Update IndividualPoints Tab of Activity")
     @PutMapping(value = "/activity/individualPoints")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> updateIndividualPointsTab(@RequestBody ActivityIndividualPointsSettingsDTO individualPointsDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateIndividualPointsTab(individualPointsDTO));
+    ResponseEntity<Map<String, Object>> updateIndividualPointsTab(@PathVariable Long unitId,@RequestBody ActivityIndividualPointsSettingsDTO individualPointsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateIndividualPointsTab(unitId,individualPointsDTO));
     }
 
     @ApiOperation("get IndividualPoints Tab of Activity")
@@ -156,15 +158,15 @@ public class OrganizationActivityController {
     @ApiOperation("delete an activity")
     @DeleteMapping(value = "/activity/{activityId}")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','DELETE')")
-    public ResponseEntity<Map<String, Object>> deleteActivity(@PathVariable BigInteger activityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.deleteActivity(activityId));
+    public ResponseEntity<Map<String, Object>> deleteActivity(@PathVariable Long unitId,@PathVariable BigInteger activityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.deleteActivity(unitId,activityId));
     }
 
     @ApiOperation("Update child Activivty of Activity")
     @PutMapping(value = "/activity/{activityId}/child_activities")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> assignChildActivitiesInActivity(@PathVariable BigInteger activityId, @RequestBody Set<BigInteger> childActivitiesIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignChildActivitiesInActivity(activityId,childActivitiesIds));
+    ResponseEntity<Map<String, Object>> assignChildActivitiesInActivity(@PathVariable Long unitId,@PathVariable BigInteger activityId, @RequestBody Set<BigInteger> childActivitiesIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignChildActivitiesInActivity(unitId,activityId,childActivitiesIds));
     }
 
     @ApiOperation("get compositeShifts Tab of Activity")
@@ -186,16 +188,17 @@ public class OrganizationActivityController {
     @ApiOperation("Upload Notes  in Activity")
     @PostMapping(value = "/activity/{activityId}/upload_note")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> addDocumentInNotesTab(@PathVariable BigInteger activityId, @RequestParam("file") MultipartFile file) throws
+    ResponseEntity<Map<String, Object>> addDocumentInNotesTab(@PathVariable Long unitId,@PathVariable BigInteger activityId, @RequestParam("file") MultipartFile file) throws
             IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.addDocumentInNotesTab(activityId, file));
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.addDocumentInNotesTab(unitId, activityId, file));
     }
 
     @ApiOperation("Update Communication Tab of Activity")
     @PutMapping(value = "/activity/communication")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> updateCommunicationTabOfActivity(@RequestBody CommunicationActivityDTO communicationActivityDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.updateCommunicationTabOfActivity(communicationActivityDTO, true));
+    ResponseEntity<Map<String, Object>> updateCommunicationTabOfActivity(@PathVariable Long unitId,@RequestBody CommunicationActivityDTO communicationActivityDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.updateCommunicationTabOfActivity(unitId,communicationActivityDTO, true));
     }
 
     @ApiOperation("get CommunicationTab of Activity")
@@ -210,8 +213,8 @@ public class OrganizationActivityController {
     @ApiOperation("Update Bonus Tab of Activity")
     @PutMapping(value = "/activity/bonus")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> updateBonusTabOfActivity(@RequestBody BonusActivityDTO bonusActivityDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateBonusTabOfActivity(bonusActivityDTO));
+    ResponseEntity<Map<String, Object>> updateBonusTabOfActivity(@PathVariable Long unitId,@RequestBody BonusActivityDTO bonusActivityDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateBonusTabOfActivity(unitId,bonusActivityDTO));
     }
 
     @ApiOperation("get Bonus Tab of Activity")
@@ -226,8 +229,8 @@ public class OrganizationActivityController {
     @ApiOperation("update Skill tab of activity Type")
     @PutMapping(value = "/activity/skill")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> updateSkillTabOfActivity(@RequestBody SkillActivityDTO skillActivityDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateSkillTabOfActivity(skillActivityDTO));
+    ResponseEntity<Map<String, Object>> updateSkillTabOfActivity(@PathVariable Long unitId,@RequestBody SkillActivityDTO skillActivityDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateSkillTabOfActivity(unitId,skillActivityDTO));
     }
 
     @ApiOperation("get Bonus Tab of Activity")
@@ -248,8 +251,8 @@ public class OrganizationActivityController {
     @ApiOperation("update Opta PlannerSetting  details  of activity Type")
     @PutMapping(value = "/activity/{activityId}/opta_planner_settings")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@PathVariable BigInteger activityId, @RequestBody ActivityOptaPlannerSetting activityOptaPlannerSetting) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateOptaPlannerSettingsTabOfActivity(activityId, activityOptaPlannerSetting));
+    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@PathVariable Long unitId,@PathVariable BigInteger activityId, @RequestBody ActivityOptaPlannerSetting activityOptaPlannerSetting) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateOptaPlannerSettingsTabOfActivity(unitId,activityId, activityOptaPlannerSetting));
     }
 
     // cta_wta_settings
@@ -263,15 +266,15 @@ public class OrganizationActivityController {
     @ApiOperation("update cta_response and wta settings  of activity Type")
     @PutMapping(value = "/activity/cta_wta_settings")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> updateCtaAndWtaSettingsTabOfActivity(@RequestBody ActivityCTAAndWTASettingsDTO activityCTAAndWTASettingsDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateCtaAndWtaSettingsTabOfActivity(activityCTAAndWTASettingsDTO));
+    ResponseEntity<Map<String, Object>> updateCtaAndWtaSettingsTabOfActivity(@PathVariable Long unitId,@RequestBody ActivityCTAAndWTASettingsDTO activityCTAAndWTASettingsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateCtaAndWtaSettingsTabOfActivity(unitId,activityCTAAndWTASettingsDTO));
     }
 
     @ApiOperation("update organization Mapping details  of activity Type")
     @PutMapping(value = "/activity/{activityId}/organizationMapping")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@RequestBody OrganizationMappingDTO organizationMappingDTO, @PathVariable BigInteger activityId) {
-        activityService.updateOrgMappingDetailOfActivity(organizationMappingDTO, activityId);
+    ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@PathVariable Long unitId,@RequestBody OrganizationMappingDTO organizationMappingDTO, @PathVariable BigInteger activityId) {
+        activityService.updateOrgMappingDetailOfActivity(unitId,organizationMappingDTO, activityId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
@@ -306,8 +309,8 @@ public class OrganizationActivityController {
     @ApiOperation("update location settings of activity ")
     @PutMapping(value = "/activity/location_settings")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> updateLocationsTabOfActivity(@RequestBody ActivityLocationSettingsDTO activityLocationSettingsDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(activityLocationSettingsDTO));
+    ResponseEntity<Map<String, Object>> updateLocationsTabOfActivity(@PathVariable Long unitId,@RequestBody ActivityLocationSettingsDTO activityLocationSettingsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(unitId,activityLocationSettingsDTO));
     }
 
     @ApiOperation("Get all activity based on unitId")
@@ -336,8 +339,8 @@ public class OrganizationActivityController {
     @ApiOperation("Remove uploaded Attachments in Activity")
     @DeleteMapping(value = "/activity/{activityId}/remove_uploaded_attachments")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> removeAttachementsFromActivity(@PathVariable BigInteger activityId, @RequestParam boolean removeNotes) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.removeAttachementsFromActivity(activityId, removeNotes));
+    ResponseEntity<Map<String, Object>> removeAttachementsFromActivity(@PathVariable Long unitId,@PathVariable BigInteger activityId, @RequestParam boolean removeNotes) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.removeAttachementsFromActivity(unitId,activityId, removeNotes));
     }
 
     @ApiOperation(value = "Get All Activities by unitId")
@@ -400,7 +403,14 @@ public class OrganizationActivityController {
     @ApiOperation("Update Translations of ActivityCategory in a unit")
     @PutMapping(value = "/activityCategory/{activityCategoryId}/unit_language_settings")
     @PreAuthorize("@appPermissionEvaluator.isValid('Activity','EDIT')")
-    ResponseEntity<Map<String, Object>> updateLanguageSettingsOfActivityCategory(@NotEmpty @PathVariable BigInteger activityCategoryId, @NotNull @RequestBody Map<String, TranslationInfo> translationMap) {
+    ResponseEntity<Map<String, Object>> updateLanguageSettingsOfActivityCategory(@PathVariable Long unitId,@NotEmpty @PathVariable BigInteger activityCategoryId, @NotNull @RequestBody Map<String, TranslationInfo> translationMap) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.updateUnitActivityCategoryTranslationDetails(activityCategoryId,translationMap));
+    }
+
+    @ApiOperation("Get all activities by time type in a unit")
+    @GetMapping(value = "/all_activities")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllActivitiesByTimeType(@PathVariable long unitId, @RequestParam TimeTypeEnum timeType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllBySecondLevelTimeTypeAndUnitIds(timeType, newHashSet(unitId)));
     }
 }

@@ -6,6 +6,7 @@ import com.kairos.enums.TimeCalaculationType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -17,7 +18,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class TimeCalculationActivityDTO {
+public class TimeCalculationActivityDTO implements Serializable {
 
     private Long activityId;
     private String methodForCalculatingTime;

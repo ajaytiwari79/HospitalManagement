@@ -452,7 +452,7 @@ public class StaffService {
             }
             return staffUploadBySheetQueryResult;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         return staffUploadBySheetQueryResult;
     }
@@ -791,7 +791,7 @@ public class StaffService {
             }
             staffGraphRepository.saveAll(staffList);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
     }
 

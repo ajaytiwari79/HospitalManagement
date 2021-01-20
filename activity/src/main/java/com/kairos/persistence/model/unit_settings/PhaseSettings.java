@@ -19,6 +19,8 @@ public class PhaseSettings extends MongoBaseEntity {
     private boolean managementEligibleForOverStaffing;
     private Long unitId;
     private int sequence;
+    private short maxProblemAllowed; // storing it in minutes
+
 
     public PhaseSettings(BigInteger phaseId, String name, String description, boolean staffEligibleForUnderStaffing, boolean staffEligibleForOverStaffing,
                          boolean managementEligibleForUnderStaffing, boolean managementEligibleForOverStaffing, Long unitId, int sequence) {

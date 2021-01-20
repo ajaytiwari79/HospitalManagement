@@ -58,9 +58,10 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
     compile('org.springframework.cloud:spring-cloud-starter-oauth2')
     compile('org.springframework.cloud:spring-cloud-starter-security')
-    compile('org.springframework.data:spring-data-redis:2.0.3.RELEASE')
+//    compile('org.springframework.data:spring-data-redis:2.0.3.RELEASE')
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.0.0.RELEASE'
     compile('redis.clients:jedis:2.9.0')
-
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-mongodb
     compile("org.springframework.boot:spring-boot-starter-data-mongodb")
 
@@ -91,10 +92,6 @@ dependencies {
     compile (('org.springframework.kafka:spring-kafka:2.1.7.RELEASE'))
 
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.5'
-    
-    //this is for hot swaping in intelij
-    compile('org.springframework.boot:spring-boot-devtools')
-
 
 }
 
