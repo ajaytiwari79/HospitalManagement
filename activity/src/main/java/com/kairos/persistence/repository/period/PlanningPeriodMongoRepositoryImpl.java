@@ -8,23 +8,28 @@ import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.ShiftDataHelper;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.getBigIntegerString;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -311,6 +316,642 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
             shiftPlanningProblemSubmitDTO.setShifts(shiftPlanningProblemSubmitDTOS.get(0).getShifts());
         }
         return shiftPlanningProblemSubmitDTO;
+    }
+
+    @Override
+    public ShiftDataHelper getDataForShiftOperation(Date startDate, Long unitId, Collection<Long> employmentIds, Collection<Long> expertiseIds, Collection<Long> staffIds, Long countryId, Collection<BigInteger> activityIds, BigInteger shiftId, boolean userAccessRole){
+        LocalDate localDate = asLocalDate(startDate);
+        Aggregation aggregation = newAggregation(
+                match(Criteria.where(UNIT_ID).is(unitId).and("startDate").lte(localDate).and("endDate").gte(localDate).and("deleted").is(false).and("active").is(true)),
+                getCustomLookUpForLastPlanningPeriod(unitId),
+                getCustomProjectionForShift(),
+                getCustomWTAOperationForShift(employmentIds),
+                getCustomCTAOperationForShift(employmentIds),
+                getCustomTimeSlotOperationForShift(unitId),
+                getCustomDayTypeOperationForShift(countryId),
+                getCustomActivityConfigurationOperationForShift(unitId),
+                getCustomOperationForActivities(activityIds),
+                getCustomOperationForNightWorker(staffIds),
+                getCustomOperationForStaffWTACounter(employmentIds,userAccessRole),
+                getCustomOperationForShift(shiftId),
+                getCustomOperationForExpertiseNightWorkSetting(expertiseIds,unitId),
+                getCustomOperationForCountryExpertiseNightWorkSetting(expertiseIds,countryId),
+                getCustomAggregationForPhases(unitId),
+                getCustomAggregationForBreakActivities(unitId,expertiseIds),
+                getCustomAggregationOperationForPlanningPeriods(unitId)
+        );
+        return mongoTemplate.aggregate(aggregation,PlanningPeriod.class, ShiftDataHelper.class).getMappedResults().get(0);
+    }
+
+    private CustomAggregationOperation getCustomAggregationOperationForPlanningPeriods(Long unitId) {
+        return new CustomAggregationOperation("{\n" +
+                "    \"$lookup\": {\n" +
+                "      \"from\": \"planningPeriod\",\n" +
+                "      \"let\": {\n" +
+                "        \"unitId\":" +unitId+
+                "      },\n" +
+                "      \"pipeline\": [\n" +
+                "        {\n" +
+                "          \"$match\": {\n" +
+                "            \"$expr\": {\n" +
+                "              \"$and\": [\n" +
+                "                {\n" +
+                "                  \"$eq\": [\n" +
+                "                    \"$unitId\",\n" +
+                "                    \"$$unitId\"\n" +
+                "                  ]\n" +
+                "                }\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }" +
+                "      ],\n" +
+                "      \"as\": \"planningPeriods\"\n" +
+                "    }\n" +
+                "  }");
+    }
+
+    private AggregationOperation getCustomAggregationForBreakActivities(Long unitId,Collection<Long> expertiseIds) {
+        return new CustomAggregationOperation("{\n" +
+                "      \"$lookup\": {\n" +
+                "        \"from\": \"breakSettings\",\n" +
+                "        \"let\": {          \n" +
+                "          \"expertiseIds\": "+expertiseIds+"\n" +
+                "        },\n" +
+                "        \"pipeline\": [\n" +
+                "          {\n" +
+                "            \"$match\": {\n" +
+                "              \"$expr\": {\n" +
+                "                \"$and\": [\n" +
+                "                  {\n" +
+                "                    \"$in\": [\n" +
+                "                      \"$expertiseId\",\n" +
+                "                      \"$$expertiseIds\"\n" +
+                "                    ]\n" +
+                "                  }\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            }\n" +
+                "          },\n" +
+                "          {\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"activities\",\n" +
+                "    \"let\": {\n" +
+                "      \"id\" : \"$activityId\",\n" +
+                "        \"unitId\":"+unitId+"\n" +
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$countryParentId\",\n" +
+                "                  \"$$id\"\n" +
+                "                ]\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$unitId\",\n" +
+                "                  \"$$unitId\"\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "     $lookup:\n" +
+                "       {\n" +
+                "         from: \"time_Type\",\n" +
+                "         localField: \"activityBalanceSettings.timeTypeId\",\n" +
+                "         foreignField: \"_id\",\n" +
+                "         as: \"timeType\"\n" +
+                "       }\n" +
+                "  },{\n" +
+                "    \"$unwind\": \"$timeType\"\n" +
+                "  }\n" +
+                "    ],\n" +
+                "    \"as\": \"activity\"\n" +
+                "  }\n" +
+                "},\n" +
+                "{\n" +
+                "    \"$unwind\": {\n" +
+                "        path: \"$activity\",\n" +
+                "        preserveNullAndEmptyArrays: true\n" +
+                "      }\n" +
+                "  }\n" +
+                "        ],\n" +
+                "        \"as\": \"breakSettings\"\n" +
+                "      }\n" +
+                "    }");
+    }
+
+    private AggregationOperation getCustomAggregationForPhases(Long unitId) {
+        return new CustomAggregationOperation("{\n" +
+                "      \"$lookup\": {\n" +
+                "        \"from\": \"phases\",\n" +
+                "        \"let\": {          \n" +
+                "          \"unitId\": "+unitId+"\n" +
+                "        },\n" +
+                "        \"pipeline\": [\n" +
+                "          {\n" +
+                "            \"$match\": {\n" +
+                "              \"$expr\": {\n" +
+                "                \"$and\": [\n" +
+                "                  {\n" +
+                "                    \"$eq\": [\n" +
+                "                      \"$organizationId\",\n" +
+                "                      \"$$unitId\"\n" +
+                "                    ]\n" +
+                "                  }\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            }\n" +
+                "          }\n" +
+                "        ],\n" +
+                "        \"as\": \"phases\"\n" +
+                "      }\n" +
+                "    }");
+    }
+
+    private AggregationOperation getCustomProjectionForShift() {
+        return new CustomAggregationOperation("{\"$project\":{\n" +
+                "    \"planningPeriod.lastPlanningPeriodEndDate\":{ $arrayElemAt: [ \"$lastPlanningPeriod.endDate\", 0 ] },    \n" +
+                "    \"planningPeriod.startDate\" : \"$startDate\",\n" +
+                "    \"planningPeriod.endDate\" : \"$endDate\",\n" +
+                "    \"planningPeriod.currentPhaseId\" : \"$currentPhaseId\",\n" +
+                "    \"planningPeriod.nextPhaseId\" : \"$nextPhaseId\",\n" +
+                "    \"planningPeriod.duration\" : \"$duration\",\n" +
+                "    \"planningPeriod.durationType\" : \"$durationType\",\n" +
+                "    \"_id\":0\n" +
+                "    }\n" +
+                "    }");
+    }
+
+    private AggregationOperation getCustomOperationForCountryExpertiseNightWorkSetting(Collection<Long> expertiseIds, Long countryId) {
+        return new CustomAggregationOperation("{\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"expertiseNightWorkerSetting\",\n" +
+                "    \"let\": {\n" +
+                "      \"expertiseIds\" : "+expertiseIds+",\n" +
+                "        \"countryId\":"+countryId+"\n" +
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$in\": [\n" +
+                "                  \"$expertiseId\",\n" +
+                "                  \"$$expertiseIds\"\n" +
+                "                ]\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$countryId\",\n" +
+                "                  \"$$countryId\"\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"as\": \"countryExpertiseNightWorkerSettings\"\n" +
+                "  }\n" +
+                "}");
+    }
+
+    private AggregationOperation getCustomOperationForExpertiseNightWorkSetting(Collection<Long> expertiseIds,Long unitId) {
+        return new CustomAggregationOperation("{\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"expertiseNightWorkerSetting\",\n" +
+                "    \"let\": {\n" +
+                "      \"expertiseIds\" : "+expertiseIds+",\n" +
+                "        \"unitId\":"+unitId+"\n" +
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$in\": [\n" +
+                "                  \"$expertiseId\",\n" +
+                "                  \"$$expertiseIds\"\n" +
+                "                ]\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$unitId\",\n" +
+                "                  \"$$unitId\"\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"as\": \"expertiseNightWorkerSettings\"\n" +
+                "  }\n" +
+                "}");
+    }
+
+    private AggregationOperation getCustomOperationForShift(BigInteger shiftId) {
+        return new CustomAggregationOperation("{\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"shifts\",\n" +
+                "    \"let\": {\n" +
+                "      \"id\" : '"+shiftId+"',\n" +
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$_id\",\n" +
+                "                  \"$$id\"\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"as\": \"shift\"\n" +
+                "  }\n" +
+                "},\n" +
+                "{\n" +
+                "    \"$unwind\": {\n" +
+                "        path: \"$shift\",\n" +
+                "        preserveNullAndEmptyArrays: true\n" +
+                "      }\n" +
+                "  }");
+    }
+
+    private AggregationOperation getCustomOperationForStaffWTACounter(Collection<Long> employmentIds, boolean userAccessRole) {
+        return new CustomAggregationOperation("{\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"staffWTACounter\",\n" +
+                "    \"let\": {\n" +
+                "      \"employmentIds\" : "+employmentIds+",\n" +
+                "        \"startDate\":\"$planningPeriod.startDate\",\n" +
+                "        \"endDate\":\"$planningPeriod.endDate\",\n" +
+                "        \"userHasStaffRole\":"+userAccessRole+"\n" +
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$in\": [\n" +
+                "                  \"$employmentId\",\n" +
+                "                  \"$$employmentIds\"\n" +
+                "                ]\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$startDate\",\n" +
+                "                  \"$$startDate\"\n" +
+                "                ]\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$endDate\",\n" +
+                "                  \"$$endDate\"\n" +
+                "                ]\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$userHasStaffRole\",\n" +
+                "                  \"$$userHasStaffRole\"\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"as\": \"staffWTACounters\"\n" +
+                "  }\n" +
+                "}");
+    }
+
+    private AggregationOperation getCustomOperationForNightWorker(Collection<Long> staffIds) {
+        return new CustomAggregationOperation("{\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"nightWorker\",\n" +
+                "    \"let\": {\n" +
+                "      \"staffIds\" : "+staffIds+"\n" +
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$in\": [\n" +
+                "                  \"$staffId\",\n" +
+                "                  \"$$staffIds\"\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"as\": \"nightWorkers\"\n" +
+                "  }\n" +
+                "}");
+    }
+
+    private AggregationOperation getCustomOperationForActivities(Collection<BigInteger> activityIds) {
+        return new CustomAggregationOperation("{\n" +
+                "    \"$lookup\": {\n" +
+                "      \"from\": \"activities\",\n" +
+                "      \"let\": {\n" +
+                "        \"ids\": "+
+                getBigIntegerString(activityIds.iterator())+
+                "      },\n" +
+                "      \"pipeline\": [\n" +
+                "        {\n" +
+                "          \"$match\": {\n" +
+                "            \"$expr\": {\n" +
+                "              \"$or\": [\n" +
+                "                {\n" +
+                "                  \"$in\": [\n" +
+                "                    \"$_id\",\n" +
+                "                    \"$$ids\"\n" +
+                "                  ]\n" +
+                "                }\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"$lookup\": {\n" +
+                "            \"from\": \"time_Type\",\n" +
+                "            \"localField\": \"activityBalanceSettings.timeTypeId\",\n" +
+                "            \"foreignField\": \"_id\",\n" +
+                "            \"as\": \"timeType\"\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"$lookup\": {\n" +
+                "            \"from\": \"activityPriority\",\n" +
+                "            \"localField\": \"activityPriorityId\",\n" +
+                "            \"foreignField\": \"_id\",\n" +
+                "            \"as\": \"activityPriority\"\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"$unwind\": {\n" +
+                "            \"path\": \"$timeType\",\n" +
+                "            \"preserveNullAndEmptyArrays\": true\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"$unwind\": {\n" +
+                "            \"path\": \"$activityPriority\",\n" +
+                "            \"preserveNullAndEmptyArrays\": true\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ],\n" +
+                "      \"as\": \"activities\"\n" +
+                "    }\n" +
+                "  }");
+    }
+
+    private AggregationOperation getCustomActivityConfigurationOperationForShift(Long unitId) {
+        return new CustomAggregationOperation("{\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"activityConfiguration\",\n" +
+                "    \"let\": {\n" +
+                "      \"unitId\" : "+unitId+"\n" +
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$unitId\",\n" +
+                "                  \"$$unitId\"\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"as\": \"activityConfigurations\"\n" +
+                "  }\n" +
+                "}");
+    }
+
+    private AggregationOperation getCustomDayTypeOperationForShift(Long countryId) {
+        return new CustomAggregationOperation("{\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"dayType\",\n" +
+                "    \"let\": {\n" +
+                "      \"countryId\" : "+countryId+"\n" +
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$countryId\",\n" +
+                "                  \"$$countryId\"\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "     $lookup:\n" +
+                "       {\n" +
+                "         from: \"countryHolidayCalender\",\n" +
+                "         localField: \"_id\",\n" +
+                "         foreignField: \"dayTypeId\",\n" +
+                "         as: \"countryHolidayCalenderData\"\n" +
+                "       }\n" +
+                "  }\n" +
+                "    ],\n" +
+                "    \"as\": \"dayTypes\"\n" +
+                "  }\n" +
+                "}");
+    }
+
+    private AggregationOperation getCustomTimeSlotOperationForShift(Long unitId) {
+        return new CustomAggregationOperation("{\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"timeSlotSet\",\n" +
+                "    \"let\": {\n" +
+                "      \"unitId\": "+unitId+"\n" +
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$unitId\",\n" +
+                "                  \"$$unitId\"\n" +
+                "                ]\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$timeSlotType\",\n" +
+                "                  \"SHIFT_PLANNING\"\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"as\": \"timeSlot\"\n" +
+                "  }\n" +
+                "},\n" +
+                "{\n" +
+                "    \"$unwind\": {\n" +
+                "        path: \"$timeSlot\",\n" +
+                "        preserveNullAndEmptyArrays: true\n" +
+                "      }\n" +
+                "  }");
+    }
+
+    private AggregationOperation getCustomCTAOperationForShift(Collection<Long> employmentIds) {
+        return new CustomAggregationOperation("{\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"costTimeAgreement\",\n" +
+                "    \"let\": {\n" +
+                "      \"employmentIds\": "+employmentIds+"\n" +
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$deleted\",\n" +
+                "                  false\n" +
+                "                ]\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"$in\": [\n" +
+                "                  \"$employmentId\",\n" +
+                "                  \"$$employmentIds\"\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "     $lookup:\n" +
+                "       {\n" +
+                "         from: \"cTARuleTemplate\",\n" +
+                "         localField: \"ruleTemplateIds\",\n" +
+                "         foreignField: \"_id\",\n" +
+                "         as: \"ruleTemplates\"\n" +
+                "       }\n" +
+                "  }\n" +
+                "    ],\n" +
+                "    \"as\": \"costTimeAgreements\"\n" +
+                "  }\n" +
+                "}");
+    }
+
+    private CustomAggregationOperation getCustomWTAOperationForShift(Collection<Long> employmentIds) {
+        return new CustomAggregationOperation("{\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"workingTimeAgreement\",\n" +
+                "    \"let\": {\n" +
+                "      \"employmentIds\": "+employmentIds+",\n" +
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$deleted\",\n" +
+                "                  false\n" +
+                "                ]\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"$in\": [\n" +
+                "                  \"$employmentId\",\n" +
+                "                  \"$$employmentIds\"\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "     $lookup:\n" +
+                "       {\n" +
+                "         from: \"wtaBaseRuleTemplate\",\n" +
+                "         localField: \"ruleTemplateIds\",\n" +
+                "         foreignField: \"_id\",\n" +
+                "         as: \"ruleTemplates\"\n" +
+                "       }\n" +
+                "  },\n" +
+                "    ],\n" +
+                "    \"as\": \"workingTimeAgreements\"\n" +
+                "  }\n" +
+                "}");
+    }
+
+    private CustomAggregationOperation getCustomLookUpForLastPlanningPeriod(Long unitId) {
+        return new CustomAggregationOperation("{\n" +
+                "  \"$lookup\": {\n" +
+                "    \"from\": \"planningPeriod\",\n" +
+                "    \"let\": {\n" +
+                "      \"unitId\" : "+unitId+
+                "    },\n" +
+                "    \"pipeline\": [\n" +
+                "      {\n" +
+                "        \"$match\": {\n" +
+                "          \"$expr\": {\n" +
+                "            \"$and\": [\n" +
+                "              {\n" +
+                "                \"$eq\": [\n" +
+                "                  \"$unitId\",\n" +
+                "                  \"$$unitId\"\n" +
+                "                ]\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "       $group:\n" +
+                "         {\n" +
+                "           _id: \"$unitId\",\n" +
+                "           endDate: { $last: \"$endDate\" }\n" +
+                "         }\n" +
+                "     }\n" +
+                "    ],\n" +
+                "    \"as\": \"lastPlanningPeriod\"\n" +
+                "  }\n" +
+                "}");
     }
 
 

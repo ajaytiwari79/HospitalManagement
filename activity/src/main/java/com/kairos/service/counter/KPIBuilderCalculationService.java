@@ -665,6 +665,7 @@ public class KPIBuilderCalculationService implements CounterService {
         }
     }
 
+
     @Setter
     @Getter
     @Builder

@@ -46,6 +46,7 @@ public class PlanningPeriodDTO {
     private Set<Long> publishEmploymentIds=new HashSet<>();
     private String color;
     private PhaseDefaultName phaseEnum;
+    private LocalDate lastPlanningPeriodEndDate;
 
     public PlanningPeriodDTO( LocalDate startDate, int duration, DurationType durationType, int recurringNumber, LocalDate endDate){
         this.startDate = startDate;

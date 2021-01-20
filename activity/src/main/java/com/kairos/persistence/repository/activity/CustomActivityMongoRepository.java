@@ -126,4 +126,6 @@ public interface CustomActivityMongoRepository {
     Set<BigInteger> findAllShowOnCallAndStandByActivitiesByUnitId(Long unitId, boolean showStandBy, boolean showOnCall);
 
     List<ActivityWithCompositeDTO> findAllActivityByIdsAndIncludeChildActivitiesWithMostUsedCountOfActivity(Collection<BigInteger> activityIds,Long unitId,Long staffId,boolean isActivityType);
+    List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds);
+    List<ActivityDTO> findActivitiesWithTimeTypeByActivityId(Collection<BigInteger> activityIds);
 }

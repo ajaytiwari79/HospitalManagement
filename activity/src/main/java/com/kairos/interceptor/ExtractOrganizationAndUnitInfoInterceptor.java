@@ -34,7 +34,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(request.getRequestURI().contains("swagger-ui")) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        getCurrentUserDetails();
+        //getCurrentUserDetails();
         updateUserInfo(request, pathVariables);
 
         String tabId = request.getParameter("moduleId");

@@ -32,6 +32,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
@@ -627,10 +628,7 @@ public class ShiftService extends MongoBaseService {
 
     public List<ShiftWithViolatedInfoDTO> updateShift(ShiftDTO shiftDTO, boolean byTAndAView, boolean validatedByPlanner, ShiftActionType shiftAction) {
         Long functionId = shiftDTO.getFunctionId();
-        Shift shift = shiftMongoRepository.findByIdAndDeletedFalse(byTAndAView ? shiftDTO.getShiftId() : shiftDTO.getId());
-        if (!Optional.ofNullable(shift).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_ID, shiftDTO.getId());
-        }
+        Shift shift = findOneByShiftId(byTAndAView ? shiftDTO.getShiftId() : shiftDTO.getId());
         if (shift.isDraft() && ShiftActionType.CANCEL.equals(shiftAction)) {
             shiftMongoRepository.delete(shift);
             return new ArrayList<>();
@@ -857,7 +855,7 @@ public class ShiftService extends MongoBaseService {
         return shiftMongoRepository.countByActivityId(activityId);
     }
 
-    public ShiftWithActivityDTO getShiftWithActivityDTO(ShiftDTO shiftDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
+    public <T> ShiftWithActivityDTO getShiftWithActivityDTO(ShiftDTO shiftDTO, Map<BigInteger, T> activityWrapperMap, Shift shift) {
         ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(isNull(shiftDTO) ? shift : shiftDTO, ShiftWithActivityDTO.class);
         shiftWithActivityDTO.setOldShiftTimeSlot(isNotNull(shift) ? shift.getOldShiftTimeSlot() : null);
         updateActivityDetails(activityWrapperMap, shiftWithActivityDTO);
@@ -865,8 +863,10 @@ public class ShiftService extends MongoBaseService {
             updateActivityDetails(activityWrapperMap, shiftWithActivityDTO.getDraftShift());
         }
         if (isNotNull(shiftDTO)) {
-            shiftDTO.getActivities().forEach(shiftActivityDTO ->
-                    shiftActivityDTO.setActivityName(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getName())
+            shiftDTO.getActivities().forEach(shiftActivityDTO -> {
+                        T activity = activityWrapperMap.get(shiftActivityDTO.getActivityId());
+                        shiftActivityDTO.setActivityName(activity instanceof ActivityDTO ? ((ActivityDTO) activity).getName() : ((ActivityWrapper) activity).getActivity().getName());
+                    }
             );
             shiftWithActivityDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());
             shiftWithActivityDTO.setEndDate(shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
@@ -874,29 +874,22 @@ public class ShiftService extends MongoBaseService {
         return shiftWithActivityDTO;
     }
 
-    private void updateActivityDetails(Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shiftWithActivityDTO) {
+    private <T> void updateActivityDetails(Map<BigInteger, T> activityWrapperMap, ShiftWithActivityDTO shiftWithActivityDTO) {
         shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
-            shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
-            shiftActivityDTO.setTimeType(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getTimeType());
-            shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> {
+            T activity = activityWrapperMap.get(shiftActivityDTO.getActivityId());
+            ActivityDTO activityDTO = activity instanceof ActivityDTO ? (ActivityDTO) activity : ObjectMapperUtils.copyPropertiesByMapper(((ActivityWrapper) activity).getActivity(), ActivityDTO.class);
+            shiftActivityDTO.setActivity(activityDTO);
+            shiftActivityDTO.setTimeType(activity instanceof ActivityDTO ? ((ActivityDTO) activity).getTimeType().getTimeTypes() : ((ActivityWrapper)activity).getTimeType());
+            for (ShiftActivityDTO childActivityDTO : shiftActivityDTO.getChildActivities()) {
                 if(activityWrapperMap.containsKey(childActivityDTO.getActivityId())) {
-                    childActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(childActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
-                    childActivityDTO.setTimeType(activityWrapperMap.get(childActivityDTO.getActivityId()).getTimeType());
-                }
-            });
-        });
-    }
+                    activity = activityWrapperMap.get(childActivityDTO.getActivityId());
+                    activityDTO = activity instanceof ActivityDTO ? (ActivityDTO) activity : ObjectMapperUtils.copyPropertiesByMapper(((ActivityWrapper) activity).getActivity(), ActivityDTO.class);
+                    childActivityDTO.setActivity(activityDTO);
+                    childActivityDTO.setTimeType(activity instanceof ActivityDTO ? ((ActivityDTO) activity).getTimeType().getTimeTypes() : ((ActivityWrapper)activity).getTimeType());
 
-    public void deleteShiftsAndOpenShiftsOnEmploymentEnd(Long staffId, LocalDateTime employmentEndDate) {
-        shiftMongoRepository.deleteShiftsAfterDate(staffId, employmentEndDate);
-        List<OpenShift> openShifts = openShiftMongoRepository.findAllOpenShiftsByInterestedStaff(staffId, employmentEndDate);
-        if (!openShifts.isEmpty()) {
-            for (OpenShift openShift : openShifts) {
-                openShift.getInterestedStaff().remove(staffId);
-                openShift.getAssignedStaff().remove(staffId);
+                }
             }
-            openShiftMongoRepository.saveEntities(openShifts);
-        }
+        });
     }
 
     public void deleteShiftsAfterEmploymentEndDate(Long employmentId, LocalDate employmentEndDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
@@ -984,8 +977,20 @@ public class ShiftService extends MongoBaseService {
         return shiftList;
     }
 
+    public Shift findOneByShiftId(BigInteger shiftId){
+        Optional<Shift> shiftOptional = shiftMongoRepository.findById(shiftId);
+        if(!shiftOptional.isPresent()){
+            exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_ID, shiftId);
+        }
+        return shiftOptional.get();
+    }
+
     public List<Shift> findShiftBetweenDurationByStaffId(Long staffId, Date startDate, Date endDate){
         return shiftMongoRepository.findShiftBetweenDurationByStaffId(staffId, startDate, endDate);
+    }
+
+    public Set<Long> getNotEligibleStaffsForCoverShifts(Date startDate, Date endDate, CoverShiftSetting coverShiftSetting, List<Long> staffIds){
+        return shiftMongoRepository.getNotEligibleStaffsForCoverShifts(startDate,endDate,coverShiftSetting,staffIds);
     }
 
 }

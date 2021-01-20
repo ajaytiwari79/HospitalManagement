@@ -4,6 +4,7 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.shift.BlockSettingDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.rule_validator.AbstractSpecification;
+import com.kairos.rule_validator.RuleExecutionType;
 import com.kairos.service.shift.ShiftValidatorService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,7 +40,7 @@ public class BlockSettingSpecification extends AbstractSpecification<ShiftWithAc
     }
 
     @Override
-    public void validateRules(ShiftWithActivityDTO shift) {
+    public void validateRules(ShiftWithActivityDTO shift, RuleExecutionType ruleExecutionType) {
         Set<BigInteger> activityIds = shift.getActivities().stream().map(activity->activity.getActivityId()).collect(Collectors.toSet());
         if(ObjectUtils.isNotNull(blockSetting) && CollectionUtils.containsAny(blockSetting.getBlockDetails().get(shift.getStaffId()), activityIds)){
             ShiftValidatorService.throwException(MESSAGE_BLOCKED_FOR_SHIFT_ENTER_AT_DATE,asDate(blockSetting.getDate()));

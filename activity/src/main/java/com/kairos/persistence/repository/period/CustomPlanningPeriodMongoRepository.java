@@ -5,8 +5,11 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.ShiftDataHelper;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -32,4 +35,5 @@ public interface CustomPlanningPeriodMongoRepository {
     List<PlanningPeriod> findLastPlanningPeriodOfAllUnits();
     PlanningPeriod findFirstRequestPhasePlanningPeriodByUnitId(Long unitId);
     ShiftPlanningProblemSubmitDTO findDataForAutoPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO);
+    ShiftDataHelper getDataForShiftOperation(Date startDate, Long unitId, Collection<Long> employmentIds, Collection<Long> expertiseIds, Collection<Long> staffIds, Long countryId, Collection<BigInteger> activityIds, BigInteger shiftId, boolean userAccessRole);;
 }

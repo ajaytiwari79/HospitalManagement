@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
@@ -32,6 +33,7 @@ import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.ShiftActivity;
+import com.kairos.persistence.model.shift.ShiftDataHelper;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -254,6 +256,52 @@ public class TimeBankCalculationService {
     }
 
     public void calculateScheduledAndDurationInMinutes(ShiftActivity shiftActivity, Activity activity, StaffEmploymentDetails staffEmploymentDetails,boolean calculateTimeBankOff) {
+        if (shiftActivity.getStartDate().after(shiftActivity.getEndDate())) {
+            exceptionService.invalidRequestException(ACTIVITY_END_DATE_LESS_THAN_START_DATE, activity.getName());
+        }
+        int scheduledMinutes = 0;
+        int duration = 0;
+        int weeklyMinutes;
+        switch (activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime()) {
+            case ENTERED_MANUALLY:
+                duration = shiftActivity.getDurationMinutes();
+                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
+                break;
+            case FIXED_TIME:
+                duration = activity.getActivityTimeCalculationSettings().getFixedTimeValue().intValue();
+                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
+                break;
+            case ENTERED_TIMES:
+                duration = (int) new Interval(shiftActivity.getStartDate().getTime(), shiftActivity.getEndDate().getTime()).toDuration().getStandardMinutes();
+                scheduledMinutes = Double.valueOf(duration * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
+                break;
+            case CommonConstants.FULL_DAY_CALCULATION:
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullDayCalculationType())) ? staffEmploymentDetails.getFullTimeWeeklyMinutes() : staffEmploymentDetails.getTotalWeeklyMinutes();
+                duration = Double.valueOf(weeklyMinutes * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+                break;
+            case AppConstants.WEEKLY_HOURS:
+                duration = Double.valueOf(staffEmploymentDetails.getTotalWeeklyMinutes() * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+                break;
+            case CommonConstants.FULL_WEEK:
+                weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(activity.getActivityTimeCalculationSettings().getFullWeekCalculationType())) ? staffEmploymentDetails.getFullTimeWeeklyMinutes() : staffEmploymentDetails.getTotalWeeklyMinutes();
+                duration = Double.valueOf(weeklyMinutes * activity.getActivityTimeCalculationSettings().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+                break;
+            default:
+                break;
+        }
+        if (TimeTypes.WORKING_TYPE.toString().equals(shiftActivity.getTimeType()) || calculateTimeBankOff) {
+            shiftActivity.setDurationMinutes(duration);
+            shiftActivity.setScheduledMinutes(scheduledMinutes);
+        }
+    }
+
+    public void calculateScheduledAndDurationInMinutes(ShiftActivityDTO shiftActivity, ActivityDTO activity, StaffEmploymentDetails staffEmploymentDetails, boolean calculateTimeBankOff) {
+        if(isNull(activity)){
+            activity = shiftActivity.getActivity();
+        }
         if (shiftActivity.getStartDate().after(shiftActivity.getEndDate())) {
             exceptionService.invalidRequestException(ACTIVITY_END_DATE_LESS_THAN_START_DATE, activity.getName());
         }
@@ -875,9 +923,16 @@ public class TimeBankCalculationService {
         return timeBankRepository.save(todayDailyTimeBankEntry);
     }
 
-    public Long calculateActualTimebank(DateTimeInterval dateTimeInterval, List<DailyTimeBankEntry> dailyTimeBankEntries, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, java.time.LocalDate endDate, java.time.LocalDate employmentStartDate) {
-        Map<java.time.LocalDate, PhaseDefaultName> datePhaseDefaultNameMap = getDatePhaseDefaultName(employmentStartDate, endDate, employmentWithCtaDetailsDTO.getUnitId());
-        Map<java.time.LocalDate, Boolean> publishPlanningPeriodDateMap = getDateWisePublishPlanningPeriod(employmentWithCtaDetailsDTO.getEmploymentTypeId(), employmentStartDate, endDate, employmentWithCtaDetailsDTO.getUnitId());
+    public Long calculateActualTimebank(DateTimeInterval dateTimeInterval, List<DailyTimeBankEntry> dailyTimeBankEntries, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, java.time.LocalDate endDate, java.time.LocalDate employmentStartDate, ShiftDataHelper shiftDataHelper) {
+        Map<java.time.LocalDate, PhaseDefaultName> datePhaseDefaultNameMap;
+        Map<java.time.LocalDate, Boolean> publishPlanningPeriodDateMap;
+        if(isNotNull(shiftDataHelper)){
+            datePhaseDefaultNameMap = shiftDataHelper.getDatePhaseDefaultName();
+            publishPlanningPeriodDateMap = shiftDataHelper.getDateAndPublishPlanningPeriod(employmentWithCtaDetailsDTO.getEmploymentTypeId());
+        }else {
+            datePhaseDefaultNameMap = getDatePhaseDefaultName(employmentStartDate, endDate, employmentWithCtaDetailsDTO.getUnitId());
+            publishPlanningPeriodDateMap = getDateWisePublishPlanningPeriod(employmentWithCtaDetailsDTO.getEmploymentTypeId(), employmentStartDate, endDate, employmentWithCtaDetailsDTO.getUnitId());
+        }
         Map<java.time.LocalDate, DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(DailyTimeBankEntry::getDate, v -> v));
         return getActualTimebank(dateTimeInterval, employmentWithCtaDetailsDTO, endDate, employmentStartDate, publishPlanningPeriodDateMap, dateDailyTimeBankEntryMap, datePhaseDefaultNameMap);
     }

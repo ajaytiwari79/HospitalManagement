@@ -9,6 +9,7 @@ import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.enums.SkillLevel;
 import com.kairos.rule_validator.AbstractSpecification;
+import com.kairos.rule_validator.RuleExecutionType;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
@@ -27,12 +28,10 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
 
     private List<SkillLevelDTO> skillLevelDTOS;
     private RuleTemplateSpecificInfo ruleTemplateSpecificInfo;
-    private ExceptionService exceptionService;
 
-    public StaffAndSkillSpecification(List<SkillLevelDTO> skillLevelDTOS, RuleTemplateSpecificInfo ruleTemplateSpecificInfo,ExceptionService exceptionService) {
+    public StaffAndSkillSpecification(List<SkillLevelDTO> skillLevelDTOS, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
         this.skillLevelDTOS = skillLevelDTOS;
         this.ruleTemplateSpecificInfo = ruleTemplateSpecificInfo;
-        this.exceptionService=exceptionService;
     }
 
     @Override
@@ -49,9 +48,9 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
     }
 
     @Override
-    public void validateRules(ShiftWithActivityDTO shift) {
+    public void validateRules(ShiftWithActivityDTO shift, RuleExecutionType ruleExecutionType) {
+        List<String> errorMessages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
-            List<String> errorMessages = new ArrayList<>();
             for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {
                 validateStaffSkills(errorMessages, childActivity);
             }

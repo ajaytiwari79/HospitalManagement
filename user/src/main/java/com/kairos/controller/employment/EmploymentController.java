@@ -1,5 +1,6 @@
 package com.kairos.controller.employment;
 
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.service.employment.EmploymentCTAWTAService;
@@ -26,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
 /**
@@ -166,7 +169,8 @@ public class EmploymentController {
     @ApiOperation(value = "get employment's CTA")
     @GetMapping(value = "/cta_by_employment/{employmentId}")
     public ResponseEntity<Map<String, Object>> getEmploymentCTA(@PathVariable Long employmentId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmploymentDetails(employmentId));
+        List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(newArrayList(employmentId), true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, isCollectionNotEmpty(employmentDetails) ? employmentDetails.get(0) : null);
     }
 
 

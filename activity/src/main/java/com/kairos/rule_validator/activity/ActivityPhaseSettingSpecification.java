@@ -1,5 +1,6 @@
 package com.kairos.rule_validator.activity;
 
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftActivityIdsDTO;
@@ -12,6 +13,7 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.rule_validator.AbstractSpecification;
+import com.kairos.rule_validator.RuleExecutionType;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigInteger;
@@ -36,7 +38,7 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
     private Shift oldShift;
 
 
-    public ActivityPhaseSettingSpecification(StaffAdditionalInfoDTO staffAdditionalInfoDTO,Phase phase,Collection<ActivityWrapper> activities,Shift oldShift) {
+    public ActivityPhaseSettingSpecification(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Phase phase, Collection<ActivityWrapper> activities, Shift oldShift) {
         this.staffAdditionalInfoDTO = staffAdditionalInfoDTO;
         this.phase = phase;
         this.activities = activities;
@@ -45,12 +47,12 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
 
     @Override
     public boolean isSatisfied(ShiftWithActivityDTO shift) {
-        validateRules(shift);
+        validateRules(shift,null);
         return false;
     }
 
     @Override
-    public void validateRules(ShiftWithActivityDTO shift) {
+    public void validateRules(ShiftWithActivityDTO shift, RuleExecutionType ruleExecutionType) {
         ShiftActivityIdsDTO shiftActivityIdsDTO = getActivitiesToProcess(oldShift.getActivities(), shift.getActivities());
         Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=constructMapOfActivityAndPhaseTemplateValue(phase,activities);
         activityPerPhaseMap.forEach((k,v)->{
@@ -81,10 +83,10 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
 
     private Map<BigInteger,PhaseTemplateValue>  constructMapOfActivityAndPhaseTemplateValue(Phase phase,Collection<ActivityWrapper> activities){
         Map<BigInteger,PhaseTemplateValue> phaseTemplateValueMap=new HashMap<>();
-        for(ActivityWrapper activityWrapper:activities){
-            for(PhaseTemplateValue phaseTemplateValue:activityWrapper.getActivity().getActivityPhaseSettings().getPhaseTemplateValues()){
+        for(ActivityWrapper activityDTO:activities){
+            for(PhaseTemplateValue phaseTemplateValue:activityDTO.getActivity().getActivityPhaseSettings().getPhaseTemplateValues()){
                 if(phaseTemplateValue.getPhaseId().equals(phase.getId())){
-                    phaseTemplateValueMap.put(activityWrapper.getActivity().getId(),phaseTemplateValue);
+                    phaseTemplateValueMap.put(activityDTO.getActivity().getId(),phaseTemplateValue);
                     break;
                 }
             }
