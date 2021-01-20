@@ -16,10 +16,7 @@ import lombok.Setter;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -40,6 +37,7 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
     private int nightShiftSequence;
     private boolean restingTimeAllowed;
     private int restingTime;
+    private transient DateTimeInterval interval;
 
     public DaysOffAfterASeriesWTATemplate() {
         this.wtaTemplateType = WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
@@ -48,11 +46,7 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled() && infoWrapper.isNightWorker() && isNotNull(infoWrapper.getExpertiseNightWorkerSetting())){
-            DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(),this.intervalUnit,this.intervalLength);
-            List<ShiftWithActivityDTO> shiftWithActivityDTOS = infoWrapper.getShifts();
-            shiftWithActivityDTOS.add(infoWrapper.getShift());
-            List<ShiftWithActivityDTO> nightShifts = getNightShifts(infoWrapper.getExpertiseNightWorkerSetting(),shiftWithActivityDTOS,dateTimeInterval);
-            Set<LocalDate> shiftDates = getSortedAndUniqueDates(nightShifts);
+            Set<LocalDate> shiftDates = getNightShifts(infoWrapper.getExpertiseNightWorkerSetting(),infoWrapper.getShifts(),interval);
             LocalDate shiftDate = asLocalDate(infoWrapper.getShift().getActivities().get(0).getStartDate());
             boolean currentNightShift = shiftDates.contains(shiftDate);
             int consecutiveNightDays = getConsecutiveDaysInDate(new ArrayList<>(shiftDates));
@@ -90,15 +84,15 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType=WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
     }
 
-    private List<ShiftWithActivityDTO> getNightShifts(ExpertiseNightWorkerSetting expertiseNightWorkerSetting, List<ShiftWithActivityDTO> shiftWithActivityDTOS, DateTimeInterval dateTimeInterval) {
-        List<ShiftWithActivityDTO> nightShifts = new ArrayList<>();
+    private Set<LocalDate> getNightShifts(ExpertiseNightWorkerSetting expertiseNightWorkerSetting, List<ShiftWithActivityDTO> shiftWithActivityDTOS, DateTimeInterval dateTimeInterval) {
+        Set<LocalDate> nightShifts = new TreeSet<>();
         for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
             if (dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())) {
                 DateTimeInterval nightInterval = getNightInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate(), expertiseNightWorkerSetting.getTimeSlot());
                 if (nightInterval.overlaps(shiftWithActivityDTO.getInterval())) {
                     int overlapMinutes = (int) nightInterval.overlap(shiftWithActivityDTO.getInterval()).getMinutes();
                     if (overlapMinutes >= expertiseNightWorkerSetting.getMinMinutesToCheckNightShift()) {
-                        nightShifts.add(shiftWithActivityDTO);
+                        nightShifts.add(asLocalDate(shiftWithActivityDTO.getStartDate()));
                     }
                 }
             }

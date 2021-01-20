@@ -24,6 +24,8 @@ public class PhaseSettingsDTO {
     private Long unitId;
     private int sequence;
     private Map<String, TranslationInfo> translations;
+    private short maxProblemAllowed; // storing it in minutes
+
     public String getName(){
         return TranslationUtil.getName(translations,name);
     }

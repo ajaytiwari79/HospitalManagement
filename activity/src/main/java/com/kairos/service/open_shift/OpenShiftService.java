@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -259,6 +260,18 @@ public class OpenShiftService extends MongoBaseService {
         });
         save(openShift);
         return true;
+    }
+
+    public void deleteShiftsAndOpenShiftsOnEmploymentEnd(Long staffId, LocalDateTime employmentEndDate) {
+        shiftMongoRepository.deleteShiftsAfterDate(staffId, employmentEndDate);
+        List<OpenShift> openShifts = openShiftMongoRepository.findAllOpenShiftsByInterestedStaff(staffId, employmentEndDate);
+        if (!openShifts.isEmpty()) {
+            for (OpenShift openShift : openShifts) {
+                openShift.getInterestedStaff().remove(staffId);
+                openShift.getAssignedStaff().remove(staffId);
+            }
+            openShiftMongoRepository.saveEntities(openShifts);
+        }
     }
 
 }

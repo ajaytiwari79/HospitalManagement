@@ -96,7 +96,7 @@ public class ShiftFilterService {
         Map<Long,Double> employmentIdAndActualTimeBankData = new HashMap<>();
         if(filterTypeMap.containsKey(TIME_BANK_BALANCE) && isCollectionNotEmpty(filterTypeMap.get(TIME_BANK_BALANCE))) {
             for (Long employmentId : employmentIds) {
-                Double timeBank = DateUtils.getHoursByMinutes(Double.valueOf(timeBankService.getAccumulatedTimebankAndDelta(employmentId, unitId, true).toString()));
+                Double timeBank = DateUtils.getHoursByMinutes(Double.valueOf(timeBankService.getAccumulatedTimebankAndDelta(employmentId, unitId, true,null,null).toString()));
                 employmentIdAndActualTimeBankData.put(employmentId,timeBank);
             }
         }

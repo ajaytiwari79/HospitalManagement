@@ -7,6 +7,7 @@ import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
 import lombok.Getter;
@@ -14,10 +15,8 @@ import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -58,7 +57,9 @@ public class WTAQueryResultDTO {
         return Optional.ofNullable(ruleTemplates).orElse(new ArrayList<>());
     }
 
-
+    public Set<WTATemplateType> getWTATemplateTypes(){
+        return getRuleTemplates().stream().map(wtaBaseRuleTemplate -> wtaBaseRuleTemplate.getWtaTemplateType()).collect(Collectors.toSet());
+    }
     public boolean isValidWorkTimeAgreement(LocalDate localDate){
         return (isNull(this.getEndDate()) && !this.getStartDate().isAfter(localDate)) || (isNotNull(this.getEndDate()) && !this.getStartDate().isAfter(localDate) && !this.getEndDate().isBefore(localDate));
     }

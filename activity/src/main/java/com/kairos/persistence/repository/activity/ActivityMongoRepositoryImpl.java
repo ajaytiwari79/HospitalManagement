@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.constants.AppConstants;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -260,6 +261,30 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }
+
+    @Override
+    public List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ID).in(activityIds).and(DELETED).is(false)),
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE_INFO),
+                match(Criteria.where("timeTypeInfo.partOfTeam").is(false)),
+                group().push("id").as("activityIds"),
+                lookup("staffActivitySetting","activityIds","activityId","staff"),
+                unwind("staff",true),
+                group("activityIds").push("staff.staffId").as("staffIds")
+        );
+        List<Map> result = mongoTemplate.aggregate(aggregation, Activity.class, Map.class).getMappedResults();
+        List<BigInteger> nonProductiveTypeActivityIds = null;
+        List<Long> staffIds = null;
+        if(isCollectionNotEmpty(result)){
+            Map<String,List> stringListMap = result.get(0);
+             nonProductiveTypeActivityIds = (List<BigInteger>)ObjectMapperUtils.copyCollectionPropertiesByMapper(stringListMap.get("_id"),BigInteger.class);
+            staffIds = stringListMap.get("staffIds");
+        }
+        return new List[]{nonProductiveTypeActivityIds,staffIds};
+    }
+
+    //Ignorecase
 
     public Activity getActivityByNameAndUnitId(Long unitId, String name) {
         Query query = new Query(Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).and(NAME).regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));
@@ -944,6 +969,24 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         aggregations[i++] = getCustomAggregationOperationForStaffActivitySetting();
         aggregations[i++] = getCustomAggregationOperationForMatchCount();
         return mongoTemplate.aggregate(Aggregation.newAggregation(aggregations), "staffActivitySetting", ActivityWithCompositeDTO.class).getMappedResults();
+    }
+
+    @Override
+    public List<ActivityDTO> findActivitiesWithTimeTypeByActivityId(Collection<BigInteger> activityIds) {
+        return getActivityDTOS(Criteria.where("id").in(activityIds).and(DELETED).is(false));
+    }
+
+    private List<ActivityDTO> getActivityDTOS(Criteria criteria) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id",
+                        TIME_TYPE1),
+                lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, UNDERSCORE_ID,
+                        ACTIVITY_PRIORITY),
+                unwind(ACTIVITY_PRIORITY,true),
+                unwind(TIME_TYPE1)
+        );
+        return mongoTemplate.aggregate(aggregation, Activity.class,ActivityDTO.class).getMappedResults();
     }
 
     private CustomAggregationOperation getCustomAggregationOperationForMatchCount() {

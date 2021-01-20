@@ -3,6 +3,7 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
@@ -14,10 +15,12 @@ import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
+import java.time.temporal.ChronoField;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -46,6 +49,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
+    private transient DateTimeInterval interval;
 
     public NumberOfPartOfDayShiftsWTATemplate(String name, boolean disabled, String description) {
         this.name = name;
@@ -63,15 +67,9 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
             TimeInterval[] timeIntervals = getTimeSlotsByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrapperMap(),infoWrapper.getShift());
             if(timeIntervals.length>0) {
                 DateTimeInterval[] dateTimeIntervals = getIntervalsByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-                List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
+                Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper,phaseTemplateValues,this);
                 for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
-                    Set<BigInteger> shiftIds = getShiftIdsByInterval(dateTimeInterval, shifts, timeIntervals);
-                    Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper,phaseTemplateValues,this);
-                    int totalCountOfShifts = shiftIds.size();
-                    if(isNull(infoWrapper.getShift().getId())){
-                        totalCountOfShifts+=1;
-                    }
-                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalCountOfShifts);
+                    boolean isValid = validateRule(dateTimeInterval, infoWrapper.getShifts(), timeIntervals,limitAndCounter[0],isNull(infoWrapper.getShift().getId()));
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
                             limitAndCounter[2], AppConstants.SHIFT_S,String.valueOf(limitAndCounter[0]));
                     if(!isValid){
@@ -80,6 +78,25 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
                 }
             }
         }
+    }
+
+    public boolean validateRule(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, TimeInterval[] timeIntervals, int value, boolean includeCurrentShiftCount) {
+        int count = 0;
+        if(includeCurrentShiftCount){
+            count+=1;
+        }
+        for (ShiftWithActivityDTO shift : shifts) {
+            for (TimeInterval timeInterval : timeIntervals) {
+                boolean isValidShift = (CollectionUtils.isNotEmpty(timeTypeIds) && CollectionUtils.containsAny(timeTypeIds, shift.getActivitiesTimeTypeIds())) && (CollectionUtils.isNotEmpty(plannedTimeIds) && CollectionUtils.containsAny(plannedTimeIds, shift.getActivitiesPlannedTimeIds()));
+                if (isValidShift && (dateTimeInterval.contains(shift.getStartDate()) || dateTimeInterval.getEndDate().equals(shift.getStartDate())) && (timeInterval == null || timeInterval.contains(DateUtils.asZonedDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
+                    count++;
+                }
+                if(!isValid(minMaxSetting, value, count)){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override

@@ -25,6 +25,16 @@ public class TimeSlot implements Serializable {
         this.endHour = endHour;
     }
 
+    public TimeSlot(TimeSlotDTO timeSlotDTO){
+        this.id = timeSlotDTO.getId();
+        this.name = timeSlotDTO.getName();
+        this.startHour = timeSlotDTO.getStartHour();
+        this.startMinute = timeSlotDTO.getStartMinute();
+        this.endHour = timeSlotDTO.getEndHour();
+        this.endMinute = timeSlotDTO.getEndMinute();
+        this.shiftStartTime = timeSlotDTO.isShiftStartTime();
+    }
+
     public TimeSlot(BigInteger id,String name, int startHour, int endHour, boolean shiftStartTime) {
         this.id=id;
         this.name = name;

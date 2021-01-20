@@ -40,6 +40,8 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 @NoArgsConstructor
 public class StaffAdditionalInfoDTO {
 
+    private String firstName;
+    private String lastName;
     private String name;
     private long id;
     private List<Long> teams;
@@ -73,6 +75,7 @@ public class StaffAdditionalInfoDTO {
     private OrganizationTypeDTO organizationSubType;
     private Set<BigInteger> mainTeamActivities;
     private List<TeamDTO> teamsData;
+    private Set<Long> employmentIds = new HashSet<>();
 
     public StaffAdditionalInfoDTO(String cprNumber, SeniorAndChildCareDaysDTO seniorAndChildCareDays) {
         this.cprNumber = cprNumber;

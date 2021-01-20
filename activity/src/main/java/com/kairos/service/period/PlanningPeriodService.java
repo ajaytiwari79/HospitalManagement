@@ -33,6 +33,7 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
+import com.kairos.persistence.model.shift.ShiftDataHelper;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelState;
@@ -995,5 +996,9 @@ public class PlanningPeriodService extends MongoBaseService {
         defaultDataDTO.setPhases(phaseDTOS);
         defaultDataDTO.setPlanningPeriods(planningPeriodDTOS);
         return defaultDataDTO;
+    }
+
+    public ShiftDataHelper getDataForShiftOperation(Date startDate, Long unitId, Collection<Long> employmentIds, Collection<Long> expertiseIds, Collection<Long> staffIds, Long countryId, Collection<BigInteger> activityIds, BigInteger shiftId, boolean userAccessRole){
+        return planningPeriodMongoRepository.getDataForShiftOperation(startDate,unitId,employmentIds,expertiseIds,staffIds,countryId,activityIds,shiftId,userAccessRole);
     }
 }
