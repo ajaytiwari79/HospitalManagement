@@ -383,9 +383,9 @@ public class AutoFillGapSettingsService {
     private ShiftActivityDTO getShiftActivityDTO(ShiftActivityDTO beforeGap, ShiftActivityDTO afterGap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftActivityDTO shiftActivityDTO) {
         TeamDTO mainTeam = staffAdditionalInfoDTO.getTeamsData().stream().filter(k -> TeamType.MAIN.equals(k.getTeamType())).findAny().orElse(null);
         if (mainTeam != null) {
-            if (staffAdditionalInfoDTO.getMainTeamActivities().contains(beforeGap.getActivityId())) {
+            if (mainTeam.getActivityIds().iterator().next().equals(beforeGap.getActivityId())) {
                 shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), beforeGap.getActivityId(), null);
-            } else if (staffAdditionalInfoDTO.getMainTeamActivities().contains(afterGap.getActivityId())) {
+            } else if (mainTeam.getActivityIds().iterator().next().equals(afterGap.getActivityId())) {
                 shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), afterGap.getActivityId(), null);
             }
         }
