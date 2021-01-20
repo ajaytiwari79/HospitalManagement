@@ -461,7 +461,7 @@ public class UserService {
         return write;
     }
 
-    @Cacheable(value = "getPermission", key = "{#unitId, #userId}", cacheManager = "cacheManager")
+    //@Cacheable(value = "getPermission", key = "{#unitId, #userId}", cacheManager = "cacheManager")
     public UnitWiseStaffPermissionsDTO getPermission(Long unitId, Long userId) {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();

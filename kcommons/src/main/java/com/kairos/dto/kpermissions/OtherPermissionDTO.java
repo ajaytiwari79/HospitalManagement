@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.CollectionUtils;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
@@ -20,7 +21,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OtherPermissionDTO {
+public class OtherPermissionDTO implements Serializable {
 
     private Set<Long> expertiseIds;
     private Set<Long> unionIds;

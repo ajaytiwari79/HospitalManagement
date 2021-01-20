@@ -5,12 +5,13 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
 @Getter
 @Setter
-public class UnitWiseStaffPermissionsDTO {
+public class UnitWiseStaffPermissionsDTO implements Serializable {
 
     private Boolean hub;
     private AccessGroupRole role;

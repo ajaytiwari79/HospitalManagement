@@ -181,8 +181,7 @@ public class PositionService {
     }
 
 
-    @CacheEvict(value = "getPermission", key = "{#unitId, #userId}")
-    public Map<String, Object> createUnitPermission(Long unitId, Long staffId, Long accessGroupId, boolean created,LocalDate startDate,LocalDate endDate,Long userId) {
+    public Map<String, Object> createUnitPermission(Long unitId, Long staffId, Long accessGroupId, boolean created,LocalDate startDate,LocalDate endDate) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
@@ -211,6 +210,7 @@ public class PositionService {
         setUnitWiseAccessRole(unitId, staffId);
         response.put("organizationId", unitId);
         response.put("synInFls", flsSyncStatus);
+        accessGroupService.resetPermissionByAccessGroupIds(unitId,newArrayList(accessGroupId));
         return response;
     }
 
@@ -658,8 +658,7 @@ public class PositionService {
             deleteAuthTokenOfUsersByPositionIds(positionIds);
             for (ExpiredPositionsQueryResult expiredPositionsQueryResult : expiredPositionsQueryResults) {
                 for (OrganizationBaseEntity unit : expiredPositionsQueryResult.getUnits()) {
-                    User user = userGraphRepository.getUserByStaffId(expiredPositionsQueryResult.getPosition().getStaff().getId());
-                    createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true,null,null,user.getId());
+                    createUnitPermission(unit.getId(), expiredPositionsQueryResult.getPosition().getStaff().getId(), expiredPositionsQueryResult.getPosition().getAccessGroupIdOnPositionEnd(), true,null,null);
                 }
             }
         }

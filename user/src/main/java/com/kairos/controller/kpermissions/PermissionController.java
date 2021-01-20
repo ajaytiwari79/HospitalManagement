@@ -66,7 +66,7 @@ public class PermissionController {
 
     @PutMapping(value = "/update_permission")
     public ResponseEntity<Map<String, Object>> createFieldPermissions(@Valid @RequestBody PermissionDTO permissionDTO,@RequestParam boolean updateOrganisationCategories)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissions(permissionDTO,updateOrganisationCategories));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissions(UserContext.getUserDetails().getLastSelectedOrganizationId(),permissionDTO,updateOrganisationCategories));
     }
 
     @PutMapping(value = "/update_action_permission")
@@ -94,7 +94,7 @@ public class PermissionController {
 
     @PostMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/field_level_permission")
     public ResponseEntity<Map<String, Object>> assignPermissionToModel(@PathVariable Long unitId,@PathVariable Long accessGroupId, @RequestBody CustomPermissionDTO customPermissionDTO) {
-        permissionService.assignPermission(unitId,accessGroupId,customPermissionDTO,UserContext.getUserDetails().getId());
+        permissionService.assignPermission(unitId,accessGroupId,customPermissionDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 

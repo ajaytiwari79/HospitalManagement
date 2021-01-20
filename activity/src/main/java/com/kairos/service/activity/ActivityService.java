@@ -170,7 +170,7 @@ public class ActivityService {
         ActivityUtil.initializeActivitySettings(activity, phaseTemplateValues, glideTimeSettingsDTO);
     }
 
-    @Cacheable(value = "findAllActivityByCountry", key = "#countryId", cacheManager = "cacheManager")
+    //@Cacheable(value = "findAllActivityByCountry", key = "#countryId", cacheManager = "cacheManager")
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
         List<ActivityTagDTO> activityTagDTOS = activityMongoRepository.findAllActivityByCountry(countryId);

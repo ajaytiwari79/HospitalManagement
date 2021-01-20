@@ -197,14 +197,14 @@ public class AccessGroupController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updatePermissionsForAccessTabsOfAccessGroupOfCountry(@RequestParam(value = "updateChildren") Boolean updateChildren, @PathVariable long accessGroupId, @PathVariable Long accessPageId, @RequestBody AccessPermissionDTO accessPermissionDTO) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.updatePermissionsForAccessTabsOfAccessGroup(accessGroupId, accessPageId, accessPermissionDTO,updateChildren,null,null));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.updatePermissionsForAccessTabsOfAccessGroup(accessGroupId, accessPageId, accessPermissionDTO,updateChildren,null));
     }
 
     @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}/access_page/{accessPageId}/permission", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updatePermissionsForAccessTabsOfAccessGroupOfOrg(@PathVariable Long unitId,@RequestParam(value = "updateChildren") Boolean updateChildren, @PathVariable long accessGroupId, @PathVariable Long accessPageId, @RequestBody AccessPermissionDTO accessPermissionDTO) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.updatePermissionsForAccessTabsOfAccessGroup(accessGroupId, accessPageId, accessPermissionDTO, updateChildren,unitId,UserContext.getUserDetails().getId()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.updatePermissionsForAccessTabsOfAccessGroup(accessGroupId, accessPageId, accessPermissionDTO, updateChildren,unitId));
     }
 
     @RequestMapping(value = UNIT_URL+"/copy_unit_access_group", method = RequestMethod.POST)

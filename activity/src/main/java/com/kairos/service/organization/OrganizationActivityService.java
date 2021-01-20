@@ -281,7 +281,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     }
 
-    @Cacheable(value = "getActivityMappingDetails", key = "#unitId", cacheManager = "cacheManager")
+    //@Cacheable(value = "getActivityMappingDetails", key = "#unitId", cacheManager = "cacheManager")
     public ActivityWithSelectedDTO getActivityMappingDetails(Long unitId) {
         ActivityWithSelectedDTO activityDetails = new ActivityWithSelectedDTO();
         ActivityWithUnitIdDTO activities = activityService.getActivityByUnitId(unitId);

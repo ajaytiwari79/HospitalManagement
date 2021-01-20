@@ -157,7 +157,7 @@ public class StaffController {
              startDate= LocalDate.parse((CharSequence) unitPermissionDetails.get("startDate"));
              endDate= unitPermissionDetails.get("endDate")==null?null:LocalDate.parse((CharSequence) unitPermissionDetails.get("endDate"));
         }
-        Map<String, Object> response = positionService.createUnitPermission(unitId, staffId, accessGroupId, isCreated,startDate,endDate,UserContext.getUserDetails().getId());
+        Map<String, Object> response = positionService.createUnitPermission(unitId, staffId, accessGroupId, isCreated,startDate,endDate);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }

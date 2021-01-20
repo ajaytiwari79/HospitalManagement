@@ -354,8 +354,9 @@ public class PermissionService {
         return fieldPermissionQueryResults;
     }
 
-    public PermissionDTO createPermissions(PermissionDTO permissionDTO, boolean updateOrganisationCategories) {
+    public PermissionDTO createPermissions(Long unitId,PermissionDTO permissionDTO, boolean updateOrganisationCategories) {
         updateOrganisationCategoryOrPermissions(permissionDTO.getModelPermissions(), permissionDTO.getAccessGroupIds(), updateOrganisationCategories);
+        accessGroupService.resetPermissionByAccessGroupIds(unitId,permissionDTO.getAccessGroupIds());
         return permissionDTO;
     }
 
@@ -618,8 +619,7 @@ public class PermissionService {
         return unitAccessGroupIds;
     }
 
-    @CacheEvict(value = "getPermission", key = "{#unitId, #userId}")
-    public void assignPermission(Long unitId, Long accessGroupId, CustomPermissionDTO customPermissionDTO,Long userId) {
+    public void assignPermission(Long unitId, Long accessGroupId, CustomPermissionDTO customPermissionDTO) {
         Set<Long> kPermissionModelIds = permissionModelRepository.kPermissionModelIds(customPermissionDTO.getId());
         OtherPermissionDTO forOtherPermissions = customPermissionDTO.getForOtherPermissions();
         LOGGER.info("other permissions are {}", customPermissionDTO.getForOtherPermissions().toString());
@@ -630,6 +630,7 @@ public class PermissionService {
         } else {
             accessGroupRepository.setCustomPermissionForSubModelAndFields(customPermissionDTO.getStaffId(), unitId, accessGroupId, kPermissionModelIds, customPermissionDTO.getPermissions());
         }
+        accessGroupService.resetPermissionByAccessGroupIds(unitId,newArrayList(accessGroupId));
     }
 
     public void assignActionPermission(Long unitId, Long accessGroupId, CustomPermissionDTO customPermissionDTO) {

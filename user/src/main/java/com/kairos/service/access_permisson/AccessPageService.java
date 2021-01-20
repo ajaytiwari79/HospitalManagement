@@ -124,12 +124,12 @@ public class AccessPageService {
         return accessPageDTOS;
     }
 
-    @CacheEvict(value = "generateHierarchy",allEntries = true)
+    @CacheEvict(value = {"generateHierarchy","getPermission"},allEntries = true)
     public Boolean updateStatus(boolean active,Long tabId){
         return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.updateStatusOfAccessTabs(tabId,active):false;
     }
 
-    @CacheEvict(value = "generateHierarchy",allEntries = true)
+    @CacheEvict(value = {"generateHierarchy","getPermission"},allEntries = true)
     public Boolean updateAccessForOrganizationCategory(Long tabId, OrgCategoryTabAccessDTO orgCategoryTabAccessDTO){
         if( !Optional.ofNullable(tabId).isPresent() ){
             return false;

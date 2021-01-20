@@ -10,6 +10,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -345,6 +346,9 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     void setActionPermissions(Long staffId, Long unitId, Long accessGroupId, Set<Long> actionIds,boolean hasPermission);
 
 
+    @Query("MATCH(user:User)<-[:BELONGS_TO]-(staff:Staff)<-[:BELONGS_TO]-(position:Position)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[: HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) WHERE ID(accessGroup) IN {0}\n" +
+            "return DISTINCT id(user)")
+    List<Long> getUserIdsByAccessGroupId(Collection<Long> accessGroupIds);
 
 
 }
