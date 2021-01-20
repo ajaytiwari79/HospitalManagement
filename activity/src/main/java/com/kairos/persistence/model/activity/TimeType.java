@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +27,9 @@ import static com.kairos.enums.PriorityFor.PRESENCE;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TimeType extends MongoBaseEntity{
+public class TimeType extends MongoBaseEntity implements Serializable {
 
+    private static final long serialVersionUID = 3265660403399363722L;
     private Long countryId;
     private TimeTypes timeTypes;
     private BigInteger upperLevelTimeTypeId;

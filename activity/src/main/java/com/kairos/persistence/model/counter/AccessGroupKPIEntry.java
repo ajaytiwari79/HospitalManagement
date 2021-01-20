@@ -6,6 +6,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import java.math.BigInteger;
 
 public class AccessGroupKPIEntry extends MongoBaseEntity {
+    private static final long serialVersionUID = 4925265220098341276L;
     private Long accessGroupId;
     private BigInteger kpiId;
     private Long countryId;

@@ -25,6 +25,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ActivityGeneralSettings implements Serializable {
+    private static final long serialVersionUID = -1490521237013298911L;
     @KPermissionField
     private String name;
     @KPermissionField

@@ -23,6 +23,7 @@ import java.util.List;
 public class ActivityRulesSettings implements Serializable {
 
 
+    private static final long serialVersionUID = 3332787178887168556L;
     private boolean eligibleForFinalSchedule;
     private boolean eligibleForDraftSchedule;
     private boolean eligibleForRequest;

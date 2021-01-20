@@ -726,7 +726,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                     "   }";
     }
 
-    //@Cacheable(value = "activities", key = "#unitId")
+    @Cacheable(value = "activities", key = "#unitId")
     public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId) {
         Criteria criteria = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false);
         Aggregation aggregation = getParentActivityAggregation(criteria);

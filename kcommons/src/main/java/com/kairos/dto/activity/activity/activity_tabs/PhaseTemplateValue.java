@@ -12,6 +12,7 @@ import java.util.Optional;
 
 //This for Activity
 public class PhaseTemplateValue implements Comparable<PhaseTemplateValue>, Serializable {
+    private static final long serialVersionUID = -5804218430683632212L;
     private BigInteger phaseId;
     private String name;
     private String description;

@@ -542,6 +542,7 @@ public class RuletemplateUtils {
         validateRuleTemplate(daysOffAfterASeriesWTATemplate.getIntervalLength(), daysOffAfterASeriesWTATemplate.getIntervalUnit());
         dateTimeInterval = getIntervalByRuleTemplate(shift, daysOffAfterASeriesWTATemplate.getIntervalUnit(), daysOffAfterASeriesWTATemplate.getIntervalLength());
         interval = interval.addInterval(dateTimeInterval);
+        ruleTemplate.setInterval(interval);
         return interval;
     }
 

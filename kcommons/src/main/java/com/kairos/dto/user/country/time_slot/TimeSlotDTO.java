@@ -30,6 +30,7 @@ public class TimeSlotDTO implements Serializable {
     private boolean shiftStartTime;
     private BigInteger id;
     private Long unitId;
+    private static final long serialVersionUID = 213213213213l;
 
     public TimeSlotDTO(String name, int startHour, int startMinute, int endHour, int endMinute) {
         this.name = name;

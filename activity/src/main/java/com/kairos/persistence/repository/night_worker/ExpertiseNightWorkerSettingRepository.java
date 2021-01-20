@@ -17,7 +17,7 @@ public interface ExpertiseNightWorkerSettingRepository extends MongoBaseReposito
     @Query(value = "{ expertiseId:{$in:?0},countryId:{$exists:true}, deleted:false}")
     List<ExpertiseNightWorkerSetting> findAllByCountryAndExpertiseIds(List<Long> expertiseIds);
 
-    //@Cacheable(value = "findByExpertiseIdAndUnitId", key = "{#expertiseId, #unitId}", cacheManager = "cacheManager")
+    @Cacheable(value = "findByExpertiseIdAndUnitId", key = "{#expertiseId, #unitId}", cacheManager = "cacheManager")
     @Query(value = "{ expertiseId:?0, unitId:?1,deleted:false}")
     ExpertiseNightWorkerSetting findByExpertiseIdAndUnitId(Long expertiseId, Long unitId);
 

@@ -17,6 +17,7 @@ import java.math.BigInteger;
 @Getter
 @Setter
 public class CompositeActivityDTO implements Serializable {
+    private static final long serialVersionUID = 1594855371841900146L;
     private BigInteger id;
     // TODO CHECK HOW TO UPDATE ID DYNAMICALLY
     private BigInteger compositeId;

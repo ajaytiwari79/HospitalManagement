@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * Created by vipul on 30/11/17.
  */
@@ -13,7 +15,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivityCTAAndWTASettings {
+public class ActivityCTAAndWTASettings implements Serializable {
+    private static final long serialVersionUID = -3739850098409906505L;
     @KPermissionField
     private  boolean eligibleForCostCalculation;
 }

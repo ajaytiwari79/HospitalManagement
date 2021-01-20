@@ -19,6 +19,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class DayTypeDTO implements Serializable {
 
+    private static final long serialVersionUID = 5492777590254886956L;
     private BigInteger id;
     @NotBlank(message = "error.DayType.name.notEmpty")
     private String name;

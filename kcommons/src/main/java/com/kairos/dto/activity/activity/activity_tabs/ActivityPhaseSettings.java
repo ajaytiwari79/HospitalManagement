@@ -13,6 +13,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ActivityPhaseSettings implements Serializable {
 
+    private static final long serialVersionUID = -994347464666492206L;
     private BigInteger activityId;
     private List<PhaseTemplateValue> phaseTemplateValues;
 

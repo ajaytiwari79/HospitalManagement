@@ -29,6 +29,7 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 @Setter
 public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
 
+    private static final long serialVersionUID = -7145432848747779050L;
     @Positive
     private long intervalLength;
     @NotEmpty(message = "message.ruleTemplate.interval.notNull")

@@ -16,6 +16,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApprovalCriteria implements Serializable {
+    private static final long serialVersionUID = 432765501571673634L;
     private Float approvalPercentage;
     private Short approvalTime; // in Days
     private transient String color;

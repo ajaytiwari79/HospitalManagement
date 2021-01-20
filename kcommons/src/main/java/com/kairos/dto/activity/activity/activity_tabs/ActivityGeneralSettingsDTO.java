@@ -15,6 +15,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityGeneralSettingsDTO implements Serializable {
 
+    private static final long serialVersionUID = 8105328468336076957L;
     private BigInteger activityId;
     private String name;
     private String code;
