@@ -838,6 +838,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 case STAFF_WITH_PERSONAL_CALENDAR:
                     //criteria.orOperator(Criteria.where("activities.secondLevelTimeType").is());
                     break;
+                default:break;
             }
         }
         return criterias;

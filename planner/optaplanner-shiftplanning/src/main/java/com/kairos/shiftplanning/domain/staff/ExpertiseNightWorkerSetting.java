@@ -1,6 +1,7 @@
 package com.kairos.shiftplanning.domain.staff;
 
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.DurationType;
 import lombok.*;
 

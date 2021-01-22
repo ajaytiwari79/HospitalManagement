@@ -145,7 +145,9 @@ public class PermissionService {
     }
 
     @CacheEvict(value = {"getPermission","getActivityPermissionMap"}, key = "{#unitId, #userId}")
-    public void resetPerMissionByUserId(Long unitId, Long userId) {}
+    public void resetPerMissionByUserId(Long unitId, Long userId) {
+        //Todo this method is for reset the permissions
+    }
 
 
     private void updateModel(boolean isSubModel, ModelDTO modelDTO) {
