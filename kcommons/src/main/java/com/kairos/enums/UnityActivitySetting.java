@@ -1,5 +1,5 @@
 package com.kairos.enums;
 
-public enum ShowActivitySetting {
+public enum UnityActivitySetting {
     ON_CALL,STAND_BY;
 }

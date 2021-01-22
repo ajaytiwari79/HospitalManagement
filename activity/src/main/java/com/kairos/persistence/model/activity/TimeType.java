@@ -56,7 +56,7 @@ public class TimeType extends MongoBaseEntity implements Serializable {
     private boolean sicknessSettingValid;
     private Map<String,BigInteger> upperLevelTimeTypeDetails;
     //this setting for unity graph
-    private ShowActivitySetting showActivitySettingForUnity;
+    private UnityActivitySetting unityActivitySetting;
 
     public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.timeTypes = timeTypes;
