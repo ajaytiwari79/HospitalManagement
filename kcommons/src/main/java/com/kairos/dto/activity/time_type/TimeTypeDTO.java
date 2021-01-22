@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityRulesSettingsDTO;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.PriorityFor;
+import com.kairos.enums.ShowActivitySetting;
 import com.kairos.enums.TimeTypeEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,6 +43,8 @@ public class TimeTypeDTO implements Serializable {
     private PriorityFor priorityFor;
     private boolean sicknessSettingValid;
     private ActivityRulesSettingsDTO activityRulesSettings;
+    //this setting for unity graph
+    private ShowActivitySetting showActivitySettingForUnity;
 
 
     public TimeTypeDTO(String backgroundColor, boolean sicknessSettingValid, ActivityRulesSettingsDTO activityRulesSettings) {

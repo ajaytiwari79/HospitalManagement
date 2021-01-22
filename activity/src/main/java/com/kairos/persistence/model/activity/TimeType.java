@@ -1,10 +1,7 @@
 package com.kairos.persistence.model.activity;
 
 import com.kairos.dto.activity.activity.activity_tabs.ActivityPhaseSettings;
-import com.kairos.enums.OrganizationHierarchy;
-import com.kairos.enums.PriorityFor;
-import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.TimeTypes;
+import com.kairos.enums.*;
 import com.kairos.persistence.model.activity.tabs.ActivitySkillSettings;
 import com.kairos.persistence.model.activity.tabs.ActivityTimeCalculationSettings;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
@@ -58,6 +55,8 @@ public class TimeType extends MongoBaseEntity implements Serializable {
     private PriorityFor priorityFor = PRESENCE;
     private boolean sicknessSettingValid;
     private Map<String,BigInteger> upperLevelTimeTypeDetails;
+    //this setting for unity graph
+    private ShowActivitySetting showActivitySettingForUnity;
 
     public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.timeTypes = timeTypes;
