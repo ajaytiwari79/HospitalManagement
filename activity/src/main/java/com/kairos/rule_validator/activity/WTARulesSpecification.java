@@ -37,13 +37,12 @@ public class WTARulesSpecification extends AbstractSpecification<ShiftWithActivi
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift, RuleExecutionType ruleExecutionType) {
-        //TODO Don't Remove this code just commented for some temp fixes
-//        for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
-//            if (RuleExecutionType.COVER_SHIFT.equals(ruleExecutionType) && isCollectionNotEmpty(this.ruleTemplateSpecificInfo.getViolatedRules().getWorkTimeAgreements())) {
-//                break;
-//            }
-//            ruleTemplate.validateRules(ruleTemplateSpecificInfo);
-//        }
+        for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
+            if (RuleExecutionType.COVER_SHIFT.equals(ruleExecutionType) && isCollectionNotEmpty(this.ruleTemplateSpecificInfo.getViolatedRules().getWorkTimeAgreements())) {
+                break;
+            }
+            ruleTemplate.validateRules(ruleTemplateSpecificInfo);
+        }
     }
 
     @Override
