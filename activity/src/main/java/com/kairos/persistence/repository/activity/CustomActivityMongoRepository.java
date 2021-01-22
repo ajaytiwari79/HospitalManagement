@@ -115,7 +115,7 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityDTO> findActivitiesByUnitId(Long unitId, Collection<BigInteger> activityIds);
 
-    List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType, Long unitId);
+    List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum secondLevelTimeType, Long unitId);
 
     List<ActivityTimeTypeWrapper> getActivityPath(final String activityId);
 
