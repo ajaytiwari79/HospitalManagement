@@ -5,7 +5,6 @@ import com.kairos.annotations.KPermissionRelationshipFrom;
 import com.kairos.annotations.KPermissionRelationshipTo;
 import com.kairos.commons.annotation.PermissionClass;
 import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.kpermissions.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
@@ -145,7 +144,7 @@ public class PermissionService {
         return kPermissionModels;
     }
 
-    @CacheEvict(value = "getPermission", key = "{#unitId, #userId}")
+    @CacheEvict(value = {"getPermission","getActivityPermissionMap"}, key = "{#unitId, #userId}")
     public void resetPerMissionByUserId(Long unitId, Long userId) {}
 
 
@@ -602,11 +601,11 @@ public class PermissionService {
         }
     }
 
-    public <T> FieldPermissionUserData fetchPermissions(Set<String> modelNames, Long unitId) {
+    public <T> FieldPermissionUserData fetchPermissions(Set<String> modelNames, Long unitId, Long userId) {
         List<AccessGroup> accessGroups = accessGroupService.validAccessGroupByDate(unitId, getDate());
         boolean systemAdmin = UserContext.getUserDetails().isSystemAdmin();
         Organization parentOrganisation = organizationService.fetchParentOrganization(unitId);
-        Long currentUserStaffId = staffService.getStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganisation.getId());
+        Long currentUserStaffId = staffService.getStaffIdByUserId(userId, parentOrganisation.getId());
         Set<Long> unitAccessGroupIds = getUnitAccessGroupIds(unitId);
         List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames), accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()), systemAdmin, currentUserStaffId, unitAccessGroupIds);
         List<ModelDTO> modelDTOS = copyCollectionPropertiesByMapper(modelPermissionQueryResults, ModelDTO.class);

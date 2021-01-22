@@ -78,7 +78,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -1110,9 +1109,7 @@ public class ActivityService {
         return activityMongoRepository.getActivityRankWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v.getActivitySequence()));
     }
     public Map<BigInteger,ActivityDTO> getActivityDetailsWithRankByUnitId(Long unitId) {
-        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
-        Map<String,Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
-        prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
+        Map<String,Set<FieldLevelPermission>> fieldPermissionMap=getActivityPermissionMap(unitId,UserContext.getUserDetails().getId());
         Map<BigInteger,ActivityDTO> activityDTOMap= activityMongoRepository.getActivityDetailsWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v));
         activityDTOMap.forEach((k,v)->{
             if(fieldPermissionMap.containsKey(NAME) && (fieldPermissionMap.get(NAME).contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get(NAME).isEmpty())){
@@ -1126,10 +1123,20 @@ public class ActivityService {
         return activityDTOMap;
     }
 
+    @Cacheable(value = "getActivityPermissionMap", key = "{#unitId, #userId}", cacheManager = "cacheManager")
+    public Map<String,Set<FieldLevelPermission>> getActivityPermissionMap(Long unitId,Long userId){
+        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
+        Map<String,Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
+        prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
+        return fieldPermissionMap;
+    }
+
     public void prepareFLPMap(List<ModelDTO> modelDTOS, Map<String, Set<FieldLevelPermission>> fieldPermissionMap) {
-            modelDTOS.parallelStream().forEach(model->{
-            model.getFieldPermissions().forEach(field-> fieldPermissionMap.putIfAbsent(field.getFieldName(),field.getPermissions()));
-            prepareFLPMap(model.getSubModelPermissions(),fieldPermissionMap);
+        modelDTOS.forEach(model -> {
+            model.getFieldPermissions().parallelStream().forEach(field -> {
+                fieldPermissionMap.putIfAbsent(field.getFieldName(), field.getPermissions());
+            });
+            prepareFLPMap(model.getSubModelPermissions(), fieldPermissionMap);
         });
     }
 
