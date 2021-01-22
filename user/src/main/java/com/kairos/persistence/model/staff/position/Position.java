@@ -27,6 +27,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_U
 @NoArgsConstructor
 public class Position extends UserBaseEntity {
 
+    private static final long serialVersionUID = 7828379183829338133L;
     private String name;
 
     @Relationship(type = HAS_UNIT_PERMISSIONS)

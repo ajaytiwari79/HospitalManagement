@@ -145,6 +145,10 @@ public class PermissionService {
         return kPermissionModels;
     }
 
+    @CacheEvict(value = "getPermission", key = "{#unitId, #userId}")
+    public void resetPerMissionByUserId(Long unitId, Long userId) {}
+
+
     private void updateModel(boolean isSubModel, ModelDTO modelDTO) {
         modelDTO.setOrganizationCategories(new HashSet<>());
         modelDTO.getFieldPermissions().forEach(fieldDTO -> fieldDTO.setOrganizationCategories(new HashSet<>()));

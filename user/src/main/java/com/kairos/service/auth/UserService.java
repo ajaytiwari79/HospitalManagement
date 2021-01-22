@@ -461,7 +461,7 @@ public class UserService {
         return write;
     }
 
-    //@Cacheable(value = "getPermission", key = "{#unitId, #userId}", cacheManager = "cacheManager")
+    @Cacheable(value = "getPermission", key = "{#unitId, #userId}", cacheManager = "cacheManager")
     public UnitWiseStaffPermissionsDTO getPermission(Long unitId, Long userId) {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
@@ -515,12 +515,10 @@ public class UserService {
         }
         if (checkDayType) {
             unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds.stream().map(BigInteger::toString).collect(Collectors.toSet()), organizationId);
-
         } else {
             unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, organizationId);
         }
         HashMap<Long, Object> unitPermission = new HashMap<>();
-
         for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
             unitPermission.put(userPermissionQueryResult.getUnitId(),
                     prepareUnitPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), userPermissionQueryResult.isParentOrganization()));

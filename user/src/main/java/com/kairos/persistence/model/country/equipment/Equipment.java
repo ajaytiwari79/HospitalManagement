@@ -15,6 +15,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.EQUIP
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class Equipment extends UserBaseEntity{
+    private static final long serialVersionUID = -5716286573426977227L;
     private String name;
     private String description;
     @Relationship(type= EQUIPMENT_HAS_CATEGORY)

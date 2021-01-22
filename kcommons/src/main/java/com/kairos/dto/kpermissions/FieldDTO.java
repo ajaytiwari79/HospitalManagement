@@ -19,6 +19,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 @NoArgsConstructor
 public class FieldDTO implements Serializable {
 
+    private static final long serialVersionUID = 1383330090951424267L;
     private Long id;
     private String fieldName;
     private Set<OrganizationCategory> organizationCategories;

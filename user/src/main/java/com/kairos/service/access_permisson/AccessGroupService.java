@@ -49,6 +49,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.tree_structure.TreeStructureService;
@@ -113,6 +114,7 @@ public class AccessGroupService {
     private StaffRetrievalService staffRetrievalService;
     @Inject private UserGraphRepository userGraphRepository;
     @Inject private ActivityIntegrationService activityIntegrationService;
+    @Inject private PermissionService permissionService;
 
     public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
@@ -289,16 +291,12 @@ public class AccessGroupService {
     public boolean resetPermissionByAccessGroupIds(Long unitId, Collection<Long> accessGroupIds){
         List<Long> userIds = accessGroupRepository.getUserIdsByAccessGroupId(accessGroupIds);
         for (Long userId : userIds) {
-            resetPerMissionByUserId(unitId,userId);
+            permissionService.resetPerMissionByUserId(unitId,userId);
         }
         return true;
     }
 
-    @CacheEvict(value = "getPermission", key = "{#unitId, #userId}")
-    private void resetPerMissionByUserId(Long unitId, Long userId) {}
-
     public AccessPage createAccessPage(String name, List<Map<String, Object>> childPage, boolean isModule) {
-
         AccessPage parentAccessPage = new AccessPage(name);
         List<AccessPage> accessPageList = new ArrayList<>();
         for (Map<String, Object> childAccessPage : childPage) {
