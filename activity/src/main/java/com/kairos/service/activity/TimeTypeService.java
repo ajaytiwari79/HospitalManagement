@@ -161,6 +161,7 @@ public class TimeTypeService extends MongoBaseService {
         timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
         timeType.setBreakNotHeldValid(timeTypeDTO.isBreakNotHeldValid());
         timeType.setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
+        timeType.setUnityActivitySetting(timeTypeDTO.getUnityActivitySetting());
     }
 
 
