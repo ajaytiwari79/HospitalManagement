@@ -720,6 +720,7 @@ public class StaffingLevelService {
             exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
         }
         if (activityReplaced) {
+
             for (int i = 0; i < oldStateShift.getActivities().size(); i++) {
                 try {
                     if (activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor().equals(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor())) {
@@ -751,7 +752,7 @@ public class StaffingLevelService {
 
     }
 
-    private boolean activityReplaced(Shift dbShift, Shift shift) {
+    public boolean activityReplaced(Shift dbShift, Shift shift) {
         boolean activityReplaced = false;
         if (shift.getActivities().size() == dbShift.getActivities().size()) {
             for (int i = 0; i < shift.getActivities().size(); i++) {
