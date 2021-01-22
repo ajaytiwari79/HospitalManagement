@@ -10,6 +10,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_CO
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Sector extends UserBaseEntity {
+    private static final long serialVersionUID = 4976798778162881235L;
     private String name;
     @Relationship(type= IN_COUNTRY)
     private Country country;

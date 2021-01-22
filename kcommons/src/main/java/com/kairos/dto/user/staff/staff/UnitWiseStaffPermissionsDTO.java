@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 public class UnitWiseStaffPermissionsDTO implements Serializable {
 
+    private static final long serialVersionUID = 7503752906891218442L;
     private Boolean hub;
     private AccessGroupRole role;
     private HashMap<String, Object> hubPermissions;

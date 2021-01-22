@@ -48,7 +48,7 @@ public class OrganizationHierarchyService {
     @Inject
     private OrganizationService organizationService;
 
-    //@Cacheable(value = "generateHierarchy", key = "#userId", cacheManager = "cacheManager")
+    @Cacheable(value = "generateHierarchy", key = "#userId", cacheManager = "cacheManager")
     public List<QueryResult> generateHierarchy(Long userId) {
         List<OrganizationWrapper> organizationWrappers = userGraphRepository.getOrganizations(userId);
         boolean isHubMember = accessPageService.isHubMember(userId);

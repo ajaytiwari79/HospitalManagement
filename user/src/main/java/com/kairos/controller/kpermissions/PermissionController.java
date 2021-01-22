@@ -89,7 +89,7 @@ public class PermissionController {
 
     @PostMapping(value = "/unit/{unitId}/fetch_permissions")
     public ResponseEntity<Map<String, Object>> fetchPermission(@RequestBody Set<String> objects, @PathVariable Long unitId)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.fetchPermissions(objects,unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.fetchPermissions(objects,unitId, UserContext.getUserDetails().getId()));
     }
 
     @PostMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/field_level_permission")
