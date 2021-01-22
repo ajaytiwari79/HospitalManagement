@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -67,6 +68,7 @@ public class FileIOUtil {
             FileWriter writer = new FileWriter(new File(fileName));
             StreamResult result = new StreamResult(writer);
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             Transformer transformer = transformerFactory.newTransformer();
             transformer.transform(source, result);
         }catch(Throwable e){
@@ -77,7 +79,7 @@ public class FileIOUtil {
         try(PrintWriter out=new PrintWriter(new File("" +fileName+".xml"))) {
             out.write(xmlString);
         } catch (FileNotFoundException | NullPointerException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -88,9 +90,9 @@ public class FileIOUtil {
                 fw.write(b);
             }
         } catch (FileNotFoundException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
         }
 
     }

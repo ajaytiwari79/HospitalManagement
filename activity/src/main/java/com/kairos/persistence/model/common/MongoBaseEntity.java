@@ -24,6 +24,7 @@ import static com.kairos.commons.utils.ObjectUtils.isMapNotEmpty;
 @Setter
 public abstract class MongoBaseEntity implements Serializable {
 
+    private static final long serialVersionUID = 3991615936551701970L;
     @Id
     protected BigInteger id;
     @CreatedDate
