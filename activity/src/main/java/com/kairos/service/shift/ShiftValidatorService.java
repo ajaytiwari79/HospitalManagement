@@ -4,7 +4,6 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
-import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
@@ -17,8 +16,6 @@ import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
-import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -40,7 +37,6 @@ import com.kairos.persistence.model.shift.ShiftDataHelper;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
-import com.kairos.persistence.model.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
@@ -230,7 +226,7 @@ public class ShiftValidatorService {
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap, CREATE);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
         ruleTemplateSpecificInfo.getViolatedRules().getActivities().addAll(activityRuleViolations);
-        validateStaffingForShift(phase, oldShift, activityWrapperMap, isValidateStaffingLevel, mainShift, ruleTemplateSpecificInfo);
+        validateStaffingForShift(phase, oldShift, activityWrapperMap, isValidateStaffingLevel, mainShift, ruleTemplateSpecificInfo,byUpdate);
         validateAbsenceReasonCodeRule(activityWrapperMap, shift, ruleTemplateSpecificInfo);
         updateScheduledAndDurationMinutesInShift(shift, staffAdditionalInfoDTO);
         boolean gracePeriodValid = validateGracePeriod(shift.getStartDate(), UserContext.getUserDetails().isStaff(), shift.getUnitId(), phase);
@@ -277,7 +273,7 @@ public class ShiftValidatorService {
         return activitySpecification;
     }
 
-    private void validateStaffingForShift(Phase phase, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean isValidateStaffingLevel, Shift mainShift, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
+    private void validateStaffingForShift(Phase phase, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean isValidateStaffingLevel, Shift mainShift, RuleTemplateSpecificInfo ruleTemplateSpecificInfo, boolean byUpdate) {
         if (isValidateStaffingLevel) {
             PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(phase.getOrganizationId(), phase.getId());
             List<ShiftActivity>[] shiftActivities = mainShift.getShiftActivitiesForValidatingStaffingLevel(oldShift);
@@ -290,7 +286,7 @@ public class ShiftValidatorService {
             for (ShiftActivity shiftActivity : shiftActivities[0]) {
                 validateStaffingLevel(phase, mainShift, activityWrapperMap, false, shiftActivity, ruleTemplateSpecificInfo, staffingLevelActivityWithDurationMap);
             }
-            verifyStaffingLevel(ruleTemplateSpecificInfo,staffingLevelActivityWithDurationMap,phaseSettings.getMaxProblemAllowed());
+            verifyStaffingLevel(ruleTemplateSpecificInfo,staffingLevelActivityWithDurationMap,byUpdate?phaseSettings.getMaxProblemAllowed():null,mainShift,oldShift,activityWrapperMap);
 
         }
     }
@@ -329,7 +325,7 @@ public class ShiftValidatorService {
             for (ShiftActivity shiftActivity : shiftActivities[0]) {
                 validateStaffingLevel(phase, shift, activityWrapperMap, false, shiftActivity, ruleTemplateSpecificInfo, staffingLevelActivityWithDurationMap);
             }
-            verifyStaffingLevel(ruleTemplateSpecificInfo,staffingLevelActivityWithDurationMap, (short) 0);
+            verifyStaffingLevel(ruleTemplateSpecificInfo,staffingLevelActivityWithDurationMap, null, shift, shift, activityWrapperMap);
             Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaBaseRuleTemplates);
             wtaRulesSpecification.validateRules(shiftWithActivityDTO,RuleExecutionType.SHIFT_DELETE);
             violatedRulesDTO = ruleTemplateSpecificInfo.getViolatedRules();
@@ -765,8 +761,7 @@ public class ShiftValidatorService {
     }
 
 
-    public List<ShiftActivityDTO> findShiftActivityToValidateStaffingLevel
-            (List<ShiftActivity> existingShiftActivities, List<ShiftActivityDTO> arrivedShiftActivities) {
+    public List<ShiftActivityDTO> findShiftActivityToValidateStaffingLevel(List<ShiftActivity> existingShiftActivities, List<ShiftActivityDTO> arrivedShiftActivities) {
         List<ShiftActivityDTO> shiftActivities = new ArrayList<>();
         try {
             for (int i = 0; i < arrivedShiftActivities.size(); i++) {
@@ -1068,10 +1063,11 @@ public class ShiftValidatorService {
         return validateRuleOnShiftDelete(activityWrapperMap, shift, staffAdditionalInfoDTO);
     }
 
-    public void verifyStaffingLevel(RuleTemplateSpecificInfo ruleTemplateSpecificInfo, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap,Short allowedMaxOverStaffing) {
+    public void verifyStaffingLevel(RuleTemplateSpecificInfo ruleTemplateSpecificInfo, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, Short allowedMaxOverStaffing, Shift mainShift, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         int totalStaffingLevelResolve = staffingLevelActivityWithDurationMap.values().stream().mapToInt(StaffingLevelActivityWithDuration::getResolvingUnderOrOverStaffingDurationInMinutes).sum();
         int totalUnderStaffingCreated = staffingLevelActivityWithDurationMap.values().stream().mapToInt(StaffingLevelActivityWithDuration::getUnderStaffingDurationInMinutes).sum();
         int totalOverStaffingCreated = staffingLevelActivityWithDurationMap.values().stream().mapToInt(StaffingLevelActivityWithDuration::getOverStaffingDurationInMinutes).sum();
+        isHigherActivity( mainShift,  oldShift,activityWrapperMap);
         if (totalOverStaffingCreated > totalStaffingLevelResolve || totalUnderStaffingCreated > totalStaffingLevelResolve || (allowedMaxOverStaffing!=null && allowedMaxOverStaffing < totalOverStaffingCreated)) {
             ActivityRuleViolation activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(staffingLevelActivityWithDurationMap.values().iterator().next().getActivityId())).findAny().orElse(null);
             if (activityRuleViolation == null) {
@@ -1080,6 +1076,18 @@ public class ShiftValidatorService {
                 activityRuleViolation.getErrorMessages().add(exceptionService.convertMessage(totalOverStaffingCreated > totalStaffingLevelResolve ? MESSAGE_SHIFT_OVERSTAFFING : MESSAGE_SHIFT_UNDERSTAFFING));
             }
         }
+    }
+
+    private void isHigherActivity(Shift mainShift, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        ShiftActivity[] shiftActivities= activityReplaced(mainShift,oldShift);
+        if(shiftActivities!=null){
+            int rankOfOld = activityWrapperMap.get(shiftActivities[0].getActivityId()).getActivityPriority().getSequence();
+            int rankOfNew = activityWrapperMap.get(shiftActivities[1].getActivityId()).getActivityPriority().getSequence();
+            if (rankOfNew > rankOfOld) {
+                exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, LOW_ACTIVITY_RANK);
+            }
+        }
+
     }
 
     public ShiftWithViolatedInfoDTO validateShiftWithActivity(Phase phase, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDataHelper shiftDataHelper) {
@@ -1107,6 +1115,30 @@ public class ShiftValidatorService {
         shift.setTimeType(shiftDataHelper.getActivityById(shift.getActivities().get(0).getActivityId()).getTimeType().getTimeTypes());
         wtaRulesSpecification.validateRules(shift, RuleExecutionType.COVER_SHIFT);
         return new ShiftWithViolatedInfoDTO(newArrayList(shift),ruleTemplateSpecificInfo.getViolatedRules());
+    }
+
+    private ShiftActivity[] activityReplaced( Shift shift,Shift dbShift) {
+        if(shift==null || dbShift==null){
+            return null;
+        }
+        try {
+            for (int i = 0; i < shift.getActivities().size(); i++) {
+                ShiftActivity shiftActivity = shift.getActivities().get(i);
+                ShiftActivity shiftActivityDB = dbShift.getActivities().get(i);
+                if (!shiftActivity.getActivityId().equals(shiftActivityDB.getActivityId())) {
+                    ShiftActivity dbShiftActivityForCheckingRank = getActivity(dbShift, shiftActivity);
+                    return new ShiftActivity[]{dbShiftActivityForCheckingRank,shiftActivity};
+                }
+            }
+        }catch (IndexOutOfBoundsException indexOutOfBoundsException){
+            //Intentionally Left Blank
+        }
+        return null;
+    }
+
+    private ShiftActivity getActivity(Shift dbShift, ShiftActivity shiftActivity) {
+        List<ShiftActivity> shiftActivities= dbShift.getActivities().stream().filter(k->k.getInterval().overlaps(shiftActivity.getInterval())).collect(Collectors.toList());
+        return shiftActivities.stream().max(Comparator.comparing(k->k.getInterval().getMinutes())).get();
     }
 
 }
