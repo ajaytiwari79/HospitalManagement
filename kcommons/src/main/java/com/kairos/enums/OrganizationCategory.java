@@ -2,6 +2,7 @@ package com.kairos.enums;
 
 import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * Created by prerna on 26/2/18.
  */
-public enum OrganizationCategory {
+public enum OrganizationCategory implements Serializable {
     HUB("Hub"), UNION("Union"), ORGANIZATION("Organization");
     public String value;
     OrganizationCategory(String value) {

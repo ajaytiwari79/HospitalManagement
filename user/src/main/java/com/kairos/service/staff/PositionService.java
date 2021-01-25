@@ -55,6 +55,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -208,6 +210,7 @@ public class PositionService {
         setUnitWiseAccessRole(unitId, staffId);
         response.put("organizationId", unitId);
         response.put("synInFls", flsSyncStatus);
+        accessGroupService.resetPermissionByAccessGroupIds(unitId,newArrayList(accessGroupId));
         return response;
     }
 
@@ -324,8 +327,8 @@ public class PositionService {
         List<Map<String, Object>> workPlaces = new ArrayList<>();
         // This is for parent organization i.e if unit is itself parent organization
         if (units.isEmpty() && unit instanceof Organization) {
-            positions = new ArrayList<>();
             for (AccessGroup accessGroup : accessGroups) {
+                positions=new ArrayList<>();
                 QueryResult queryResult = new QueryResult();
                 queryResult.setId(unit.getId());
                 queryResult.setName(unit.getName());

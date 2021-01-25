@@ -116,9 +116,9 @@ public class TaskReportService extends MongoBaseService {
             return null;
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         return null;
@@ -194,9 +194,9 @@ public class TaskReportService extends MongoBaseService {
             }
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -246,9 +246,9 @@ public class TaskReportService extends MongoBaseService {
             }
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 */

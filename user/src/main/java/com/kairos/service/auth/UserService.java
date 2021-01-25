@@ -53,6 +53,7 @@ import com.kairos.utils.OtpGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -460,33 +461,33 @@ public class UserService {
         return write;
     }
 
-    public UnitWiseStaffPermissionsDTO getPermission(Long organizationId) {
-        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(organizationId);
-        long currentUserId = UserContext.getUserDetails().getId();
+    @Cacheable(value = "getPermission", key = "{#unitId, #userId}", cacheManager = "cacheManager")
+    public UnitWiseStaffPermissionsDTO getPermission(Long unitId, Long userId) {
+        UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
-        permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
+        permissionData.setHub(accessPageRepository.isHubMember(userId));
         Set<Long> unitAccessGroupIds=new HashSet<>();
         if(UserContext.getUserDetails().isSystemAdmin()){
             List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubSystemAdminPermissions();
             preparePermission(permissionData, permissions);
         }
         else if (permissionData.isHub()) {
-             Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
-             unitAccessGroupIds=parentHub.getId().equals(organizationId)?parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet()):accessGroupService.getAccessGroupIdsOfUnit(organizationId);
+             Organization parentHub = accessPageRepository.fetchParentHub(userId);
+             unitAccessGroupIds=parentHub.getId().equals(unitId)?parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet()):accessGroupService.getAccessGroupIdsOfUnit(unitId);
             //List<AccessGroupQueryResult> accessGroupQueryResults = accessGroupService.getCountryAccessGroupByOrgCategory(UserContext.getUserDetails().getCountryId(), OrganizationCategory.HUB.toString());
             Set<Long> accessGroupIds = parentHub.getAccessGroups().stream().map(UserBaseEntity::getId).collect(Collectors.toSet());
-            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId(), accessGroupIds,accessGroupIds.equals(unitAccessGroupIds)?new HashSet<>():unitAccessGroupIds);
+            List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(userId, parentHub.getId(), accessGroupIds,accessGroupIds.equals(unitAccessGroupIds)?new HashSet<>():unitAccessGroupIds);
             preparePermission(permissionData, permissions);
 
         } else {
-            loadUnitPermissions(organizationId, currentUserId, permissionData);
+            loadUnitPermissions(unitId, userId, permissionData);
         }
-        updateLastSelectedOrganizationIdAndCountryId(organizationId);
+        updateLastSelectedOrganizationIdAndCountryId(unitId);
         permissionData.setRole((userAccessRoleDTO.isManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
 
         permissionData.setModelPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isSystemAdmin(),userAccessRoleDTO.getStaffId(),unitAccessGroupIds), ModelDTO.class));
-        Organization parent = organizationService.fetchParentOrganization(organizationId);
-        permissionData.setStaffId(staffGraphRepository.getStaffIdByUserId(currentUserId,parent.getId()));
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        permissionData.setStaffId(staffGraphRepository.getStaffIdByUserId(userId,parent.getId()));
         updateChatStatus(ChatStatus.ONLINE);
         return permissionData;
     }
@@ -514,12 +515,10 @@ public class UserService {
         }
         if (checkDayType) {
             unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds.stream().map(BigInteger::toString).collect(Collectors.toSet()), organizationId);
-
         } else {
             unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, organizationId);
         }
         HashMap<Long, Object> unitPermission = new HashMap<>();
-
         for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
             unitPermission.put(userPermissionQueryResult.getUnitId(),
                     prepareUnitPermissions(ObjectMapperUtils.copyCollectionPropertiesByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), userPermissionQueryResult.isParentOrganization()));

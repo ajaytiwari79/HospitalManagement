@@ -26,6 +26,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class EmploymentType extends UserBaseEntity {
 
+    private static final long serialVersionUID = 4110466717999127870L;
     @NotBlank(message = "error.EmploymentType.name.notEmptyOrNotNull")
     private String name;
     private String description;

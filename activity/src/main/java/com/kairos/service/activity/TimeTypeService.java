@@ -160,6 +160,7 @@ public class TimeTypeService extends MongoBaseService {
         timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
         timeType.setBreakNotHeldValid(timeTypeDTO.isBreakNotHeldValid());
         timeType.setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
+        timeType.setUnityActivitySetting(timeTypeDTO.getUnityActivitySetting());
     }
 
 
@@ -600,6 +601,10 @@ public class TimeTypeService extends MongoBaseService {
         timeType.setTranslations(translations);
         timeTypeMongoRepository.save(timeType);
         return timeType.getTranslations();
+    }
+
+    public List<TimeType> getAllSickTimeTypes(){
+        return timeTypeMongoRepository.findAllSickTimeTypes();
     }
 
 }

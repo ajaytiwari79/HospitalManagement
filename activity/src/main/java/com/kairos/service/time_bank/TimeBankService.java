@@ -24,6 +24,7 @@ import com.kairos.persistence.model.pay_out.PayOutPerShift;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
+import com.kairos.persistence.model.shift.ShiftDataHelper;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -37,6 +38,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.counter.KPIBuilderCalculationService;
+import com.kairos.service.counter.KPICalculationRelatedInfo;
 import com.kairos.service.counter.KPIService;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.day_type.DayTypeService;
@@ -102,6 +104,7 @@ public class TimeBankService implements KPIService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
+    @Inject private TimeBankAndPayOutCalculationService timeBankAndPayOutCalculationService;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
@@ -303,7 +306,7 @@ public class TimeBankService implements KPIService {
         List<Long> employmentIds = advanceViewData.getEmploymentIds();
         List<DailyTimeBankEntry> dailyTimeBanks = timeBankRepository.findAllByEmploymentIdsAndBeforDate(employmentIds, endDate);
         Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, startDate,endDate,employmentId);
-        return timeBankCalculationService.getTimeBankAdvanceView(intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts);
+        return timeBankAndPayOutCalculationService.getTimeBankAdvanceView(intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,payOutPerShifts);
     }
 
     /**
@@ -318,7 +321,7 @@ public class TimeBankService implements KPIService {
         Date endDate = asDate(ZonedDateTime.now().withYear(year).with(TemporalAdjusters.lastDayOfYear()).truncatedTo(ChronoUnit.DAYS).with(LocalTime.MAX));
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentId, startDate, endDate);
         TimeBankDTO timeBankDTO = timeBankCalculationService.getTimeBankOverview(unitId, employmentId, startDate, endDate, dailyTimeBankEntries, employmentWithCtaDetailsDTO);
-        Long actualTimebankMinutes = getAccumulatedTimebankAndDelta(employmentId, unitId, true);
+        Long actualTimebankMinutes = getAccumulatedTimebankAndDelta(employmentId, unitId, true,null,null);
         timeBankDTO.setActualTimebankMinutes(actualTimebankMinutes);
         PlanningPeriodDTO planningPeriodDTO = planningPeriodService.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
         timeBankDTO.setPlanningPeriodStartDate(planningPeriodDTO.getStartDate());
@@ -651,22 +654,20 @@ public class TimeBankService implements KPIService {
         return ctaResponse;
     }
 
-    public <T> T getAccumulatedTimebankAndDelta(Long employmentId, Long unitId, Boolean includeActualTimebank) {
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>(),null);
-        staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
+    public <T> T getAccumulatedTimebankAndDelta(Long employmentId, Long unitId, Boolean includeActualTimebank,StaffAdditionalInfoDTO staffAdditionalInfoDTO,ShiftDataHelper shiftDataHelper) {
+        staffAdditionalInfoDTO = isNotNull(staffAdditionalInfoDTO) ? staffAdditionalInfoDTO : userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>(),null);
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getEmploymentDetailDTO(staffAdditionalInfoDTO, unitId);
         T object;
-        DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
+        DateTimeInterval planningPeriodInterval = isNotNull(shiftDataHelper) ? shiftDataHelper.getPlanningPeriodDateTimeInterval() : planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
         LocalDate periodEndDate = planningPeriodInterval.getEndLocalDate();
         Date endDate = asDate(periodEndDate);
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, endDate);
         LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate().isAfter(planningPeriodInterval.getStartLocalDate())?employmentWithCtaDetailsDTO.getStartDate():planningPeriodInterval.getStartLocalDate();
         Date startDate  = asDate(employmentStartDate);
-        object = (T)timeBankCalculationService.calculateActualTimebank(planningPeriodInterval,dailyTimeBankEntries,employmentWithCtaDetailsDTO,periodEndDate,employmentStartDate);
+        object = (T)timeBankCalculationService.calculateActualTimebank(planningPeriodInterval,dailyTimeBankEntries,employmentWithCtaDetailsDTO,periodEndDate,employmentStartDate,shiftDataHelper);
         if(isNull(includeActualTimebank)) {
             List<CTARuleTemplateDTO> ruleTemplates = costTimeAgreementService.getCtaRuleTemplatesByEmploymentId(employmentId, startDate, endDate);
             ruleTemplates = ruleTemplates.stream().filter(distinctByKey(CTARuleTemplateDTO::getName)).collect(toList());
-            dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, asDate(periodEndDate));
             PlanningPeriod firstRequestPhasePlanningPeriodByUnitId = planningPeriodService.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
             java.time.LocalDate firstRequestPhasePlanningPeriodEndDate = isNull(firstRequestPhasePlanningPeriodByUnitId) ? periodEndDate : firstRequestPhasePlanningPeriodByUnitId.getEndDate();
             object = (T)timeBankCalculationService.getAccumulatedTimebankDTO(firstRequestPhasePlanningPeriodEndDate,planningPeriodInterval, dailyTimeBankEntries, employmentWithCtaDetailsDTO, employmentStartDate, periodEndDate,(Long)object,ruleTemplates);
@@ -736,7 +737,28 @@ public class TimeBankService implements KPIService {
         }
         staffAdditionalInfoDTO.getEmployment().setStaffId(staffAdditionalInfoDTO.getId());
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOList, dailyTimeBankEntriy, planningPeriodInterval, staffAdditionalInfoDTO.getDayTypes(), false);
-        TreeMap<LocalDate, TimeBankIntervalDTO> timeBankByDateDTOMap = getAccumulatedTimebankAndDelta(staffAdditionalInfoDTO.getEmployment().getId(),shift.getUnitId(),null);
+        TreeMap<LocalDate, TimeBankIntervalDTO> timeBankByDateDTOMap = getAccumulatedTimebankAndDelta(staffAdditionalInfoDTO.getEmployment().getId(),shift.getUnitId(),null,staffAdditionalInfoDTO,null);
+        long expectedTimebank = timeBankByDateDTOMap.lastEntry().getValue().getExpectedTimebankMinutes();
+        if (isNotNull(dailyTimeBankEntry)) {
+            expectedTimebank += dailyTimeBankEntry.getDeltaTimeBankMinutes();
+        }
+        return expectedTimebank;
+    }
+
+    public long getExpectedTimebankByDate(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDataHelper shiftDataHelper) {
+        DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
+        DateTime endDate = startDate.plusDays(1);
+        DailyTimeBankEntry dailyTimeBankEntriy = timeBankRepository.findByEmploymentAndDate(staffAdditionalInfoDTO.getEmployment().getId(), asLocalDate(startDate));
+        DateTimeInterval planningPeriodInterval = shiftDataHelper.getPlanningPeriodDateTimeInterval();
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(shift.getId(),staffAdditionalInfoDTO.getEmployment().getId(), startDate.toDate(), endDate.toDate(),null);
+        DateTimeInterval interval = new DateTimeInterval(startDate.getMillis(), endDate.getMillis());
+        List<ShiftWithActivityDTO> shiftWithActivityDTOList = getShiftsByInterval(shiftWithActivityDTOS, interval);
+        if(!shift.isDeleted()) {
+            shiftWithActivityDTOList.add(shift);
+        }
+        staffAdditionalInfoDTO.getEmployment().setStaffId(staffAdditionalInfoDTO.getId());
+        DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOList, dailyTimeBankEntriy, planningPeriodInterval, shiftDataHelper.getDayTypes(), false);
+        TreeMap<LocalDate, TimeBankIntervalDTO> timeBankByDateDTOMap = getAccumulatedTimebankAndDelta(staffAdditionalInfoDTO.getEmployment().getId(),shift.getUnitId(),null,staffAdditionalInfoDTO,shiftDataHelper);
         long expectedTimebank = timeBankByDateDTOMap.lastEntry().getValue().getExpectedTimebankMinutes();
         if (isNotNull(dailyTimeBankEntry)) {
             expectedTimebank += dailyTimeBankEntry.getDeltaTimeBankMinutes();
@@ -751,7 +773,7 @@ public class TimeBankService implements KPIService {
     public List<DailyTimeBankEntry> findAllByEmploymentIdsAndBetweenDate(Collection<Long> employmentIds, LocalDate startDate, LocalDate endDate){
         return timeBankRepository.findAllByEmploymentIdsAndBetweenDate(employmentIds,asDate(startDate),asDate(endDate));
     }
-    public double getTotalTimeBankOrContractual(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, boolean calculateContractual) {
+    public double getTotalTimeBankOrContractual(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, boolean calculateContractual) {
         double totalTimeBankOrContractual = 0;
         for (StaffKpiFilterDTO staffKpiFilterDTO : kpiCalculationRelatedInfo.getStaffKPIFilterDTO(staffId)) {
             for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
@@ -764,7 +786,7 @@ public class TimeBankService implements KPIService {
     }
 
     @Override
-    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
         return getTotalTimeBankOrContractual(staffId, dateTimeInterval, kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getCalculationType().equals(CalculationType.STAFFING_LEVEL_CAPACITY));
     }
 

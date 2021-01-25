@@ -6,6 +6,7 @@ import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.Properties;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.annotation.CreatedBy;
@@ -13,6 +14,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,10 +27,11 @@ import java.util.Map;
 
 @Getter
 @Setter
-public abstract class UserBaseEntity  {
+public abstract class UserBaseEntity  implements Serializable {
 
     //@GeneratedValue
-    @GraphId protected Long id;
+    @GraphId
+    protected Long id;
     @JsonIgnore
     protected boolean deleted;
     @JsonIgnore

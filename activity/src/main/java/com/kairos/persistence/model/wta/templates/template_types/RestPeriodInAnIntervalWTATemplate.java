@@ -3,6 +3,7 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.MinMaxSetting;
@@ -16,6 +17,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,6 +40,7 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     private String intervalUnit;
     private float recommendedValue;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
+    private transient DateTimeInterval interval;
 
     public RestPeriodInAnIntervalWTATemplate(String name, boolean disabled,
                                              String description) {
@@ -55,27 +58,27 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)){
-            DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-            List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts(), null);
-            shifts.add(infoWrapper.getShift());
-            shifts = sortShifts(shifts);
-            int maxRestingTime = getMaxRestingTime(shifts);
             Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
-            boolean isValid = isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], maxRestingTime/60);
+            boolean isValid = getMaxRestingTime(infoWrapper.getShifts(),interval,limitAndCounter[0]);
             brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS.toValue(),getHoursByMinutes(limitAndCounter[0],this.name));
         }
     }
 
 
-    public int getMaxRestingTime(List<ShiftWithActivityDTO> shifts) {
+    public boolean getMaxRestingTime(List<ShiftWithActivityDTO> shifts,DateTimeInterval dateTimeInterval,int value) {
         int maxRestTime = 0;
+        shifts.sort(Comparator.comparing(ShiftDTO::getStartDate));
         for (int i=1;i<shifts.size();i++) {
             int restTime = (int)new DateTimeInterval(shifts.get(i-1).getEndDate().getTime(),shifts.get(i).getStartDate().getTime()).getMinutes();
-            if(restTime>maxRestTime){
+            boolean isValid = (dateTimeInterval.contains(shifts.get(i).getStartDate()) || dateTimeInterval.getEndLocalDate().equals(shifts.get(i).getEndLocalDate()));
+            if(isValid && restTime>maxRestTime){
                 maxRestTime = restTime;
+                if(!isValid(MinMaxSetting.MINIMUM, value, restTime/60)){
+                    return false;
+                }
             }
         }
-        return maxRestTime;
+        return true;
     }
 
     @Override

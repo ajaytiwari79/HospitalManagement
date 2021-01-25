@@ -76,6 +76,7 @@ public class RequestAbsenceService {
         Activity activity = activityMongoRepository.findOne(requestAbsence.getActivityId());
         requestAbsence.setActivityName(activity.getName());
         Shift shift = shiftOptional.get();
+        requestAbsence.setMethodForCalculatingTime(activity.getActivityTimeCalculationSettings().getMethodForCalculatingTime());
         shift.setRequestAbsence(requestAbsence);
         shiftMongoRepository.save(shift);
         todoService.createOrUpdateTodo(shift, TodoType.REQUEST_ABSENCE);

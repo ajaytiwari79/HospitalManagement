@@ -6,7 +6,10 @@ package com.kairos.dto.activity.glide_time;
 
 import com.kairos.enums.LocationEnum;
 
-public class ActivityGlideTimeDetails {
+import java.io.Serializable;
+
+public class ActivityGlideTimeDetails implements Serializable {
+    private static final long serialVersionUID = -1047736179421816528L;
     private LocationEnum location;
 
     private short before; // storing in minutes

@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.activity;
 
+import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
@@ -22,7 +23,7 @@ import java.util.Set;
 
 public interface CustomActivityMongoRepository {
 
-    List<ActivityDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted);
+    List<ActivityCategoryListDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted);
 
     List<ActivityTagDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds);
 
@@ -114,7 +115,7 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityDTO> findActivitiesByUnitId(Long unitId, Collection<BigInteger> activityIds);
 
-    List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType, Long unitId);
+    List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum secondLevelTimeType, Long unitId);
 
     List<ActivityTimeTypeWrapper> getActivityPath(final String activityId);
 
@@ -125,4 +126,6 @@ public interface CustomActivityMongoRepository {
     Set<BigInteger> findAllShowOnCallAndStandByActivitiesByUnitId(Long unitId, boolean showStandBy, boolean showOnCall);
 
     List<ActivityWithCompositeDTO> findAllActivityByIdsAndIncludeChildActivitiesWithMostUsedCountOfActivity(Collection<BigInteger> activityIds,Long unitId,Long staffId,boolean isActivityType);
+    List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds);
+    List<ActivityDTO> findActivitiesWithTimeTypeByActivityId(Collection<BigInteger> activityIds);
 }

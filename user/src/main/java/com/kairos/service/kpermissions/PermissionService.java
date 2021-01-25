@@ -5,7 +5,6 @@ import com.kairos.annotations.KPermissionRelationshipFrom;
 import com.kairos.annotations.KPermissionRelationshipTo;
 import com.kairos.commons.annotation.PermissionClass;
 import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.kpermissions.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
@@ -42,6 +41,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -143,6 +143,12 @@ public class PermissionService {
         kPermissionModels.addAll(copyCollectionPropertiesByMapper(newModelDTO, KPermissionModel.class));
         return kPermissionModels;
     }
+
+    @CacheEvict(value = {"getPermission","getActivityPermissionMap"}, key = "{#unitId, #userId}")
+    public void resetPerMissionByUserId(Long unitId, Long userId) {
+        //Todo this method is for reset the permissions
+    }
+
 
     private void updateModel(boolean isSubModel, ModelDTO modelDTO) {
         modelDTO.setOrganizationCategories(new HashSet<>());
@@ -353,8 +359,9 @@ public class PermissionService {
         return fieldPermissionQueryResults;
     }
 
-    public PermissionDTO createPermissions(PermissionDTO permissionDTO, boolean updateOrganisationCategories) {
+    public PermissionDTO createPermissions(Long unitId,PermissionDTO permissionDTO, boolean updateOrganisationCategories) {
         updateOrganisationCategoryOrPermissions(permissionDTO.getModelPermissions(), permissionDTO.getAccessGroupIds(), updateOrganisationCategories);
+        accessGroupService.resetPermissionByAccessGroupIds(unitId,permissionDTO.getAccessGroupIds());
         return permissionDTO;
     }
 
@@ -497,7 +504,7 @@ public class PermissionService {
                     S startNode = (S) field.get(entity);
                     id = (Long) startNode.getClass().getMethod(GET_ID).invoke(startNode);
                 } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                    e.printStackTrace();
+                    LOGGER.error(e.getMessage());
                 }
                 modelName = field.getType().getSimpleName();
             }
@@ -562,7 +569,7 @@ public class PermissionService {
                             objectIdsMap.put(object.getClass(), ids);
                         }
                     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage());
                     }
                 }
             }
@@ -585,7 +592,7 @@ public class PermissionService {
                         ID id = (ID) object.getClass().getMethod(GET_ID).invoke(object);
                         mapOfDataBaseObject.put(id, object);
                     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage());
                     }
                 }
             }
@@ -596,11 +603,11 @@ public class PermissionService {
         }
     }
 
-    public <T> FieldPermissionUserData fetchPermissions(Set<String> modelNames, Long unitId) {
+    public <T> FieldPermissionUserData fetchPermissions(Set<String> modelNames, Long unitId, Long userId) {
         List<AccessGroup> accessGroups = accessGroupService.validAccessGroupByDate(unitId, getDate());
         boolean systemAdmin = UserContext.getUserDetails().isSystemAdmin();
         Organization parentOrganisation = organizationService.fetchParentOrganization(unitId);
-        Long currentUserStaffId = staffService.getStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganisation.getId());
+        Long currentUserStaffId = staffService.getStaffIdByUserId(userId, parentOrganisation.getId());
         Set<Long> unitAccessGroupIds = getUnitAccessGroupIds(unitId);
         List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames), accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()), systemAdmin, currentUserStaffId, unitAccessGroupIds);
         List<ModelDTO> modelDTOS = copyCollectionPropertiesByMapper(modelPermissionQueryResults, ModelDTO.class);
@@ -628,6 +635,7 @@ public class PermissionService {
         } else {
             accessGroupRepository.setCustomPermissionForSubModelAndFields(customPermissionDTO.getStaffId(), unitId, accessGroupId, kPermissionModelIds, customPermissionDTO.getPermissions());
         }
+        accessGroupService.resetPermissionByAccessGroupIds(unitId,newArrayList(accessGroupId));
     }
 
     public void assignActionPermission(Long unitId, Long accessGroupId, CustomPermissionDTO customPermissionDTO) {

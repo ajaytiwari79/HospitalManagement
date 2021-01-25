@@ -15,6 +15,7 @@ import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRul
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
@@ -26,7 +27,8 @@ import java.util.*;
 @Getter
 @Setter
 @PermissionClass(name = "Activity")
-public class ActivityTagDTO {
+public class ActivityTagDTO implements Serializable {
+    private static final long serialVersionUID = -8814717901742581421L;
     private BigInteger id;
     private String name;
     private String description;

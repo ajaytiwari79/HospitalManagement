@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
@@ -14,6 +15,7 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.todo.TodoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.reason_code.ReasonCodeService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.SICK_ACTIVITY_NOT_FOUND;
 import static com.kairos.enums.shift.ShiftType.SICK;
 
 
@@ -54,6 +57,8 @@ public class ShiftDetailsService extends MongoBaseService {
     private ActivityMongoRepository activityMongoRepository;
     @Inject
     private ReasonCodeService reasonCodeService;
+    @Inject
+    private ExceptionService exceptionService;
 
     public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds, boolean showDraft) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS;
@@ -118,13 +123,17 @@ public class ShiftDetailsService extends MongoBaseService {
         shiftsMap.forEach((date, shifts) -> {
             ShiftDTO sickShift = shifts.stream().filter(k -> k.getShiftType().equals(SICK)).findAny().orElse(null);
             if (sickShift != null) {
-                Activity activity = getWorkingSickActivity(sickShift, activityMap);
-                if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfPublishedShift()) {
-                    shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()))).collect(Collectors.toList()));
-                }
-                if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfUnPublishedShift()) {
-                    shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> !act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()))).collect(Collectors.toList()));
-                }
+                Map<Long,List<ShiftDTO>> staffWiseShift=shifts.stream().collect(Collectors.groupingBy(ShiftDTO::getStaffId, Collectors.toList()));
+                staffWiseShift.forEach((staffId,shiftList)->{
+                    Activity activity = getWorkingSickActivity(sickShift, activityMap);
+                    if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfPublishedShift()) {
+                        shiftList.removeAll(shiftList.stream().filter(k -> k.getActivities().stream().anyMatch(act -> act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()))).collect(Collectors.toList()));
+                    }
+                    if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfUnPublishedShift()) {
+                        shiftList.removeAll(shiftList.stream().filter(k -> k.getActivities().stream().anyMatch(act -> !act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()))).collect(Collectors.toList()));
+                    }
+                });
+
             }
         });
     }
@@ -143,8 +152,12 @@ public class ShiftDetailsService extends MongoBaseService {
         Activity activity = null;
         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
             if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivityRulesSettings().isSicknessSettingValid()) {
-                return activityWrapperMap.get(shiftActivity.getActivityId());
+                activity= activityWrapperMap.get(shiftActivity.getActivityId());
+                break;
             }
+        }
+        if(isNull(activity)){
+            exceptionService.dataNotFoundException(SICK_ACTIVITY_NOT_FOUND);
         }
         return activity;
     }

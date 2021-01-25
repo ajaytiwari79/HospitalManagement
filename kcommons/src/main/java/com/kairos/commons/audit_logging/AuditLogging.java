@@ -5,7 +5,7 @@ import com.kairos.enums.audit_logging.LoggingType;
 import de.danielbechler.diff.ObjectDifferBuilder;
 import de.danielbechler.diff.node.DiffNode;
 import de.danielbechler.diff.node.Visit;
-import org.neo4j.ogm.annotation.NodeEntity;
+//import org.neo4j.ogm.annotation.NodeEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,7 +105,7 @@ public class AuditLogging {
 
     private static void updateMap(DiffNode arg0, Object oldValue, Object newValue, String properteyName, Map<String, Object> result, Class parentNodeClass) {
         if(isArgumentValid(arg0, properteyName) && isPropertyValid(arg0, properteyName) && parentNodeClass.equals(arg0.getParentNode().getValueType())) {
-            if(!primitives.contains(arg0.getValueType().getSimpleName()) && arg0.getValueType().isAnnotationPresent(NodeEntity.class)) {
+            if(!primitives.contains(arg0.getValueType().getSimpleName())){// && arg0.getValueType().isAnnotationPresent(NodeEntity.class)) {
                 if(isNull(oldValue)){
                     try {
                         oldValue = newValue.getClass().newInstance();
@@ -145,7 +145,7 @@ public class AuditLogging {
             deleted = (boolean)newEntity.getClass().getMethod("isDeleted").invoke(newEntity);
 
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         if(isNull(id)) {
             return LoggingType.CREATED;

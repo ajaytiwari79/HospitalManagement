@@ -22,6 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class HousingType extends UserBaseEntity {
 
+    private static final long serialVersionUID = -7907812016818032034L;
     @NotBlank(message = "error.HousingType.name.notEmpty")
     private String name;
     private String description;

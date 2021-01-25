@@ -11,10 +11,12 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.filter.RequiredDataForFilterDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.shift.CoverShiftCriteria;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
+import com.kairos.persistence.model.shift.CoverShiftSetting;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
@@ -40,11 +42,12 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.getEndOfDay;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
+import static com.kairos.enums.TimeTypeEnum.*;
+import static com.kairos.enums.shift.ShiftType.SICK;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
@@ -82,6 +85,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     private static final String CTA_TEMPLATES_COLLECTION = "cTARuleTemplate";
     private static final String CTA_COLLECTION = "costTimeAgreement";
     private static final String ID = "_id";
+    public static final String REQUEST_ABSENCE_METHOD_FOR_CALCULATING_TIME = "requestAbsence.methodForCalculatingTime";
+    public static final String ACTIVITIES_SECOND_LEVEL_TIME_TYPE = "activities.secondLevelTimeType";
+    public static final String SHIFT_TYPE = "shiftType";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -118,10 +124,10 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(Set<Long> employmentIds, Date startDate, Date endDate, Set<BigInteger> activityIds) {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
-            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and("shiftType").ne(ShiftType.SICK)
+            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and(SHIFT_TYPE).ne(SICK)
                     .and(START_DATE).lte(endDate).and(END_DATE).gte(startDate);
         } else {
-            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and("shiftType").ne(ShiftType.SICK)
+            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and(SHIFT_TYPE).ne(SICK)
                     .and(START_DATE).gte(startDate).orOperator(Criteria.where(END_DATE).gte(startDate));
         }
         return getShiftWithActivityByCriteria(criteria.and(ACTIVITIES_ACTIVITY_ID).in(activityIds),false,ShiftWithActivityDTO.class);
@@ -771,6 +777,65 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 group(STAFF_ID)
         );
         return mongoTemplate.aggregate(aggregations, Shift.class, StaffShiftDetailsDTO.class).getMappedResults();
+    }
+
+    @Override
+    public Set<Long> getNotEligibleStaffsForCoverShifts(Date startDate, Date endDate, CoverShiftSetting coverShiftSetting,List<Long> staffIds){
+        Criteria criteria = where(UNIT_ID).is(coverShiftSetting.getUnitId());
+        if(isCollectionNotEmpty(staffIds)){
+            criteria = criteria.and(STAFF_ID).in(staffIds);
+        }
+        List<Criteria> criteriaList = getConverShiftCriteria(coverShiftSetting,startDate,endDate);
+        Criteria[] criterias = new Criteria[criteriaList.size()];
+        for (int i = 0; i < criteriaList.size(); i++) {
+            criterias[i] = criteriaList.get(i);
+        }
+        if(criterias.length>0){
+            criteria.orOperator(criterias);
+            Aggregation aggregation = Aggregation.newAggregation(
+                    match(criteria),
+                    project(STAFF_ID),
+                    group().push(STAFF_ID).as("staffIds")
+            );
+            return new HashSet<>(((List<Long>)mongoTemplate.aggregate(aggregation,Shift.class,Map.class).getMappedResults().get(0).get("staffIds")));
+        }
+        return new HashSet<>();
+    }
+
+    private List<Criteria> getConverShiftCriteria(CoverShiftSetting coverShiftSetting,Date startDate,Date endDate) {
+        List<Criteria> criterias = new ArrayList<>();
+        for (CoverShiftCriteria coverShiftCriterion : coverShiftSetting.getCoverShiftCriteria()) {
+            switch (coverShiftCriterion){
+                case STAFF_WITH_SICKNESS:
+                    criterias.add(Criteria.where(SHIFT_TYPE).is(SICK.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    break;
+                case STAFF_WITH_FREE_DAYS:
+                    criterias.add(where(START_DATE).lt(getEndOfDay(endDate)).and(END_DATE).gt(getStartOfDay(startDate)));
+                    break;
+                case STAFF_WITH_PLANNED_UNAVAILABLE:
+                    criterias.add(Criteria.where(ACTIVITIES_SECOND_LEVEL_TIME_TYPE).is(UNAVAILABLE_TIME.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    break;
+                case STAFF_WITH_PENDING_ABSENCE_REQUEST:
+                    criterias.add(Criteria.where(REQUEST_ABSENCE_METHOD_FOR_CALCULATING_TIME).exists(false).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    criterias.add(Criteria.where(REQUEST_ABSENCE_METHOD_FOR_CALCULATING_TIME).is(FULL_DAY_CALCULATION).and(START_DATE).lt(getEndOfDay(endDate)).and(END_DATE).gt(getStartOfDay(startDate)));
+                    criterias.add(Criteria.where(REQUEST_ABSENCE_METHOD_FOR_CALCULATING_TIME).is(FULL_WEEK).and(START_DATE).lt(getEndOfDay(endDate)).and(END_DATE).gt(getStartOfDay(minusDays(startDate,6))));
+                    break;
+                case STAFF_WITH_PLANNED_VETO:
+                    criterias.add(Criteria.where(ACTIVITIES_SECOND_LEVEL_TIME_TYPE).is(VETO.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    break;
+                case STAFF_WITH_PLANNED_STOP_BRICKS:
+                    criterias.add(Criteria.where(ACTIVITIES_SECOND_LEVEL_TIME_TYPE).is(STOP_BRICK.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    break;
+                case STAFF_WITH_PLANNED_PROTECTED_DAYS_OFF:
+                    criterias.add(Criteria.where(ACTIVITIES_SECOND_LEVEL_TIME_TYPE).is(PROTECTED_DAYS_OFF.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    break;
+                case STAFF_WITH_PERSONAL_CALENDAR:
+                    //criteria.orOperator(Criteria.where("activities.secondLevelTimeType").is());
+                    break;
+                default:break;
+            }
+        }
+        return criterias;
     }
 
 }

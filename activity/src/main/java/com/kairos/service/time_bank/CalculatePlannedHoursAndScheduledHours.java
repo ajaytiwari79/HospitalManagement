@@ -488,7 +488,7 @@ public class CalculatePlannedHoursAndScheduledHours {
                     payOutPerShift.getPayOutPerShiftCTADistributions().add(new PayOutPerShiftCTADistribution(ruleTemplate.getName(), value, ruleTemplate.getId(), 0f));
                 }
             }
-            timeBankCalculationService.addBonusForProtectedDaysOff(addValueInProtectedDaysOff, payOutPerShift, value);
+            timeBankCalculationService.getPayOutService().addBonusForProtectedDaysOff(addValueInProtectedDaysOff, payOutPerShift, value);
         }
         return payOutPerShift;
     }

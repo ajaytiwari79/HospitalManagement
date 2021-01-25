@@ -7,6 +7,7 @@ import com.kairos.dto.activity.night_worker.ShiftAndExpertiseNightWorkerSettingD
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.DurationType;
+import com.kairos.rule_validator.RuleExecutionType;
 import com.kairos.rule_validator.activity.AbstractActivitySpecification;
 
 import javax.management.timer.Timer;
@@ -131,7 +132,7 @@ public class ValidNightShiftSpecification extends AbstractActivitySpecification<
     }
 
     @Override
-    public void validateRules(ShiftAndExpertiseNightWorkerSettingDTO shiftAndExpertiseNightWorkerSettingDTO) {
+    public void validateRules(ShiftAndExpertiseNightWorkerSettingDTO shiftAndExpertiseNightWorkerSettingDTO, RuleExecutionType executionType) {
         //Not in use
     }
 

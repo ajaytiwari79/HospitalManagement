@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +26,9 @@ import static com.kairos.commons.utils.ObjectUtils.isEmpty;
 @NoArgsConstructor
 @Getter
 @Setter
-public class AccessPageQueryResult {
+public class AccessPageQueryResult implements Serializable {
 
+    private static final long serialVersionUID = -8499590569706361922L;
     private long id;
     private String name;
     private boolean selected;

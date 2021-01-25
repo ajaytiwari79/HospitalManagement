@@ -34,6 +34,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @NoArgsConstructor
 public class Organization extends OrganizationBaseEntity {
 
+    private static final long serialVersionUID = 4623987856633496626L;
     private boolean isKairosHub;
     //fixme need to remove
     private boolean isParentOrganization;

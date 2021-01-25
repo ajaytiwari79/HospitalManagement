@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -22,7 +23,7 @@ import java.util.Optional;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ActivityRulesSettingsDTO {
+public class ActivityRulesSettingsDTO implements Serializable {
 
     private BigInteger activityId;
     private boolean eligibleForFinalSchedule;

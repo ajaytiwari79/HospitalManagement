@@ -21,6 +21,7 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
@@ -73,6 +74,9 @@ import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,55 +96,35 @@ import static com.kairos.service.activity.ActivityUtil.*;
 @Transactional
 @Service
 public class ActivityService {
-    @Inject
-    private ActivityMongoRepository activityMongoRepository;
-    @Inject
-    private ActivityCategoryRepository activityCategoryRepository;
-    @Inject
-    private ShiftService shiftService;
-    @Inject
-    private PhaseService phaseService;
-    @Inject
-    private PlannedTimeTypeService plannedTimeTypeService;
-    @Inject
-    private TagMongoRepository tagMongoRepository;
-    @Inject
-    private OrganizationActivityService organizationActivityService;
-    @Inject
-    private TimeTypeMongoRepository timeTypeMongoRepository;
-    @Inject
-    private TimeTypeService timeTypeService;
-    @Inject
-    private PlannerSyncService plannerSyncService;
-    @Inject
-    private ExceptionService exceptionService;
-    @Inject
-    private OpenShiftIntervalRepository openShiftIntervalRepository;
-    @Inject
-    private UserIntegrationService userIntegrationService;
-    @Inject
-    private CounterRepository counterRepository;
-    @Inject
-    private GlideTimeSettingsService glideTimeSettingsService;
-    @Inject
-    private ShiftMongoRepository shiftMongoRepository;
-    @Inject
-    private StaffingLevelService staffingLevelService;
-    @Inject
-    private ActivitySchedulerJobService activitySchedulerJobService;
-    @Inject
-    private ActivitySettingsService activitySettingsService;
-    @Inject
-    private StaffActivityDetailsService staffActivityDetailsService;
-    @Inject
-    private PlanningPeriodService planningPeriodService;
-    @Inject
-    private DayTypeService dayTypeService;
-    @Inject
-    private StaffingLevelMongoRepository staffingLevelMongoRepository;
+    public static final String XXXXX = "XXXXX";
+    public static final String NAME = "name";
+    public static final String ULTRA_SHORT_NAME = "ultraShortName";
+    @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject private ActivityCategoryRepository activityCategoryRepository;
+    @Inject private ShiftService shiftService;
+    @Inject private PhaseService phaseService;
+    @Inject private PlannedTimeTypeService plannedTimeTypeService;
+    @Inject private TagMongoRepository tagMongoRepository;
+    @Inject private OrganizationActivityService organizationActivityService;
+    @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject private TimeTypeService timeTypeService;
+    @Inject private PlannerSyncService plannerSyncService;
+    @Inject private ExceptionService exceptionService;
+    @Inject private OpenShiftIntervalRepository openShiftIntervalRepository;
+    @Inject private UserIntegrationService userIntegrationService;
+    @Inject private CounterRepository counterRepository;
+    @Inject private GlideTimeSettingsService glideTimeSettingsService;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private StaffingLevelService staffingLevelService;
+    @Inject private ActivitySchedulerJobService activitySchedulerJobService;
+    @Inject private ActivitySettingsService activitySettingsService;
+    @Inject private StaffActivityDetailsService staffActivityDetailsService;
+    @Inject private PlanningPeriodService planningPeriodService;
+    @Inject private DayTypeService dayTypeService;
+    @Inject private StaffingLevelMongoRepository staffingLevelMongoRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
-
+    @CacheEvict(value = "findAllActivityByCountry", key = "#countryId")
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
         if (activityDTO.getEndDate() != null && activityDTO.getEndDate().isBefore(activityDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ENDDATE_GREATERTHAN_STARTDATE);
@@ -188,13 +172,14 @@ public class ActivityService {
         ActivityUtil.initializeActivitySettings(activity, phaseTemplateValues, glideTimeSettingsDTO);
     }
 
+
+    @Cacheable(value = "findAllActivityByCountry", key = "#countryId", cacheManager = "cacheManager")
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
         List<ActivityTagDTO> activityTagDTOS = activityMongoRepository.findAllActivityByCountry(countryId);
-        activityTagDTOS.forEach(activityTagDTO -> activityTagDTO.setActivityCanBeCopied(true));
-        List<ActivityCategory> acivitityCategories = activityCategoryRepository.findByCountryId(countryId);
+        activityTagDTOS.parallelStream().forEach(activityTagDTO -> activityTagDTO.setActivityCanBeCopied(true));
         response.put("activities", activityTagDTOS);
-        response.put("activityCategories", acivitityCategories);
+        response.put("activityCategories", activityCategoryRepository.findByCountryId(countryId));
         return response;
     }
 
@@ -258,6 +243,17 @@ public class ActivityService {
         return true;
     }
 
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public boolean deleteActivity(Long unitId, BigInteger activityId){
+        return this.deleteActivity(activityId);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public boolean deleteActivity(BigInteger activityId,Long countryId){
+        return this.deleteActivity(activityId);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",allEntries = true)
     public ActivitySettingsWrapper updateGeneralTab(Long countryId, ActivityGeneralSettingsDTO generalDTO) {
         validateActivityDetails(countryId, generalDTO);
         Activity activity = findActivityById(generalDTO.getActivityId());
@@ -273,7 +269,6 @@ public class ActivityService {
         activity.setName(generalTab.getName());
         activity.setTags(generalDTO.getTags());
         activity.setDescription(generalTab.getDescription());
-        List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         generalTab.setTags(null);
         GeneralActivityWithTagDTO generalActivityWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityWithTagDTO.class);
         generalActivityWithTagDTO.setTags(null);
@@ -284,7 +279,7 @@ public class ActivityService {
         updateBalanceSettingTab(generalDTO, activity);
         updateNotesTabOfActivity(generalDTO, activity);
         activityMongoRepository.save(activity);
-        return getActivitySettingsWrapper(activity, activityCategories, generalActivityWithTagDTO);
+        return getActivitySettingsWrapper(activity, checkCountryAndFindActivityCategory(countryId), generalActivityWithTagDTO);
     }
 
     private void validateActivityDetails(Long countryId, ActivityGeneralSettingsDTO generalDTO) {
@@ -304,7 +299,7 @@ public class ActivityService {
         }
     }
 
-    private ActivitySettingsWrapper getActivitySettingsWrapper(Activity activity, List<ActivityCategory> activityCategories, GeneralActivityWithTagDTO generalActivityWithTagDTO) {
+    private ActivitySettingsWrapper getActivitySettingsWrapper(Activity activity, List<ActivityCategoryDTO> activityCategories, GeneralActivityWithTagDTO generalActivityWithTagDTO) {
         generalActivityWithTagDTO.setAddTimeTo(activity.getActivityBalanceSettings().getAddTimeTo());
         generalActivityWithTagDTO.setTimeTypeId(activity.getActivityBalanceSettings().getTimeTypeId());
         generalActivityWithTagDTO.setOnCallTimePresent(activity.getActivityBalanceSettings().isOnCallTimePresent());
@@ -318,7 +313,6 @@ public class ActivityService {
     }
 
     public ActivitySettingsWrapper getGeneralTabOfActivity(Long countryId, BigInteger activityId) {
-        List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         Activity activity = findActivityById(activityId);
         ActivityGeneralSettings generalTab = activity.getActivityGeneralSettings();
         generalTab.setTranslations(activity.getTranslations());
@@ -336,7 +330,7 @@ public class ActivityService {
         generalActivityWithTagDTO.setContent(activity.getActivityNotesSettings().getContent());
         generalActivityWithTagDTO.setOriginalDocumentName(activity.getActivityNotesSettings().getOriginalDocumentName());
         generalActivityWithTagDTO.setModifiedDocumentName(activity.getActivityNotesSettings().getModifiedDocumentName());
-        ActivitySettingsWrapper activitySettingsWrapper = new ActivitySettingsWrapper(generalActivityWithTagDTO, activityCategories);
+        ActivitySettingsWrapper activitySettingsWrapper = new ActivitySettingsWrapper(generalActivityWithTagDTO, checkCountryAndFindActivityCategory(countryId));
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
         PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, countryId);
         activitySettingsWrapper.setPresenceTypeWithTimeType(presenceType);
@@ -344,7 +338,7 @@ public class ActivityService {
         return activitySettingsWrapper;
     }
 
-    private List<ActivityCategory> checkCountryAndFindActivityCategory(Long countryId) {
+    private List<ActivityCategoryDTO> checkCountryAndFindActivityCategory(Long countryId) {
         return activityCategoryRepository.findByCountryId(countryId);
     }
 
@@ -451,6 +445,16 @@ public class ActivityService {
         return timeCalculationActivityDTO;
     }
 
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public TimeCalculationActivityDTO updateTimeCalculationTabOfActivity(Long unitId, TimeCalculationActivityDTO timeCalculationActivityDTO, boolean availableAllowActivity){
+        return this.updateTimeCalculationTabOfActivity(timeCalculationActivityDTO,availableAllowActivity);
+    }
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public TimeCalculationActivityDTO updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO, boolean availableAllowActivity,Long countryId){
+        return this.updateTimeCalculationTabOfActivity(timeCalculationActivityDTO,availableAllowActivity);
+    }
+
     private TimeCalculationActivityDTO verifyAndDeleteCompositeActivity(TimeCalculationActivityDTO timeCalculationActivityDTO, boolean availableAllowActivity) {
         if (timeCalculationActivityDTO.getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK) || timeCalculationActivityDTO.getMethodForCalculatingTime().equals(CommonConstants.FULL_DAY_CALCULATION)) {
             boolean availableAllowActivities = activityMongoRepository.existsByActivityIdInCompositeActivitiesAndDeletedFalse(new BigInteger((String.valueOf(timeCalculationActivityDTO.getActivityId()))));
@@ -473,6 +477,16 @@ public class ActivityService {
         activity.setChildActivityIds(childActivitiesIds);
         activityMongoRepository.save(activity);
         return childActivitiesIds;
+    }
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public Set<BigInteger> assignChildActivitiesInActivity(Long unitId, BigInteger activityId, Set<BigInteger> childActivitiesIds){
+        return this.assignChildActivitiesInActivity(activityId,childActivitiesIds);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public Set<BigInteger> assignChildActivitiesInActivity(BigInteger activityId, Set<BigInteger> childActivitiesIds,Long countryId){
+        return this.assignChildActivitiesInActivity(activityId,childActivitiesIds);
     }
 
     public ActivitySettingsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
@@ -514,6 +528,16 @@ public class ActivityService {
         return new ActivitySettingsWrapper(activityIndividualPointsSettings);
     }
 
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public ActivitySettingsWrapper updateIndividualPointsTab(Long unitId, ActivityIndividualPointsSettingsDTO individualPointsDTO){
+        return this.updateIndividualPointsTab(individualPointsDTO);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public ActivitySettingsWrapper updateIndividualPointsTab(ActivityIndividualPointsSettingsDTO individualPointsDTO,Long countryId){
+        return this.updateIndividualPointsTab(individualPointsDTO);
+    }
+
     public ActivityIndividualPointsSettings getIndividualPointsTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
         return activity.getActivityIndividualPointsSettings();
@@ -540,6 +564,16 @@ public class ActivityService {
             activitySchedulerJobService.registerJobForActivityCutoff(newArrayList(activity));
         }
         return new ActivitySettingsWrapper(activityRulesSettings);
+    }
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public ActivitySettingsWrapper updateRulesTab(Long unitId, ActivityRulesSettingsDTO rulesActivityDTO, boolean updateFromOrg){
+        return this.updateRulesTab(rulesActivityDTO,updateFromOrg);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public ActivitySettingsWrapper updateRulesTab(ActivityRulesSettingsDTO rulesActivityDTO, boolean updateFromOrg,Long countryId){
+        return this.updateRulesTab(rulesActivityDTO,updateFromOrg);
     }
 
     private void updateCutoffDetails(ActivityRulesSettingsDTO rulesActivityDTO, ActivityRulesSettings activityRulesSettings) {
@@ -593,6 +627,17 @@ public class ActivityService {
         return activityPhaseSettings;
     }
 
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public ActivityPhaseSettings updatePhaseSettingTab(Long unitId, ActivityPhaseSettings activityPhaseSettings){
+        return this.updatePhaseSettingTab(activityPhaseSettings);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public ActivityPhaseSettings updatePhaseSettingTab(ActivityPhaseSettings activityPhaseSettings,Long countryId){
+        return this.updatePhaseSettingTab(activityPhaseSettings);
+    }
+
     public ActivitySettingsWrapper getRulesTabOfActivity(BigInteger activityId, Long countryId) {
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
         List<DayTypeDTO> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
@@ -637,17 +682,41 @@ public class ActivityService {
         return new ActivitySettingsWrapper(activityBonusSettings);
     }
 
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public ActivitySettingsWrapper updateBonusTabOfActivity(Long unitId, BonusActivityDTO bonusActivityDTO){
+        return this.updateBonusTabOfActivity(bonusActivityDTO);
+    }
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public ActivitySettingsWrapper updateBonusTabOfActivity(BonusActivityDTO bonusActivityDTO,Long countryId){
+        return this.updateBonusTabOfActivity(bonusActivityDTO);
+    }
+
     public ActivitySettingsWrapper getBonusTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
         return new ActivitySettingsWrapper(activity.getActivityBonusSettings());
     }
 
-    public ActivitySettingsWrapper updateSkillTabOfActivity(SkillActivityDTO skillActivityDTO) {
+
+    @Caching(evict = {
+            @CacheEvict(value = "findAllActivityByCountry",allEntries = true),
+            @CacheEvict(value="getActivityMappingDetails", key="#unitId") })
+    public ActivitySettingsWrapper updateSkillTabOfActivity( SkillActivityDTO skillActivityDTO) {
         Activity activity = findActivityById(skillActivityDTO.getActivityId());
         ActivitySkillSettings activitySkillSettings = new ActivitySkillSettings(skillActivityDTO.getActivitySkills());
         activity.setActivitySkillSettings(activitySkillSettings);
         activityMongoRepository.save(activity);
         return new ActivitySettingsWrapper(activitySkillSettings);
+    }
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public ActivitySettingsWrapper updateSkillTabOfActivity(Long unitId, SkillActivityDTO skillActivityDTO){
+        return this.updateSkillTabOfActivity(skillActivityDTO);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public ActivitySettingsWrapper updateSkillTabOfActivity(SkillActivityDTO skillActivityDTO,Long countryId){
+        return this.updateSkillTabOfActivity(skillActivityDTO);
     }
 
     public ActivitySettingsWrapper getSkillTabOfActivity(BigInteger activityId) {
@@ -681,6 +750,16 @@ public class ActivityService {
         if (activity.getUnitId() != null) {
             plannerSyncService.publishActivity(activity.getUnitId(), activity, IntegrationOperation.UPDATE);
         }
+    }
+
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public void updateOrgMappingDetailOfActivity(Long unitId, OrganizationMappingDTO organizationMappingDTO, BigInteger activityId){
+        this.updateOrgMappingDetailOfActivity(organizationMappingDTO,activityId);
+    }
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public void updateOrgMappingDetailOfActivity(OrganizationMappingDTO organizationMappingDTO, BigInteger activityId,Long countryId){
+        this.updateOrgMappingDetailOfActivity(organizationMappingDTO,activityId);
     }
 
     public OrganizationMappingDTO getOrgMappingDetailOfActivity(BigInteger activityId) {
@@ -723,13 +802,24 @@ public class ActivityService {
         return new ActivitySettingsWrapper(activityOptaPlannerSetting);
     }
 
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public ActivitySettingsWrapper updateOptaPlannerSettingsTabOfActivity(Long unitId, BigInteger activityId, ActivityOptaPlannerSetting activityOptaPlannerSetting){
+        return updateOptaPlannerSettingsTabOfActivity(activityId,activityOptaPlannerSetting);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public ActivitySettingsWrapper updateOptaPlannerSettingsTabOfActivity(BigInteger activityId, ActivityOptaPlannerSetting activityOptaPlannerSetting,Long countryId){
+        return updateOptaPlannerSettingsTabOfActivity(activityId,activityOptaPlannerSetting);
+    }
+
     public ActivitySettingsWrapper getOptaPlannerSettingsTabOfActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
         return new ActivitySettingsWrapper(activity.getActivityOptaPlannerSetting());
     }
 
     public ActivitySettingsWrapper getCtaAndWtaSettingsTabOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
+        Activity activity = findActivityById(activityId);
         return new ActivitySettingsWrapper(activity.getActivityCTAAndWTASettings());
     }
 
@@ -741,6 +831,18 @@ public class ActivityService {
         return new ActivitySettingsWrapper(activityCTAAndWTASettings);
     }
 
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public ActivitySettingsWrapper updateCtaAndWtaSettingsTabOfActivity(Long unitId, ActivityCTAAndWTASettingsDTO activityCTAAndWTASettingsDTO){
+        return this.updateCtaAndWtaSettingsTabOfActivity(activityCTAAndWTASettingsDTO);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public ActivitySettingsWrapper updateCtaAndWtaSettingsTabOfActivity(ActivityCTAAndWTASettingsDTO activityCTAAndWTASettingsDTO, Long countryId){
+        return this.updateCtaAndWtaSettingsTabOfActivity(activityCTAAndWTASettingsDTO);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",allEntries = true)
     public boolean deleteCountryActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
         if (activity.getState().equals(ActivityStateEnum.LIVE)) {
@@ -824,6 +926,8 @@ public class ActivityService {
         }
     }
 
+
+    @CacheEvict(value = "findAllActivityByCountry",allEntries = true)
     public Boolean publishActivity(BigInteger activityId) {
         Activity activity = findActivityById(activityId);
         if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
@@ -837,6 +941,8 @@ public class ActivityService {
         return true;
     }
 
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
     public ActivityDTO copyActivityDetails(Long countryId, BigInteger activityId, ActivityDTO activityDTO) {
         Activity activity = activityMongoRepository.findByNameIgnoreCaseAndCountryIdAndByDate(activityDTO.getName().trim(), countryId, activityDTO.getStartDate(), activityDTO.getEndDate());
         if (Optional.ofNullable(activity).isPresent() && activityDTO.getStartDate().isBefore(activity.getActivityGeneralSettings().getStartDate())) {
@@ -876,7 +982,19 @@ public class ActivityService {
         return new ActivitySettingsWrapper(activityLocationSettings);
     }
 
-    public Map<String, TranslationInfo> updateTranslationData(BigInteger activityId, Map<String, TranslationInfo> activityTranslationDTO) {
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public ActivitySettingsWrapper updateLocationsTabOfActivity(Long unitId, ActivityLocationSettingsDTO activityLocationSettingsDTO){
+        return this.updateLocationsTabOfActivity(activityLocationSettingsDTO);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public ActivitySettingsWrapper updateLocationsTabOfActivity(ActivityLocationSettingsDTO activityLocationSettingsDTO,Long countryId){
+        return this.updateLocationsTabOfActivity(activityLocationSettingsDTO);
+    }
+
+    @Caching(evict = {@CacheEvict(value = "findAllActivityByCountry",allEntries = true),
+            @CacheEvict(value="getActivityMappingDetails", allEntries = true)})
+    public Map<String, TranslationInfo> updateTranslationData(BigInteger activityId, Map<String, TranslationInfo> activityTranslationDTO){
         Activity activity = activityMongoRepository.findActivityByIdAndEnabled(activityId);
         if (isNull(activity)) {
             exceptionService.dataNotFoundException(MESSAGE_DATA_NOTFOUND);
@@ -884,7 +1002,11 @@ public class ActivityService {
         return updateActivityTranslations(activity, activityTranslationDTO);
     }
 
-    public Map<String, TranslationInfo> updateActivityTranslations(@NotNull Activity activity, Map<String, TranslationInfo> activityTranslationDTO) {
+
+    @Caching(evict = {
+            @CacheEvict(value = "findAllActivityByCountry",allEntries = true),
+            @CacheEvict(value="getActivityMappingDetails", allEntries = true)})
+    public Map<String, TranslationInfo> updateActivityTranslations(@NotNull Activity activity, Map<String, TranslationInfo> activityTranslationDTO){
         final Map<String, TranslationInfo> activityLanguageDetailsMap = activity.getTranslations();
         activityTranslationDTO.forEach((s, translation) -> {
             LOGGER.debug("saving language details {} ", translation);
@@ -977,10 +1099,24 @@ public class ActivityService {
         return true;
     }
 
+
+    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    public boolean removeAttachementsFromActivity(Long unitId, BigInteger activityId, boolean removeNotes) {
+        return this.removeAttachementsFromActivity(activityId,removeNotes);
+    }
+
+    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    public boolean removeAttachementsFromActivity(BigInteger activityId, boolean removeNotes,Long countryId) {
+        return this.removeAttachementsFromActivity(activityId,removeNotes);
+    }
+
+
     public List<ActivityDTO> findAllActivityByDeletedFalseAndUnitId(List<Long> unitIds) {
         return activityMongoRepository.findAllActivityByDeletedFalseAndUnitId(unitIds);
     }
-
+    @Caching(evict = {
+            @CacheEvict(value = "findAllActivityByCountry",allEntries = true),
+            @CacheEvict(value="getActivityMappingDetails", allEntries = true) })
     public void unassighExpertiseFromActivities(BigInteger expertiseId) {
         activityMongoRepository.unassignExpertiseFromActivitiesByExpertiesId(expertiseId.longValue());
         LOGGER.info("successfully remove expertise from activities by job");
@@ -1038,21 +1174,27 @@ public class ActivityService {
         return activityMongoRepository.getActivityRankWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getActivitySequence()));
     }
 
-    public Map<BigInteger, ActivityDTO> getActivityDetailsWithRankByUnitId(Long unitId) {
-        FieldPermissionUserData fieldPermissionUserData = userIntegrationService.getPermissionData(newHashSet("Activity"));
-        Map<String, Set<FieldLevelPermission>> fieldPermissionMap = new HashMap<>();
-        prepareFLPMap(fieldPermissionUserData.getModelDTOS(), fieldPermissionMap);
-        Map<BigInteger, ActivityDTO> activityDTOMap = activityMongoRepository.getActivityDetailsWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
-        activityDTOMap.forEach((k, v) -> {
-            if (fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()) {
-                v.setName("XXXXX");
-                v.getActivityGeneralSettings().setName("XXXXX");
+    public Map<BigInteger,ActivityDTO> getActivityDetailsWithRankByUnitId(Long unitId) {
+        Map<String,Set<FieldLevelPermission>> fieldPermissionMap=getActivityPermissionMap(unitId,UserContext.getUserDetails().getId());
+        Map<BigInteger,ActivityDTO> activityDTOMap= activityMongoRepository.getActivityDetailsWithRankByUnitId(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        activityDTOMap.forEach((k,v)->{
+            if(fieldPermissionMap.containsKey(NAME) && (fieldPermissionMap.get(NAME).contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get(NAME).isEmpty())){
+                v.setName(XXXXX);
+                v.getActivityGeneralSettings().setName(XXXXX);
             }
-            if (fieldPermissionMap.get("ultraShortName").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("ultraShortName").isEmpty()) {
-                v.getActivityGeneralSettings().setUltraShortName("XXXXX");
+            if(fieldPermissionMap.containsKey(ULTRA_SHORT_NAME) && (fieldPermissionMap.get(ULTRA_SHORT_NAME).contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get(ULTRA_SHORT_NAME).isEmpty())){
+                v.getActivityGeneralSettings().setUltraShortName(XXXXX);
             }
         });
         return activityDTOMap;
+    }
+
+    @Cacheable(value = "getActivityPermissionMap", key = "{#unitId, #userId}", cacheManager = "cacheManager")
+    public Map<String,Set<FieldLevelPermission>> getActivityPermissionMap(Long unitId,Long userId){
+        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
+        Map<String,Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
+        prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
+        return fieldPermissionMap;
     }
 
     public void prepareFLPMap(List<ModelDTO> modelDTOS, Map<String, Set<FieldLevelPermission>> fieldPermissionMap) {

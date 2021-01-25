@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 
+import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.persistence.model.activity.tabs.ActivityCategory;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -20,7 +21,7 @@ public interface ActivityCategoryRepository extends MongoRepository<ActivityCate
     ActivityCategory getCategoryByNameAndCountryAndDeleted(String categoryName, long countryId,boolean status);
 
     @Query("{'deleted': false, 'countryId' : ?0}")
-    List<ActivityCategory> findByCountryId(long countryId);
+    List<ActivityCategoryDTO> findByCountryId(long countryId);
 
     @Query(value = "{ 'name' :{$regex:?0,$options:'i'} ,'deleted':false} ")
     ActivityCategory getCategoryByName(String categoryName);

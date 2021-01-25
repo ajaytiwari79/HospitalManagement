@@ -3,6 +3,7 @@ package com.kairos.dto.activity.activity.activity_tabs;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.TimeTypeEnum;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -12,8 +13,9 @@ import java.util.List;
  * Created by pawanmandhan on 22/8/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ActivityGeneralSettingsDTO {
+public class ActivityGeneralSettingsDTO implements Serializable {
 
+    private static final long serialVersionUID = 8105328468336076957L;
     private BigInteger activityId;
     private String name;
     private String code;

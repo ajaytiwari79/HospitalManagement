@@ -13,6 +13,7 @@ import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ViewType;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.open_shift.OpenShiftService;
 import com.kairos.service.shift.*;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -44,6 +45,8 @@ public class ShiftController {
     @Inject
     private ShiftService shiftService;
     @Inject
+    private FetchShiftService fetchShiftService;
+    @Inject
     private ShiftSickService shiftSickService;
     @Inject
     private ShiftTemplateService shiftTemplateService;
@@ -63,6 +66,8 @@ public class ShiftController {
     private RequestAbsenceService requestAbsenceService;
     @Inject
     private ShiftBreakService shiftBreakService;
+    @Inject
+    private OpenShiftService openShiftService;
 
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
@@ -147,11 +152,11 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStatusService.updateStatusOfShifts(unitId, shiftPublishDTO));
     }
 
-    @ApiOperation("copy shifts from 1 employee to others")
+   /* @ApiOperation("copy shifts from 1 employee to others")
     @PutMapping(value = "/copy_shifts")
     public ResponseEntity<Map<String, Object>> copyShifts(@PathVariable long unitId, @RequestBody @Valid CopyShiftDTO copyShiftDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftCopyService.copyShifts(unitId, copyShiftDTO));
-    }
+    }*/
 
     @ApiOperation("create shift using template")
     @PostMapping(value = "shift/from_shift_template")
@@ -166,7 +171,7 @@ public class ShiftController {
                                                                                                 Long employmentEndDate, @PathVariable Long staffId,
                                                                                         @PathVariable Long unitId) {
 
-        shiftService.deleteShiftsAndOpenShiftsOnEmploymentEnd(staffId, DateUtils.getLocalDatetimeFromLong(employmentEndDate));
+        openShiftService.deleteShiftsAndOpenShiftsOnEmploymentEnd(staffId, DateUtils.getLocalDatetimeFromLong(employmentEndDate));
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
 
     }
@@ -240,7 +245,7 @@ public class ShiftController {
         if (isNull(staffFilterDTO)) {
             staffFilterDTO = new StaffFilterDTO();
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, employmentId, viewType, shiftFilterParam, expertiseId, staffFilterDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, fetchShiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, employmentId, viewType, shiftFilterParam, expertiseId, staffFilterDTO));
     }
 
     @ApiOperation("Update planning period id in Shifts")

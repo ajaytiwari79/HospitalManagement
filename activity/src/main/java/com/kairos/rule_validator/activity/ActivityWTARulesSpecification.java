@@ -6,6 +6,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.rule_validator.RuleExecutionType;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
     }
 
     @Override
-    public void validateRules(Activity activity) {
+    public void validateRules(Activity activity, RuleExecutionType ruleExecutionType) {
         //Not in use
     }
 

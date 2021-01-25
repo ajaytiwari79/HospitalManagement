@@ -40,10 +40,12 @@ public class StaffingLevelAvailableCountService {
         LocalDate startDate = null;
         LocalDate endDate = null;
         Set<LocalDate> localDates = newHashSet();
+        Long unitId = null;
         if(isNotNull(shift)){
             startDate = asLocalDate(shift.getStartDate());
             endDate = asLocalDate(shift.getEndDate());
             localDates.addAll(newHashSet(startDate, endDate));
+            unitId = shift.getUnitId();
         }
         LocalDate oldStartDate = null;
         LocalDate oldEndDate = null;
@@ -51,18 +53,19 @@ public class StaffingLevelAvailableCountService {
              oldStartDate = asLocalDate(oldShift.getStartDate());
              oldEndDate = asLocalDate(oldShift.getEndDate());
              localDates.addAll(newHashSet(oldStartDate, oldEndDate));
+             unitId = oldShift.getUnitId();
         }
-        Map<LocalDate, StaffingLevel> staffingLevelMap = staffingLevelMongoRepository.findByUnitIdAndDates(shift.getUnitId(),localDates).stream().collect(Collectors.toMap(staffingLevel -> asLocalDate(staffingLevel.getCurrentDate()), v->v));
+        Map<LocalDate, StaffingLevel> staffingLevelMap = staffingLevelMongoRepository.findByUnitIdAndDates(unitId,localDates).stream().collect(Collectors.toMap(staffingLevel -> asLocalDate(staffingLevel.getCurrentDate()), v->v));
         updateCount(oldShift, staffAdditionalInfoDTO, oldStartDate, oldEndDate, staffingLevelMap, true);
         updateCount(shift, staffAdditionalInfoDTO, startDate, endDate, staffingLevelMap, false);
         staffingLevelMongoRepository.saveEntities(staffingLevelMap.values());
     }
 
-    private void updateCount(Shift oldShift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, LocalDate startDate, LocalDate endDate, Map<LocalDate, StaffingLevel> staffingLevelMap, boolean b) {
-        if (isNotNull(startDate)) {
-            updatePresenceStaffingLevelAvailableStaffCount(staffingLevelMap.get(startDate), newArrayList(oldShift), staffAdditionalInfoDTO, b);
+    private void updateCount(Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, LocalDate startDate, LocalDate endDate, Map<LocalDate, StaffingLevel> staffingLevelMap, boolean removedShift) {
+        if (isNotNull(startDate) && isNotNull(shift)) {
+            updatePresenceStaffingLevelAvailableStaffCount(staffingLevelMap.get(startDate), newArrayList(shift), staffAdditionalInfoDTO, removedShift);
             if (!startDate.equals(endDate)) {
-                updatePresenceStaffingLevelAvailableStaffCount(staffingLevelMap.get(endDate), newArrayList(oldShift), staffAdditionalInfoDTO, b);
+                updatePresenceStaffingLevelAvailableStaffCount(staffingLevelMap.get(endDate), newArrayList(shift), staffAdditionalInfoDTO, removedShift);
             }
         }
     }
@@ -168,6 +171,7 @@ public class StaffingLevelAvailableCountService {
     @Async
     public StaffingLevel updatePresenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel) {
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(getStartOfDay(staffingLevel.getCurrentDate()), getEndOfDay(staffingLevel.getCurrentDate()), newArrayList(staffingLevel.getUnitId()));
+        resetAvailableCount(staffingLevel);
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
                 if ((FULL_WEEK.equals(shiftActivity.getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(shiftActivity.getMethodForCalculatingTime()))) {
@@ -180,5 +184,12 @@ public class StaffingLevelAvailableCountService {
         }
         staffingLevelMongoRepository.save(staffingLevel);
         return staffingLevel;
+    }
+
+    private void resetAvailableCount(StaffingLevel staffingLevel) {
+        staffingLevel.getPresenceStaffingLevelInterval().parallelStream().forEach(staffingLevelInterval -> {
+            staffingLevelInterval.setAvailableNoOfStaff(0);
+            staffingLevelInterval.getStaffingLevelActivities().stream().forEach(staffingLevelActivity -> staffingLevelActivity.setAvailableNoOfStaff(0));
+        });
     }
 }

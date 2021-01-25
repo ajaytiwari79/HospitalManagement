@@ -371,7 +371,7 @@ public class ClientBatchService {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         logger.info("counter: " + counter);

@@ -3,6 +3,7 @@ package com.kairos.dto.user.country.agreement.cta.cta_response;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,8 +14,9 @@ import java.time.LocalTime;
  */
 @Getter
 @Setter
-public class CountryHolidayCalenderDTO {
+public class CountryHolidayCalenderDTO implements Serializable {
 
+    private static final long serialVersionUID = -8334410671363091603L;
     private BigInteger id;
     private boolean reOccuring;
     private boolean holidayType;

@@ -273,6 +273,10 @@ public  class DateUtils {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
+    public static LocalDateTime asLocalDateTime(LocalDate date) {
+        return LocalDateTime.of(date,LocalTime.MIN);
+    }
+
     public static Date onlyDate(Date date) {
         return getDateByZoneDateTime(asZonedDateTime(date).truncatedTo(ChronoUnit.DAYS));
     }
@@ -526,6 +530,10 @@ public  class DateUtils {
 
     public static LocalDateTime getLocalDateTimeFromZoneId(ZoneId unitTimeZone) {
         return LocalDateTime.now(unitTimeZone);
+    }
+
+    public static ZonedDateTime getZonedDateTimeFromZoneId(ZoneId unitTimeZone) {
+        return ZonedDateTime.now(unitTimeZone);
     }
 
     public static Long getEndOfDayMillisforUnitFromEpoch(ZoneId zone, Long dateMillis) {
@@ -946,5 +954,6 @@ public  class DateUtils {
         int minutes=Integer.parseInt(hrs)*60;
         return minutes+Integer.parseInt(time.substring(indexOfDot+1));
     }
+
 
 }

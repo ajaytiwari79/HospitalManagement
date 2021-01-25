@@ -10,6 +10,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 public class AbsenceTypes extends UserBaseEntity {
 
 
+    private static final long serialVersionUID = -6347869095754259167L;
     private Long ATVTID; // Absence Type Id as in Visitour master data
     private String name;
     private long organizationId;

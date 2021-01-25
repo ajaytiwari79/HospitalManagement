@@ -3,6 +3,7 @@ package com.kairos.controller.staff;
 import com.kairos.annotations.KPermissionActions;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.dto.activity.shift.NotEligibleStaffDataDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.employment.PositionDTO;
@@ -423,7 +424,7 @@ public class StaffController {
         long accessGroupId = Long.parseLong((String) permission.get("accessGroupId"));
         long tabId = Long.parseLong((String) permission.get("tabId"));
         long unitId = Long.parseLong((String) permission.get("unitId"));
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setPagePermissionToUser(staffId, unitId, accessGroupId, tabId, read, write));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setPagePermissionToUser(staffId, unitId, accessGroupId, tabId, read, write,UserContext.getUserDetails().getId()));
     }
 
     @RequestMapping(value = "/{staffId}/external_id", method = RequestMethod.POST)
@@ -690,6 +691,12 @@ public class StaffController {
     @ApiOperation("update staff child translation data")
     public ResponseEntity<Map<String, Object>>  updateStaffChildTranslations(@PathVariable Long staffChildId,@RequestBody Map<String, TranslationInfo> translations){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(staffChildId,translations));
+    }
+
+    @PostMapping(value ="/get_eligible_staffs_for_cover_shifts" )
+    @ApiOperation("get eligible staffs for cover shifts")
+    public ResponseEntity<Map<String, Object>> getEligibleStaffsForCoverShifts(@PathVariable Long unitId,@RequestBody NotEligibleStaffDataDTO notEligibleStaffData){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getEligibleStaffsForCoverShifts(unitId,notEligibleStaffData));
     }
 
 

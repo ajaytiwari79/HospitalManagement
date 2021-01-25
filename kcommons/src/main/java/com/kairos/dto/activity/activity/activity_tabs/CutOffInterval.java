@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
@@ -7,8 +8,9 @@ import java.time.LocalDate;
  * @date - 21/8/18
  */
 
-public class CutOffInterval {
+public class CutOffInterval implements Serializable {
 
+    private static final long serialVersionUID = 2435203302227263141L;
     private LocalDate startDate;
     private LocalDate endDate;
 

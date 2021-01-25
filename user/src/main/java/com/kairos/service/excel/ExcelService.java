@@ -1,9 +1,12 @@
 package com.kairos.service.excel;
 
 import com.google.common.collect.Lists;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepositoryImpl;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +23,8 @@ import java.util.List;
 @Service
 public class ExcelService {
 
+    private final Logger logger = LoggerFactory.getLogger(ExcelService.class);
+
     public List<Row> getRowsByXLSXFile(MultipartFile multipartFile, int sheetNo) {
         InputStream stream;
         XSSFWorkbook workbook;
@@ -33,7 +38,7 @@ public class ExcelService {
             rows = Lists.newArrayList(sheet.iterator());
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         return rows;

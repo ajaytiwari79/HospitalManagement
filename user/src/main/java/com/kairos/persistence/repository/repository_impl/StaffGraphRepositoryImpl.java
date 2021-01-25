@@ -3,11 +3,14 @@
  import com.kairos.commons.utils.DateUtils;
  import com.kairos.commons.utils.ObjectMapperUtils;
  import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+ import com.kairos.dto.activity.shift.NotEligibleStaffDataDTO;
+ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
  import com.kairos.enums.Employment;
  import com.kairos.enums.FilterType;
  import com.kairos.enums.ModuleId;
  import com.kairos.persistence.model.staff.StaffEmploymentQueryResult;
  import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
+ import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
  import com.kairos.persistence.model.staff.personal_details.StaffEmploymentWithTag;
  import com.kairos.persistence.repository.user.staff.CustomStaffGraphRepository;
  import org.apache.commons.collections.CollectionUtils;
@@ -16,6 +19,7 @@
  import org.neo4j.ogm.session.Session;
  import org.slf4j.Logger;
  import org.slf4j.LoggerFactory;
+ import org.springframework.data.neo4j.annotation.Query;
  import org.springframework.stereotype.Repository;
 
  import javax.inject.Inject;
@@ -24,6 +28,7 @@
  import java.util.stream.Collectors;
  import java.util.stream.StreamSupport;
 
+ import static com.kairos.commons.utils.ObjectUtils.getBigIntegerString;
  import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
  import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -603,6 +608,50 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         String value = (countOfSubString == 0 ? " WHERE" : " AND" );
         return countOfSubString<0 ? "" : value;
     }
+
+    @Override
+    public List<StaffAdditionalInfoDTO> getEligibleStaffsForCoverShift(Long unitId,NotEligibleStaffDataDTO notEligibleStaffDataDTO){
+        Map<String, Object> queryParameters = new HashMap<>();
+        queryParameters.put(UNIT_ID, unitId);
+        queryParameters.put("date",DateUtils.formatLocalDate(notEligibleStaffDataDTO.getShiftDate(), "yyyy-MM-dd"));
+        StringBuilder query = new StringBuilder("MATCH (organization:Unit)<-[:IN_UNIT]-(employment:Employment) WHERE id(organization)={unitId} AND (employment.endDate is null OR date(employment.endDate) >= date({date}))");
+        if(isCollectionNotEmpty(notEligibleStaffDataDTO.getEmploymentTypeIds())){
+            queryParameters.put(EMPLOYMENT_TYPE_IDS, notEligibleStaffDataDTO.getEmploymentTypeIds());
+            query.append(" MATCH (employment)-[:HAS_EMPLOYMENT_LINES]-(empLine:EmploymentLine)-[:HAS_EMPLOYMENT_TYPE]-(empType) where id(empType) in {employmentTypeIds}");
+        }
+        if(isCollectionNotEmpty(notEligibleStaffDataDTO.getStaffIds())){
+            queryParameters.put("notIncludeStaffIds", notEligibleStaffDataDTO.getStaffIds());
+            query.append(" MATCH (employment)<-[:BELONGS_TO_STAFF]-(staff:Staff)<-[:BELONGS_TO]-(position:Position)-[:HAS_UNIT_PERMISSIONS]->(up:UnitPermission) WHERE NOT id(staff) in {notIncludeStaffIds}");
+        }else{
+            query.append(" MATCH (employment)<-[:BELONGS_TO_STAFF]-(staff:Staff)<-[:BELONGS_TO]-(position:Position)-[:HAS_UNIT_PERMISSIONS]->(up:UnitPermission)");
+        }
+        query.append(" WITH staff,organization,collect(id(employment)) AS employmentIds ")
+        .append(" MATCH (staff)-[:BELONGS_TO]->(user:User) WITH staff,organization,employmentIds,user")
+                .append(" OPTIONAL MATCH (staff)-[:HAS_CHILDREN]->(staffChildDetail:StaffChildDetail) WITH staff,collect(staffChildDetail) AS  staffChildDetails,organization,employmentIds,user");
+        if(isCollectionNotEmpty(notEligibleStaffDataDTO.getActivityIds())){
+            //queryParameters.put("activityIds", notEligibleStaffDataDTO.getActivityIds());
+            query.append(" MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff) where all(activity in").append(getBigIntegerString(notEligibleStaffDataDTO.getActivityIds().iterator())).append(" WHERE activity IN teams.activityIds)");
+        }else{
+            query.append(" OPTIONAL MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff)");
+        }
+        query.append(" WITH staff,collect(id(teams)) AS teams,organization,employmentIds,user,staffChildDetails");
+        if(isCollectionNotEmpty(notEligibleStaffDataDTO.getTagIds())){
+            queryParameters.put(TAG_IDS, notEligibleStaffDataDTO.getTagIds());
+            query.append(" MATCH (staff)-[:BELONGS_TO_TAGS]->(tag:Tag) where id(tag) in {tagIds}");
+        }else {
+            query.append(" MATCH (staff)-[:BELONGS_TO_TAGS]->(tag:Tag)");
+        }
+        query.append(" WITH staff,staffChildDetails,teams,organization,employmentIds,user,COLLECT(tag) AS tags RETURN id(staff) AS id,staff.firstName AS firstName,staff.lastName as lastName,staff.profilePic AS profilePic,teams,id(organization) AS unitId,employmentIds as employmentIds,id(user) AS staffUserId,user.cprNumber AS cprNumber,staffChildDetails,tags");
+        Result result = session.query(query.toString(), queryParameters);
+        Iterator si = result.iterator();
+        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = new ArrayList<>();
+        while (si.hasNext()) {
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(si.next(), StaffAdditionalInfoDTO.class);
+            staffAdditionalInfoDTOS.add(staffAdditionalInfoDTO);
+        }
+        return staffAdditionalInfoDTOS;
+    }
+
 
 
 }

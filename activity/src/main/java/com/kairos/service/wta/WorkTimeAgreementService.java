@@ -97,11 +97,6 @@ import static com.kairos.enums.FilterType.NIGHT_WORKERS;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
 import static java.util.stream.Collectors.toMap;
 
-
-/**
- * Created by pawanmandhan on 2/8/17.
- */
-
 @Transactional
 @Service
 public class WorkTimeAgreementService{
@@ -229,13 +224,12 @@ public class WorkTimeAgreementService{
         return wtaResponseDTO;
     }
 
-
     private Map<Long, WTAResponseDTO> assignWTAToNewOrganization(WorkingTimeAgreement wta, WTADTO wtadto, WTABasicDetailsDTO wtaBasicDetailsDTO, boolean creatingFromCountry, Long referenceId) {
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>(wtaBasicDetailsDTO.getOrganizations().size());
         List<Long> organizationIds = wtaBasicDetailsDTO.getOrganizations().stream().map(OrganizationBasicDTO::getId).collect(Collectors.toList());
         List<WorkingTimeAgreement> workingTimeAgreementList = wtaRepository.findWTAByUnitIdsAndName(organizationIds, wtadto.getName());
         Map<String, WorkingTimeAgreement> workingTimeAgreementMap = workingTimeAgreementList.stream().collect(toMap(k -> k.getName() + "_" + k.getOrganization().getId() + "_" + k.getOrganizationType().getId(), v -> v));
-        Map<String, BigInteger> activitiesIdsAndUnitIdsMap = getActivityMapWithUnitId(wtadto.getRuleTemplates(), organizationIds);
+        Map<String, BigInteger> activitiesIdsAndUnitIdsMap = ruleTemplateService.getActivityMapWithUnitId(wtadto.getRuleTemplates(), organizationIds);
         Map<Long, WTAResponseDTO> wtaResponseDTOMap = new HashMap<>();
         wtaBasicDetailsDTO.getOrganizations().forEach(organization ->
         {
@@ -457,7 +451,7 @@ public class WorkTimeAgreementService{
         List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndCountryId(countryId);
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
         List<PresenceTypeDTO> plannedTimeTypes=plannedTimeTypeService.getAllPresenceTypeByCountry(countryId);
-        List<DayTypeDTO> dayTypeDTOS=dayTypeService.getAllDayTypeByCountryId(countryId);
+        List<DayTypeDTO> dayTypeDTOS=dayTypeService.getDayTypeWithCountryHolidayCalender(countryId);
         WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = new WTADefaultDataInfoDTO();
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);
         wtaDefaultDataInfoDTO.setActivityList(activityDTOS);
@@ -468,11 +462,9 @@ public class WorkTimeAgreementService{
 
     public WTADefaultDataInfoDTO getDefaultWtaInfoForUnit(Long unitId) {
         WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = new WTADefaultDataInfoDTO();
-        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
         List<ActivityDTO> activities = activityMongoRepository.findByDeletedFalseAndUnitId(unitId);
         List<PresenceTypeDTO> presenceTypeDTOS=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
-        Map<String, Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
-        activityService.prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
+        Map<String, Set<FieldLevelPermission>> fieldPermissionMap=activityService.getActivityPermissionMap(unitId,UserContext.getUserDetails().getId());
         activities.forEach(activity->{
             if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
                 activity.setName("XXXXX");
@@ -480,7 +472,7 @@ public class WorkTimeAgreementService{
         });
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, wtaDefaultDataInfoDTO.getCountryID());
         List<TimeSlotDTO> timeSlotDTOS=timeSlotSetService.getShiftPlanningTimeSlotByUnit(unitId);
-        wtaDefaultDataInfoDTO.setDayTypes(dayTypeService.getAllDayTypeByCountryId(UserContext.getUserDetails().getCountryId()));
+        wtaDefaultDataInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);
         wtaDefaultDataInfoDTO.setActivityList(activities);
         wtaDefaultDataInfoDTO.setTimeSlots(timeSlotDTOS);
@@ -569,7 +561,7 @@ public class WorkTimeAgreementService{
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
         WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-        Map<String, BigInteger> activitiesIdsAndUnitIdsMap = getActivityMapWithUnitId(wtaResponseDTO.getRuleTemplates(), newArrayList(unitId));
+        Map<String, BigInteger> activitiesIdsAndUnitIdsMap = ruleTemplateService.getActivityMapWithUnitId(wtaResponseDTO.getRuleTemplates(), newArrayList(unitId));
         if (CollectionUtils.isNotEmpty(wtaResponseDTO.getRuleTemplates())) {
             ruleTemplates = wtaBuilderService.copyRuleTemplatesWithUpdateActivity(activitiesIdsAndUnitIdsMap, unitId, wtaResponseDTO.getRuleTemplates(), true);
             for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
@@ -782,43 +774,6 @@ public class WorkTimeAgreementService{
         return true;
     }
 
-    public <T> Map<String, BigInteger> getActivityMapWithUnitId(List<T> wtaBaseRuleTemplateDTOS, List<Long> organisationIds) {
-        Set<BigInteger> activityIds = new HashSet<>();
-        for (T ruleTemplate : wtaBaseRuleTemplateDTOS) {
-            boolean instanceOfWTABaseTemplate = ruleTemplate instanceof WTABaseRuleTemplate;
-            WTATemplateType wtaTemplateType = ruleTemplate instanceof WTABaseRuleTemplate ?  ((WTABaseRuleTemplate)ruleTemplate).getWtaTemplateType() : ((WTABaseRuleTemplateDTO)ruleTemplate).getWtaTemplateType();
-            switch (wtaTemplateType) {
-                case VETO_AND_STOP_BRICKS:
-                    VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate = instanceOfWTABaseTemplate ? (VetoAndStopBricksWTATemplate) ruleTemplate :ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, VetoAndStopBricksWTATemplate.class);
-                    CollectionUtils.addIgnoreNull(activityIds, vetoAndStopBricksWTATemplate.getStopBrickActivityId());
-                    CollectionUtils.addIgnoreNull(activityIds, vetoAndStopBricksWTATemplate.getVetoActivityId());
-                    break;
-                case SENIOR_DAYS_PER_YEAR:
-                    SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = instanceOfWTABaseTemplate ? (SeniorDaysPerYearWTATemplate) ruleTemplate: ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, SeniorDaysPerYearWTATemplate.class);
-                    activityIds.addAll(seniorDaysPerYearWTATemplate.getActivityIds());
-                    break;
-                case CHILD_CARE_DAYS_CHECK:
-                    ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = instanceOfWTABaseTemplate ? (ChildCareDaysCheckWTATemplate)ruleTemplate : ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ChildCareDaysCheckWTATemplate.class);
-                    activityIds.addAll(childCareDaysCheckWTATemplate.getActivityIds());
-                    break;
-                case WTA_FOR_CARE_DAYS:
-                    WTAForCareDays wtaForCareDays = instanceOfWTABaseTemplate ? (WTAForCareDays) ruleTemplate: ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, WTAForCareDays.class);
-                    activityIds.addAll(wtaForCareDays.getCareDayCounts().stream().map(activityCareDayCount -> activityCareDayCount.getActivityId()).collect(Collectors.toSet()));
-                    break;
-                case PROTECTED_DAYS_OFF:
-                    ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = instanceOfWTABaseTemplate ? (ProtectedDaysOffWTATemplate) ruleTemplate : ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ProtectedDaysOffWTATemplate.class);
-                    CollectionUtils.addIgnoreNull(activityIds,protectedDaysOffWTATemplate.getActivityId());
-                    break;
-                default:
-                    break;
-            }
-
-        }
-
-        List<Activity> activities = activityMongoRepository.findAllActivitiesByUnitIds(organisationIds, activityIds);
-        return activities.stream().filter(distinctByKey(activity -> activity.getCountryParentId() + "-" + activity.getUnitId())).collect(toMap(k -> k.getCountryParentId() + "-" + k.getUnitId(), v -> v.getId()));
-    }
-
     private WTAResponseDTO updateWTAOfPublishedEmployment(WorkingTimeAgreement oldWta, WTADTO wtadto, Long unitId,Boolean save) {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
         if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
@@ -895,23 +850,6 @@ public class WorkTimeAgreementService{
         return workTimeAgreementBalancesCalculationService.getWorkTimeAgreementBalance(unitId, employmentId, startDate, endDate,new HashSet<>(),null);
     }
 
-    public IntervalBalance getProtectedDaysOffCount(Long unitId, LocalDate localDate, Long staffId, BigInteger activityId) {
-        localDate = isNotNull(localDate) ? localDate : DateUtils.getCurrentLocalDate();
-        WorkTimeAgreementRuleTemplateBalancesDTO workTimeAgreementRuleTemplateBalancesDTO = null;
-        StaffEmploymentDetails staffEmploymentDetails = userIntegrationService.mainUnitEmploymentOfStaff(staffId, unitId);
-        if (isNotNull(staffEmploymentDetails)) {
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffEmploymentDetails);
-            ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = new ProtectedDaysOffWTATemplate(activityId, WTATemplateType.PROTECTED_DAYS_OFF);
-            List<ActivityWrapper> activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(newArrayList(activityId));
-            Map<BigInteger, ActivityWrapper> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-            PlanningPeriod planningPeriod = planningPeriodMongoRepository.getLastPlanningPeriod(unitId);
-            DateTimeInterval dateTimeInterval = workTimeAgreementBalancesCalculationService.getIntervalByRuletemplates(activityWrapperMap, Arrays.asList(protectedDaysOffWTATemplate), localDate, planningPeriod.getEndDate(), unitId);
-            List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentAndActivityIds(staffAdditionalInfoDTO.getEmployment().getId(), dateTimeInterval.getStartDate(), dateTimeInterval.getEndDate(), newHashSet(activityId));
-            workTimeAgreementRuleTemplateBalancesDTO = workTimeAgreementBalancesCalculationService.getProtectedDaysOffBalance(unitId, protectedDaysOffWTATemplate, shiftWithActivityDTOS, activityWrapperMap, new HashMap<>(), staffAdditionalInfoDTO, localDate, localDate, planningPeriod.getEndDate());
-        }
-        return isNotNull(workTimeAgreementRuleTemplateBalancesDTO) ? workTimeAgreementRuleTemplateBalancesDTO.getIntervalBalances().get(0) : new IntervalBalance();
-    }
-
     public void updateExistingPhaseIdOfWTA(List<PhaseTemplateValue> phaseTemplateValues, Long unitId, Long referenceId, boolean creatingFromCountry) {
         List<Phase> countryPhase = creatingFromCountry ? phaseMongoRepository.findAllBycountryIdAndDeletedFalse(referenceId) : phaseMongoRepository.findByOrganizationIdAndDeletedFalse(referenceId);
         Map<BigInteger, PhaseDefaultName> phaseDefaultNameMap = countryPhase.stream().collect(Collectors.toMap(Phase::getId, Phase::getPhaseEnum));
@@ -920,24 +858,8 @@ public class WorkTimeAgreementService{
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             BigInteger phaseId = parentPhasesAndUnitPhaseIdMap.getOrDefault(phaseDefaultNameMap.get(phaseTemplateValue.getPhaseId()), phaseTemplateValue.getPhaseId());
             phaseTemplateValue.setPhaseId(phaseId);
-
         }
     }
-
-
-    private void updatePhaseInRuletemplates(WorkingTimeAgreement workingTimeAgreement, Map<String, BigInteger> stringBigIntegerMap, boolean valid) {
-        if (valid) {
-            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateRepository.findAllByIdInAndDeletedFalse(workingTimeAgreement.getRuleTemplateIds());
-            for (WTABaseRuleTemplate wtaBaseRuleTemplate : wtaBaseRuleTemplates) {
-                for (PhaseTemplateValue phaseTemplateValue : wtaBaseRuleTemplate.getPhaseTemplateValues()) {
-                    phaseTemplateValue.setPhaseId(stringBigIntegerMap.getOrDefault(phaseTemplateValue.getPhaseName(), phaseTemplateValue.getPhaseId()));
-
-                }
-            }
-            wtaBaseRuleTemplateRepository.saveAll(wtaBaseRuleTemplates);
-        }
-    }
-
 
     public WTAQueryResultDTO getWtaQueryResultDTOByDateAndEmploymentId(Long employmentId, Date startDate) {
         WTAQueryResultDTO wtaQueryResultDTO = getWTAByEmploymentIdAndDate(employmentId, startDate);
@@ -946,7 +868,6 @@ public class WorkTimeAgreementService{
         }
         return wtaQueryResultDTO;
     }
-
 
     public WTAQueryResultDTO getWTAByEmploymentIdAndDate(Long employmentId, Date date) {
         return wtaRepository.getWTAByEmploymentIdAndDate(employmentId, date);
@@ -975,7 +896,7 @@ public class WorkTimeAgreementService{
             staffIds = shiftDTOS.stream().map(shiftDTO -> shiftDTO.getStaffId()).collect(Collectors.toSet());
             staffIds.forEach(staffId->staffFilterDTO.getMapOfStaffAndEmploymentIds().remove(staffId));
         }
-        Set<Long> filteredStaffIds = filterStaffByCTATemplateAccountType(staffFilterDTO, staffIds, filterTypeMap);
+        Set<Long> filteredStaffIds = costTimeAgreementService.filterStaffByCTATemplateAccountType(staffFilterDTO, staffIds, filterTypeMap);
         staffFilterDTO.setStaffIds(new ArrayList<>(filteredStaffIds));
         staffFilterDTO.setNightWorkerDetails(staffIdNightWorkerMap.entrySet().stream().filter(x->filteredStaffIds.contains(x.getKey())).collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue)));
         if(staffFilterDTO.isIncludeWorkTimeAgreement()) {
@@ -985,32 +906,6 @@ public class WorkTimeAgreementService{
             staffFilterDTO.setEmploymentIdAndWtaResponseMap(employmentIdAndwtaQueryResultDTOSMap);
         }
         return staffFilterDTO;
-    }
-
-    private Set<Long> filterStaffByCTATemplateAccountType(StaffFilterDTO staffFilterDTO, Set<Long> staffIds, Map<FilterType, Set<String>> filterTypeMap) {
-        Set<Long> filteredStaffIds = staffIds;
-        if(filterTypeMap.containsKey(CTA_ACCOUNT_TYPE)){
-            List<CTAResponseDTO> allCTAs = costTimeAgreementRepository.getParentCTAByUpIds(staffFilterDTO.getMapOfStaffAndEmploymentIds().values().stream().flatMap(longs -> longs.stream()).filter(longs -> isNotNull(longs)).collect(Collectors.toList()));
-            Map<Long,List<CTAResponseDTO>>  ctagroup = allCTAs.stream().collect(Collectors.groupingBy(ctaResponseDTO -> ctaResponseDTO.getEmploymentId(),Collectors.toList()));
-            Set<Long> staffFilterDTOList = new HashSet<>();
-            for(Long staffId:staffIds) {
-                List<Long> employmentIDs=staffFilterDTO.getMapOfStaffAndEmploymentIds().get(staffId);
-                for(Long employmentID:employmentIDs) {
-                    List<CTAResponseDTO> CTAs=ctagroup.getOrDefault(employmentID,new ArrayList<>());
-                    for(CTAResponseDTO ctaResponseDTO:CTAs) {
-                        for(CTARuleTemplateDTO CTARule:ctaResponseDTO.getRuleTemplates()) {
-                            if(filterTypeMap.get(CTA_ACCOUNT_TYPE).contains(CTARule.getPlannedTimeWithFactor().getAccountType().toString())){
-                                staffFilterDTOList.add(staffId);
-                            }
-
-                        }
-                    }
-                }
-            }
-            filteredStaffIds = staffFilterDTOList;
-
-        }
-        return filteredStaffIds;
     }
 
     public boolean updateDatesInCTAWTA(Long unitId){
@@ -1027,10 +922,10 @@ public class WorkTimeAgreementService{
             Collections.sort(costTimeAgreements1);
             List<WorkingTimeAgreement> workTimeAgreements1 = workTimeAgreementMap.getOrDefault(employmentDTO.getId(),new ArrayList<>());
             Collections.sort(workTimeAgreements1);
-            updateDatesOnCTA(costTimeAgreements1);
+            costTimeAgreementService.updateDatesOnCTA(costTimeAgreements1);
             updateDatesOnWTA(workTimeAgreements1);
             for (EmploymentLinesDTO employmentLinesDTO : employmentLinesDTOS) {
-                updateCTADates(costTimeAgreements1, employmentLinesDTO);
+                costTimeAgreementService.updateCTADates(costTimeAgreements1, employmentLinesDTO);
                 updateWTADates(workTimeAgreements1, employmentLinesDTO);
             }
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentDTO.getId(), new HashSet<>(),null);
@@ -1046,18 +941,6 @@ public class WorkTimeAgreementService{
         return true;
     }
 
-    private void updateDatesOnCTA(List<CostTimeAgreement> costTimeAgreements1) {
-        for (int i = 1; i < costTimeAgreements1.size(); i++) {
-            CostTimeAgreement first = costTimeAgreements1.get(i-1);
-            CostTimeAgreement second = costTimeAgreements1.get(i);
-            first.setEndDate(second.getStartDate().minusDays(1));
-            if(first.getStartDate().equals(second.getStartDate())){
-                first.setEndDate(first.getStartDate());
-                second.setStartDate(first.getEndDate().plusDays(1));
-            }
-        }
-    }
-
     private void updateDatesOnWTA(List<WorkingTimeAgreement> workTimeAgreements1) {
         for (int i = 1; i < workTimeAgreements1.size(); i++) {
             WorkingTimeAgreement first = workTimeAgreements1.get(i-1);
@@ -1066,27 +949,6 @@ public class WorkTimeAgreementService{
             if(first.getStartDate().equals(second.getStartDate())){
                 first.setEndDate(first.getStartDate());
                 second.setStartDate(first.getEndDate().plusDays(1));
-            }
-        }
-    }
-
-    private void updateCTADates(List<CostTimeAgreement> costTimeAgreements1, EmploymentLinesDTO employmentLinesDTO) {
-        for (CostTimeAgreement costTimeAgreement : costTimeAgreements1) {
-            if(costTimeAgreement.getStartDate().isAfter(employmentLinesDTO.getStartDate())){
-                costTimeAgreement.setStartDate(employmentLinesDTO.getStartDate());
-            }
-            break;
-        }
-        if(isNull(employmentLinesDTO.getEndDate()) && !costTimeAgreements1.isEmpty()){
-            costTimeAgreements1.get(costTimeAgreements1.size()-1).setEndDate(null);
-        }else {
-            for (CostTimeAgreement costTimeAgreement : costTimeAgreements1) {
-                if(isNull(costTimeAgreement.getEndDate())){
-                    break;
-                }else if(costTimeAgreement.getEndDate().isBefore(employmentLinesDTO.getEndDate())){
-                    costTimeAgreement.setEndDate(employmentLinesDTO.getEndDate());
-                    break;
-                }
             }
         }
     }

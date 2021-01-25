@@ -9,18 +9,22 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.kairos.commons.utils.ObjectUtils.isMapNotEmpty;
 
 /**
  * Created by oodles on 4/1/17.
  */
 @Getter
 @Setter
-public abstract class MongoBaseEntity {
+public abstract class MongoBaseEntity implements Serializable {
 
+    private static final long serialVersionUID = 3991615936551701970L;
     @Id
     protected BigInteger id;
     @CreatedDate
@@ -35,6 +39,10 @@ public abstract class MongoBaseEntity {
 
     public UserInfo getCreatedBy() {
         return createdBy;
+    }
+
+    public Map<String, TranslationInfo> getTranslations() {
+        return isMapNotEmpty(translations) ? translations : new HashMap<>();
     }
 
     @JsonIgnore

@@ -18,6 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,8 +35,9 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @KPermissionModel
-public class Activity extends MongoBaseEntity {
+public class Activity extends MongoBaseEntity implements Serializable {
 
+    private static final long serialVersionUID = -4888258469348591990L;
     @KPermissionField
     private String name;
     @KPermissionField

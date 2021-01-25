@@ -865,6 +865,10 @@ public class UserIntegrationService {
     public Set<Long> getAllExpertiseByCountryId(Long countryId) {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "/all_expertise_by_country", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Long>>>() {});
     }
+
+    public List<StaffAdditionalInfoDTO> getEligibleStaffsForCoverShifts(NotEligibleStaffDataDTO notEligibleStaffDataDTO,Long unitId) {
+        return genericRestClient.publishRequest(notEligibleStaffDataDTO, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/staff/get_eligible_staffs_for_cover_shifts", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>() {});
+    }
 }
 
 

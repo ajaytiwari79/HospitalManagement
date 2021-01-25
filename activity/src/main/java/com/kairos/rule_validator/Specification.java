@@ -14,7 +14,7 @@ public interface Specification<T> {
      */
     boolean isSatisfied(T t);
 
-    void validateRules(T t);
+    void validateRules(T t,RuleExecutionType ruleExecutionType);
 
     /**
      * Create a new rule_validator that is the AND operation of {@code this} rule_validator and another rule_validator.

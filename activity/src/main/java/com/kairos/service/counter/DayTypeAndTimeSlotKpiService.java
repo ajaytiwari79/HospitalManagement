@@ -132,7 +132,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         //filter staffids base on kpi filter rest call
         staffIds = defaultKpiDataDTO.getStaffKpiFilterDTOs().stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
         List<BigInteger> dayTypeIds = filterBasedCriteria.containsKey(FilterType.DAY_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.DAY_TYPE)) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.DAY_TYPE)) : defaultKpiDataDTO.getDayTypeDTOS().stream().map(DayTypeDTO::getId).collect(Collectors.toList());
-        List<Long> timeSlotIds = filterBasedCriteria.containsKey(FilterType.TIME_SLOT) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_SLOT)) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.TIME_SLOT)) : Arrays.asList(defaultKpiDataDTO.getTimeSlotDTOS().get(0).getId());
+        Set<BigInteger> timeSlotIds = filterBasedCriteria.containsKey(FilterType.TIME_SLOT) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_SLOT)) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(FilterType.TIME_SLOT)) : newHashSet(defaultKpiDataDTO.getTimeSlotDTOS().get(0).getId());
         Map<BigInteger, DayTypeDTO> daysTypeIdAndDayTypeMap = defaultKpiDataDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         Set<DayOfWeek> daysOfWeek = counterHelperService.getDayOfWeek(dayTypeIds,daysTypeIdAndDayTypeMap);
         List<Integer> dayOfWeeksNo = new ArrayList<>();

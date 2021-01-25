@@ -2,6 +2,7 @@ package com.kairos.dto.user.access_permission;
 
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**

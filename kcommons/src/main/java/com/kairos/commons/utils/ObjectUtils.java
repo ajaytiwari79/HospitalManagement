@@ -2,6 +2,7 @@ package com.kairos.commons.utils;
 
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.lang.Nullable;
 
 import java.math.BigInteger;

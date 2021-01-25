@@ -17,6 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class PaymentType extends UserBaseEntity {
 
+    private static final long serialVersionUID = -193362343655621106L;
     @NotBlank(message = "error.PaymentType.name.notEmpty")
     private String name;
     private String description;

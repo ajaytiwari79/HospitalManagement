@@ -14,6 +14,7 @@ import java.util.TreeMap;
 @Getter
 @Setter
 public class ActivityRanking extends MongoBaseEntity {
+    private static final long serialVersionUID = -3722777805221769643L;
     private Long expertiseId;
     private LocalDate startDate;
     private LocalDate endDate;

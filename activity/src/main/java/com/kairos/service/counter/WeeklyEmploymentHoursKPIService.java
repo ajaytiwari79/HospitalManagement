@@ -19,7 +19,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Service
 public class WeeklyEmploymentHoursKPIService implements KPIService{
 
-    public double getWeeklyHoursOfEmployment(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+    public double getWeeklyHoursOfEmployment(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if (isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())) {
             LocalDate startDate = kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
             LocalDate endDate = kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
@@ -29,7 +29,7 @@ public class WeeklyEmploymentHoursKPIService implements KPIService{
         }
     }
 
-    public Double getWeeklyHoursOfEmployment(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, LocalDate startDate, LocalDate endDate) {
+    public Double getWeeklyHoursOfEmployment(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo, LocalDate startDate, LocalDate endDate) {
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = isNotNull(staffId) ? Arrays.asList(kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().getOrDefault(staffId, new StaffKpiFilterDTO())) : kpiCalculationRelatedInfo.getStaffKpiFilterDTOS();
         DateTimeInterval dateTimeInterval = new DateTimeInterval(startDate, endDate);
         Double weeklyHours = 0.0d;
@@ -43,7 +43,7 @@ public class WeeklyEmploymentHoursKPIService implements KPIService{
          return weeklyHours;
         }
 
-    private Double getWeeklyHours(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, LocalDate startDate, DateTimeInterval dateTimeInterval, Double weeklyHours, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
+    private Double getWeeklyHours(KPICalculationRelatedInfo kpiCalculationRelatedInfo, LocalDate startDate, DateTimeInterval dateTimeInterval, Double weeklyHours, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
         if (kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(FilterType.EMPLOYMENT_SUB_TYPE)) {
             if(isNotNull(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentSubType())) {
                 weeklyHours = getWeeklyHoursByEmploymentSubType(kpiCalculationRelatedInfo, startDate, dateTimeInterval, weeklyHours, employmentWithCtaDetailsDTO);
@@ -55,7 +55,7 @@ public class WeeklyEmploymentHoursKPIService implements KPIService{
         return weeklyHours;
     }
 
-    private Double getWeeklyHoursByEmploymentSubType(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, LocalDate startDate, DateTimeInterval dateTimeInterval, Double weeklyHours, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
+    private Double getWeeklyHoursByEmploymentSubType(KPICalculationRelatedInfo kpiCalculationRelatedInfo, LocalDate startDate, DateTimeInterval dateTimeInterval, Double weeklyHours, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
         if (kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).get(0).equals(EmploymentSubType.MAIN.name()) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(FilterType.EMPLOYMENT_SUB_TYPE).size() < 2) {
             if (employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentSubType().equals(EmploymentSubType.MAIN)) {
                 weeklyHours = getWeeklyHours(startDate, dateTimeInterval, weeklyHours, employmentWithCtaDetailsDTO);
@@ -83,7 +83,7 @@ public class WeeklyEmploymentHoursKPIService implements KPIService{
     }
 
     @Override
-    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
+    public <T> double get(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, T t) {
         return getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo);
     }
 }
