@@ -24,7 +24,7 @@ public interface TimeSlotRepository extends MongoBaseRepository<TimeSlotSet, Big
 
     //List<TimeSlot> findBySystemGeneratedTimeSlotsTrue();
 
-    @Cacheable(value = "findByUnitIdAndTimeSlotTypeOrderByStartDate", key = "#unitId", cacheManager = "cacheManager")
+    //@Cacheable(value = "findByUnitIdAndTimeSlotTypeOrderByStartDate", key = "#unitId", cacheManager = "cacheManager")
     TimeSlotSetDTO findByUnitIdAndTimeSlotTypeOrderByStartDate(Long unitId, TimeSlotType timeSlotType);
 
     List<TimeSlotSetDTO> findByUnitIdAndTimeSlotModeAndTimeSlotTypeOrderByStartDate(Long unitId, TimeSlotMode timeSlotMode, TimeSlotType timeSlotType);
