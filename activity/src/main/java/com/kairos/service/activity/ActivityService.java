@@ -1211,4 +1211,8 @@ public class ActivityService {
     public List<ActivityDTO> findAllAbsenceActivities() {
         return activityMongoRepository.findAllAbsenceActivitiesByCountryId(UserContext.getUserDetails().getCountryId(), ABSENCE);
     }
+
+    public List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds) {
+        return activityMongoRepository.findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(activityIds);
+    }
 }
