@@ -305,12 +305,12 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE1:
-                    if (mainTeam != null && staffingLevelActivityWithDurationMap.get(mainTeam.getActivityIds().iterator().next()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
+                    if (mainTeam != null && staffingLevelActivityWithDurationMap.getOrDefault(mainTeam.getActivityIds().iterator().next(),new StaffingLevelActivityWithDuration()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeam.getActivityIds().iterator().next(), null);
                     }
                     break;
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE2:
-                    if (staffingLevelActivityWithDurationMap.get(highestRankTeam.getActivityIds().iterator().next()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
+                    if (staffingLevelActivityWithDurationMap.getOrDefault(highestRankTeam.getActivityIds().iterator().next(),new StaffingLevelActivityWithDuration()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeam.getActivityIds().iterator().next(), null);
                     }
                     break;
@@ -327,7 +327,7 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE1:
-                    if (highestRankTeamApartFromShift != null && staffingLevelActivityWithDurationMap.get(highestRankTeamApartFromShift.getActivityIds().iterator().next()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
+                    if (highestRankTeamApartFromShift != null && staffingLevelActivityWithDurationMap.getOrDefault(highestRankTeamApartFromShift.getActivityIds().iterator().next(),new StaffingLevelActivityWithDuration()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), highestRankTeamApartFromShift.getActivityIds().iterator().next(), null);
                     }
                     break;
@@ -363,11 +363,11 @@ public class AutoFillGapSettingsService {
         if (allActivitySolvingMaxDuration.isEmpty()) {
             return null;
         }
-        short solvedDuration = staffingLevelActivityWithDurationMap.get(allActivitySolvingMaxDuration.get(0)).getResolvingUnderOrOverStaffingDurationInMinutes();
+        short solvedDuration = staffingLevelActivityWithDurationMap.getOrDefault(allActivitySolvingMaxDuration.get(0),new StaffingLevelActivityWithDuration()).getResolvingUnderOrOverStaffingDurationInMinutes();
         Set<BigInteger> solvingEqualProblems = new HashSet<>();
         solvingEqualProblems.add(allActivitySolvingMaxDuration.get(0));
         for (int i = 1; i < allActivitySolvingMaxDuration.size() - 1; i++) {
-            if (solvedDuration == staffingLevelActivityWithDurationMap.get(allActivitySolvingMaxDuration.get(i)).getResolvingUnderOrOverStaffingDurationInMinutes()) {
+            if (solvedDuration == staffingLevelActivityWithDurationMap.getOrDefault(allActivitySolvingMaxDuration.get(i),new StaffingLevelActivityWithDuration()).getResolvingUnderOrOverStaffingDurationInMinutes()) {
                 solvingEqualProblems.add(allActivitySolvingMaxDuration.get(0));
                 continue;
             }
