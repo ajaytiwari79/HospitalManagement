@@ -35,6 +35,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 @NoArgsConstructor
 public class AccessGroup extends UserBaseEntity {
 
+    private static final long serialVersionUID = 5789054664231770197L;
     @NotBlank(message = ERROR_NAME_NOTNULL)
     private String name;
     private boolean enabled = true;

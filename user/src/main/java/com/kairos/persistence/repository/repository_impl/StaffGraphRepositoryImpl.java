@@ -616,7 +616,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         queryParameters.put("date",DateUtils.formatLocalDate(notEligibleStaffDataDTO.getShiftDate(), "yyyy-MM-dd"));
         StringBuilder query = new StringBuilder("MATCH (organization:Unit)<-[:IN_UNIT]-(employment:Employment) WHERE id(organization)={unitId} AND (employment.endDate is null OR date(employment.endDate) >= date({date}))");
         if(isCollectionNotEmpty(notEligibleStaffDataDTO.getEmploymentTypeIds())){
-            queryParameters.put("employmentTypeIds", notEligibleStaffDataDTO.getEmploymentTypeIds());
+            queryParameters.put(EMPLOYMENT_TYPE_IDS, notEligibleStaffDataDTO.getEmploymentTypeIds());
             query.append(" MATCH (employment)-[:HAS_EMPLOYMENT_LINES]-(empLine:EmploymentLine)-[:HAS_EMPLOYMENT_TYPE]-(empType) where id(empType) in {employmentTypeIds}");
         }
         if(isCollectionNotEmpty(notEligibleStaffDataDTO.getStaffIds())){
@@ -636,7 +636,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         query.append(" WITH staff,collect(id(teams)) AS teams,organization,employmentIds,user,staffChildDetails");
         if(isCollectionNotEmpty(notEligibleStaffDataDTO.getTagIds())){
-            queryParameters.put("tagIds", notEligibleStaffDataDTO.getTagIds());
+            queryParameters.put(TAG_IDS, notEligibleStaffDataDTO.getTagIds());
             query.append(" MATCH (staff)-[:BELONGS_TO_TAGS]->(tag:Tag) where id(tag) in {tagIds}");
         }else {
             query.append(" MATCH (staff)-[:BELONGS_TO_TAGS]->(tag:Tag)");

@@ -21,6 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 public class BusinessType extends UserBaseEntity {
 
+    private static final long serialVersionUID = -5108345322170237054L;
     @NotBlank(message = "error.BusinessType.name.notEmpty")
     private String name;
     private String description;

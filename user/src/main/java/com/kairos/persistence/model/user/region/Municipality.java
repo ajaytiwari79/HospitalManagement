@@ -25,6 +25,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.PROVI
 @Setter
 @NoArgsConstructor
 public class Municipality extends UserBaseEntity {
+    private static final long serialVersionUID = 7983603466312360468L;
     @NotBlank(message = ERROR_MUNICIPALITY_NAME_NOTEMPTY)
     private String name;
 
