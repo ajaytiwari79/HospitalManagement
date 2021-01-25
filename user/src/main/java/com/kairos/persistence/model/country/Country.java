@@ -38,6 +38,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 public class Country extends UserBaseEntity {
 
+    private static final long serialVersionUID = -8239277648666031215L;
     @NotBlank(message = "error.Country.name.notEmpty")
     private String name;
 

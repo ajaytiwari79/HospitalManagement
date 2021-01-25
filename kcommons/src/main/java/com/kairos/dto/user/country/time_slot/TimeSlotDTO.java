@@ -21,6 +21,7 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 public class TimeSlotDTO implements Serializable {
+    private static final long serialVersionUID = 5540857333800102854L;
     @NotBlank(message = "error.name.notnull")
     private String name;
     private int startHour;
@@ -30,7 +31,6 @@ public class TimeSlotDTO implements Serializable {
     private boolean shiftStartTime;
     private BigInteger id;
     private Long unitId;
-    private static final long serialVersionUID = 213213213213l;
 
     public TimeSlotDTO(String name, int startHour, int startMinute, int endHour, int endMinute) {
         this.name = name;

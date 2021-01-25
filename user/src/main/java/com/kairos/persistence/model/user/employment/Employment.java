@@ -30,6 +30,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 public class Employment extends UserBaseEntity {
 
+    private static final long serialVersionUID = 1387806326762328484L;
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
 

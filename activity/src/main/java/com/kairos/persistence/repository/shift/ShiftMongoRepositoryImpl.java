@@ -86,6 +86,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     private static final String CTA_TEMPLATES_COLLECTION = "cTARuleTemplate";
     private static final String CTA_COLLECTION = "costTimeAgreement";
     private static final String ID = "_id";
+    public static final String REQUEST_ABSENCE_METHOD_FOR_CALCULATING_TIME = "requestAbsence.methodForCalculatingTime";
+    public static final String ACTIVITIES_SECOND_LEVEL_TIME_TYPE = "activities.secondLevelTimeType";
+    public static final String SHIFT_TYPE = "shiftType";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -122,10 +125,10 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(Set<Long> employmentIds, Date startDate, Date endDate, Set<BigInteger> activityIds) {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
-            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and("shiftType").ne(SICK)
+            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and(SHIFT_TYPE).ne(SICK)
                     .and(START_DATE).lte(endDate).and(END_DATE).gte(startDate);
         } else {
-            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and("shiftType").ne(SICK)
+            criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).and(DISABLED).is(false).and(SHIFT_TYPE).ne(SICK)
                     .and(START_DATE).gte(startDate).orOperator(Criteria.where(END_DATE).gte(startDate));
         }
         return getShiftWithActivityByCriteria(criteria.and(ACTIVITIES_ACTIVITY_ID).in(activityIds),false,ShiftWithActivityDTO.class);
@@ -800,8 +803,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             criteria.orOperator(criterias);
             Aggregation aggregation = Aggregation.newAggregation(
                     match(criteria),
-                    project("staffId"),
-                    group().push("staffId").as("staffIds")
+                    project(STAFF_ID),
+                    group().push(STAFF_ID).as("staffIds")
             );
             return new HashSet<>(((List<Long>)mongoTemplate.aggregate(aggregation,Shift.class,Map.class).getMappedResults().get(0).get("staffIds")));
         }
@@ -813,27 +816,27 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         for (CoverShiftCriteria coverShiftCriterion : coverShiftSetting.getCoverShiftCriteria()) {
             switch (coverShiftCriterion){
                 case STAFF_WITH_SICKNESS:
-                    criterias.add(Criteria.where("shiftType").is(SICK.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    criterias.add(Criteria.where(SHIFT_TYPE).is(SICK.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
                     break;
                 case STAFF_WITH_FREE_DAYS:
                     criterias.add(where(START_DATE).lt(getEndOfDay(endDate)).and(END_DATE).gt(getStartOfDay(startDate)));
                     break;
                 case STAFF_WITH_PLANNED_UNAVAILABLE:
-                    criterias.add(Criteria.where("activities.secondLevelTimeType").is(UNAVAILABLE_TIME.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    criterias.add(Criteria.where(ACTIVITIES_SECOND_LEVEL_TIME_TYPE).is(UNAVAILABLE_TIME.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
                     break;
                 case STAFF_WITH_PENDING_ABSENCE_REQUEST:
-                    criterias.add(Criteria.where("requestAbsence.methodForCalculatingTime").exists(false).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
-                    criterias.add(Criteria.where("requestAbsence.methodForCalculatingTime").is(FULL_DAY_CALCULATION).and(START_DATE).lt(getEndOfDay(endDate)).and(END_DATE).gt(getStartOfDay(startDate)));
-                    criterias.add(Criteria.where("requestAbsence.methodForCalculatingTime").is(FULL_WEEK).and(START_DATE).lt(getEndOfDay(endDate)).and(END_DATE).gt(getStartOfDay(minusDays(startDate,6))));
+                    criterias.add(Criteria.where(REQUEST_ABSENCE_METHOD_FOR_CALCULATING_TIME).exists(false).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    criterias.add(Criteria.where(REQUEST_ABSENCE_METHOD_FOR_CALCULATING_TIME).is(FULL_DAY_CALCULATION).and(START_DATE).lt(getEndOfDay(endDate)).and(END_DATE).gt(getStartOfDay(startDate)));
+                    criterias.add(Criteria.where(REQUEST_ABSENCE_METHOD_FOR_CALCULATING_TIME).is(FULL_WEEK).and(START_DATE).lt(getEndOfDay(endDate)).and(END_DATE).gt(getStartOfDay(minusDays(startDate,6))));
                     break;
                 case STAFF_WITH_PLANNED_VETO:
-                    criterias.add(Criteria.where("activities.secondLevelTimeType").is(VETO.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    criterias.add(Criteria.where(ACTIVITIES_SECOND_LEVEL_TIME_TYPE).is(VETO.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
                     break;
                 case STAFF_WITH_PLANNED_STOP_BRICKS:
-                    criterias.add(Criteria.where("activities.secondLevelTimeType").is(STOP_BRICK.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    criterias.add(Criteria.where(ACTIVITIES_SECOND_LEVEL_TIME_TYPE).is(STOP_BRICK.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
                     break;
                 case STAFF_WITH_PLANNED_PROTECTED_DAYS_OFF:
-                    criterias.add(Criteria.where("activities.secondLevelTimeType").is(PROTECTED_DAYS_OFF.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
+                    criterias.add(Criteria.where(ACTIVITIES_SECOND_LEVEL_TIME_TYPE).is(PROTECTED_DAYS_OFF.toString()).and(START_DATE).lt(endDate).and(END_DATE).gt(startDate));
                     break;
                 case STAFF_WITH_PERSONAL_CALENDAR:
                     //criteria.orOperator(Criteria.where("activities.secondLevelTimeType").is());
