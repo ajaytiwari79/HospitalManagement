@@ -233,7 +233,6 @@ public class ShiftSickService extends MongoBaseService {
             }
 
         });
-        shiftService.createShifts(activity.getUnitId(),ObjectMapperUtils.copyCollectionPropertiesByMapper(allShiftsToUpdate,ShiftDTO.class),ShiftActionType.SAVE);
         if(isCollectionNotEmpty(allShiftsToDelete)) {
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(allShiftsToDelete.get(0).getStartDate()), allShiftsToDelete.get(0).getStaffId(), allShiftsToDelete.get(0).getEmploymentId());
             staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
@@ -241,6 +240,8 @@ public class ShiftSickService extends MongoBaseService {
             shiftService.deleteShifts(new ArrayList<>(), allShiftsToDelete, staffAdditionalInfoDTO);
             shiftMongoRepository.saveEntities(allShiftsToDelete);
         }
+        shiftService.createShifts(activity.getUnitId(),ObjectMapperUtils.copyCollectionPropertiesByMapper(allShiftsToUpdate,ShiftDTO.class),ShiftActionType.SAVE);
+
 
     }
 
