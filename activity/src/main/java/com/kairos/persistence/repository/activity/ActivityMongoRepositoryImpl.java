@@ -15,6 +15,7 @@ import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
+import com.kairos.enums.UnityActivitySetting;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
@@ -938,17 +939,15 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public  Set<BigInteger> findAllShowOnCallAndStandByActivitiesByUnitId(Long unitId, boolean showStandBy, boolean showOnCall){
-        Criteria criteriaDefinition = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false);
-        if(showStandBy){
-            criteriaDefinition.and(RULES_ACTIVITY_TAB+".showStandBy").is(showStandBy);
-        }
-        if(showOnCall){
-            criteriaDefinition.and(RULES_ACTIVITY_TAB+".showOnCall").is(showOnCall);
-        }
-        Query query = new Query(criteriaDefinition);
-        query.fields().include("id");
-        return mongoTemplate.find(query,Activity.class).stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+    public  Set<BigInteger> findAllShowOnCallAndStandByActivitiesByUnitId(Long unitId, UnityActivitySetting unityActivitySetting){
+        Criteria criteriaDefinition = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(TIME_TYPE1+".unityActivitySetting").is(unityActivitySetting);
+        Aggregation aggregation = Aggregation.newAggregation(
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
+                unwind(TIME_TYPE1),
+                match(criteriaDefinition),
+                project(ID,NAME)
+        );
+        return mongoTemplate.aggregate(aggregation,Activity.class,Activity.class).getMappedResults().stream().map(activity -> activity.getId()).collect(Collectors.toSet());
     }
 
     @Override

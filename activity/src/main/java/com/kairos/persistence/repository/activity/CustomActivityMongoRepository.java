@@ -9,6 +9,7 @@ import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettings
 import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.UnityActivitySetting;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
@@ -123,7 +124,7 @@ public interface CustomActivityMongoRepository {
 
     List<Activity> findAllBreakActivitiesByOrganizationId(Long unitId);
 
-    Set<BigInteger> findAllShowOnCallAndStandByActivitiesByUnitId(Long unitId, boolean showStandBy, boolean showOnCall);
+    Set<BigInteger> findAllShowOnCallAndStandByActivitiesByUnitId(Long unitId, UnityActivitySetting unityActivitySetting);
 
     List<ActivityWithCompositeDTO> findAllActivityByIdsAndIncludeChildActivitiesWithMostUsedCountOfActivity(Collection<BigInteger> activityIds,Long unitId,Long staffId,boolean isActivityType);
     List[] findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(Collection<BigInteger> activityIds);
