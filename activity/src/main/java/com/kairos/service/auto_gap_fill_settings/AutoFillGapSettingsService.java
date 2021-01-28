@@ -403,7 +403,7 @@ public class AutoFillGapSettingsService {
         shift.setUnitId(phase.getOrganizationId());
         Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = new HashMap<>();
         for (ShiftActivity shiftActivity : shiftActivities) {
-            staffingLevelService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, new RuleTemplateSpecificInfo(), staffingLevelActivityWithDurationMap);
+            staffingLevelService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, new RuleTemplateSpecificInfo(), staffingLevelActivityWithDurationMap,true);
         }
         return staffingLevelActivityWithDurationMap;
     }
