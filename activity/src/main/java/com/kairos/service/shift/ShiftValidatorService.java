@@ -955,7 +955,7 @@ public class ShiftValidatorService {
         Date endDate;
         if (shiftDTO.getStartDate() != null && asLocalDate(shiftDTO.getEndDate()).isAfter(asLocalDate(shiftDTO.getStartDate()))) {
             startDate = DateUtils.getStartOfDay(shiftDTO.getStartDate());
-            endDate = DateUtils.getEndOfDay(shiftDTO.getEndDate());
+            endDate = DateUtils.getEndOfDay(shiftDTO.getStartDate());
         } else {
             startDate = asDateStartOfDay(shiftDTO.getShiftDate());
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
