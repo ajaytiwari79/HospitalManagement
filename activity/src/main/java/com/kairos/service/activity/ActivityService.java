@@ -62,6 +62,7 @@ import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
+import com.kairos.service.shift.ShiftHelperService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
@@ -105,6 +106,7 @@ public class ActivityService {
     @Inject private PlannedTimeTypeService plannedTimeTypeService;
     @Inject private TagMongoRepository tagMongoRepository;
     @Inject private OrganizationActivityService organizationActivityService;
+    @Inject private ShiftHelperService shiftHelperService;
     @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject private TimeTypeService timeTypeService;
     @Inject private PlannerSyncService plannerSyncService;
@@ -246,6 +248,9 @@ public class ActivityService {
         validateActivityDetails(countryId, generalDTO);
         Activity activity = findActivityById(generalDTO.getActivityId());
         generalDTO.setBackgroundColor(activity.getActivityGeneralSettings().getBackgroundColor());
+        if(!activity.getActivityGeneralSettings().getUltraShortName().equals(generalDTO.getUltraShortName()) || !activity.getActivityGeneralSettings().getShortName().equals(generalDTO.getShortName())){
+            shiftHelperService.updateBackgroundColorInActivityAndShift(activity,null);
+        }
         ActivityGeneralSettings generalTab = ObjectMapperUtils.copyPropertiesByMapper(generalDTO, ActivityGeneralSettings.class);
         if (Optional.ofNullable(activity.getActivityGeneralSettings().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getActivityGeneralSettings().getModifiedIconName());
@@ -332,7 +337,7 @@ public class ActivityService {
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
         }
-        updateBackgroundColorInActivityAndShift(activity, timeType);
+        shiftHelperService.updateBackgroundColorInActivityAndShift(activity, timeType);
         if(isNotNull(activityGeneralSettingsDTO.getTimeTypeId()) && !activityGeneralSettingsDTO.getTimeTypeId().equals(activity.getActivityBalanceSettings().getTimeTypeId())){
             if (activity.getState().equals(ActivityStateEnum.PUBLISHED)) {
                 exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED, activity.getId());
@@ -376,27 +381,8 @@ public class ActivityService {
         activity.getActivityBalanceSettings().setPriorityFor(timeType.getPriorityFor());
         updateActivityCategory(activity, UserContext.getUserDetails().getCountryId());
     }
-    private void updateBackgroundColorInActivityAndShift(Activity activity, TimeType timeType) {
-        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()), null, null, null);
-        updateShiftActivityBackGroundColor(activity, timeType, shifts);
-        if (isCollectionNotEmpty(shifts)) {
-            shiftMongoRepository.saveEntities(shifts);
-        }
-    }
-    private void updateShiftActivityBackGroundColor(Activity activity, TimeType timeType, List<Shift> shifts) {
-        shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
-            if (shiftActivity.getActivityId().equals(activity.getId())) {
-                shiftActivity.setBackgroundColor(timeType.getBackgroundColor());
-                shiftActivity.setSecondLevelTimeType(timeType.getSecondLevelType());
-            }
-            shiftActivity.getChildActivities().forEach(childActivity -> {
-                if (childActivity.getActivityId().equals(activity.getId())) {
-                    childActivity.setBackgroundColor(timeType.getBackgroundColor());
-                    childActivity.setSecondLevelTimeType(timeType.getSecondLevelType());
-                }
-            });
-        }));
-    }
+
+
     public void updateActivityCategory(Activity activity, Long countryId) {
         TimeType timeType = timeTypeMongoRepository.findOneById(activity.getActivityBalanceSettings().getTimeTypeId(), countryId);
         if (isNull(timeType))

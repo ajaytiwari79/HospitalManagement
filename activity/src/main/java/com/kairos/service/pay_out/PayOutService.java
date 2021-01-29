@@ -169,9 +169,12 @@ public class PayOutService extends MongoBaseService {
 
     public ShiftWithActivityDTO buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftWithActivityDTO.class);
-        shift.getActivities().forEach(shiftActivityDTO ->
-                shiftActivityDTO.setActivityName(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getName())
-        );
+        shift.getActivities().forEach(shiftActivityDTO -> {
+            Activity activity = activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity();
+            shiftActivityDTO.setActivityName(activity.getName());
+            shiftActivityDTO.setUltraShortName(activity.getActivityGeneralSettings().getUltraShortName());
+            shiftActivityDTO.setShortName(activity.getActivityGeneralSettings().getShortName());
+        });
         shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
             shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
             shiftActivityDTO.setTimeType(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getTimeType());

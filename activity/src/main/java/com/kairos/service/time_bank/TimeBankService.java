@@ -19,6 +19,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
@@ -820,18 +821,21 @@ public class TimeBankService implements KPIService {
         }
         ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
         shiftActivity.setTimeType(activityWrapper.getTimeType());
+        Activity activity = activityWrapper.getActivity();
         if (CollectionUtils.isNotEmpty(staffAdditionalInfoDTO.getDayTypes())) {
             Map<BigInteger, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
-            Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, activityWrapper.getActivity().getActivityTimeCalculationSettings().getDayTypes(), asLocalDate(shiftActivity.getStartDate()));
+            Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, activity.getActivityTimeCalculationSettings().getDayTypes(), asLocalDate(shiftActivity.getStartDate()));
             if (activityDayTypes.contains(DateUtils.asLocalDate(shiftActivity.getStartDate()).getDayOfWeek())) {
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activityWrapper.getActivity(), staffAdditionalInfoDTO.getEmployment(), false);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffAdditionalInfoDTO.getEmployment(), false);
                 scheduledMinutes = shiftActivity.getScheduledMinutes();
                 durationMinutes = shiftActivity.getDurationMinutes();
             }
         }
-        shiftActivity.setSecondLevelTimeType(activityWrapper.getActivity().getActivityBalanceSettings().getTimeType());
-        shiftActivity.setBackgroundColor(activityWrapper.getActivity().getActivityGeneralSettings().getBackgroundColor());
-        shiftActivity.setActivityName(activityWrapper.getActivity().getName());
+        shiftActivity.setSecondLevelTimeType(activity.getActivityBalanceSettings().getTimeType());
+        shiftActivity.setBackgroundColor(activity.getActivityGeneralSettings().getBackgroundColor());
+        shiftActivity.setActivityName(activity.getName());
+        shiftActivity.setUltraShortName(activity.getActivityGeneralSettings().getUltraShortName());
+        shiftActivity.setShortName(activity.getActivityGeneralSettings().getShortName());
         return new int[]{scheduledMinutes, durationMinutes};
     }
     @Getter

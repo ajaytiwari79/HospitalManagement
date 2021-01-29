@@ -395,7 +395,7 @@ public class AutoFillGapSettingsService {
 
     private Map<BigInteger, StaffingLevelActivityWithDuration> updateStaffingLevelDetails(ShiftActivityDTO[] activities, Phase phase, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         List<ShiftActivity> shiftActivities = new ArrayList<>();
-        activityWrapperMap.forEach((k, v) -> shiftActivities.add(new ShiftActivity(v.getActivity().getName(), activities[0].getEndDate(), activities[1].getEndDate(), k, null)));
+        activityWrapperMap.forEach((k, v) -> shiftActivities.add(new ShiftActivity(v.getActivity().getName(), activities[0].getEndDate(), activities[1].getEndDate(), k, null,v.getActivity().getActivityGeneralSettings().getUltraShortName(),v.getActivity().getActivityGeneralSettings().getShortName())));
         Shift shift = new Shift();
         shift.setActivities(shiftActivities);
         shift.setStartDate(activities[0].getEndDate());

@@ -16,4 +16,6 @@ public class ShiftActivityLineInterval {
     private Date endDate;
     private BigInteger activityId;
     private String activityName;
+    private String shortName;
+    private String ultraShortName;
 }

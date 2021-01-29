@@ -151,7 +151,7 @@ public class ShiftSickService extends MongoBaseService {
             if(shift.getActivities().get(i).getInterval().contains(currentDate)){
                 shift.getActivities().get(i).setEndDate(currentDate);
                 shiftActivities.add(shift.getActivities().get(i));
-                ShiftActivity shiftActivity=new ShiftActivity(sickActivityWrapper.getActivity().getName(),shift.getActivities().get(i).getEndDate(),getStartOfDay(asDate(asLocalDate(shift.getStartDate()).plusDays(1))),sickActivityWrapper.getActivity().getId(),null);
+                ShiftActivity shiftActivity=new ShiftActivity(sickActivityWrapper.getActivity().getName(),shift.getActivities().get(i).getEndDate(),getStartOfDay(asDate(asLocalDate(shift.getStartDate()).plusDays(1))),sickActivityWrapper.getActivity().getId(),null,sickActivityWrapper.getActivity().getActivityGeneralSettings().getUltraShortName(),sickActivityWrapper.getActivity().getActivityGeneralSettings().getShortName());
                 shiftActivities.add(shiftActivity);
                 break;
             }
@@ -211,7 +211,7 @@ public class ShiftSickService extends MongoBaseService {
                             exceptionService.dataNotFoundException(MESSAGE_PROTECTEDDAYSOFF_ACTIVITY_NOT_FOUND);
                         }
                         shifts.forEach(s->s.setDeleted(true));
-                        ShiftActivity shiftActivity=new ShiftActivity(protectDaysOffActivity.get(0).getActivity().getName(),asDate(date.atStartOfDay()),asDate(date.plusDays(1).atStartOfDay()),protectDaysOffActivity.get(0).getActivity().getId(),null);
+                        ShiftActivity shiftActivity=new ShiftActivity(protectDaysOffActivity.get(0).getActivity().getName(),asDate(date.atStartOfDay()),asDate(date.plusDays(1).atStartOfDay()),protectDaysOffActivity.get(0).getActivity().getId(),null,protectDaysOffActivity.get(0).getActivity().getActivityGeneralSettings().getUltraShortName(),protectDaysOffActivity.get(0).getActivity().getActivityGeneralSettings().getUltraShortName());
                         Shift protectedShift = new Shift(asDate(date.atStartOfDay()),asDate(date.plusDays(1).atStartOfDay()),
                                  shift.getStaffId(),newArrayList(shiftActivity),shift.getEmploymentId(), shift.getUnitId(),shift.getPhaseId(),shift.getPlanningPeriodId());
                         allShiftsToUpdate.add(protectedShift);
