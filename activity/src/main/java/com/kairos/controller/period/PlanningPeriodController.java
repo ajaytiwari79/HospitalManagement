@@ -117,4 +117,12 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getDefaultDataForPlanning(unitId));
     }
 
+    @ApiOperation(value = "Get Planning Period Details")
+    @GetMapping(value="/get_planning_period_details")
+    public ResponseEntity<Map<String, Object>> getPlanningPeriodDetails(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getPlanningPeriodDetails(unitId));
+    }
+
+
+
 }

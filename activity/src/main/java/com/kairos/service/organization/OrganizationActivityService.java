@@ -199,7 +199,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         Activity activityCopied;
         if (checked) {
@@ -249,7 +249,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     private Activity removeActivityFromUnity(Long unitId, BigInteger activityId) {
         Activity activityCopied;
         activityCopied = Optional.ofNullable(activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId)).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_ACTIVITY_ID, activityId)));
@@ -309,7 +309,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public Map<String, TranslationInfo> updateUnitActivityTranslationDetails(BigInteger activityId, Long unitId, Map<String, TranslationInfo> activityTranslationMap){
         Activity activity = activityMongoRepository.findByIdAndUnitIdAndDeleted(activityId,unitId,false);
         if(isNull(activity)) {
@@ -361,7 +361,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     //TODO Need to make sure that its fine to not copy expertise/skills/employmentTypes
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     private Activity copyAllActivitySettingsInUnit(Activity activity, Long unitId) {
         Activity activityCopied = new Activity();
         Activity.copyProperties(activity, activityCopied, "id", "organizationTypes", "organizationSubTypes");
@@ -398,7 +398,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityCopied;
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivitySettingsWrapper updateGeneralTab(ActivityGeneralSettingsDTO generalDTO, Long unitId) {
         validateActivityOnGeneralDetailsUpdate(generalDTO, unitId);
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
@@ -503,7 +503,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return new ActivitySettingsWrapper(roles, activityPhaseSettings, dayTypes, employmentTypeDTOS);
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivityDTO copyActivityDetails(Long unitId, BigInteger activityId, ActivityDTO activityDTO) {
         Activity activity = activityMongoRepository.
                 findByNameIgnoreCaseAndUnitIdAndByDate(activityDTO.getName().trim(), unitId, activityDTO.getStartDate(), activityDTO.getEndDate());
@@ -587,7 +587,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return true;
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     private void createActivityforOrganisation(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, List<Phase> phases) {
         List<Activity> existingActivities;
         if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
@@ -669,7 +669,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setExpertises(expertiseIds);
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivityGeneralSettings addIconInActivity(BigInteger activityId, MultipartFile file) throws IOException {
         Activity activity =activityService.findActivityById(activityId);
         byte[] bytes = file.getBytes();
@@ -681,7 +681,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityMongoRepository.save(activity);
         return activity.getActivityGeneralSettings();
     }
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivityGeneralSettings addIconInActivity(Long unitId,BigInteger activityId, MultipartFile file) throws IOException {
         return this.addIconInActivity(activityId,file);
     }
@@ -705,6 +705,15 @@ public class OrganizationActivityService extends MongoBaseService {
         createDummyPhase(year, currentWeek, phaseDTOs, phaseWeeklyDTOS);
         return getPhaseActivityDTO(unitId, publicHolidayDayTypeWrapper, dayTypes, reasonCodeWrapper, phaseDTOs, phaseWeeklyDTOS);
     }
+
+    /*public PhaseActivityDTO getActivityAndPhaseByUnitId(Long unitId) {
+        SelfRosteringMetaData publicHolidayDayTypeWrapper = getSelfRosteringMetaData(unitId);
+        List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
+        List<ActivityPhaseSettings> activityPhaseSettings = activityMongoRepository.findActivityIdAndStatusByUnitAndAccessGroupIds(unitId, new ArrayList<>(publicHolidayDayTypeWrapper.getReasonCodeWrapper().getUserAccessRoleDTO().getAccessGroupIds()));
+        Phase phase=phaseService.getPhaseByName(unitId,TIME_ATTENDANCE.toString());
+        LocalDate gracePeriodEndDate = getGracePeriodExpireDate(phase,publicHolidayDayTypeWrapper.getReasonCodeWrapper().getUserAccessRoleDTO().isManagement());
+        return PhaseActivityDTO.builder().activities(activities).activityPhaseSettings(activityPhaseSettings).gracePeriodExpireDate(gracePeriodEndDate).reasonCodes(publicHolidayDayTypeWrapper.getReasonCodeWrapper().getReasonCodes()).build();
+    }*/
 
     private SelfRosteringMetaData getSelfRosteringMetaData(long unitId) {
         SelfRosteringMetaData publicHolidayDayTypeWrapper = userIntegrationService.getPublicHolidaysDayTypeAndReasonCodeByUnitId(unitId);
@@ -759,11 +768,11 @@ public class OrganizationActivityService extends MongoBaseService {
         PlanningPeriod firstRequestPlanningPeriod = planningPeriodMongoRepository.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
         LocalDate firstRequestPhasePlanningPeriodEndDate = isNotNull(firstRequestPlanningPeriod) ? firstRequestPlanningPeriod.getEndDate() : null;
         List<PresenceTypeDTO> plannedTimes = plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
-        List<ActivityConfiguration> activityConfigurations = activityConfigurationService.findAllByUnitIdAndDeletedFalse(unitId);
+        List<ActivityConfigurationDTO> activityConfigurations = activityConfigurationService.findAllByUnitIdAndDeletedFalse(unitId);
         Phase phase=phaseService.getPhaseByName(unitId,TIME_ATTENDANCE.toString());
         LocalDate gracePeriodEndDate= getGracePeriodExpireDate(phase,reasonCodeWrapper.getUserAccessRoleDTO().isManagement());
         return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),
-                publicHolidayDayTypeWrapper.getPublicHolidays(), firstRequestPhasePlanningPeriodEndDate, plannedTimes, activityPhaseSettings, copyCollectionPropertiesByMapper(activityConfigurations, ActivityConfigurationDTO.class),gracePeriodEndDate);
+                publicHolidayDayTypeWrapper.getPublicHolidays(), firstRequestPhasePlanningPeriodEndDate, plannedTimes, activityPhaseSettings, activityConfigurations,gracePeriodEndDate);
     }
 
     private LocalDate getGracePeriodExpireDate(Phase phase,boolean management) {
@@ -792,7 +801,7 @@ public class OrganizationActivityService extends MongoBaseService {
         return activity.getActivityNotesSettings();
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivityNotesSettings addDocumentInNotesTab(Long unitId, BigInteger activityId, MultipartFile file) throws IOException{
         return this.addDocumentInNotesTab(activityId,file);
     }
@@ -817,7 +826,7 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         return new ActivitySettingsWrapper(activityCommunicationSettings);
     }
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivitySettingsWrapper updateCommunicationTabOfActivity(Long unitId,CommunicationActivityDTO communicationActivityDTO, boolean updateFromOrg){
         return this.updateCommunicationTabOfActivity(communicationActivityDTO,updateFromOrg);
     }

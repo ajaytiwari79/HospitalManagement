@@ -15,6 +15,7 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityTimeTypeWrapper;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -50,6 +51,7 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(List<BigInteger> activityIds);
 
+    @Cacheable(value = "findAllActivityByUnitIdWithCompositeActivities", key = "#unitId", cacheManager = "cacheManager")
     List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId);
 
     List<ActivityPhaseSettings> findActivityIdAndStatusByUnitAndAccessGroupIds(Long unitId, List<Long> accessGroupIds);

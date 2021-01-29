@@ -179,4 +179,11 @@ public class ActivityConfigurationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.copyNonWorkingActivityConfigurationFromAbsence());
     }
 
+    @ApiOperation("Get Planned TimeType Configuration")
+    @GetMapping(value = UNIT_ACTIVITY_CONFIGURATION+"/get_planned_timetype_configuration")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getPlannedTimeTypeConfiguration(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getPlannedTimeTypeConfiguration(unitId));
+    }
+
 }

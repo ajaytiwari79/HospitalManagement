@@ -14,7 +14,7 @@ public interface ActivityConfigurationRepository extends MongoBaseRepository<Act
 
    boolean existsByUnitIdAndDeletedFalse(Long unitId);
 
-   List<ActivityConfiguration> findAllByUnitIdAndDeletedFalse(Long unitId);
+   List<ActivityConfigurationDTO> findAllByUnitIdAndDeletedFalse(Long unitId);
 
    boolean existsByCountryIdAndDeletedFalse(Long countryId);
 

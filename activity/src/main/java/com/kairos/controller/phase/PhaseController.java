@@ -70,11 +70,19 @@ public class PhaseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getDefaultPhasesByUnit(unitId));
     }
 
-    @RequestMapping(value = "phase/{id}/languageSettings", method = RequestMethod.PUT)
+    @PutMapping(value = "phase/{id}/languageSettings")
     @ApiOperation("Add translated data")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTranslationsOfOrganizationPhase(@PathVariable BigInteger id, @RequestBody Map<String, TranslationInfo> translations) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.updateTranslations(id,translations));
     }
+
+    @GetMapping(value = "/get_applicable_phases")
+    @ApiOperation("get Applicable Phases")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> getApplicablePhases(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getApplicablePhases(unitId));
+    }
+
 }
 
