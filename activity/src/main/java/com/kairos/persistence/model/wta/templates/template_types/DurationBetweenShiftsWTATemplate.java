@@ -99,12 +99,9 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
                     int duration = (int)new DateTimeInterval(date,activity.getStartDate()).getMinutes();
                     restingHours = restingHours > duration || restingHours==NOT_VALID_VALUE ? duration : restingHours;
                 }
-                if(!isValid(minMaxSetting, value, restingHours) || restingHours==NOT_VALID_VALUE){
-                    return false;
-                }
             }
         }
-        return true;
+        return isValid(minMaxSetting, value, restingHours) && restingHours != NOT_VALID_VALUE;
     }
 
     public TimeTypeEnum getTimeTypeEnum(ShiftActivityDTO shiftActivityDTO){
