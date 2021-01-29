@@ -15,7 +15,7 @@ public class TranslationService {
     @Inject
     private SystemLanguageGraphRepository systemLanguageGraphRepository;
 
-    @CacheEvict(value = {"getPermission","generateHierarchy"}, allEntries = true)
+    @CacheEvict(value = {"getPermission","generateHierarchy","getTabHierarchy"}, allEntries = true)
     public Map<String, TranslationInfo> updateTranslation(Long id, Map<String, TranslationInfo> translation){
         String jsonString;
         try{
