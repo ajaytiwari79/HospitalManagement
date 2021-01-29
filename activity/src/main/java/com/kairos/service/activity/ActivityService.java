@@ -231,7 +231,7 @@ public class ActivityService {
         return true;
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public boolean deleteActivity(Long unitId, BigInteger activityId){
         return this.deleteActivity(activityId);
     }
@@ -426,7 +426,7 @@ public class ActivityService {
         }
         return timeCalculationActivityDTO;
     }
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public TimeCalculationActivityDTO updateTimeCalculationTabOfActivity(Long unitId, TimeCalculationActivityDTO timeCalculationActivityDTO, boolean availableAllowActivity){
         return this.updateTimeCalculationTabOfActivity(timeCalculationActivityDTO,availableAllowActivity);
     }
@@ -460,7 +460,7 @@ public class ActivityService {
         return childActivitiesIds;
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public Set<BigInteger> assignChildActivitiesInActivity(Long unitId, BigInteger activityId, Set<BigInteger> childActivitiesIds){
         return this.assignChildActivitiesInActivity(activityId,childActivitiesIds);
     }
@@ -506,7 +506,7 @@ public class ActivityService {
         return new ActivitySettingsWrapper(activityIndividualPointsSettings);
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivitySettingsWrapper updateIndividualPointsTab(Long unitId, ActivityIndividualPointsSettingsDTO individualPointsDTO){
         return this.updateIndividualPointsTab(individualPointsDTO);
     }
@@ -544,7 +544,7 @@ public class ActivityService {
         return new ActivitySettingsWrapper(activityRulesSettings);
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivitySettingsWrapper updateRulesTab(Long unitId, ActivityRulesSettingsDTO rulesActivityDTO, boolean updateFromOrg){
         return this.updateRulesTab(rulesActivityDTO,updateFromOrg);
     }
@@ -601,7 +601,7 @@ public class ActivityService {
         return activityPhaseSettings;
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivityPhaseSettings updatePhaseSettingTab(Long unitId, ActivityPhaseSettings activityPhaseSettings){
         return this.updatePhaseSettingTab(activityPhaseSettings);
     }
@@ -650,7 +650,7 @@ public class ActivityService {
         return new ActivitySettingsWrapper(activityBonusSettings);
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivitySettingsWrapper updateBonusTabOfActivity(Long unitId, BonusActivityDTO bonusActivityDTO){
         return this.updateBonusTabOfActivity(bonusActivityDTO);
     }
@@ -666,7 +666,7 @@ public class ActivityService {
 
     @Caching(evict = {
             @CacheEvict(value = "findAllActivityByCountry",allEntries = true),
-            @CacheEvict(value="getActivityMappingDetails", key="#unitId") })
+            @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId") })
     public ActivitySettingsWrapper updateSkillTabOfActivity( SkillActivityDTO skillActivityDTO) {
         Activity activity = findActivityById(skillActivityDTO.getActivityId());
         ActivitySkillSettings activitySkillSettings = new ActivitySkillSettings(skillActivityDTO.getActivitySkills());
@@ -674,7 +674,7 @@ public class ActivityService {
         activityMongoRepository.save(activity);
         return new ActivitySettingsWrapper(activitySkillSettings);
     }
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivitySettingsWrapper updateSkillTabOfActivity(Long unitId, SkillActivityDTO skillActivityDTO){
         return this.updateSkillTabOfActivity(skillActivityDTO);
     }
@@ -716,7 +716,7 @@ public class ActivityService {
         }
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public void updateOrgMappingDetailOfActivity(Long unitId, OrganizationMappingDTO organizationMappingDTO, BigInteger activityId){
         this.updateOrgMappingDetailOfActivity(organizationMappingDTO,activityId);
     }
@@ -763,7 +763,7 @@ public class ActivityService {
         activityMongoRepository.save(activity);
         return new ActivitySettingsWrapper(activityOptaPlannerSetting);
     }
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivitySettingsWrapper updateOptaPlannerSettingsTabOfActivity(Long unitId, BigInteger activityId, ActivityOptaPlannerSetting activityOptaPlannerSetting){
         return updateOptaPlannerSettingsTabOfActivity(activityId,activityOptaPlannerSetting);
     }
@@ -790,7 +790,7 @@ public class ActivityService {
         return new ActivitySettingsWrapper(activityCTAAndWTASettings);
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivitySettingsWrapper updateCtaAndWtaSettingsTabOfActivity(Long unitId, ActivityCTAAndWTASettingsDTO activityCTAAndWTASettingsDTO){
         return this.updateCtaAndWtaSettingsTabOfActivity(activityCTAAndWTASettingsDTO);
     }
@@ -932,7 +932,7 @@ public class ActivityService {
         return new ActivitySettingsWrapper(activityLocationSettings);
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public ActivitySettingsWrapper updateLocationsTabOfActivity(Long unitId, ActivityLocationSettingsDTO activityLocationSettingsDTO){
         return this.updateLocationsTabOfActivity(activityLocationSettingsDTO);
     }
@@ -944,7 +944,7 @@ public class ActivityService {
 
     @Caching(evict = {
             @CacheEvict(value = "findAllActivityByCountry",allEntries = true),
-            @CacheEvict(value="getActivityMappingDetails", allEntries = true)})
+            @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, allEntries = true)})
     public Map<String, TranslationInfo> updateTranslationData(BigInteger activityId, Map<String, TranslationInfo> activityTranslationDTO){
         Activity activity = activityMongoRepository.findActivityByIdAndEnabled(activityId);
         if(isNull(activity)) {
@@ -955,7 +955,7 @@ public class ActivityService {
 
     @Caching(evict = {
             @CacheEvict(value = "findAllActivityByCountry",allEntries = true),
-            @CacheEvict(value="getActivityMappingDetails", allEntries = true)})
+            @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, allEntries = true)})
     public Map<String, TranslationInfo> updateActivityTranslations(@NotNull Activity activity, Map<String, TranslationInfo> activityTranslationDTO){
         final Map<String, TranslationInfo> activityLanguageDetailsMap = activity.getTranslations();
         activityTranslationDTO.forEach((s, translation) -> {
@@ -1042,7 +1042,7 @@ public class ActivityService {
         return true;
     }
 
-    @CacheEvict(value="getActivityMappingDetails", key="#unitId")
+    @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, key="#unitId")
     public boolean removeAttachementsFromActivity(Long unitId, BigInteger activityId, boolean removeNotes) {
         return this.removeAttachementsFromActivity(activityId,removeNotes);
     }
@@ -1058,7 +1058,7 @@ public class ActivityService {
     }
     @Caching(evict = {
             @CacheEvict(value = "findAllActivityByCountry",allEntries = true),
-            @CacheEvict(value="getActivityMappingDetails", allEntries = true) })
+            @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"}, allEntries = true) })
     public void unassighExpertiseFromActivities(BigInteger expertiseId) {
         activityMongoRepository.unassignExpertiseFromActivitiesByExpertiesId(expertiseId.longValue());
         LOGGER.info("successfully remove expertise from activities by job");

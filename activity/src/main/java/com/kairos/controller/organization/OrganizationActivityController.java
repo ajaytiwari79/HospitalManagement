@@ -354,7 +354,7 @@ public class OrganizationActivityController {
     @ApiOperation(value = "Get All Activities and Phases by unitId")
     @GetMapping(value = "/activity_with_phase")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId( @PathVariable long unitId) {
+    public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId( @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivityAndPhaseByUnitId(unitId));
     }
 

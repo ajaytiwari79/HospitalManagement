@@ -4,7 +4,9 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.shift.ShiftStatus;
@@ -17,6 +19,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
+import com.kairos.wrapper.phase.PhaseActivityDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -29,6 +32,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -421,6 +426,53 @@ public class PhaseService extends MongoBaseService {
         phase.setTranslations(translations);
         phaseMongoRepository.save(phase);
         return phase.getTranslations();
+    }
+
+    public PhaseActivityDTO getApplicablePhases(Long unitId){
+        List<PhaseDTO> phaseDTOs = getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
+        LocalDate date = LocalDate.now();
+        int year = date.getYear();
+        int currentWeek = date.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
+        List<PhaseWeeklyDTO> phaseWeeklyDTOS = getPhaseWeeklyDTO(phaseDTOs,currentWeek,year);
+        // Creating dummy next remaining 2 years as PHASE with lowest sequence
+        createDummyPhase(year, currentWeek, phaseDTOs, phaseWeeklyDTOS);
+        List<PhaseDTO> actualPhase = getActualPhasesByOrganizationId(unitId);
+        return PhaseActivityDTO.builder().actualPhases(actualPhase).phases(phaseWeeklyDTOS).applicablePhases(phaseDTOs).build();
+    }
+
+    private List<PhaseWeeklyDTO> getPhaseWeeklyDTO(List<PhaseDTO> phaseDTOs,int currentWeek,int year) {
+        ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<>();
+        for (PhaseDTO phaseObj : phaseDTOs) {
+            if (phaseObj.getDurationType().equals(DurationType.WEEKS)) {
+                for (int i = 0; i < phaseObj.getDuration(); i++) {
+                    PhaseWeeklyDTO tempPhaseObj = phaseObj.buildWeekDTO();
+                    tempPhaseObj.setWeekCount(++currentWeek);
+                    tempPhaseObj.setYear(year);
+                    if (currentWeek >= 52) {
+                        year = year + 1;
+                        currentWeek = 0;
+                    }
+                    phaseWeeklyDTOS.add(tempPhaseObj);
+                }
+            }
+        }
+        return phaseWeeklyDTOS;
+    }
+
+    private void createDummyPhase(int year, int currentWeek, List<PhaseDTO> phaseDTOs, List<PhaseWeeklyDTO> phaseWeeklyDTOS) {
+        if (isCollectionNotEmpty(phaseDTOs)) {
+            int indexOfPhaseWithLowestSeq = phaseDTOs.size() - 1;
+            for (int start = phaseWeeklyDTOS.size(); start <= 104; start++) {
+                PhaseWeeklyDTO tempPhaseObj = phaseDTOs.get(indexOfPhaseWithLowestSeq).buildWeekDTO();
+                tempPhaseObj.setWeekCount(++currentWeek);
+                tempPhaseObj.setYear(year);
+                if (currentWeek >= 52) {
+                    year = year + 1;
+                    currentWeek = 0;
+                }
+                phaseWeeklyDTOS.add(tempPhaseObj);
+            }
+        }
     }
 
 

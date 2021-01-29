@@ -14,6 +14,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.solver_config.PlanningType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
@@ -26,8 +27,10 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.wrapper.phase.PhaseActivityDTO;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +67,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     @Inject
     private PlannedTimeTypeRepository plannedTimeTypeRepository;
     @Inject private PhaseService phaseService;
+    @Inject private PlannedTimeTypeService plannedTimeTypeService;
 
     public void createDefaultSettings(Long unitId, Long countryId, List<Phase> phases,List<Long> employmentTypeIds) {
         if(!activityConfigurationRepository.existsByUnitIdAndDeletedFalse(unitId)) {
@@ -349,7 +353,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         return plannedTimes;
     }
 
-    public List<ActivityConfiguration> findAllByUnitIdAndDeletedFalse(Long unitId){
+    public List<ActivityConfigurationDTO> findAllByUnitIdAndDeletedFalse(Long unitId){
         return activityConfigurationRepository.findAllByUnitIdAndDeletedFalse(unitId);
     }
 
@@ -407,5 +411,11 @@ public class ActivityConfigurationService extends MongoBaseService {
             });
         }
         return true;
+    }
+
+    public PhaseActivityDTO getPlannedTimeTypeConfiguration(Long unitId){
+        List<PresenceTypeDTO> plannedTimes = plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
+        List<ActivityConfigurationDTO> activityConfigurations = findAllByUnitIdAndDeletedFalse(unitId);
+        return PhaseActivityDTO.builder().plannedTimes(plannedTimes).activityConfigurations(activityConfigurations).build();
     }
 }

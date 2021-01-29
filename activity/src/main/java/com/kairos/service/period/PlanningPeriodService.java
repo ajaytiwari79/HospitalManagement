@@ -59,6 +59,7 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftStateService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.wrapper.phase.PhaseActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -874,7 +875,11 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     public PlanningPeriod getPlanningPeriodContainsDate(Long unitId, LocalDate dateLiesInPeriod) {
-        return planningPeriodMongoRepository.getPlanningPeriodContainsDate(unitId, dateLiesInPeriod);
+        PlanningPeriod planningPeriodContainsDate = planningPeriodMongoRepository.getPlanningPeriodContainsDate(unitId, dateLiesInPeriod);
+        if(isNull(planningPeriodContainsDate)){
+            exceptionService.dataNotFoundException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
+        }
+        return planningPeriodContainsDate;
     }
 
     public PlanningPeriod getFirstPlanningPeriod(Long unitId) {
@@ -1000,5 +1005,12 @@ public class PlanningPeriodService extends MongoBaseService {
 
     public ShiftDataHelper getDataForShiftOperation(Date startDate, Long unitId, Collection<Long> employmentIds, Collection<Long> expertiseIds, Collection<Long> staffIds, Long countryId, Collection<BigInteger> activityIds, BigInteger shiftId, boolean userAccessRole){
         return planningPeriodMongoRepository.getDataForShiftOperation(startDate,unitId,employmentIds,expertiseIds,staffIds,countryId,activityIds,shiftId,userAccessRole);
+    }
+
+    public PhaseActivityDTO getPlanningPeriodDetails(Long unitId){
+        PlanningPeriodDTO planningPeriodDTO = findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
+        PlanningPeriod firstRequestPlanningPeriod = planningPeriodMongoRepository.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
+        LocalDate firstRequestPhasePlanningPeriodEndDate = isNotNull(firstRequestPlanningPeriod) ? firstRequestPlanningPeriod.getEndDate() : null;
+        return PhaseActivityDTO.builder().planningPeriodStartDate(planningPeriodDTO.getStartDate()).planningPeriodEndDate(planningPeriodDTO.getEndDate()).firstRequestPhasePlanningPeriodEndDate(firstRequestPhasePlanningPeriodEndDate).build();
     }
 }
