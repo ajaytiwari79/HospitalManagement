@@ -18,6 +18,7 @@ import java.util.List;
 @Setter
 @PermissionClass(name = "Activity")
 public class ActivityWithSelectedDTO implements Serializable {
+    private static final long serialVersionUID = 7426135099733771383L;
     private List<ActivityTagDTO> allActivities;
     private List<ActivityTagDTO> selectedActivities;
 }

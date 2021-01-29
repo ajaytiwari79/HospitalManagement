@@ -21,6 +21,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Document
 public class AutoFillGapSettings extends MongoBaseEntity {
+    private static final long serialVersionUID = 7544736561082188532L;
     private Long organizationTypeId;
     private Long organizationSubTypeId;
     private BigInteger phaseId;

@@ -26,6 +26,7 @@ import java.math.BigInteger;
 @NoArgsConstructor
 public class ActivityCategory extends MongoBaseEntity implements Serializable {
 
+    private static final long serialVersionUID = -7252015059142411734L;
     private String name;
     private String description;
     private Long countryId;

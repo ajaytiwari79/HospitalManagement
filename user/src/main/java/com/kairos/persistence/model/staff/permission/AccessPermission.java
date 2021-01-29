@@ -13,6 +13,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_A
 @NodeEntity
 public class AccessPermission extends UserBaseEntity {
 
+    private static final long serialVersionUID = -4255824724737881508L;
     @Relationship(type = HAS_ACCESS_GROUP)
     AccessGroup accessGroup;
 

@@ -12,6 +12,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TranslationInfo implements Serializable {
+
+    private static final long serialVersionUID = -9068699808609851002L;
     private String name;
     private String description;
 

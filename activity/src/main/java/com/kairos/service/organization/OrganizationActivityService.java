@@ -36,10 +36,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.SelfRosteringMetaData;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.ActivityStateEnum;
-import com.kairos.enums.DurationType;
-import com.kairos.enums.OrganizationHierarchy;
-import com.kairos.enums.ProtectedDaysOffUnitSettings;
+import com.kairos.enums.*;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.model.activity.TimeType;
@@ -281,7 +278,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     }
 
-    //@Cacheable(value = "getActivityMappingDetails", key = "#unitId", cacheManager = "cacheManager")
+    @Cacheable(value = "getActivityMappingDetails", key = "#unitId", cacheManager = "cacheManager")
     public ActivityWithSelectedDTO getActivityMappingDetails(Long unitId) {
         ActivityWithSelectedDTO activityDetails = new ActivityWithSelectedDTO();
         ActivityWithUnitIdDTO activities = activityService.getActivityByUnitId(unitId);
@@ -898,8 +895,8 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public  Map<String,Set<BigInteger>> getShowOnCallAndStandByActivityId(Long unitId,boolean showStandBy,boolean showOnCall){
         Map<String,Set<BigInteger>> showOnCallAndStandByActivityIds = new HashMap<>();
-        showOnCallAndStandByActivityIds.put("showStandBy", showStandBy ? activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId, showStandBy, false) : newHashSet());
-        showOnCallAndStandByActivityIds.put("showOnCall", showOnCall ? activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId, false, showOnCall) : newHashSet());
+        showOnCallAndStandByActivityIds.put("showStandBy", showStandBy ? activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId, UnityActivitySetting.STAND_BY) : newHashSet());
+        showOnCallAndStandByActivityIds.put("showOnCall", showOnCall ? activityMongoRepository.findAllShowOnCallAndStandByActivitiesByUnitId(unitId, UnityActivitySetting.ON_CALL) : newHashSet());
         return showOnCallAndStandByActivityIds;
     }
 

@@ -15,10 +15,12 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 public class ActivitySkill implements Serializable {
+    private static final long serialVersionUID = -146660442280491933L;
     private String name;
     private String level;
     private Long skillId;
     private Map<String, TranslationInfo> translations;
+
 
 
     public ActivitySkill(String name, String level, Long skillId) {

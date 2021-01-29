@@ -21,6 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ActivityTimeCalculationSettings implements Serializable {
 
+    private static final long serialVersionUID = -443573021578255404L;
     @KPermissionField
     private String methodForCalculatingTime;
     @KPermissionField

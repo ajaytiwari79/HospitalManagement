@@ -18,6 +18,7 @@ import java.math.BigInteger;
 @Setter
 @NoArgsConstructor
 public class ActivityBalanceSettings implements Serializable {
+    private static final long serialVersionUID = 2859661998195599675L;
     private Integer addTimeTo;
     @KPermissionField
     private BigInteger timeTypeId;

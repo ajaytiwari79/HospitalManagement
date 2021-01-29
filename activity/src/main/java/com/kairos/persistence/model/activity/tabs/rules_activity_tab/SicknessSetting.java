@@ -15,6 +15,7 @@ import java.util.Set;
 public class SicknessSetting implements Serializable {
 
 
+    private static final long serialVersionUID = -2454050699794513683L;
     private boolean canOnlyUsedOnMainEmployment;
     private boolean canNotUsedTopOfApprovedAbsences;
     private boolean validForChildCare;

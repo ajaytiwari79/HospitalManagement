@@ -23,6 +23,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 @AllArgsConstructor
 public class OtherPermissionDTO implements Serializable {
 
+    private static final long serialVersionUID = 7618845778148781807L;
     private Set<Long> expertiseIds;
     private Set<Long> unionIds;
     private Set<Long> teamIds;

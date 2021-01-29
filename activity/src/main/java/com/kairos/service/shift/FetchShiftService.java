@@ -80,6 +80,7 @@ import static com.kairos.enums.shift.ShiftType.SICK;
 @Service
 public class FetchShiftService {
 
+    public static final String NAME = "name";
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject private ShiftFilterService shiftFilterService;
@@ -370,9 +371,7 @@ public class FetchShiftService {
     }
 
     private void updateReasonCodeAndNameInActivitiesAndUpdateSicknessDetails(Map<BigInteger, ReasonCodeDTO> reasonCodeMap, List<ShiftDTO> shifts) {
-        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
-        Map<String, Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
-        activityService.prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
+        Map<String, Set<FieldLevelPermission>> fieldPermissionMap=activityService.getActivityPermissionMap(UserContext.getUserDetails().getLastSelectedOrganizationId(),UserContext.getUserDetails().getId());
         Set<BigInteger> activityIds = shifts.stream().flatMap(shiftDTO -> shiftDTO.getActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet());
         List<Activity> activities = activityMongoRepository.findActivitiesSickSettingByActivityIds(activityIds);
         Map<BigInteger, Activity> activityWrapperMap = activities.stream().collect(Collectors.toMap(Activity::getId, v -> v));
@@ -384,7 +383,7 @@ public class FetchShiftService {
     private List<ShiftDTO> updateActivityAndSicknessDetails(Map<BigInteger, ReasonCodeDTO> reasonCodeMap, List<ShiftDTO> shifts, Map<String, Set<FieldLevelPermission>> fieldPermissionMap, Map<BigInteger, Activity> activityWrapperMap, ShiftDTO shift) {
         shift.setMultipleActivity(shift.getActivities().size()>1);
         for (ShiftActivityDTO activity : shift.getActivities()) {
-            if(fieldPermissionMap.get("name").contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get("name").isEmpty()){
+            if(fieldPermissionMap.get(NAME).contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get(NAME).isEmpty()){
                 activity.setActivityName("XXXXX");
                 activity.getChildActivities().forEach(k->k.setActivityName("XXXXX"));
             }

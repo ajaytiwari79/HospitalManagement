@@ -15,6 +15,7 @@ import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
+import com.kairos.enums.UnityActivitySetting;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
@@ -54,6 +55,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public static final String CHILD_ACTIVITIES_ACTIVITY_PRIORITY_ID = "childActivities.activityPriorityId";
     public static final String CHILD_ACTIVITIES_CATEGORY_ID = "childActivities.categoryId";
     public static final String STAFF_ID = "staffId";
+    public static final String ACTIVITY_IDS = "activityIds";
+    public static final String ACTIVITY_ID = "activityId";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -268,10 +271,10 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where(ID).in(activityIds).and(DELETED).is(false)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE_INFO),
                 match(Criteria.where("timeTypeInfo.partOfTeam").is(false)),
-                group().push("id").as("activityIds"),
-                lookup("staffActivitySetting","activityIds","activityId","staff"),
+                group().push("id").as(ACTIVITY_IDS),
+                lookup("staffActivitySetting", ACTIVITY_IDS, ACTIVITY_ID,"staff"),
                 unwind("staff",true),
-                group("activityIds").push("staff.staffId").as("staffIds")
+                group(ACTIVITY_IDS).push("staff.staffId").as("staffIds")
         );
         List<Map> result = mongoTemplate.aggregate(aggregation, Activity.class, Map.class).getMappedResults();
         List<BigInteger> nonProductiveTypeActivityIds = null;
@@ -416,7 +419,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     private ProjectionOperation getProject() {
-        return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
+        return project().and(ID).as(AppConstants.ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
                 .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
                 .and(ID).as(AppConstants.ACTIVITY_ID)
                 .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
@@ -463,7 +466,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     private ProjectionOperation getProjectForParentActivityWrapper() {
-        return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(CHILD_ACTIVITY_IDS).as("activity.childActivityIds")
+        return project().and(ID).as(AppConstants.ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(CHILD_ACTIVITY_IDS).as("activity.childActivityIds")
                 .and(ID).as(AppConstants.ACTIVITY_ID).and(ACTIVITY_PRIORITY_ID).as("activity.activityPriorityId").and(UNIT_ID).as(ACTIVITY_UNIT_ID)
                 .and(BALANCE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_BALANCE_SETTINGS_ACTIVITY_TAB).and(RULES_ACTIVITY_TAB).as(ACTIVITY_RULES_ACTIVITY_TAB)
                 .and(TIME_CALCULATION_ACTIVITY_TAB).as(ACTIVITY_TIME_CALCULATION_ACTIVITY_TAB).and(BONUS_ACTIVITY_TAB).as(ACTIVITY_BONUS_ACTIVITY_TAB)
@@ -494,7 +497,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
 
     private ProjectionOperation getProjectForActivityWrapper() {
-        return project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
+        return project().and(ID).as(AppConstants.ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
                 .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES).and(CHILD_ACTIVITY_IDS).as("activity.childActivityIds")
                 .and(ID).as(AppConstants.ACTIVITY_ID).and(ACTIVITY_PRIORITY_ID).as("activity.activityPriorityId")
                 .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
@@ -518,15 +521,15 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY);
     }
     @Override
-    public List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType,Long unitId){
-        return getActivityWrappersByCriteria(Criteria.where(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).is(secondLevelTimeType).and(UNIT_ID).is(unitId).and(DELETED).is(false));
+    public List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum secondLevelTimeType,Long unitId){
+        return getActivityWrappersByCriteria(Criteria.where(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE).is(secondLevelTimeType).and(UNIT_ID).is(unitId).and(DELETED).is(false));
     }
 
     public List<TimeTypeAndActivityIdDTO> findAllTimeTypeByActivityIds(Set<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ID).in(activityIds).and(DELETED).is(false)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID,
-                        TIME_TYPE1), project().and(ID).as("activityId")
+                        TIME_TYPE1), project().and(ID).as(ACTIVITY_ID)
                         .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1).and(TIME_TYPE_TIME_TYPES).as(TIME_TYPE1));
         AggregationResults<TimeTypeAndActivityIdDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, TimeTypeAndActivityIdDTO.class);
         return result.getMappedResults();
@@ -564,7 +567,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).orOperator(Criteria.where(COUNTRY_PARENT_ID).in(activityIds), Criteria.where(ID).in(activityIds))),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
-                project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME)
+                project().and(ID).as(AppConstants.ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME)
                         .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
                         .and(PARENT_ID).as(ACTIVITY_PARENT_ID)
                         .and(COUNTRY_PARENT_ID).as("activity.countryParentId")
@@ -629,7 +632,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where(ID).in(activityIds).and(DELETED).is(false).and(TIME_CALCULATION_ACTIVITY_TAB_METHOD_FOR_CALCULATING_TIME).nin(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID,
                         TIME_TYPE1),
-                project().and(ID).as(ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME)
+                project().and(ID).as(AppConstants.ACTIVITY_ID).and(NAME).as(ACTIVITY_NAME)
                         .and(BALANCE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_BALANCE_SETTINGS_ACTIVITY_TAB)
                         .and(RULES_ACTIVITY_TAB).as(ACTIVITY_RULES_ACTIVITY_TAB)
                         .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE_INFO)
@@ -726,7 +729,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                     "   }";
     }
 
-    //@Cacheable(value = "activities", key = "#unitId")
+
     public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId) {
         Criteria criteria = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false);
         Aggregation aggregation = getParentActivityAggregation(criteria);
@@ -936,17 +939,15 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public  Set<BigInteger> findAllShowOnCallAndStandByActivitiesByUnitId(Long unitId, boolean showStandBy, boolean showOnCall){
-        Criteria criteriaDefinition = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false);
-        if(showStandBy){
-            criteriaDefinition.and(RULES_ACTIVITY_TAB+".showStandBy").is(showStandBy);
-        }
-        if(showOnCall){
-            criteriaDefinition.and(RULES_ACTIVITY_TAB+".showOnCall").is(showOnCall);
-        }
-        Query query = new Query(criteriaDefinition);
-        query.fields().include("id");
-        return mongoTemplate.find(query,Activity.class).stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+    public  Set<BigInteger> findAllShowOnCallAndStandByActivitiesByUnitId(Long unitId, UnityActivitySetting unityActivitySetting){
+        Criteria criteriaDefinition = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and(TIME_TYPE1+".unityActivitySetting").is(unityActivitySetting);
+        Aggregation aggregation = Aggregation.newAggregation(
+                lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, UNDERSCORE_ID, TIME_TYPE1),
+                unwind(TIME_TYPE1),
+                match(criteriaDefinition),
+                project(ID,NAME)
+        );
+        return mongoTemplate.aggregate(aggregation,Activity.class,Activity.class).getMappedResults().stream().map(activity -> activity.getId()).collect(Collectors.toSet());
     }
 
     @Override
@@ -959,7 +960,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
             staffId = 0l;
         }
         aggregations[i++] = match(Criteria.where(STAFF_ID).in(staffId).and(DELETED).is(false));
-        aggregations[i++] = group(STAFF_ID).addToSet("activityId").as("activityIds");
+        aggregations[i++] = group(STAFF_ID).addToSet(ACTIVITY_ID).as(ACTIVITY_IDS);
         aggregations[i++] = getCustomLookUpForActivityAggregationOperation(activityIdString,isActivityType,unitId);
         aggregations[i++] = getCustomAggregationOperationForChildActivitiyIds();
         aggregations[i++] = getCustomAggregationOperationForConcatArray();

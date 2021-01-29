@@ -445,10 +445,8 @@ public class StaffingLevelService {
         LOGGER.debug("getting staffing level organizationId ,startDate ,endDate {},{},{}", unitId, startDate, endDate);
         Map<String, PresenceStaffingLevelDto> presenceStaffingLevelMap = new HashMap<String, PresenceStaffingLevelDto>();
         Map<String, AbsenceStaffingLevelDto> absenceStaffingLevelMap = new HashMap<String, AbsenceStaffingLevelDto>();
-        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
         Map<LocalDate,StaffingLevel> staffingLevelMap = staffingLevelMongoRepository.findByUnitIdAndDates(unitId,asDate(startDate),asDate(endDate)).stream().collect(Collectors.toMap(k->asLocalDate(k.getCurrentDate()),v->v));
-        Map<String,Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
-        activityService.prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
+        Map<String,Set<FieldLevelPermission>> fieldPermissionMap=activityService.getActivityPermissionMap(unitId,UserContext.getUserDetails().getId());
         while (!startDate.isAfter(endDate)) {
             getStaffingLevelPerDate(unitId, startDate, presenceStaffingLevelMap, absenceStaffingLevelMap,staffingLevelMap.get(startDate),fieldPermissionMap);
             startDate = startDate.plusDays(1);

@@ -322,7 +322,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     public ShiftDataHelper getDataForShiftOperation(Date startDate, Long unitId, Collection<Long> employmentIds, Collection<Long> expertiseIds, Collection<Long> staffIds, Long countryId, Collection<BigInteger> activityIds, BigInteger shiftId, boolean userAccessRole){
         LocalDate localDate = asLocalDate(startDate);
         Aggregation aggregation = newAggregation(
-                match(Criteria.where(UNIT_ID).is(unitId).and("startDate").lte(localDate).and("endDate").gte(localDate).and("deleted").is(false).and("active").is(true)),
+                match(Criteria.where(UNIT_ID).is(unitId).and(START_DATE).lte(localDate).and(END_DATE).gte(localDate).and(DELETED).is(false).and(ACTIVE).is(true)),
                 getCustomLookUpForLastPlanningPeriod(unitId),
                 getCustomProjectionForShift(),
                 getCustomWTAOperationForShift(employmentIds),

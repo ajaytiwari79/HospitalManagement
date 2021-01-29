@@ -182,7 +182,7 @@ public class ShiftSickService extends MongoBaseService {
             Activity activity = activityOptional.get();
             List<ActivityWrapper> protectDaysOffActivity;
             if(PROTECTED_DAYS_OFF.equals(activity.getActivityRulesSettings().getSicknessSetting().getReplaceSickShift())){
-                protectDaysOffActivity = activityRepository.getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF.toString(),unitId);
+                protectDaysOffActivity = activityRepository.getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF,unitId);
                 if(isCollectionEmpty(protectDaysOffActivity)){
                     exceptionService.dataNotFoundException(MESSAGE_PROTECTEDDAYSOFF_ACTIVITY_NOT_FOUND);
                 }
@@ -206,7 +206,7 @@ public class ShiftSickService extends MongoBaseService {
                 }
                 switch (activity.getActivityRulesSettings().getSicknessSetting().getReplaceSickShift()) {
                     case PROTECTED_DAYS_OFF:
-                        List<ActivityWrapper> protectDaysOffActivity = activityRepository.getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF.toString(),activity.getUnitId());
+                        List<ActivityWrapper> protectDaysOffActivity = activityRepository.getAllActivityWrapperBySecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF,activity.getUnitId());
                         if(isCollectionEmpty(protectDaysOffActivity)){
                             exceptionService.dataNotFoundException(MESSAGE_PROTECTEDDAYSOFF_ACTIVITY_NOT_FOUND);
                         }
@@ -233,7 +233,6 @@ public class ShiftSickService extends MongoBaseService {
             }
 
         });
-        shiftService.createShifts(activity.getUnitId(),ObjectMapperUtils.copyCollectionPropertiesByMapper(allShiftsToUpdate,ShiftDTO.class),ShiftActionType.SAVE);
         if(isCollectionNotEmpty(allShiftsToDelete)) {
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(allShiftsToDelete.get(0).getStartDate()), allShiftsToDelete.get(0).getStaffId(), allShiftsToDelete.get(0).getEmploymentId());
             staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
@@ -241,6 +240,8 @@ public class ShiftSickService extends MongoBaseService {
             shiftService.deleteShifts(new ArrayList<>(), allShiftsToDelete, staffAdditionalInfoDTO);
             shiftMongoRepository.saveEntities(allShiftsToDelete);
         }
+        shiftService.createShifts(activity.getUnitId(),ObjectMapperUtils.copyCollectionPropertiesByMapper(allShiftsToUpdate,ShiftDTO.class),ShiftActionType.SAVE);
+
 
     }
 

@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
@@ -122,13 +123,17 @@ public class ShiftDetailsService extends MongoBaseService {
         shiftsMap.forEach((date, shifts) -> {
             ShiftDTO sickShift = shifts.stream().filter(k -> k.getShiftType().equals(SICK)).findAny().orElse(null);
             if (sickShift != null) {
-                Activity activity = getWorkingSickActivity(sickShift, activityMap);
-                if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfPublishedShift()) {
-                    shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()))).collect(Collectors.toList()));
-                }
-                if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfUnPublishedShift()) {
-                    shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> !act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()))).collect(Collectors.toList()));
-                }
+                Map<Long,List<ShiftDTO>> staffWiseShift=shifts.stream().collect(Collectors.groupingBy(ShiftDTO::getStaffId, Collectors.toList()));
+                staffWiseShift.forEach((staffId,shiftList)->{
+                    Activity activity = getWorkingSickActivity(sickShift, activityMap);
+                    if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfPublishedShift()) {
+                        shiftList.removeAll(shiftList.stream().filter(k -> k.getActivities().stream().anyMatch(act -> act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()))).collect(Collectors.toList()));
+                    }
+                    if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfUnPublishedShift()) {
+                        shiftList.removeAll(shiftList.stream().filter(k -> k.getActivities().stream().anyMatch(act -> !act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()))).collect(Collectors.toList()));
+                    }
+                });
+
             }
         });
     }

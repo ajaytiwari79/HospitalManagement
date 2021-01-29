@@ -16,6 +16,7 @@ import java.time.LocalTime;
 @Setter
 public class CountryHolidayCalenderDTO implements Serializable {
 
+    private static final long serialVersionUID = -8334410671363091603L;
     private BigInteger id;
     private boolean reOccuring;
     private boolean holidayType;

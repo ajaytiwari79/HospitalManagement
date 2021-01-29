@@ -32,6 +32,7 @@ import java.util.*;
 @NoArgsConstructor
 public class ActivityWithCompositeDTO implements Serializable {
 
+    private static final long serialVersionUID = -3544658576963067202L;
     private BigInteger id;
     private String name;
     private ActivityGeneralSettings activityGeneralSettings;

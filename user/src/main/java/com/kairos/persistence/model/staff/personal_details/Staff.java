@@ -38,6 +38,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Setter
 @NoArgsConstructor
 public class Staff extends UserBaseEntity {
+    private static final long serialVersionUID = -2082354170738899004L;
     @KPermissionSubModel
     @Relationship(type = HAS_CONTACT_DETAIL)
     private ContactDetail contactDetail;

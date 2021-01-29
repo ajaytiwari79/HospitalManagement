@@ -9,7 +9,7 @@ import java.util.*;
  * Created by prerna on 21/3/18.
  */
 
-public enum AccessGroupRole implements Serializable {
+public enum AccessGroupRole {
     STAFF("Staff"), MANAGEMENT("Management");
     private String accessGroupRole;
 

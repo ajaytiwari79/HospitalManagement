@@ -36,6 +36,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @NoArgsConstructor
 public class Unit extends OrganizationBaseEntity {
 
+    private static final long serialVersionUID = 3067534382760791397L;
     private boolean showPersonNames;
 
     // Relationships

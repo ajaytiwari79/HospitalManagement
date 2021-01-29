@@ -18,6 +18,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @NoArgsConstructor
 public class ModelDTO implements Serializable {
 
+    private static final long serialVersionUID = 4335555182715765843L;
     private Long id;
     private String modelName;
     private String modelClass;
