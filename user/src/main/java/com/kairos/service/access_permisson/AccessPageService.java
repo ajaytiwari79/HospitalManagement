@@ -25,6 +25,7 @@ import com.kairos.service.translation.TranslationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +65,7 @@ public class AccessPageService {
 
     @Inject private TranslationService translationService;
 
-    @CacheEvict(value = "generateHierarchy",allEntries = true)
+    @CacheEvict(value = {"generateHierarchy","getTabHierarchy"},allEntries = true)
     public synchronized AccessPage createAccessPage(AccessPageDTO accessPageDTO){
         AccessPage accessPage = new AccessPage(accessPageDTO.getName(),accessPageDTO.isModule(),
                 getTabId(accessPageDTO.isModule()));
@@ -84,7 +85,7 @@ public class AccessPageService {
         return accessPage;
     }
 
-    @CacheEvict(value = "generateHierarchy",allEntries = true)
+    @CacheEvict(value = {"generateHierarchy","getTabHierarchy"},allEntries = true)
     public AccessPage updateAccessPage(Long accessPageId,AccessPageDTO accessPageDTO){
         AccessPage accessPage = accessPageRepository.findOne(accessPageId);
         if(isNull(accessPage)){
@@ -124,12 +125,12 @@ public class AccessPageService {
         return accessPageDTOS;
     }
 
-    @CacheEvict(value = {"generateHierarchy","getPermission"},allEntries = true)
+    @CacheEvict(value = {"generateHierarchy","getPermission","getTabHierarchy"},allEntries = true)
     public Boolean updateStatus(boolean active,Long tabId){
         return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.updateStatusOfAccessTabs(tabId,active):false;
     }
 
-    @CacheEvict(value = {"generateHierarchy","getPermission"},allEntries = true)
+    @CacheEvict(value = {"generateHierarchy","getPermission","getTabHierarchy"},allEntries = true)
     public Boolean updateAccessForOrganizationCategory(Long tabId, OrgCategoryTabAccessDTO orgCategoryTabAccessDTO){
         if( !Optional.ofNullable(tabId).isPresent() ){
             return false;
@@ -151,7 +152,7 @@ public class AccessPageService {
 
     }
 
-    @CacheEvict(value = "generateHierarchy",allEntries = true)
+    @CacheEvict(value = {"generateHierarchy","getTabHierarchy"},allEntries = true)
     public void createAccessPageByXml(Tab tab){
 
         List<AccessPage> accessPages = new ArrayList<>();
@@ -179,7 +180,7 @@ public class AccessPageService {
         employmentPageGraphRepository.saveAll(accessPermissionAccessPageRelations);
     }
 
-    @CacheEvict(value = "generateHierarchy",allEntries = true)
+    @CacheEvict(value = {"generateHierarchy","getTabHierarchy"},allEntries = true)
     public void setPagePermissionToStaff(AccessPermission accessPermission,long accessGroupId) {
         List<AccessPage> accessPages = accessGroupRepository.getAccessPageByGroup(accessGroupId);
         List<AccessPermissionAccessPageRelation> accessPermissionAccessPageRelations = new ArrayList<>(accessPages.size());
@@ -192,7 +193,7 @@ public class AccessPageService {
         employmentPageGraphRepository.saveAll(accessPermissionAccessPageRelations);
     }
 
-    @CacheEvict(value = "generateHierarchy",allEntries = true)
+    @CacheEvict(value = {"generateHierarchy","getTabHierarchy"},allEntries = true)
     public void setPagePermissionToAdmin(AccessPermission accessPermission) {
         List<AccessPage> accessPages =(List<AccessPage>) accessPageRepository.findAll();
         List<AccessPermissionAccessPageRelation> accessPermissionAccessPageRelations = new ArrayList<>(accessPages.size());
@@ -249,7 +250,7 @@ public class AccessPageService {
         return ObjectMapperUtils.copyCollectionPropertiesByMapper(accessPages, KPIAccessPageDTO.class);
     }
 
-    @CacheEvict(value = "generateHierarchy",allEntries = true)
+    @CacheEvict(value = {"generateHierarchy","getTabHierarchy"},allEntries = true)
     public AccessPageLanguageDTO assignLanguageToAccessPage(String moduleId, AccessPageLanguageDTO accessPageLanguageDTO){
             AccessPage accessPage=accessPageRepository.findByModuleId(moduleId);
             if(!Optional.ofNullable(accessPage).isPresent()){
@@ -286,6 +287,7 @@ public class AccessPageService {
         return accessPage.getTranslatedData();
     }
 
+    @Cacheable(value = "getTabHierarchy", key = "#languageId", cacheManager = "cacheManager")
     public List<AccessPageDTO> getTabHierarchy(Long languageId) {
         List<AccessPageDTO> mainTabs = prepareAccessPageDTOList(accessPageRepository.getMainTabsWithHelperText(languageId));
         for (AccessPageDTO accessPageDTO : mainTabs) {
@@ -294,7 +296,7 @@ public class AccessPageService {
         return mainTabs;
     }
 
-    @CacheEvict(value = "generateHierarchy",allEntries = true)
+    @CacheEvict(value = {"generateHierarchy","getTabHierarchy"},allEntries = true)
     private void setChildrenAccessPages(AccessPageDTO accessPageDTO, Long languageId){
         List<AccessPageDTO> childAccessPageDTOS = prepareAccessPageDTOList(accessPageRepository.getChildTabsWithHelperText(accessPageDTO.getId(), languageId));
         for (AccessPageDTO childAccessPageDTO : childAccessPageDTOS) {
@@ -305,7 +307,7 @@ public class AccessPageService {
         accessPageDTO.setChildren(childAccessPageDTOS);
     }
 
-    @CacheEvict(value = "generateHierarchy",allEntries = true)
+    @CacheEvict(value = {"generateHierarchy","getTabHierarchy"},allEntries = true)
     public boolean setUrlInAccessPages() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         ClassPathResource resource = new ClassPathResource("accesspage/accessPageUrl.json");

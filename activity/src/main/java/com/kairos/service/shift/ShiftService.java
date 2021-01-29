@@ -29,6 +29,7 @@ import com.kairos.enums.shift.*;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.period.PlanningPeriod;
@@ -74,6 +75,7 @@ import lombok.Getter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.BeanUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
