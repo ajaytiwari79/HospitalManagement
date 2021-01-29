@@ -271,7 +271,7 @@ public class ShiftSickService extends MongoBaseService {
             List<Activity> protectedDaysOffActivities = activityRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, newHashSet(shift.getUnitId()));
             Set<BigInteger> protectedDayOffActivityIds = protectedDaysOffActivities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
             Set<BigInteger> activityIds = shifts.stream().flatMap(k -> k.getActivities().stream().map(ShiftActivity::getActivityId)).collect(Collectors.toSet());
-            if (!CollectionUtils.containsAny(protectedDayOffActivityIds, activityIds) {
+            if (!CollectionUtils.containsAny(protectedDayOffActivityIds, activityIds)) {
                 exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_USEDON_PROTECTEDDAYSOFF);
             }
         }
