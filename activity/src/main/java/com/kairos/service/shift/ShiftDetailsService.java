@@ -134,7 +134,10 @@ public class ShiftDetailsService extends MongoBaseService {
                     }
                     if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfUnPublishedShift()) {
                         updatedShifts.addAll(shiftDTOS.stream().filter(k -> k.getActivities().stream().noneMatch(act -> !act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()) && sickShift.getStaffId().equals(k.getStaffId()))).collect(Collectors.toList()));
+                    }else {
+                        updatedShifts.addAll(shiftDTOS);
                     }
+                    updatedShifts.add(sickShift);
                 }
             });
             return updatedShifts;

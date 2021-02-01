@@ -79,7 +79,7 @@ import static com.kairos.enums.reason_code.ReasonCodeType.TIME_TYPE;
 import static com.kairos.enums.shift.ShiftType.SICK;
 
 @Service
-public class FetchShiftService {
+public class ShiftFetchService {
 
     public static final String NAME = "name";
     @Inject
