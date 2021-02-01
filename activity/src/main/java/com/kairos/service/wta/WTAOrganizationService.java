@@ -76,9 +76,6 @@ public class WTAOrganizationService extends MongoBaseService {
         List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWtaByOrganization(unitId);
         List<WTAResponseDTO> wtaResponseDTOs = new ArrayList<>();
         workingTimeAgreements.forEach(wta -> {
-            if(isNull(wta.getTranslations())){
-                wta.setTranslations(new HashMap<>());
-            }
             WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
             ruleTemplateService.assignCategoryToRuleTemplate(organization.getCountryId(), wtaResponseDTO.getRuleTemplates());
             wtaResponseDTOs.add(wtaResponseDTO);

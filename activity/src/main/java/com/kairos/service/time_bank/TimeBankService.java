@@ -49,6 +49,7 @@ import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.pay_out.PayOutTransaction;
 import com.kairos.service.period.PlanningPeriodService;
+import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import lombok.Getter;
@@ -132,7 +133,7 @@ public class TimeBankService implements KPIService {
     private DayTypeService dayTypeService;
     @Inject
     private ProtectedDaysOffService protectedDaysOffService;
-
+    @Inject private PhaseService phaseService;
 
 
 
@@ -562,7 +563,7 @@ public class TimeBankService implements KPIService {
     }
 
     private EmploymentWithCtaDetailsDTO getEmploymentDetailDTO(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Long unitId) {
-        return new EmploymentWithCtaDetailsDTO(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO.getEmployment().getTotalWeeklyHours(), staffAdditionalInfoDTO.getEmployment().getTotalWeeklyMinutes(), staffAdditionalInfoDTO.getEmployment().getWorkingDaysInWeek(), staffAdditionalInfoDTO.getEmployment().getStaffId(), staffAdditionalInfoDTO.getEmployment().getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate(), staffAdditionalInfoDTO.getEmployment().getEmploymentLines(), staffAdditionalInfoDTO.getEmployment().getAccumulatedTimebankMinutes(), staffAdditionalInfoDTO.getEmployment().getAccumulatedTimebankDate(),unitId,staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId());
+        return new EmploymentWithCtaDetailsDTO(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO.getEmployment().getTotalWeeklyHours(), staffAdditionalInfoDTO.getEmployment().getTotalWeeklyMinutes(), staffAdditionalInfoDTO.getEmployment().getWorkingDaysInWeek(), staffAdditionalInfoDTO.getEmployment().getStaffId(), staffAdditionalInfoDTO.getEmployment().getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate(), staffAdditionalInfoDTO.getEmployment().getEmploymentLines(), staffAdditionalInfoDTO.getEmployment().getAccumulatedTimebankMinutes(), staffAdditionalInfoDTO.getEmployment().getAccumulatedTimebankDate(),unitId,staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId(),staffAdditionalInfoDTO.getEmployment().getUnitTimeZone());
     }
 
     public void deleteDuplicateEntry() {
@@ -666,11 +667,12 @@ public class TimeBankService implements KPIService {
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, endDate);
         LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate().isAfter(planningPeriodInterval.getStartLocalDate())?employmentWithCtaDetailsDTO.getStartDate():planningPeriodInterval.getStartLocalDate();
         Date startDate  = asDate(employmentStartDate);
-        Map<java.time.LocalDate, PhaseDefaultName> datePhaseDefaultNameMap = timeBankCalculationService.getDatePhaseDefaultName(employmentStartDate, periodEndDate, employmentWithCtaDetailsDTO.getUnitId());
-        Map<java.time.LocalDate, Boolean> publishPlanningPeriodDateMap = timeBankCalculationService.getDateWisePublishPlanningPeriod(employmentWithCtaDetailsDTO.getEmploymentTypeId(), employmentStartDate, periodEndDate, employmentWithCtaDetailsDTO.getUnitId());
+        Map[] mapArray = phaseService.getPhasesByDates(unitId, employmentStartDate,periodEndDate,employmentWithCtaDetailsDTO.getUnitTimeZone(),employmentWithCtaDetailsDTO.getEmploymentTypeId());
+        Map<java.time.LocalDate, PhaseDefaultName> datePhaseDefaultNameMap = mapArray[0];
+        Map<java.time.LocalDate, Boolean> publishPlanningPeriodDateMap = mapArray[1];
         shiftDataHelper = ShiftDataHelper.builder().dateAndPhaseDefaultName(datePhaseDefaultNameMap).dateAndPublishPlanningPeriod(publishPlanningPeriodDateMap).build();
         object = (T)timeBankCalculationService.calculateActualTimebank(planningPeriodInterval,dailyTimeBankEntries,employmentWithCtaDetailsDTO,periodEndDate,employmentStartDate,shiftDataHelper);
-        if(isNull(includeActualTimebank)) {
+        if(includeActualTimebank) {
             List<CTARuleTemplateDTO> ruleTemplates = costTimeAgreementService.getCtaRuleTemplatesByEmploymentId(employmentId, startDate, endDate);
             ruleTemplates = ruleTemplates.stream().filter(distinctByKey(CTARuleTemplateDTO::getName)).collect(toList());
             PlanningPeriod firstRequestPhasePlanningPeriodByUnitId = planningPeriodService.findFirstRequestPhasePlanningPeriodByUnitId(unitId);

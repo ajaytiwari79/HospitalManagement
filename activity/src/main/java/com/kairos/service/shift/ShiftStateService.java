@@ -132,8 +132,9 @@ public class ShiftStateService {
         List<ShiftState> oldTimeAndAttendanceShiftStates=shiftStateMongoRepository.findAllByShiftIdInAndShiftStatePhaseIdAndValidatedNotNull(shifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet()),phase.getId());
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=oldTimeAndAttendanceShiftStates.stream().filter(shiftState -> shiftState.getShiftStatePhaseId().equals(phase.getId())).collect(Collectors.toMap(ShiftState::getShiftId, v->v,(s1, s2) -> s2));
         List<ShiftState> timeAndAttendanceShiftStates = getShiftStateLists( shifts, phase.getId(), timeAndAttendanceShiftStateMap);
+        String timeZone = userIntegrationService.getTimeZoneByUnitId(timeAndAttendanceShiftStates.get(0).getUnitId());
         for (ShiftState timeAndAttendanceShiftState : timeAndAttendanceShiftStates) {
-            if(shiftValidatorService.validateGracePeriod(timeAndAttendanceShiftState.getStartDate(),true,timeAndAttendanceShiftState.getUnitId(),phase)){
+            if(shiftValidatorService.validateGracePeriod(timeAndAttendanceShiftState.getStartDate(),true,timeAndAttendanceShiftState.getUnitId(),phase,timeZone)){
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.STAFF);
             }else {
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
@@ -151,8 +152,9 @@ public class ShiftStateService {
     private void createManagementShiftStateAfterStaffGracePeriodExpire(Phase phase, List<ShiftState> timeAndAttendanceShiftStates) {
         ShiftState newshiftState;
         List<ShiftState> shiftState = new CopyOnWriteArrayList<>(timeAndAttendanceShiftStates);
+        String timeZone = userIntegrationService.getTimeZoneByUnitId(timeAndAttendanceShiftStates.get(0).getUnitId());
         for (ShiftState timeAndAttendanceShiftState : shiftState) {
-            if(!shiftValidatorService.validateGracePeriod(timeAndAttendanceShiftState.getStartDate(),true,timeAndAttendanceShiftState.getUnitId(),phase) && !AccessGroupRole.MANAGEMENT.equals(timeAndAttendanceShiftState.getAccessGroupRole())){
+            if(!shiftValidatorService.validateGracePeriod(timeAndAttendanceShiftState.getStartDate(),true,timeAndAttendanceShiftState.getUnitId(),phase,timeZone) && !AccessGroupRole.MANAGEMENT.equals(timeAndAttendanceShiftState.getAccessGroupRole())){
                 newshiftState=ObjectMapperUtils.copyPropertiesByMapper(timeAndAttendanceShiftState,ShiftState.class);
                 newshiftState.setId(null);
                 newshiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
@@ -263,15 +265,8 @@ public class ShiftStateService {
         ButtonConfig buttonConfig = new ButtonConfig();
         if (management && isCollectionNotEmpty(shifts)) {
             Set<BigInteger> shiftIds = shifts.stream().map(ShiftDTO::getId).collect(Collectors.toSet());
-            List<ShiftState> shiftStates = shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds, MANAGEMENT);
-            Set<BigInteger> shiftStateIds = shiftStates.stream().map(ShiftState::getShiftId).collect(Collectors.toSet());
-            for (BigInteger shiftId : shiftIds) {
-                if (!shiftStateIds.contains(shiftId)) {
-                    buttonConfig.setSendToPayrollEnabled(false);
-                    break;
-                }
-                buttonConfig.setSendToPayrollEnabled(true);
-            }
+            long count = shiftStateMongoRepository.getCountByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds, MANAGEMENT);
+            buttonConfig.setSendToPayrollEnabled(count == shiftIds.size());
         }
         return buttonConfig;
     }
