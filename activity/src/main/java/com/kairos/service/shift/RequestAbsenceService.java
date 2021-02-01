@@ -221,7 +221,7 @@ public class RequestAbsenceService {
     }
 
     private List<ShiftActivity> updateShiftActivity(ActivityWrapper activityWrapper,DateTimeInterval dateTimeInterval, List<ShiftActivity> shiftActivities, ShiftActivity shiftActivity) {
-        ShiftActivity absenceActivity = new ShiftActivity(activityWrapper.getActivity().getName(),dateTimeInterval.getStartDate(),dateTimeInterval.getEndDate(),activityWrapper.getActivity().getId(),activityWrapper.getTimeType());
+        ShiftActivity absenceActivity = new ShiftActivity(activityWrapper.getActivity().getName(),dateTimeInterval.getStartDate(),dateTimeInterval.getEndDate(),activityWrapper.getActivity().getId(),activityWrapper.getTimeType(),activityWrapper.getActivity().getActivityGeneralSettings().getUltraShortName(),activityWrapper.getActivity().getActivityGeneralSettings().getShortName());
         absenceActivity.getStatus().add(ShiftStatus.REQUEST);
         if(shiftActivity.getInterval().overlaps(dateTimeInterval)){
             List<DateTimeInterval> dateTimeIntervals = shiftActivity.getInterval().minusInterval(dateTimeInterval);

@@ -45,6 +45,8 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>, Serializa
     private int scheduledMinutes;
     private int durationMinutes;
     private String activityName;
+    private String shortName;
+    private String ultraShortName;
     //used in T&A view
     private BigInteger reasonCodeId;
     //used for adding absence type of activities.

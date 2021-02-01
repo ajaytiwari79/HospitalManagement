@@ -123,17 +123,13 @@ public class ShiftDetailsService extends MongoBaseService {
         shiftsMap.forEach((date, shifts) -> {
             ShiftDTO sickShift = shifts.stream().filter(k -> k.getShiftType().equals(SICK)).findAny().orElse(null);
             if (sickShift != null) {
-                Map<Long,List<ShiftDTO>> staffWiseShift=shifts.stream().collect(Collectors.groupingBy(ShiftDTO::getStaffId, Collectors.toList()));
-                staffWiseShift.forEach((staffId,shiftList)->{
                     Activity activity = getWorkingSickActivity(sickShift, activityMap);
                     if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfPublishedShift()) {
-                        shiftList.removeAll(shiftList.stream().filter(k -> k.getActivities().stream().anyMatch(act -> act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()))).collect(Collectors.toList()));
+                        shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()) && sickShift.getStaffId().equals(k.getStaffId()))).collect(Collectors.toList()));
                     }
                     if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfUnPublishedShift()) {
-                        shiftList.removeAll(shiftList.stream().filter(k -> k.getActivities().stream().anyMatch(act -> !act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()))).collect(Collectors.toList()));
+                        shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> !act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()) && sickShift.getStaffId().equals(k.getStaffId()))).collect(Collectors.toList()));
                     }
-                });
-
             }
         });
     }

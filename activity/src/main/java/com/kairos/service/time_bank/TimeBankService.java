@@ -18,6 +18,8 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.kpi.CalculationType;
+import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
@@ -430,7 +432,7 @@ public class TimeBankService implements KPIService {
 
     private void updateBonusHoursOfTimeBankInShift(List<ShiftWithActivityDTO> shiftWithActivityDTOS, List<Shift> shifts) {
         if(CollectionUtils.isNotEmpty(shifts)) {
-            Map<String, ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).collect(Collectors.toMap(k -> k.getActivityId()+"_"+k.getStartDate(), v -> v));
+            Map<String, ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).filter(distinctByKey(shiftWithActivityDTO -> shiftWithActivityDTO.getActivityId()+"_"+shiftWithActivityDTO.getStartDate())).collect(Collectors.toMap(k -> k.getActivityId()+"_"+k.getStartDate(), v -> v));
             for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
                 for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
                     for (ShiftActivityDTO childActivity : activity.getChildActivities()) {
@@ -664,13 +666,16 @@ public class TimeBankService implements KPIService {
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, endDate);
         LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate().isAfter(planningPeriodInterval.getStartLocalDate())?employmentWithCtaDetailsDTO.getStartDate():planningPeriodInterval.getStartLocalDate();
         Date startDate  = asDate(employmentStartDate);
+        Map<java.time.LocalDate, PhaseDefaultName> datePhaseDefaultNameMap = timeBankCalculationService.getDatePhaseDefaultName(employmentStartDate, periodEndDate, employmentWithCtaDetailsDTO.getUnitId());
+        Map<java.time.LocalDate, Boolean> publishPlanningPeriodDateMap = timeBankCalculationService.getDateWisePublishPlanningPeriod(employmentWithCtaDetailsDTO.getEmploymentTypeId(), employmentStartDate, periodEndDate, employmentWithCtaDetailsDTO.getUnitId());
+        shiftDataHelper = ShiftDataHelper.builder().dateAndPhaseDefaultName(datePhaseDefaultNameMap).dateAndPublishPlanningPeriod(publishPlanningPeriodDateMap).build();
         object = (T)timeBankCalculationService.calculateActualTimebank(planningPeriodInterval,dailyTimeBankEntries,employmentWithCtaDetailsDTO,periodEndDate,employmentStartDate,shiftDataHelper);
         if(isNull(includeActualTimebank)) {
             List<CTARuleTemplateDTO> ruleTemplates = costTimeAgreementService.getCtaRuleTemplatesByEmploymentId(employmentId, startDate, endDate);
             ruleTemplates = ruleTemplates.stream().filter(distinctByKey(CTARuleTemplateDTO::getName)).collect(toList());
             PlanningPeriod firstRequestPhasePlanningPeriodByUnitId = planningPeriodService.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
             java.time.LocalDate firstRequestPhasePlanningPeriodEndDate = isNull(firstRequestPhasePlanningPeriodByUnitId) ? periodEndDate : firstRequestPhasePlanningPeriodByUnitId.getEndDate();
-            object = (T)timeBankCalculationService.getAccumulatedTimebankDTO(firstRequestPhasePlanningPeriodEndDate,planningPeriodInterval, dailyTimeBankEntries, employmentWithCtaDetailsDTO, employmentStartDate, periodEndDate,(Long)object,ruleTemplates);
+            object = (T)timeBankCalculationService.getAccumulatedTimebankDTO(firstRequestPhasePlanningPeriodEndDate,planningPeriodInterval, dailyTimeBankEntries, employmentWithCtaDetailsDTO, employmentStartDate, periodEndDate,(Long)object,ruleTemplates,shiftDataHelper);
         }
         return object;
     }
@@ -816,18 +821,21 @@ public class TimeBankService implements KPIService {
         }
         ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
         shiftActivity.setTimeType(activityWrapper.getTimeType());
+        Activity activity = activityWrapper.getActivity();
         if (CollectionUtils.isNotEmpty(staffAdditionalInfoDTO.getDayTypes())) {
             Map<BigInteger, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
-            Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, activityWrapper.getActivity().getActivityTimeCalculationSettings().getDayTypes(), asLocalDate(shiftActivity.getStartDate()));
+            Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, activity.getActivityTimeCalculationSettings().getDayTypes(), asLocalDate(shiftActivity.getStartDate()));
             if (activityDayTypes.contains(DateUtils.asLocalDate(shiftActivity.getStartDate()).getDayOfWeek())) {
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activityWrapper.getActivity(), staffAdditionalInfoDTO.getEmployment(), false);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffAdditionalInfoDTO.getEmployment(), false);
                 scheduledMinutes = shiftActivity.getScheduledMinutes();
                 durationMinutes = shiftActivity.getDurationMinutes();
             }
         }
-        shiftActivity.setSecondLevelTimeType(activityWrapper.getActivity().getActivityBalanceSettings().getTimeType());
-        shiftActivity.setBackgroundColor(activityWrapper.getActivity().getActivityGeneralSettings().getBackgroundColor());
-        shiftActivity.setActivityName(activityWrapper.getActivity().getName());
+        shiftActivity.setSecondLevelTimeType(activity.getActivityBalanceSettings().getTimeType());
+        shiftActivity.setBackgroundColor(activity.getActivityGeneralSettings().getBackgroundColor());
+        shiftActivity.setActivityName(activity.getName());
+        shiftActivity.setUltraShortName(activity.getActivityGeneralSettings().getUltraShortName());
+        shiftActivity.setShortName(activity.getActivityGeneralSettings().getShortName());
         return new int[]{scheduledMinutes, durationMinutes};
     }
     @Getter

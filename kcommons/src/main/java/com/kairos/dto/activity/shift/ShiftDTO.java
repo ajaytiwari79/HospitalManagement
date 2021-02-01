@@ -56,6 +56,7 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     @NotNull(message = "message.shift.shiftDate")
     protected LocalDate shiftDate;
     protected Long allowedBreakDurationInMinute;
+
     protected ShiftTemplateDTO template;
     @NotEmpty(message = "message.shift.activity.empty")
     protected List<ShiftActivityDTO> activities = new ArrayList<>();

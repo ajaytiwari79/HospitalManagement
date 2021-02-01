@@ -35,6 +35,7 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getShiftsByIn
 @Setter
 public class WTAForCareDays extends WTABaseRuleTemplate{
 
+    private static final long serialVersionUID = 953116250236407293L;
     private List<ActivityCareDayCount> careDayCounts = new ArrayList<>();
 
     private CutOffIntervalUnit cutOffIntervalUnit;

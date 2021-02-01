@@ -834,9 +834,12 @@ public class ShiftValidatorService {
         shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
         shiftState.setValidated(LocalDate.now());
         shiftState.setShiftStatePhaseId(actualPhases.getId());
-        shiftState.getActivities().forEach(activity -> {
-            activity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
-            activity.setActivityName(activityWrapperMap.get(activity.getActivityId()).getActivity().getName());
+        shiftState.getActivities().forEach(shiftActivity -> {
+            shiftActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
+            Activity activity1 = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
+            shiftActivity.setActivityName(activity1.getName());
+            shiftActivity.setUltraShortName(activity1.getActivityGeneralSettings().getUltraShortName());
+            shiftActivity.setShortName(activity1.getActivityGeneralSettings().getShortName());
         });
         shiftStateMongoRepository.save(shiftState);
         if (validatedByStaff) {
@@ -951,7 +954,7 @@ public class ShiftValidatorService {
         Date endDate;
         if (shiftDTO.getStartDate() != null && asLocalDate(shiftDTO.getEndDate()).isAfter(asLocalDate(shiftDTO.getStartDate()))) {
             startDate = DateUtils.getStartOfDay(shiftDTO.getStartDate());
-            endDate = DateUtils.getEndOfDay(shiftDTO.getEndDate());
+            endDate = DateUtils.getEndOfDay(shiftDTO.getStartDate());
         } else {
             startDate = asDateStartOfDay(shiftDTO.getShiftDate());
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
