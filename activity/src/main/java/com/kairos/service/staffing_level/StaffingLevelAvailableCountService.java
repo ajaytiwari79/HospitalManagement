@@ -17,10 +17,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
@@ -163,8 +160,29 @@ public class StaffingLevelAvailableCountService {
     private void updateShiftActivityStaffingLevel(int durationMinutes, ShiftActivity shiftActivity, StaffingLevelInterval staffingLevelInterval, DateTimeInterval interval, List<ShiftActivity> breakActivities,boolean removedShift) {
         boolean breakValid = breakActivities.stream().anyMatch(shiftActivity1 -> !shiftActivity1.isBreakNotHeld() && interval.overlaps(shiftActivity1.getInterval()) && interval.overlap(shiftActivity1.getInterval()).getMinutes() >= durationMinutes);
         if (!breakValid && interval.overlaps(shiftActivity.getInterval()) && interval.overlap(shiftActivity.getInterval()).getMinutes() >= durationMinutes) {
-            staffingLevelInterval.getStaffingLevelActivities().stream().filter(staffingLevelActivity -> staffingLevelActivity.getActivityId().equals(shiftActivity.getActivityId())).findFirst().
-                    ifPresent(staffingLevelActivity -> staffingLevelActivity.setAvailableNoOfStaff(removedShift ? (staffingLevelActivity.getAvailableNoOfStaff() -1) : (staffingLevelActivity.getAvailableNoOfStaff() + 1)));
+            Optional<StaffingLevelActivity> staffingLevelActivityOptional = staffingLevelInterval.getStaffingLevelActivities().stream().filter(staffingLevelActivity -> staffingLevelActivity.getActivityId().equals(shiftActivity.getActivityId())).findFirst();
+            if(staffingLevelActivityOptional.isPresent()){
+                StaffingLevelActivity staffingLevelActivity = staffingLevelActivityOptional.get();
+                if(removedShift){
+                    staffingLevelActivity.setAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff() - 1);
+                    int currentUnderStaffing = Math.max(staffingLevelActivity.getMinNoOfStaff() - staffingLevelActivity.getAvailableNoOfStaff(),0);
+                    staffingLevelActivity.setInitialUnderStaffing(Math.min(staffingLevelActivity.getInitialUnderStaffing() ,currentUnderStaffing));
+                    staffingLevelActivity.setSolvedUnderStaffing(Math.max(staffingLevelActivity.getSolvedUnderStaffing() - 1,0));
+                    staffingLevelActivity.setRemainingUnderStaffing(staffingLevelActivity.getInitialUnderStaffing() - staffingLevelActivity.getSolvedUnderStaffing());
+                    int currentOverStaffing = Math.max(staffingLevelActivity.getAvailableNoOfStaff() - staffingLevelActivity.getMaxNoOfStaff(),0);
+                    staffingLevelActivity.setInitialOverStaffing(Math.max(currentOverStaffing,staffingLevelActivity.getInitialOverStaffing()));
+                    staffingLevelActivity.setSolvedOverStaffing(staffingLevelActivity.getInitialOverStaffing() > 0 ? staffingLevelActivity.getSolvedOverStaffing() + 1 : 0);
+                    staffingLevelActivity.setRemainingOverStaffing(Math.max(staffingLevelActivity.getInitialOverStaffing() - staffingLevelActivity.getSolvedOverStaffing(),0));
+                } else {
+                    staffingLevelActivity.setAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff() + 1);
+                    staffingLevelActivity.setSolvedUnderStaffing(Math.min(staffingLevelActivity.getSolvedUnderStaffing() + 1,staffingLevelActivity.getMinNoOfStaff()));
+                    staffingLevelActivity.setRemainingUnderStaffing(Math.max(staffingLevelActivity.getInitialUnderStaffing() - staffingLevelActivity.getSolvedUnderStaffing(),0));
+                    int currentOverStaffing = Math.max(staffingLevelActivity.getAvailableNoOfStaff() - staffingLevelActivity.getMaxNoOfStaff(),0);
+                    staffingLevelActivity.setInitialOverStaffing(Math.max(staffingLevelActivity.getInitialOverStaffing(),currentOverStaffing));
+                    staffingLevelActivity.setSolvedOverStaffing(Math.max(staffingLevelActivity.getSolvedOverStaffing() - 1,0));
+                    staffingLevelActivity.setRemainingOverStaffing(staffingLevelActivity.getInitialOverStaffing() - staffingLevelActivity.getSolvedOverStaffing());
+                }
+            }
         }
     }
 
