@@ -45,7 +45,7 @@ public class ShiftController {
     @Inject
     private ShiftService shiftService;
     @Inject
-    private FetchShiftService fetchShiftService;
+    private ShiftFetchService shiftFetchService;
     @Inject
     private ShiftSickService shiftSickService;
     @Inject
@@ -245,7 +245,7 @@ public class ShiftController {
         if (isNull(staffFilterDTO)) {
             staffFilterDTO = new StaffFilterDTO();
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, fetchShiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, employmentId, viewType, shiftFilterParam, expertiseId, staffFilterDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftFetchService.getAllShiftAndStates(unitId, staffId, startDate, endDate, employmentId, viewType, shiftFilterParam, expertiseId, staffFilterDTO));
     }
 
     @ApiOperation("Update planning period id in Shifts")

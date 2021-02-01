@@ -624,6 +624,10 @@ public  class DateUtils {
         return LocalDate.now(ZoneId.of(timeZone));
     }
 
+    public static LocalDate getLocalDateFromTimezone(ZoneId timeZone){
+        return LocalDate.now(timeZone);
+    }
+
     public static int getHourFromDate(Date date) {
         return asZonedDateTime(date).getHour();
     }

@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.period;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import lombok.Getter;
@@ -14,6 +15,8 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.kairos.commons.utils.DateUtils.asDate;
 
 /**
  * Created by prerna on 10/4/18.
@@ -54,6 +57,14 @@ public class PlanningPeriodDTO {
         this.durationType = durationType;
         this.recurringNumber = recurringNumber;
         this.endDate = endDate;
+    }
+
+    public boolean contains(LocalDate localDate){
+        return interval().contains(asDate(localDate)) || endDate.equals(localDate);
+    }
+
+    public DateTimeInterval interval(){
+        return new DateTimeInterval(asDate(startDate),asDate(endDate));
     }
 
 

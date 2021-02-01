@@ -64,12 +64,12 @@ public class PlanningPeriod extends MongoBaseEntity {
     }
 
 
-     public DateTimeInterval takeInterval(){
+     public DateTimeInterval interval(){
         return new DateTimeInterval(asDate(startDate),asDate(endDate));
     }
 
     public boolean contains(LocalDate localDate){
-        return takeInterval().contains(asDate(localDate)) || endDate.equals(localDate);
+        return interval().contains(asDate(localDate)) || endDate.equals(localDate);
     }
 
     public Map<LocalDate,BigInteger> getLocalDatePhaseIdMap(){

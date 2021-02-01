@@ -138,6 +138,10 @@ public class CTARuleTemplateDTO {
         return  TranslationUtil.getDescription(translations,description);
     }
 
+    public Map<String, TranslationInfo> getTranslations() {
+        return isNull(translations) ? new HashMap<>() : translations;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
