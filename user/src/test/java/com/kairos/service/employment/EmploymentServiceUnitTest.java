@@ -25,8 +25,8 @@
 //    EmploymentDetailsValidatorService employmentDetailsValidatorService;
 //    @Mock
 //    ExceptionService exceptionService;
-//    List<Employment> employments = new ArrayList<Employment>();
-//    EmploymentDTO employmentDTO;
+//    static List<Employment> employments = new ArrayList<Employment>();
+//    static EmploymentDTO employmentDTO;
 //
 //    @Before
 //    public void setUp() throws Exception {
