@@ -88,7 +88,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
     private boolean getDurationByAbsenceOrPresenceType(List<ShiftWithActivityDTO> shifts, ShiftActivityDTO shiftActivityDTO, boolean checkBefore, Set<TimeTypeEnum> timeTypeEnums,int value) {
         Date date = checkBefore ? shiftActivityDTO.getStartDate() : shiftActivityDTO.getEndDate();
-        int restingHours = NOT_VALID_VALUE;
+        int restingHours = Integer.MAX_VALUE;
         for (ShiftWithActivityDTO shiftWithActivityDTO : shifts) {
             for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
                 if(checkBefore && !activity.getEndDate().after(date) && timeTypeEnums.contains(activity.getActivity().getActivityBalanceSettings().getTimeType())){
