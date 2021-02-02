@@ -416,6 +416,7 @@ public class ShiftService extends MongoBaseService {
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shifts.get(0).getActivities().get(0).getStartDate()), shifts.get(0).getStaffId(), shifts.get(0).getEmploymentId());
         staffAdditionalInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
+        staffAdditionalInfoDTO.setTimeSlotSets(timeSlotRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(shifts.get(0).getUnitId(), TimeSlotType.SHIFT_PLANNING).getTimeSlots());
         boolean updateWTACounterFlag = true;
         for (Shift shift : shifts) {
             if (updateWTACounterFlag) {
