@@ -78,7 +78,7 @@ public class TimeBankController {
     @ApiOperation("Get accumulated timebank and delta timebank")
     @GetMapping("/get_timebank_metadata")
     public ResponseEntity<Map<String,Object>> getAccumulatedTimebankDTO(@PathVariable Long unitId,@RequestParam Long employmentId,@RequestParam(required = false) boolean includeActualTimebank){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getAccumulatedTimebankAndDelta(employmentId,unitId,includeActualTimebank,null,null));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getAccumulatedTimebankAndDelta(employmentId,unitId,!includeActualTimebank,null,null));
     }
 
     //Todo remove this API after sprint 46 is closed
