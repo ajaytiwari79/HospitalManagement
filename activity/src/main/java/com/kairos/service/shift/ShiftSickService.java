@@ -168,7 +168,7 @@ public class ShiftSickService extends MongoBaseService {
 
 
     public void disableSicknessShiftsOfStaff(Long staffId, Long unitId, LocalDate localDate, BigInteger activityId) {
-        Activity sicknessActivity = activityRepository.findOne(new BigInteger("4859"));
+        Activity sicknessActivity = activityRepository.findOne(activityId);
         LocalDate endDate = localDate.plusDays(sicknessActivity.getActivityRulesSettings().getRecurrenceDays());
         List<Shift> shifts = shiftMongoRepository.findAllSicknessShiftByEmploymentIdAndActivityIds(staffId, asDate(localDate), asDate(endDate));
         if (isCollectionEmpty(shifts) || shifts.stream().noneMatch(k -> SICK.equals(k.getShiftType()))) {
