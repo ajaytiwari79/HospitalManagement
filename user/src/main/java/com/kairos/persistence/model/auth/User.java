@@ -169,7 +169,7 @@ public class User extends UserBaseEntity {
 
     public String getUserName() {
         if(userName != null) {
-            userName.toLowerCase();
+            userName = userName.toLowerCase();
         }
         return userName;
     }

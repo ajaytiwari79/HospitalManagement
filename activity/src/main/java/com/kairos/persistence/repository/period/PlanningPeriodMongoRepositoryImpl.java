@@ -241,11 +241,9 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 andInclude(START_DATE).
                 andInclude(END_DATE).
                 andInclude(PUBLISH_EMPLOYMENT_IDS).
-                and(CURRENT_PHASE_DATA_NAME).as(CURRENT_PHASE).
-                and("current_phase_data._id").as(CURRENT_PHASE_ID);
+                and(CURRENT_PHASE_ID).as(CURRENT_PHASE_ID);
         Aggregation aggregation = newAggregation(
                 match(Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).and(START_DATE).lte(requestedEndDate).and(END_DATE).gte(requestedStartDate)),
-                lookup(PHASES, CURRENT_PHASE_ID, "_id", CURRENT_PHASE_DATA),
                 sort(Sort.Direction.ASC, START_DATE),
                 projectionOperation
         );

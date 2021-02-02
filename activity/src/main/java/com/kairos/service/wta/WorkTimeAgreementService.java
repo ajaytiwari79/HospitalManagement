@@ -389,9 +389,6 @@ public class WorkTimeAgreementService{
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByCountryId(countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
-            if(isNull(wta.getTranslations())){
-                wta.setTranslations(new HashMap<>());
-            }
             WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
             wtaResponseDTO.setCountryId(countryId);
             wtaResponseDTOS.add(wtaResponseDTO);

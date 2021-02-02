@@ -95,13 +95,7 @@ public class FibonacciKPIService implements CounterService{
     }
 
     public List<KPIDTO> getAllFibonacciKPI(Long referenceId,ConfLevel confLevel){
-        List<KPIDTO> kpidtos = counterRepository.getFibonacciKpiForReferenceId(referenceId, confLevel, false);
-        kpidtos.forEach(kpidto -> {
-            if(isNull(kpidto.getTranslations())){
-                kpidto.setTranslations(new HashMap<>());
-            }
-        });
-        return kpidtos;
+        return counterRepository.getFibonacciKpiForReferenceId(referenceId, confLevel, false);
     }
 
     public KPIDTO getOneFibonacciKPI(BigInteger fibonacciKPIId,Long referenceId,ConfLevel confLevel){

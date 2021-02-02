@@ -155,7 +155,7 @@ public class ShiftService extends MongoBaseService {
     @Inject private DayTypeService dayTypeService;
     @Inject private AutoFillGapSettingsService gapSettingsService;
     @Inject private StaffingLevelAvailableCountService staffingLevelAvailableCountService;
-    @Inject private FetchShiftService fetchShiftService;
+    @Inject private ShiftFetchService shiftFetchService;
 
     public List<ShiftWithViolatedInfoDTO> createShifts(Long unitId, List<ShiftDTO> shiftDTOS, ShiftActionType shiftActionType) {
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>(shiftDTOS.size());
@@ -543,7 +543,7 @@ public class ShiftService extends MongoBaseService {
             deletedShiftIds = saveShiftsDeletedShiftIds[1];
         }
         Map<String, Object> response = new HashMap<>();
-        response.put("shiftDetails", fetchShiftService.getAllShiftAndStates(unitId, staffId, isNull(startDate) ? planningPeriods.get(0).getStartDate() : startDate, isNull(endDate) ? planningPeriods.get(planningPeriods.size() - 1).getEndDate() : endDate, employmentId, viewType, shiftFilterParam, null, staffFilterDTO));
+        response.put("shiftDetails", shiftFetchService.getAllShiftAndStates(unitId, staffId, isNull(startDate) ? planningPeriods.get(0).getStartDate() : startDate, isNull(endDate) ? planningPeriods.get(planningPeriods.size() - 1).getEndDate() : endDate, employmentId, viewType, shiftFilterParam, null, staffFilterDTO));
         response.put("deletedShiftIds", deletedShiftIds);
         return response;
     }

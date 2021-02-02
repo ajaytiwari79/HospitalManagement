@@ -3,6 +3,7 @@ package com.kairos.service.phase;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.TranslationInfo;
+import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -250,7 +251,7 @@ public class PhaseService extends MongoBaseService {
      * @return phase
      */
     public Phase getCurrentPhaseByUnitIdAndDate(Long unitId, Date startDate,Date endDate){
-        String timeZone= userIntegrationService.getTimeZoneByUnitId(unitId);
+        ZoneId timeZone= ZoneId.of(userIntegrationService.getTimeZoneByUnitId(unitId));
         Phase tentativePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId,PhaseDefaultName.TENTATIVE.toString());
         LocalDateTime untilTentativeDate = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),tentativePhase.getUntilNextDay()==null?DayOfWeek.MONDAY:tentativePhase.getUntilNextDay()).atStartOfDay().minusSeconds(1);
         LocalDateTime startDateTime=DateUtils.asLocalDateTime(startDate);
@@ -270,12 +271,11 @@ public class PhaseService extends MongoBaseService {
         return phase;
     }
 
-    public Phase getCurrentPhaseByUnitIdAndDate(Date startDate, Date endDate, ShiftDataHelper shiftDataHelper){
-        String timeZone= shiftDataHelper.getTimeZone();
+    public Phase getCurrentPhaseByUnitIdAndDate(Date startDate, ShiftDataHelper shiftDataHelper){
+        ZoneId timeZone= ZoneId.of(shiftDataHelper.getTimeZone());
         Phase tentativePhase = shiftDataHelper.getPhases().stream().filter(phase -> PhaseDefaultName.TENTATIVE.equals(phase.getPhaseEnum())).findFirst().get();
         LocalDateTime untilTentativeDate = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),tentativePhase.getUntilNextDay()==null?DayOfWeek.MONDAY:tentativePhase.getUntilNextDay()).atStartOfDay().minusSeconds(1);
         LocalDateTime startDateTime=DateUtils.asLocalDateTime(startDate);
-        LocalDateTime endDateTime=Optional.ofNullable(endDate).isPresent()? DateUtils.asLocalDateTime(endDate):null;
         Phase phase;
         if(startDateTime.isAfter(untilTentativeDate)){
             phase= shiftDataHelper.getPhases().stream().filter(phase1 -> phase1.getId().equals(shiftDataHelper.getPlanningPeriod().getCurrentPhaseId())).findFirst().get();
@@ -300,7 +300,7 @@ public class PhaseService extends MongoBaseService {
      * @return
      */
     public Map<Date,Phase> getPhasesByDates(Long unitId, Set<LocalDateTime> dates) {
-        String timeZone = userIntegrationService.getTimeZoneByUnitId(unitId);
+        ZoneId timeZone = ZoneId.of(userIntegrationService.getTimeZoneByUnitId(unitId));
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Set<LocalDate> localDates = dates.stream().map(localDateTime -> localDateTime.toLocalDate()).collect(Collectors.toSet());
         List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId,localDates);
@@ -330,9 +330,41 @@ public class PhaseService extends MongoBaseService {
         return localDatePhaseStatusMap;
     }
 
+    public Map[] getPhasesByDates(Long unitId, LocalDate startDate,LocalDate endDate,ZoneId timeZone,Long employementTypeId) {
+        timeZone = isNull(timeZone) ? ZoneId.of(userIntegrationService.getTimeZoneByUnitId(unitId)) : timeZone;
+        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
+        List<PlanningPeriodDTO> planningPeriods = planningPeriodMongoRepository.findAllPlanningPeriodBetweenDatesAndUnitId(unitId,asDate(startDate),asDate(endDate));
+        Map<Date,Phase> localDatePhaseStatusMap=new HashMap<>();
+        Map[] phaseDetailsMap=getPhaseMap(phases);
+        Map<LocalDate,Boolean> publishEmployementType = new HashMap<>();
+        Map<BigInteger,Phase> phaseAndIdMap=(Map<BigInteger,Phase>)phaseDetailsMap[0];
+        Map<String,Phase> phaseMap = (Map<String,Phase>)phaseDetailsMap[1];
+        DayOfWeek tentativeDayOfWeek = phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay() == null ? DayOfWeek.MONDAY : phaseMap.get(PhaseDefaultName.TENTATIVE.toString()).getUntilNextDay();
+        LocalDateTime untilTentative = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),tentativeDayOfWeek).atStartOfDay().minusSeconds(1);
+        while (!startDate.isAfter(endDate)){
+            Phase phase = null;
+            LocalDateTime requestedDate = asLocalDateTime(startDate);
+            Optional<PlanningPeriodDTO> planningPeriodOptional = planningPeriods.stream().filter(planningPeriod -> planningPeriod.contains(requestedDate.toLocalDate())).findAny();
+            if (requestedDate.isAfter(untilTentative)) {
+                if (planningPeriodOptional.isPresent()) {
+                    phase = phaseAndIdMap.get(planningPeriodOptional.get().getCurrentPhaseId());
+                }
+            } else {
+                phase = getActualPhaseApplicableForDate(requestedDate, phaseMap, untilTentative, timeZone);
+            }
+            if (isNull(phase) || !planningPeriodOptional.isPresent()) {
+                exceptionService.dataNotFoundException(MESSAGE_ORGANIZATION_PHASES_ON_DATE, unitId, requestedDate);
+            }
+            publishEmployementType.put(startDate,planningPeriodOptional.get().getPublishEmploymentIds().contains(employementTypeId));
+            localDatePhaseStatusMap.put(asDate(requestedDate), phase);
+            startDate = startDate.plusDays(1);
+        }
+        return new Map[]{localDatePhaseStatusMap,publishEmployementType};
+    }
+
     //Please Use this method For Future dates
     public Map<LocalDate,Phase> getPhasesByDates(Set<LocalDate> dates,ShiftDataHelper shiftDataHelper) {
-        String timeZone=shiftDataHelper.getTimeZone();
+        ZoneId timeZone=ZoneId.of(shiftDataHelper.getTimeZone());
         List<Phase> phases = shiftDataHelper.getPhases();
         List<PlanningPeriod> planningPeriods = shiftDataHelper.getPlanningPeriods();
         Map<LocalDate,Phase> localDatePhaseStatusMap=new HashMap<>();
@@ -383,11 +415,11 @@ public class PhaseService extends MongoBaseService {
      * @param untilTentativeDate
      * @return phase
      */
-    private Phase getActualPhaseApplicableForDate(LocalDateTime startDateTime, Map<String,Phase> phaseMap, LocalDateTime untilTentativeDate,String timeZone){
+    private Phase getActualPhaseApplicableForDate(LocalDateTime startDateTime, Map<String,Phase> phaseMap, LocalDateTime untilTentativeDate,ZoneId timeZone){
         Phase phase=null;
         int minutesToCalculate=phaseMap.get(PhaseDefaultName.REALTIME.toString()).getRealtimeDuration();
-        LocalDateTime realTimeStartDate=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(minutesToCalculate+1);
-        LocalDateTime realTimeEndDate=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(minutesToCalculate+1);
+        LocalDateTime realTimeStartDate=DateUtils.getLocalDateTimeFromZoneId(timeZone).minusMinutes(minutesToCalculate+1);
+        LocalDateTime realTimeEndDate=DateUtils.getLocalDateTimeFromZoneId(timeZone).plusMinutes(minutesToCalculate+1);
         boolean realTime= new DateTimeInterval(asDate(realTimeStartDate),asDate(realTimeEndDate)).contains(asDate(startDateTime));
          if(realTime){
             phase= phaseMap.get(PhaseDefaultName.REALTIME.toString());

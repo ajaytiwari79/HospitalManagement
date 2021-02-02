@@ -13,8 +13,6 @@ import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDetailsByTimeSlotDTO;
-import com.kairos.dto.kpermissions.FieldPermissionUserData;
-import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.organization.OrganizationSkillAndOrganizationTypesDTO;
@@ -465,12 +463,45 @@ public class StaffingLevelService {
                 }
                 presenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
                 presenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(presenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), presenceStaffingLevelDto);
+                Map<BigInteger,List<StaffingLevelActivity>> bigIntegerListMap = presenceStaffingLevelDto.getPresenceStaffingLevelInterval().stream().flatMap(staffingLevelInterval -> staffingLevelInterval.getStaffingLevelActivities().stream()).collect(Collectors.groupingBy(staffingLevelActivity -> staffingLevelActivity.getActivityId()));
+                //System.out.println(DateUtils.getDateStringWithFormat(presenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD));
+                //printMap(bigIntegerListMap);
             }
             AbsenceStaffingLevelDto absenceStaffingLevelDto = getAbsenceStaffingLevelDto(staffingLevel);
             absenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(absenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), absenceStaffingLevelDto);
         }
         return startDate;
     }
+
+    //todo pradeep will remove it after testing
+    /*private void printMap(Map<BigInteger, List<StaffingLevelActivity>> bigIntegerListMap) {
+        for (Map.Entry<BigInteger, List<StaffingLevelActivity>> bigIntegerListEntry : bigIntegerListMap.entrySet()) {
+            System.out.println(bigIntegerListEntry.getKey());
+            int remaining = 0;
+            int solved = 0;
+            int intial = 0;
+            int overRemaining = 0;
+            int overSolved = 0;
+            int overintial = 0;
+            int available = 0;
+            for (StaffingLevelActivity staffingLevelActivity : bigIntegerListEntry.getValue()) {
+                intial += staffingLevelActivity.getInitialUnderStaffing();
+                solved += staffingLevelActivity.getSolvedUnderStaffing();
+                remaining += staffingLevelActivity.getRemainingUnderStaffing();
+                overintial += staffingLevelActivity.getInitialOverStaffing();
+                overSolved += staffingLevelActivity.getSolvedOverStaffing();
+                overRemaining += staffingLevelActivity.getRemainingOverStaffing();
+                available += staffingLevelActivity.getAvailableNoOfStaff();
+            }
+            System.out.println("available "+available);
+            System.out.println("remaining "+remaining);
+            System.out.println("solved "+solved);
+            System.out.println("intial "+intial);
+            System.out.println("overRemaining "+overRemaining);
+            System.out.println("overSolved "+overSolved);
+            System.out.println("overintial "+overintial);
+        }
+    }*/
 
     private AbsenceStaffingLevelDto getAbsenceStaffingLevelDto(StaffingLevel staffingLevel) {
         AbsenceStaffingLevelDto absenceStaffingLevelDto = new AbsenceStaffingLevelDto(staffingLevel.getId(), staffingLevel.getPhaseId(),
@@ -863,8 +894,7 @@ public class StaffingLevelService {
         staffingLevels.parallelStream().forEach(staffingLevel -> {
             for (StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()) {
                 for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
-                    staffingLevelActivity.setInitialOverStaffing(Math.max(staffingLevelActivity.getAvailableNoOfStaff()-staffingLevelActivity.getMaxNoOfStaff(),0));
-                    staffingLevelActivity.setInitialUnderStaffing(Math.max(staffingLevelActivity.getMinNoOfStaff() - staffingLevelActivity.getAvailableNoOfStaff(),0));
+                    staffingLevelActivity.resetValueOnPhaseFlip();
                 }
             }
         });

@@ -19,6 +19,7 @@ import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftFilterParam;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.enums.shift.ViewType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -78,7 +79,7 @@ import static com.kairos.enums.reason_code.ReasonCodeType.TIME_TYPE;
 import static com.kairos.enums.shift.ShiftType.SICK;
 
 @Service
-public class FetchShiftService {
+public class ShiftFetchService {
 
     public static final String NAME = "name";
     @Inject
@@ -272,8 +273,10 @@ public class FetchShiftService {
         }
         Map<Long, List<ShiftDTO>> employmentIdAndShiftsMap = assignedShifts.stream().collect(Collectors.groupingBy(ShiftDTO::getEmploymentId, Collectors.toList()));
         assignedShifts = new ArrayList<>(assignedShifts.size());
+        Set<BigInteger> sickActivityIds = new HashSet<>();
         for (Map.Entry<Long, List<ShiftDTO>> employmentIdAndShiftEntry : employmentIdAndShiftsMap.entrySet()) {
             assignedShifts.addAll(wtaRuleTemplateCalculationService.updateRestingTimeInShifts(employmentIdAndShiftEntry.getValue()));
+            sickActivityIds.addAll(employmentIdAndShiftEntry.getValue().parallelStream().filter(shiftDTO -> SICK.equals(shiftDTO.getShiftType())).flatMap(shiftDTO -> shiftDTO.getActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()));
         }
         List<OpenShift> openShifts = userAccessRoleDTO.isManagement() ? openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate) : openShiftNotificationMongoRepository.findValidOpenShiftsForStaff(userAccessRoleDTO.getStaffId(), startDate, endDate);
         ButtonConfig buttonConfig = null;
@@ -342,13 +345,14 @@ public class FetchShiftService {
         if (endDate == null) {
             endDate = DateUtils.getLocalDate();
         }
-        List<ShiftDTO> shifts = getShiftDTOSAfterFilterAndUpdateShiftData(unitId, staffId, startDate, endDate, employmentId, staffFilterDTO, reasonCodeMap);
+        Object[] collections = getShiftDTOSAfterFilterAndUpdateShiftData(unitId, staffId, startDate, endDate, employmentId, staffFilterDTO, reasonCodeMap);
+        List<ShiftDTO> shifts = (List<ShiftDTO>)collections[0];
         Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
         shiftDetailsService.setLayerInShifts(shiftsMap);
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
     }
 
-    private List<ShiftDTO> getShiftDTOSAfterFilterAndUpdateShiftData(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, StaffFilterDTO staffFilterDTO, Map<BigInteger, ReasonCodeDTO> reasonCodeMap) {
+    private Object[] getShiftDTOSAfterFilterAndUpdateShiftData(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, StaffFilterDTO staffFilterDTO, Map<BigInteger, ReasonCodeDTO> reasonCodeMap) {
         List<ShiftDTO> shifts;
         if (Optional.ofNullable(employmentId).isPresent()) {
             shifts = shiftMongoRepository.findAllShiftsBetweenDuration(employmentId, staffId, asDate(startDate), asDate(endDate), unitId,staffFilterDTO);
@@ -360,14 +364,18 @@ public class FetchShiftService {
             shifts = updateDraftShiftToShift(shifts);
         }
         shifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts);
+        Set<BigInteger> sickActivityIds = new HashSet<>();
         for(ShiftDTO shift :shifts){
             if(isNotNull(shift.getShiftViolatedRules())) {
                 shift.setEscalationReasons(shift.getShiftViolatedRules().getEscalationReasons());
                 shift.setEscalationResolved(shift.getShiftViolatedRules().isEscalationResolved());
             }
+            if(shift.getShiftType().equals(SICK)) {
+                sickActivityIds.addAll(shift.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()));
+            }
         }
 
-        return shifts;
+        return new Object[]{shifts,sickActivityIds};
     }
 
     private void updateReasonCodeAndNameInActivitiesAndUpdateSicknessDetails(Map<BigInteger, ReasonCodeDTO> reasonCodeMap, List<ShiftDTO> shifts) {
