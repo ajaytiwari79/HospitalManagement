@@ -21,6 +21,7 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.gap_settings.AutoFillGapSettingsMongoRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,7 @@ public class AutoFillGapSettingsService {
     private ShiftValidatorService staffingLevelService;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private RedisService redisService;
 
     public AutoFillGapSettingsDTO createAutoFillGapSettings(AutoFillGapSettingsDTO autoFillGapSettingsDTO, boolean forCountry) {
         AutoFillGapSettings autoFillGapSettings = ObjectMapperUtils.copyPropertiesByMapper(autoFillGapSettingsDTO, AutoFillGapSettings.class);
