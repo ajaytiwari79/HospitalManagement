@@ -8,6 +8,7 @@ import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivityWithDuration;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.auto_gap_fill_settings.AutoFillGapSettingsRule;
@@ -130,6 +131,20 @@ public class AutoFillGapSettingsService {
         autoFillGapSettings.setDeleted(true);
         autoFillGapSettingsMongoRepository.save(autoFillGapSettings);
         return true;
+    }
+
+    public void createDefaultAutoFillGapSettings(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, List<Phase> phases){
+        List<AutoFillGapSettings> autoFillGapSettings = autoFillGapSettingsMongoRepository.getAllDefautAutoFillSettings(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
+        Map<BigInteger,BigInteger> countryPhaseIdAndUnitPhaseIdMap = phases.stream().collect(Collectors.toMap(Phase::getParentCountryPhaseId, Phase::getId));
+        if(isCollectionNotEmpty(autoFillGapSettings)){
+            autoFillGapSettings.forEach(autoFillGapSetting -> {
+                autoFillGapSetting.setId(null);
+                autoFillGapSetting.setCountryId(null);
+                autoFillGapSetting.setUnitId(unitId);
+                autoFillGapSetting.setPhaseId(countryPhaseIdAndUnitPhaseIdMap.get(autoFillGapSetting.getPhaseId()));
+            });
+            autoFillGapSettingsMongoRepository.saveEntities(autoFillGapSettings);
+        }
     }
 
     public void adjustGapByActivity(ShiftDTO shiftDTO, Shift shift, Phase phase, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {

@@ -58,6 +58,7 @@ import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.*;
+import com.kairos.service.auto_gap_fill_settings.AutoFillGapSettingsService;
 import com.kairos.service.counter.CounterDistService;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.service.cta.CostTimeAgreementService;
@@ -200,6 +201,7 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject
     private TimeSlotSetService timeSlotSetService;
     @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private AutoFillGapSettingsService autoFillGapSettingsService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -585,6 +587,7 @@ public class OrganizationActivityService extends MongoBaseService {
         protectedDaysOffService.saveProtectedDaysOff(unitId, ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);
         reasonCodeService.createReasonCodeForUnit(unitId,orgTypeAndSubTypeDTO.getCountryId());
         counterDistService.createDefaultCategory(unitId);
+        autoFillGapSettingsService.createDefaultAutoFillGapSettings(unitId, orgTypeAndSubTypeDTO, phases);
         return true;
     }
 
