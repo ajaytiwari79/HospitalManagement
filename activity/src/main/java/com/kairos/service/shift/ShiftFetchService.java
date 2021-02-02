@@ -285,7 +285,9 @@ public class ShiftFetchService {
         }
         StaffAccessRoleDTO staffAccessRoleDTO = new StaffAccessRoleDTO(userAccessRoleDTO.getStaffId(), getAccessGroupRole(userAccessRoleDTO));
         Map<LocalDate, List<FunctionDTO>> appliedFunctionDTOs = userIntegrationService.getFunctionsOfEmployment(unitId, startLocalDate, endLocalDate);
-        List<ShiftDTO> shiftDTOS=shiftDetailsService.setLayerInShifts(assignedShifts,sickActivityIds);
+        Map<LocalDate, List<ShiftDTO>> shiftsMap = assignedShifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
+        shiftDetailsService.setLayerInShifts(shiftsMap);
+        List<ShiftDTO> shiftDTOS=shiftsMap.values().stream().flatMap(List::stream).collect(Collectors.toList());
         return new ShiftWrapper(shiftDTOS, getOpenShiftResponceDTOS(openShifts), staffAccessRoleDTO, buttonConfig, appliedFunctionDTOs);
     }
 
@@ -345,8 +347,8 @@ public class ShiftFetchService {
         }
         Object[] collections = getShiftDTOSAfterFilterAndUpdateShiftData(unitId, staffId, startDate, endDate, employmentId, staffFilterDTO, reasonCodeMap);
         List<ShiftDTO> shifts = (List<ShiftDTO>)collections[0];
-        shifts = shiftDetailsService.setLayerInShifts(shifts,(Set<BigInteger>)collections[1]);
         Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
+        shiftDetailsService.setLayerInShifts(shiftsMap);
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
     }
 
