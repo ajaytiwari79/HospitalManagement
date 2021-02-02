@@ -21,6 +21,7 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.gap_settings.AutoFillGapSettingsMongoRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,7 @@ public class AutoFillGapSettingsService {
     private ShiftValidatorService staffingLevelService;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private RedisService redisService;
 
     public AutoFillGapSettingsDTO createAutoFillGapSettings(AutoFillGapSettingsDTO autoFillGapSettingsDTO, boolean forCountry) {
         AutoFillGapSettings autoFillGapSettings = ObjectMapperUtils.copyPropertiesByMapper(autoFillGapSettingsDTO, AutoFillGapSettings.class);
@@ -314,7 +316,7 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE2:
-                    if (staffingLevelActivityWithDurationMap.containsKey(highestRankTeam.getActivityIds().iterator().next()) && staffingLevelActivityWithDurationMap.get(highestRankTeam.getActivityIds().iterator().next()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
+                    if (highestRankTeam.getActivityIds()!=null && staffingLevelActivityWithDurationMap.containsKey(highestRankTeam.getActivityIds().iterator().next()) && staffingLevelActivityWithDurationMap.get(highestRankTeam.getActivityIds().iterator().next()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), highestRankTeam.getActivityIds().iterator().next(), null);
                     }
                     break;
@@ -349,7 +351,9 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE3:
-                    return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), highestRankTeam.getActivityIds().iterator().next(), null);
+                    if(isCollectionNotEmpty(highestRankTeam.getActivityIds())) {
+                        return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), highestRankTeam.getActivityIds().iterator().next(), null);
+                    }
                 case RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REAL_TIME_PHASE1:
                     activityId = activityList.stream().sorted(Comparator.comparing(k -> k.getActivityPriority().getSequence())).collect(Collectors.toList()).get(0).getActivity().getId();
                     return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);

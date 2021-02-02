@@ -80,11 +80,8 @@ public class ShiftServiceUnitTest {
         shifts.add(shift);
         shift = new ShiftDTO(BigInteger.valueOf(13562L),new Date(2018,11,22,9,0),new Date(2018,11,22,14,0),35602L,32545L);
         shifts.add(shift);
-        List<ShiftState> shiftStates = new ArrayList<>();
-        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT, TIME_ATTENDANCE,LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
-        shiftStates.add(shiftState);
         Set<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
-        when(shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT)).thenReturn(shiftStates);
+        when(shiftStateMongoRepository.getCountByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT)).thenReturn(1l);
         ButtonConfig buttonConfig = shiftStateService.findButtonConfig(shifts,true);
         Assert.assertEquals(buttonConfig.isSendToPayrollEnabled(),false);;
     }
@@ -98,13 +95,8 @@ public class ShiftServiceUnitTest {
         shifts.add(shift);
         shift = new ShiftDTO(BigInteger.valueOf(13880L),new Date(2018,11,21,15,0),new Date(2018,11,21,21,0),35602L,18752L);
         shifts.add(shift);
-        List<ShiftState> shiftStates = new ArrayList<>();
-        ShiftState shiftState = new ShiftState(BigInteger.valueOf(13879L),AccessGroupRole.MANAGEMENT, TIME_ATTENDANCE,LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,20,0),35602L,14139L);
-        shiftStates.add(shiftState);
-        shiftState = new ShiftState(BigInteger.valueOf(13880L),AccessGroupRole.MANAGEMENT, TIME_ATTENDANCE,LocalDate.of(2018,11,21),new Date(2018,11,21,15,0),new Date(2018,11,21,21,0),35602L,14139L);
-        shiftStates.add(shiftState);
         Set<BigInteger> shiftIds = shifts.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
-        when(shiftStateMongoRepository.findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT)).thenReturn(shiftStates);
+        when(shiftStateMongoRepository.getCountByShiftIdInAndAccessGroupRoleAndValidatedNotNull(shiftIds,AccessGroupRole.MANAGEMENT)).thenReturn(2l);
         ButtonConfig buttonConfig = shiftStateService.findButtonConfig(shifts,true);
         Assert.assertEquals(buttonConfig.isSendToPayrollEnabled(),true);;
     }

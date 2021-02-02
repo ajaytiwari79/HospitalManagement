@@ -57,6 +57,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public static final String STAFF_ID = "staffId";
     public static final String ACTIVITY_IDS = "activityIds";
     public static final String ACTIVITY_ID = "activityId";
+    public static final String ACTIVITY_RULES_SETTINGS = "activityRulesSettings";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -477,7 +478,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     @Override
     public List<Activity> findActivitiesSickSettingByActivityIds(Collection<BigInteger> activityIds){
         Query query = new Query(Criteria.where("id").in(activityIds).and(DELETED).is(false).and("activityRulesSettings.sicknessSettingValid").is(true));
-        query.fields().include("activityRulesSettings");
+        query.fields().include(ACTIVITY_RULES_SETTINGS);
         return mongoTemplate.find(query,Activity.class);
     }
 

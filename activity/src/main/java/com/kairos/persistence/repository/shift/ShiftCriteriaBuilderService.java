@@ -83,7 +83,7 @@ public class ShiftCriteriaBuilderService {
     }
 
     private <T> void updateTimeTypeCriteria(Map<FilterType, Set<T>> filterTypeMap, Criteria criteria, RequiredDataForFilterDTO requiredDataForFilterDTO){
-        Set<BigInteger> timeTypeIds = null;
+        Set<BigInteger> timeTypeIds = new HashSet<>();
         FilterType timeType = FilterType.TIME_TYPE;
         if(isValidFilter(filterTypeMap, timeType)) {
             timeTypeIds = new HashSet<>(getBigInteger(filterTypeMap.get(timeType)));

@@ -298,9 +298,6 @@ public class OrganizationActivityService extends MongoBaseService {
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         List<ActivityTagDTO> activities = includeTeamActivity ? activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false) : activityMongoRepository.findAllActivityByUnitIdAndNotPartOfTeam(unitId);
         for (ActivityTagDTO activityTagDTO : activities) {
-            if(isNull(activityTagDTO.getTranslations())){
-                activityTagDTO.setTranslations(new HashMap<>());
-            }
             Set<OrganizationHierarchy> hierarchies = activityTagDTO.getActivityCanBeCopiedForOrganizationHierarchy();
             boolean activityCanBeCopied = ((isCollectionNotEmpty(hierarchies)) && ((organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.ORGANIZATION)) ||
                     (!organizationDTO.isParentOrganization() && hierarchies.contains(OrganizationHierarchy.UNIT))));

@@ -69,4 +69,8 @@ public class WTAQueryResultDTO {
         this.getRuleTemplates().stream().filter(current->current.getWtaTemplateType().toString().equals(WTA_FOR_BREAKS_IN_SHIFT.toString())).findFirst().orElse(null);
     }
 
+    public Map<String, TranslationInfo> getTranslations() {
+        return isNull(translations) ? new HashMap<>() : translations;
+    }
+
 }

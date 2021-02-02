@@ -682,7 +682,7 @@ public class UserIntegrationService {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("type", type));
         queryParamList.add(new BasicNameValuePair("startDate", shiftDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));
-        queryParamList.add(new BasicNameValuePair("activityCutOffEndDate", activityCutOffEndDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));
+        queryParamList.add(new BasicNameValuePair("activityCutOffEndDate", activityCutOffEndDate != null && shiftDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));
         if (CollectionUtils.isNotEmpty(reasonCodeIds)) {
             queryParamList.add(new BasicNameValuePair("reasonCodeIds", RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
         }

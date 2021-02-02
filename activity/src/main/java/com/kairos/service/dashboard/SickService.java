@@ -123,7 +123,7 @@ public class SickService {
     }
 
     public void validateSickSettings(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<Shift> shifts, List<String> errorMessages, SicknessSetting sicknessSetting) {
-        if (!(sicknessSetting.isCanOnlyUsedOnMainEmployment() && EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType()))) {
+        if (sicknessSetting.isCanOnlyUsedOnMainEmployment() && !EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType())) {
             exceptionService.actionNotPermittedException(MESSAGE_STAFF_MAIN_EMPLOYMENT_NOT_FOUND);
         }
         if (isCollectionNotEmpty(activityWrapper.getActivity().getActivityRulesSettings().getStaffTagIds())) {

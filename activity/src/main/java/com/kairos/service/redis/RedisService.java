@@ -5,14 +5,21 @@ import com.kairos.commons.utils.CommonsExceptionUtil;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.CommonConstants.LOCAL_PROFILE;
 
 /**
@@ -72,5 +79,14 @@ public class RedisService extends CommonsExceptionUtil {
     private String getTokenKey(String accessToken) {
         String[] tokenSplitString = accessToken.split("\\.");
         return tokenSplitString[tokenSplitString.length - 1].toLowerCase();
+    }
+
+    @Async
+    public void removeKeyFromCache(Set<String> removeKeys){
+        Set<String> patternKeys = removeKeys.stream().filter(key->key.contains("*")).collect(Collectors.toSet());
+        if(isCollectionNotEmpty(patternKeys)){
+            patternKeys.forEach(key->removeKeys.addAll(valueOperations.keys(key)));
+        }
+        valueOperations.delete(removeKeys);
     }
 }
