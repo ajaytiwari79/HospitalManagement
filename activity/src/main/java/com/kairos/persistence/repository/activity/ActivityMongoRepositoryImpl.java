@@ -476,7 +476,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public List<Activity> findActivitiesSickSettingByActivityIds(Collection<BigInteger> activityIds){
-        Query query = new Query(Criteria.where("id").in(activityIds).and(DELETED).is(false));
+        Query query = new Query(Criteria.where("id").in(activityIds).and(DELETED).is(false).and("activityRulesSettings.sicknessSettingValid").is(true));
         query.fields().include("activityRulesSettings");
         return mongoTemplate.find(query,Activity.class);
     }
