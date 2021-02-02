@@ -146,12 +146,32 @@ public class ShiftDetailsService extends MongoBaseService {
         }
     }
 
-    public Set<BigInteger> getAllActivityIds(List<ShiftDTO> shiftDTOS) {
-        Set<BigInteger> activityIds = new HashSet<>();
-        shiftDTOS.forEach(shiftDTO -> {
-            if(shiftDTO.getShiftType().equals(SICK)) {
-                activityIds.addAll(shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()));
+    public void setLayerInShifts(Map<LocalDate, List<ShiftDTO>> shiftsMap) {
+        Set<BigInteger> activityIds = getAllActivityIds(shiftsMap);
+        List<Activity> activityWrappers = activityMongoRepository.findActivitiesSickSettingByActivityIds(activityIds);
+        Map<BigInteger, Activity> activityMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        shiftsMap.forEach((date, shifts) -> {
+            ShiftDTO sickShift = shifts.stream().filter(k -> k.getShiftType().equals(SICK)).findAny().orElse(null);
+            if (sickShift != null) {
+                Activity activity = getWorkingSickActivity(sickShift, activityMap);
+                if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfPublishedShift()) {
+                    shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()) && sickShift.getStaffId().equals(k.getStaffId()))).collect(Collectors.toList()));
+                }
+                if (!activity.getActivityRulesSettings().getSicknessSetting().isShowAslayerOnTopOfUnPublishedShift()) {
+                    shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> !act.getStatus().contains(ShiftStatus.PUBLISH) && !SICK.equals(k.getShiftType()) && sickShift.getStaffId().equals(k.getStaffId()))).collect(Collectors.toList()));
+                }
             }
+        });
+    }
+
+    public Set<BigInteger> getAllActivityIds(Map<LocalDate,List<ShiftDTO>> dateListMap) {
+        Set<BigInteger> activityIds = new HashSet<>();
+        dateListMap.values().forEach(shiftDTOS -> {
+            shiftDTOS.forEach(shiftDTO -> {
+                if(shiftDTO.getShiftType().equals(SICK)) {
+                    activityIds.addAll(shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()));
+                }
+            });
         });
         return activityIds;
     }
