@@ -709,59 +709,7 @@ public class StaffingLevelService {
         absenceStaffingLevelDto.setStaffingLevelIntervalLogs(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelIntervalLogs());
     }
 
-    public boolean validateStaffingLevel(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, Shift oldStateShift) {
-        ShiftType oldStateShiftType = oldStateShift.getShiftType();
-        ShiftType shiftType = shift.getShiftType();
-        boolean activityReplaced = activityReplaced(oldStateShift, shift);
-        PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
-        if (!Optional.ofNullable(phaseSettings).isPresent()) {
-            exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
-        }
-        if (activityReplaced) {
 
-            for (int i = 0; i < oldStateShift.getActivities().size(); i++) {
-                try {
-                    if (activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor().equals(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor())) {
-                        shift.setShiftType(oldStateShiftType);
-                        boolean isOldShiftVerifyStaffingLevel = shiftValidatorService.isVerificationRequired(false, phaseSettings);
-                        shift.setShiftType(shiftType);
-                        boolean isNewShiftVerifyStaffingLevel = shiftValidatorService.isVerificationRequired(true, phaseSettings);
-                        if (isNull(activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority()) || isNull(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority())) {
-                            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
-                        }
-                        int rankOfOld = activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
-                        int rankOfNew = activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
-                        if (isNewShiftVerifyStaffingLevel || isOldShiftVerifyStaffingLevel) {
-                            validateRankOfActivity(rankOfOld, rankOfNew);
-                        }
-                    }
-                } catch (IndexOutOfBoundsException e) {
-                    //Intentionally left blank
-                }
-            }
-        }
-        return activityReplaced;
-    }
-
-    private void validateRankOfActivity(final int rankOfOld, final int rankOfNew) {
-        if (rankOfNew > rankOfOld) {
-            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, LOW_ACTIVITY_RANK);
-        }
-
-    }
-
-    public boolean activityReplaced(Shift dbShift, Shift shift) {
-        boolean activityReplaced = false;
-        if (shift.getActivities().size() == dbShift.getActivities().size()) {
-            for (int i = 0; i < shift.getActivities().size(); i++) {
-                if (!shift.getActivities().get(i).getActivityId().equals(dbShift.getActivities().get(i).getActivityId())) {
-                    activityReplaced = true;
-                    break;
-                }
-            }
-        }
-        return activityReplaced;
-    }
 
     public Map<LocalDate, DailyStaffingLevelDetailsDTO> getWeeklyStaffingLevel(Long unitId, LocalDate date, BigInteger activityId, boolean unpublishedChanges) {
         LocalDate startLocalDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);

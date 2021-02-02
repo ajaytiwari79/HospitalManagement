@@ -51,6 +51,10 @@ public class FunctionService {
     @Inject
     private EmploymentFunctionRelationshipRepository employmentFunctionRelationshipRepository;
 
+    private int test=0;
+    private static int staticTest=0;
+
+
 
     public com.kairos.persistence.model.country.functions.FunctionDTO createFunction(Long countryId, FunctionDTO functionDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -234,6 +238,10 @@ public class FunctionService {
     }
 
     public Map<String, TranslationInfo> getTranslatedData(Long functionId) {
+        test+=1;
+        staticTest+=1;
+        System.out.println("Test is " + test);
+        System.out.println("static Test is " + staticTest);
         Function function = functionGraphRepository.findOne(functionId);
         return function.getTranslatedData();
     }
