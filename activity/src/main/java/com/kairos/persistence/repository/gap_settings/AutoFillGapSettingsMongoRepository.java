@@ -19,7 +19,7 @@ public interface AutoFillGapSettingsMongoRepository extends MongoBaseRepository<
     @Query("{deleted : false,unitId:?0}")
     List<AutoFillGapSettingsDTO> getAllByUnitId(Long unitId);
 
-    @Query("{deleted : false, published: true,unitId: ?0,organizationTypeId: ?1,organizationSubTypeId: ?2,phaseId: ?3,autoGapFillingScenario: ?4,_id:{$ne: ?5},gapApplicableFor: ?6, $or:[{startDate:{$lt:?7},endDate:{$exists:false} },{startDate: {$lt: ?7},endDate:{$gte:?7}}]}")
+    @Query("{deleted : false, published: true,unitId: ?0,organizationTypeId: ?1,organizationSubTypeId: ?2,phaseId: ?3,autoGapFillingScenario: ?4,_id:{$ne: ?5},gapApplicableFor: ?6, $or:[{startDate:{$lte:?7},endDate:{$exists:false} },{startDate: {$lte: ?7},endDate:{$gte:?7}}]}")
     AutoFillGapSettings getCurrentlyApplicableGapSettingsForUnit(Long unitId, Long organizationTypeId, Long organizationSubTypeId, BigInteger phaseId, String gapFillingScenario, BigInteger id, String gapApplicableFor, LocalDate startDate);
 
     @Query("{deleted : false, published: true,countryId: ?0,organizationTypeId: ?1,organizationSubTypeId: ?2,phaseId: ?3,autoGapFillingScenario: ?4,_id:{$ne: ?5},gapApplicableFor: ?6, $or:[{startDate:{$lt:?7},endDate:{$exists:false} },{startDate: {$lt: ?7},endDate:{$gte:?7}}]}")
@@ -33,4 +33,8 @@ public interface AutoFillGapSettingsMongoRepository extends MongoBaseRepository<
 
     @Query("{deleted : false, parentId: ?0, published: false}")
     AutoFillGapSettings getGapSettingsByParentId(BigInteger parentId);
+
+    @Query("{deleted : false, published: true,countryId: ?0,organizationTypeId: ?1,organizationSubTypeId: {$in: ?2}}")
+    List<AutoFillGapSettings> getAllDefautAutoFillSettings(Long countryId, Long organizationTypeId, List<Long> organizationSubTypeIds);
+
 }
