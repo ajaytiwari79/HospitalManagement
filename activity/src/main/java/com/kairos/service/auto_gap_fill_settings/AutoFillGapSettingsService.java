@@ -135,10 +135,9 @@ public class AutoFillGapSettingsService {
         return true;
     }
 
-    public void createDefaultAutoFillGapSettings(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO){
+    public void createDefaultAutoFillGapSettings(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, List<Phase> phases){
         List<AutoFillGapSettings> autoFillGapSettings = autoFillGapSettingsMongoRepository.getAllDefautAutoFillSettings(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
-        List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
-        Map<BigInteger,BigInteger> countryPhaseIdAndUnitPhaseIdMap = phases.stream().collect(Collectors.toMap(PhaseDTO::getParentCountryPhaseId, PhaseDTO::getId));
+        Map<BigInteger,BigInteger> countryPhaseIdAndUnitPhaseIdMap = phases.stream().collect(Collectors.toMap(Phase::getParentCountryPhaseId, Phase::getId));
         if(isCollectionNotEmpty(autoFillGapSettings)){
             autoFillGapSettings.forEach(autoFillGapSetting -> {
                 autoFillGapSetting.setId(null);
