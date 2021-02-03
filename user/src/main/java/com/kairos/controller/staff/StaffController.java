@@ -672,10 +672,6 @@ public class StaffController {
     @ApiOperation("end position process")
     public ResponseEntity<Map<String, Object>> endPositionProcess() {
         positionService.endPositionProcess();
-        /*
-             teamA 10-12unders-13overstaffing rank 2.
-             teamB 10------------13undrstaffing----14 overs
-         */
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
