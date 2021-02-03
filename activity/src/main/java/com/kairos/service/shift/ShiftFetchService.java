@@ -7,7 +7,6 @@ import com.kairos.dto.activity.attendance.AttendanceTimeSlotDTO;
 import com.kairos.dto.activity.attendance.TimeAndAttendanceDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.shift.*;
-import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -19,7 +18,6 @@ import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftFilterParam;
 import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.enums.shift.ShiftType;
 import com.kairos.enums.shift.ViewType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -39,7 +37,7 @@ import com.kairos.persistence.repository.reason_code.ReasonCodeRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
-import com.kairos.persistence.repository.time_slot.TimeSlotRepository;
+import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
 import com.kairos.persistence.repository.todo.TodoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -120,8 +118,6 @@ public class ShiftFetchService {
     @Inject
     private ShiftDetailsService shiftDetailsService;
     @Inject
-    private TodoService todoService;
-    @Inject
     private TodoRepository todoRepository;
     @Inject
     private ActivityConfigurationService activityConfigurationService;
@@ -138,7 +134,7 @@ public class ShiftFetchService {
     @Inject
     private ReasonCodeRepository reasonCodeRepository;
     @Inject
-    private TimeSlotRepository timeSlotRepository;
+    private TimeSlotMongoRepository timeSlotMongoRepository;
     @Inject
     private DayTypeService dayTypeService;
     @Inject
@@ -278,15 +274,15 @@ public class ShiftFetchService {
             assignedShifts.addAll(wtaRuleTemplateCalculationService.updateRestingTimeInShifts(employmentIdAndShiftEntry.getValue()));
             sickActivityIds.addAll(employmentIdAndShiftEntry.getValue().parallelStream().filter(shiftDTO -> SICK.equals(shiftDTO.getShiftType())).flatMap(shiftDTO -> shiftDTO.getActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()));
         }
-        List<OpenShift> openShifts = userAccessRoleDTO.isManagement() ? openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate) : openShiftNotificationMongoRepository.findValidOpenShiftsForStaff(userAccessRoleDTO.getStaffId(), startDate, endDate);
+        FunctionsWithUserAccessRoleDTO functionsWithUserAccessRoleDTO = userIntegrationService.getFunctionsWithUserAccessRoleDTO(unitId, startLocalDate, endLocalDate);
+        List<OpenShift> openShifts = functionsWithUserAccessRoleDTO.getUserAccessRoleDTO().isManagement() ? openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate) : openShiftNotificationMongoRepository.findValidOpenShiftsForStaff(userAccessRoleDTO.getStaffId(), startDate, endDate);
         ButtonConfig buttonConfig = null;
         if (Optional.ofNullable(viewType).isPresent() && viewType.toString().equalsIgnoreCase(ViewType.WEEKLY.toString())) {
             buttonConfig = shiftStateService.findButtonConfig(assignedShifts, userAccessRoleDTO.isManagement());
         }
         StaffAccessRoleDTO staffAccessRoleDTO = new StaffAccessRoleDTO(userAccessRoleDTO.getStaffId(), getAccessGroupRole(userAccessRoleDTO));
-        Map<LocalDate, List<FunctionDTO>> appliedFunctionDTOs = userIntegrationService.getFunctionsOfEmployment(unitId, startLocalDate, endLocalDate);
         List<ShiftDTO> shiftDTOS = shiftDetailsService.setLayerInShifts(assignedShifts,sickActivityIds);
-        return new ShiftWrapper(shiftDTOS, getOpenShiftResponceDTOS(openShifts), staffAccessRoleDTO, buttonConfig, appliedFunctionDTOs);
+        return new ShiftWrapper(shiftDTOS, getOpenShiftResponceDTOS(openShifts), staffAccessRoleDTO, buttonConfig, functionsWithUserAccessRoleDTO.getFunctions());
     }
 
     private List<AccessGroupRole> getAccessGroupRole(UserAccessRoleDTO userAccessRoleDTO){
@@ -319,9 +315,9 @@ public class ShiftFetchService {
         if (staffId == null) {
             exceptionService.actionNotPermittedException(STAFF_ID_NULL);
         }
-        Map<LocalDate, List<FunctionDTO>> functionDTOMap = new HashMap<>();
         List<ReasonCodeDTO> reasonCodeDTOS = reasonCodeRepository.findByUnitIdAndReasonCodeTypeAndDeletedFalse(unitId, TIME_TYPE);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = null;
+        Map<LocalDate, List<FunctionDTO>> functionDTOMap = new HashMap<>();
         if (Optional.ofNullable(employmentId).isPresent()) {
             staffAdditionalInfoDTO = userIntegrationService.verifyEmploymentAndFindFunctionsAfterDate(staffId, employmentId);
             if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent()) {
@@ -331,10 +327,10 @@ public class ShiftFetchService {
                 exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_ABSENT, startDate.toString());
             }
             List<FunctionDTO> appliedFunctionDTOs = null;
-            if (Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
+            if (Optional.ofNullable(staffAdditionalInfoDTO.getEmployment().getAppliedFunctions()).isPresent()) {
                 appliedFunctionDTOs = staffAdditionalInfoDTO.getEmployment().getAppliedFunctions();
+                functionDTOMap = shiftFunctionService.addFunction(staffAdditionalInfoDTO, appliedFunctionDTOs);
             }
-            shiftFunctionService.addFunction(functionDTOMap, staffAdditionalInfoDTO, appliedFunctionDTOs);
         } else {
             functionDTOMap = userIntegrationService.getFunctionsOfEmployment(unitId, startDate, endDate);
         }
@@ -362,17 +358,7 @@ public class ShiftFetchService {
             shifts = updateDraftShiftToShift(shifts);
         }
         shifts = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts);
-        Set<BigInteger> sickActivityIds = new HashSet<>();
-        for(ShiftDTO shift :shifts){
-            if(isNotNull(shift.getShiftViolatedRules())) {
-                shift.setEscalationReasons(shift.getShiftViolatedRules().getEscalationReasons());
-                shift.setEscalationResolved(shift.getShiftViolatedRules().isEscalationResolved());
-            }
-            if(shift.getShiftType().equals(SICK)) {
-                sickActivityIds.addAll(shift.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()));
-            }
-        }
-
+        Set<BigInteger> sickActivityIds = shifts.parallelStream().filter(shift -> shift.getShiftType().equals(SICK)).flatMap(shiftDTO -> shiftDTO.getActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet());
         return new Object[]{shifts,sickActivityIds};
     }
 

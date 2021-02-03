@@ -143,6 +143,7 @@ public final class ApiConstants {
     public static final String RESTORE_FUNCTION_ON_PHASE_RESTORATION = "/updateFunctionOnPhaseRestoration";
     public static final String GET_FUNCTIONS_OF_EMPLOYMENT = STAFF_WITH_STAFF_ID + "/employment/{employmentId}/functions";
     public static final String FUNCTIONS_OF_EMPLOYMENT = "/employment/functions";
+    public static final String FUNCTIONS_WITH_ACCESS_ROLE = "/employment/functions_with_access_role";
     public static final String UNIT_TIMEZONE = "/time_zone";
     public static final String UNITS_TIMEZONE = "/units_time_zone";
     public static final String GET_ORGANIZATION_IDS = "/get_organization_ids";

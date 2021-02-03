@@ -29,7 +29,8 @@ public class ShiftFunctionService {
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private ExceptionService exceptionService;
 
-    public void addFunction(Map<LocalDate, List<FunctionDTO>> functionDTOMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<FunctionDTO> appliedFunctionDTOs) {
+    public Map<LocalDate, List<FunctionDTO>> addFunction(StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<FunctionDTO> appliedFunctionDTOs) {
+        Map<LocalDate, List<FunctionDTO>> functionDTOMap = new HashMap<>();
         if (CollectionUtils.isNotEmpty(appliedFunctionDTOs)) {
             for (FunctionDTO appliedFunctionDTO : appliedFunctionDTOs) {
                 if (CollectionUtils.isNotEmpty(appliedFunctionDTO.getAppliedDates())) {
@@ -42,6 +43,7 @@ public class ShiftFunctionService {
                 }
             }
         }
+        return functionDTOMap;
     }
 
     public void updateAppliedFunctionDetail(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, Long functionId) {

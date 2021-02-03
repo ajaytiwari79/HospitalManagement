@@ -15,8 +15,10 @@ import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.time_bank.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.activity.Activity;
@@ -36,6 +38,8 @@ import com.kairos.persistence.repository.pay_out.PayOutRepository;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
+import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepositoryImpl;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
@@ -80,8 +84,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_CTA_NOTFOUND;
-import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFFEMPLOYMENT_NOTFOUND;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
@@ -134,6 +137,7 @@ public class TimeBankService implements KPIService {
     @Inject
     private ProtectedDaysOffService protectedDaysOffService;
     @Inject private PhaseService phaseService;
+    @Inject private TimeSlotMongoRepository timeSlotMongoRepository;
 
 
 
@@ -840,6 +844,31 @@ public class TimeBankService implements KPIService {
         shiftActivity.setShortName(activity.getActivityGeneralSettings().getShortName());
         return new int[]{scheduledMinutes, durationMinutes};
     }
+    public void updateShiftDailyTimeBankAndPaidOut(List<Shift> shifts, List<Shift> shiftsList, Long unitId) {
+        if (isCollectionEmpty(shifts)) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_SHIFT_IDS);
+        }
+        List<Long> staffIds = shifts.stream().map(Shift::getStaffId).collect(Collectors.toList());
+        List<Long> employmentIds = shifts.stream().map(Shift::getEmploymentId).collect(Collectors.toList());
+        List<NameValuePair> requestParam = new ArrayList<>();
+        requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
+        requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
+        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
+        List<DayTypeDTO> dayTypeDTOS=dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId());
+        staffAdditionalInfoDTOS.forEach(staff-> staff.setDayTypes(dayTypeDTOS));
+        List<TimeSlotDTO> timeSlotDTOS= timeSlotMongoRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(unitId, TimeSlotType.SHIFT_PLANNING).getTimeSlots();
+        staffAdditionalInfoDTOS.forEach(staff-> staff.setTimeSlotSets(timeSlotDTOS));
+        shifts.sort(Comparator.comparing(Shift::getStartDate));
+        shiftsList.sort((shift, shiftSecond) -> shift.getStartDate().compareTo(shiftSecond.getStartDate()));
+        Date startDate = shifts.get(0).getStartDate();
+        Date endDate = shifts.get(shifts.size() - 1).getEndDate();
+        Date shiftStartDate = shiftsList.get(0).getStartDate();
+        Date shiftEndDate = shiftsList.get(shiftsList.size() - 1).getEndDate();
+        startDate = startDate.before(shiftStartDate) ? startDate : shiftStartDate;
+        endDate = endDate.after(shiftEndDate) ? endDate : shiftEndDate;
+        saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, startDate, endDate);
+    }
+
     @Getter
     private class AdvanceViewData {
         private Long unitId;

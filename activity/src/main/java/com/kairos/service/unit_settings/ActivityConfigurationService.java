@@ -14,6 +14,8 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.TimeTypes;
 import com.kairos.enums.solver_config.PlanningType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -31,6 +33,7 @@ import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.wrapper.phase.PhaseActivityDTO;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -222,12 +225,23 @@ public class ActivityConfigurationService extends MongoBaseService {
         return new ActivityConfigurationWrapper(phases, secondLevelTimeTypes, plannedTimeTypes,employmentTypeDTOS);
     }
 
-    public void addPlannedTimeInShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrappers, StaffAdditionalInfoDTO staffAdditionalInfoDTO,boolean shiftTypeChanged) {
-        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
+    public void addPlannedTimeInShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO,boolean shiftTypeChanged,Phase phase) {
+        //Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
         List<PlannedTime> plannedTimeList = shift.getActivities().stream().flatMap(k -> k.getPlannedTimes().stream()).collect(Collectors.toList());
         Map<DateTimeInterval, PlannedTime> plannedTimeMap = plannedTimeList.stream().filter(distinctByKey(plannedTime -> new DateTimeInterval(plannedTime.getStartDate(), plannedTime.getEndDate()))).collect(toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()), Function.identity()));
+        Set<TimeTypeEnum> timeTypes = shift.getActivities().stream().map(shiftActivity -> activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getActivityBalanceSettings().getTimeType()).collect(Collectors.toSet());
+        List<ActivityConfiguration> absenceActivityConfigurations = null;
+        ActivityConfiguration presenceActivityConfiguration = null;
+        ActivityConfiguration nonWorkingActivityConfiguration = null;
+        if(timeTypes.contains(TimeTypeEnum.ABSENCE)){
+            absenceActivityConfigurations = activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
+        }else if(timeTypes.contains(TimeTypeEnum.PRESENCE)){
+            presenceActivityConfiguration = findPresenceConfigurationByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
+        }else if(!CollectionUtils.removeAll(timeTypes,newHashSet(TimeTypeEnum.ABSENCE,TimeTypeEnum.PRESENCE)).isEmpty()){
+            nonWorkingActivityConfiguration = activityConfigurationRepository.findAllNonWorkingConfigurationByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
+        }
         for (ShiftActivity shiftActivity : shift.getActivities()) {
-            List<BigInteger> plannedTimeIds = addPlannedTimeInShift(shift.getUnitId(), phase.getId(), activityWrappers.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO);
+            List<BigInteger> plannedTimeIds = addPlannedTimeInShift(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO,absenceActivityConfigurations,presenceActivityConfiguration,nonWorkingActivityConfiguration);
             BigInteger plannedTimeId;
             if(!asLocalDate(shiftActivity.getStartDate()).isAfter(LocalDate.now()) && plannedTimeIds.contains(shiftActivity.getPlannedTimeId())){
                 plannedTimeId = shiftActivity.getPlannedTimeId();
@@ -242,25 +256,25 @@ public class ActivityConfigurationService extends MongoBaseService {
         }
     }
 
-    public List<BigInteger> addPlannedTimeInShift(Long unitId, BigInteger phaseId, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+
+    public List<BigInteger> addPlannedTimeInShift(Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO,List<ActivityConfiguration> absenceActivityConfigurations,ActivityConfiguration presenceActivityConfiguration,ActivityConfiguration nonWorkingActivityConfiguration) {
         boolean managementPerson = UserContext.getUserDetails().isManagement();
         List<BigInteger> plannedTimes;
         switch (activity.getActivityBalanceSettings().getTimeType()){
             case ABSENCE :
-                plannedTimes = getAbsencePlannedTime(unitId, phaseId, activity);
+                plannedTimes = getAbsencePlannedTime(activity,absenceActivityConfigurations);
                 break;
             case PRESENCE:
-                plannedTimes = getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);
+                plannedTimes = getPresencePlannedTime(managementPerson, staffAdditionalInfoDTO,presenceActivityConfiguration);
                 break;
             default:
-                plannedTimes = getNonWorkingPlannedTime(unitId, phaseId);
+                plannedTimes = getNonWorkingPlannedTime(nonWorkingActivityConfiguration);
 
         }
         return plannedTimes;
     }
 
-    private List<BigInteger> getAbsencePlannedTime(Long unitId, BigInteger phaseId, Activity activity) {
-        List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
+    private List<BigInteger> getAbsencePlannedTime(Activity activity,List<ActivityConfiguration> activityConfigurations) {
         List<BigInteger> plannedTimeIds = null;
         for (ActivityConfiguration activityConfiguration : activityConfigurations) {
             if (!Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
@@ -279,24 +293,19 @@ public class ActivityConfigurationService extends MongoBaseService {
         return plannedTimeIds;
     }
 
-    private List<BigInteger> getNonWorkingPlannedTime(Long unitId, BigInteger phaseId) {
-        List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllNonWorkingConfigurationByUnitIdAndPhaseId(unitId, phaseId);
-        List<BigInteger> plannedTimeIds = null;
-        for (ActivityConfiguration activityConfiguration : activityConfigurations) {
-            if (!Optional.ofNullable(activityConfiguration.getNonWorkingPlannedTime()).isPresent()) {
-                exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
-            }
-            plannedTimeIds = activityConfiguration.getNonWorkingPlannedTime().getPlannedTimeIds();
+    private List<BigInteger> getNonWorkingPlannedTime(ActivityConfiguration nonWorkingActivityConfiguration) {
+        if (!Optional.ofNullable(nonWorkingActivityConfiguration).isPresent()) {
+            exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
         }
+        List<BigInteger> plannedTimeIds = nonWorkingActivityConfiguration.getNonWorkingPlannedTime().getPlannedTimeIds();
         if(isCollectionEmpty(plannedTimeIds)){
             exceptionService.dataNotFoundByIdException(PLANNED_TIME_NOT_CONFIGURE);
         }
         return plannedTimeIds;
     }
 
-    public List<BigInteger> getPresencePlannedTime(Long unitId, BigInteger phaseId, Boolean managementPerson, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public List<BigInteger> getPresencePlannedTime(Boolean managementPerson, StaffAdditionalInfoDTO staffAdditionalInfoDTO,ActivityConfiguration activityConfiguration) {
         List<BigInteger> plannedTimeIds;
-        ActivityConfiguration activityConfiguration = findPresenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
         if (!Optional.ofNullable(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
             exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
         }

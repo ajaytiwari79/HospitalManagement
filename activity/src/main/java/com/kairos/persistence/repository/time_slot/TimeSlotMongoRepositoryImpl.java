@@ -11,6 +11,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import javax.inject.Inject;
 import java.util.List;
 
+import static com.kairos.constants.AppConstants.TIME_SLOT_SET;
+
 public class TimeSlotMongoRepositoryImpl implements CustomTimeSlotMongoRepository {
 
     @Inject private MongoTemplate mongoTemplate;
@@ -19,9 +21,10 @@ public class TimeSlotMongoRepositoryImpl implements CustomTimeSlotMongoRepositor
     public List<TimeSlotSetDTO> findByUnitIdAndTimeSlotType(Long unitId, TimeSlotType timeSlotType){
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where(AppConstants.UNIT_ID).is(unitId)),
-                Aggregation.lookup(AppConstants.TIME_SLOT_SET, AppConstants.UNIT_ID, AppConstants.UNIT_ID, AppConstants.TIME_SLOT_SET),
-                Aggregation.replaceRoot(AppConstants.TIME_SLOT_SET),
-                Aggregation.match(Criteria.where("timeSlotType").is(timeSlotType))
+                Aggregation.lookup(TIME_SLOT_SET, AppConstants.UNIT_ID, AppConstants.UNIT_ID, TIME_SLOT_SET),
+                Aggregation.unwind(TIME_SLOT_SET),
+                Aggregation.replaceRoot(TIME_SLOT_SET),
+                Aggregation.match(Criteria.where("timeSlotType").is(timeSlotType.toString()))
         );
         return mongoTemplate.aggregate(aggregation, UnitSetting.class,TimeSlotSetDTO.class).getMappedResults();
     }

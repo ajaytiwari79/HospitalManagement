@@ -63,6 +63,8 @@ import com.kairos.wrapper.phase.PhaseActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -119,15 +121,15 @@ public class PlanningPeriodService extends MongoBaseService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject
-    private ShiftStateService shiftStateService;
-    @Inject
     private TimeBankService timeBankService;
     @Inject private ActivitySchedulerJobService activitySchedulerJobService;
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject private ActivityService activityService;
-    @Inject private StaffingLevelService staffingLevelService;
+    @Autowired
+    @Lazy
+    private StaffingLevelService staffingLevelService;
 
     // To get list of phases with duration in days
     public Map<Long, List<PhaseDTO>> getPhasesWithDurationInDays(List<Long> unitIds) {
@@ -162,43 +164,45 @@ public class PlanningPeriodService extends MongoBaseService {
         // Prepare map for phases with id as key and sequence as value
         Map<BigInteger, Integer> phaseIdAndSequenceMap = getMapOfPhasesIdAndSequence(phases);
         // Fetch planning periods
-        List<PlanningPeriodDTO> planningPeriods = null;
+        List<PlanningPeriodDTO> planningPeriods;
         if (Optional.ofNullable(startDate).isPresent() || Optional.ofNullable(endDate).isPresent()) {
             planningPeriods = planningPeriodMongoRepository.findPeriodsOfUnitByStartAndEndDate(unitId, startDate, endDate);
         } else {
             planningPeriods = planningPeriodMongoRepository.findAllPeriodsOfUnit(unitId);
         }
-        Set<LocalDateTime> localDateTimes=planningPeriods.stream().map(planningPeriodDTO -> asLocalDateTime(asDate(planningPeriodDTO.getEndDate()))).collect(Collectors.toSet());
-        Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, localDateTimes);
-        for (PlanningPeriodDTO planningPeriod : planningPeriods) {
-            Phase phase=phaseListByDate.get(asDate(planningPeriod.getEndDate()));
-            if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
-                planningPeriod.setCurrentPhase(phase.getName());
-                planningPeriod.setColor(phase.getColor());
-            }
-            planningPeriod.setPhaseEnum(phase.getPhaseEnum());
-            // Set duration of period
-            planningPeriod.setPeriodDuration(DateUtils.getDurationOfTwoLocalDates(planningPeriod.getStartDate(), planningPeriod.getEndDate().plusDays(1)));
+        if(isCollectionNotEmpty(planningPeriods)){
+            Set<LocalDateTime> localDateTimes=planningPeriods.stream().map(planningPeriodDTO -> asLocalDateTime(asDate(planningPeriodDTO.getEndDate()))).collect(Collectors.toSet());
+            Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, localDateTimes);
+            for (PlanningPeriodDTO planningPeriod : planningPeriods) {
+                Phase phase=phaseListByDate.get(asDate(planningPeriod.getEndDate()));
+                if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
+                    planningPeriod.setCurrentPhase(phase.getName());
+                    planningPeriod.setColor(phase.getColor());
+                }
+                planningPeriod.setPhaseEnum(phase.getPhaseEnum());
+                // Set duration of period
+                planningPeriod.setPeriodDuration(DateUtils.getDurationOfTwoLocalDates(planningPeriod.getStartDate(), planningPeriod.getEndDate().plusDays(1)));
 
-            // Set flipping dates
-            FlippingDateDTO flippingDateDTO;
-            for (PeriodPhaseDTO flippingDateTime : planningPeriod.getPhaseFlippingDate()) {
-                int phaseSequence = phaseIdAndSequenceMap.get(flippingDateTime.getPhaseId());
-                switch (phaseSequence) {
-                    case 4:
-                        flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
-                        planningPeriod.setConstructionToDraftDate(flippingDateDTO);
-                        break;
-                    case 3:
-                        flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
-                        planningPeriod.setPuzzleToConstructionDate(flippingDateDTO);
-                        break;
-                    case 2:
-                        flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
-                        planningPeriod.setRequestToPuzzleDate(flippingDateDTO);
-                        break;
-                    default:
-                        break;
+                // Set flipping dates
+                FlippingDateDTO flippingDateDTO;
+                for (PeriodPhaseDTO flippingDateTime : planningPeriod.getPhaseFlippingDate()) {
+                    int phaseSequence = phaseIdAndSequenceMap.get(flippingDateTime.getPhaseId());
+                    switch (phaseSequence) {
+                        case 4:
+                            flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
+                            planningPeriod.setConstructionToDraftDate(flippingDateDTO);
+                            break;
+                        case 3:
+                            flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
+                            planningPeriod.setPuzzleToConstructionDate(flippingDateDTO);
+                            break;
+                        case 2:
+                            flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
+                            planningPeriod.setRequestToPuzzleDate(flippingDateDTO);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -750,9 +754,9 @@ public class PlanningPeriodService extends MongoBaseService {
                 shift.setId(shiftState.getShiftId());
                 shifts.add(shift);
             });
-            save(shifts);
+            shiftMongoRepository.saveEntities(shifts);
             shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(), planningPeriod.getCurrentPhaseId());
-            shiftStateService.updateShiftDailyTimeBankAndPaidOut(shifts, shiftList, unitId);
+            timeBankService.updateShiftDailyTimeBankAndPaidOut(shifts, shiftList, unitId);
         }
     }
 

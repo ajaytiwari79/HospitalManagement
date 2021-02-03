@@ -64,6 +64,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -124,7 +126,8 @@ public class KPIBuilderCalculationService implements CounterService {
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-    @Inject
+    @Autowired
+    @Lazy
     private TodoService todoService;
     @Inject
     private AbsencePlanningKPIService absencePlanningKPIService;

@@ -706,7 +706,10 @@ public class ActivityService {
     public void updateOrgMappingDetailOfActivity(Long unitId, OrganizationMappingDTO organizationMappingDTO, BigInteger activityId){
         this.updateOrgMappingDetailOfActivity(organizationMappingDTO,activityId);
     }
-    @CacheEvict(value = "findAllActivityByCountry",key = "#countryId")
+    @Caching(evict = {
+            @CacheEvict(value = "findAllActivityByCountry",key = "#countryId"),
+            @CacheEvict(value={"getActivityMappingDetails","findAllActivityByUnitIdWithCompositeActivities"},allEntries = true)
+    })
     public void updateOrgMappingDetailOfActivity(OrganizationMappingDTO organizationMappingDTO, BigInteger activityId,Long countryId){
         this.updateOrgMappingDetailOfActivity(organizationMappingDTO,activityId);
     }

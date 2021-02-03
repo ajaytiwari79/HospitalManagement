@@ -58,6 +58,7 @@ public class AutoFillGapSettingsService {
         }
         autoFillGapSettingsMongoRepository.save(autoFillGapSettings);
         autoFillGapSettingsDTO.setId(autoFillGapSettings.getId());
+        resetCacheData(autoFillGapSettings);
         return autoFillGapSettingsDTO;
     }
 
@@ -82,6 +83,7 @@ public class AutoFillGapSettingsService {
             }
         }
         autoFillGapSettingsMongoRepository.save(autoFillGapSettings);
+        resetCacheData(autoFillGapSettings);
         return autoFillGapSettingsDTO;
     }
 
@@ -116,9 +118,9 @@ public class AutoFillGapSettingsService {
     public List<AutoFillGapSettingsDTO> getAllAutoFillGapSettings(Long countryOrUnitId, boolean forCountry) {
         List<AutoFillGapSettingsDTO> autoFillGapSettingsList;
         if (forCountry) {
-            autoFillGapSettingsList = autoFillGapSettingsMongoRepository.getAllByCountryId(countryOrUnitId);
+            autoFillGapSettingsList = autoFillGapSettingsMongoRepository.getAllAutoFillGapSettingsByCountryId(countryOrUnitId);
         } else {
-            autoFillGapSettingsList = autoFillGapSettingsMongoRepository.getAllByUnitId(countryOrUnitId);
+            autoFillGapSettingsList = autoFillGapSettingsMongoRepository.getAllAutoFillGapSettingsByUnitId(countryOrUnitId);
         }
         return autoFillGapSettingsList;
     }
@@ -130,6 +132,7 @@ public class AutoFillGapSettingsService {
         }
         autoFillGapSettings.setDeleted(true);
         autoFillGapSettingsMongoRepository.save(autoFillGapSettings);
+        resetCacheData(autoFillGapSettings);
         return true;
     }
 
@@ -472,5 +475,12 @@ public class AutoFillGapSettingsService {
         return temp;
     }
 
+    private void resetCacheData(AutoFillGapSettings autoFillGapSettings){
+        if(isNotNull(autoFillGapSettings.getCountryId())){
+            redisService.removeKeyFromCache(newHashSet("getAllAutoFillGapSettingsByCountryId::"+autoFillGapSettings.getCountryId()));
+        }else if(isNotNull(autoFillGapSettings.getUnitId())){
+            redisService.removeKeyFromCache(newHashSet("getAllAutoFillGapSettingsByUnitId::"+autoFillGapSettings.getUnitId()));
+        }
+    }
 
 }

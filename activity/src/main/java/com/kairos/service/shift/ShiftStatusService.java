@@ -38,6 +38,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -85,7 +87,8 @@ public class ShiftStatusService {
     private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
     @Inject
     private TodoRepository todoRepository;
-    @Inject
+    @Autowired
+    @Lazy
     private TodoService todoService;
     @Inject
     private DayTypeService dayTypeService;
