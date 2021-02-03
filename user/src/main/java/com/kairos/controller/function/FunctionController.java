@@ -119,5 +119,9 @@ public class FunctionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, translationService.updateTranslation(id, translations));
     }
 
-
+    @GetMapping(value = API_V1 + UNIT_URL + "/employment/functions_with_access_role")
+    @ApiOperation("find functions with access role")
+    public ResponseEntity<Map<String, Object>> getFunctionsAndUserAccessRole(@PathVariable Long unitId, @RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctionsAndUserAccessRole(unitId, startDate, endDate));
+    }
 }

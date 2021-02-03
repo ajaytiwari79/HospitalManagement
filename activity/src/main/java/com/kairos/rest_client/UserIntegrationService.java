@@ -872,6 +872,14 @@ public class UserIntegrationService {
     public List<StaffAdditionalInfoDTO> getEligibleStaffsForCoverShifts(NotEligibleStaffDataDTO notEligibleStaffDataDTO,Long unitId) {
         return genericRestClient.publishRequest(notEligibleStaffDataDTO, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/staff/get_eligible_staffs_for_cover_shifts", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>() {});
     }
+
+    public FunctionsWithUserAccessRoleDTO getFunctionsWithUserAccessRoleDTO(Long employmentId, LocalDate startDate, LocalDate endDate) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair("startDate", startDate.toString()));
+        queryParamList.add(new BasicNameValuePair("endDate", endDate!=null? endDate.toString():null));
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, FUNCTIONS_WITH_ACCESS_ROLE, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<FunctionsWithUserAccessRoleDTO>>() {
+        }, employmentId);
+    }
 }
 
 

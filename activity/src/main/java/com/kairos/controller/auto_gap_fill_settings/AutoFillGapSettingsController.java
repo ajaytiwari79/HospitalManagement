@@ -3,6 +3,7 @@ package com.kairos.controller.auto_gap_fill_settings;
 import com.kairos.dto.activity.auto_gap_fill_settings.AutoFillGapSettingsDTO;
 import com.kairos.enums.auto_gap_fill_settings.AutoFillGapSettingsRule;
 import com.kairos.service.auto_gap_fill_settings.AutoFillGapSettingsService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -23,6 +25,7 @@ import static com.kairos.constants.ApiConstants.*;
 public class AutoFillGapSettingsController {
     @Inject
     private AutoFillGapSettingsService autoFillGapSettingsService;
+    @Inject private RedisService redisService;
 
     @ApiOperation("Create gap settings for country")
     @PostMapping(COUNTRY_URL + AUTO_FILL_GAP_SETTINGS_URL)
@@ -83,6 +86,14 @@ public class AutoFillGapSettingsController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllAutoFillGapSettingsRules() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, AutoFillGapSettingsRule.getAllAutoFillGapSettingsRules());
+    }
+
+    @ApiOperation("Remove Key from Cache")
+    @PostMapping("/remove_key_from_cache")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> removeKeyFromCache(@RequestBody Set<String> cacheKeys) {
+        redisService.removeKeyFromCache(cacheKeys);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
 }

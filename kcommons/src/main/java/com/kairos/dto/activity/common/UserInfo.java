@@ -17,6 +17,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserInfo implements Serializable {
+    private static final long serialVersionUID = -5063027528255969117L;
     private Long id;
     private String email;
     private String fullName;

@@ -3,7 +3,9 @@ package com.kairos.service.country;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.shift.FunctionDTO;
+import com.kairos.dto.activity.shift.FunctionsWithUserAccessRoleDTO;
 import com.kairos.dto.user.TranslationDTO;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
@@ -18,6 +20,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentFunctionRelationshipRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.staff.StaffRetrievalService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +45,7 @@ public class FunctionService {
     private FunctionGraphRepository functionGraphRepository;
     @Inject
     private CountryService countryService;
-
+    @Inject private StaffRetrievalService staffRetrievalService;
     @Inject
     private UnitGraphRepository unitGraphRepository;
 
@@ -206,7 +209,7 @@ public class FunctionService {
     public Map<LocalDate, List<FunctionDTO>> findAppliedFunctionsAtEmployment(Long unitId, String startDate, String endDate) {
         List<EmploymentQueryResult> employmentQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(functionGraphRepository.findAppliedFunctionsAtEmpployment(unitId, startDate, endDate), EmploymentQueryResult.class);
         Map<LocalDate, List<FunctionDTO>> dateWiseFunctionMap = new HashMap<>();
-        for (EmploymentQueryResult employmentQueryResult : employmentQueryResults) {
+        employmentQueryResults.parallelStream().forEach(employmentQueryResult -> {
             for (com.kairos.persistence.model.country.functions.FunctionDTO appliedFunctionDTO : employmentQueryResult.getAppliedFunctions()) {
                 for (LocalDate localDate : appliedFunctionDTO.getAppliedDates()) {
                     FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
@@ -217,8 +220,15 @@ public class FunctionService {
                     dateWiseFunctionMap.put(localDate, functionDTOS);
                 }
             }
-        }
+        });
         return dateWiseFunctionMap;
+    }
+
+
+    public FunctionsWithUserAccessRoleDTO getFunctionsAndUserAccessRole(Long unitId, String startDate, String endDate){
+        Map<LocalDate,List<FunctionDTO>> functionDTOMap = findAppliedFunctionsAtEmployment(unitId,startDate,endDate);
+        UserAccessRoleDTO userAccessRoleDTO = staffRetrievalService.getAccessRolesOfStaffByUserId(unitId);
+        return new FunctionsWithUserAccessRoleDTO(functionDTOMap,userAccessRoleDTO);
     }
 
     public List<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
