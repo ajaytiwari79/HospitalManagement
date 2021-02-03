@@ -403,6 +403,7 @@ public class ActivityMessagesConstants {
     public static final String ERROR_AUTO_FILL_GAP_SETTING_NOT_FOUND = "error.auto.fill.gap.setting.not.found";
     public static final String ERROR_AUTO_FILL_GAP_SETTING_PUBLISH_DATE_INVALID = "error.auto.fill.gap.setting.publish.date.invalid";
     public static final String MAIN_TEAM_ABSENT = "error.main.team.absent";
+    public static final String HIGHEST_RANK_ACTIVITY_ABSENT = "error.highest.team.absent";
     public static final String ERROR_ALREADY_AUTO_FILL_GAP_SETTING_PUBLISH = "error.already.auto.fill.gap.setting.publish";
     public static final String ERROR_DRAFT_COPY_ALREADY_CREATED = "error.draft.copy.already.created";
 
