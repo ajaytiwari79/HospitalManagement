@@ -369,7 +369,9 @@ public class PositionService {
                     for (QueryResult queryResult : list) {
                         if (queryResult.getId() == id) {
                             List<QueryResult> childs = queryResult.getChildren();
-                            QueryResult child = objectMapper.convertValue(((Map<String, Object>) unitData.get("data")).get(CHILD), QueryResult.class);
+                            Map<String, Object> data= (Map<String, Object>) ((Map<String, Object>) unitData.get("data")).get(CHILD);
+                            TranslationUtil.convertTranslationFromStringToMap(data);
+                            QueryResult child = objectMapper.convertValue(data, QueryResult.class);
                             child.setTranslations(unit.getTranslations());
                             position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
                             if (position != null && !position.isEmpty()) {
