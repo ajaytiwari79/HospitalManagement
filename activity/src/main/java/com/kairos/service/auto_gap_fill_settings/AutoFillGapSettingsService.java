@@ -275,7 +275,7 @@ public class AutoFillGapSettingsService {
     }
 
     private boolean gapCreated(ShiftDTO shiftDTO, Shift shift) {
-        return shift.getActivities().size() > shiftDTO.getActivities().size() && shift.getStartDate().equals(shiftDTO.getStartDate()) && shift.getEndDate().equals(shiftDTO.getEndDate());
+        return shift.getActivities().size() > shiftDTO.getActivities().size() && shift.getStartDate().equals(shiftDTO.getStartDate()) && shift.getEndDate().equals(shiftDTO.getEndDate()) && shift.getActivities().get(0).getActivityId().equals(shiftDTO.getActivities().get(0).getActivityId()) && shift.getActivities().get(shift.getActivities().size()-1).getActivityId().equals(shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getActivityId());
     }
 
     private ShiftActivityDTO[] getActivitiesAroundGap(ShiftDTO shiftDTO) {
