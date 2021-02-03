@@ -103,7 +103,7 @@ public class FunctionController {
 
     @ApiOperation(value = "add translated data")
     @PostMapping(API_V1 + UNIT_URL + "/function/{functionId}/update_translation")
-    public ResponseEntity<Map<String, Object>> updateTranslation(@PathVariable Long functionId, @RequestBody TranslationDTO translationData) {
+    public ResponseEntity<Map<String, Object>> updateTranslation(@PathVariable Long functionId, @RequestBody Map<String, TranslationInfo> translationData) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.updateTranslation(functionId, translationData));
     }
 

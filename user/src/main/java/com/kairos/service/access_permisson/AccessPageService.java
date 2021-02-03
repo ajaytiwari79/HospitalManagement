@@ -284,7 +284,7 @@ public class AccessPageService {
 
     public Map<String, TranslationInfo> getTranslatedData(Long accessPageId) {
         AccessPage accessPage = accessPageRepository.findOne(accessPageId);
-        return accessPage.getTranslatedData();
+        return accessPage.getTranslations();
     }
 
     @Cacheable(value = "getTabHierarchy", key = "#languageId", cacheManager = "cacheManager")

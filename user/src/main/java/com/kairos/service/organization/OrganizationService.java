@@ -908,17 +908,10 @@ public class OrganizationService {
     }
 
     public Map<String, TranslationInfo> updateTranslation(Long organizationId, Map<String,TranslationInfo> translations) {
-        Map<String,String> translatedNames = new HashMap<>();
-        Map<String,String> translatedDescriptios = new HashMap<>();
-        for(Map.Entry<String,TranslationInfo> entry :translations.entrySet()){
-            translatedNames.put(entry.getKey(),entry.getValue().getName());
-            translatedDescriptios.put(entry.getKey(),entry.getValue().getDescription());
-        }
         Organization organization =organizationGraphRepository.findOne(organizationId);
-        organization.setTranslatedNames(translatedNames);
-        organization.setTranslatedDescriptions(translatedDescriptios);
+        organization.setTranslations(translations);
         organizationGraphRepository.save(organization);
-        return organization.getTranslatedData();
+        return organization.getTranslations();
     }
 
     public boolean transferReasonCode(){

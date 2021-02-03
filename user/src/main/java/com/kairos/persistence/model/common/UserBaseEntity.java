@@ -48,17 +48,7 @@ public abstract class UserBaseEntity  implements Serializable {
     protected Long lastModifiedBy;
     @Properties
     protected Map<String,String> translatedNames;
-    @Properties
-    protected Map<String,String> translatedDescriptions;
     @Convert(TranslationConverter.class)
     protected Map<String, TranslationInfo> translations;
 
-
-
-    @JsonIgnore
-    public Map<String, TranslationInfo> getTranslatedData() {
-        Map<String, TranslationInfo> infoMap=new HashMap<>();
-        translatedNames.forEach((k,v)-> infoMap.put(k,new TranslationInfo(v,translatedDescriptions.get(k))));
-        return infoMap;
-    }
 }

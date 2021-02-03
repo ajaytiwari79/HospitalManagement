@@ -126,8 +126,7 @@ public class GroupService {
             filterSelectionDTOS.add(new FilterSelectionDTO(filterSelection.getName(), values));
         }
         groupDTO.setFiltersData(filterSelectionDTOS);
-        groupDTO.setTranslatedDescriptions(group.getTranslatedDescriptions());
-        groupDTO.setTranslatedNames(group.getTranslatedNames());
+        groupDTO.setTranslations(group.getTranslations());
         return groupDTO;
     }
 
