@@ -193,7 +193,6 @@ public class AuthController {
         userInfo.put("credentials", UserContext.getUserDetails().getId());
         userInfo.put("clientId", user.getOAuth2Request().getClientId());
         userInfo.put("user12", user.getPrincipal());
-
         return userInfo;
     }
 
