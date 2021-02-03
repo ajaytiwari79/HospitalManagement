@@ -246,11 +246,6 @@ public class AutoFillGapSettingsService {
                     break;
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE3:
                     return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), beforeGap.getActivity().getTimeType().isPartOfTeam() ? afterGap.getActivityId() : beforeGap.getActivityId(), null);
-                case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_REAL_TIME_PHASE1:
-                    if (mainTeam != null) {
-                        return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeam.getActivityIds().iterator().next(), null);
-                    }
-                    break;
                 case RULES_AS_PER_MANAGEMENT_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_REAL_TIME_PHASE1:
                     activityId = afterGap.getActivity().getActivityPriority().getSequence() < beforeGap.getActivity().getActivityPriority().getSequence() ? afterGap.getActivityId() : beforeGap.getActivityId();
                     return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
@@ -307,6 +302,8 @@ public class AutoFillGapSettingsService {
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2:
                     if (mainTeamActivityId != null) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeamRemoved ? highestRankTeam.getActivityIds().iterator().next() : mainTeamActivityId, true);
+                    }else {
+                        exceptionService.actionNotPermittedException(MAIN_TEAM_ABSENT);
                     }
                     break;
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE3:
