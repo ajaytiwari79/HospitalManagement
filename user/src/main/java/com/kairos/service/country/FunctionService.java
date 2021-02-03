@@ -225,17 +225,16 @@ public class FunctionService {
         return functionGraphRepository.findAllDateByFunctionIds(unitId, functionIds);
     }
 
-    public Map<String, TranslationInfo> updateTranslation(Long functionId, TranslationDTO translationData) {
+    public Map<String, TranslationInfo> updateTranslation(Long functionId, Map<String, TranslationInfo> translationData) {
         Function function = functionGraphRepository.findOne(functionId);
-        function.setTranslatedNames(translationData.getTranslatedNames());
-        function.setTranslatedDescriptions(translationData.getTranslatedDescriptions());
+        function.setTranslations(translationData);
         functionGraphRepository.save(function);
-        return function.getTranslatedData();
+        return function.getTranslations();
     }
 
     public Map<String, TranslationInfo> getTranslatedData(Long functionId) {
         Function function = functionGraphRepository.findOne(functionId);
-        return function.getTranslatedData();
+        return function.getTranslations();
     }
 
 }

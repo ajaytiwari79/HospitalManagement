@@ -932,7 +932,7 @@ public class StaffRetrievalService {
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
         organizationBaseEntity.setTranslations(translations);
         organizationBaseRepository.save(organizationBaseEntity);
-        return organizationBaseEntity.getTranslatedData();
+        return organizationBaseEntity.getTranslations();
     }
 
     public List<StaffAdditionalInfoDTO> getEligibleStaffsForCoverShifts(Long unitId, NotEligibleStaffDataDTO notEligibleStaffDataDTO) {
