@@ -18,7 +18,6 @@ import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.cta_compensation_settings.CTACompensationSettingService;
 import com.kairos.service.exception.ExceptionService;
@@ -44,7 +43,7 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_CTA_NAME_AL
 
 @Service
 @Transactional
-public class CountryCTAService extends MongoBaseService {
+public class CountryCTAService {
     public static final String ORGANIZATION_SUB_TYPE_ID = "organizationSubTypeId";
     public static final String EXPERTISE_ID = "expertiseId";
     private Logger logger = LoggerFactory.getLogger(CountryCTAService.class);

@@ -1,6 +1,5 @@
 package com.kairos.service.region;
 
-import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.user.region.*;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

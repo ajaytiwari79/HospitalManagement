@@ -7,7 +7,6 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.payroll.PensionProviderDTO;
 import com.kairos.persistence.model.payroll.PensionProvider;
 import com.kairos.persistence.repository.payroll.PensionProviderRepository;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +19,7 @@ import java.util.Optional;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
-public class PensionProviderService extends MongoBaseService {
+public class PensionProviderService {
 
     @Inject
     private PensionProviderRepository pensionProviderRepository;

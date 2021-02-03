@@ -1,6 +1,5 @@
 package com.kairos.service.region;
 
-import com.kairos.dto.TranslationInfo;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.region.*;

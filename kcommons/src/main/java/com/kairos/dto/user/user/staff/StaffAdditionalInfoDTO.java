@@ -1,7 +1,6 @@
 package com.kairos.dto.user.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.gdpr.OrganizationTypeDTO;

@@ -10,7 +10,6 @@ import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutService;
@@ -21,13 +20,11 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
-import static java.util.stream.Collectors.groupingBy;
-
 /**
  * CreatedBy vipulpandey on 28/11/18
  **/
 @Service
-public class ShiftCopyService extends MongoBaseService {
+public class ShiftCopyService {
 
     public static final String ERROR = "error";
     @Inject

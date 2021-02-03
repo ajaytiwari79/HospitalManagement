@@ -2,7 +2,6 @@ package com.kairos.controller.function;
 
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.shift.FunctionDTO;
-import com.kairos.dto.user.TranslationDTO;
 import com.kairos.service.country.FunctionService;
 import com.kairos.service.translation.TranslationService;
 import com.kairos.utils.response.ResponseHandler;

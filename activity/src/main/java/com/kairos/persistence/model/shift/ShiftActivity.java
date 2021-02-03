@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.shift;
 
-import com.kairos.annotations.KPermissionField;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.PlannedTime;

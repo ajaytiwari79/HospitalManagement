@@ -10,7 +10,6 @@ import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +28,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
  */
 
 @Service
-public class CounterConfService extends MongoBaseService {
+public class CounterConfService {
 
     @Inject
     private ExceptionService exceptionService;

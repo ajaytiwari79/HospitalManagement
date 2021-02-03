@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.access_permission;
 
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import lombok.Getter;

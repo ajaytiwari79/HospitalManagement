@@ -23,7 +23,6 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftStateService;
@@ -47,7 +46,7 @@ import static com.kairos.enums.reason_code.ReasonCodeType.ATTENDANCE;
 
 @Service
 //Todo we have to refactor this service
-public class TimeAndAttendanceService extends MongoBaseService {
+public class TimeAndAttendanceService {
 
     @Inject
     private TimeAndAttendanceRepository timeAndAttendanceRepository;

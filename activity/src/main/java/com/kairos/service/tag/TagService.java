@@ -12,7 +12,6 @@ import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
  */
 @Transactional
 @Service
-public class TagService extends MongoBaseService {
+public class TagService {
 
     private Logger logger= LoggerFactory.getLogger(StaffingLevelController.class);
 
@@ -58,7 +57,7 @@ public class TagService extends MongoBaseService {
         if( tagMongoRepository.findTagByNameIgnoreCaseAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false)  != null){
            exceptionService.duplicateDataException(MESSAGE_TAG_NAME,tagDTO.getName() );
         }
-        return this.save(buildTag(tagDTO, true, countryId));
+        return tagMongoRepository.save(buildTag(tagDTO, true, countryId));
     }
 
     public Tag  updateCountryTag(Long countryId, BigInteger tagId, TagDTO tagDTO) {
@@ -74,7 +73,7 @@ public class TagService extends MongoBaseService {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME,tagDTO.getName());
         }
         tag.setName(tagDTO.getName());
-        this.save(tag);
+        tagMongoRepository.save(tag);
         return tag;
     }
 
@@ -115,7 +114,7 @@ public class TagService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_TAG_ID,tagId);
         }
         tag.setDeleted(true);
-        this.save(tag);
+        tagMongoRepository.save(tag);
         return true;
     }
 
@@ -129,7 +128,7 @@ public class TagService extends MongoBaseService {
         if( tagMongoRepository.findTagByNameIgnoreCaseAndOrganizationIdAndMasterDataTypeAndDeletedAndCountryTagFalse(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false)  != null){
            exceptionService.duplicateDataException(MESSAGE_TAG_NAME,tagDTO.getName());
         }
-        return this.save(buildTag(tagDTO, false, organizationId));
+        return tagMongoRepository.save(buildTag(tagDTO, false, organizationId));
     }
 
     public Tag  updateOrganizationTag(Long organizationId, BigInteger tagId, TagDTO tagDTO) {
@@ -142,7 +141,7 @@ public class TagService extends MongoBaseService {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME,tagDTO.getName());
         }
         tag.setName(tagDTO.getName());
-        this.save(tag);
+        tagMongoRepository.save(tag);
         return tag;
     }
 
@@ -184,7 +183,7 @@ public class TagService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_TAG_ID,tagId);
         }
         tag.setDeleted(true);
-        this.save(tag);
+        tagMongoRepository.save(tag);
         return true;
     }
 

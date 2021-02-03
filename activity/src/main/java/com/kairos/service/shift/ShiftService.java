@@ -43,7 +43,6 @@ import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
 import com.kairos.persistence.repository.todo.TodoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.StaffActivityDetailsService;
 import com.kairos.service.auto_gap_fill_settings.AutoFillGapSettingsService;
@@ -84,7 +83,7 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToC
  * Created by vipul on 30/8/17.
  */
 @Service
-public class ShiftService extends MongoBaseService {
+public class ShiftService {
     public static final int MULTIPLE_ACTIVITY_COUNT = 1;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
@@ -902,7 +901,7 @@ public class ShiftService extends MongoBaseService {
         }
         BigInteger shiftStateId = shiftDTO.getId();
         BigInteger shiftStatePhaseId = shiftDTO.getShiftStatePhaseId();
-        shiftDTO.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
+        shiftDTO.getActivities().forEach(a -> a.setId(shiftMongoRepository.nextSequence(ShiftActivity.class.getSimpleName())));
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = updateShift(shiftDTO, true, false, null);
         for (ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO : shiftWithViolatedInfoDTOS) {
             ShiftDTO updatedShiftDto = shiftStateService.updateShiftStateAfterValidatingWtaRule(shiftWithViolatedInfoDTO.getShifts().get(0), shiftStateId, shiftStatePhaseId);

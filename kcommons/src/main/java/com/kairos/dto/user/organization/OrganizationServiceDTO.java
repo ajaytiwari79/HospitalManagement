@@ -10,11 +10,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 /**
  * Created by prerna on 15/11/17.

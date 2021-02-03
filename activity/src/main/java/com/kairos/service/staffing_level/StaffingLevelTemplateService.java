@@ -15,7 +15,6 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -37,7 +36,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
 @Transactional
-public class StaffingLevelTemplateService extends MongoBaseService {
+public class StaffingLevelTemplateService {
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffingLevelService.class);
     @Inject
     private StaffingLevelTemplateRepository staffingLevelTemplateRepository;
@@ -100,7 +99,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         if (Optional.ofNullable(staffingLevelTemplate).isPresent()) {
             BeanUtils.copyProperties(staffingLevelTemplateDTO, staffingLevelTemplate);
             staffingLevelTemplate.setId(staffingTemplateId);
-            this.save(staffingLevelTemplate);
+            staffingLevelTemplateRepository.save(staffingLevelTemplate);
             staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevelTemplate.getPresenceStaffingLevelInterval().stream()
                     .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
             } else {

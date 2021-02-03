@@ -39,11 +39,9 @@ import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepositor
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
-import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepositoryImpl;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
-import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.counter.KPICalculationRelatedInfo;
 import com.kairos.service.counter.KPIService;
 import com.kairos.service.cta.CostTimeAgreementService;

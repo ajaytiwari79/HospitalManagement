@@ -24,7 +24,6 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.period.PlanningPeriodService;
@@ -45,7 +44,7 @@ import static com.kairos.enums.TimeTypeEnum.*;
 import static com.kairos.service.activity.ActivityUtil.getCutoffInterval;
 
 @Service
-public class TimeTypeService extends MongoBaseService {
+public class TimeTypeService {
     public static final String PRESENCE = "Presence";
     public static final String ABSENCE = "Absence";
     @Inject

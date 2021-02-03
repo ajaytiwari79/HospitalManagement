@@ -16,7 +16,6 @@ import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepo
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.StaffActivityAssignmentSpecification;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.StaffActivityDetailsService;
 import com.kairos.service.activity.TimeTypeService;
@@ -35,7 +34,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
-public class StaffActivitySettingService extends MongoBaseService {
+public class StaffActivitySettingService {
 
     public static final String SUCCESS = "success";
     public static final String ERROR = "error";
@@ -88,7 +87,7 @@ public class StaffActivitySettingService extends MongoBaseService {
             exceptionService.dataNotFoundException(MESSAGE_STAFF_ACTIVITY_SETTINGS_ABSENT);
         }
         staffActivitySetting.setDeleted(true);
-        save(staffActivitySetting);
+        staffActivitySettingRepository.save(staffActivitySetting);
         return true;
     }
 
@@ -155,7 +154,7 @@ public class StaffActivitySettingService extends MongoBaseService {
             staffActivitySetting.setStaffId(staffId);
         });
         List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyCollectionPropertiesByMapper(staffActivitySettings,StaffActivitySetting.class);
-        save(staffActivitySettingsList);
+       staffActivitySettingRepository.saveEntities(staffActivitySettingsList);
         return staffActivitySettings;
    }
 

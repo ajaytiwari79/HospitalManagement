@@ -5,7 +5,6 @@ import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.kpermissions.PermissionAction;
 import com.kairos.persistence.model.activity.tabs.ActivityOptaPlannerSetting;
 import com.kairos.service.activity.ActivityService;

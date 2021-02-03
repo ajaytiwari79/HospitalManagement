@@ -5,7 +5,6 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.shift.ShiftDataHelper;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.rule_validator.RuleExecutionType;
 

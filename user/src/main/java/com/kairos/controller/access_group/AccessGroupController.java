@@ -6,7 +6,6 @@ import com.kairos.dto.user.access_permission.AccessGroupPermissionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.AccessPermissionDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.service.access_permisson.AccessGroupService;

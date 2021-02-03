@@ -1,7 +1,6 @@
 package com.kairos.service.reason_code;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.reason_code.ReasonCodeType;
@@ -12,7 +11,10 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;

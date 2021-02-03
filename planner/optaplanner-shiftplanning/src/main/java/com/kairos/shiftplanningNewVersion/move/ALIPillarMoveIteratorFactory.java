@@ -1,8 +1,6 @@
 package com.kairos.shiftplanningNewVersion.move;
 
 import com.kairos.commons.utils.DateTimeInterval;
-
-
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.kairos.shiftplanningNewVersion.entity.ALI;
 import com.kairos.shiftplanningNewVersion.entity.Shift;
