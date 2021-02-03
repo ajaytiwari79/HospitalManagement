@@ -7,7 +7,6 @@ package com.kairos.service.glide_time;
 import com.kairos.dto.activity.glide_time.GlideTimeSettingsDTO;
 import com.kairos.persistence.model.flexible_time.GlideTimeSettings;
 import com.kairos.persistence.repository.glide_time.GlideTimeSettingsRepository;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,7 @@ import javax.inject.Inject;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
-public class GlideTimeSettingsService extends MongoBaseService {
+public class GlideTimeSettingsService {
 
 
     @Inject
@@ -28,7 +27,7 @@ public class GlideTimeSettingsService extends MongoBaseService {
         validateGlideTime(glideTimeSettingsDTO);
         GlideTimeSettings glideTimeSettings = new GlideTimeSettings(glideTimeSettingsDTO.getId(), glideTimeSettingsDTO.getGlideTimeForCheckIn(), glideTimeSettingsDTO.getGlideTimeForCheckOut(), glideTimeSettingsDTO.getTimeLimit());
         glideTimeSettings.setCountryId(countryId);
-        save(glideTimeSettings);
+        glideTimeSettingsRepository.save(glideTimeSettings);
         glideTimeSettingsDTO.setId(glideTimeSettings.getId());
         return glideTimeSettingsDTO;
     }

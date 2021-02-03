@@ -14,7 +14,6 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.todo.TodoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.reason_code.ReasonCodeService;
@@ -39,7 +38,7 @@ import static com.kairos.enums.shift.ShiftType.SICK;
  **/
 @Service
 @Transactional
-public class ShiftDetailsService extends MongoBaseService {
+public class ShiftDetailsService {
 
     @Inject
     private ShiftMongoRepository shiftMongoRepository;

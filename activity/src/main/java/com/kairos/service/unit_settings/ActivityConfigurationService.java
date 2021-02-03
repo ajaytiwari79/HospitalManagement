@@ -15,8 +15,6 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDT
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.TimeTypes;
-import com.kairos.enums.solver_config.PlanningType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
@@ -28,7 +26,6 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
@@ -55,7 +52,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toMap;
 
 @Service
-public class ActivityConfigurationService extends MongoBaseService {
+public class ActivityConfigurationService {
 
     @Inject
     private ActivityConfigurationRepository activityConfigurationRepository;

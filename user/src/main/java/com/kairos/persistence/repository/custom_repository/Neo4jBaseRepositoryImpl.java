@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.custom_repository;
 
 import com.kairos.annotations.KPermissionRelatedModel;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.rest_client.TomTomRestClient;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.session.Session;
 import org.slf4j.Logger;

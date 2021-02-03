@@ -4,7 +4,6 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.activity.shift.FunctionsWithUserAccessRoleDTO;
-import com.kairos.dto.user.TranslationDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.country.Country;

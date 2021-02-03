@@ -1,7 +1,6 @@
 package com.kairos.shiftplanning.utils;
 
 import com.kairos.commons.custom_exception.ActionNotPermittedException;
-import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;

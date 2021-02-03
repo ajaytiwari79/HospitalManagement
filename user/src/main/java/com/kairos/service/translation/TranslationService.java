@@ -2,7 +2,6 @@ package com.kairos.service.translation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.TranslationInfo;
-import com.kairos.persistence.repository.custom_repository.CommonRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;

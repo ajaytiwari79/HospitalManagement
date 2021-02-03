@@ -36,7 +36,6 @@ import java.util.stream.Stream;
 
 import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.DateUtils.getCurrentLocalTime;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 
 @Service
 public class DayTypeService {

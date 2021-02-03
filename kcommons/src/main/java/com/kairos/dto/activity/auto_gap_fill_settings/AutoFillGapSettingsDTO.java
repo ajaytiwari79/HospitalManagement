@@ -2,8 +2,8 @@ package com.kairos.dto.activity.auto_gap_fill_settings;
 
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.enums.auto_gap_fill_settings.AutoGapFillingScenario;
 import com.kairos.enums.auto_gap_fill_settings.AutoFillGapSettingsRule;
+import com.kairos.enums.auto_gap_fill_settings.AutoGapFillingScenario;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

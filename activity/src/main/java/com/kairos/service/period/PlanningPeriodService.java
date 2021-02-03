@@ -50,13 +50,11 @@ import com.kairos.rest_client.GenericRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.service.shift.ShiftStateService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.wrapper.phase.PhaseActivityDTO;
@@ -91,7 +89,7 @@ import static com.kairos.constants.AppConstants.PLANNING_PERIOD_NAME;
  */
 @Service
 @Transactional
-public class PlanningPeriodService extends MongoBaseService {
+public class PlanningPeriodService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlanningPeriodService.class);
     public static final String SCHEDULER_PANEL = "/scheduler_panel";
 
@@ -506,7 +504,7 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         planningPeriod = updatePhaseFlippingDateOfPeriod(planningPeriod, planningPeriodDTO, unitId);
         planningPeriod.setName(planningPeriodDTO.getName());
-        save(planningPeriod);
+        planningPeriodMongoRepository.save(planningPeriod);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate());
     }
 
@@ -541,7 +539,7 @@ public class PlanningPeriodService extends MongoBaseService {
             LOGGER.error("ex {}" , ex);
         }
         planningPeriod.setDeleted(true);
-        save(planningPeriod);
+        planningPeriodMongoRepository.save(planningPeriod);
         return true;
     }
 
@@ -686,7 +684,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 }
                 shiftStates.add(shiftState);
             });
-            save(shiftStates);
+            shiftStateMongoRepository.saveEntities(shiftStates);
         }
     }
 

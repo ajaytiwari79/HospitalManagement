@@ -56,7 +56,6 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_WTA_NOTFOUND;
-import static com.kairos.constants.AppConstants.TIME_AND_ATTENDANCE;
 import static com.kairos.enums.shift.ShiftEscalationReason.WORK_TIME_AGREEMENT;
 import static com.kairos.enums.wta.MinMaxSetting.MINIMUM;
 import static com.kairos.utils.CPRUtil.getAgeByCPRNumberAndStartDate;

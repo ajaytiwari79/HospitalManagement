@@ -1,6 +1,5 @@
 package com.kairos.rule_validator.activity;
 
-import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftActivityIdsDTO;

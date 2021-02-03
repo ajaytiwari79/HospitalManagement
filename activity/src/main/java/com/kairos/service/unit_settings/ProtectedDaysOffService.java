@@ -13,7 +13,6 @@ import com.kairos.persistence.repository.protected_day_off.ProtectedDaysOffRepos
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ProtectedDaysOffSettingsRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.day_type.CountryHolidayCalenderService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,7 @@ import java.util.Set;
  * Created By G.P.Ranjan on 1/7/19
  **/
 @Service
-public class ProtectedDaysOffService extends MongoBaseService {
+public class ProtectedDaysOffService {
     @Inject
     private ProtectedDaysOffSettingsRepository protectedDaysOffSettingsRepository;
     @Inject
