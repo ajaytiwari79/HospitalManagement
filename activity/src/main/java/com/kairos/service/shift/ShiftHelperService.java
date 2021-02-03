@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 @Service
 public class ShiftHelperService {

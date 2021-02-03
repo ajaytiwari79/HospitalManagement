@@ -17,12 +17,13 @@ import com.kairos.persistence.model.shift.ShiftDataHelper;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.wrapper.phase.PhaseActivityDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.function.Function;
@@ -50,7 +50,7 @@ import static com.kairos.enums.phase.PhaseType.ACTUAL;
  */
 @Service
 @Transactional
-public class PhaseService extends MongoBaseService {
+public class PhaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhaseService.class);
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
@@ -63,7 +63,7 @@ public class PhaseService extends MongoBaseService {
     @Inject private ActivityConfigurationService activityConfigurationService;
 
 
-
+    @CacheEvict(value = "getPhasesByUnit", key = "#unitId")
     public List<Phase> createDefaultPhase(Long unitId, Long countryId) {
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         if(isCollectionEmpty(phases)) {
@@ -90,6 +90,7 @@ public class PhaseService extends MongoBaseService {
     }
 
 
+    @Cacheable(value = "getPhasesByUnit", key = "#unitId", cacheManager = "cacheManager")
     public List<PhaseDTO> getPhasesByUnit(Long unitId) {
         return phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.DESC);
     }
@@ -102,13 +103,14 @@ public class PhaseService extends MongoBaseService {
         return phasesData;
     }
 
+    @CacheEvict(value = "getPhasesByUnit", allEntries = true)
     public boolean removePhase(BigInteger phaseId) {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (phase == null) {
             return false;
         }
         phase.setDeleted(true);
-        save(phase);
+        phaseMongoRepository.save(phase);
 
         return true;
     }
@@ -122,7 +124,7 @@ public class PhaseService extends MongoBaseService {
         }
         Phase phase = buildPhaseForCountry(phaseDTO);
         phase.setCountryId(countryId);
-        save(phase);
+        phaseMongoRepository.save(phase);
         return phase;
     }
 
@@ -155,7 +157,7 @@ public class PhaseService extends MongoBaseService {
         return phaseMongoRepository.getActualPhasesByUnit(orgId);
         }
 
-
+    @CacheEvict(value = "getPhasesByUnit", allEntries = true)
     public boolean deletePhase(Long countryId, BigInteger phaseId) {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
@@ -163,7 +165,7 @@ public class PhaseService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_PHASE_NOTFOUND, phaseId);
         }
         phase.setDeleted(true);
-        save(phase);
+        phaseMongoRepository.save(phase);
         return true;
     }
 
@@ -189,7 +191,7 @@ public class PhaseService extends MongoBaseService {
             prepareActualPhase(phase,phaseDTO);
         }
         phase.setStatus(ShiftStatus.getListByValue(phaseDTO.getStatus()));
-        save(phase);
+        phaseMongoRepository.save(phase);
         return phase;
     }
 
@@ -219,7 +221,7 @@ public class PhaseService extends MongoBaseService {
    }
 
 
-
+    @CacheEvict(value = "getPhasesByUnit", key = "#unitId")
     public PhaseDTO updatePhase(BigInteger phaseId, Long unitId, PhaseDTO phaseDTO) {
         phaseDTO.setOrganizationId(unitId);
         Phase oldPhase = phaseMongoRepository.findOne(phaseId);
@@ -236,7 +238,7 @@ public class PhaseService extends MongoBaseService {
         if(ACTUAL.equals(oldPhase.getPhaseType())){
             prepareActualPhase(oldPhase,phaseDTO);
         }
-        save(oldPhase);
+        phaseMongoRepository.save(oldPhase);
         return phaseDTO;
     }
 
@@ -452,7 +454,7 @@ public class PhaseService extends MongoBaseService {
     public Phase getPhaseByName(final Long unitId,final String name){
         return phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId,name);
     }
-
+    @CacheEvict(value = "getPhasesByUnit", allEntries = true)
     public Map<String, TranslationInfo>  updateTranslations(BigInteger phaseId,Map<String, TranslationInfo> translations){
         Phase phase = phaseMongoRepository.findOne(phaseId);
         phase.setTranslations(translations);

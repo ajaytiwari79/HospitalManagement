@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface TimeSlotRepository extends MongoBaseRepository<TimeSlotSet, BigInteger>,CustomTimeSlotMongoRepository {
+public interface TimeSlotMongoRepository extends MongoBaseRepository<TimeSlotSet, BigInteger>,CustomTimeSlotMongoRepository {
 
     List<TimeSlotSetDTO> getByUnitIdAndTimeSlotMode(@NotNull Long unitId, @NotNull TimeSlotMode timeSlotMode);
 

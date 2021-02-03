@@ -1,10 +1,8 @@
 package com.kairos.shiftplanningNewVersion.entity;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
-import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.staff.*;
 import com.kairos.shiftplanning.domain.tag.Tag;

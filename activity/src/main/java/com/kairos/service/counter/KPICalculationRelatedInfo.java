@@ -48,16 +48,13 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyCollectionPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.dto.activity.counter.enums.XAxisConfig.HOURS;
 import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.kpi.CalculationType.*;
-import static com.kairos.enums.kpi.CalculationType.STAFFING_LEVEL_CAPACITY;
-import static com.kairos.enums.wta.WTATemplateType.*;
 import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
-import static com.kairos.enums.wta.WTATemplateType.WTA_FOR_CARE_DAYS;
+import static com.kairos.enums.wta.WTATemplateType.*;
+import static com.kairos.utils.counter.KPIUtils.getBigIntegerSet;
 import static com.kairos.utils.counter.KPIUtils.*;
-import static com.kairos.utils.counter.KPIUtils.getStringByList;
 
 @Getter
 @Setter

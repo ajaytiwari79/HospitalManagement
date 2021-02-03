@@ -66,13 +66,13 @@ public class SickService {
         return userSickDataWrapper;
     }
 
-    public Map<String, Object> markUserAsFine(Long staffId, Long unitId, LocalDate startDate) {
+    public Map<String, Object> markUserAsFine(Long staffId, Long unitId, LocalDate startDate, BigInteger activityId) {
         Map<String, Object> response = new HashMap<>();
         if (isNull(unitId) || isNull(staffId)) {
             exceptionService.actionNotPermittedException(ERROR_EMPTY_STAFF_OR_UNIT_SETTING);
         }
         Date endDate = DateUtils.getEndOfDay(DateUtils.plusDays(asDate(startDate),21));
-        shiftSickService.disableSicknessShiftsOfStaff(staffId, unitId,startDate);
+        shiftSickService.disableSicknessShiftsOfStaff(staffId, unitId,startDate,activityId);
         List<ShiftDTO> threeWeeksShift =shiftMongoRepository.findAllShiftsByStaffIdsAndDateAndUnitId(staffId,asDate(startDate),endDate,unitId);
         sickSettingsRepository.markUserAsFine(staffId, unitId);  //set end date of user sick table.
         response.put("unitId", unitId);

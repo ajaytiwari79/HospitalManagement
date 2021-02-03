@@ -6,11 +6,14 @@ import lombok.NoArgsConstructor;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public enum AutoFillGapSettingsRule {
+public enum AutoFillGapSettingsRule implements Serializable {
     RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1("Check if either side of the activity falls in main team. If it is, fill the gap with that activity."),
     /* Changed */RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2("Fill with main team assigned to the staff in subject. But if main team causes gap, fill with highest secondary team assigned to the staff (even if it is not planned in the shift, causing problems, or breaking continuity)"),
     RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE3("Fill the gap with the activity of secondary teams with the highest rank planned in the same shift."),

@@ -8,6 +8,7 @@ import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivityWithDuration;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.auto_gap_fill_settings.AutoFillGapSettingsRule;
@@ -21,13 +22,13 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.gap_settings.AutoFillGapSettingsMongoRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.redis.RedisService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,7 @@ public class AutoFillGapSettingsService {
     private ShiftValidatorService staffingLevelService;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private RedisService redisService;
 
     public AutoFillGapSettingsDTO createAutoFillGapSettings(AutoFillGapSettingsDTO autoFillGapSettingsDTO, boolean forCountry) {
         AutoFillGapSettings autoFillGapSettings = ObjectMapperUtils.copyPropertiesByMapper(autoFillGapSettingsDTO, AutoFillGapSettings.class);
@@ -55,6 +57,7 @@ public class AutoFillGapSettingsService {
         }
         autoFillGapSettingsMongoRepository.save(autoFillGapSettings);
         autoFillGapSettingsDTO.setId(autoFillGapSettings.getId());
+        resetCacheData(autoFillGapSettings);
         return autoFillGapSettingsDTO;
     }
 
@@ -79,6 +82,7 @@ public class AutoFillGapSettingsService {
             }
         }
         autoFillGapSettingsMongoRepository.save(autoFillGapSettings);
+        resetCacheData(autoFillGapSettings);
         return autoFillGapSettingsDTO;
     }
 
@@ -113,9 +117,9 @@ public class AutoFillGapSettingsService {
     public List<AutoFillGapSettingsDTO> getAllAutoFillGapSettings(Long countryOrUnitId, boolean forCountry) {
         List<AutoFillGapSettingsDTO> autoFillGapSettingsList;
         if (forCountry) {
-            autoFillGapSettingsList = autoFillGapSettingsMongoRepository.getAllByCountryId(countryOrUnitId);
+            autoFillGapSettingsList = autoFillGapSettingsMongoRepository.getAllAutoFillGapSettingsByCountryId(countryOrUnitId);
         } else {
-            autoFillGapSettingsList = autoFillGapSettingsMongoRepository.getAllByUnitId(countryOrUnitId);
+            autoFillGapSettingsList = autoFillGapSettingsMongoRepository.getAllAutoFillGapSettingsByUnitId(countryOrUnitId);
         }
         return autoFillGapSettingsList;
     }
@@ -127,11 +131,27 @@ public class AutoFillGapSettingsService {
         }
         autoFillGapSettings.setDeleted(true);
         autoFillGapSettingsMongoRepository.save(autoFillGapSettings);
+        resetCacheData(autoFillGapSettings);
         return true;
     }
 
+
+    public void createDefaultAutoFillGapSettings(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, List<Phase> phases){
+        List<AutoFillGapSettings> autoFillGapSettings = autoFillGapSettingsMongoRepository.getAllDefautAutoFillSettings(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
+        Map<BigInteger,BigInteger> countryPhaseIdAndUnitPhaseIdMap = phases.stream().collect(Collectors.toMap(Phase::getParentCountryPhaseId, Phase::getId));
+        if(isCollectionNotEmpty(autoFillGapSettings)){
+            autoFillGapSettings.forEach(autoFillGapSetting -> {
+                autoFillGapSetting.setId(null);
+                autoFillGapSetting.setCountryId(null);
+                autoFillGapSetting.setUnitId(unitId);
+                autoFillGapSetting.setPhaseId(countryPhaseIdAndUnitPhaseIdMap.get(autoFillGapSetting.getPhaseId()));
+            });
+            autoFillGapSettingsMongoRepository.saveEntities(autoFillGapSettings);
+        }
+    }
+
     public boolean adjustGapByActivity(ShiftDTO shiftDTO, Shift shift, Phase phase, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        boolean skipRules=false;
+        boolean skipRules = false;
         if (gapCreated(shiftDTO, shift)) {
             adjustTiming(shiftDTO, shift);
             ShiftActivityDTO[] activities = getActivitiesAroundGap(shiftDTO, shift);
@@ -257,7 +277,7 @@ public class AutoFillGapSettingsService {
     }
 
     private boolean gapCreated(ShiftDTO shiftDTO, Shift shift) {
-        return shift.getActivities().size() > shiftDTO.getActivities().size() && shift.getStartDate().equals(shiftDTO.getStartDate()) && shift.getEndDate().equals(shiftDTO.getEndDate()) && shift.getActivities().get(0).getActivityId().equals(shiftDTO.getActivities().get(0).getActivityId()) && shift.getActivities().get(shift.getActivities().size()-1).getActivityId().equals(shiftDTO.getActivities().get(shift.getActivities().size()-1).getActivityId());
+        return shift.getActivities().size() > shiftDTO.getActivities().size() && shift.getStartDate().equals(shiftDTO.getStartDate()) && shift.getEndDate().equals(shiftDTO.getEndDate()) && shift.getActivities().get(0).getActivityId().equals(shiftDTO.getActivities().get(0).getActivityId()) && shift.getActivities().get(shift.getActivities().size()-1).getActivityId().equals(shiftDTO.getActivities().get(shiftDTO.getActivities().size()-1).getActivityId());
     }
 
     private ShiftActivityDTO[] getActivitiesAroundGap(ShiftDTO shiftDTO, Shift shift) {
@@ -464,5 +484,12 @@ public class AutoFillGapSettingsService {
         return temp;
     }
 
+    private void resetCacheData(AutoFillGapSettings autoFillGapSettings){
+        if(isNotNull(autoFillGapSettings.getCountryId())){
+            redisService.removeKeyFromCache(newHashSet("getAllAutoFillGapSettingsByCountryId::"+autoFillGapSettings.getCountryId()));
+        }else if(isNotNull(autoFillGapSettings.getUnitId())){
+            redisService.removeKeyFromCache(newHashSet("getAllAutoFillGapSettingsByUnitId::"+autoFillGapSettings.getUnitId()));
+        }
+    }
 
 }

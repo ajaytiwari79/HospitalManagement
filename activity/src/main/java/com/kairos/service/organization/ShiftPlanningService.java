@@ -13,6 +13,7 @@ import com.kairos.enums.shift.ShiftFilterDurationType;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.wrapper.shift.StaffShiftDetailsDTO;
 import org.apache.commons.collections.CollectionUtils;
@@ -43,6 +44,7 @@ public class ShiftPlanningService {
 
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
+    @Inject private NightWorkerService nightWorkerService;
 
 
     public <T> List<StaffShiftDetailsDTO> getShiftPlanningDetailsForUnit(final Long unitId, final ShiftSearchDTO shiftSearchDTO, boolean showAllStaffs) {
@@ -96,7 +98,6 @@ public class ShiftPlanningService {
          Object[] validFilterObjectsAndExistShiftFilter = FilterUtils.filterOutEmptyQueriesAndPrepareMap(shiftSearchDTO);
         Map<FilterType, Set<T>> validFilterMap = (Map<FilterType, Set<T>>)validFilterObjectsAndExistShiftFilter[0];
          boolean anyShiftFilterExists = (boolean)validFilterObjectsAndExistShiftFilter[1];
-        LOGGER.debug(" shift filters present are {}", anyShiftFilterExists);
         FilteredStaffsAndRequiredDataFilterDTO filteredStaffsAndRequiredDataFilterDTO = getAllStaffEligibleForPlanning(unitId, shiftSearchDTO,showAllStaffs);
         List<StaffShiftDetailsDTO> staffListWithPersonalDetails = filteredStaffsAndRequiredDataFilterDTO.getStaffShiftDetailsDTOS();
         if (CollectionUtils.isEmpty(staffListWithPersonalDetails)) {
@@ -120,6 +121,7 @@ public class ShiftPlanningService {
         if(loggedInStaff.isPresent() && staffListWithPersonalDetails.stream().noneMatch(k->k.getUserId().equals(shiftSearchDTO.getLoggedInUserId()))){
             staffListWithPersonalDetails.add(0,loggedInStaff.get());
         }
+        setNightWorkerDetails(staffListWithPersonalDetails);
         return staffListWithPersonalDetails;//getStaffListAfterShiftFilterMatches(staffListWithPersonalDetails, shiftWithActivityDTOS, shiftSearchDTO.getLoggedInUserId(),shiftSearchDTO,anyShiftFilterExists);
     }
 
@@ -289,6 +291,11 @@ public class ShiftPlanningService {
             }
         }
         return staffShiftDetailsDTOS;
+    }
+
+    private void setNightWorkerDetails(List<StaffShiftDetailsDTO> staffListWithPersonalDetails){
+        Map<Long, Boolean> notNightWorkerMap = nightWorkerService.getStaffIdAndNightWorkerMap(staffListWithPersonalDetails.stream().map(StaffShiftDetailsDTO::getId).collect(Collectors.toSet()));
+        staffListWithPersonalDetails.forEach(k-> k.getEmployments().get(0).setNightWorker(!notNightWorkerMap.containsKey(k.getId())));
     }
 
 

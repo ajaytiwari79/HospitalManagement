@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.night_worker;
 
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;

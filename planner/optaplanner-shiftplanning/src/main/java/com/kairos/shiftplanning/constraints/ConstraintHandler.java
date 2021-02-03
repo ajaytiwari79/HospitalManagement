@@ -7,8 +7,6 @@ import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanningNewVersion.entity.Shift;
 import org.kie.api.runtime.rule.RuleContext;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 

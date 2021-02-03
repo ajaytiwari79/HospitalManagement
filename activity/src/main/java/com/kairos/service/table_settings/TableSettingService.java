@@ -4,7 +4,6 @@ import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.table_settings.TableSetting;
 import com.kairos.persistence.repository.table_settings.TableSettingMongoRepository;
-import com.kairos.service.MongoBaseService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +23,7 @@ import static com.kairos.persistence.model.constants.TableSettingConstants.ORGAN
  */
 @Transactional
 @Service
-public class TableSettingService extends MongoBaseService {
+public class TableSettingService {
 
     @Inject
     private TableSettingMongoRepository tableSettingMongoRepository;
@@ -60,7 +59,7 @@ public class TableSettingService extends MongoBaseService {
                 tableConfiguration.setSettings(tableConf);
             }
         }
-        save(tableSetting);
+        tableSettingMongoRepository.save(tableSetting);
         return tableConfiguration;
 
     }

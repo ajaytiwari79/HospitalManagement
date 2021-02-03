@@ -6,7 +6,6 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.staff.StaffEmploymentQueryResult;
 import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
-import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffEmploymentWithTag;
 
 import java.time.LocalDate;

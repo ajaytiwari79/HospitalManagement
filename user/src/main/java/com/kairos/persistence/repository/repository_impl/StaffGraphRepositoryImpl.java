@@ -10,7 +10,6 @@
  import com.kairos.enums.ModuleId;
  import com.kairos.persistence.model.staff.StaffEmploymentQueryResult;
  import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
- import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
  import com.kairos.persistence.model.staff.personal_details.StaffEmploymentWithTag;
  import com.kairos.persistence.repository.user.staff.CustomStaffGraphRepository;
  import org.apache.commons.collections.CollectionUtils;
@@ -19,7 +18,6 @@
  import org.neo4j.ogm.session.Session;
  import org.slf4j.Logger;
  import org.slf4j.LoggerFactory;
- import org.springframework.data.neo4j.annotation.Query;
  import org.springframework.stereotype.Repository;
 
  import javax.inject.Inject;

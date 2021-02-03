@@ -7,19 +7,20 @@ import com.kairos.dto.activity.unit_settings.PhaseSettingsDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.phase.PhaseService;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class PhaseSettingsService extends MongoBaseService {
+public class PhaseSettingsService {
     @Inject private PhaseSettingsRepository phaseSettingsRepository;
     @Inject private PhaseService phaseService;
     public List<PhaseSettingsDTO> getPhaseSettings(Long unitId){
@@ -36,7 +37,7 @@ public class PhaseSettingsService extends MongoBaseService {
             phaseSettingsDTO.setUnitId(unitId);
         });
         List<PhaseSettings> phaseSettings = ObjectMapperUtils.copyCollectionPropertiesByMapper(phaseSettingsDTOS,PhaseSettings.class);
-        save(phaseSettings);
+        phaseSettingsRepository.saveEntities(phaseSettings);
         return phaseSettingsDTOS;
     }
 

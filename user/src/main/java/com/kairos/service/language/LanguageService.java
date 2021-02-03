@@ -1,8 +1,6 @@
 package com.kairos.service.language;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.TranslationUtil;
-import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.user.country.LanguageDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.language.Language;
@@ -17,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

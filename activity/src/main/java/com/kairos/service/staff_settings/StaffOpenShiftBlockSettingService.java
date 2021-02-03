@@ -8,7 +8,6 @@ import com.kairos.dto.user.staff.staff.StaffPreferencesDTO;
 import com.kairos.persistence.model.staff_settings.StaffOpenShiftBlockSetting;
 import com.kairos.persistence.repository.staff_settings.StaffOpenShiftBlockSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,7 @@ import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_NO_BLOCK_
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
 
 @Service
-public class StaffOpenShiftBlockSettingService extends MongoBaseService {
+public class StaffOpenShiftBlockSettingService {
 
     @Inject
     private UserIntegrationService userIntegrationService;
@@ -44,7 +43,7 @@ public class StaffOpenShiftBlockSettingService extends MongoBaseService {
             default:
                 exceptionService.actionNotPermittedException(EXCEPTION_NO_BLOCK_TYPE_FOUND);
         }
-        save(staffOpenShiftBlockSetting);
+        staffOpenShiftBlockSettingRepository.save(staffOpenShiftBlockSetting);
         return true;
     }
 }

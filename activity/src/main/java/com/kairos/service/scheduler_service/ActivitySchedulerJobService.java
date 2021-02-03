@@ -15,7 +15,6 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.SchedulerServiceRestClient;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.shift.ShiftReminderService;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -38,7 +37,7 @@ import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.service.period.PlanningPeriodService.SCHEDULER_PANEL;
 
 @Service
-public class ActivitySchedulerJobService extends MongoBaseService {
+public class ActivitySchedulerJobService {
 
     @Inject private SchedulerServiceRestClient schedulerRestClient;
     @Inject private ShiftReminderService shiftReminderService;

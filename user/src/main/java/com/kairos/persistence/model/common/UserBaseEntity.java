@@ -6,7 +6,6 @@ import com.kairos.dto.TranslationInfo;
 import lombok.Getter;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.GraphId;
-import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.Properties;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.annotation.CreatedBy;
@@ -16,7 +15,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,6 +27,7 @@ import java.util.Map;
 @Setter
 public abstract class UserBaseEntity  implements Serializable {
 
+    private static final long serialVersionUID = 8338404773846966110L;
     //@GeneratedValue
     @GraphId
     protected Long id;
@@ -48,17 +47,7 @@ public abstract class UserBaseEntity  implements Serializable {
     protected Long lastModifiedBy;
     @Properties
     protected Map<String,String> translatedNames;
-    @Properties
-    protected Map<String,String> translatedDescriptions;
     @Convert(TranslationConverter.class)
     protected Map<String, TranslationInfo> translations;
 
-
-
-    @JsonIgnore
-    public Map<String, TranslationInfo> getTranslatedData() {
-        Map<String, TranslationInfo> infoMap=new HashMap<>();
-        translatedNames.forEach((k,v)-> infoMap.put(k,new TranslationInfo(v,translatedDescriptions.get(k))));
-        return infoMap;
-    }
 }
