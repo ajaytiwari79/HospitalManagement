@@ -450,6 +450,7 @@ public class StaffingLevelService {
                 getStaffingLevelPerDate(unitId, startDate, presenceStaffingLevelMap, absenceStaffingLevelMap, staffingLevelMap.get(startDate), fieldPermissionMap);
             }else {
                 StaffingLevel staffingLevel = createDefaultStaffingLevel(unitId, asDate(startDate));
+                staffingLevelMongoRepository.save(staffingLevel);
                 getStaffingLevelPerDate(unitId,startDate,presenceStaffingLevelMap,absenceStaffingLevelMap,staffingLevel,null);
             }
             startDate = startDate.plusDays(1);
