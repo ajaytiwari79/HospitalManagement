@@ -446,7 +446,13 @@ public class StaffingLevelService {
         Map<LocalDate,StaffingLevel> staffingLevelMap = staffingLevelMongoRepository.findByUnitIdAndDates(unitId,asDate(startDate),asDate(endDate)).stream().collect(Collectors.toMap(k->asLocalDate(k.getCurrentDate()),v->v));
         Map<String,Set<FieldLevelPermission>> fieldPermissionMap=activityService.getActivityPermissionMap(unitId,UserContext.getUserDetails().getId());
         while (!startDate.isAfter(endDate)) {
-            getStaffingLevelPerDate(unitId, startDate, presenceStaffingLevelMap, absenceStaffingLevelMap,staffingLevelMap.get(startDate),fieldPermissionMap);
+            if(staffingLevelMap.containsKey(startDate)) {
+                getStaffingLevelPerDate(unitId, startDate, presenceStaffingLevelMap, absenceStaffingLevelMap, staffingLevelMap.get(startDate), fieldPermissionMap);
+            }else {
+                StaffingLevel staffingLevel = createDefaultStaffingLevel(unitId, asDate(startDate));
+                staffingLevelMongoRepository.save(staffingLevel);
+                getStaffingLevelPerDate(unitId,startDate,presenceStaffingLevelMap,absenceStaffingLevelMap,staffingLevel,null);
+            }
             startDate = startDate.plusDays(1);
         }
         return new StaffingLevelDto(presenceStaffingLevelMap, absenceStaffingLevelMap);
