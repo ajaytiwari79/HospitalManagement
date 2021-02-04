@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
@@ -23,6 +24,7 @@ public class PresenceStaffingLevelDto {
     private BigInteger id;
     private BigInteger phaseId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @NotNull(message = "message.staffingLevel.currentDate.not.exists")
     private Date currentDate;
     private Integer weekCount;
     private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
