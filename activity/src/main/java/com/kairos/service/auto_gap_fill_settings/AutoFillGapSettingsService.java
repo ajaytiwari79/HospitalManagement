@@ -406,6 +406,7 @@ public class AutoFillGapSettingsService {
                     } else {
                         exceptionService.actionNotPermittedException(HIGHEST_RANK_ACTIVITY_ABSENT);
                     }
+                    break;
                 case RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REAL_TIME_PHASE1:
                     activityId = activityList.stream().sorted(Comparator.comparing(k -> k.getActivityPriority().getSequence())).collect(Collectors.toList()).get(0).getActivity().getId();
                     return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
