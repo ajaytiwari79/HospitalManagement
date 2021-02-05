@@ -277,11 +277,11 @@ public class ShiftValidatorService {
                 validateStaffingLevel(phase, mainShift, activityWrapperMap, true, shiftActivity, ruleTemplateSpecificInfo,  staffingLevelActivityWithDurationMap,false);
             }
             //verifyStaffingLevel(ruleTemplateSpecificInfo,staffingLevelActivityWithDurationMap,phaseSettings.getMaxProblemAllowed());
-            //Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMapForUnderStaffing = new HashMap<>();
+            Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMapForUnderStaffing = new HashMap<>();
             for (ShiftActivity shiftActivity : shiftActivities[0]) {
-                validateStaffingLevel(phase, mainShift, activityWrapperMap, false, shiftActivity, ruleTemplateSpecificInfo, staffingLevelActivityWithDurationMap,false);
+                validateStaffingLevel(phase, mainShift, activityWrapperMap, false, shiftActivity, ruleTemplateSpecificInfo, staffingLevelActivityWithDurationMapForUnderStaffing,false);
             }
-            verifyStaffingLevel(ruleTemplateSpecificInfo,staffingLevelActivityWithDurationMap,byUpdate?phaseSettings.getMaxProblemAllowed():null,mainShift,oldShift,activityWrapperMap);
+            verifyStaffingLevel(ruleTemplateSpecificInfo,staffingLevelActivityWithDurationMap,staffingLevelActivityWithDurationMapForUnderStaffing,byUpdate?phaseSettings.getMaxProblemAllowed():null,mainShift,oldShift,activityWrapperMap);
 
         }
     }
@@ -320,7 +320,7 @@ public class ShiftValidatorService {
             for (ShiftActivity shiftActivity : shiftActivities[0]) {
                 validateStaffingLevel(phase, shift, activityWrapperMap, false, shiftActivity, ruleTemplateSpecificInfo, staffingLevelActivityWithDurationMap,false);
             }
-            verifyStaffingLevel(ruleTemplateSpecificInfo,staffingLevelActivityWithDurationMap, null, shift, shift, activityWrapperMap);
+            verifyStaffingLevel(ruleTemplateSpecificInfo, staffingLevelActivityWithDurationMap, staffingLevelActivityWithDurationMap, null, shift, shift, activityWrapperMap);
             Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaBaseRuleTemplates);
             wtaRulesSpecification.validateRules(shiftWithActivityDTO,RuleExecutionType.SHIFT_DELETE);
             violatedRulesDTO = ruleTemplateSpecificInfo.getViolatedRules();
@@ -756,24 +756,7 @@ public class ShiftValidatorService {
     }
 
 
-    public List<ShiftActivityDTO> findShiftActivityToValidateStaffingLevel(List<ShiftActivity> existingShiftActivities, List<ShiftActivityDTO> arrivedShiftActivities) {
-        List<ShiftActivityDTO> shiftActivities = new ArrayList<>();
-        try {
-            for (int i = 0; i < arrivedShiftActivities.size(); i++) {
-                ShiftActivityDTO currentShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(arrivedShiftActivities.get(i), ShiftActivityDTO.class);
-                ShiftActivityDTO existingShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(existingShiftActivities.get(i), ShiftActivityDTO.class);
-                if (!currentShiftActivity.getActivityId().equals(existingShiftActivity.getActivityId())) {
-                    currentShiftActivity.setStartDate(existingShiftActivity.getStartDate());
-                    shiftActivities.add(existingShiftActivity);
-                    shiftActivities.add(currentShiftActivity);
-                    break;
-                }
-            }
-        } catch (IndexOutOfBoundsException e) {
-            //Intentionally left blank to avoid ArrayIndexOutOfBoundsException
-        }
-        return shiftActivities;
-    }
+
 
     public List<ShiftWithViolatedInfoDTO> validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId) {
         BigInteger shiftStateId = shiftDTO.getId();
@@ -1061,7 +1044,7 @@ public class ShiftValidatorService {
         return validateRuleOnShiftDelete(activityWrapperMap, shift, staffAdditionalInfoDTO);
     }
 
-    public void verifyStaffingLevel(RuleTemplateSpecificInfo ruleTemplateSpecificInfo, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, Short allowedMaxOverStaffing, Shift mainShift, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+    public void verifyStaffingLevel(RuleTemplateSpecificInfo ruleTemplateSpecificInfo, Map<BigInteger, StaffingLevelActivityWithDuration> underStaffingLevelActivityWithDurationMap, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, Short allowedMaxOverStaffing, Shift mainShift, Shift oldShift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         int totalStaffingLevelResolve = staffingLevelActivityWithDurationMap.values().stream().mapToInt(StaffingLevelActivityWithDuration::getResolvingUnderOrOverStaffingDurationInMinutes).sum();
         int totalUnderStaffingCreated = staffingLevelActivityWithDurationMap.values().stream().mapToInt(StaffingLevelActivityWithDuration::getUnderStaffingDurationInMinutes).sum();
         int totalOverStaffingCreated = staffingLevelActivityWithDurationMap.values().stream().mapToInt(StaffingLevelActivityWithDuration::getOverStaffingDurationInMinutes).sum();

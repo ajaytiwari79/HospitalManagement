@@ -27,8 +27,8 @@ import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.redis.RedisService;
 import com.kairos.service.shift.ShiftValidatorService;
-import com.kairos.service.unit_settings.PhaseSettingsService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -353,7 +353,9 @@ public class AutoFillGapSettingsService {
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE1:
                     if (mainTeamActivityId != null && staffingLevelActivityWithDurationMap.getOrDefault(mainTeamActivityId, new StaffingLevelActivityWithDuration()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0) {
                         ShiftActivityDTO s= new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeamActivityId, null);
-                        if(needToCheckOverStaffing)
+                        if(needToCheckOverStaffing && needToCheckUnderStaffing){
+
+                        }
                     } else {
                         exceptionService.actionNotPermittedException(MAIN_TEAM_ABSENT);
                     }

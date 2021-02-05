@@ -20,6 +20,7 @@ import com.kairos.persistence.repository.user.country.functions.FunctionGraphRep
 import com.kairos.persistence.repository.user.employment.EmploymentFunctionRelationshipRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffRetrievalService;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +56,8 @@ public class FunctionService {
 
     private int test=0;
     private static int staticTest=0;
+    private final ThreadLocal<Integer> integerThreadLocal=new ThreadLocal<>();
+
 
 
 
@@ -250,6 +253,8 @@ public class FunctionService {
         staticTest+=1;
         System.out.println("Test is " + test);
         System.out.println("static Test is " + staticTest);
+        integerThreadLocal.set(integerThreadLocal.get()+1);
+        System.out.println("integerThreadLocal is " + integerThreadLocal.get());
         Function function = functionGraphRepository.findOne(functionId);
         return function.getTranslations();
     }
