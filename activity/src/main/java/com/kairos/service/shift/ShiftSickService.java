@@ -32,6 +32,7 @@ import com.kairos.service.activity.ActivityService;
 import com.kairos.service.dashboard.SickService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.slf4j.Logger;
@@ -89,7 +90,7 @@ public class ShiftSickService {
     @Inject
     private AbsenceShiftService absenceShiftService;
     @Inject
-    private ActivityService activityService;
+    private OrganizationActivityService organizationActivityService;
     @Inject
     private ShiftDetailsService shiftDetailsService;
     @Inject
@@ -120,7 +121,7 @@ public class ShiftSickService {
         int shiftAddedForNumberOfDays = 0;
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
         if (PhaseDefaultName.REALTIME.equals(phase.getPhaseEnum()) && isNotNull(realTimeShift)) {
-            Map<BigInteger, ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(Arrays.asList(realTimeShift), shiftDTO);
+            Map<BigInteger, ActivityWrapper> activityWrapperMap = organizationActivityService.getActivityWrapperMap(Arrays.asList(realTimeShift), shiftDTO);
             replaceWithSick(realTimeShift, activityWrapperMap.get(shiftDTO.getActivities().get(0).getActivityId()), currentDate);
             List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoList = shiftService.updateShift(ObjectMapperUtils.copyPropertiesByMapper(realTimeShift, ShiftDTO.class), false, false, ShiftActionType.SAVE);
             shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoList.get(0));

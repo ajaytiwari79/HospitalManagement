@@ -883,6 +883,9 @@ public class AccessGroupService {
         List<AccessGroup> accessGroups = new ArrayList<>();
         if(!UserContext.getUserDetails().isSystemAdmin()){
             AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
+            if(isNull(accessGroupStaffQueryResult)){
+                exceptionService.dataNotFoundByIdException(ERROR_POSITION_ACCESSGROUP_NOTFOUND);
+            }
             List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyCollectionPropertiesByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
             Map<Long,Set<BigInteger>> accessGroupAndDayTypeMap= getMapOfAccessGroupAndDayType(accessGroupDayTypesQueryResults);
             Set<BigInteger> dayTypesIds=new HashSet<>();
