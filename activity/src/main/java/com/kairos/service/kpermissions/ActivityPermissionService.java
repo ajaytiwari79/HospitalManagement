@@ -2,6 +2,7 @@ package com.kairos.service.kpermissions;
 
 import com.kairos.annotations.KPermissionRelatedModel;
 import com.kairos.commons.annotation.PermissionClass;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.kpermissions.FieldPermissionUserData;
 import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.kpermissions.OtherPermissionDTO;
@@ -26,7 +27,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.enums.kpermissions.FieldLevelPermission.READ;
+import static com.kairos.service.activity.ActivityService.*;
 
 
 @Service
@@ -40,6 +43,35 @@ public class ActivityPermissionService {
     @Inject private CommonRepository commonRepository;
     @Inject private UserIntegrationService userIntegrationService;
 
+    //@Cacheable(value = "getActivityPermissionMap", key = "{#unitId, #userId}", cacheManager = "cacheManager")
+    public Map<String, Set<FieldLevelPermission>> getActivityPermissionMap(Long unitId, Long userId){
+        FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
+        Map<String,Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
+        prepareFLPMap(fieldPermissionUserData.getModelDTOS(),fieldPermissionMap);
+        return fieldPermissionMap;
+    }
+
+    public void prepareFLPMap(List<ModelDTO> modelDTOS, Map<String, Set<FieldLevelPermission>> fieldPermissionMap) {
+        modelDTOS.forEach(model -> {
+            model.getFieldPermissions().parallelStream().forEach(field -> {
+                fieldPermissionMap.putIfAbsent(field.getFieldName(), field.getPermissions());
+            });
+            prepareFLPMap(model.getSubModelPermissions(), fieldPermissionMap);
+        });
+    }
+
+    public void updateActivityMapByPermission(Long unitId, Map<BigInteger, ActivityDTO> activityDTOMap) {
+        Map<String,Set<FieldLevelPermission>> fieldPermissionMap = getActivityPermissionMap(unitId, UserContext.getUserDetails().getId());
+        activityDTOMap.forEach((k,v)->{
+            if(fieldPermissionMap.containsKey(NAME) && (fieldPermissionMap.get(NAME).contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get(NAME).isEmpty())){
+                v.setName(XXXXX);
+                v.getActivityGeneralSettings().setName(XXXXX);
+            }
+            if(fieldPermissionMap.containsKey(ULTRA_SHORT_NAME) && (fieldPermissionMap.get(ULTRA_SHORT_NAME).contains(FieldLevelPermission.HIDE) || fieldPermissionMap.get(ULTRA_SHORT_NAME).isEmpty())){
+                v.getActivityGeneralSettings().setUltraShortName(XXXXX);
+            }
+        });
+    }
 
     public <T,E extends MongoBaseEntity> void updateModelBasisOfPermission(List<T> objects, Set<FieldLevelPermission> fieldLevelPermissions){
         try {

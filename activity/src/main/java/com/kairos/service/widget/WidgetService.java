@@ -82,7 +82,7 @@ public class WidgetService {
         Date startDate = asDate(LocalDate.now().minusDays(1));
         Date endDate = asDate(LocalDate.now().plusDays(2));
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
-        List<ShiftWithActivityDTO> shiftDTOs = shiftMongoRepository.findAllShiftBetweenDurationByUnitId(unitId, startDate, endDate);
+        /*List<ShiftWithActivityDTO> shiftDTOs = shiftMongoRepository.findAllShiftBetweenDurationByUnitId(unitId, startDate, endDate);
         Object[] objects = getEmploymentIdsAndStaffIds(shiftDTOs);
         List<Long> staffIds = (List<Long>) objects[0];
         List<Long> employmentIds = (List<Long>) objects[1];
@@ -96,14 +96,14 @@ public class WidgetService {
             exceptionService.dataNotFoundException(TIMESLOT_NOT_FOUND_FOR_UNIT);
         }
         List<TimeSlotDTO> timeSlotDTOS= timeSlotSetDTO.getTimeSlots();
-        staffAdditionalInfoDTOS.forEach(staff-> {staff.setDayTypes(dayTypeDTOS);staff.setTimeSlotSets(timeSlotDTOS);});
+        staffAdditionalInfoDTOS.forEach(staff-> {staff.setDayTypes(dayTypeDTOS);staff.setTimeSlotSets(timeSlotDTOS);});*/
         Phase realTimePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, organizationDTO.getCountryId());
         if (isNull(realTimePhase) || isNull(realTimePhase.getRealtimeDuration())) {
             exceptionService.dataNotFoundException(REALTIME_DURATION_NOT_CONFIGURED);
         }
-        dashBoardWidgetDTO = new DashboardWidgetDTO(null, shiftDTOs, new HashMap<>(), realTimePhase.getRealtimeDuration(), timeTypeDTOS);
-        updatedetailsOfNightWorkers(dashBoardWidgetDTO, shiftDTOs, staffAdditionalInfoDTOS);
+        dashBoardWidgetDTO = new DashboardWidgetDTO(null, new ArrayList<>(), new HashMap<>(), realTimePhase.getRealtimeDuration(), timeTypeDTOS);
+        updatedetailsOfNightWorkers(dashBoardWidgetDTO, new ArrayList<>(), new ArrayList<>());
         DashboardWidget dashboardWidget = getDashboardWidget();
         dashBoardWidgetDTO.setTimeTypeIds(dashboardWidget.getTimeTypeIds());
         dashBoardWidgetDTO.setWidgetFilterTypes(dashboardWidget.getWidgetFilterTypes());
