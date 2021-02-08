@@ -5,6 +5,7 @@ import com.kairos.constants.AppConstants;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -19,6 +20,7 @@ import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.ActivitySkillSettings;
 import com.kairos.persistence.model.activity.tabs.ActivityTimeCalculationSettings;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.PQLSettings;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -26,13 +28,17 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.period.PlanningPeriodService;
+import com.kairos.service.phase.PhaseService;
 import com.kairos.service.reason_code.ReasonCodeService;
 import com.kairos.wrapper.activity.ActivitySettingsWrapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -40,8 +46,10 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.AppConstants.ENTERED_TIMES;
 import static com.kairos.enums.TimeTypeEnum.*;
 import static com.kairos.service.activity.ActivityUtil.getCutoffInterval;
+import static com.kairos.service.activity.ActivityUtil.getPhaseForRulesActivity;
 
 @Service
 public class TimeTypeService {
@@ -60,10 +68,11 @@ public class TimeTypeService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject private ShiftMongoRepository shiftMongoRepository;
-    @Inject private ActivityService activityService;
+    @Inject private OrganizationActivityService organizationActivityService;
     @Inject private ExecutorService executorService;
     @Inject private PlanningPeriodService planningPeriodService;
     @Inject private ReasonCodeService reasonCodeService;
+    @Inject private PhaseService phaseService;
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
         List<String> timeTypeLabels = timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
@@ -80,16 +89,52 @@ public class TimeTypeService {
         return timeTypeDTOs;
     }
 
+    private void initializeTimeTypeSettings(TimeType timeType, Long countryId) {
+        timeType.setCountryId(countryId);
+        List<PhaseDTO> phases = phaseService.getPhasesByCountryId(countryId);
+        if (CollectionUtils.isEmpty(phases)) {
+            exceptionService.actionNotPermittedException(MESSAGE_COUNTRY_PHASE_NOTFOUND);
+        }
+        List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
+        initializeActivitySettings(timeType, phaseTemplateValues);
+    }
+
+    public void initializeActivitySettings(TimeType timeType, List<PhaseTemplateValue> phaseTemplateValues){
+        ActivityRulesSettings activityRulesSettings = new ActivityRulesSettings();
+        activityRulesSettings.setPqlSettings(new PQLSettings());
+        activityRulesSettings.setCutOffBalances(CutOffIntervalUnit.CutOffBalances.EXPIRE);
+        activityRulesSettings.setCutOffIntervals(new ArrayList<>());
+        activityRulesSettings.setDayTypes(new ArrayList<>());
+        ActivityTimeCalculationSettings activityTimeCalculationSettings = new ActivityTimeCalculationSettings(ENTERED_TIMES, 0L, true, LocalTime.of(7, 0), 1d);
+        activityTimeCalculationSettings.setDayTypes(new ArrayList<>());
+        ActivityPhaseSettings activityPhaseSettings =new ActivityPhaseSettings(phaseTemplateValues);
+        ActivitySkillSettings activitySkillSettings = new ActivitySkillSettings();
+        timeType.setActivityRulesSettings(activityRulesSettings);
+        timeType.setActivityTimeCalculationSettings(activityTimeCalculationSettings);
+        timeType.setActivityPhaseSettings(activityPhaseSettings);
+        timeType.setActivitySkillSettings(activitySkillSettings);
+        timeType.setChildTimeTypeIds(new ArrayList<>());
+        timeType.setExpertises(new ArrayList<>());
+        timeType.setEmploymentTypes(new ArrayList<>());
+        timeType.setOrganizationSubTypes(new ArrayList<>());
+        timeType.setOrganizationTypes(new ArrayList<>());
+        timeType.setActivityCanBeCopiedForOrganizationHierarchy(new HashSet<>());
+        timeType.setLeafNode(true);
+        timeType.setLevels(new ArrayList<>());
+    }
+
     private void saveTimeType(Long countryId, TimeType upperTimeType, TimeTypeDTO timeTypeDTO) {
         TimeType timeType;
         if (timeTypeDTO.getTimeTypes() != null && timeTypeDTO.getUpperLevelTimeTypeId() != null) {
             timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription(), timeTypeDTO.getBackgroundColor(), upperTimeType.getSecondLevelType(), countryId, timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy());
             timeType.setCountryId(countryId);
             timeType.setUpperLevelTimeTypeId(timeTypeDTO.getUpperLevelTimeTypeId());
+            initializeTimeTypeSettings(timeType,countryId);
             timeType = timeTypeMongoRepository.save(timeType);
             if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                 upperTimeType.getChildTimeTypeIds().add(timeType.getId());
                 upperTimeType.setLeafNode(false);
+                initializeTimeTypeSettings(timeType,countryId);
                 timeTypeMongoRepository.save(upperTimeType);
             }
             timeTypeDTO.setId(timeType.getId());
@@ -104,7 +149,7 @@ public class TimeTypeService {
         List<BigInteger> childTimeTypeIds = childTimeTypes.stream().map(timetype -> timetype.getId()).collect(Collectors.toList());
         List<TimeType> leafTimeTypes = timeTypeMongoRepository.findAllChildTimeTypeByParentId(childTimeTypeIds);
         Map<BigInteger, List<TimeType>> leafTimeTypesMap = leafTimeTypes.stream().collect(Collectors.groupingBy(timetype -> timetype.getUpperLevelTimeTypeId(), Collectors.toList()));
-        activityService.updateBackgroundColorInShifts(timeTypeDTO, timeType.getBackgroundColor(),timeType.getId());
+        organizationActivityService.updateBackgroundColorInShifts(timeTypeDTO, timeType.getBackgroundColor(),timeType.getId());
         updateDetailsTimeType(timeTypeDTO, timeType);
         updateOrganizationHierarchyDetailsInTimeType(timeTypeDTO, timeType);
         List<TimeType> childTimeTypeList = childTimeTypesMap.get(timeTypeDTO.getId());
@@ -136,6 +181,8 @@ public class TimeTypeService {
         }
         return timeType;
     }
+
+
 
     private void updateOrganizationHierarchyDetailsInTimeType(TimeTypeDTO timeTypeDTO, TimeType timeType) {
         Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy = timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy();
@@ -171,7 +218,7 @@ public class TimeTypeService {
         boolean priorityForUpdate = false;
         boolean sicknessSettingUpdate  = false;
         for (TimeType childTimeType : childTimeTypeList) {
-            activityService.updateBackgroundColorInShifts(timeTypeDTO, childTimeType.getBackgroundColor(),childTimeType.getId());
+            organizationActivityService.updateBackgroundColorInShifts(timeTypeDTO, childTimeType.getBackgroundColor(),childTimeType.getId());
             partOfTeamUpdated = isPartOfTeamUpdated(timeTypeDTO, partOfTeamUpdated, childTimeType);
             allowedChildActivityUpdated = isAllowedChildActivityUpdated(timeTypeDTO, allowedChildActivityUpdated, childTimeType);
             allowedConflictsUpdate = isAllowedConflictsUpdate(timeTypeDTO, allowedConflictsUpdate, childTimeType);
@@ -228,7 +275,7 @@ public class TimeTypeService {
 
     private void setPropertiesInLeafTimeTypes(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> childTimeTypeList, boolean partOfTeamUpdated, boolean allowedChildActivityUpdated, boolean allowedConflictsUpdate, boolean priorityForUpdate, TimeType childTimeType,boolean sicknessSettingUpdate) {
         for (TimeType leafTimeType : childTimeTypeList) {
-            activityService.updateBackgroundColorInShifts(timeTypeDTO, leafTimeType.getBackgroundColor(),leafTimeType.getId());
+            organizationActivityService.updateBackgroundColorInShifts(timeTypeDTO, leafTimeType.getBackgroundColor(),leafTimeType.getId());
             leafTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
             if (leafTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && !partOfTeamUpdated && timeType.getUpperLevelTimeTypeId() != null) {
                 childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
@@ -474,7 +521,7 @@ public class TimeTypeService {
     }
 
     public ActivitySettingsWrapper updateRulesTab(ActivityRulesSettingsDTO rulesActivityDTO, BigInteger timeTypeId) {
-        activityService.validateActivityTimeRules(rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
+        organizationActivityService.validateActivityTimeRules(rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
         ActivityRulesSettings activityRulesSettings = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, ActivityRulesSettings.class);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
@@ -493,7 +540,7 @@ public class TimeTypeService {
         if (!timeType.getActivityTimeCalculationSettings().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
             timeType.getActivityTimeCalculationSettings().setDayTypes(timeType.getActivityRulesSettings().getDayTypes());
         }
-        activityService.updateColorInActivity(new TimeTypeDTO(timeType.getBackgroundColor(),rulesActivityDTO.isSicknessSettingValid(),rulesActivityDTO),timeTypeId);
+        organizationActivityService.updateColorInActivity(new TimeTypeDTO(timeType.getBackgroundColor(),rulesActivityDTO.isSicknessSettingValid(),rulesActivityDTO),timeTypeId);
         timeTypeMongoRepository.save(timeType);
         return new ActivitySettingsWrapper(activityRulesSettings);
     }
