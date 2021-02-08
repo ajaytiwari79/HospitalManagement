@@ -17,7 +17,7 @@ public class LevelDTO {
     private boolean isEnabled = true;
     private Map<String,String> translatedNames;
     private Map<String,String> translatedDescriptions;
-    private Map<String, TranslationInfo> translations ;
+    private Map<String, TranslationInfo> translations =new HashMap<>();
 
     public Map<String, TranslationInfo> getTranslatedData() {
         Map<String, TranslationInfo> infoMap=new HashMap<>();
