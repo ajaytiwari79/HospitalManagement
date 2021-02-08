@@ -325,9 +325,9 @@ public class CountryService {
     public List<LevelDTO> getLevels(long countryId) {
         List<Level> levels = countryGraphRepository.getLevelsByCountry(countryId);
         List<LevelDTO> levelDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(levels,LevelDTO.class);
-        for(LevelDTO level :levelDTOS){
-            level.setTranslations(level.getTranslatedData());
-        }
+//        for(LevelDTO level :levelDTOS){
+//            level.setTranslations(level.getTranslatedData());
+//        }
         return levelDTOS;
     }
 
