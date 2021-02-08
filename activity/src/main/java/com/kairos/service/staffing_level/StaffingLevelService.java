@@ -747,7 +747,6 @@ public class StaffingLevelService {
     }
 
 
-
     public Map<LocalDate, DailyStaffingLevelDetailsDTO> getWeeklyStaffingLevel(Long unitId, LocalDate date, BigInteger activityId, boolean unpublishedChanges) {
         LocalDate startLocalDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
         LocalDate endLocalDate = startLocalDate.plusWeeks(3).plusDays(1);
