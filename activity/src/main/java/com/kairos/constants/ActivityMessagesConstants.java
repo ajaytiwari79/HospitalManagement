@@ -163,6 +163,9 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_DELETE = "message.shift.delete";
     public static final String MESSAGE_PHASE_AUTHORITY_ABSENT = "message.phase.authority.absent";
     public static final String MESSAGE_SHIFT_OVERSTAFFING = "message.shift.overStaffing";
+    public static final String MESSAGE_SHIFT_OVERSTAFFING_GAP = "message.shift.overStaffing.gap";
+
+
     public static final String MESSAGE_SHIFT_UNDERSTAFFING = "message.shift.underStaffing";
     public static final String MESSAGE_STAFFINGLEVEL_ACTIVITY = "message.staffingLevel.activity";
     public static final String MESSAGE_SHIFTTEMPLATE_ABSENT = "message.shiftTemplate.absent";
