@@ -23,6 +23,7 @@ import com.kairos.persistence.model.activity.tabs.rules_activity_tab.PQLSettings
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
@@ -31,6 +32,8 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.ERROR_GLIDETIME_NOTFOUND_COUNTRY;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_COUNTRY_PHASE_NOTFOUND;
 import static com.kairos.constants.AppConstants.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

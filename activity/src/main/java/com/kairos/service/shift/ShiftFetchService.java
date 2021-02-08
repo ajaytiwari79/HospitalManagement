@@ -41,11 +41,11 @@ import com.kairos.persistence.repository.time_slot.TimeSlotMongoRepository;
 import com.kairos.persistence.repository.todo.TodoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.StaffActivityDetailsService;
 import com.kairos.service.auto_gap_fill_settings.AutoFillGapSettingsService;
 import com.kairos.service.day_type.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.kpermissions.ActivityPermissionService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
@@ -124,7 +124,7 @@ public class ShiftFetchService {
     @Inject
     private ActivitySchedulerJobService activitySchedulerJobService;
     @Inject
-    private ActivityService activityService;
+    private ActivityPermissionService activityPermissionService;
     @Inject
     private ShiftFunctionService shiftFunctionService;
     @Inject
@@ -361,7 +361,7 @@ public class ShiftFetchService {
     }
 
     private void updateReasonCodeAndNameInActivitiesAndUpdateSicknessDetails(Map<BigInteger, ReasonCodeDTO> reasonCodeMap, List<ShiftDTO> shifts) {
-        Map<String, Set<FieldLevelPermission>> fieldPermissionMap=activityService.getActivityPermissionMap(UserContext.getUserDetails().getLastSelectedOrganizationId(),UserContext.getUserDetails().getId());
+        Map<String, Set<FieldLevelPermission>> fieldPermissionMap= activityPermissionService.getActivityPermissionMap(UserContext.getUserDetails().getLastSelectedOrganizationId(),UserContext.getUserDetails().getId());
         Set<BigInteger> activityIds = shifts.stream().flatMap(shiftDTO -> shiftDTO.getActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet());
         List<Activity> activities = activityMongoRepository.findActivitiesSickSettingByActivityIds(activityIds);
         Map<BigInteger, Activity> activityWrapperMap = activities.stream().collect(Collectors.toMap(Activity::getId, v -> v));

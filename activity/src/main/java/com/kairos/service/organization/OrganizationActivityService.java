@@ -20,6 +20,8 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
@@ -39,11 +41,16 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityPriority;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.ActivityRulesSettings;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -86,6 +93,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -119,7 +127,7 @@ public class OrganizationActivityService {
 
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-    @Inject
+    @Inject @Lazy
     private ActivityService activityService;
     @Inject
     private TagMongoRepository tagMongoRepository;
@@ -898,5 +906,87 @@ public class OrganizationActivityService {
         return activityCategory.getTranslations();
     }
 
+    public Map<BigInteger, ActivityWrapper> getActivityWrapperMap(List<Shift> shifts, ShiftDTO shiftDTO) {
+        Set<BigInteger> activityIds = new HashSet<>();
+        for (Shift shift : shifts) {
+            getActivityIdsByShift(activityIds, shift);
+            if(isNotNull(shift.getDraftShift())){
+                getActivityIdsByShift(activityIds, shift.getDraftShift());
+            }
+        }
+        if (isNotNull(shiftDTO)) {
+            activityIds.addAll(shiftDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+            activityIds.addAll(shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+            activityIds.addAll(shiftDTO.getBreakActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+        }
+        List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        return activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+    }
 
+    private void getActivityIdsByShift(Set<BigInteger> activityIds, Shift shift) {
+        activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        activityIds.addAll(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        if(isCollectionNotEmpty(shift.getBreakActivities())){
+            activityIds.addAll(shift.getBreakActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        }
+    }
+    public void updateBackgroundColorInShifts(TimeTypeDTO timeTypeDTO, String existingTimeTypeColor,BigInteger timeTypeId) {
+        if(!existingTimeTypeColor.equals(timeTypeDTO.getBackgroundColor())){
+            new Thread(() -> {
+                Set<BigInteger> activityIds = updateColorInActivity(timeTypeDTO, timeTypeId);
+                updateColorInShift(timeTypeDTO.getBackgroundColor(),activityIds);
+
+            }).start();
+
+        }
+    }
+    public Set<BigInteger> updateColorInActivity(TimeTypeDTO timeTypeDTO,BigInteger timeTypeId) {
+        List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
+        if (isCollectionNotEmpty(activities)) {
+            activities.forEach(activity -> {
+                activity.getActivityGeneralSettings().setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                activity.getActivityRulesSettings().setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
+                if(isNotNull(timeTypeDTO.getActivityRulesSettings())){
+                    activity.getActivityRulesSettings().setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(timeTypeDTO.getActivityRulesSettings().getSicknessSetting(), SicknessSetting.class));
+                }
+            });
+            activityMongoRepository.saveEntities(activities);
+        }
+        return activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
+    }
+    private void updateColorInShift(String newTimeTypeColor,Set<BigInteger> activityIds) {
+        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activityIds,null,null,null);
+        shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
+            updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, shiftActivity);
+            if(isNotNull(shift.getDraftShift())){
+                shift.getDraftShift().getActivities().forEach(draftShiftActivity-> updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, draftShiftActivity));
+            }
+        }));
+        if(isCollectionNotEmpty(shifts)){
+            shiftMongoRepository.saveEntities(shifts);
+        }
+    }
+    private void updateBackgroundColorInShiftActivity(String newTimeTypeColor, Set<BigInteger> activitiyIds, ShiftActivity shiftActivity) {
+        if(activitiyIds.contains(shiftActivity.getActivityId())){
+            shiftActivity.setBackgroundColor(newTimeTypeColor);
+        }
+        shiftActivity.getChildActivities().forEach(childActivity -> {
+            if(activitiyIds.contains(childActivity.getActivityId())){
+                childActivity.setBackgroundColor(newTimeTypeColor);
+            }
+        });
+    }
+    public void validateActivityTimeRules( Short shortestTime, Short longestTime) {
+        if (shortestTime != null && longestTime != null && shortestTime > longestTime) {
+            exceptionService.actionNotPermittedException(SHORTEST_TIME_GREATER_LONGEST);
+        }
+    }
+    public List<ActivityDTO> getAllAbsenceActivity(Long unitId) {
+        List<ActivityDTO> activityDTOS = new ArrayList<>(activityMongoRepository.findAbsenceActivityByUnitId(unitId));
+        List<ActivityDTO> filterActivityDto=activityDTOS.stream().filter(activityDTO -> activityDTO.getActivitySequence()>0).collect(Collectors.toList());
+        activityDTOS.removeAll(filterActivityDto);
+        filterActivityDto.sort(Comparator.comparing(ActivityDTO :: getActivitySequence));
+        filterActivityDto.addAll(activityDTOS);
+        return filterActivityDto;
+    }
 }
