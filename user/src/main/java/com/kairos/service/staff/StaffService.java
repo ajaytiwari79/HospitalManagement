@@ -617,7 +617,8 @@ public class StaffService {
     private Long getCPR(Row row, Long cprAsLong) {
 
         if (isNotNull(row.getCell(41, Row.RETURN_BLANK_AS_NULL))) {
-            cprAsLong = new Double(getStringValueOfIndexedCell(row, 41)).longValue();
+            String cprNumber=getStringValueOfIndexedCell(row, 41).replace("-","");
+            cprAsLong = new Double(cprNumber).longValue();
         }
         return cprAsLong;
     }

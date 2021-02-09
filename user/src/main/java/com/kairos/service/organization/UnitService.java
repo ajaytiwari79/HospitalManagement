@@ -34,9 +34,9 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANISATION_NOTFOUND;
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANIZATION_ID_NOTFOUND;
+import static com.kairos.constants.UserMessagesConstants.*;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 @Service
@@ -123,6 +123,9 @@ public class UnitService {
      * @throws ExecutionException
      */
     public OrganizationBasicDTO onBoardOrganization(OrganizationBasicDTO organizationBasicDTO, Long parentOrgaziationId) {
+        if(isCollectionEmpty(organizationBasicDTO.getSubTypeId())){
+            exceptionService.invalidRequestException(ERROR_ORGANIZATION_ORGSUBTYPE_NOTNULL, organizationBasicDTO.getName());
+        }
         if (organizationBasicDTO.getId() == null) {
             companyCreationService.addNewUnit(organizationBasicDTO, parentOrgaziationId);
         } else {
