@@ -26,7 +26,8 @@ import java.util.stream.Collectors;
 public class PhaseSettingsService {
     @Inject private PhaseSettingsRepository phaseSettingsRepository;
     @Inject private PhaseService phaseService;
-    @Cacheable(value = "getPhaseSettings", key = "#unitId", cacheManager = "cacheManager")
+
+    //@Cacheable(value = "getPhaseSettings", key = "#unitId", cacheManager = "cacheManager")
     public List<PhaseSettingsDTO> getPhaseSettings(Long unitId){
         List<PhaseSettingsDTO> phaseSettingsDTOS = phaseSettingsRepository.findAllByUnitIdAndDeletedFalse(unitId, Sort.by(Sort.Direction.ASC, "sequence"));
         Map<BigInteger,PhaseDTO> phaseDTOMap = phaseService.getPhasesByUnit(unitId).stream().collect(Collectors.toMap(k->k.getId(), v->v));
