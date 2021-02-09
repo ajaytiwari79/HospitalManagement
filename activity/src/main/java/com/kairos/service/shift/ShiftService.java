@@ -230,7 +230,7 @@ public class ShiftService {
         ShiftType shiftType = updateShiftType(activityWrapperMap,mainShift);
         shiftDTO.setShiftType(shiftType);
         ShiftWithActivityDTO shiftWithActivityDTO = getShiftWithActivityDTO(shiftDTO, activityWrapperMap, null);
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false);
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false, false);
         if(isNotNull(shiftOverlapInfo[1])){
             shiftWithViolatedInfoDTO.getViolatedRules().setOverlapWithShiftId((BigInteger) shiftOverlapInfo[1]);
             shiftWithViolatedInfoDTO.getViolatedRules().setOverlapMessage(convertMessage(MESSAGE_SHIFT_DATE_STARTANDEND,shiftDTO.getStartDate(),shiftDTO.getEndDate()));
@@ -446,7 +446,7 @@ public class ShiftService {
             PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shiftDTO.getUnitId(), shiftDTO.getShiftDate());
             List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(shift.isShiftUpdated(isNotNull(oldShift) ? oldShift : shift), shift, activityWrapperMap, staffAdditionalInfoDTO, wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets(), isNotNull(oldShift) ? oldShift : shift,null);
             shift.setBreakActivities(breakActivities);
-            ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfo = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldShift, activityWrapperMap, isNotNull(shiftWithActivityDTO.getId()), isNull(shiftDTO.getShiftId()));
+            ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfo = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldShift, activityWrapperMap, isNotNull(shiftWithActivityDTO.getId()), isNull(shiftDTO.getShiftId()), false);
             if (isIgnoredAllRuletemplate(shiftWithViolatedInfo, updatedShiftWithViolatedInfo)) {
                 if (updateWTACounterFlag && !ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
                     shiftValidatorService.updateWTACounter(staffAdditionalInfoDTO, updatedShiftWithViolatedInfo, shift);
@@ -626,7 +626,7 @@ public class ShiftService {
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(shiftDTO.getShiftDate(), shiftDTO.getStaffId(), shiftDTO.getEmploymentId());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shiftDTO.getStartDate(), shiftDTO.getEndDate());
-        gapSettingsService.adjustGapByActivity(shiftDTO,shift,phase,staffAdditionalInfoDTO);
+        Boolean skipRules=gapSettingsService.adjustGapByActivity(shiftDTO,shift,phase,staffAdditionalInfoDTO);
         Shift oldShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
         boolean ruleCheckRequired = shift.isShiftUpdated(ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class));
         Date currentShiftStartDate = shift.getStartDate();
@@ -684,9 +684,7 @@ public class ShiftService {
 
             activityConfigurationService.addPlannedTimeInShift(shift, activityWrapperMap, staffAdditionalInfoDTO, !oldStateOfShift.getShiftType().equals(shift.getShiftType()),phase);
             ShiftWithActivityDTO shiftWithActivityDTO = getShiftWithActivityDTO(null, activityWrapperMap, shift);
-            boolean valid = isNotNull(shiftAction) && !shiftAction.equals(ShiftActionType.CANCEL) && shift.getActivities().stream().anyMatch(activity -> !activity.getStatus().contains(ShiftStatus.PUBLISH)) && UserContext.getUserDetails().isManagement();
-
-            ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateRuleCheck( ruleCheckRequired, staffAdditionalInfoDTO, activityWrapperMap, phase, valid, wtaQueryResultDTO, shiftWithActivityDTO, oldStateOfShift);
+            ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateRuleCheck(ruleCheckRequired, staffAdditionalInfoDTO, activityWrapperMap, phase, wtaQueryResultDTO, shiftWithActivityDTO, oldStateOfShift,skipRules);
             shiftWithViolatedInfoDTO.getViolatedRules().setOverlapWithShiftId((BigInteger) shiftOverlapInfo[1]);
             List<ShiftDTO> shiftDTOS = newArrayList(shiftDTO);
             if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || (isNull(shiftOverlapInfo[1]) && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty())) {

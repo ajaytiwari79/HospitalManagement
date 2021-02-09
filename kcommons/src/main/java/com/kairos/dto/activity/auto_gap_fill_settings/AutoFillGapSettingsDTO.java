@@ -43,4 +43,6 @@ public class AutoFillGapSettingsDTO implements Serializable {
     private UserInfo lastModifiedBy;
     private boolean published;
     private BigInteger parentId;
+    private boolean skipRules;
+    private boolean checkedStaffingLevel; // filled the gap after checking staffing level
 }

@@ -212,7 +212,7 @@ public class AbsenceShiftService {
         for (ShiftDTO shiftDTO : shiftDTOS) {
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
             ShiftWithActivityDTO shiftWithActivityDTO = shiftService.getShiftWithActivityDTO(shiftDTO, activityWrapperMap,null);
-            ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false);
+            ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false, false);
             updatedShiftWithViolatedInfoDTO.setShifts(newArrayList(shiftDTO));
             Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
             Optional<PlanningPeriod> planningPeriodByShift = planningPeriods.stream().filter(planningPeriod -> new DateTimeInterval(asDate(planningPeriod.getStartDate()), asDate(planningPeriod.getEndDate())).contains(shift.getStartDate()) || planningPeriod.getEndDate().equals(asLocalDate(shift.getStartDate()))).findAny();

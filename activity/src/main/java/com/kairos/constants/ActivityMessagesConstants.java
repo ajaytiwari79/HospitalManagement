@@ -163,6 +163,9 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_DELETE = "message.shift.delete";
     public static final String MESSAGE_PHASE_AUTHORITY_ABSENT = "message.phase.authority.absent";
     public static final String MESSAGE_SHIFT_OVERSTAFFING = "message.shift.overStaffing";
+    public static final String MESSAGE_SHIFT_OVERSTAFFING_GAP = "message.shift.overStaffing.gap";
+
+
     public static final String MESSAGE_SHIFT_UNDERSTAFFING = "message.shift.underStaffing";
     public static final String MESSAGE_STAFFINGLEVEL_ACTIVITY = "message.staffingLevel.activity";
     public static final String MESSAGE_SHIFTTEMPLATE_ABSENT = "message.shiftTemplate.absent";
@@ -402,6 +405,8 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_FULLWEEK_STARTDAY_NOTFOUND = "message.fullWeek.startDay.notFound";
     public static final String ERROR_AUTO_FILL_GAP_SETTING_NOT_FOUND = "error.auto.fill.gap.setting.not.found";
     public static final String ERROR_AUTO_FILL_GAP_SETTING_PUBLISH_DATE_INVALID = "error.auto.fill.gap.setting.publish.date.invalid";
+    public static final String MAIN_TEAM_ABSENT = "error.main.team.absent";
+    public static final String HIGHEST_RANK_ACTIVITY_ABSENT = "error.highest.team.absent";
     public static final String ERROR_ALREADY_AUTO_FILL_GAP_SETTING_PUBLISH = "error.already.auto.fill.gap.setting.publish";
     public static final String ERROR_DRAFT_COPY_ALREADY_CREATED = "error.draft.copy.already.created";
 

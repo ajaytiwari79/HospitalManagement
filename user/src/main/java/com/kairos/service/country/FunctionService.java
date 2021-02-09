@@ -54,6 +54,7 @@ public class FunctionService {
     private EmploymentFunctionRelationshipRepository employmentFunctionRelationshipRepository;
 
 
+
     public com.kairos.persistence.model.country.functions.FunctionDTO createFunction(Long countryId, FunctionDTO functionDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
