@@ -37,10 +37,10 @@ public class PhaseSettingsService {
         return phaseSettingsDTOS;
     }
 
-//    @Caching(evict = {
-//            @CacheEvict(value = "getPhasSettingsByUnitIdAndPhaseId",allEntries = true),
-//            @CacheEvict(value = "getPhaseSettings", key = "#unitId")
-//    })
+    @Caching(evict = {
+            @CacheEvict(value = "getPhasSettingsByUnitIdAndPhaseId",allEntries = true),
+            @CacheEvict(value = "getPhaseSettings", key = "#unitId")
+    })
     public List<PhaseSettingsDTO> updatePhaseSettings(Long unitId, List<PhaseSettingsDTO> phaseSettingsDTOS) {
         phaseSettingsDTOS.forEach(phaseSettingsDTO -> {
             phaseSettingsDTO.setUnitId(unitId);
