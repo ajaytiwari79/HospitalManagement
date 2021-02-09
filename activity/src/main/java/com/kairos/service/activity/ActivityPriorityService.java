@@ -96,10 +96,10 @@ public class ActivityPriorityService {
     }
 
     public ActivityPriorityDTO createActivityPriorityAtOrganization(Long organizationId, ActivityPriorityDTO activityPriorityDTO) {
-        boolean existByName = activityPriorityMongoRepository.existsByNameAndCountryIdAndNotEqualToId(activityPriorityDTO.getName(), activityPriorityDTO.getColorCode(), null, organizationId);
-        if (existByName) {
-            exceptionService.actionNotPermittedException(ERROR_NAME_DUPLICATE, activityPriorityDTO.getName());
-        }
+//        boolean existByName = activityPriorityMongoRepository.existsByNameAndCountryIdAndNotEqualToId(activityPriorityDTO.getName(), activityPriorityDTO.getColorCode(), null, organizationId);
+//        if (existByName) {
+//            exceptionService.actionNotPermittedException(ERROR_NAME_DUPLICATE, activityPriorityDTO.getName());
+//        }
         int activityPriorityCount = activityPriorityMongoRepository.getActivityPriorityCountAtOrganization(organizationId);
         if ((activityPriorityCount + 1) != activityPriorityDTO.getSequence()) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
