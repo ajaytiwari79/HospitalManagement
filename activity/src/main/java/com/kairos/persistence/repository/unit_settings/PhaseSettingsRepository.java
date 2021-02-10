@@ -12,6 +12,7 @@ import java.util.List;
 public interface PhaseSettingsRepository extends MongoBaseRepository<PhaseSettings,BigInteger> {
 
     List<PhaseSettingsDTO> findAllByUnitIdAndDeletedFalse(Long unitId, Sort sort);
+
     @Cacheable(value = "getPhaseSettingsByUnitIdAndPhaseId", key = "#phaseId", cacheManager = "cacheManager")
     PhaseSettings getPhaseSettingsByUnitIdAndPhaseId(Long unitId,BigInteger phaseId);
 
