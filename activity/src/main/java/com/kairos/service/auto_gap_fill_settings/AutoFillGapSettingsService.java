@@ -57,7 +57,7 @@ public class AutoFillGapSettingsService {
     @Inject
     private PhaseSettingsRepository phaseSettingsRepository;
 
-    @CacheEvict(value = "getAllAutoFillGapSettingsByUnitId",key = "#countryId")
+    //@CacheEvict(value = "getAllAutoFillGapSettingsByUnitId",key = "#countryId")
     public AutoFillGapSettingsDTO createAutoFillGapSettings(AutoFillGapSettingsDTO autoFillGapSettingsDTO, boolean forCountry) {
         AutoFillGapSettings autoFillGapSettings = ObjectMapperUtils.copyPropertiesByMapper(autoFillGapSettingsDTO, AutoFillGapSettings.class);
         if (autoFillGapSettings.isPublished()) {
