@@ -439,8 +439,6 @@ public class AutoFillGapSettingsService {
             } else if (mainTeam.getActivityIds().iterator().next().equals(afterGap.getActivityId())) {
                 shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), afterGap.getActivityId(), null);
             }
-        } else {
-            exceptionService.actionNotPermittedException(MAIN_TEAM_ABSENT);
         }
         return shiftActivityDTO;
     }
