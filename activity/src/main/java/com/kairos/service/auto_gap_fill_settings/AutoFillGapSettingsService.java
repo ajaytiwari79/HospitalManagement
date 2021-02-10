@@ -328,7 +328,7 @@ public class AutoFillGapSettingsService {
         for (AutoFillGapSettingsRule autoFillGapSettingsRule : gapSettings.getSelectedAutoFillGapSettingsRules()) {
             switch (autoFillGapSettingsRule) {
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1:
-                    return getShiftActivityDTO(beforeGap, afterGap, staffAdditionalInfoDTO, shiftActivityDTO);
+                    return getShiftActivityDTO(beforeGap, afterGap, staffAdditionalInfoDTO, shiftActivityDTO,mainTeamActivityId);
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2:
                     if (mainTeamActivityId != null) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeamRemoved ? highestRankTeam.getActivityIds().iterator().next() : mainTeamActivityId, true);
@@ -431,16 +431,13 @@ public class AutoFillGapSettingsService {
         return staffingLevelActivityWithDurationMap.values().stream().noneMatch(k -> k.getResolvingUnderOrOverStaffingDurationInMinutes() > 0);
     }
 
-    private ShiftActivityDTO getShiftActivityDTO(ShiftActivityDTO beforeGap, ShiftActivityDTO afterGap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftActivityDTO shiftActivityDTO) {
-        TeamDTO mainTeam = staffAdditionalInfoDTO.getTeamsData().stream().filter(k -> TeamType.MAIN.equals(k.getTeamType())).findAny().orElse(null);
-        if (mainTeam != null) {
-            if (mainTeam.getActivityIds().iterator().next().equals(beforeGap.getActivityId())) {
+    private ShiftActivityDTO getShiftActivityDTO(ShiftActivityDTO beforeGap, ShiftActivityDTO afterGap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftActivityDTO shiftActivityDTO, BigInteger mainTeamActivityId) {
+        if (mainTeamActivityId != null) {
+            if (mainTeamActivityId.equals(beforeGap.getActivityId())) {
                 shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), beforeGap.getActivityId(), null);
-            } else if (mainTeam.getActivityIds().iterator().next().equals(afterGap.getActivityId())) {
+            } else if (mainTeamActivityId.equals(afterGap.getActivityId())) {
                 shiftActivityDTO = new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), afterGap.getActivityId(), null);
             }
-        } else {
-            exceptionService.actionNotPermittedException(MAIN_TEAM_ABSENT);
         }
         return shiftActivityDTO;
     }
