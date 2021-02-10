@@ -338,7 +338,7 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE3:
-                    BigInteger actId = teamRankingMap.getOrDefault(afterGap.getActivity().getId(),0) < teamRankingMap.getOrDefault(beforeGap.getActivity().getId(),0) ? afterGap.getActivityId() : beforeGap.getActivityId();
+                    BigInteger actId = teamRankingMap.getOrDefault(afterGap.getActivity().getId(),Integer.MAX_VALUE) < teamRankingMap.getOrDefault(beforeGap.getActivity().getId(),Integer.MAX_VALUE) ? afterGap.getActivityId() : beforeGap.getActivityId();
                     return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), actId, null);
                 case RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1:
                     BigInteger activityId = afterGap.getActivity().getActivityPriority().getSequence() < beforeGap.getActivity().getActivityPriority().getSequence() ? afterGap.getActivityId() : beforeGap.getActivityId();
