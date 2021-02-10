@@ -252,6 +252,7 @@ public class PhaseService {
      * @param startDate
      * @return phase
      */
+
     public Phase getCurrentPhaseByUnitIdAndDate(Long unitId, Date startDate,Date endDate){
         ZoneId timeZone= ZoneId.of(userIntegrationService.getTimeZoneByUnitId(unitId));
         Phase tentativePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId,PhaseDefaultName.TENTATIVE.toString());
