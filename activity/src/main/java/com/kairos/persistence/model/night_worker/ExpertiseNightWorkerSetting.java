@@ -7,9 +7,11 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
-public class ExpertiseNightWorkerSetting extends MongoBaseEntity {
+public class ExpertiseNightWorkerSetting extends MongoBaseEntity implements Serializable {
 
     private static final long serialVersionUID = -351941897142204264L;
     private TimeSlot timeSlot;
