@@ -1,0 +1,1 @@
+db.staffing_level.createIndex( { unitId:1,currentDate:1,deleted:1 }, { unique: true } );

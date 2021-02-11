@@ -423,4 +423,5 @@ public class ActivityMessagesConstants {
     public static final String TIMESLOT_NOT_FOUND_FOR_UNIT = "timeslot.not.found";
 
     public static final String GAP_FILLING_CONFIGURATION_ABSENT = "gap.filling.configuration.absent";
+    public static final String SHIFT_STATE_NOT_FOUND_TANDA = "message.shift.state.t&A";
 }
