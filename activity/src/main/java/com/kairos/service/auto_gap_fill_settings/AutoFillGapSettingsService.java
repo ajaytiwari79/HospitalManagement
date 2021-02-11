@@ -338,6 +338,9 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE3:
+                    if(!teamRankingMap.containsKey(afterGap.getActivityId()) && !teamRankingMap.containsKey(beforeGap.getActivityId())){
+                        exceptionService.actionNotPermittedException(GAP_FILLING_CONFIGURATION_ABSENT);
+                    }
                     BigInteger actId = teamRankingMap.getOrDefault(afterGap.getActivity().getId(),Integer.MAX_VALUE) < teamRankingMap.getOrDefault(beforeGap.getActivity().getId(),Integer.MAX_VALUE) ? afterGap.getActivityId() : beforeGap.getActivityId();
                     return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), actId, null);
                 case RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1:
@@ -404,7 +407,7 @@ public class AutoFillGapSettingsService {
                     activityId = activityList.stream().sorted(Comparator.comparing(k -> k.getActivityPriority().getSequence())).collect(Collectors.toList()).get(0).getActivity().getId();
                     return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
                 default:
-                    exceptionService.actionNotPermittedException("gap.filling.configuration.absent");
+                    exceptionService.actionNotPermittedException(GAP_FILLING_CONFIGURATION_ABSENT);
             }
 
         }
