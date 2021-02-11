@@ -44,7 +44,7 @@ public class ActivityPermissionService {
     @Inject private CommonRepository commonRepository;
     @Inject private UserIntegrationService userIntegrationService;
 
-    //@Cacheable(value = "getActivityPermissionMap", key = "{#unitId, #userId}", cacheManager = "cacheManager")
+    @Cacheable(value = "getActivityPermissionMap", key = "{#unitId, #userId}", cacheManager = "cacheManager")
     public Map<String, Set<FieldLevelPermission>> getActivityPermissionMap(Long unitId, Long userId){
         FieldPermissionUserData fieldPermissionUserData=userIntegrationService.getPermissionData(newHashSet("Activity"));
         Map<String,Set<FieldLevelPermission>> fieldPermissionMap=new HashMap<>();
