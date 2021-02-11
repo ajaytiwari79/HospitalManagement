@@ -90,7 +90,7 @@ public class PhaseService {
     }
 
 
-    //@Cacheable(value = "getPhasesByUnit", key = "#unitId", cacheManager = "cacheManager")
+    @Cacheable(value = "getPhasesByUnit", key = "#unitId", cacheManager = "cacheManager")
     public List<PhaseDTO> getPhasesByUnit(Long unitId) {
         return phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.DESC);
     }

@@ -17,6 +17,7 @@ import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.tree_structure.TreeStructureService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +48,7 @@ public class OrganizationHierarchyService {
     @Inject
     private OrganizationService organizationService;
 
-    //@Cacheable(value = "generateHierarchy", key = "#userId", cacheManager = "cacheManager")
+    @Cacheable(value = "generateHierarchy", key = "#userId", cacheManager = "cacheManager")
     public List<QueryResult> generateHierarchy(Long userId) {
         List<OrganizationWrapper> organizationWrappers = userGraphRepository.getOrganizations(userId);
         boolean isHubMember = accessPageService.isHubMember(userId);

@@ -38,6 +38,7 @@ import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.PAST_DATE_ALLOWED;
+import static com.kairos.constants.ActivityMessagesConstants.SHIFT_STATE_NOT_FOUND_TANDA;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 
 /*
@@ -127,6 +128,9 @@ public class ShiftStateService {
         List<ShiftState> oldTimeAndAttendanceShiftStates=shiftStateMongoRepository.findAllByShiftIdInAndShiftStatePhaseIdAndValidatedNotNull(shifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet()),phase.getId());
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=oldTimeAndAttendanceShiftStates.stream().filter(shiftState -> shiftState.getShiftStatePhaseId().equals(phase.getId())).collect(Collectors.toMap(ShiftState::getShiftId, v->v,(s1, s2) -> s2));
         List<ShiftState> timeAndAttendanceShiftStates = getShiftStateLists( shifts, phase.getId(), timeAndAttendanceShiftStateMap);
+        if(isCollectionEmpty(timeAndAttendanceShiftStates)){
+            exceptionService.dataNotFoundException(SHIFT_STATE_NOT_FOUND_TANDA);
+        }
         String timeZone = userIntegrationService.getTimeZoneByUnitId(timeAndAttendanceShiftStates.get(0).getUnitId());
         for (ShiftState timeAndAttendanceShiftState : timeAndAttendanceShiftStates) {
             if(shiftValidatorService.validateGracePeriod(timeAndAttendanceShiftState.getStartDate(),true,timeAndAttendanceShiftState.getUnitId(),phase,timeZone)){

@@ -6,13 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Map;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class PhaseSettingsDTO {
+public class PhaseSettingsDTO implements Serializable {
+    private static final long serialVersionUID = 129261157436625112L;
     private BigInteger id;
     private BigInteger phaseId;
     private String name;

@@ -14,11 +14,11 @@ import java.util.List;
 @Repository
 public interface AutoFillGapSettingsMongoRepository extends MongoBaseRepository<AutoFillGapSettings, BigInteger> {
 
-    //@Cacheable(value = "getAllAutoFillGapSettingsByCountryId", key = "#countryId", cacheManager = "cacheManager")
+    @Cacheable(value = "getAllAutoFillGapSettingsByCountryId", key = "#countryId", cacheManager = "cacheManager")
     @Query("{deleted : false,countryId:?0}")
     List<AutoFillGapSettingsDTO> getAllAutoFillGapSettingsByCountryId(Long countryId);
 
-    //@Cacheable(value = "getAllAutoFillGapSettingsByUnitId", key = "#unitId", cacheManager = "cacheManager")
+    @Cacheable(value = "getAllAutoFillGapSettingsByUnitId", key = "#unitId", cacheManager = "cacheManager")
     @Query("{deleted : false,unitId:?0}")
     List<AutoFillGapSettingsDTO> getAllAutoFillGapSettingsByUnitId(Long unitId);
 

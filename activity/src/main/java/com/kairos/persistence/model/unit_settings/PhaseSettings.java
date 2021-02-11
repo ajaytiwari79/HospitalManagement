@@ -5,11 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PhaseSettings extends MongoBaseEntity {
+public class PhaseSettings extends MongoBaseEntity implements Serializable {
+    private static final long serialVersionUID = 2087037270008785656L;
     private BigInteger phaseId;
     private String name;
     private String description;

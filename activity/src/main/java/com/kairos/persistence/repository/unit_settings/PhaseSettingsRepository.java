@@ -13,7 +13,7 @@ public interface PhaseSettingsRepository extends MongoBaseRepository<PhaseSettin
 
     List<PhaseSettingsDTO> findAllByUnitIdAndDeletedFalse(Long unitId, Sort sort);
 
-    //@Cacheable(value = "getPhaseSettingsByUnitIdAndPhaseId", key = "#phaseId", cacheManager = "cacheManager")
+    @Cacheable(value = "getPhaseSettingsByUnitIdAndPhaseId", key = "#phaseId", cacheManager = "cacheManager")
     PhaseSettings getPhaseSettingsByUnitIdAndPhaseId(Long unitId,BigInteger phaseId);
 
 }
