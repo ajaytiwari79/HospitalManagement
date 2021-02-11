@@ -170,7 +170,7 @@ public class ShiftSickService {
         LocalDate endDate = localDate.plusDays(sicknessActivity.getActivityRulesSettings().getRecurrenceDays());
         List<Shift> shifts = shiftMongoRepository.findAllSicknessShiftByEmploymentIdAndActivityIds(staffId, asDate(localDate), asDate(endDate));
         if (isCollectionEmpty(shifts) || shifts.stream().noneMatch(k -> SICK.equals(k.getShiftType()))) {
-            exceptionService.dataNotFoundException("Data not found");
+            exceptionService.dataNotFoundException(MESSAGE_SHIFT_IDS);
         }
         Map<LocalDate, List<Shift>> shiftMap = shifts.stream().collect(Collectors.groupingBy(shift -> asLocalDate(shift.getStartDate())));
         List<ActivityWrapper> protectDaysOffActivity;

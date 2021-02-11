@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public enum AutoFillGapSettingsRule implements Serializable {
     RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1("Check if either side of the activity falls in main team. If it is, fill the gap with that activity."),
-    /* Changed */RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2("Fill with main team assigned to the staff in subject. But if main team causes gap, fill with highest secondary team assigned to the staff (even if it is not planned in the shift, causing problems, or breaking continuity)"),
+    /* Changed */RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2("Fill with main team assigned to the staff in subject. But if main team causes gap, fill with highest secondary team assigned to the staff (even if it is not planned in the shift, causing problems, or breaking continuity)."),
     RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE3("Fill the gap with the activity of secondary teams with the highest rank planned in the same shift."),
     RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE1("Fill the gap with the activity of the main team not planned in the shift, if having partial or complete understaffing."),
     RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE2("Fill the gap with the highest ranked activity of the team solving complete/partial understaffing. Including main and secondary"),
