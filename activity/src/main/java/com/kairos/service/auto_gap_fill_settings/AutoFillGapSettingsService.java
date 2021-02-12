@@ -1,5 +1,6 @@
 package com.kairos.service.auto_gap_fill_settings;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityPriorityDTO;
@@ -250,6 +251,7 @@ public class AutoFillGapSettingsService {
         staffAdditionalInfoDTO.getTeamsData().remove(mainTeam);
         staffAdditionalInfoDTO.setTeamsData(staffAdditionalInfoDTO.getTeamsData().stream().sorted(Comparator.comparing(TeamDTO::getSequence)).collect(Collectors.toList()));
         TeamDTO highestRankTeam = staffAdditionalInfoDTO.getTeamsData().isEmpty() ? null : staffAdditionalInfoDTO.getTeamsData().get(0);
+        short gapDuration = (short) new DateTimeInterval(beforeGap.getEndDate(),afterGap.getStartDate()).getMinutes();
         for (AutoFillGapSettingsRule autoFillGapSettingsRule : gapSettings.getSelectedAutoFillGapSettingsRules()) {
             switch (autoFillGapSettingsRule) {
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_REQUEST_PHASE1:
@@ -268,7 +270,7 @@ public class AutoFillGapSettingsService {
                     break;
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE2:
                     List<ActivityWrapper> activityWrappers = activityList.stream().filter(k -> !k.getActivity().getId().equals(productiveActivity.getActivityId())).collect(Collectors.toList());
-                    BigInteger activityId = staffingLevelActivityWithDurationMap.isEmpty() ? null : getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityWrappers, shiftDTO);
+                    BigInteger activityId = staffingLevelActivityWithDurationMap.isEmpty() ? null : getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityWrappers, shiftDTO,gapDuration);
                     if (activityId != null) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
                     }
@@ -325,6 +327,7 @@ public class AutoFillGapSettingsService {
         TeamDTO highestRankTeam = staffAdditionalInfoDTO.getTeamsData().isEmpty() ? null : staffAdditionalInfoDTO.getTeamsData().get(0);
         TeamDTO highestRankTeamApartFromShift = staffAdditionalInfoDTO.getTeamsData().stream().filter(k -> !k.getActivityIds().contains(beforeGap.getActivityId()) && !k.getActivityIds().contains(afterGap.getActivityId())).findFirst().orElse(null);
         Map<BigInteger,Integer> teamRankingMap=staffAdditionalInfoDTO.getTeamsData().stream().collect(Collectors.toMap(k->k.getActivityIds().iterator().next(), TeamDTO::getSequence));
+        short gapDuration = (short) new DateTimeInterval(beforeGap.getEndDate(),afterGap.getStartDate()).getMinutes();
         for (AutoFillGapSettingsRule autoFillGapSettingsRule : gapSettings.getSelectedAutoFillGapSettingsRules()) {
             switch (autoFillGapSettingsRule) {
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1:
@@ -368,7 +371,7 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE3:
-                    activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, new ArrayList<>(),shiftDTO);
+                    activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, new ArrayList<>(),shiftDTO,gapDuration);
                     if (activityId != null) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
                     } else {
@@ -395,7 +398,7 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE3:
-                    activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList, shiftDTO);
+                    activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList, shiftDTO,gapDuration);
                     if (activityId != null) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
                     } else {
@@ -414,7 +417,7 @@ public class AutoFillGapSettingsService {
 
     }
 
-    private BigInteger getHighestRankActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityWrappers, ShiftDTO shiftDTO) {
+    private BigInteger getHighestRankActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, List<ActivityWrapper> activityWrappers, ShiftDTO shiftDTO,short gapDuration) {
         List<BigInteger> allActivitySolvingMaxDuration = getActivitiesResolvingMostProblem(staffingLevelActivityWithDurationMap,shiftDTO);
         if (allActivitySolvingMaxDuration.isEmpty()) {
             return null;
@@ -423,7 +426,7 @@ public class AutoFillGapSettingsService {
         Set<BigInteger> solvingEqualProblems = new HashSet<>();
         solvingEqualProblems.add(allActivitySolvingMaxDuration.get(0));
         for (int i = 1; i < allActivitySolvingMaxDuration.size() - 1; i++) {
-            if (solvedDuration == staffingLevelActivityWithDurationMap.getOrDefault(allActivitySolvingMaxDuration.get(i), new StaffingLevelActivityWithDuration()).getResolvingUnderOrOverStaffingDurationInMinutes()) {
+            if (solvedDuration == staffingLevelActivityWithDurationMap.getOrDefault(allActivitySolvingMaxDuration.get(i), new StaffingLevelActivityWithDuration()).getResolvingUnderOrOverStaffingDurationInMinutes() || solvedDuration > gapDuration) {
                 solvingEqualProblems.add(allActivitySolvingMaxDuration.get(0));
                 continue;
             }
@@ -465,13 +468,9 @@ public class AutoFillGapSettingsService {
 
     private List<BigInteger> getActivitiesResolvingMostProblem(Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap, ShiftDTO shiftDTO) {
         Set<BigInteger> activityIds=shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet());
-        Map<Short, BigInteger> solvingMostProblem = new TreeMap<>(Collections.reverseOrder());
-        staffingLevelActivityWithDurationMap.forEach((k, v) -> {
-            if(!activityIds.contains(v.getActivityId())) {
-                solvingMostProblem.put(v.getResolvingUnderOrOverStaffingDurationInMinutes(), v.getActivityId());
-            }
-        });
-        return new ArrayList<>(solvingMostProblem.values());
+        List<BigInteger> mostProblemResolvingActivities=staffingLevelActivityWithDurationMap.values().stream().sorted(Comparator.comparing(StaffingLevelActivityWithDuration::getResolvingUnderOrOverStaffingDurationInMinutes).reversed()).collect(Collectors.toList()).stream().map(StaffingLevelActivityWithDuration::getActivityId).collect(Collectors.toList());
+        mostProblemResolvingActivities.removeAll(activityIds);
+        return mostProblemResolvingActivities;
     }
 
     private BigInteger getHighestRankedActivity(Set<BigInteger> activityIds, List<TeamDTO> teamsData, List<ActivityWrapper> activityList) {
