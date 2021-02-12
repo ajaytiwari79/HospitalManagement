@@ -10,7 +10,9 @@ import com.kairos.dto.user.employment.PlanningEmploymentDTO;
 import com.kairos.dto.user.filter.FilteredStaffsAndRequiredDataFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.shift.ShiftFilterDurationType;
+import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
+import com.kairos.persistence.repository.night_worker.NightWorkerMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.night_worker.NightWorkerService;
@@ -27,8 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.FilterType.CTA_ACCOUNT_TYPE;
 
 @Service
@@ -45,6 +46,7 @@ public class ShiftPlanningService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject private NightWorkerService nightWorkerService;
+    @Inject private NightWorkerMongoRepository nightWorkerMongoRepository;
 
 
     public <T> List<StaffShiftDetailsDTO> getShiftPlanningDetailsForUnit(final Long unitId, final ShiftSearchDTO shiftSearchDTO, boolean showAllStaffs) {
@@ -294,8 +296,9 @@ public class ShiftPlanningService {
     }
 
     private void setNightWorkerDetails(List<StaffShiftDetailsDTO> staffListWithPersonalDetails){
-        Map<Long, Boolean> notNightWorkerMap = nightWorkerService.getStaffIdAndNightWorkerMap(staffListWithPersonalDetails.stream().map(StaffShiftDetailsDTO::getId).collect(Collectors.toSet()));
-        staffListWithPersonalDetails.forEach(k-> k.getEmployments().get(0).setNightWorker(!notNightWorkerMap.containsKey(k.getId())));
+        List<NightWorker> nightWorker = nightWorkerMongoRepository.findByStaffIds(staffListWithPersonalDetails.stream().map(StaffShiftDetailsDTO::getId).collect(Collectors.toSet()));
+        Map<Long, Boolean> nightWorkerMap = nightWorker.stream().filter(distinctByKey(NightWorker::getStaffId)).collect(Collectors.toMap(NightWorker::getStaffId, NightWorker::isNightWorker));
+        staffListWithPersonalDetails.forEach(k-> k.getEmployments().get(0).setNightWorker(nightWorkerMap.getOrDefault(k.getId(),false)));
     }
 
 
