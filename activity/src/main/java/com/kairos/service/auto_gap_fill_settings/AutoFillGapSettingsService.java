@@ -330,7 +330,7 @@ public class AutoFillGapSettingsService {
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1:
                     return getShiftActivityDTO(beforeGap, afterGap, shiftActivityDTO,mainTeamActivityId);
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2:
-                    if (mainTeamActivityId != null) {
+                    if (mainTeamActivityId != null || highestRankTeam!=null) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeamRemoved ? highestRankTeam.getActivityIds().iterator().next() : mainTeamActivityId, true);
                     } else if(!mainTeamRemoved){
                         exceptionService.actionNotPermittedException(MAIN_TEAM_ABSENT);
