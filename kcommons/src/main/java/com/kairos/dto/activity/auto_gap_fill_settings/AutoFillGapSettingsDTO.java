@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -36,7 +37,7 @@ public class AutoFillGapSettingsDTO implements Serializable {
     @NotNull(message = "message.gap.filling.scenario.not.null")
     private AutoGapFillingScenario autoGapFillingScenario;
     @NotEmpty(message = "message.gap.settings.rule.not.empty")
-    private Set<AutoFillGapSettingsRule> selectedAutoFillGapSettingsRules;
+    private List<AutoFillGapSettingsRule> selectedAutoFillGapSettingsRules;
     @NotNull(message = "message.gap.applicable.for.not.null")
     private AccessGroupRole gapApplicableFor;
     private Date updatedAt;
