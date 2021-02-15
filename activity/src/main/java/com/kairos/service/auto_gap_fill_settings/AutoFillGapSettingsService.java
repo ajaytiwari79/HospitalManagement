@@ -262,12 +262,10 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2:
-                    if (mainTeamActivityId != null || highestRankTeam!=null) {
-                        return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeamRemoved ? highestRankTeam.getActivityIds().iterator().next() : mainTeamActivityId, true);
-                    } else if(!mainTeamRemoved){
+                    if(!mainTeamRemoved && mainTeamActivityId==null){
                         exceptionService.actionNotPermittedException(MAIN_TEAM_ABSENT);
                     }
-                    break;
+                    return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeamActivityId==null ? highestRankTeam.getActivityIds().iterator().next():mainTeamActivityId , true);
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE2:
                     List<ActivityWrapper> activityWrappers = activityList.stream().filter(k -> !k.getActivity().getId().equals(productiveActivity.getActivityId())).collect(Collectors.toList());
                     BigInteger activityId = staffingLevelActivityWithDurationMap.isEmpty() ? null : getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityWrappers, shiftDTO,gapDuration);
@@ -333,12 +331,10 @@ public class AutoFillGapSettingsService {
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1:
                     return getShiftActivityDTO(beforeGap, afterGap, shiftActivityDTO,mainTeamActivityId);
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2:
-                    if (mainTeamActivityId != null || highestRankTeam!=null) {
-                        return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeamRemoved ? highestRankTeam.getActivityIds().iterator().next() : mainTeamActivityId, true);
-                    } else if(!mainTeamRemoved){
+                    if(!mainTeamRemoved && mainTeamActivityId==null){
                         exceptionService.actionNotPermittedException(MAIN_TEAM_ABSENT);
                     }
-                    break;
+                    return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeamActivityId==null ? highestRankTeam.getActivityIds().iterator().next():mainTeamActivityId , true);
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE3:
                     if(!teamRankingMap.containsKey(afterGap.getActivityId()) && !teamRankingMap.containsKey(beforeGap.getActivityId())){
                         exceptionService.actionNotPermittedException(GAP_FILLING_CONFIGURATION_ABSENT);
