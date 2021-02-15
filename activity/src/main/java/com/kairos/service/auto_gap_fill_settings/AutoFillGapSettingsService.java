@@ -174,7 +174,7 @@ public class AutoFillGapSettingsService {
             boolean mainTeamRemoved = staffAdditionalInfoDTO.getTeamsData().stream().anyMatch(k -> TeamType.MAIN.equals(k.getTeamType()) && k.getActivityIds().contains(removedActivity.getActivityId()));
             filterActivities(staffAdditionalInfoDTO.getTeamsData(), activityWrapperMap, shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()), shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toSet()), mainTeamRemoved);
             setBasicDetails(shiftActivityBeforeGap, shiftActivityAfterGap, activityWrapperMap);
-            Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = updateStaffingLevelDetails(activities, phase, activityWrapperMap);
+            Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = updateStaffingLevelDetails(shiftActivityBeforeGap,shiftActivityAfterGap, phase, activityWrapperMap);
             AutoGapFillingScenario gapFillingScenario = getGapFillingScenario(shiftActivityBeforeGap, shiftActivityAfterGap);
             AutoFillGapSettings gapSettings = autoFillGapSettingsMongoRepository.getCurrentlyApplicableGapSettingsForUnit(shiftDTO.getUnitId(), phase.getId(), gapFillingScenario.toString(), null, UserContext.getUserDetails().isManagement() ? MANAGEMENT.toString() : STAFF.toString(), shiftDTO.getShiftDate());
             if (isNull(gapSettings)) {
@@ -451,13 +451,13 @@ public class AutoFillGapSettingsService {
     }
 
 
-    private Map<BigInteger, StaffingLevelActivityWithDuration> updateStaffingLevelDetails(ShiftActivityDTO[] activities, Phase phase, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+    private Map<BigInteger, StaffingLevelActivityWithDuration> updateStaffingLevelDetails(ShiftActivityDTO beforeGap,ShiftActivityDTO afterGap, Phase phase, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         List<ShiftActivity> shiftActivities = new ArrayList<>();
-        activityWrapperMap.forEach((k, v) -> shiftActivities.add(new ShiftActivity(v.getActivity().getName(), activities[0].getEndDate(), activities[1].getEndDate(), k, null, v.getActivity().getActivityGeneralSettings().getUltraShortName(), v.getActivity().getActivityGeneralSettings().getShortName())));
+        activityWrapperMap.forEach((k, v) -> shiftActivities.add(new ShiftActivity(v.getActivity().getName(), beforeGap.getEndDate(), afterGap.getStartDate(), k, null, v.getActivity().getActivityGeneralSettings().getUltraShortName(), v.getActivity().getActivityGeneralSettings().getShortName())));
         Shift shift = new Shift();
         shift.setActivities(shiftActivities);
-        shift.setStartDate(activities[0].getEndDate());
-        shift.setEndDate(activities[1].getStartDate());
+        shift.setStartDate(beforeGap.getEndDate());
+        shift.setEndDate(afterGap.getStartDate());
         shift.setUnitId(phase.getOrganizationId());
         Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = new HashMap<>();
         for (ShiftActivity shiftActivity : shiftActivities) {
