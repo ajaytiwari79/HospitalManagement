@@ -267,6 +267,7 @@ public class AutoFillGapSettingsService {
                     }
                     return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), mainTeamActivityId==null ? highestRankTeam.getActivityIds().iterator().next():mainTeamActivityId , true);
                 case RULES_AS_PER_STAFF_ONE_SIDE_PRODUCTIVE_OTHER_SIDE_NON_PRODUCTIVE_PUZZLE_TO_TENTATIVE_PHASE2:
+                    //TODO Check Main Team As well
                     List<ActivityWrapper> activityWrappers = activityList.stream().filter(k -> !k.getActivity().getId().equals(productiveActivity.getActivityId())).collect(Collectors.toList());
                     BigInteger activityId = staffingLevelActivityWithDurationMap.isEmpty() ? null : getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityWrappers, shiftDTO,gapDuration);
                     if (activityId != null) {
@@ -330,6 +331,7 @@ public class AutoFillGapSettingsService {
         for (AutoFillGapSettingsRule autoFillGapSettingsRule : gapSettings.getSelectedAutoFillGapSettingsRules()) {
             switch (autoFillGapSettingsRule) {
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE1:
+                    //TODO Check for all activities in shift
                     return getShiftActivityDTO(beforeGap, afterGap, shiftActivityDTO,mainTeamActivityId);
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_REQUEST_PHASE2:
                     if(!mainTeamRemoved && mainTeamActivityId==null){
@@ -360,6 +362,7 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_STAFF_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE2:
+                    //TODO This will check only inside the shift
                     boolean mainTeamResolvingProblem=staffingLevelActivityWithDurationMap.getOrDefault(mainTeamActivityId, new StaffingLevelActivityWithDuration()).getResolvingUnderOrOverStaffingDurationInMinutes() > 0;
                     TeamDTO highestRank=null;
                     if(!mainTeamResolvingProblem){
@@ -393,6 +396,7 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE2:
+                    //TODO Remove this Template
                     short durationOfBefore = staffingLevelActivityWithDurationMap.containsKey(beforeGap.getActivityId()) ? staffingLevelActivityWithDurationMap.get(beforeGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() : 0;
                     short durationOfAfter = staffingLevelActivityWithDurationMap.containsKey(afterGap.getActivityId()) ? staffingLevelActivityWithDurationMap.get(afterGap.getActivityId()).getResolvingUnderOrOverStaffingDurationInMinutes() : 0;
                     if (durationOfBefore != 0 || durationOfAfter != 0) {
@@ -400,6 +404,7 @@ public class AutoFillGapSettingsService {
                     }
                     break;
                 case RULES_AS_PER_MANAGEMENT_PRODUCTIVE_TYPE_ON_BOTH_SIDE_PUZZLE_TO_TENTATIVE_PHASE3:
+                    //TODO Remove this one as it is duplicate of another
                     activityId = getHighestRankActivity(staffAdditionalInfoDTO, staffingLevelActivityWithDurationMap, activityList, shiftDTO,gapDuration);
                     if (activityId != null) {
                         return new ShiftActivityDTO("", beforeGap.getEndDate(), afterGap.getStartDate(), activityId, null);
@@ -463,7 +468,7 @@ public class AutoFillGapSettingsService {
         shift.setUnitId(phase.getOrganizationId());
         Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = new HashMap<>();
         for (ShiftActivity shiftActivity : shiftActivities) {
-            staffingLevelService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, new RuleTemplateSpecificInfo(), staffingLevelActivityWithDurationMap, true);
+            staffingLevelService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, staffingLevelActivityWithDurationMap, true);
         }
         return staffingLevelActivityWithDurationMap;
     }

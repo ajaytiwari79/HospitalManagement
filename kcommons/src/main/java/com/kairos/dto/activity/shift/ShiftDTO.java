@@ -98,6 +98,7 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     private Map<String,Object> changes;
     protected List<TimeBankDistributionDTO> timeBankCTADistributions = new ArrayList<>();
     protected List<PayOutPerShiftCTADistributionDTO> payoutPerShiftCTADistributions = new ArrayList<>();
+    private ShiftActivityDTO replacedActivity;
 
     public ShiftDTO(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivityDTO> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
         this.startDate = startDate;

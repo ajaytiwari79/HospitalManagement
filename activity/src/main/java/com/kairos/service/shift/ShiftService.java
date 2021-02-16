@@ -351,7 +351,7 @@ public class ShiftService {
             List<ShiftActivity>[] shiftActivities = shift.getShiftActivitiesForValidatingStaffingLevel(null);
 
             for (ShiftActivity shiftActivity : shiftActivities[1]) {
-                shiftValidatorService.validateStaffingLevel(phaseListByDate.get(shift.getStartDate()), shift, activityWrapperMap, true, shiftActivity, null, staffingLevelActivityWithDurationMap,false);
+                shiftValidatorService.validateStaffingLevel(phaseListByDate.get(shift.getStartDate()), shift, activityWrapperMap, true, shiftActivity, staffingLevelActivityWithDurationMap,false);
             }
             int scheduledMinutes = 0;
             int durationMinutes = 0;
@@ -625,6 +625,7 @@ public class ShiftService {
             return new ArrayList<>();
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(shiftDTO.getShiftDate(), shiftDTO.getStaffId(), shiftDTO.getEmploymentId());
+        staffAdditionalInfoDTO.setReplacedActivity(shiftDTO.getReplacedActivity());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shiftDTO.getStartDate(), shiftDTO.getEndDate());
         Boolean skipRules=gapSettingsService.adjustGapByActivity(shiftDTO,shift,phase,staffAdditionalInfoDTO);
         Shift oldShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
