@@ -154,7 +154,11 @@ public class TimeSlotSetService {
     }
 
     public List<TimeSlotDTO> getUnitTimeSlot(Long unitId) {
-        return getShiftPlanningTimeSlotSetsByUnit(unitId).get(0).getTimeSlots();
+        List<TimeSlotSetDTO> timeSlotSetDTOS = getShiftPlanningTimeSlotSetsByUnit(unitId);
+        if(isCollectionEmpty(timeSlotSetDTOS)){
+            exceptionService.dataNotFoundException(TIMESLOT_NOT_FOUND_FOR_UNIT,unitId);
+        }
+        return timeSlotSetDTOS.get(0).getTimeSlots();
     }
 
     public List<TimeSlotDTO> getUnitTimeSlotByNames(Long unitId, Set<String> timeslotNames) {
