@@ -8,6 +8,8 @@ import org.neo4j.ogm.typeconversion.AttributeConverter;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+
 /**
  * Created By Pavan on 19/11/20
  **/
@@ -19,7 +21,10 @@ public class TranslationConverter implements AttributeConverter<Map<String,Trans
     @Override
     public String toGraphProperty(Map value) {
         try {
-            return ObjectMapperUtils.mapper.writeValueAsString(value);
+            if(isNull(value)){
+                return null;
+            }
+            return ObjectMapperUtils.getObjectMapper().writeValueAsString(value);
         } catch (Exception ex) {
             return null;
         }

@@ -28,6 +28,7 @@ import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -221,7 +222,11 @@ public class CounterDataService {
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
         defaultKpiDataDTO.setDayTypeDTOS(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         defaultKpiDataDTO.setReasonCodeDTOS(reasonCodeService.getReasonCodesByUnitId(refId, FORCEPLAN));
-        defaultKpiDataDTO.setTimeSlotDTOS(timeSlotMongoRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(refId, TimeSlotType.SHIFT_PLANNING).getTimeSlots());
+        TimeSlotSetDTO timeSlotSetDTO = timeSlotMongoRepository.findByUnitIdAndTimeSlotTypeOrderByStartDate(refId, TimeSlotType.SHIFT_PLANNING);
+        if(isNull(timeSlotSetDTO)){
+            exceptionService.dataNotFoundException(TIMESLOT_NOT_FOUND_FOR_UNIT);
+        }
+        defaultKpiDataDTO.setTimeSlotDTOS(timeSlotSetDTO.getTimeSlots());
         getSelectedFilterDefaultData(level, criteriaList, kpi, defaultKpiDataDTO);
         setKpiProperty(applicableKPIS.get(0), criteriaList, kpi);
         return kpi;
