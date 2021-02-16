@@ -213,9 +213,7 @@ public class ActivityService {
         validateActivityDetails(countryId, generalDTO);
         Activity activity = findActivityById(generalDTO.getActivityId());
         generalDTO.setBackgroundColor(activity.getActivityGeneralSettings().getBackgroundColor());
-        if(isNotNull(generalDTO.getUltraShortName()) || isNotNull(generalDTO.getShortName())){
-            shiftHelperService.updateBackgroundColorInActivityAndShift(activity,null);
-        }
+        shiftHelperService.updateBackgroundColorInActivityAndShift(activity,null);
         ActivityGeneralSettings generalTab = ObjectMapperUtils.copyPropertiesByMapper(generalDTO, ActivityGeneralSettings.class);
         if (Optional.ofNullable(activity.getActivityGeneralSettings().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getActivityGeneralSettings().getModifiedIconName());
