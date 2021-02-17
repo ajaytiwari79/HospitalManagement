@@ -600,7 +600,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         List<TimeTypeEnum> breakTypes = new ArrayList<>();
         breakTypes.add(PAID_BREAK);
         breakTypes.add(UNPAID_BREAK);
-        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).in(breakTypes)),
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE).in(breakTypes)),
                 project("id")
                 );
         AggregationResults<Activity> result = mongoTemplate.aggregate(aggregation, Activity.class, Activity.class);
