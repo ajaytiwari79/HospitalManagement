@@ -321,10 +321,7 @@ public class ShiftValidatorService {
     }
 
     private boolean isValidWTARuleForDelete(WTABaseRuleTemplate wtaRule) {
-        if (newHashSet(NUMBER_OF_PARTOFDAY, CONSECUTIVE_WORKING_PARTOFDAY).contains(wtaRule.getWtaTemplateType())) {
-            return true;
-        }
-        return false;
+        return newHashSet(NUMBER_OF_PARTOFDAY, CONSECUTIVE_WORKING_PARTOFDAY).contains(wtaRule.getWtaTemplateType());
     }
 
     private void updateScheduledAndDurationMinutesInShift(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
