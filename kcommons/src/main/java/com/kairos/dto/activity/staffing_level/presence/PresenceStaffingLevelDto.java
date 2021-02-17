@@ -30,6 +30,7 @@ public class PresenceStaffingLevelDto {
     private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
+    private Set<StaffingLevelActivityDetails> staffingLevelActivityDetails =new LinkedHashSet<>();
     private Date updatedAt;
     private boolean draft;
 

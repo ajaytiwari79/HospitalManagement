@@ -2,8 +2,10 @@ package com.kairos.persistence.model.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
+import com.kairos.dto.activity.staffing_level.presence.StaffingLevelActivityDetails;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,10 +17,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Document(collection = "staffing_level")
@@ -35,6 +34,7 @@ public class StaffingLevel extends MongoBaseEntity {
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval = new ArrayList<>();
     private List<StaffingLevelInterval> absenceStaffingLevelInterval = new ArrayList<>();
+    private Set<StaffingLevelActivityDetails> staffingLevelActivityDetails =new LinkedHashSet<>();
 
     public StaffingLevel(Date currentDate, Integer weekCount,
                          Long organizationId, BigInteger phaseId, StaffingLevelSetting staffingLevelSetting) {

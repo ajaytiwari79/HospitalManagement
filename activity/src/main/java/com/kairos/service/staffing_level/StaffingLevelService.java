@@ -12,6 +12,7 @@ import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.presence.StaffingLevelActivityDetails;
 import com.kairos.dto.activity.staffing_level.presence.StaffingLevelDetailsByTimeSlotDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
@@ -19,15 +20,11 @@ import com.kairos.dto.user.organization.OrganizationSkillAndOrganizationTypesDTO
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
-import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
-import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -469,9 +466,8 @@ public class StaffingLevelService {
                 }
                 presenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getPresenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
                 presenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(presenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), presenceStaffingLevelDto);
-                Map<BigInteger,List<StaffingLevelActivity>> bigIntegerListMap = presenceStaffingLevelDto.getPresenceStaffingLevelInterval().stream().flatMap(staffingLevelInterval -> staffingLevelInterval.getStaffingLevelActivities().stream()).collect(Collectors.groupingBy(staffingLevelActivity -> staffingLevelActivity.getActivityId()));
                 System.out.println(DateUtils.getDateStringWithFormat(presenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD));
-                printMap(bigIntegerListMap);
+                printMap(staffingLevel.getStaffingLevelActivityDetails());
             }
             AbsenceStaffingLevelDto absenceStaffingLevelDto = getAbsenceStaffingLevelDto(staffingLevel);
             absenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(absenceStaffingLevelDto.getCurrentDate(), YYYY_MM_DD), absenceStaffingLevelDto);
@@ -480,32 +476,16 @@ public class StaffingLevelService {
     }
 
     //todo pradeep will remove it after testing
-    private void printMap(Map<BigInteger, List<StaffingLevelActivity>> bigIntegerListMap) {
-        for (Map.Entry<BigInteger, List<StaffingLevelActivity>> bigIntegerListEntry : bigIntegerListMap.entrySet()) {
-            System.out.println(bigIntegerListEntry.getKey());
-            int remaining = 0;
-            int solved = 0;
-            int intial = 0;
-            int overRemaining = 0;
-            int overSolved = 0;
-            int overintial = 0;
-            int available = 0;
-            for (StaffingLevelActivity staffingLevelActivity : bigIntegerListEntry.getValue()) {
-                intial += staffingLevelActivity.getInitialUnderStaffing();
-                solved += staffingLevelActivity.getSolvedUnderStaffing();
-                remaining += staffingLevelActivity.getRemainingUnderStaffing();
-                overintial += staffingLevelActivity.getInitialOverStaffing();
-                overSolved += staffingLevelActivity.getSolvedOverStaffing();
-                overRemaining += staffingLevelActivity.getRemainingOverStaffing();
-                available += staffingLevelActivity.getAvailableNoOfStaff();
-            }
-            System.out.println("available "+available);
-            System.out.println("remaining "+remaining);
-            System.out.println("solved "+solved);
-            System.out.println("intial "+intial);
-            System.out.println("overRemaining "+overRemaining);
-            System.out.println("overSolved "+overSolved);
-            System.out.println("overintial "+overintial);
+    private void printMap(Set<StaffingLevelActivityDetails> staffingLevelActivityDetails) {
+        for (StaffingLevelActivityDetails staffingLevelActivityDetail : staffingLevelActivityDetails) {
+            System.out.println("Activity Id "+staffingLevelActivityDetail.getActivityId());
+            System.out.println("available Count "+staffingLevelActivityDetail.getAvailableCount());
+            System.out.println("remaining "+staffingLevelActivityDetail.getRemainingUnderStaffing());
+            System.out.println("solved "+staffingLevelActivityDetail.getSolvedUnderStaffing());
+            System.out.println("intial "+staffingLevelActivityDetail.getInitialUnderStaffing());
+            System.out.println("overRemaining "+staffingLevelActivityDetail.getRemainingOverStaffing());
+            System.out.println("overSolved "+staffingLevelActivityDetail.getSolvedOverStaffing());
+            System.out.println("overintial "+staffingLevelActivityDetail.getInitialOverStaffing());
         }
     }
 
@@ -742,6 +722,9 @@ public class StaffingLevelService {
         Object[] staffingLevelMapAndActivityIds = getStaffingLevelMapAndActivityIds(staffingLevels);
         Set<BigInteger> activityIds = (Set<BigInteger>) staffingLevelMapAndActivityIds[0];
         List<Activity> activities = activityMongoRepository.findAllBreakActivitiesByOrganizationId(unitId);
+        if(isCollectionEmpty(activities)){
+            exceptionService.dataNotFoundException(ERROR_BREAKSACTIVITY_NOT_CONFIGURED,unitId);
+        }
         Set<BigInteger> breakActivityIds = activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
         activityIds.addAll(breakActivityIds);
         Map<LocalDate, PresenceStaffingLevelDto> staffingLevelMap = (Map<LocalDate, PresenceStaffingLevelDto>) staffingLevelMapAndActivityIds[1];
@@ -883,13 +866,25 @@ public class StaffingLevelService {
     @Async
     public void setIntialValueOfStaffingLevel(PlanningPeriod planningPeriod){
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(planningPeriod.getUnitId(),asDate(planningPeriod.getStartDate()),asDate(planningPeriod.getEndDate()));
-        staffingLevels.parallelStream().forEach(staffingLevel -> {
-            for (StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()) {
-                for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
-                    staffingLevelActivity.resetValueOnPhaseFlip();
+        for (StaffingLevel staffingLevel : staffingLevels) {
+            Map<BigInteger,List<StaffingLevelActivity>> bigIntegerListMap = staffingLevel.getPresenceStaffingLevelInterval().stream().flatMap(staffingLevelInterval -> staffingLevelInterval.getStaffingLevelActivities().stream()).collect(Collectors.groupingBy(staffingLevelActivity -> staffingLevelActivity.getActivityId()));
+            staffingLevel.setStaffingLevelActivityDetails(new LinkedHashSet<>());
+            for (Map.Entry<BigInteger, List<StaffingLevelActivity>> bigIntegerListEntry : bigIntegerListMap.entrySet()) {
+                int maxNoOfStaff = 0;
+                int minNoOfStaff = 0;
+                int availableNoOfStaff = 0;
+
+                for (StaffingLevelActivity staffingLevelActivity : bigIntegerListEntry.getValue()) {
+                    maxNoOfStaff += staffingLevelActivity.getMaxNoOfStaff();
+                    minNoOfStaff += staffingLevelActivity.getMinNoOfStaff();
+                    availableNoOfStaff +=staffingLevelActivity.getAvailableNoOfStaff();
                 }
+                StaffingLevelActivityDetails staffingLevelActivityDetails = new StaffingLevelActivityDetails();
+                staffingLevelActivityDetails.setActivityId(bigIntegerListEntry.getKey());
+                staffingLevelActivityDetails.resetValueOnPhaseFlip(availableNoOfStaff,minNoOfStaff,maxNoOfStaff);
+                staffingLevel.getStaffingLevelActivityDetails().add(staffingLevelActivityDetails);
             }
-        });
+        }
         staffingLevelMongoRepository.saveEntities(staffingLevels);
     }
 

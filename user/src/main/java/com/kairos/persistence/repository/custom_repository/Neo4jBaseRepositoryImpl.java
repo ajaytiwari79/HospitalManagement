@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.service.kpermissions.PermissionService.checkAndUpdateRelationShipPermission;
 
 @Transactional(readOnly = true)

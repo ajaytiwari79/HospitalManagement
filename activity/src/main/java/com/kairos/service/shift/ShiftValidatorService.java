@@ -144,7 +144,6 @@ public class ShiftValidatorService {
     private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
     @Inject
     private NightWorkerMongoRepository nightWorkerMongoRepository;
-    private static ExceptionService exceptionService;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
@@ -155,7 +154,7 @@ public class ShiftValidatorService {
     private ShiftSickService shiftSickService;
     @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
-
+    private static ExceptionService exceptionService;
     @Autowired
     public void setExceptionService(ExceptionService exceptionService) {
         this.exceptionService = exceptionService;
@@ -455,7 +454,7 @@ public class ShiftValidatorService {
     }
 
     public RuleTemplateSpecificInfo getRuleTemplateSpecificInfo(Phase phase, ShiftWithActivityDTO shift, WTAQueryResultDTO wtaQueryResultDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftOperationType shiftOperationType) {
-        logger.info("Current phase is {} for date {}", phase.getName(), new DateTime(shift.getStartDate()));
+        LOGGER.info("Current phase is {} for date {}", phase.getName(), new DateTime(shift.getStartDate()));
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), asLocalDate(shift.getStartDate()));
         if (planningPeriod == null) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PLANNING_PERIOD_EXITS, shift.getStartDate());
@@ -490,7 +489,7 @@ public class ShiftValidatorService {
     }
 
     public RuleTemplateSpecificInfo getRuleTemplateSpecificInfo(Phase phase, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDataHelper shiftDataHelper, ShiftOperationType shiftOperationType) {
-        logger.info("Current phase is {} for date {}", phase.getName(), new DateTime(shift.getStartDate()));
+        LOGGER.info("Current phase is {} for date {}", phase.getName(), new DateTime(shift.getStartDate()));
         WTAQueryResultDTO wtaQueryResultDTO = shiftDataHelper.getWtaByDate(asLocalDate(shift.getStartDate()), shift.getEmploymentId());
         Set<WTATemplateType> templateTypes = wtaQueryResultDTO.getWTATemplateTypes();
         PlanningPeriodDTO planningPeriod = shiftDataHelper.getPlanningPeriod();
@@ -915,7 +914,6 @@ public class ShiftValidatorService {
                 overLappedShift.getShiftViolatedRules().setEscalationResolved(true);
                 isResolved = true;
             }
-
         }
         return isResolved;
     }
