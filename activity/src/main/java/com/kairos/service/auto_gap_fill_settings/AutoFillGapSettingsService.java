@@ -28,6 +28,7 @@ import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.redis.RedisService;
 import com.kairos.service.shift.ShiftValidatorService;
+import com.kairos.service.staffing_level.StaffingLevelValidatorService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,7 @@ public class AutoFillGapSettingsService {
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
-    private ShiftValidatorService staffingLevelService;
+    private StaffingLevelValidatorService staffingLevelValidatorService;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -468,7 +469,7 @@ public class AutoFillGapSettingsService {
         shift.setUnitId(phase.getOrganizationId());
         Map<BigInteger, StaffingLevelActivityWithDuration> staffingLevelActivityWithDurationMap = new HashMap<>();
         for (ShiftActivity shiftActivity : shiftActivities) {
-            staffingLevelService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, staffingLevelActivityWithDurationMap, true);
+            staffingLevelValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity, staffingLevelActivityWithDurationMap, true);
         }
         return staffingLevelActivityWithDurationMap;
     }
