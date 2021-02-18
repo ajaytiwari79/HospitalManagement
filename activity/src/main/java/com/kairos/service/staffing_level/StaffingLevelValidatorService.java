@@ -26,11 +26,12 @@ import java.math.BigInteger;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.ActivityMessagesConstants.SHIFT_CAN_NOT_MOVE;
 import static com.kairos.constants.AppConstants.LOW_ACTIVITY_RANK;
 import static com.kairos.enums.TimeTypeEnum.PRESENCE;
 
