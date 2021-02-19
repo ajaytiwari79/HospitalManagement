@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 /**
@@ -78,29 +79,22 @@ public class TagService {
     }
 
     public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType,boolean includeStaffTags){
-        if ( !userIntegrationService.isCountryExists(countryId)) {
+        if (!userIntegrationService.isCountryExists(countryId)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID,countryId);
         }
-
-        if(filterText == null){
-            filterText = "";
-        }/* else {
-            filterText = "/"+filterText+"/i";
-        }*/
-
+        filterText = isNull(filterText) ? "" : filterText;
         HashMap<String,Object> tagsData = new HashMap<>();
         List<Tag> tags;
         List<TagDTO> tagDTOS ;
         if(masterDataType == null){
-            tags = tagMongoRepository.findAllTagByCountryIdAndNameAndDeletedAndCountryTagTrue(countryId, filterText, false);
+            tagDTOS = tagMongoRepository.findAllTagByCountryIdAndNameAndDeletedAndCountryTag(countryId, filterText, false);
         } else {
-            tags = tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeletedAndCountryTagTrue(countryId, filterText, masterDataType.toString(), false);
+            tagDTOS = tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeleted(countryId, filterText, masterDataType.toString(), false);
         }
-
         if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.equals(masterDataType)){
-            tags.addAll(userIntegrationService.getAllStaffTagsByCountryIdOrOrganizationId(countryId, filterText, true));
+            tags = userIntegrationService.getAllStaffTagsByCountryIdOrOrganizationId(countryId, filterText, true);
+            tagDTOS.addAll(ObjectMapperUtils.copyCollectionPropertiesByMapper(tags, com.kairos.dto.activity.tags.TagDTO.class));
         }
-        tagDTOS = ObjectMapperUtils.copyCollectionPropertiesByMapper(tags, com.kairos.dto.activity.tags.TagDTO.class);
         tagsData.put("tags",tagDTOS);
         return tagsData;
     }
@@ -213,7 +207,7 @@ public class TagService {
 
     public Map<String, TranslationInfo> updateTranslation(BigInteger tagId, Map<String,TranslationInfo> translations) {
         Tag tag =tagMongoRepository.findTagByIdAndEnabled(tagId);
-        if(ObjectUtils.isNull(tag)){
+        if(isNull(tag)){
             exceptionService.dataNotFoundByIdException(MESSAGE_TAG_ID,tagId);
         }
         tag.setTranslations(translations);

@@ -17,11 +17,13 @@ import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
@@ -31,6 +33,7 @@ import com.kairos.service.tag.TagService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,6 +72,28 @@ public class RuleTemplateService{
     @Inject
     private ExceptionService exceptionService;
     @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject private CTARuleTemplateRepository ctaRuleTemplateRepository;
+
+    @Async
+    public void updateCategoryInTemplate(Long countryId, BigInteger templateCategoryId, RuleTemplateCategory ruleTemplateCategory) {
+        if (RuleTemplateCategoryType.WTA.equals(ruleTemplateCategory.getRuleTemplateCategoryType())) {
+            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(templateCategoryId);
+            RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
+            wtaBaseRuleTemplates.forEach(rt -> {
+                rt.setRuleTemplateCategoryId(noneRuleTemplateCategory.getId());
+            });
+            if (!wtaBaseRuleTemplates.isEmpty()) {
+                wtaBaseRuleTemplateMongoRepository.saveEntities(wtaBaseRuleTemplates);
+            }
+        } else {
+            List<CTARuleTemplate> ctaRuleTemplates = ctaRuleTemplateRepository.findAllByCategoryId(ruleTemplateCategory.getId());
+            RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
+            ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setRuleTemplateCategoryId(noneRuleTemplateCategory.getId()));
+            if (!ctaRuleTemplates.isEmpty()) {
+                ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
+            }
+        }
+    }
 
     public boolean createRuleTemplate(long countryId) {
         CountryDTO countryDTO = getCountryDTO(countryId);

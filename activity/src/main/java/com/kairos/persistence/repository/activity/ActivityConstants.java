@@ -27,7 +27,16 @@ public class ActivityConstants {
             "                ]\n" +
             "              }\n" +
             "            }\n" +
-            "          }\n" +
+            "          },\n" +
+            "          {\n" +
+            "          \"$project\":{\n" +
+            "              \"id\":1,\n" +
+            "              \"name\":1,\n" +
+            "              \"activityRulesSettings\":1,\n" +
+            "              \"parentActivityId\":1,\n" +
+            "              \"activityPriorityName\":1,\n" +
+            "              }    \n" +
+            "              }\n" +
             "        ],\n" +
             "        \"as\": \"activities\"\n" +
             "      }\n" +

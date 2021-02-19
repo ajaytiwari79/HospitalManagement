@@ -22,6 +22,7 @@ import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,8 +56,10 @@ public class RuleTemplateCategoryService {
     @Autowired
     private ExceptionService excpExceptionService;
     @Inject
-    TagMongoRepository tagMongoRepository;
-    private final Logger logger = LoggerFactory.getLogger(RuleTemplateCategoryService.class);
+    private TagMongoRepository tagMongoRepository;
+    @Inject @Lazy private RuleTemplateService ruleTemplateService;
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(RuleTemplateCategoryService.class);
 
     /**
      * used to save a new Rule template in a country
@@ -134,7 +137,7 @@ public class RuleTemplateCategoryService {
     }
 
 
-    public boolean deleteRuleTemplateCategory(long countryId, BigInteger templateCategoryId) {
+    public boolean deleteRuleTemplateCategory(Long countryId, BigInteger templateCategoryId) {
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryMongoRepository.findOne(templateCategoryId);
         if (ruleTemplateCategory == null) {
             excpExceptionService.dataNotFoundByIdException(MESSAGE_RULETEMPLATECATEGORY_ID, templateCategoryId);
@@ -143,29 +146,12 @@ public class RuleTemplateCategoryService {
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
             excpExceptionService.actionNotPermittedException(MESSAGE_RULETEMPLATECATEGORY_DELETE, templateCategoryId);
         }
-        if (RuleTemplateCategoryType.WTA.equals(ruleTemplateCategory.getRuleTemplateCategoryType())) {
-            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(templateCategoryId);
-            RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
-            wtaBaseRuleTemplates.forEach(rt -> {
-                rt.setRuleTemplateCategoryId(noneRuleTemplateCategory.getId());
-            });
-            if (!wtaBaseRuleTemplates.isEmpty()) {
-                wtaBaseRuleTemplateMongoRepository.saveEntities(wtaBaseRuleTemplates);
-            }
-        } else {
-            List<CTARuleTemplate> ctaRuleTemplates = ctaRuleTemplateRepository.findAllByCategoryId(ruleTemplateCategory.getId());
-            RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
-            ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setRuleTemplateCategoryId(noneRuleTemplateCategory.getId()));
-            if (!ctaRuleTemplates.isEmpty()) {
-                ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
-            }
-        }
+        ruleTemplateService.updateCategoryInTemplate(countryId, templateCategoryId, ruleTemplateCategory);
         ruleTemplateCategory.setDeleted(true);
         ruleTemplateCategoryMongoRepository.save(ruleTemplateCategory);
         return true;
 
     }
-
 
     //Create and Update method should be different
     public RuleTemplateAndCategoryResponseDTO updateRuleTemplateCategory(Long countryId, BigInteger templateCategoryId, RuleTemplateCategoryRequestDTO ruleTemplateCategoryDTO, RuleTemplateCategory ruleTemplateCategoryObj) {
