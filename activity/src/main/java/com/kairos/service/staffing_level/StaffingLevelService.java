@@ -685,8 +685,12 @@ public class StaffingLevelService {
             staffingLevelAvailableCountService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel);
         }
         staffingLevelMongoRepository.saveEntities(staffingLevels);
-        DateTimeInterval presenceInterval = new DateTimeInterval(staffingLevelPublishDTO.getSelectedDateForPresence(), staffingLevelPublishDTO.getSelectedEndDateForPresence());
-        DateTimeInterval absenceInterval = new DateTimeInterval(staffingLevelPublishDTO.getSelectedDateForAbsence(), staffingLevelPublishDTO.getSelectedEndDateForAbsence());
+        LocalDate presenceStaffingLevelStartDate = isNull(staffingLevelPublishDTO.getSelectedDateForPresence()) ? asLocalDate(staffingLevelPublishDTO.getStartDate()) : staffingLevelPublishDTO.getSelectedDateForPresence();
+        LocalDate presenceStaffingLevelEndDate = isNull(staffingLevelPublishDTO.getSelectedEndDateForPresence()) ? asLocalDate(staffingLevelPublishDTO.getEndDate()) : staffingLevelPublishDTO.getSelectedEndDateForPresence();
+        LocalDate absenceStaffingLevelStartDate = isNull(staffingLevelPublishDTO.getSelectedDateForAbsence()) ? asLocalDate(staffingLevelPublishDTO.getStartDate()) : staffingLevelPublishDTO.getSelectedDateForAbsence();
+        LocalDate absenceStaffingLevelEndDate = isNull(staffingLevelPublishDTO.getSelectedEndDateForAbsence()) ? asLocalDate(staffingLevelPublishDTO.getEndDate()) : staffingLevelPublishDTO.getSelectedEndDateForAbsence();
+        DateTimeInterval presenceInterval = new DateTimeInterval(presenceStaffingLevelStartDate, presenceStaffingLevelEndDate);
+        DateTimeInterval absenceInterval = new DateTimeInterval(absenceStaffingLevelStartDate,absenceStaffingLevelEndDate);
         for (StaffingLevel staffingLevel : staffingLevels) {
             LocalDate currentDate = asLocalDate(staffingLevel.getCurrentDate());
             if (presenceInterval.containsOrEqualsEnd(currentDate)) {
