@@ -821,9 +821,9 @@ public class TimeBankService implements KPIService {
     public int[] updateScheduledHoursAndActivityDetailsInShiftActivity(ShiftActivity shiftActivity, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         int scheduledMinutes = 0;
         int durationMinutes = 0;
-        if (shiftActivity.getId() == null) {
+        //if (shiftActivity.getId() == null) {
             shiftActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
-        }
+        //}
         ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
         shiftActivity.setTimeType(activityWrapper.getTimeType());
         Activity activity = activityWrapper.getActivity();

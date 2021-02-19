@@ -62,11 +62,14 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
@@ -139,6 +142,7 @@ public class ShiftFetchService {
     private AutoFillGapSettingsService gapSettingsService;
     @Inject
     private StaffingLevelAvailableCountService staffingLevelAvailableCountService;
+    @Inject private ExecutorService executorService;
 
     public Object getAllShiftAndStates(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, ViewType viewType, ShiftFilterParam shiftFilterParam, Long expertiseId, StaffFilterDTO staffFilterDTO) {
         Object object = null;
@@ -316,21 +320,17 @@ public class ShiftFetchService {
         List<ReasonCodeDTO> reasonCodeDTOS = reasonCodeRepository.findByUnitIdAndReasonCodeTypeAndDeletedFalse(unitId, TIME_TYPE);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = null;
         Map<LocalDate, List<FunctionDTO>> functionDTOMap = new HashMap<>();
+        Future<Map<LocalDate, List<FunctionDTO>>> responseData = null;
         if (Optional.ofNullable(employmentId).isPresent()) {
-            staffAdditionalInfoDTO = userIntegrationService.verifyEmploymentAndFindFunctionsAfterDate(staffId, employmentId);
-            if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent()) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_BELONGS, staffId);
-            }
-            if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
-                exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_ABSENT, startDate.toString());
-            }
-            List<FunctionDTO> appliedFunctionDTOs = null;
+            staffAdditionalInfoDTO = getStaffAdditionalInfoDTO(staffId, startDate, employmentId);
             if (Optional.ofNullable(staffAdditionalInfoDTO.getEmployment().getAppliedFunctions()).isPresent()) {
-                appliedFunctionDTOs = staffAdditionalInfoDTO.getEmployment().getAppliedFunctions();
+                List<FunctionDTO> appliedFunctionDTOs = staffAdditionalInfoDTO.getEmployment().getAppliedFunctions();
                 functionDTOMap = shiftFunctionService.addFunction(staffAdditionalInfoDTO, appliedFunctionDTOs);
             }
         } else {
-            functionDTOMap = userIntegrationService.getFunctionsOfEmployment(unitId, startDate, endDate);
+            LocalDate functionEndDate = endDate;
+            Callable<Map<LocalDate, List<FunctionDTO>>> data = () -> userIntegrationService.getFunctionsOfEmployment(unitId, startDate, functionEndDate);
+            responseData = executorService.submit(data);
         }
         Map<BigInteger, ReasonCodeDTO> reasonCodeMap = reasonCodeDTOS.stream().collect(Collectors.toMap(ReasonCodeDTO::getId, v -> v));
         //When employmentID is not present then we are retreiving shifts for all staffs(NOT only for Employment).
@@ -341,7 +341,26 @@ public class ShiftFetchService {
         List<ShiftDTO> shifts = (List<ShiftDTO>)collections[0];
         shifts = shiftDetailsService.setLayerInShifts(shifts,(Set<BigInteger>)collections[1]);
         Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
+        if(isNotNull(responseData)){
+            try {
+                functionDTOMap = responseData.get();
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.error(e.getMessage());
+            }
+        }
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
+    }
+
+    private StaffAdditionalInfoDTO getStaffAdditionalInfoDTO(Long staffId, LocalDate startDate, Long employmentId) {
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO;
+        staffAdditionalInfoDTO = userIntegrationService.verifyEmploymentAndFindFunctionsAfterDate(staffId, employmentId);
+        if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_BELONGS, staffId);
+        }
+        if (!Optional.ofNullable(staffAdditionalInfoDTO.getEmployment()).isPresent()) {
+            exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_ABSENT, startDate.toString());
+        }
+        return staffAdditionalInfoDTO;
     }
 
     private Object[] getShiftDTOSAfterFilterAndUpdateShiftData(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, StaffFilterDTO staffFilterDTO, Map<BigInteger, ReasonCodeDTO> reasonCodeMap) {
