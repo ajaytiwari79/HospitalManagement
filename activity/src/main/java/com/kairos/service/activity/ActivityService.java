@@ -300,13 +300,13 @@ public class ActivityService {
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
         }
-        shiftHelperService.updateBackgroundColorInActivityAndShift(activity, timeType);
         if(isNotNull(activityGeneralSettingsDTO.getTimeTypeId()) && !activityGeneralSettingsDTO.getTimeTypeId().equals(activity.getActivityBalanceSettings().getTimeTypeId())){
             if (activity.getState().equals(ActivityStateEnum.PUBLISHED)) {
                 exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED, activity.getId());
             }
             setDataInActivity(activity, timeType);
         }
+        shiftHelperService.updateBackgroundColorInActivityAndShift(activity, timeType);
         activity.getActivityGeneralSettings().setColorPresent(true);
         Long countryId = activity.getCountryId();
         if (countryId == null) {
