@@ -116,7 +116,7 @@ public class StaffActivitySettingService {
         return responseMap;
     }
 
-    @Cacheable(value = "getStaffSpecificActivitySettings", key = "{#unitId,#staffId,#includeTeamActivity,#isActivityType}", cacheManager = "cacheManager")
+    //@Cacheable(value = "getStaffSpecificActivitySettings", key = "{#unitId,#staffId,#includeTeamActivity,#isActivityType}", cacheManager = "cacheManager")
     public List<ActivityWithCompositeDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId,boolean includeTeamActivity,boolean isActivityType){
         List<ActivityWithCompositeDTO> staffPersonalizedActivities;
         if(includeTeamActivity) {
