@@ -505,7 +505,7 @@ public class StaffingLevelService {
 
         StaffingLevelTemplate staffingLevelTemplate = staffingLevelTemplateRepository.findByIdAndUnitIdAndDeletedFalse(templateId, unitId);
         if (!Optional.ofNullable(staffingLevelTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException(STAFFINGLEVELTEMPLATE_NOT_FOUND, templateId);
+            exceptionService.dataNotFoundByIdException(STAFFINGLEVEL_NOT_FOUND, templateId);
         }
         Set<BigInteger> activityIds = staffingLevelFromTemplateDTO.getActivitiesByDate().stream().flatMap(s -> s.getActivityIds().stream()).collect(Collectors.toSet());
         List<BigInteger> parentActivityIds = new ArrayList<>();
@@ -735,6 +735,9 @@ public class StaffingLevelService {
         Map<LocalDate, DailyStaffingLevelDetailsDTO> localDateDailyStaffingLevelDetailsDTOMap = new HashMap<>();
         while (startLocalDate.isBefore(endLocalDate)) {
             PresenceStaffingLevelDto staffingLevel = staffingLevelMap.get(startLocalDate);
+            if(isNull(staffingLevel)){
+                exceptionService.dataNotFoundException(STAFFINGLEVEL_NOT_FOUND,startLocalDate);
+            }
             List<StaffingLevelDetailsByTimeSlotDTO> staffingLevelDetailsByTimeSlotDTOS = new ArrayList<>();
             Integer detailLevelMinutes = staffingLevel.getStaffingLevelSetting().getDetailLevelMinutes();
             for (TimeSlotDTO timeSlot : timeSlots) {
@@ -834,7 +837,8 @@ public class StaffingLevelService {
 
         unityStaffingLevelRelatedDetails.setPlanningPeriodStartDate(planningPeriod.getStartDate());
         unityStaffingLevelRelatedDetails.setPlanningPeriodEndDate(planningPeriod.getEndDate());
-        unityStaffingLevelRelatedDetails.setWeekStartDate(startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
+        LocalDate weekStartDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        unityStaffingLevelRelatedDetails.setWeekStartDate(weekStartDate);
         unityStaffingLevelRelatedDetails.setWeekEndDate(startDate.plusWeeks(1).minusDays(1));
         unityStaffingLevelRelatedDetails.setStartDate(startDate);
         unityStaffingLevelRelatedDetails.setEndDate(startDate);
@@ -845,7 +849,7 @@ public class StaffingLevelService {
                 endDate = planningPeriod.getEndDate();
                 break;
             case WEEK:
-                startDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                startDate = weekStartDate;
                 endDate = startDate.plusWeeks(1);
                 break;
             default:

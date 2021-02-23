@@ -199,7 +199,6 @@ public class ShiftTemplateService{
                 if (CollectionUtils.isNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements())) {
                     shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().addAll(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
                 }
-                //shifts.addAll(shiftWithViolatedInfoDTO.getShifts());
             }
             shiftWithViolatedInfoDTOS.addAll(result);
         });

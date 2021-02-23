@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -13,7 +14,8 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ActivityConfigurationDTO {
+public class ActivityConfigurationDTO implements Serializable {
+    private static final long serialVersionUID = 1519971499326410869L;
     private BigInteger id;
     private Long unitId;
     private PresencePlannedTime presencePlannedTime;

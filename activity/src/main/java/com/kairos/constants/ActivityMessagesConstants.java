@@ -226,7 +226,7 @@ public class ActivityMessagesConstants {
     public static final String ACTIVITY_NOTELIGIBLE_FOR_ABSENCE = "activity.notEligible.for.absence";
     public static final String ACTIVITY_NOT_ELIGIBLE_DAYTYPE = "activity.not.eligible.dayType";
     public static final String DATE_OUT_OF_RANGE = "date.out.of.range";
-    public static final String STAFFINGLEVELTEMPLATE_NOT_FOUND = "staffingLevelTemplate.not.found";
+    public static final String STAFFINGLEVEL_NOT_FOUND = "staffingLevelTemplate.not.found";
 
 
     public static final String MESSAGE_EXCEPTION_SCHEDULER = "message.exception.scheduler";
