@@ -31,6 +31,8 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.wrapper.phase.PhaseActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -69,6 +71,7 @@ public class ActivityConfigurationService {
     @Inject private PhaseService phaseService;
     @Inject private PlannedTimeTypeService plannedTimeTypeService;
 
+    @CacheEvict(value = {"getPresenceActivityConfiguration","getAbsenceActivityConfiguration","getNonWorkingActivityConfiguration"},allEntries = true)
     public void createDefaultSettings(Long unitId, Long countryId, List<Phase> phases,List<Long> employmentTypeIds) {
         if(!activityConfigurationRepository.existsByUnitIdAndDeletedFalse(unitId)) {
             List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
@@ -89,6 +92,7 @@ public class ActivityConfigurationService {
         }
     }
 
+    @CacheEvict(value = {"getPresenceActivityConfiguration","getAbsenceActivityConfiguration","getNonWorkingActivityConfiguration"},allEntries = true)
     private void createDefaultPresentSettings(BigInteger phaseId, BigInteger applicablePlannedTimeId, List<ActivityConfiguration> activityConfigurations, Long referenceId,List<Long> employmentTypeIds,ConfLevel confLevel) {
         List<EmploymentWisePlannedTimeConfiguration> employmentWisePlannedTimeConfigurations = new ArrayList<>();
         employmentTypeIds.forEach(employmentTypeId -> employmentWisePlannedTimeConfigurations.add(new EmploymentWisePlannedTimeConfiguration(employmentTypeId,newArrayList(applicablePlannedTimeId))));
@@ -106,6 +110,7 @@ public class ActivityConfigurationService {
         activityConfigurations.add(ConfLevel.UNIT.equals(confLevel) ? new ActivityConfiguration(referenceId, nonWorkingPlannedTime) : new ActivityConfiguration(nonWorkingPlannedTime,referenceId));
     }
 
+    @CacheEvict(value = "getPresenceActivityConfiguration", key = "#unitId")
     public PresencePlannedTime updatePresenceActivityConfiguration(Long unitId, PresencePlannedTime presencePlannedTime) {
         ActivityConfiguration activityConfiguration = activityConfigurationRepository.findPresenceConfigurationByUnitIdAndPhaseId(unitId, presencePlannedTime.getPhaseId());
         if (!Optional.ofNullable(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
@@ -117,6 +122,11 @@ public class ActivityConfigurationService {
         return presencePlannedTime;
     }
 
+    @CacheEvict(value = "getAbsenceActivityConfiguration", key = "#unitId")
+    public AbsencePlannedTime updateAbsenceActivityConfiguration(Long unitId, BigInteger activityConfigurationId, AbsencePlannedTime absencePlannedTime) {
+        return updateAbsenceActivityConfiguration(activityConfigurationId,absencePlannedTime);
+    }
+
     public AbsencePlannedTime updateAbsenceActivityConfiguration(BigInteger activityConfigurationId, AbsencePlannedTime absencePlannedTime) {
         ActivityConfiguration activityConfiguration = activityConfigurationRepository.findById(activityConfigurationId).orElseThrow(()->new DataNotFoundByIdException(convertMessage(ERROR_ABSENCEACTIVITYCONFIGURATION_NOTFOUND)));
         if (Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
@@ -126,9 +136,9 @@ public class ActivityConfigurationService {
         activityConfiguration.getAbsencePlannedTime().setPlannedTimeIds(absencePlannedTime.getPlannedTimeIds());
         activityConfigurationRepository.save(activityConfiguration);
         return absencePlannedTime;
-
     }
 
+    @CacheEvict(value = {"getPresenceActivityConfiguration","getAbsenceActivityConfiguration","getNonWorkingActivityConfiguration"},allEntries = true)
     public BigInteger createAbsenceExceptionActivityConfiguration(Long unitOrCountryId, AbsencePlannedTime absencePlannedTime, boolean forCountry) {
         if (!Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
             exceptionService.dataNotFoundByIdException(ERROR_TIMETYPE_UNSELECTED);
@@ -139,19 +149,21 @@ public class ActivityConfigurationService {
         return activityConfiguration.getId();
     }
 
+    @Cacheable(value = "getAbsenceActivityConfiguration", key = "#unitId", cacheManager = "cacheManager")
     public List<ActivityConfigurationDTO> getAbsenceActivityConfiguration(Long unitId) {
         List<ActivityConfigurationDTO> activityConfigurationDTOS = activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
         Map<BigInteger,Integer> phaseMap = phaseService.getPhasesByUnit(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v.getSequence()));
         List<ActivityConfigurationDTO> modifiableList = new ArrayList<>(activityConfigurationDTOS);
-        modifiableList.sort((a1, a2) -> Integer.compare(phaseMap.get(a1.getAbsencePlannedTime().getPhaseId()), phaseMap.get(a2.getAbsencePlannedTime().getPhaseId())));
+        modifiableList.sort(Comparator.comparingInt(a -> phaseMap.get(a.getAbsencePlannedTime().getPhaseId())));
         return modifiableList;
     }
 
+    @Cacheable(value = "getPresenceActivityConfiguration", key = "#unitId", cacheManager = "cacheManager")
     public List<ActivityConfigurationDTO> getPresenceActivityConfiguration(Long unitId) {
         List<ActivityConfigurationDTO> activityConfigurationDTOS = activityConfigurationRepository.findPresenceConfigurationByUnitId(unitId);
         Map<BigInteger,Integer> phaseMap = phaseService.getPhasesByUnit(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v.getSequence()));
         List<ActivityConfigurationDTO> modifiableList = new ArrayList<>(activityConfigurationDTOS);
-        modifiableList.sort((a1, a2) -> Integer.compare(phaseMap.get(a1.getPresencePlannedTime().getPhaseId()), phaseMap.get(a2.getPresencePlannedTime().getPhaseId())));
+        modifiableList.sort(Comparator.comparingInt(a -> phaseMap.get(a.getPresencePlannedTime().getPhaseId())));
         return modifiableList;
     }
 
@@ -377,6 +389,7 @@ public class ActivityConfigurationService {
         return activityConfiguration.getId();
     }
 
+
     public NonWorkingPlannedTime updateNonWorkingActivityConfiguration(BigInteger activityConfigurationId, NonWorkingPlannedTime nonWorkingPlannedTime) {
         Optional<ActivityConfiguration> activityConfiguration = activityConfigurationRepository.findById(activityConfigurationId);
         if (!Optional.of(activityConfiguration).isPresent()) {
@@ -391,11 +404,17 @@ public class ActivityConfigurationService {
         return nonWorkingPlannedTime;
     }
 
+    @CacheEvict(value = "getNonWorkingActivityConfiguration",key = "#unitId")
+    public NonWorkingPlannedTime updateNonWorkingActivityConfiguration(Long unitId,BigInteger activityConfigurationId, NonWorkingPlannedTime nonWorkingPlannedTime) {
+        return updateNonWorkingActivityConfiguration(activityConfigurationId,nonWorkingPlannedTime);
+    }
+
+    @Cacheable(value = "getNonWorkingActivityConfiguration", key = "#unitId", cacheManager = "cacheManager")
     public List<ActivityConfigurationDTO> getNonWorkingActivityConfiguration(Long unitId) {
         List<ActivityConfigurationDTO> activityConfigurationDTOS = activityConfigurationRepository.findNonWorkingConfigurationByUnitId(unitId);
         Map<BigInteger,Integer> phaseMap = phaseService.getPhasesByUnit(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v.getSequence()));
         List<ActivityConfigurationDTO> modifiableList = new ArrayList<>(activityConfigurationDTOS);
-        modifiableList.sort((a1, a2) -> Integer.compare(phaseMap.get(a1.getNonWorkingPlannedTime().getPhaseId()), phaseMap.get(a2.getNonWorkingPlannedTime().getPhaseId())));
+        modifiableList.sort(Comparator.comparingInt(a -> phaseMap.get(a.getNonWorkingPlannedTime().getPhaseId())));
         return modifiableList;
     }
 

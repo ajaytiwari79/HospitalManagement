@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Document
 @Getter
 @Setter
-public class ActivityPriority extends MongoBaseEntity implements Serializable {
+public class ActivityPriority extends MongoBaseEntity {
 
     private static final long serialVersionUID = 2006631334246625719L;
     private Long countryId;

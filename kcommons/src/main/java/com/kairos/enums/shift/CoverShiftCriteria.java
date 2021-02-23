@@ -1,6 +1,8 @@
 package com.kairos.enums.shift;
 
-public enum CoverShiftCriteria {
+import java.io.Serializable;
+
+public enum CoverShiftCriteria implements Serializable {
     STAFF_WITH_FREE_DAYS,
     STAFF_WITH_MAX_PENDING_INVITATIONS,
     STAFF_WITH_PERSONAL_CALENDAR,

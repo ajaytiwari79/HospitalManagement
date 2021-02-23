@@ -5,13 +5,15 @@ import com.kairos.enums.shift.GeneralCoverShiftCriteria;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Map;
 import java.util.Set;
 
 @Getter
 @Setter
-public class CoverShiftSettingDTO {
+public class CoverShiftSettingDTO implements Serializable {
+    private static final long serialVersionUID = -7528282585274834199L;
     private BigInteger id;
     private Long unitId;
     private Long countryId;

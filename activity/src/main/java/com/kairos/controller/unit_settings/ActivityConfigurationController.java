@@ -37,7 +37,7 @@ public class ActivityConfigurationController {
     @PutMapping(value = UNIT_ACTIVITY_CONFIGURATION+"/absence/{activityConfigurationId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateAbsenceActivityConfiguration(@PathVariable Long unitId, @PathVariable BigInteger activityConfigurationId, @RequestBody @Valid AbsencePlannedTime absencePlannedTime) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfiguration(activityConfigurationId, absencePlannedTime));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfiguration(unitId,activityConfigurationId, absencePlannedTime));
     }
 
 
@@ -141,7 +141,7 @@ public class ActivityConfigurationController {
     @PutMapping(value = UNIT_ACTIVITY_CONFIGURATION+"/non_working/{activityConfigurationId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateNonWorkingActivityConfiguration(@PathVariable Long unitId, @PathVariable BigInteger activityConfigurationId, @RequestBody @Valid NonWorkingPlannedTime nonWorkingPlannedTime) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateNonWorkingActivityConfiguration(activityConfigurationId, nonWorkingPlannedTime));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateNonWorkingActivityConfiguration(unitId,activityConfigurationId, nonWorkingPlannedTime));
     }
 
     @ApiOperation("Get non working Activity Configuration")
