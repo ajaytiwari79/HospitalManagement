@@ -17,6 +17,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 public class CoverShiftSetting extends MongoBaseEntity {
+    private static final long serialVersionUID = 5203658405987724913L;
     private Long unitId;
     private Long countryId;
     private Set<Long> employmentTypeIds;

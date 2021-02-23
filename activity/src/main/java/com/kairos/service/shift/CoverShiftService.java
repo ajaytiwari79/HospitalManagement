@@ -23,6 +23,8 @@ import com.kairos.service.phase.PhaseService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -55,14 +57,16 @@ public class CoverShiftService {
     @Inject private CoverShiftSettingMongoRepository coverShiftSettingMongoRepository;
     @Inject private ExceptionService exceptionService;
 
-    public CoverShiftSettingDTO createCoverShiftSettingByUnit(CoverShiftSettingDTO coverShiftSettingDTO) {
+    @CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
+    public CoverShiftSettingDTO createCoverShiftSettingByUnit(Long unitId,CoverShiftSettingDTO coverShiftSettingDTO) {
         CoverShiftSetting coverShiftSetting = ObjectMapperUtils.copyPropertiesByMapper(coverShiftSettingDTO, CoverShiftSetting.class);
         coverShiftSettingMongoRepository.save(coverShiftSetting);
         coverShiftSettingDTO.setId(coverShiftSetting.getId());
         return coverShiftSettingDTO;
     }
 
-    public CoverShiftSettingDTO updateCoverShiftSettingByUnit(CoverShiftSettingDTO coverShiftSettingDTO) {
+    @CacheEvict(value = "getCoverShiftSettingByUnit", key = "#unitId")
+    public CoverShiftSettingDTO updateCoverShiftSettingByUnit(Long unitId,CoverShiftSettingDTO coverShiftSettingDTO) {
         CoverShiftSetting coverShiftSetting = coverShiftSettingMongoRepository.findOne(coverShiftSettingDTO.getId());
         if(isNull(coverShiftSetting)){
             exceptionService.dataNotFoundByIdException("Cover Shift Setting Not Found");
@@ -72,20 +76,14 @@ public class CoverShiftService {
         return coverShiftSettingDTO;
     }
 
-    public CoverShiftSettingDTO getCoverShiftSettingByUnit(Long unitId) {
-        CoverShiftSetting coverShiftSetting = coverShiftSettingMongoRepository.getCoverShiftSettingByUnitId(unitId);
-        return ObjectMapperUtils.copyPropertiesByMapper(coverShiftSetting, CoverShiftSettingDTO.class);
-    }
-
-    public CoverShiftSetting getCoverShiftSettingsForUnit(Long unitId,CoverShiftSetting coverShiftSetting){
-        coverShiftSetting.setUnitId(unitId);
-        //coverShiftSetting.setCoverShiftCriteria(coverShiftCriteria);
-        return coverShiftSetting;
+    @Cacheable(value = "getCoverShiftSettingByUnit", key = "#unitId", cacheManager = "cacheManager")
+    public CoverShiftSetting getCoverShiftSettingByUnit(Long unitId) {
+        return coverShiftSettingMongoRepository.getCoverShiftSettingByUnitId(unitId);
     }
 
     public List<Staff> getEligibleStaffs(BigInteger shiftId,CoverShiftSetting coverShiftSetting){
         Shift shift = shiftService.findOneByShiftId(shiftId);
-        coverShiftSetting = getCoverShiftSettingsForUnit(shift.getUnitId(),coverShiftSetting);
+        coverShiftSetting = getCoverShiftSettingByUnit(shift.getUnitId());
         Set<BigInteger> activityIds = getActivityIdsByShift(shift);
         List[] nonProductiveTypeActivityIdsAndAssignedStaffIds = activityService.findAllNonProductiveTypeActivityIdsAndAssignedStaffIds(activityIds);
         List<BigInteger> nonProductiveTypeActivityIds = nonProductiveTypeActivityIdsAndAssignedStaffIds[0];
