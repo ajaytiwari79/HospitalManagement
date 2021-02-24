@@ -83,7 +83,7 @@ public class StaffingLevelValidatorService {
             }
         } else {
             if (totalUnderStaffingCreated > totalUnderStaffingResolved || (allowedMaxOverStaffing != null && allowedMaxOverStaffing < totalOverStaffingCreated)) {
-                suggestError(totalUnderStaffingCreated, totalUnderStaffingResolved, replacedActivity == null ?MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITHOUT_ACTIVITY  : gapFilling ? MESSAGE_SHIFT_OVERSTAFFING_GAP :MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITH_ACTIVITY);
+                suggestError(totalUnderStaffingCreated, totalUnderStaffingResolved, replacedActivity == null ?MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITH_ACTIVITY   : gapFilling ? MESSAGE_SHIFT_OVERSTAFFING_GAP :MESSAGE_SHIFT_STAFFING_LEVEL_REPLACE_WITHOUT_ACTIVITY);
             } else if (totalUnderStaffingCreated == totalUnderStaffingResolved) {
                 isHigherActivity(oldShift, activityWrapperMap, replacedActivity);
             }
