@@ -392,7 +392,7 @@ public class ShiftValidatorService {
         shiftWithViolatedInfo.getViolatedRules().getWorkTimeAgreements().forEach(workTimeAgreementRuleViolation -> {
             if (isNotNull(workTimeAgreementRuleViolation.getCounter())) {
                 int count = workTimeAgreementRuleViolation.getCounter() - 1;
-                if (count < MINIMUM_WTA_RULE_TEMPLATE_COUNTER) {
+                if (count < MINIMUM_WTA_RULE_TEMPLATE_COUNTER || count >= workTimeAgreementRuleViolation.getTotalCounter()) {
                     exceptionService.actionNotPermittedException("message.ruleTemplate.counter.exhausted");
                 }
                 StaffWTACounter staffWTACounter = staffWTACounterMap.getOrDefault(workTimeAgreementRuleViolation.getRuleTemplateId(), new StaffWTACounter(planningPeriod.getStartDate(), planningPeriod.getEndDate(), workTimeAgreementRuleViolation.getRuleTemplateId(), wtaBaseRuleTemplateMap.get(workTimeAgreementRuleViolation.getRuleTemplateId()).getName(), staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO.getUnitId(), UserContext.getUserDetails().isStaff()));
