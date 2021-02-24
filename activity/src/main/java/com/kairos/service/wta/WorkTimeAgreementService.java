@@ -456,7 +456,7 @@ public class WorkTimeAgreementService{
                 activity.setName("XXXXX");
             }
         });
-        List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, wtaDefaultDataInfoDTO.getCountryID());
+        List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, UserContext.getUserDetails().getCountryId());
         List<TimeSlotDTO> timeSlotDTOS=timeSlotSetService.getShiftPlanningTimeSlotByUnit(unitId);
         wtaDefaultDataInfoDTO.setDayTypes(dayTypeService.getDayTypeWithCountryHolidayCalender(UserContext.getUserDetails().getCountryId()));
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);
