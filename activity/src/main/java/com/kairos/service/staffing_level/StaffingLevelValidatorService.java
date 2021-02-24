@@ -126,7 +126,7 @@ public class StaffingLevelValidatorService {
             int rankOfOld = activityWrapperMap.get(shiftActivities[0].getActivityId()).getActivityPriority().getSequence();
             int rankOfNew = activityWrapperMap.get(shiftActivities[1].getActivityId()).getActivityPriority().getSequence();
             if (rankOfNew > rankOfOld) {
-                exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, LOW_ACTIVITY_RANK);
+                exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE);
             }
         }
     }
